@@ -3378,10 +3378,10 @@ abstract class Mapper implements IMapper
         $this_table   = $this->getTable();
         $other_mapper = $this->getJoinMapper($name);
         $other_table  = $other_mapper->getTable();
-        if (strlen($this_alias) === 0) {
+        if (strlen($this_alias ?? '') === 0) {
             $this_alias = $this_table;
         }
-        if (strlen($other_alias) === 0) {
+        if (strlen($other_alias ?? '') === 0) {
             $other_alias = $other_table;
         }
         $params = array(

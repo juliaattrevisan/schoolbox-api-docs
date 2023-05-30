@@ -58,7 +58,7 @@ class Scrub
      * Cleans plain text of all nasty stuff
      * Can be used on input to database or output
      *
-     * @param string $text
+     * @param string|null $text
      * @return string
      */
     public static function text($text)
@@ -67,14 +67,14 @@ class Scrub
         // Don't think ENT_IGNORE is a problem here.
         // This is used to escape output as text or as an attribute - HTML tags
         // are escaped regardless.
-        return htmlentities($text, ENT_IGNORE | ENT_QUOTES, 'UTF-8');
+        return htmlentities($text ?? '', ENT_IGNORE | ENT_QUOTES, 'UTF-8');
     }
 
 
     /**
      * Scrubs text for XML output.
      *
-     * @param string $text
+     * @param string|null $text
      * @return string
      */
     public static function xml($text)
@@ -83,7 +83,7 @@ class Scrub
         // Don't think ENT_IGNORE is a problem here.
         // This is used to escape output as text or as an attribute - HTML tags
         // are escaped regardless.
-        return htmlspecialchars($text, ENT_QUOTES);
+        return htmlspecialchars($text ?? '', ENT_QUOTES);
     }
 
 
@@ -91,13 +91,13 @@ class Scrub
      * Turns html into plaintext.
      * Note: output will be quite unpredictable if used on input that contains tables or copious formatting.
      * @static
-     * @param string $html
+     * @param string|null $html
      * @return string
      */
     public static function html2text($html)
     {
         // 0: replace all text-style block-level elements with newlines
-        $text = preg_replace('#</(p|h[1-5]|br)>#i', "\n", $html);
+        $text = preg_replace('#</(p|h[1-5]|br)>#i', "\n", $html ?? '');
         // 1: remove all remaining tags from input
         $text = strip_tags($text);
         // 2: all recurring whitespaces (including &nbsp;) to be trimmed
