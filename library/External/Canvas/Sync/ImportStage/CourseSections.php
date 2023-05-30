@@ -252,7 +252,11 @@ class CourseSections
                             $this->log->warning("Unable to find folder for section.sis_source_id '$sectionSisSourceId' (canvas_id: $sectionCanvasId)");
                             continue;
                         }
-                        $courseImpl               = $this->syncCourseSectionToCourseImpl($courseSpecFolder->getCourseSpecification(), $classFolder);
+                        $courseImpl = $this->syncCourseSectionToCourseImpl($courseSpecFolder->getCourseSpecification(), $classFolder);
+                        if ($courseImpl === null) {
+                            $this->log->warning("Unable to find course spec folder for section.sis_source_id '$sectionSisSourceId' (canvas_id: $sectionCanvasId)");
+                            continue;
+                        }
                         $courseImplSynchronised[] = $courseImpl->getId();
                         $unitImpl                 = $this->syncCourseSectionWithUnitImpl(
                             $courseImpl,
@@ -285,7 +289,7 @@ class CourseSections
      *
      * @param CourseSpec\Model $courseSpec
      * @param Folder\Model     $classFolder
-     * @return CourseImpl\Model
+     * @return CourseImpl\Model|null
      * @throws Database\Exception
      * @throws InvalidColumnException
      * @throws Mapper\Exception
@@ -293,7 +297,7 @@ class CourseSections
      * @throws UnexpectedValueException
      * @throws DomainException
      */
-    private function syncCourseSectionToCourseImpl(CourseSpec\Model $courseSpec, Folder\Model $classFolder): CourseImpl\Model
+    private function syncCourseSectionToCourseImpl(CourseSpec\Model $courseSpec, Folder\Model $classFolder): ?CourseImpl\Model
     {
         $courseImpl = $this->findCourseImpl($classFolder);
 
@@ -306,6 +310,10 @@ class CourseSections
 
         $currentCourseSpec = $courseImpl->getSpecification();
         if ($currentCourseSpec->getId() !== $courseSpec->getId()) {
+            if (!$currentCourseSpec->getFolder()->getParent()) {
+                $this->log->debug("Could not find folder for course spec folder: ({$currentCourseSpec->getFolder()->getId()}");
+                return null;
+            }
             $currentAccountId  = $this->courseGroupBridge->getAccountCanvasIdFromCourseSpecFolder($currentCourseSpec->getFolder());
             $currentCourseCode = $this->courseGroupBridge->getCourseCodeFromCourseSpecFolder($currentCourseSpec->getFolder());
             $newAccountId      = $this->courseGroupBridge->getAccountCanvasIdFromCourseSpecFolder($courseSpec->getFolder());

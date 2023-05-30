@@ -1616,11 +1616,6 @@ parameters:
 			path: library/External/Canvas/Sync/CliDatabaseCreator.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/CliImporter.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/CliImporter.php

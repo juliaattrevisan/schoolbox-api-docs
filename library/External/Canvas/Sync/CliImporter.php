@@ -282,29 +282,35 @@ class CliImporter extends CliTool\App
         // Store downloaded data to tables in the staging database
         $this->getLogger()->notice('Restoring data to tables.');
         $tableGzFiles = scandir($tempDir);
-        if (!$tableGzFiles || !count($tableGzFiles)) {
+        if ($tableGzFiles === false || !count($tableGzFiles)) {
             $this->getLogger()->warning("Failed to open directory $tempDir.");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
+
+        // Which table are already seen (i.e. truncated)
+        $truncatedTables = [];
         foreach ($tableGzFiles as $tableGzFile) {
             if ($tableGzFile === '..' || $tableGzFile === '.') {
                 continue;
             }
             // Table file name format should be <table name>.<index>.gz
             $tableFileParts = explode('.', $tableGzFile);
-            if (count($tableFileParts) !== 3) {
+            if (count($tableFileParts) === 3) {
+                // <table name>.<index>.gz
+                $tableName = $tableFileParts[0];
+                $index     = (int)$tableFileParts[1];
+                if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
+                    continue;
+                }
+                $tableFile = "$tempDir/$tableName.$index";
+            } else {
                 continue;
             }
-            $tableName = $tableFileParts[0];
-            $index = (int)$tableFileParts[1];
-            if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
-                continue;
-            }
-            $tableFile = "$tempDir/$tableName.$index";
             $this->getLogger()->debug("Loading $tableFile.");
 
             exec("gunzip -f -k " . escapeshellarg("$tempDir/$tableGzFile")); // force overwrite of existing files, keep original
-            $dataRestorer->restoreTableData($tableName, $tableFile, $index);
+            $dataRestorer->restoreTableData($tableName, $tableFile, !in_array($tableName, $truncatedTables));
+            $truncatedTables[] = $tableName;
             if (file_exists($tableFile)) {
                 unlink($tableFile);
             } else {

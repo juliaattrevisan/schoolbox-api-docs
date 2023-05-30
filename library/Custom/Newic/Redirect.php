@@ -8,9 +8,13 @@
 
 namespace Custom\Newic;
 
-use Alaress\IDatabase;
-use External\Canvas\Importer\CanvasDb;
+use Alaress\Database\Exception;
+use External\Canvas\Redirect\AbstractRedirect;
+use PDOException;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\User;
 
 /**
  * Redirect from schoolbox homepage to canvas somewhere
@@ -19,9 +23,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
  * If there's a matching course, manufacture a url to that place in
  * canvas instance; otherwise return null
  */
-class Redirect
+class Redirect extends AbstractRedirect
 {
-
     /**
      * Newington identifier
      */
@@ -33,7 +36,7 @@ class Redirect
      * Note that Due Works and Quizzes each have their own url
      */
     private const DUE_WORK_URL = '%s/assignments/%s';
-    private const QUIZ_URL = '%s/quizzes/%s';
+    private const QUIZ_URL     = '%s/quizzes/%s';
 
 
     /**
@@ -43,69 +46,21 @@ class Redirect
 
 
     /**
-     * The host url for canvas instance at this school
-     * Typically found in config.canvas_url
-     *
-     * @var string
-     */
-    private string $canvasUrl;
-
-
-    /**
-     * A direct connection to our local canvas db cache
-     *
-     * @var CanvasDb
-     */
-    private CanvasDb $canvasDb;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
-     * A direct connection to our local schoolbox db
-     *
-     * @var IDatabase
-     */
-    private IDatabase $db;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string                            $canvasUrl
-     * @param CanvasDb                          $canvasDb
-     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
-     */
-    public function __construct(string $canvasUrl, CanvasDb $canvasDb, \Schoolbox\Resource\Folder\Mapper $folderMapper)
-    {
-        $this->canvasUrl = trim($canvasUrl);
-        $this->canvasDb = $canvasDb;
-        $this->folderMapper = $folderMapper;
-        $this->db = $folderMapper->getDatabase();
-    }
-
-
-    /**
-     * For the given user, folder, assessument,
+     * For the given user, folder, assessment,
      * Find a corresponding url in canvas.
      *
      * If the user isn't allowed to go to canvas, immediately return null
      *
-     * @param \Schoolbox\User $user
-     * @param IAssessable     $assessment
+     * @param User        $user
+     * @param IAssessable $assessment
      * @return array|null
-     * @throws \Alaress\Database\Exception
-     * @throws \PDOException
+     * @throws Exception
+     * @throws PDOException
      */
     public function generateAssessmentRedirect(
-        \Schoolbox\User $user,
+        User $user,
         IAssessable $assessment
     ): ?array {
-
         /* If the currently logged in user is staff or students,
          * They can visit a link to canvas
          * Parents can't
@@ -124,13 +79,13 @@ class Redirect
 
         /* Due work
          */
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
+        if ($assessment instanceof DueWork) {
             /* Find out if external_id exists in canvas as an assignment identifier
              */
             $query = "
                 SELECT *
                 FROM assignment_dim
-                WHERE canvas_id = :assessmentCanvasId  
+                WHERE canvas_id = :assessmentCanvasId
             ";
 
             return $this->buildAssessmentUrl(
@@ -143,13 +98,13 @@ class Redirect
 
         /* Quiz
          */
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+        if ($assessment instanceof Quiz) {
             /* Find out if external_id exists in canvas as a quiz identifier
              */
             $query = "
                 SELECT *
                 FROM quiz_dim
-                WHERE canvas_id = :assessmentCanvasId  
+                WHERE canvas_id = :assessmentCanvasId
             ";
 
             return $this->buildAssessmentUrl(
@@ -174,7 +129,7 @@ class Redirect
      *
      * @param IAssessable $assessment
      * @return string|null
-     * @throws \PDOException
+     * @throws PDOException
      */
     private function findDueWorkExternalId(IAssessable $assessment): ?string
     {
@@ -188,8 +143,8 @@ class Redirect
 
         $statement = $this->db->prepare($query);
         $statement->execute([
-            'assessmentId' => $assessment->getId()
-        ]);
+                                'assessmentId' => $assessment->getId(),
+                            ]);
 
         $row = $statement->fetch();
 
@@ -213,7 +168,7 @@ class Redirect
      *
      * @param IAssessable $assessment
      * @return string|null
-     * @throws \PDOException
+     * @throws PDOException
      */
     private function findQuizExternalId(IAssessable $assessment): ?string
     {
@@ -227,8 +182,8 @@ class Redirect
 
         $statement = $this->db->prepare($query);
         $statement->execute([
-            'assessmentId' => $assessment->getId()
-        ]);
+                                'assessmentId' => $assessment->getId(),
+                            ]);
 
         $row = $statement->fetch();
 
@@ -253,8 +208,8 @@ class Redirect
      * @param string|null $canvasId
      * @param string      $canvasUrl
      * @return array|null
-     * @throws \Alaress\Database\Exception
-     * @throws \PDOException
+     * @throws Exception
+     * @throws PDOException
      */
     private function buildAssessmentUrl(IAssessable $assessment, string $query, ?string $canvasId, string $canvasUrl): ?array
     {
@@ -289,8 +244,8 @@ class Redirect
         $statement = $this->canvasDb->build()->prepareQuery($query);
 
         $statement->execute([
-            'assessmentCanvasId' => $canvasId
-        ]);
+                                'assessmentCanvasId' => $canvasId,
+                            ]);
 
         $row = $statement->fetch();
 
@@ -304,91 +259,12 @@ class Redirect
          * assessment, since external_id is system agnostic - not everyone uses Canvas
          */
         return [
-            'url' => sprintf(
+            'url'  => sprintf(
                 $canvasUrl,
                 rtrim($prefix, '/'),
                 $row['canvas_id']
             ),
-            'name' => self::NAME
+            'name' => self::NAME,
         ];
-    }
-
-
-    /**
-     * Redirect from schoolbox homepage to canvas somewhere
-     *
-     * Try to redirect to canvas - assume the parent folder contains the Year as its folder code
-     *
-     * @param \Schoolbox\Resource\Folder\Model $folder
-     * @return string|null
-     * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     */
-    public function generateRedirect(\Schoolbox\Resource\Folder\Model $folder): ?string
-    {
-
-        /* I suppose you don't generate links to canvas if you didn't specify the url
-         */
-        if ('' === $this->canvasUrl) {
-            return null;
-        }
-
-        /* Assume the parent of $folder is the year node
-         * e.g. "2022 (2022)"
-         * And get the Course Code using that folder's folder code
-         *
-         * If you don't have a parent folder, just return null
-         * That isn't supposed to happen
-         */
-        if (null === $folder->getParent()) {
-            return null;
-        }
-
-        /* There are some big assumptions about this folder tree, but I can't really
-         * move the pieces around in andy's importer without incurring a penalty
-         *
-         * Just blindly assume the parent a) exists b) works c) has a course code
-         */
-        $parentFolder = $this->folderMapper->findById($folder->getParent()->getId());
-
-        $courseCode = sprintf(
-            '%s%s',
-            $folder->getCodeString(),
-            $parentFolder->getCodeString()
-        );
-
-        /* Find out if $folderCode exists in canvas as a course identifier
-         * Only care about the states "claimed" and "available", according to the cox
-         */
-        $query = "
-            SELECT *
-            FROM course_dim
-            WHERE code = :courseCode
-            AND workflow_state IN ('claimed', 'available')
-        ";
-
-        $statement = $this->canvasDb->build()->prepareQuery($query);
-
-        $statement->execute([
-            'courseCode' => $courseCode
-        ]);
-
-        $row = $statement->fetch();
-
-        /* If $row is null, it didn't exist in canvas
-         */
-        if (!$row) {
-            return null;
-        }
-
-        /* Extract the course_dim.id value and go to that place
-         */
-        return sprintf(
-            '%s/courses/%s',
-            rtrim($this->canvasUrl, '/'),
-            $row['canvas_id']
-        );
     }
 }

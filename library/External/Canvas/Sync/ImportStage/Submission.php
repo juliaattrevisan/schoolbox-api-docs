@@ -226,13 +226,15 @@ class Submission extends SubmissionAbstract
 
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
-            // check whether the rest are the same
+            // Check whether the rest are the same
+            // Floating point precision in Schoolbox's getMark() is less than in canvas, so an exact match won't always work.
+            // We have to test equality somewhat approximately, but with reasonable certainty.
             if (
                 $existingFeedback->getOwner()->getId() === $reviewee->getId()
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
                 && (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
                 && (string)$existingFeedback->getHumanReadableMark() === (string)$readableMark
-                && (float)$existingFeedback->getNormalizedMark() === (float)$normMark
+                && (abs((float)$existingFeedback->getNormalizedMark() - (float)$normMark) < 0.0001)
             ) {
                 $this->log->debug(sprintf('Feedback already exists : submission_return_id:%s', $existingFeedback->getId()));
                 return $existingFeedback;
@@ -253,6 +255,7 @@ class Submission extends SubmissionAbstract
                  ->setNormalizedMark($normMark)
                  ->setCreatedAt($feedbackTime)
                  ->setPublishedAt($feedbackTime)
+                 ->setPublishedBy($reviewer->getId())
                  ->setUpdatedAt($feedbackTime);
 
         /* Cannot use mappers here to save because:

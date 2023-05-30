@@ -288,10 +288,24 @@ abstract class SectionAssessmentAbstract
                         throw new UnexpectedValueException("Unable to find folder for section.sis_source_id '$sectionSisSourceId'");
                     }
                     if (!array_key_exists($sectionSisSourceId, $unitImplCache)) {
-                        $unitImplCache[$sectionSisSourceId] = $this->unitImplMapper->findOneByColumnList([
-                            'cf.id' => $classFolder->getId(),
-                            's.id'  => $unitSpec->getId(),
-                        ]);
+                        try {
+                            $unitImplCache[$sectionSisSourceId] = $this->unitImplMapper->findOneByColumnList(
+                                [
+                                    'cf.id' => $classFolder->getId(),
+                                    's.id'  => $unitSpec->getId(),
+                                ]
+                            );
+                        } catch (Mapper\Exception $e) {
+                            $this->log->warning(
+                                sprintf(
+                                    'Unable to find unit impl for section.sis_source_id %s (class %s and unit %s)',
+                                    $sectionSisSourceId,
+                                    $classFolder->getId(),
+                                    $unitSpec->getId()
+                                )
+                            );
+                            continue;
+                        }
                     }
                     $unitImpl = $unitImplCache[$sectionSisSourceId];
 
