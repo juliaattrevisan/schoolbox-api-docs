@@ -14,7 +14,6 @@ use JsonSerializable;
 
 class Model implements JsonSerializable
 {
-
     /**
      * Pending booking
      */

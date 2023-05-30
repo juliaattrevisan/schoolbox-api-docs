@@ -21,7 +21,6 @@ use JsonSerializable;
  */
 class SegmentSelectizeOption implements JsonSerializable
 {
-
     /**
      * The encoded value that represents a segment. eg 'folder:2:x:self'
      * @var string

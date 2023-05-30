@@ -14,7 +14,6 @@ use JsonSerializable;
 
 class Model implements JsonSerializable
 {
-
     /**
      * Open resources may be booked by anyone, and are automatically confirmed.
      */

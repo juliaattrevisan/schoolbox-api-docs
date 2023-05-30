@@ -17,7 +17,6 @@ use Serializable;
 
 abstract class WorkNotifier
 {
-
     /** @var IConfigLoader */
     protected $conf;
 

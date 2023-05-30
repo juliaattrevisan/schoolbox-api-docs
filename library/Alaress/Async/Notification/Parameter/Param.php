@@ -20,7 +20,6 @@ namespace Alaress\Async\Notification\Parameter;
  */
 class Param implements ParameterInterface
 {
-
     /** @var string */
     protected $text;
 

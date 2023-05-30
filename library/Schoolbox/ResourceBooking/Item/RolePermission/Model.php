@@ -16,7 +16,6 @@ use JsonSerializable;
 
 class Model implements JsonSerializable
 {
-
     /**
      * @var int
      */

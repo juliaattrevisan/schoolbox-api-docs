@@ -31,7 +31,6 @@ use TextFormatter;
  */
 class Instance implements JsonSerializable
 {
-
     const MAX_FIELD_SIZE = 512;
 
     /**
