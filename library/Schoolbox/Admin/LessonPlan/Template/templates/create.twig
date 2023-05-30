@@ -9,131 +9,23 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="admin-container row">
-
-    {# Shared navigation menu #}
-    {{ renderAdminNavigation(pageCurrent) }}
-
-    {% if lessonPlanTemplate and lessonPlanTemplate.id %}
-        {% set formAction = routeLookupIfAuthorized('adminLessonPlanTemplate.postUpdate', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
-    {% else %}
-        {% set formAction = routeLookupIfAuthorized('adminLessonPlanTemplate.postCreate') %}
-    {% endif %}
-
-    <div class="admin-content">
-        <form id="lesson-plan-template-form" class="lesson-plan-template-form" action="{{ formAction }}" method="post">
-            <div class="small-12 island">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label for="lesson-plan-template-title" class="required">Title</label>
-                            {# This maxlength corresponds to the schema field length #}
-                            <input type="text" id="lesson-plan-template-title" name="title" maxlength="255" value="{{ lessonPlanTemplate.title ?? ''}}" />
-                        </div>
-                    </fieldset>
-                    <fieldset class="content">
-                        <legend>Fields</legend>
-
-                        <ul id="fields" class="information-list sortable ui-sortable lpt-fields" data-sortable data-list>
-                            {% if lessonPlanTemplate is not null %}
-                                {% for field in lessonPlanTemplate.fields %}
-                                    {% if not field.isDeleted %}
-                                        <li>
-                                            <!-- See further down the file for why we use section here -->
-                                            <section data-template-section>
-                                                <div class="s-topbar" data-topbar>
-                                                    <div class="grip ui-sortable-handle">
-                                                    </div>
-                                                    <div class="s-name-display" data-name-display>{{ field.title }}</div>
-                                                    <nav>
-                                                        <a class="button icon-delete" data-delete></a>
-                                                    </nav>
-                                                </div>
-                                                <div class="s-field-contents">
-                                                    <div>
-                                                        <div class="s-title-row">
-                                                            <div class="s-field-title">
-                                                                <label for="field-title-{{ field.id }}" class="required">Field Title</label>
-                                                                <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" data-field-title maxlength="255" value="{{ field.title }}" />
-                                                            </div>
-                                                            <div class="s-field-visibility">
-                                                                <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
-                                                                <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
-                                                                <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Field visible to students</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label for="field-body-{{ field.id }}">Body</label>
-                                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
-                                                    </div>
-                                                </div>
-                                            </section>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-
-                        <div class="small-12 columns">
-                            <a class='icon-add button full-width' id="add-field">Add a new field</a>
-                        </div>
-                    </fieldset>
-                </section>
-            </div>
-            <div class="small-12 columns">
-                <section>
-                    <input id="save-button" type="submit" value="Save" />
-                </section>
-            </div>
-        </form>
-    </div>
-
-</div>
-
-<!--
-    We use a section below avoid some weird inheritance rules cascading
-    on div elements (coming from .information-list - we shouldn't be using
-    inheritance selectors if a parent class isn't explicitly encapsulating
-    the scope to the component we want it to appear in. Otherwise you get
-    stuff leaking out when it ought to stay put instead.)
--->
-<div id="field-blueprint" style="display:none">
-    <section class="field-content" data-template-section>
-        <div class="s-topbar" data-topbar>
-            <div class="grip ui-sortable-handle"></div>
-            <div class="s-name-display" data-name-display></div>
-            <nav>
-                <a class="button icon-delete" data-delete></a>
-            </nav>
-        </div>
-        <div class="s-field-contents">
-            <div>
-                <div class="s-title-row">
-                    <div class="s-field-title">
-                        <label for="field-title" class="required">Field Title</label>
-                        <input type="text" id="field-title" data-field-title maxlength="255" value="" />
-                    </div>
-                    <div class="s-field-visibility">
-                        <input type="hidden" value="off" />
-                        <input id="field-visibility" type="checkbox" checked="checked" />
-                        <label for="field-visibility" class="checkbox-label">Field visible to students</label>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <label for="field-body">Body</label>
-                <textarea id="field-body" rows="5"></textarea>
-            </div>
-        </div>
-    </section>
-</div>
-
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.mightyList.js?v={{ config.site_version }}"></script>
 
 <script>
     $(function() {
+        /**
+         *  Mandate at least one field existing at all times
+         */
+        function refreshDeletes() {
+            if ($('#fields').find('li').length === 1) {
+                $('#fields li [data-delete]').first().addClass('hide');
+            } else {
+                $('#fields li [data-delete]').removeClass('hide');
+            }
+        }
+
+
         let fieldCount = 1;
 
         // Set up draggable menu
@@ -163,7 +55,6 @@
                 document.querySelector('#fields').classList.remove('s-is-dragging');
             }
         });
-
 
         $('#add-field').on('click', function() {
             /* Make a clone
@@ -227,6 +118,10 @@
             /* Postincrement in preparation for another new row
              */
             fieldCount++;
+
+            /* Mandate at least one field existing at all times
+             */
+            refreshDeletes();
         });
 
         /* A dynamic mix-it-up of fields that already exist
@@ -235,11 +130,11 @@
         $('#lesson-plan-template-form').alaressValidate({
             rules: {
                 {% if lessonPlanTemplate is not null %}
-                    {% for field in lessonPlanTemplate.fields %}
-                        'field[{{ field.id }}][title]': {
-                            requiredNotBlank: true
-                        },
-                    {% endfor %}
+                {% for field in lessonPlanTemplate.fields %}
+                'field[{{ field.id }}][title]': {
+                    requiredNotBlank: true
+                },
+                {% endfor %}
                 {% endif %}
 
                 /* LPT title is always required
@@ -261,9 +156,17 @@
                 text: 'Are you sure you want to delete this field?',
                 confirmEvent: function() {
                     $(element).parents('li').remove();
+
+                    /* Mandate at least one field existing at all times
+                     */
+                    refreshDeletes();
                 }
             });
         });
+
+        /* Mandate at least one field existing at all times
+         */
+        refreshDeletes();
     });
 
     document.querySelectorAll('[id^=field-body-]').forEach((el) => {
@@ -276,9 +179,9 @@
         detail: {
             targetElements: [
                 {% if lessonPlanTemplate is not null %}
-                    {% for field in lessonPlanTemplate.fields %}
-                        '#field-body-{{ field.id }}',
-                    {% endfor %}
+                {% for field in lessonPlanTemplate.fields %}
+                '#field-body-{{ field.id }}',
+                {% endfor %}
                 {% endif %}
             ]
         }
@@ -315,3 +218,131 @@
         );
     }
 </script>
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    {% if lessonPlanTemplate and lessonPlanTemplate.id %}
+        {% set formAction = routeLookupIfAuthorized('adminLessonPlanTemplate.postUpdate', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
+    {% else %}
+        {% set formAction = routeLookupIfAuthorized('adminLessonPlanTemplate.postCreate') %}
+    {% endif %}
+
+    <div class="admin-content">
+        <form id="lesson-plan-template-form" class="lesson-plan-template-form" action="{{ formAction }}" method="post">
+            <div class="small-12 island">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="lesson-plan-template-title" class="required">Title</label>
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="lesson-plan-template-title" name="title" maxlength="255" value="{{ lessonPlanTemplate.title ?? ''}}" />
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <legend>Fields</legend>
+
+                        <ul id="fields" class="information-list sortable ui-sortable lpt-fields" data-sortable data-list>
+                            {% if lessonPlanTemplate is not null %}
+                                {% for field in lessonPlanTemplate.fields %}
+                                    {% if not field.isDeleted %}
+                                        <li>
+                                            <!-- See further down the file for why we use section here -->
+                                            <section data-template-section>
+                                                <div class="s-topbar" data-topbar>
+                                                    <div class="grip ui-sortable-handle">
+                                                    </div>
+                                                    <div class="s-name-display" data-name-display>{{ field.title }}</div>
+                                                    <nav>
+                                                        <a class="button icon-delete" data-delete></a>
+                                                    </nav>
+                                                </div>
+                                                <div class="s-field-contents">
+                                                    <div>
+                                                        <div class="s-title-row">
+                                                            <div class="s-field-title">
+                                                                <label for="field-title-{{ field.id }}" class="required">Field Title</label>
+                                                                <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" data-field-title maxlength="255" value="{{ field.title }}" />
+                                                            </div>
+                                                            <div class="s-field-visibility">
+                                                                <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
+                                                                <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
+                                                                <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Field visible to students</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label for="field-body-{{ field.id }}">Body</label>
+                                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {# Mandate at least one field per template to prevent people spawning unusable data
+                                 # This reuses the ui to spawn one arbitrarily
+                                 #}
+                                <script>
+                                    $(function() {
+                                        $('#add-field').trigger('click');
+                                    });
+                                </script>
+                            {% endif %}
+                        </ul>
+
+                        <div class="small-12 columns">
+                            <a class='icon-add button full-width' id="add-field">Add a new field</a>
+                        </div>
+                    </fieldset>
+                </section>
+            </div>
+            <div class="small-12 columns">
+                <section>
+                    <input id="save-button" type="submit" value="Save" />
+                </section>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--
+    We use a section below avoid some weird inheritance rules cascading
+    on div elements (coming from .information-list - we shouldn't be using
+    inheritance selectors if a parent class isn't explicitly encapsulating
+    the scope to the component we want it to appear in. Otherwise you get
+    stuff leaking out when it ought to stay put instead.)
+-->
+<div id="field-blueprint" style="display:none">
+    <section class="field-content" data-template-section>
+        <div class="s-topbar" data-topbar>
+            <div class="grip ui-sortable-handle"></div>
+            <div class="s-name-display" data-name-display></div>
+            <nav>
+                <a class="button icon-delete" data-delete></a>
+            </nav>
+        </div>
+        <div class="s-field-contents">
+            <div>
+                <div class="s-title-row">
+                    <div class="s-field-title">
+                        <label for="field-title" class="required">Field Title</label>
+                        <input type="text" id="field-title" data-field-title maxlength="255" value="" />
+                    </div>
+                    <div class="s-field-visibility">
+                        <input type="hidden" value="off" />
+                        <input id="field-visibility" type="checkbox" checked="checked" />
+                        <label for="field-visibility" class="checkbox-label">Field visible to students</label>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="field-body">Body</label>
+                <textarea id="field-body" rows="5"></textarea>
+            </div>
+        </div>
+    </section>
+</div>
