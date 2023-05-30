@@ -20,7 +20,6 @@ use ReturnTypeWillChange;
  */
 trait SerializeTrait
 {
-
     /**
      * @param IDecorator ...$decorators
      * @return array
