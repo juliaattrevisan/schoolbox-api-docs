@@ -16,6 +16,7 @@ use ArrayAccess;
 use InvalidArgumentException;
 use ArrayIterator;
 use ICollection;
+use ReturnTypeWillChange;
 
 class Collection implements ICollection, Serializable, ArrayAccess
 {
@@ -1070,6 +1071,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * @param IDecorator ...$decorators
      * @return array
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize(IDecorator ...$decorators): array
     {
         if (\count($decorators) === 0) {
