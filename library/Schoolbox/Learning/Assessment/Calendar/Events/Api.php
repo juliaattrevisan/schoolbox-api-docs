@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Color\Color;
 use Alaress_Date_Format;
-use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\Submission\Event;
 use Calendar_Api_EventType_Interface;

@@ -10,7 +10,6 @@
 
 namespace EOTC;
 
-use Calendar\Event\Collection;
 use Calendar\Event\Type\EOTC\Event;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventType;

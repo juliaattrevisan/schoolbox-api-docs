@@ -11,7 +11,6 @@
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
-use Calendar\Event\Collection;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;

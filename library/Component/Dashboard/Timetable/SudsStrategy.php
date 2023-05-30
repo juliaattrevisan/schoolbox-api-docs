@@ -7,7 +7,6 @@
 
 declare(strict_types=1);
 
-use Calendar\Event\Collection;
 use Calendar\Event\SortStrategy;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\GenericCollection;

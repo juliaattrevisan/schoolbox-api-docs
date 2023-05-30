@@ -6,7 +6,6 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;

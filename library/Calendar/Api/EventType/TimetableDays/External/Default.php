@@ -11,7 +11,6 @@
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
-use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;

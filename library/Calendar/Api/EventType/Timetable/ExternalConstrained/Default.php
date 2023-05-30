@@ -4,7 +4,6 @@ use Calendar\Event\Type\EventInterface;
 use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;

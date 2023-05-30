@@ -11,7 +11,6 @@
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Booking;
-use Calendar\Event\Collection;
 
 class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_ResourceBooking_Base
 {

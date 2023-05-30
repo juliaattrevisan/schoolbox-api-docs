@@ -6,7 +6,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\Event as EventModel;
