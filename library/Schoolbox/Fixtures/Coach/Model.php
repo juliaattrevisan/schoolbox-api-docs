@@ -130,7 +130,7 @@ class Model implements \JsonSerializable, ISoftDeletable
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id'   => $this->formatId(),

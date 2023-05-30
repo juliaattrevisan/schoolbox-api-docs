@@ -79,7 +79,7 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @return array
      */
-    function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id'   => $this->getName(),

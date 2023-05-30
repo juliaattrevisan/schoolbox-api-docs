@@ -215,7 +215,7 @@ class Event implements CrudEventInterface, JsonSerializable
      * @throws Mapper\Exception
      * @return array
      */
-    function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'u' => UserMapper::getInstance()->dehydrate($this->effector),

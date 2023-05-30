@@ -74,7 +74,7 @@ class SegmentSelectizeOption implements JsonSerializable
      * This is the format expected by the audience selectize
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'key'       => $this->key,

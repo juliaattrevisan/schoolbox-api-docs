@@ -31,9 +31,9 @@ class Base implements \JsonSerializable
     }
 
     /**
-     * @return mixed|Collection
+     * @return Collection
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): Collection
     {
         return $this->data;
     }
