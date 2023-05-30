@@ -84,7 +84,7 @@ abstract class WorkNotifier
     /**
      * Constructs the object
      *
-     * @param string $serialized
+     * @param array $serialized
      *
      * @return void
      */
