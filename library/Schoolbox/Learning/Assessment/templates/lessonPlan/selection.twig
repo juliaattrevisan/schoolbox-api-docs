@@ -111,10 +111,12 @@
             <div class="small-12 columns">
                 <div class="empty-state">
                     <i class="icon-lesson-plan"></i>
-                    {% if USER.isSuperuser %}
+                    {% set templateCreateRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getCreate') %}
+
+                    {% if templateCreateRoute %}
                         <p>
                             No lesson plan templates have been created.
-                            <a href="{{ routeLookup('adminLessonPlanTemplate.getCreate') }}">Click here</a> to build a lesson plan template.
+                            <a href="{{ templateCreateRoute }}">Click here</a> to build a lesson plan template.
                         </p>
                     {% else %}
                         <p>
