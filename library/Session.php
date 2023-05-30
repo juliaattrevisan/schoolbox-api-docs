@@ -115,23 +115,14 @@ class Session
             session_regenerate_id();
 
             //register users id
-            $_SESSION['title']              = $user->getTitle();
-            $_SESSION['firstname']          = $user->getFirstname();
-            $_SESSION['lastname']           = $user->getLastname();
             $_SESSION['id']                 = $user->getId();
             $_SESSION['sid']                = $user->getExternalId();
-            $_SESSION['gid']                = $user->getRole() ? $user->getRole()->getId() : null;
-            $_SESSION['houseId']            = $user->getSchoolHouse() ? $user->getSchoolHouse()->getId() : null;
-            $_SESSION['year']               = $user->getYear();
-            $_SESSION['local_email']        = $user->getLocalEmail();
-            $_SESSION['alt_email']          = $user->getAltEmail();
+            $_SESSION['gid']                = $user->getRole()->getId();
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();
             $_SESSION['password']           = $_POST['password'] ?? null;
-            $_SESSION['eportfolio_enabled'] = $user->getEportfolioEnable();
             $_SESSION['ip']                 = $ip;
-            $_SESSION['campus']             = $userHandler->getUserCampus($user->getId());
 
             // add mobile session data
             $sbmAuth = new Authenticator();
@@ -545,11 +536,8 @@ class Session
             UserMapper::getInstance()
         );
         //load all relationships for the current user
-        $externalUser->loadChildren([$user]);
-        $externalUser->loadTeachers([$user]);
-        $externalUser->loadParents([$user]);
 
-        $synergy_id = $_SESSION['sid'];
+        $synergyId = $_SESSION['sid'];
 
         //
         // Children and subjects should be cleared before attempting to add
@@ -557,8 +545,9 @@ class Session
         // adding the same children and subjects again.
         unset($_SESSION['children'], $_SESSION['subjects']);
 
-        if ($synergy_id) {
+        if ($synergyId) {
             if ($user->getRole()->isParent()) {
+                $externalUser->loadChildren([$user]);
                 $children = $user->getChildren();
                 //load parent object int the child object
                 $externalUser->loadParents($children);

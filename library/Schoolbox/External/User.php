@@ -71,7 +71,7 @@ class User
     {
         foreach ($students as $student) {
             //if parents have already been loaded, the just continue
-            if (null !== $student->getParents()) {
+            if (!$student->getRole()->isStudent() || null !== $student->getParents()) {
                 continue;
             }
             $parents = new GenericCollection(\Schoolbox\User::class);
@@ -126,7 +126,7 @@ class User
         // Get all of the students subjects
         foreach ($students as $student) {
             //if teachers have already been loaded, the just continue
-            if (null !== $student->getTeacherCollection()) {
+            if (!$student->getRole()->isStudent() || null !== $student->getTeacherCollection()) {
                 continue;
             }
             $teachersLoaded = new GenericCollection(\Schoolbox\User::class);
@@ -169,7 +169,7 @@ class User
     {
         foreach ($parents as $parent) {
             //if children have already been loaded, the just continue
-            if (null !== $parent->getChildren()) {
+            if (!$parent->getRole()->isParent() || null !== $parent->getChildren()) {
                 continue;
             }
             $children = new GenericCollection(\Schoolbox\User::class);
