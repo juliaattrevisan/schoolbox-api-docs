@@ -103,6 +103,7 @@ class Renderer
 
         /* Sort all the events in order of time
          */
+        // TODO implement in GenericCollection
         $this->allEvents->sort();
     }
 

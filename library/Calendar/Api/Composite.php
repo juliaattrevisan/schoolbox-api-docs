@@ -44,6 +44,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
             $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp, $allowedEventTypes));
         }
 
+        // TODO implement in GenericCollection
         $result->sort();
 
         return $result;
