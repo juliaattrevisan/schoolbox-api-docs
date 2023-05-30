@@ -21,6 +21,12 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
+        if ($this->perform()) {
+            $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
+        } else {
+            $this->getLogger()->notice('Running in dry-run mode: use -p to write changes to database');
+        }
+
         // component definition id
         $query                 = "
             SELECT `id` FROM `component_definition` WHERE `msg_namespace_slug` = 'sports_fixtures';
