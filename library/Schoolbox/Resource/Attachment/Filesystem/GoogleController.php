@@ -89,13 +89,13 @@ class GoogleController extends AbstractController
         }
 
         // explode on common delimiters
-        $xpl = preg_split('[ ,;]', $mimeFilter);
+        $xpl = preg_split('/[ ,;]+/', $mimeFilter);
 
-        $map = [
-            'application/pdf' => 'PDFS',
-            'image/*'         => 'DOCS_IMAGES',
-            'video/*'         => 'DOCS_VIDEOS',
-        ];
+//        $map = [
+//            'application/pdf' => 'PDFS',
+//            'image/*'         => 'DOCS_IMAGES',
+//            'video/*'         => 'DOCS_VIDEOS',
+//        ];
 
         /* The mimetypes can also be used to filter items in the picker itself
          * but the google picker needs them in a particular format.
@@ -104,12 +104,20 @@ class GoogleController extends AbstractController
          * "sets" of files from which we can choose
          *
          * TODO Not sure if addView() etc. are actually obsolete now...?
-         *  This version of the picker doesn't...seem to use them?
+         *
+         * FIXME These views only work if the $xpl split succeeds. The way it was originally
+         *  written is not compatible with the heif/heic support and is actually broken,
+         *  which causes google picker to show the My Drive appearance. If the regex
+         *  succeeds, like in this commit, the DOCS_IMAGES view strictly shows you all
+         *  the images, but this disregards any folder structure you may have had.
+         *  imho those views aren't worth anything, so imma remove them next.
+         *  This is why the === comparison failed when doing:  $mime === 'image/*'
+         *  because it's been compounded with the heic/heif extensions.
          */
         foreach ($xpl as $mime) {
-            if (isset($map[$mime])) {
-                $this->addView($map[$mime]);
-            }
+//            if (isset($map[$mime])) {
+//                $this->addView($map[$mime]);
+//            }
 
             /* The mimetypes can also be used to filter items in the picker itself
              * Note that heic/heif, in true apple fashion, have somewhat broken mimetype
@@ -126,7 +134,9 @@ class GoogleController extends AbstractController
              * which means we need to interpret image/* as a particular set of mimes
              * that google picker can comprehend...
              */
-            if (str_contains($mime, 'image/*')) {
+//            new \Alaress_Probe($mimeFilter, $xpl, $mime);
+
+            if ('image/*' === $mime) {
                 $this->mimeTypes[] = 'image/png,image/jpeg,image/gif,image/heic,image/heif';
             }
         }
