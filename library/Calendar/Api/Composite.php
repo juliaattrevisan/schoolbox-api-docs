@@ -14,6 +14,7 @@
  */
 
 use Calendar\Event\Collection;
+use Calendar\Event\SortStrategy;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\GenericCollection;
 
@@ -44,10 +45,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
             $result = $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp, $allowedEventTypes));
         }
 
-        // TODO implement in GenericCollection
-        $result->sort();
-
-        return $result;
+        return $result->sortByCallback(new SortStrategy());
     }
 
     /**

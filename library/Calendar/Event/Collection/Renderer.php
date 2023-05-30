@@ -13,6 +13,7 @@ namespace Calendar\Event\Collection;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
 use Calendar\Event\Collection;
+use Calendar\Event\SortStrategy;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\RendererInterface;
 use Calendar_Api_EventType_Interface;
@@ -99,12 +100,9 @@ class Renderer
     {
         $eventList = $this->api->getEvents($this->startTimestamp, $this->endTimestamp, $allowedEventTypes);
 
-        $this->allEvents = $this->allEvents->merge($eventList);
-
-        /* Sort all the events in order of time
-         */
-        // TODO implement in GenericCollection
-        $this->allEvents->sort();
+        $this->allEvents = $this->allEvents
+            ->merge($eventList)
+            ->sortByCallback(new SortStrategy());
     }
 
 
