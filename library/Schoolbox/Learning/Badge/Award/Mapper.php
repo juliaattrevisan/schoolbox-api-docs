@@ -286,10 +286,10 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find awards in specific badge categories given to users
      * Logic should be similar to $this->findRecentForUser
-     * @param int[] $userIds
-     * @param int[] $categoryIds
+     * @param int[]    $userIds
+     * @param int[]    $categoryIds
      * @param string[] $status
-     * @param int[] $termIds
+     * @param int[]    $termIds
      * @return GenericCollection|Model[]
      * @throws MapperException
      */
@@ -309,39 +309,48 @@ class Mapper extends \Schoolbox\Mapper
         $pb = $pb->isNull('deleted_at');
 
         // Terms .. attempt to get simplified ranges from given terms
-        $terms  = \Schoolbox\Assessment\Term\Mapper::getInstance()->findByColumnList(['id' => $termIds])->sortBy('start', Collection::ORDER_ASCENDING);
+        $terms = \Schoolbox\Assessment\Term\Mapper::getInstance()->findByColumnList(['id' => $termIds])->sortBy('start', Collection::ORDER_ASCENDING);
+        // Examined time ranges
         $ranges = [];
         /** @var \Schoolbox\Assessment\Term\Model $term */
         foreach ($terms as $term) {
             if (empty($ranges)) {
+                // set first term as an examined range
                 $ranges[] = [
                     'from' => $term->getStart(),
                     'to'   => $term->getActualFinish(),
                 ];
                 continue;
             }
-            $noWrap = true;
 
+            $newRange = true;
+
+            // Check whether the current term is in the examined ranges
             foreach ($ranges as $key => $range) {
-                // if the current term's range does not exist
+                /** @var Alaress_Date_Format $rangeFrom */
+                $rangeFrom = $range['from'];
+                /** @var Alaress_Date_Format|null $rangeTo */
+                $rangeTo = $range['to'];
+
+                // The term does not have overlap time.
                 if (
-                    ($term->getActualFinish() && $term->getActualFinish()->diffInDays($range['from']) < -1)
-                    || (!$range['to']->isNull() && $term->getStart()->diffInDays($range['to']) > 1)
+                    ($term->getActualFinish() && $term->getActualFinish()->diffInDays($rangeFrom) < -1)
+                    || ($rangeTo && $term->getStart()->diffInDays($rangeTo) > 1)
                 ) {
                     continue;
                 }
-                $noWrap = false;
-                // if the current term (likely be a transition term) wraps existing term
+                $newRange = false;
+                // if the current term (likely be a transition term) overlaps existing term
                 // and current start is before existing start
-                if ($term->getStart()->lt($range['from'])) {
+                if ($term->getStart()->lt($rangeFrom)) {
                     $ranges[$key]['from'] = $term->getStart();
                 }
                 // and current end is later than existing end
-                if (!$term->getActualFinish() || (!$range['to']->isNull() && $term->getActualFinish()->gt($range['to']))) {
+                if (!$term->getActualFinish() || ($rangeTo && $term->getActualFinish()->gt($rangeTo))) {
                     $ranges[$key]['to'] = $term->getActualFinish();
                 }
             }
-            if ($noWrap) {
+            if ($newRange) {
                 $ranges[] = [
                     'from' => $term->getStart(),
                     'to'   => $term->getActualFinish(),
@@ -352,7 +361,7 @@ class Mapper extends \Schoolbox\Mapper
         foreach ($ranges as $range) {
             $pbTerm = $this->getPredicateBuilder();
             $pbTerm->greaterThanOrEqualTo('awarded_at', $range['from']->getDatabaseDate());
-            if (!$range['to']->isNull()) {
+            if ($range['to']) {
                 $pbTerm->lessThanOrEqualTo('awarded_at', $range['to']->getDatabaseDate());
             }
             $pbTerms->all($pbTerm);
