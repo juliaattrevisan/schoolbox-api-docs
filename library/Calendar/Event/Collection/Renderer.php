@@ -192,6 +192,15 @@ class Renderer
         return $this->allEvents;
     }
 
+    /**
+     * @param GenericCollection<EventInterface> $allEvents
+     * @return $this
+     */
+    public function setAllEvents(GenericCollection $allEvents): self
+    {
+        $this->allEvents = $allEvents;
+        return $this;
+    }
 
     /**
      * @return User

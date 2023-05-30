@@ -202,10 +202,9 @@ class Controller extends Base
 
         // The same event can exist in multiple campuses at once.
         // Filter, then remove any duplicates that remain.
-        $events->getAllEvents()->filter($eventFilter);
-        $collection = new GenericCollection(EventInterface::class, $events->getAllEvents()->getStack());
-        $collection = $collection->getUnique('eventId');
-        $events->getAllEvents()->setStack($collection->getAll());
+        $collection = (clone $events->getAllEvents())
+            ->filter($eventFilter)
+            ->getUnique('eventId');
 
 
         // Add assessment events to the event renderer
@@ -223,8 +222,9 @@ class Controller extends Base
             $end,
             $user
         );
-        $assessmentEvents->getAllEvents()->filter($eventFilter);
-        $events->getAllEvents()->merge($assessmentEvents->getAllEvents());
+        $assessmentEventsCollection = (clone $assessmentEvents->getAllEvents())
+            ->filter($eventFilter);
+        $events = $events->setAllEvents($collection->merge($assessmentEventsCollection));
 
 
         // The API's renderAll returns a list of json-encoded events.
