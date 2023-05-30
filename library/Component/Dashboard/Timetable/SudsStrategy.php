@@ -8,6 +8,8 @@
 declare(strict_types=1);
 
 use Calendar\Event\Collection;
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
@@ -19,9 +21,9 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
     /**
      * A set of sis_event records via the calendar subscription mechanism
      *
-     * @var Collection
+     * @var GenericCollection<EventInterface>
      */
-    private Collection $events;
+    private GenericCollection $events;
 
 
     /**

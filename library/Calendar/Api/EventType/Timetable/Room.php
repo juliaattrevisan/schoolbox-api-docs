@@ -1,5 +1,7 @@
 <?php
 
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Calendar\Event\Collection;
@@ -62,12 +64,12 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection
      * @throws InvalidArgumentException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
-        $stack = new Collection();
+        $stack = new GenericCollection(EventInterface::class);
 
         $roomTimetable = $this->externalTimetable->getRoomTimetable(array_keys($this->roomCodes));
 
@@ -208,13 +210,12 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * Find a particular event from this source
      *
      * @param int $eventId
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         // Blah
-        $stack = new Collection();
-        return $stack;
+        return new GenericCollection(EventInterface::class);
     }
 
     /**

@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\External\Connector\AttendanceFactory;
 use Schoolbox\External\Event\Overrides\Mapper;
@@ -105,13 +106,13 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection
      * @throws InvalidArgumentException
      * @throws PDOException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
-        $stack = new \Calendar\Event\Collection();
+        $stack = new GenericCollection(EventInterface::class);
 
         /* If the viewee's Hide Timetable is set, hide it from everyone
          */
@@ -193,12 +194,12 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * (by /www/calendar/ajax/create.php, to display a new event)
      *
      * @param int $eventId
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         /* TODO I don't think this is used anymore...
          */
-        return new \Calendar\Event\Collection();
+        return new GenericCollection(EventInterface::class);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 /**
@@ -34,9 +36,9 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         $collection = $this->getEventsFromCalendarHandler($startTimestamp, $endTimestamp, $allowedEventTypes);
 
@@ -60,10 +62,13 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      */
-    protected function getEventsFromCalendarHandler(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
-    {
+    protected function getEventsFromCalendarHandler(
+        int $startTimestamp,
+        int $endTimestamp,
+        ?array $allowedEventTypes = null,
+    ): GenericCollection {
         /* Manufacture a special $filters array
         /* Do a detection on $allowedEventTypes, if provided and meaningful
          */
@@ -88,9 +93,9 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
      * (by /www/calendar/ajax/create.php, to display a new event)
      *
      * @param int $eventId
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         return $this->getCalendarHandler()->getDayEvents(
             $this->getUser(),

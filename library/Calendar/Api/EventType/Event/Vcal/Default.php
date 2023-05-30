@@ -7,10 +7,11 @@
  */
 
 use Alaress\Redis;
-use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
+use Calendar\Event\Type\EventInterface;
 use Sabre\VObject\Component\VCalendar;
 use Schoolbox\Calendar\Cache\Vcal;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\ParseException;
@@ -81,10 +82,10 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection
      * @internal param $currentDay
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         return $this->getFilteredEventCollection(
             function ($currentEvent) use ($startTimestamp, $endTimestamp) {
@@ -127,9 +128,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      *
      * @param  int $eventId
      *
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         return $this->getFilteredEventCollection(
             function ($currentEvent) use ($eventId) {
@@ -153,7 +154,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      * @param  int      $endTimestamp     If set, only events before this are returned
      * @param  int      $limit            If set, only this many events are returned
      *
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
     protected function getFilteredEventCollection(
         $filterFunction,
@@ -161,9 +162,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $endTimestamp = null,
         $limit = null,
         ?array $allowedEventTypes = null
-    ) {
+    ): GenericCollection {
 
-        $collection = new Collection();
+        $collection = new GenericCollection(EventInterface::class);
 
         $currentConfig = $this->loadConnectorConfiguration();
         $decodedConfig = $currentConfig->decodeConfig();
@@ -231,7 +232,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                                 $this->buildCalendarEventFromVevent($currentEvent, $decodedConfig)
                             );
                         }
-                        if (isset($limit) && $collection->getCount() >= $limit) {
+                        if (isset($limit) && $collection->count() >= $limit) {
                             return $collection;
                         }
                     }

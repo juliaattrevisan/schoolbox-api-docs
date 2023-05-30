@@ -8,10 +8,12 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api_EventType_Abstract
@@ -45,12 +47,12 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @throws InvalidArgumentException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
-        $stack            = new Collection();
+        $stack            = new GenericCollection(EventInterface::class);
         $currentTimestamp = $startTimestamp;
 
         // Figure out event type
@@ -162,12 +164,11 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
      *
      * @param int $eventId
      *
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         // Blah
-        $stack = new Collection();
-        return $stack;
+        return new GenericCollection(EventInterface::class);
     }
 }

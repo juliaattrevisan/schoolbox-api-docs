@@ -16,6 +16,7 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\RendererInterface;
 use Calendar_Api_EventType_Interface;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Renderer
@@ -46,8 +47,12 @@ class Renderer
     /** @var User */
     private $viewer;
 
-    /** @var Collection $allEvents Mega-stack Collection instance which stores all events */
-    private $allEvents;
+    /**
+     * Mega-stack Collection instance which stores all events
+     *
+     * @var GenericCollection<EventInterface>
+     */
+    private GenericCollection $allEvents;
 
 
     /**
@@ -80,7 +85,7 @@ class Renderer
         $this->router         = $router;
         $this->viewer         = $viewer;
 
-        $this->allEvents = new Collection();
+        $this->allEvents = new GenericCollection(EventInterface::class);
         $this->collectAllEvents($allowedEventTypes);
     }
 
@@ -94,11 +99,7 @@ class Renderer
     {
         $eventList = $this->api->getEvents($this->startTimestamp, $this->endTimestamp, $allowedEventTypes);
 
-        /* Only attempt to merge collections
-         */
-        if ($eventList instanceof Collection) {
-            $this->allEvents->merge($eventList);
-        }
+        $this->allEvents->merge($eventList);
 
         /* Sort all the events in order of time
          */
@@ -181,24 +182,11 @@ class Renderer
 
 
     /**
-     * Set all events
-     *
-     * @param Collection $allEvents
-     * @return $this
-     */
-    protected function setAllEvents(Collection $allEvents): self
-    {
-        $this->allEvents = $allEvents;
-        return $this;
-    }
-
-
-    /**
      * Get all events
      *
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getAllEvents(): Collection
+    public function getAllEvents(): GenericCollection
     {
         return $this->allEvents;
     }

@@ -7,6 +7,9 @@
 
 declare(strict_types=1);
 
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
+
 /**
  * Class Room
  *
@@ -53,14 +56,14 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection
      * @throws PDOException
      * @throws UnderflowException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         /* Find all the SUDS Timetable records in use between $startTimestamp and $endTimestamp
          * which are in the locations specified by $this->roomCodes
@@ -104,7 +107,7 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
 
         /* Set up a collection to store all the events we can match
          */
-        $stack = new \Calendar\Event\Collection();
+        $stack = new GenericCollection(EventInterface::class);
 
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
@@ -149,7 +152,7 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
     }
 
 
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         // TODO: Implement getEvent() method.
         // TODO: I don't think this is even used anymore

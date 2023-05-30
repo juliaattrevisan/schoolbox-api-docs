@@ -9,6 +9,8 @@
  */
 
 use Calendar\Event\Collection;
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 
 class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Base
 {
@@ -19,9 +21,9 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return Collection
+     * @return GenericCollection
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         // Get all items out of booking mapper that I am the owner of.
         $bookings = $this->getBookingMapper()->findForOwner(
@@ -31,7 +33,7 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
             $this->getStatus(),
             $allowedEventTypes
         );
-        $collection = new Collection();
+        $collection = new GenericCollection(EventInterface::class);
         foreach ($bookings as $booking) {
             $calendarEvent = $this->getEventConverter()->convertEventToCalendarEvent(
                 $booking->getEvent(),

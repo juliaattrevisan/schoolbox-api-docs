@@ -1,6 +1,8 @@
 <?php
 
+use Calendar\Event\Type\EventInterface;
 use Schoolbox\Campus;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
@@ -55,17 +57,17 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection
      * @throws InvalidArgumentException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         // we're going to use this as a window for not building *too* much expensive timetable at once
         $startOfDay = Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
 
         // If the user is not allowed to view timetables return an empty collection
         if ($this->getUser()->getHideTimetable()) {
-            return new Collection();
+            return new GenericCollection(EventInterface::class);
         }
 
         $currentTimestamp = $startTimestamp;
@@ -107,7 +109,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
          */
         if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
             if (!\in_array((int)$eventType, $allowedEventTypes, true)) {
-                return new Collection();
+                return new GenericCollection(EventInterface::class);
             }
         }
 
@@ -257,8 +259,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
             }
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
         }
-        $stack = new Collection();
-        $stack->setStack(array_values($addedEvents));
+        $stack = new GenericCollection(EventInterface::class, array_values($addedEvents));
         return $stack;
     }
 
@@ -405,11 +406,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      *
      * @param int $eventId
      *
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         // No events in this strat, just return empty.
-        return new Collection();
+        return new GenericCollection(EventInterface::class);
     }
 }
