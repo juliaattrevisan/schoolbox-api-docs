@@ -27,7 +27,6 @@ use Calendar\Event\Type\EventInterface;
  */
 class Collection implements \Iterator, \Countable
 {
-
     /**
      * A bunch of EventBase subclasses
      *
@@ -236,7 +235,7 @@ class Collection implements \Iterator, \Countable
     /**
      * Rewind
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -246,7 +245,7 @@ class Collection implements \Iterator, \Countable
      *
      * @return EventBase
      */
-    public function current()
+    public function current(): EventBase
     {
         return $this->stack[$this->position];
     }
@@ -256,7 +255,7 @@ class Collection implements \Iterator, \Countable
      *
      * @return mixed
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
@@ -264,7 +263,7 @@ class Collection implements \Iterator, \Countable
     /**
      * Next
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -274,7 +273,7 @@ class Collection implements \Iterator, \Countable
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->stack[$this->position]);
     }
@@ -284,7 +283,7 @@ class Collection implements \Iterator, \Countable
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->stack);
     }
