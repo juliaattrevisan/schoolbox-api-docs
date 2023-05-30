@@ -26,6 +26,7 @@ use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
+use RangeException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper;
@@ -913,6 +914,7 @@ class Controller extends Assessment\Controller
      * @throws Deleted If specified Response is deleted
      * @throws RouteNotFound If unable to generate a specified Route
      * @throws \Schoolbox\File\Exception
+     * @throws Exception
      * @api POST /learning/assessments/:assessmentId/:studentId/submit
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
@@ -1103,7 +1105,11 @@ class Controller extends Assessment\Controller
                 ) {
                     $this->feedbackDataSource->delete($feedback);
                 } else {
-                    $this->feedbackDataSource->save($feedback);
+                    try {
+                        $this->feedbackDataSource->save($feedback);
+                    } catch (RangeException $e) {
+                        throw new Exception(sprintf('Invalid mark provided: %s', $e->getMessage()));
+                    }
                 }
 
                 // Process the rubric

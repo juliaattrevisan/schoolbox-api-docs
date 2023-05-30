@@ -15,7 +15,7 @@ use PDOException;
 use PDOStatement;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use RangeException;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
@@ -110,7 +110,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         if ($object->getNormalizedMark() < IMarkScheme::NORMALISED_MARK_MIN || $object->getNormalizedMark() > IMarkScheme::NORMALISED_MARK_MAX) {
             $msg = 'Normalised mark must lie between ' . IMarkScheme::NORMALISED_MARK_MIN .
                 ' and ' . IMarkScheme::NORMALISED_MARK_MAX . ' inclusive: ' . $object->getNormalizedMark();
-            throw new SchoolboxException($msg);
+            throw new RangeException($msg);
         }
         return true;
     }
