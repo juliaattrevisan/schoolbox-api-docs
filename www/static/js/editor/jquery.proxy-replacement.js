@@ -232,7 +232,24 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
                 //        will appear on the video's container.
                 $element.closest("[data-schoolboxmedia-replacement-container]").css({ width: "auto", height: "auto" });
 
-                $element.mediaelementplayer(getConfigForVideo());
+                const $componentDiv = $element.closest("[data-collapsable]");
+                const componentDiv = $componentDiv.length > 0 ? $componentDiv[0] : null;
+
+                if (componentDiv !== null && componentDiv.getAttribute("data-collapse-state") === "collapsed") {
+                    // The video is inside a component that is currently collapsed (eg. on homepage).
+                    // A mediaelementplayer cannot be initialised on a hidden <video> element, so we must wait until it becomes visible.
+
+                    const onExpandStarted = () => {
+                        $element.mediaelementplayer(getConfigForVideo());
+                        // This event listener only needs to be run on the first event, so remove it now that its work is done.
+                        componentDiv.removeEventListener("expandStarted.collapsable", onExpandStarted);
+                    };
+
+                    // Add event listener for when the component becomes visible.
+                    componentDiv.addEventListener("expandStarted.collapsable", onExpandStarted);
+                } else {
+                    $element.mediaelementplayer(getConfigForVideo());
+                }
             });
     };
 })(jQuery);

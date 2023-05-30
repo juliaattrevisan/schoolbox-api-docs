@@ -59,7 +59,7 @@ export function isOpen(component) {
  */
 export async function open(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(collapseButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED)
+    animateRotation(collapseButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
     collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
