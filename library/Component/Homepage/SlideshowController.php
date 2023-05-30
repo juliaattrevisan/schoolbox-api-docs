@@ -10,7 +10,7 @@
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 
-class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
+class Component_Homepage_SlideshowController extends Component_Homepage_ControllerAbstract
 {
     /**
      * @var FileMapper
@@ -43,7 +43,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'scroller')) {
+        if (!parent::loadTemplate($templateHandle, 'slideshow')) {
             return false;
         }
         if (!$this->isSourceRenderable()) {
@@ -63,7 +63,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $allFiles = $this->fileMapper->findForFolders([$this->getSource()->getId()], $opts);
 
         // Have update form to back to this homepage, not the gallery's homepage
-        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
+        $this->setVar('IMAGESLIDESHOW_CATEGORY_ID', $this->getSource()->getId());
 
         $this->setBlock($templateHandle, 'has_images', 'has_images_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
@@ -84,11 +84,11 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         } else {
             $this->setBlock('has_images', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_images', 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock('source_folder_exists', 'submit_image_scroller', 'submit_image_scroller_block');
-            $this->setBlock('source_folder_exists', 'image_scroller', 'image_scroller_block');
-            $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
-            $this->setBlock('image_scroller', 'linked_image', 'linked_image_block');
-            $this->setBlock('image_scroller', 'unlinked_image', 'unlinked_image_block');
+            $this->setBlock('source_folder_exists', 'submit_image_slideshow', 'submit_image_slideshow_block');
+            $this->setBlock('source_folder_exists', 'image_slideshow', 'image_slideshow_block');
+            $this->setBlock('image_slideshow', 'show_caption', 'show_caption_block');
+            $this->setBlock('image_slideshow', 'linked_image', 'linked_image_block');
+            $this->setBlock('image_slideshow', 'unlinked_image', 'unlinked_image_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -114,7 +114,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             /* Prevent multiple galleries from other categories stacking up in the wrong place
              * and initialise empty gallery by default
              */
-            $this->setVar('image_scroller_block', '');
+            $this->setVar('image_slideshow_block', '');
 
             if ($this->getConfig('randomStartingSlide')) {
                 $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
@@ -124,9 +124,9 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
             // Controls such as Post Images
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("submit_image_scroller_block", "");
+                $this->setVar("submit_image_slideshow_block", "");
             } else {
-                $this->parse("submit_image_scroller_block", "submit_image_scroller");
+                $this->parse("submit_image_slideshow_block", "submit_image_slideshow");
             }
 
             // Iterate
@@ -169,7 +169,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                     $this->setVar('linked_image_block', '');
                 }
 
-                $this->parse('image_scroller_block', 'image_scroller', true);
+                $this->parse('image_slideshow_block', 'image_slideshow', true);
             }
             $this->parse('source_folder_exists_block', 'source_folder_exists');
 

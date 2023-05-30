@@ -28,7 +28,7 @@
 
                 <div class="empty-state">
                     <i class="icon-image-slideshow"></i>
-                    <p><a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}">Post an image</a> or drag and drop multiple images on this component to display as a slideshow.</p>
+                    <p><a href="/cms/file/new/{IMAGESLIDESHOW_CATEGORY_ID}">Post an image</a> or drag and drop multiple images on this component to display as a slideshow.</p>
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                             wrapClass: 'dragging',
@@ -47,7 +47,7 @@
                                 $('#img{COMPONENT_INSTANCE_ID}').remove();
 
                                 formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('category', {IMAGESCROLLER_CATEGORY_ID});
+                                formData.append('category', {IMAGESLIDESHOW_CATEGORY_ID});
                                 formData.append('comment', '');
                                 formData.append('hidden', 0);
                             },
@@ -78,7 +78,7 @@
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
                     <div class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslideshow">
                         <div class="swiper-wrapper">
-                            <!-- BEGIN image_scroller -->
+                            <!-- BEGIN image_slideshow -->
                             <div class="swiper-slide">
                                 <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
                                     <!-- BEGIN linked_image -->
@@ -95,7 +95,7 @@
                                 <p class="meta">{IMAGE_NAME}</p>
                                 <!-- END show_caption -->
                             </div>
-                            <!-- END image_scroller -->
+                            <!-- END image_slideshow -->
                         </div>
                         <div class="swiper-button-next"></div>
                         <div class="swiper-button-prev"></div>
@@ -188,10 +188,10 @@
                     </ul>
                 </div>
 
-                <!-- BEGIN submit_image_scroller -->
+                <!-- BEGIN submit_image_slideshow -->
                 <div class="component-action">
                     <section>
-                        <p><a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}">Select an image</a> or drag and drop multiple onto this component</p>
+                        <p><a href="/cms/file/new/{IMAGESLIDESHOW_CATEGORY_ID}">Select an image</a> or drag and drop multiple onto this component</p>
                     </section>
                 </div>
 
@@ -213,7 +213,7 @@
                             $('#img{COMPONENT_INSTANCE_ID}').remove();
 
                             formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                            formData.append('category', {IMAGESCROLLER_CATEGORY_ID});
+                            formData.append('category', {IMAGESLIDESHOW_CATEGORY_ID});
                             formData.append('comment', '');
                             formData.append('hidden', 0);
                         },
@@ -228,7 +228,7 @@
                         }
                     });
                     </script>
-                <!-- END submit_image_scroller -->
+                <!-- END submit_image_slideshow -->
 
                 <!-- END source_folder_exists -->
             </section>
