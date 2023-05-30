@@ -204,7 +204,8 @@ class Controller extends Base
         // Filter, then remove any duplicates that remain.
         $collection = (clone $events->getAllEvents())
             ->filter($eventFilter)
-            ->getUnique('eventId');
+            ->getUnique('eventId')
+            ->reindex();
 
 
         // Add assessment events to the event renderer
@@ -223,8 +224,9 @@ class Controller extends Base
             $user
         );
         $assessmentEventsCollection = (clone $assessmentEvents->getAllEvents())
-            ->filter($eventFilter);
-        $events = $events->setAllEvents($collection->merge($assessmentEventsCollection));
+            ->filter($eventFilter)
+            ->reindex();
+        $events = $events->setAllEvents($collection->merge($assessmentEventsCollection)->reindex());
 
 
         // The API's renderAll returns a list of json-encoded events.
