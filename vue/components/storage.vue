@@ -7,7 +7,7 @@
  * * Other files are rendered with an `<a>` tag, providing a link for download
  */
 
-import filesize from "filesize";
+import { filesize } from "filesize";
 import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
 
 export default {

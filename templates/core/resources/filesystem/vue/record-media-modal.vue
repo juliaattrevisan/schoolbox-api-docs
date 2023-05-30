@@ -11,7 +11,7 @@ import RecordScreen from "@schoolboxVue/components/record/record-screen";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
 import recordMediaTypes from "@js/record-media/recordMediaTypes";
 import axios from "axios";
-import filesize from "filesize";
+import { filesize } from "filesize";
 import { hasDeviceCapture } from "@js/util/featureDetectionUtils";
 import { isOfFileType, convertFilenameExtension } from "@js/util/fileUtils";
 

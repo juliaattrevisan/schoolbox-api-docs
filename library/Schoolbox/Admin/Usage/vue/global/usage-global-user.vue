@@ -1,5 +1,5 @@
 <script>
-import filesize from "filesize";
+import { filesize } from "filesize";
 import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 
 export default {

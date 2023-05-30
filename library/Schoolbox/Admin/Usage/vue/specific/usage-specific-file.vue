@@ -1,5 +1,5 @@
 <script>
-import filesize from "filesize";
+import { filesize } from "filesize";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast";
 import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
