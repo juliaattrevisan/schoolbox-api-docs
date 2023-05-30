@@ -3578,7 +3578,10 @@ abstract class Mapper implements IMapper
      */
     private function getLocalObjectCacheKey(Mapper $mapper, array $row, $alias = '')
     {
-        $idCol = trim($mapper->getIdentifierColumn());
+        $idCol = $mapper->getIdentifierColumn();
+        if (isset($idCol)) {
+            $idCol = trim($idCol);
+        }
 
         if (empty($idCol)) {
             // this occurs on things that fundamentally are join tables, so lack a single primary key
