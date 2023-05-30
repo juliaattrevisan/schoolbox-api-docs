@@ -1566,11 +1566,6 @@ parameters:
 			path: library/Evaluation/Export/Graph.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Evaluation/Export/Xml.php
-
-		-
 			message: "#^Return type \\(void\\) of method Evaluation_Question\\:\\:update\\(\\) should be compatible with return type \\(bool\\) of method DeprecatedModel\\:\\:update\\(\\)$#"
 			count: 1
 			path: library/Evaluation/Question.php
