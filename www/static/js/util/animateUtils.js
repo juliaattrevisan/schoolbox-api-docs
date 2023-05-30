@@ -129,7 +129,6 @@ function onSlideUpComplete(element, paddingTop, paddingBottom) {
     element.removeAttribute(PADDING_BOTTOM_ATTRIBUTE);
 }
 
-
 /**
  * Animate the rotation of an element
  *
