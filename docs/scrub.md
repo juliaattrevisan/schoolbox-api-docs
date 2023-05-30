@@ -14,7 +14,7 @@ You'll see `Scrub` in a lot of old schoolbox controllers revolving around phplib
 
 The first corresponds to "defusing" bad content for what should have been text-only data (csv, input fields, etc). If $input happened to contain html/javascript, etc. they can be rendered harmlessly as a plain text string.
 
-The second corresponds to "defusing" bad content for what should have been html/javascript data. This renders an html fragment in a safe way and filters away malignant js. This is used when outputting ckeditor contents, for example - we don't know the contents of what end users put into their ckeditor fields; while we want to keep the safe html parts, we don't want the unsafe javascript to execute. 
+The second corresponds to "defusing" bad content for what should have been html/javascript data. This renders an html fragment in a safe way and filters away malignant js. This is used when outputting ckeditor contents, for example - we don't know the contents of what end users put into their ckeditor fields; while we want to keep the safe html parts, we don't want the unsafe javascript to execute.
 
 HTMLPurifier has its own logic to determine what's safe and what isn't, but that goes beyond the scope of this rundown. We can customise it a bit to allow/disallow styles, attributes, classes, tags, etc in various ways. For now, don't worry too much about this
 
@@ -48,7 +48,6 @@ Twig-based locations are a bit more advanced - it does some stuff for you. Howev
 - `html2text`: Produces plain text output with any HTML tags completely removed. Useful for truncated text where HTML formatting would be broken (such as news blurbs generated from the news body).
 - `xml`: Sanitises data for output as XML
 - `csv`: Sanitises data for output as CSV
-- `smartQuotes`: Converts smart quotes to ordinary quotes
 
 ## Try it for yourself
 You can set up an example specimen to try it out. In www, create a `test.php` file:

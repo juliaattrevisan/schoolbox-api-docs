@@ -108,27 +108,6 @@ class Scrub
 
 
     /**
-     * Convert smart quotes to apostrophes/double quotes
-     *
-     * @static
-     * @param string $text
-     * @return string
-     */
-    public static function smartQuotes($text)
-    {
-        $search  = [chr(145), chr(146), chr(147), chr(148), chr(151)];
-        $replace = ["'", "'", '"', '"', '-'];
-
-        $data = str_replace($search, $replace, $text);
-
-        $search  = ['&#8220;', '&#8221;', '&#8216;', '&#8217;', '&#8243;'];
-        $replace = ['&quot;', '&quot;', '&#39;', '&#39;', '&quot;'];
-
-        return str_replace($search, $replace, $data);
-    }
-
-
-    /**
      * Retrieves the singleton HTMLPurifier instance with our special config,
      * creating it if it doesn't already exist.
      *
