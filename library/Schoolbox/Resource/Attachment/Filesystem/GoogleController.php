@@ -39,6 +39,14 @@ class GoogleController extends AbstractController
     /** @var string */
     protected $gDriveEnabled;
 
+    /**
+     * A list of mime types accepted by google picker
+     * They must be in some unique format, for some google reason
+     *
+     * @var array
+     */
+    private array $mimeTypes = [];
+
 
     /**
      * @param bool          $multi
@@ -89,9 +97,37 @@ class GoogleController extends AbstractController
             'video/*'         => 'DOCS_VIDEOS',
         ];
 
+        /* The mimetypes can also be used to filter items in the picker itself
+         * but the google picker needs them in a particular format.
+         *
+         * We currently support "images only" and "all files", basically, as two
+         * "sets" of files from which we can choose
+         *
+         * TODO Not sure if addView() etc. are actually obsolete now...?
+         *  This version of the picker doesn't...seem to use them?
+         */
         foreach ($xpl as $mime) {
             if (isset($map[$mime])) {
                 $this->addView($map[$mime]);
+            }
+
+            /* The mimetypes can also be used to filter items in the picker itself
+             * Note that heic/heif, in true apple fashion, have somewhat broken mimetype
+             * interpretation and is hazardous. I'm not sure google even supports it.
+             *
+             * Anyway the google picker can't interpret image/*, you need to specify
+             * all the individual mimes, because google reasons I suppose
+             *
+             * However, due to our intended support for heic/heif files, $mimeFilter
+             * might actually be a combination of mime types and file extensions:
+             *
+             * like this: image/*,.heic,.heics,.heif
+             *
+             * which means we need to interpret image/* as a particular set of mimes
+             * that google picker can comprehend...
+             */
+            if (str_contains($mime, 'image/*')) {
+                $this->mimeTypes[] = 'image/png,image/jpeg,image/gif,image/heic,image/heif';
             }
         }
     }
@@ -115,6 +151,7 @@ class GoogleController extends AbstractController
                 'GOOGLE_ACCESS_TOKEN_TYPE' => $_SESSION['googleAccessTokenType'] ?? '',
                 'VIEWS'                    => implode(',', array_keys($this->views)),
                 'FEATURES'                 => implode(',', array_keys($this->features)),
+                'MIME_TYPES'               => implode(',', $this->mimeTypes)
             ]
         );
     }
