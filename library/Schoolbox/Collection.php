@@ -108,17 +108,15 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @param  mixed $offset
      * @param  mixed $value
-     *
-     * @return $this
+     * @return void
      */
-    public function offsetSet(mixed $offset, mixed $value): self
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (!isset($offset)) {
             $this->stack[] = $value;
         } else {
             $this->stack[$offset] = $value;
         }
-        return $this;
     }
 
     /**
@@ -149,13 +147,11 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * Unsets value in collection
      *
      * @param mixed $offset
-     *
-     * @return $this
+     * @return void
      */
-    public function offsetUnset(mixed $offset): self
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->stack[$offset]);
-        return $this;
     }
 
     /**

@@ -87,9 +87,9 @@ class MappingCollection extends Collection
     /**
      * @inheritDoc
      */
-    public function offsetSet(mixed $offset, mixed $value): self
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        return $this->setOffset($offset, $value);
+        $this->setOffset($offset, $value);
     }
 
 

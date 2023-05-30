@@ -100,10 +100,10 @@ class CollectionTest extends TestCase
         return [
             'Firstnames 1, Ascending' => [
                 (new Collection())
-                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
-                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
-                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
-                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
+                    ->setOffset('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->setOffset('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->setOffset('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->setOffset('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS'))
@@ -112,17 +112,17 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD')),
 
                 (new Collection())
-                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS'))
-                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
-                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
-                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD')),
+                    ->setOffset('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS'))
+                    ->setOffset('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->setOffset('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->setOffset('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD')),
             ],
             'Firstnames 2, Ascending' => [
                 (new Collection())
-                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
-                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
-                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
-                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
+                    ->setOffset(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->setOffset(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->setOffset(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->setOffset(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('  Alfred'))
@@ -131,10 +131,10 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('   The Butler')),
 
                 (new Collection())
-                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
-                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
-                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
-                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
+                    ->setOffset(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->setOffset(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->setOffset(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->setOffset(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
             ],
             'Firstnames 3, Ascending' => [
                 (new Collection())
@@ -150,10 +150,10 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('there were seven cockatoos')),
 
                 (new Collection())
-                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('# Cannot Reproduce'))
-                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname('# Let me make my point'))
-                    ->offsetSet(0, (new \Schoolbox\User())->setFirstname('1. please do not'))
-                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('there were seven cockatoos')),
+                    ->setOffset(3, (new \Schoolbox\User())->setFirstname('# Cannot Reproduce'))
+                    ->setOffset(2, (new \Schoolbox\User())->setFirstname('# Let me make my point'))
+                    ->setOffset(0, (new \Schoolbox\User())->setFirstname('1. please do not'))
+                    ->setOffset(1, (new \Schoolbox\User())->setFirstname('there were seven cockatoos')),
             ]
         ];
     }
@@ -186,10 +186,10 @@ class CollectionTest extends TestCase
         return [
             'Firstnames 1, Descending' => [
                 (new Collection())
-                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
-                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
-                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
-                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
+                    ->setOffset('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->setOffset('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->setOffset('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->setOffset('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
@@ -198,17 +198,17 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
 
                 (new Collection())
-                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
-                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
-                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
-                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
+                    ->setOffset('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->setOffset('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->setOffset('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->setOffset('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
             ],
             'Firstnames 2, Descending' => [
                 (new Collection())
-                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
-                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
-                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
-                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
+                    ->setOffset(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->setOffset(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->setOffset(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->setOffset(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('   The Butler'))
@@ -217,10 +217,10 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('  Alfred')),
 
                 (new Collection())
-                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
-                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion'))
-                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
-                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred')),
+                    ->setOffset(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->setOffset(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion'))
+                    ->setOffset(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->setOffset(1, (new \Schoolbox\User())->setFirstname('  Alfred')),
             ],
             'Firstnames 3, Descending' => [
                 (new Collection())
@@ -236,10 +236,10 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('# Cannot Reproduce')),
 
                 (new Collection())
-                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('there were seven cockatoos'))
-                    ->offsetSet(0, (new \Schoolbox\User())->setFirstname('1. please do not'))
-                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname('# Let me make my point'))
-                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('# Cannot Reproduce')),
+                    ->setOffset(1, (new \Schoolbox\User())->setFirstname('there were seven cockatoos'))
+                    ->setOffset(0, (new \Schoolbox\User())->setFirstname('1. please do not'))
+                    ->setOffset(2, (new \Schoolbox\User())->setFirstname('# Let me make my point'))
+                    ->setOffset(3, (new \Schoolbox\User())->setFirstname('# Cannot Reproduce')),
             ]
         ];
     }
