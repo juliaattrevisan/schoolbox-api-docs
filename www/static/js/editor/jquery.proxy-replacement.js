@@ -235,17 +235,24 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
                 const $componentDiv = $element.closest("[data-collapsable]");
                 const componentDiv = $componentDiv.length > 0 ? $componentDiv[0] : null;
 
-                if (componentDiv.getAttribute("data-collapse-state") === "uncollapsed") {
+                if (componentDiv === null) {
+                    // The video is not inside a component.
                     $element.mediaelementplayer(getConfigForVideo());
                 } else {
-                    const onExpandStarted = () => {
-                        $element.mediaelementplayer(getConfigForVideo());
-                        // This event listener only needs to be run on the first event, so remove it now that its work is done.
-                        componentDiv.removeEventListener("expandStarted.collapsable", onExpandStarted);
-                    };
+                    // The video is inside a component that might be collapsed (eg. on homepage).
 
-                    // Add event listener for when the component becomes visible.
-                    componentDiv.addEventListener("expandStarted.collapsable", onExpandStarted);
+                    if (componentDiv.getAttribute("data-collapse-state") === "uncollapsed") {
+                        $element.mediaelementplayer(getConfigForVideo());
+                    } else {
+                        const onExpandStarted = () => {
+                            $element.mediaelementplayer(getConfigForVideo());
+                            // This event listener only needs to be run on the first event, so remove it now that its work is done.
+                            componentDiv.removeEventListener("expandStarted.collapsable", onExpandStarted);
+                        };
+
+                        // Add event listener for when the component becomes visible.
+                        componentDiv.addEventListener("expandStarted.collapsable", onExpandStarted);
+                    }
                 }
             });
     };
