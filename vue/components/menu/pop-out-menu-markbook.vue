@@ -111,7 +111,7 @@ const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
  *  the activity they're expecting to see might not be there.
  */
 const viewAllText = computed(() => {
-    if ('Due Work' !== assessmentType.value) {
+    if (('Task' === assessmentType.value) || ('Project' === assessmentType.value)) {
         return "";
     }
     if (isExcluded.value) {
@@ -260,7 +260,7 @@ async function onPopOutSelected(event: CustomEvent) {
         isExcluded.value = "true" === event.detail.isExcluded; //make bool from string issues....
         assessmentType.value = event.detail.assessmentType;
         referenceElement.value = event.detail.target;
-        if ('Due Work' !== assessmentType.value) {
+        if (('Task' === assessmentType.value) || ('Project' === assessmentType.value)) {
             hasLoadError.value = false;
             isLoading.value = false;
             activityItems.value = [];
@@ -468,13 +468,15 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                 </small-card>
             </div>
             <div class="c-pop-out-menu__options">
-                <template v-if="'Due Work' === assessmentType & !isExcluded">
+                <template v-if="'Project' !== assessmentType">
                 <pop-out-menu-item
                     :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                     @selected="onToggleSelected()"
                 >
                     {{ viewAllText }}
                 </pop-out-menu-item>
+                </template>
+                <template v-if="'Due Work' === assessmentType & !isExcluded">
                 <pop-out-menu-divider />
                     <pop-out-menu-item v-if="!isExcluded"
                         :class="{ 'is-disabled': !routes.updateRoute }"
