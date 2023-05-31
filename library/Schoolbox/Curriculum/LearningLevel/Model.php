@@ -150,20 +150,26 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
+     * @deprecated
+     *
      * @param  Source\Model $source
      * @return $this
      */
     public function setSource($source)
     {
+        trigger_error(sprintf('Property %s::source is deprecated', __CLASS__), E_USER_DEPRECATED);
         $this->source = $source;
         return $this;
     }
 
     /**
+     * @deprecated
+     *
      * @return Source\Model
      */
     public function getSource()
     {
+        trigger_error(sprintf('Property %s::source is deprecated', __CLASS__), E_USER_DEPRECATED);
         return $this->source;
     }
 
