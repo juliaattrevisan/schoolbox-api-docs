@@ -25,6 +25,11 @@ export function getConfigForVideo(overrideValueByKey?: object) {
          * @param instance - the relevant instance of MediaElementPlayer
          */
         success: function (media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
+            if (instance.node.nodeName.toLowerCase() === "audio") {
+                // The below code to fix aspect ratio need not be run when the instance is an audio player.
+                return;
+            }
+
             // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
             // done so that portrait videos do not take up too much vertical space.
             const aspectRatio = 16 / 9;
@@ -52,7 +57,7 @@ export function getConfigForVideo(overrideValueByKey?: object) {
             // Ensure the video dimensions match the container dimensions when the video is playing.
             // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
             const containerW = container.getBoundingClientRect().width;
-            const containerH = containerW / aspectRatio;
+            const containerH = Math.round(containerW / aspectRatio);
             instance.setPlayerSize(containerW, containerH);
 
             // Ensure the video container adjusts in size correctly as the window size changes (both when it
