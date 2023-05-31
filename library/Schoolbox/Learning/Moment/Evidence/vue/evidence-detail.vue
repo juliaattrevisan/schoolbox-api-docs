@@ -206,6 +206,7 @@ export default {
 
                         <!-- Discussion thread -->
                         <comment-thread
+                            :unique-identifier="evidence.id"
                             :thread="evidence.discussionThread"
                             :create-thread-endpoint="evidence._links.createThread"
                             :can-comment="canComment"

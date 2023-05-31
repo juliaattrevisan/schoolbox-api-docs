@@ -19,6 +19,9 @@ export default {
     mixins: [cdnPrefixMixin],
 
     props: {
+        uniqueIdentifier: {
+            type: String,
+        },
         thread: {
             type: Object,
             default: {
@@ -247,8 +250,8 @@ export default {
 </script>
 
 <template>
-    <div id="discussion" class="small-12 island">
-        <section id="threads-section" class="discussion">
+    <div :id="`discussion-${uniqueIdentifier}`" class="small-12 island">
+        <section :id="`threads-section-${uniqueIdentifier}`" class="discussion">
             <div class="discussion-threads">
                 <p class="comment-count">
                     Comments <span v-if="!hasComments">(0)</span
