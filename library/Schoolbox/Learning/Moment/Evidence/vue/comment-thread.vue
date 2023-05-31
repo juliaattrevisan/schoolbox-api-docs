@@ -19,9 +19,6 @@ export default {
     mixins: [cdnPrefixMixin],
 
     props: {
-        uniqueIdentifier: {
-            type: String,
-        },
         thread: {
             type: Object,
             default: {
