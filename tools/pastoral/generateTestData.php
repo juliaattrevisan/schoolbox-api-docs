@@ -62,6 +62,9 @@ $app = new class extends CliTool\App
             }
         }
 
+        //hydrate the students parents
+        (new \Schoolbox\External\User())->loadParents($testStudents);
+
         // pastoral types
         $pastoralTypeMapper = \Schoolbox\Pastoral\Type\Mapper::getInstance();
         $types              = $pastoralTypeMapper->findAll();
