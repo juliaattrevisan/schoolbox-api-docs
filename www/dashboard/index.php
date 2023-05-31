@@ -13,9 +13,11 @@ $this->setFile(TEMPLATE_content, 'dashboard/index.html');
 $this->setTab('main');
 
 /* Instance factory */
-$groupID = $_SESSION['gid'];
+/** @var \Schoolbox\User $user */
+$user    = $this->getDi()->get('session')->get('user');
+$groupID = $user->getRole()->getId();
 
-$componentFactory = new Component_Dashboard_Factory($this->getDi()->get('session')->get('user'), $this);
+$componentFactory = new Component_Dashboard_Factory($user, $this);
 $componentCollection = $componentFactory->buildComponentList($groupID);
 
 $occupiedPositionList = array();

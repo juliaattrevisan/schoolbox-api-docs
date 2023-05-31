@@ -25,18 +25,20 @@ class Blog extends DeprecatedModel
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
     {
-        $params = ['keyword' => $keyword];
+        /** @var \Schoolbox\User $user */
+        $user     = $_SESSION['user'];
+        $params = ['keyword ' => $keyword];
         $query  = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
                         FROM `blog`
                         JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
                         LEFT JOIN `user` ON `blog`.owner_id = `user`.id
                         LEFT JOIN `perms` ON `blog`.folder_id = `perms`.cid
-                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.gid = {$user->getRole()->getId()}
                             AND `perms`.type > 0
                         LEFT JOIN `userAccess` ON `blog`.folder_id = `userAccess`.sid
                             AND `userAccess`.service = 1
-                            AND `userAccess`.uid = {$_SESSION['id']}
+                            AND `userAccess`.uid = {$user->getId()}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST (:keyword)
                             AND `blog`.`deleted_at` IS NULL
@@ -49,11 +51,11 @@ class Blog extends DeprecatedModel
                             JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
                             LEFT JOIN `user` ON `blog`.owner_id = `user`.id
                             LEFT JOIN `perms` ON `blog`.folder_id = `perms`.cid
-                                AND `perms`.gid = {$_SESSION['gid']}
+                                AND `perms`.gid = {$user->getRole()->getId()}
                                 AND `perms`.type > 0
                             LEFT JOIN `userAccess` ON `blog`.folder_id = `userAccess`.sid
                                 AND `userAccess`.service = 1
-                                AND `userAccess`.uid = {$_SESSION['id']}
+                                AND `userAccess`.uid = {$user->getId()}
                             WHERE (`perms`.cid OR `userAccess`.sid)
                                 AND MATCH(`heading`,`body`) AGAINST (:keyword)
                                 AND `blog`.`deleted_at` IS NULL

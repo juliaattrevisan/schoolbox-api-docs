@@ -113,7 +113,6 @@ class Session
             //register users id
             $_SESSION['id']                 = $user->getId();
             $_SESSION['sid']                = $user->getExternalId();
-            $_SESSION['gid']                = $user->getRole()->getId();
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();

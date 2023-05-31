@@ -147,7 +147,7 @@ foreach ($homepageHandler->getColorList() as $key => $color) {
 // Moving forward! Log the page view.
 $mapper = new Schoolbox\Resource\Folder\Log\Mapper();
 $mapper->incrementHitcount($sessionUser, $folder);
-$folderMapper->logPageView($folder);
+$folderMapper->logPageView($folder, $sessionUser->getRole());
 
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
