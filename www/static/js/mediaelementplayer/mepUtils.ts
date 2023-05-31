@@ -60,6 +60,10 @@ export function getConfigForVideo(overrideValueByKey?: object) {
             const containerH = Math.round(containerW / aspectRatio);
             instance.setPlayerSize(containerW, containerH);
 
+            const replacementContainer: HTMLElement | null = container.closest(
+                "[data-schoolboxmedia-replacement-container]"
+            );
+
             // Ensure the video container adjusts in size correctly as the window size changes (both when it
             // is playing and not playing).
             // If this function is removed (with the MediaElementPlayer 'stretching' option remaining as 'none'):
@@ -69,13 +73,29 @@ export function getConfigForVideo(overrideValueByKey?: object) {
             //    space grows
             //  * The video content size will not change as the window grows/shrinks.
             window.addEventListener("resize", function () {
+                if (replacementContainer !== null) {
+                    replacementContainer.style.display = ""; // Set display back to blank so we can calculate dimensions.
+                }
+
                 container.style.width = "auto";
                 const containerW = container.getBoundingClientRect().width;
                 const containerH = Math.round(containerW / aspectRatio);
 
                 container.style.height = containerH + "px";
                 instance.setPlayerSize(containerW, containerH);
+
+                if (replacementContainer !== null) {
+                    // Set display to inline-block so eg. text-align:right on parent element will cause video to align right.
+                    // This must be done after the dimensions are calculated.
+                    replacementContainer.style.display = "inline-block";
+                }
             });
+
+            if (replacementContainer !== null) {
+                // Set display to inline-block so eg. text-align:right on parent element will cause video to align right.
+                // This must be done after the dimensions are calculated.
+                replacementContainer.style.display = "inline-block";
+            }
         },
     };
 
