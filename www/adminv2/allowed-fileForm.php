@@ -3,7 +3,6 @@
 use Schoolbox\Collection;
 use Schoolbox\File\Extension;
 use Schoolbox\File\ExtensionMapper;
-use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -65,9 +64,7 @@ if (isset($_POST['max_file_size'])) {
  * Otherwise create a new instance and continue normally
  */
 try {
-    $mime = $mimeMapper->findOneByColumn('mime', $_POST['mime'], [
-        'deleted' => true
-    ]);
+    $mime = $mimeMapper->findOneByColumn('mime', $_POST['mime']);
 
     /* Check if $mime->getFileTypeId is the same as that which was POSTed
      *
@@ -86,11 +83,8 @@ try {
         error(105, 'The mime type you have chosen for this file type is already in use.');
     }
 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    /** @var \Schoolbox\File\Mimetype $mime */
     $mime = $e->getDeletedObject();
-
-    /* Resurrect it
-     */
-    $mime->setDeleted(0);
 } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
     $mime = $mimeMapper->createModel();
 }
