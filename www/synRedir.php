@@ -9,7 +9,7 @@ $user = $_SESSION['user'];
 $url = new \Schoolbox\Url\Uri(Config::get('external_portal'));
 
 /* If the user has already passed by the login, we can go directly to the page */
-if ($_SESSION['communityLogin']) {
+if ($_SESSION['communityLogin'] ?? false) {
     if ($_GET['page']) {
         $url->withPath('/' . $_GET['page'] . '.aspx');
     } else {

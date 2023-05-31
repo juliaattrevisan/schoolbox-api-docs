@@ -6276,11 +6276,6 @@ parameters:
 			path: library/Schoolbox/Wiki/WikiMapper.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Session.php
-
-		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 2
 			path: library/SitePage.php
