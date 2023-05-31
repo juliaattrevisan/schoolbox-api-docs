@@ -544,6 +544,9 @@ class Session
 
         $synergyId = $_SESSION['sid'];
 
+        // initialize children, as there are places using getChildren to check permission
+        $externalUser->loadChildren([$user]);
+
         //
         // Children and subjects should be cleared before attempting to add
         // them. This prevents re-authentication (for example, from WebDAV) from
@@ -552,7 +555,6 @@ class Session
 
         if ($synergyId) {
             if ($user->getRole()->isParent()) {
-                $externalUser->loadChildren([$user]);
                 $children = $user->getChildren();
                 //load parent object int the child object
                 $externalUser->loadParents($children);

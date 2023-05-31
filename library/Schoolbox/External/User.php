@@ -71,14 +71,14 @@ class User
     {
         foreach ($students as $student) {
             //if parents have already been loaded, the just continue
-            if (!$student->getRole()->isStudent() || null !== $student->getParents()) {
+            if (null !== $student->getParents()) {
                 continue;
             }
             $parents = new GenericCollection(\Schoolbox\User::class);
-            /* if the student does not have an externalID
+            /* if the user is not a student or the student does not have an externalID
              * set an empty array and continue
              */
-            if ('' === trim((string)$student->getExternalId())) {
+            if (!$student->getRole()->isStudent() || '' === trim((string)$student->getExternalId())) {
                 $student->setParents($parents);
                 continue;
             }
@@ -126,12 +126,16 @@ class User
         // Get all of the students subjects
         foreach ($students as $student) {
             //if teachers have already been loaded, the just continue
-            if (!$student->getRole()->isStudent() || null !== $student->getTeacherCollection()) {
+            if (null !== $student->getTeacherCollection()) {
                 continue;
             }
             $teachersLoaded = new GenericCollection(\Schoolbox\User::class);
-            $found                                     = [];
-            $subjects                                  = $this->externalUser->getSubjectList($student);
+            if (!$student->getRole()->isStudent() || '' === trim((string)$student->getExternalId())) {
+                $student->setTeacherCollection($teachersLoaded);
+                continue;
+            }
+            $found    = [];
+            $subjects = $this->externalUser->getSubjectList($student);
 
             // Iterate and find teachers associated with each subject
             foreach ($subjects as $subject) {
@@ -169,19 +173,19 @@ class User
     {
         foreach ($parents as $parent) {
             //if children have already been loaded, the just continue
-            if (!$parent->getRole()->isParent() || null !== $parent->getChildren()) {
+            if (null !== $parent->getChildren()) {
                 continue;
             }
             $children = new GenericCollection(\Schoolbox\User::class);
-            /* if the parent does not have an externalID
+            /* if the user is not a parent or the parent does not have an externalID
              * set an empty array and continue
              */
-            if ('' === trim((string)$parent->getExternalId())) {
+            if (!$parent->getRole()->isParent() || '' === trim((string)$parent->getExternalId())) {
                 $parent->setChildren($children);
                 continue;
             }
 
-            $enrolments                             = $this->externalUser->getEnrolledStudents($parent->getExternalId());
+            $enrolments = $this->externalUser->getEnrolledStudents($parent->getExternalId());
             foreach ($enrolments as $child) {
                 try {
                     $children->add($this->userMapper->findByExternalId($child['RelatedID']));
