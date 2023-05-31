@@ -91,12 +91,6 @@ class GoogleController extends AbstractController
         // explode on common delimiters
         $xpl = preg_split('/[ ,;]+/', $mimeFilter);
 
-//        $map = [
-//            'application/pdf' => 'PDFS',
-//            'image/*'         => 'DOCS_IMAGES',
-//            'video/*'         => 'DOCS_VIDEOS',
-//        ];
-
         /* The mimetypes can also be used to filter items in the picker itself
          * but the google picker needs them in a particular format.
          *
@@ -115,10 +109,6 @@ class GoogleController extends AbstractController
          *  because it's been compounded with the heic/heif extensions.
          */
         foreach ($xpl as $mime) {
-//            if (isset($map[$mime])) {
-//                $this->addView($map[$mime]);
-//            }
-
             /* The mimetypes can also be used to filter items in the picker itself
              * Note that heic/heif, in true apple fashion, have somewhat broken mimetype
              * interpretation and is hazardous. I'm not sure google even supports it.
@@ -134,8 +124,6 @@ class GoogleController extends AbstractController
              * which means we need to interpret image/* as a particular set of mimes
              * that google picker can comprehend...
              */
-//            new \Alaress_Probe($mimeFilter, $xpl, $mime);
-
             if ('image/*' === $mime) {
                 $this->mimeTypes[] = 'image/png,image/jpeg,image/gif,image/heic,image/heif';
             }
@@ -159,7 +147,6 @@ class GoogleController extends AbstractController
                 'CLIENT_ID'                => $this->gAppsClientId,
                 'GOOGLE_ACCESS_TOKEN'      => $_SESSION['googleAccessToken'] ?? '',
                 'GOOGLE_ACCESS_TOKEN_TYPE' => $_SESSION['googleAccessTokenType'] ?? '',
-                'VIEWS'                    => implode(',', array_keys($this->views)),
                 'FEATURES'                 => implode(',', array_keys($this->features)),
                 'MIME_TYPES'               => implode(',', $this->mimeTypes)
             ]
