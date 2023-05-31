@@ -2321,11 +2321,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Cache/Vcal.php
 
 		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Config\\\\Base\\:\\:\\$data \\(Schoolbox\\\\Collection\\) does not accept array\\<string, mixed\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Config/Filter.php
-
-		-
 			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\:\\:getRoleCollection\\(\\) should return iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
