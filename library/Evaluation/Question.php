@@ -78,10 +78,10 @@ abstract class Evaluation_Question extends DeprecatedModel
     {
         $query = "SELECT MAX(sequence)+1 AS num
                   FROM {$this->_table}
-                  WHERE section_id = " . $this->db->smartQuote($section_id) . "
+                  WHERE section_id = ?
                   AND deleted_at IS NULL";
 
-        $sequence = $this->db->query($query)->fetchColumn();
+        $sequence = $this->db->query($query, [$section_id])->fetchColumn();
 
         if ($sequence) {
             return $sequence;
@@ -116,9 +116,9 @@ abstract class Evaluation_Question extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM assess_luQuestionType
-                  WHERE type_id = " . $this->db->smartQuote($type_id);
+                  WHERE type_id = ?";
 
-        return $this->db->query($query)->fetch();
+        return $this->db->query($query, [$type_id])->fetch();
     }
 
 
@@ -143,13 +143,13 @@ abstract class Evaluation_Question extends DeprecatedModel
             FROM assess
             INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
             INNER JOIN assess_question ON assess_section.section_id = assess_question.section_id
-            WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
+            WHERE assess.assess_id = ?
             AND assess_question.deleted_at IS NULL
             AND assess_section.deleted_at IS NULL
             ORDER BY assess_section.sequence, assess_question.sequence
         ";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$assess_id])->fetchAll();
     }
 
     /**
@@ -162,11 +162,11 @@ abstract class Evaluation_Question extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE section_id = " . $this->db->smartQuote($section_id) . "
+                  WHERE section_id = ?
                   AND deleted_at IS NULL
                   ORDER BY sequence";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$section_id])->fetchAll();
     }
 
     /**
@@ -214,9 +214,9 @@ abstract class Evaluation_Question extends DeprecatedModel
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_question.deleted_at IS NULL
                   AND assess_section.deleted_at IS NULL
-                  AND assess.assess_id = " . $this->db->smartQuote($assess_id);
+                  AND assess.assess_id = ?";
 
-        return $this->db->query($query)->fetchColumn();
+        return $this->db->query($query, [$assess_id])->fetchColumn();
     }
 
     /**

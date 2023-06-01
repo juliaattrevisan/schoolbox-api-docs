@@ -116,9 +116,9 @@ abstract class Evaluation_Factory extends DeprecatedModel
     {
         $query = "SELECT filename
                   FROM assess_luQuestionType
-                  WHERE type_id = " . $this->db->smartQuote($type_id);
+                  WHERE type_id = ?";
 
-        return $this->db->query($query)->fetchColumn();
+        return $this->db->query($query, [$type_id])->fetchColumn();
     }
 
     /**
@@ -131,9 +131,9 @@ abstract class Evaluation_Factory extends DeprecatedModel
     {
         $query = "SELECT classname
                   FROM assess_luQuestionType
-                  WHERE type_id = " . $this->db->smartQuote($type_id);
+                  WHERE type_id = ?";
 
-        return $this->db->query($query)->fetchColumn();
+        return $this->db->query($query, [$type_id])->fetchColumn();
     }
 
     /**
@@ -146,9 +146,9 @@ abstract class Evaluation_Factory extends DeprecatedModel
     {
         $query = "SELECT moodle
                   FROM assess_luQuestionType
-                  WHERE type_id = " . $this->db->smartQuote($type_id);
+                  WHERE type_id = ?"
 
-        return $this->db->query($query)->fetchColumn();
+        return $this->db->query($query, [$type_id])->fetchColumn();
     }
 
     /**

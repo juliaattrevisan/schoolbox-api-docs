@@ -68,9 +68,9 @@ class User extends DeprecatedModel
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN superusers ON user.id = superusers.id
                     LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
-                WHERE user.username = " . $this->db->smartQuote($username) . "
+                WHERE user.username = ?
                 AND user.deleted_at IS NULL";
-        return $this->db->query($query)->fetch();
+        return $this->db->query($query, [$username])->fetch();
     }
 
     public function getSuperusers()
@@ -413,10 +413,8 @@ class User extends DeprecatedModel
      */
     public function getUserLogins($username, int $limit = 10): array|bool
     {
-        $query = "SELECT date, ip, login FROM login_log WHERE username like "
-            . $this->db->smartQuote($username)
-            . " ORDER BY date DESC LIMIT 0,$limit";
-        return $this->db->query($query)->fetchAll();
+        $query = "SELECT date, ip, login FROM login_log WHERE username = ? ORDER BY date DESC LIMIT 0,$limit";
+        return $this->db->query($query, [$username])->fetchAll();
     }
 
     /**

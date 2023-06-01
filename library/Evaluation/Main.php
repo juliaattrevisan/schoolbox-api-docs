@@ -38,6 +38,7 @@
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Permission\Access\UserAccess;
 
 abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
@@ -75,26 +76,31 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     public function getList($category_id, $limit = false)
     {
         if (is_array($category_id)) {
-            $categoryIDList = implode(',', $category_id);
+            if (empty($category_id)) {
+                return [];
+            }
+            $placeholders = Builder::getArrayPlaceholders($category_id, 'category');
 
             $query = "SELECT *
                       FROM {$this->_table}
-                      WHERE category_id IN ($categoryIDList)
+                      WHERE category_id IN $placeholders
                       AND deleted_at IS NULL
                       ORDER BY finish";
+            $params = Builder::getArrayParameters($category_id, 'category');
         } else {
             $query = "SELECT *
                       FROM {$this->_table}
-                      WHERE category_id = " . $this->db->smartQuote($category_id) . "
+                      WHERE category_id = :categoryId
                       AND deleted_at IS NULL
                       ORDER BY finish";
+            $params['categoryId'] = $category_id;
         }
 
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, $params)->fetchAll();
     }
 
     /**
@@ -107,9 +113,9 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE {$this->_index} = " . $this->db->smartQuote($assess_id);
+                  WHERE {$this->_index} = ?";
 
-        return $this->db->query($query)->fetch();
+        return $this->db->query($query, [$assess_id])->fetch();
     }
 
     /**
@@ -130,12 +136,12 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                 SUM(IF (assess_question.deleted_at IS NULL AND assess_question.question_id IS NOT NULL, 1, 0)) AS numQuestions
             FROM assess_section
             LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-            WHERE assess_section.assess_id = " . $this->db->smartQuote($assess_id) . "
+            WHERE assess_section.assess_id = ?
             AND assess_section.deleted_at IS NULL
             GROUP BY assess_section.section_id
         ";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$assess_id])->fetchAll();
     }
 
     /**
@@ -247,11 +253,11 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                          assess_question.deleted_at AS questionDeletedAt
                   FROM assess_section
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  WHERE assess_id = ?
                   AND assess_section.deleted_at IS NULL
                   ORDER BY sectionSequence, questionSequence";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$assess_id])->fetchAll();
     }
 
     /**
@@ -323,10 +329,10 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
 
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
-                  AND user_id = " . $this->db->smartQuote($uid);
+                  WHERE assess_id = ?
+                  AND user_id = ?";
 
-        return $this->db->query($query)->fetchColumn();
+        return $this->db->query($query, [$assess_id, $uid])->fetchColumn();
     }
 
     /**
@@ -374,10 +380,10 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     {
         $query = "SELECT COUNT(assess_id)
                   FROM assess
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  WHERE assess_id = ?
                   AND finish > NOW()";
 
-        $result = $this->db->query($query)->fetchColumn();
+        $result = $this->db->query($query, [$assess_id])->fetchColumn();
 
         if (!$result) {
             return true;
@@ -396,10 +402,10 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     {
         $query = "SELECT COUNT(assess_id)
                   FROM assess
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  WHERE assess_id = ?
                   AND deleted_at IS NULL";
 
-        $result = $this->db->query($query)->fetchColumn();
+        $result = $this->db->query($query, [$assess_id])->fetchColumn();
 
         if (!$result) {
             return true;
@@ -435,9 +441,9 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     {
         $query = "SELECT availability
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id);
+                  WHERE assess_id = ?";
 
-        return $this->getAvailabilityType() == $this->db->query($query)->fetchColumn();
+        return $this->getAvailabilityType() == $this->db->query($query, [$assess_id])->fetchColumn();
     }
 
     /**

@@ -337,22 +337,26 @@ class Group extends DeprecatedModel
             return UserAccess::ACCESS_FULL;
         }
 
+        $params          = [];
         $serviceIdFilter = '';
         if (in_array($this->_service, array(UserAccess::SERVICE_CALENDAR, UserAccess::SERVICE_HOUSEMASTER))) {
-            $serviceIdFilter = "AND sid = {$this->db->smartQuote($relationID)}";
+            $serviceIdFilter = "AND sid = ?";
+            $params[] = $relationID;
         }
 
         // check individual access
         $query = "
             SELECT type
             FROM userAccess
-            WHERE uid = {$this->db->smartQuote($userID)}
+            WHERE uid = ?
             $serviceIdFilter
-            AND ((service = {$this->db->smartQuote($this->_service)}))
+            AND ((service = ?))
             ORDER BY `type` DESC LIMIT 1
         ";
+        $params[] = $userID;
+        $params[] = $this->_service;
 
-        $permission = $this->db->query($query)->fetchColumn();
+        $permission = $this->db->query($query, $params)->fetchColumn();
         $permission = (int)$permission;
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...

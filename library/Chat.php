@@ -120,14 +120,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             return false;
         }
 
-        $category_id = $this->db->smartQuote($category_id);
-        $user_id     = $this->db->smartQuote($user_id);
-
         $query = "INSERT INTO chat_poll (user_id, category_id, time)
-                  VALUES ($user_id, $category_id, NOW())
+                  VALUES (?, ?, NOW())
                   ON DUPLICATE KEY UPDATE time = NOW()";
 
-        return $this->db->query($query);
+        return $this->db->query($query, [$user_id, $category_id]);
     }
 
 

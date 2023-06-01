@@ -85,7 +85,7 @@ class Survey_Main extends Evaluation_Main
         } else {
             $query = "SELECT *
                       FROM {$this->_table}
-                      WHERE category_id = " . $this->db->smartQuote($category_id) . "
+                      WHERE category_id = ?
                       AND availability = 'survey'
                       AND deleted_at IS NULL
                       ORDER BY created_at DESC";
@@ -95,7 +95,7 @@ class Survey_Main extends Evaluation_Main
             $query .= " LIMIT $limit";
         }
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$category_id])->fetchAll();
     }
 
 

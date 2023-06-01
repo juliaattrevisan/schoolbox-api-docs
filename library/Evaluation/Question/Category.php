@@ -37,10 +37,10 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE availability = '{$this->getAvailability()}'
-                  AND parent_id = " . $this->db->smartQuote($parent_id) . "
+                  AND parent_id = ?
                   ORDER BY name";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$parent_id])->fetchAll();
     }
 
     /**
@@ -59,13 +59,13 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
                   LEFT JOIN assess_question_bank
                     ON {$this->_table}.question_category_id = assess_question_bank.question_category_id
                     AND assess_question_bank.deleted_at IS NULL
-                  WHERE availability = '{$this->getAvailability()}'
-                  AND parent_id = " . $this->db->smartQuote($parent_id) . "
+                  WHERE availability = ?
+                  AND parent_id = ?
                   AND {$this->_table}.deleted_at IS NULL
                   GROUP BY question_category_id
                   ORDER BY name";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$this->getAvailability(), $parent_id])->fetchAll();
     }
 
     /**

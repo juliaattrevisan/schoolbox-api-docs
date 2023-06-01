@@ -81,9 +81,9 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
             assess_question_bank.answer
             FROM assess_question_bank
             LEFT JOIN assess_luQuestionType ON assess_question_bank.type_id = assess_luQuestionType.type_id
-            WHERE question_category_id = " . $this->db->smartQuote($category_id) . " AND assess_question_bank.deleted_at IS NULL";
+            WHERE question_category_id = ? AND assess_question_bank.deleted_at IS NULL";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, [$category_id])->fetchAll();
     }
 
     /**

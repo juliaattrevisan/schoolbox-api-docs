@@ -154,7 +154,8 @@ class Assess_Main extends Evaluation_Main
     public function getAssessmentType()
     {
         return $this->db->query(
-            "SELECT name FROM lu_work_type WHERE id = " . $this->db->smartQuote(self::ONLINE_ASSESSMENT_TYPE_ID)
+            "SELECT name FROM lu_work_type WHERE id = ?",
+            [self::ONLINE_ASSESSMENT_TYPE_ID],
         )->fetchColumn();
     }
 
@@ -178,10 +179,10 @@ class Assess_Main extends Evaluation_Main
         $query = "  SELECT COUNT(assess_id)
                     FROM assess ass
                     JOIN assessment assm on assm.id = ass.assessment_id
-                    WHERE ass.assess_id = " . $this->db->smartQuote($assess_id) . "
+                    WHERE ass.assess_id = ?
                     AND assm.close_date > NOW()";
 
-        $result = $this->db->query($query)->fetchColumn();
+        $result = $this->db->query($query, [$assess_id])->fetchColumn();
 
         if (!$result) {
             return true;
