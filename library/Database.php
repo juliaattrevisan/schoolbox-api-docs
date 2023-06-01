@@ -503,18 +503,14 @@ class Database implements IDatabase, Serializable
      *
      * @deprecated use \Schoolbox\Mapper::save()
      *
-     * @param string $table     Insert into this table
-     * @param array  $array     Insert this set of key-value pairs into this
-     *                          table's fields
-     * @param array  $nowFields Update these fields with `NOW()`
+     * @param string $table Insert into this table
+     * @param array  $array Insert this set of key-value pairs into this table's
+     *                      fields
      * @return bool
      */
-    public function insert($table, $array, array $nowFields = [])
+    public function insert($table, $array)
     {
         if (!($table && is_array($array))) {
-            return false;
-        }
-        if (empty($array) || empty($nowFields)) {
             return false;
         }
 
@@ -532,15 +528,11 @@ class Database implements IDatabase, Serializable
                 $params[] = $value['value'];
             }
         }
-        foreach ($nowFields as $field) {
-            $names[]  = $quoter->quoteIdentifier($field);
-            $values[] = 'NOW()';
-        }
         $names  = implode(',', $names);
         $values = implode(',', $values);
 
         $query = "INSERT INTO {$quoter->quoteIdentifier($table)} ($names) VALUES ($values)";
-        $this->query($query);
+        $this->query($query, $params);
         return true;
     }
 
