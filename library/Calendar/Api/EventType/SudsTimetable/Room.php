@@ -56,7 +56,7 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      * @throws PDOException
      * @throws UnderflowException
      * @throws UnexpectedValueException
@@ -154,7 +154,6 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
 
     public function getEvent($eventId): GenericCollection
     {
-        // TODO: Implement getEvent() method.
-        // TODO: I don't think this is even used anymore
+        return new GenericCollection(EventInterface::class);
     }
 }

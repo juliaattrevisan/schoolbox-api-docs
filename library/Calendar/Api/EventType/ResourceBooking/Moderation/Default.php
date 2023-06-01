@@ -45,7 +45,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * Loads permissions for resource bookings - whether the user can moderate
      * at all, and the items they're restricted to if any.
      *
-     * @return GenericCollection<EventInterface>
+     * @return void
      */
     protected function loadPermissions()
     {
@@ -73,7 +73,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */

@@ -200,10 +200,10 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     /**
      * Making the abstract class happy
      * @param int $eventId
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      */
     public function getEvent($eventId): GenericCollection
     {
-        return '';
+        return new GenericCollection(EventInterface::class);
     }
 }
