@@ -70,10 +70,6 @@ export function useDescriptionEditor(
                 await injectScript(ckeditorScript);
             }
 
-            if (submitButton.value === null) {
-                console.error("Could not find submit button for CKEditor '" + ckeditorSelector + "' field.");
-            }
-
             const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
 
             ckeditorElem.addEventListener(EditorEvent.EDITOR__CREATED, onEditorCreated);
