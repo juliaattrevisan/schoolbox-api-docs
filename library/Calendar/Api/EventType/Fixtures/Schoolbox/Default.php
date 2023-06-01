@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * The Results section of a matchup's description, as per the modal
      * The results are optional, and can be empty for either home team or away team, or both

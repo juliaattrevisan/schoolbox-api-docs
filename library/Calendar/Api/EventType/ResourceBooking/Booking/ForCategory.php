@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Calendar_Api_EventType_ResourceBooking_Booking_ForCategory extends Calendar_Api_EventType_ResourceBooking_Base
 {
-
     /**
      * Resource category filter. Does not filter by resource category if NULL.
      *

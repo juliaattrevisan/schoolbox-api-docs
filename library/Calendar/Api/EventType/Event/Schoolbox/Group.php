@@ -14,7 +14,6 @@ use Schoolbox\User;
  */
 class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventType_Event_Schoolbox_Default
 {
-
     /**
      * The group to get events for. Does not filter by group if NULL
      *

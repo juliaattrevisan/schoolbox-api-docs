@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class Calendar_Api_EventType_Event_Schoolbox_Type extends Calendar_Api_EventType_Event_Schoolbox_Default
 {
-
     /**
      * Event Type to fetch.
      *

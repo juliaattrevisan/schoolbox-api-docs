@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Api_EventType_ResourceBooking_Base
 {
-
     /**
      * The IDs of the resource to fetch. Does not filter by resourceId if NULL.
      *

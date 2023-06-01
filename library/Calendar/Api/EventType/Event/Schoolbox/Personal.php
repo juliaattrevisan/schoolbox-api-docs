@@ -16,7 +16,6 @@ use Schoolbox\GenericCollection;
 
 class Calendar_Api_EventType_Event_Schoolbox_Personal extends Calendar_Api_EventType_Event_Schoolbox_Default
 {
-
     /**
      * Overridden to get personal events only.
      *

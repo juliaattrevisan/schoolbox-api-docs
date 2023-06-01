@@ -21,7 +21,6 @@ use Schoolbox\User;
 
 abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * Statuses to filter out
      *

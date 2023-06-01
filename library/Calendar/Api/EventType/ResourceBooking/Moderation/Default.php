@@ -14,7 +14,6 @@ use Schoolbox\ResourceBooking\Booking;
 
 class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_ResourceBooking_Base
 {
-
     /**
      * Can the current user moderate ANY resource item?
      *

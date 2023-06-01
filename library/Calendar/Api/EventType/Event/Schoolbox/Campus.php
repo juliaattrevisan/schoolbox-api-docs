@@ -16,7 +16,6 @@ use Schoolbox\User;
  */
 class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default
 {
-
     /**
      * The campus to get events for. If null, returns events for all campuses.
      *
