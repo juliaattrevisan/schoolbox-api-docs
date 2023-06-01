@@ -15,6 +15,7 @@ export function getConfigForVideo(overrideValueByKey?: object) {
          * and resizing would be less janky.
          *    To get the resizing and container aspect ratio to work as we desire, we must set 'stretching'
          * to 'none', and create our own 'resize' event handler.
+         *
          * See: https://github.com/mediaelement/mediaelement/blob/master/docs/api.md
          */
         stretching: "none",
@@ -23,6 +24,8 @@ export function getConfigForVideo(overrideValueByKey?: object) {
          * @param media - the <mediaelementwrapper> DOM node (contains the <video> node)
          * @param node - the <video> DOM node
          * @param instance - the relevant instance of MediaElementPlayer
+         *
+         * See: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
          */
         success: function (media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
             if (instance.node.nodeName.toLowerCase() === "audio") {
@@ -30,16 +33,16 @@ export function getConfigForVideo(overrideValueByKey?: object) {
                 return;
             }
 
-            // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
-            // done so that portrait videos do not take up too much vertical space.
-            const aspectRatio = 16 / 9;
-
             // This is the container for all mejs nodes (including <mediaelementwrapper>).
             const container = node.closest(".mejs__container") as HTMLElement;
 
             if (container === null) {
                 return;
             }
+
+            // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
+            // done so that portrait videos do not take up too much vertical space.
+            const aspectRatio = 16 / 9;
 
             if (node.classList.contains("full-width")) {
                 node.style.width = "100%";
@@ -54,27 +57,23 @@ export function getConfigForVideo(overrideValueByKey?: object) {
                 poster.removeAttribute("style");
             }
 
-            // Ensure the video dimensions match the container dimensions when the video is playing.
-            // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
-            const containerW = container.getBoundingClientRect().width;
-            const containerH = Math.round(containerW / aspectRatio);
-            instance.setPlayerSize(containerW, containerH);
-
             const replacementContainer: HTMLElement | null = container.closest(
                 "[data-schoolboxmedia-replacement-container]"
             );
 
-            // Ensure the video container adjusts in size correctly as the window size changes (both when it
-            // is playing and not playing).
-            // If this function is removed (with the MediaElementPlayer 'stretching' option remaining as 'none'):
-            //  * downsizing the window from a large size will cause a horizontal scrollbar to appear on the
-            //    video container
-            //  * when upsizing the window from a small size, the video will remain small as the surrounding
-            //    space grows
-            //  * The video content size will not change as the window grows/shrinks.
-            window.addEventListener("resize", function () {
+            /**
+             * Ensure the video container adjusts in size correctly as the window size changes (both when it
+             * is playing and not playing).
+             * If this function is removed (with the MediaElementPlayer 'stretching' option remaining as 'none'):
+             *  * downsizing the window from a large size will cause a horizontal scrollbar to appear on the
+             *    video container
+             *  * when upsizing the window from a small size, the video will remain small as the surrounding
+             *    space grows
+             *  * The video content size will not change as the window grows/shrinks.
+             */
+            function fixVideoPlayerDimensions() {
                 if (replacementContainer !== null) {
-                    replacementContainer.style.display = ""; // Set display back to blank so we can calculate dimensions.
+                    replacementContainer.style.display = ""; // Set display to blank so we can calculate dimensions.
                 }
 
                 container.style.width = "auto";
@@ -89,13 +88,11 @@ export function getConfigForVideo(overrideValueByKey?: object) {
                     // This must be done after the dimensions are calculated.
                     replacementContainer.style.display = "inline-block";
                 }
-            });
-
-            if (replacementContainer !== null) {
-                // Set display to inline-block so eg. text-align:right on parent element will cause video to align right.
-                // This must be done after the dimensions are calculated.
-                replacementContainer.style.display = "inline-block";
             }
+
+            window.addEventListener("resize", fixVideoPlayerDimensions);
+
+            fixVideoPlayerDimensions();
         },
     };
 
