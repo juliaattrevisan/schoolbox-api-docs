@@ -49,9 +49,9 @@
     <script type="text/javascript">
 
         // Date formats (global variable)
-        var siteLocation = "{{ config.site_school_code }}";
+        window.siteLocation = "{{ config.site_school_code }}";
 
-        var dateDisplayFormats = {
+        window.dateDisplayFormats = {
             dayjs:          "{{ config.date_local | dayjsFormat }}",
             dayjsDatetime:  "{{ (config.date_local ~ ' ' ~ config.date_time) | dayjsFormat }}",
             dayjsDateLong:  "{{ config.date_long | dayjsFormat }}",
@@ -63,7 +63,7 @@
         };
 
         // This schoolboxUser is here for custom scripts.
-        var schoolboxUser            = {{ user.current | json_encode | raw }};
+        window.schoolboxUser            = {{ user.current | json_encode | raw }};
         schoolboxUser.name           = "{{ user.current.formatName }}";
         schoolboxUser.email          = "{{ user.current.email }}";
         schoolboxUser.year           = "{{ user.current.year.name ?? '' }}";
@@ -99,7 +99,6 @@
                 "rgb(255, 255, 255)",
             ]
         }
-
 
         // When showing colour swatches, we only want the first 3 unique colours from skin config as well as the constant colours,
         // if there are less than 3 unique colours, we'll use the first 3 colours but bias towards the unique colours
