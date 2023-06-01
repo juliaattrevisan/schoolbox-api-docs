@@ -335,6 +335,11 @@ class Calendar extends DeprecatedModel
             }
         }
 
+        $params = [
+            'timeFormat' => Config::get('calendar_time_format'),
+            'keyword'    => $keyword,
+            'userId'     => $sessionUser->getId(),
+        ];
         $event_query = "
             SELECT DISTINCT
                 event.id, owner,
@@ -355,9 +360,9 @@ class Calendar extends DeprecatedModel
                 LEFT JOIN event_role ON event.id = event_role.event_id
                 LEFT JOIN event_folder ON event.id = event_folder.event_id
             WHERE (
-                    (access = '1' AND owner = '" . intval($sessionUser->getId()) . "')
+                    (access = '1' AND owner = :userId)
                     $groupQuery
-                    OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
+                    OR (access = '3' AND $campusQuery $groupChunk OR owner = :userId)
                 )
                 AND MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword)
                 AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
@@ -377,17 +382,17 @@ class Calendar extends DeprecatedModel
                 LEFT JOIN event_role ON event.id = event_role.event_id
                 LEFT JOIN event_folder ON event.id = event_folder.event_id
             WHERE (
-                (access = '1' AND owner = '" . intval($sessionUser->getId()) . "')
+                (access = '1' AND owner = :userId)
                 $groupQuery
-                OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
+                OR (access = '3' AND $campusQuery $groupChunk OR owner = :userId)
             )
             AND event.deleted_at IS NULL
             AND MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword)
             AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
         ";
 
-        $events = $this->db->query($event_query)->fetchAll();
-        $count  = $this->db->query($count_query)->fetchColumn();
+        $events = $this->db->query($event_query, $params)->fetchAll();
+        $count  = $this->db->query($count_query, $params)->fetchColumn();
 
         return $events;
     }

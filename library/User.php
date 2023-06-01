@@ -177,7 +177,7 @@ class User extends DeprecatedModel
         }
         // Don't allow LIKE searches on keywords < 2 chars long
         $wherePart = "(synergy_id = :keyword";
-        $params    = [$keyword];
+        $params    = ['keyword' => $keyword];
         if (mb_strlen($keyword, 'UTF-8') >= 2) {
             $wherePart .= " OR CONCAT_WS(' ', title, firstname, lastname) LIKE :keywordLike
                 OR CONCAT_WS(' ', firstname, lastname) LIKE :keywordLike
@@ -189,7 +189,7 @@ class User extends DeprecatedModel
                 OR lastname LIKE :keywordLike
                 OR username LIKE :keywordLike"
             ;
-            $params[] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
+            $params['keywordLike'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
         }
         $wherePart .= ') AND user.deleted_at IS NULL';
 
