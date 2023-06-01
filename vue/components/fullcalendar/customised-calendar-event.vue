@@ -23,7 +23,7 @@ export default {
          * @returns { Boolean }
          */
         isEventInListComponent() {
-            return this.$el.parentElement.parentElement.className.includes("fc-list-event-title");
+            return this.$el.parentElement.className.includes("fc-list-event-title");
         },
 
         /**
@@ -32,7 +32,7 @@ export default {
          * @returns { String }
          */
         eventBackgroundColor() {
-            return this.$el.parentElement.parentElement.parentElement.style.backgroundColor;
+            return this.$el.parentElement.parentElement.style.backgroundColor;
         },
 
         /**
@@ -98,6 +98,7 @@ export default {
          * Ensure the text colour is readable on the background, which uses the user assigned folder colour
          */
         updateTextColor() {
+            window.sbProps.testEl = this.$el;
             if (!this.isEventInListComponent) {
                 //don't do for list view, only within month/week views
                 const readableTextColor = tinycolor
@@ -128,7 +129,7 @@ export default {
 </script>
 
 <template>
-    <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
+    <div class="event-container hithere" ref="eventContainer" :class="getAttendanceClass">
         <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
         <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete" />
         <span
