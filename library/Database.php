@@ -598,15 +598,18 @@ class Database implements IDatabase, Serializable
      */
     public function delete($table, $identifier, $value)
     {
-        $query = "DELETE FROM `$table` WHERE 1 != 1 ";
+        $query  = "DELETE FROM {$this->getQuoter()->quoteIdentifier($table)} WHERE 1 != 1 ";
+        $params = [];
         if (is_array($value)) {
             foreach ($value as $item) {
-                $query .= " OR `$identifier` =  " . $this->smartQuote($value);
+                $query .= " OR {$this->getQuoter()->quoteIdentifier($identifier)} = ?";
+                $params[] = $item;
             }
         } else {
-            $query .= "OR `$identifier` =  " . $this->smartQuote($value);
+            $query .= "OR {$this->getQuoter()->quoteIdentifier($identifier)}` = ?";
+            $params[] = $value;
         }
-        $this->query($query);
+        $this->query($query, $params);
         return true;
     }
 }
