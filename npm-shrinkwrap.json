@@ -43,7 +43,6 @@
                 "@fullcalendar/interaction": "^6.1.8",
                 "@fullcalendar/list": "^6.1.8",
                 "@fullcalendar/resource": "^6.1.8",
-                "@fullcalendar/resource-common": "~5.11.3",
                 "@fullcalendar/resource-daygrid": "^6.1.8",
                 "@fullcalendar/resource-timegrid": "^6.1.8",
                 "@fullcalendar/resource-timeline": "^6.1.8",
