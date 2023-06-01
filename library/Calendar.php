@@ -37,95 +37,6 @@ class Calendar extends DeprecatedModel
         parent::__construct();
     }
 
-    /**
-     * Get a list of people who are attending/pending for a particular
-     * event attendance
-     *
-     * @param int $eventId
-     * @param int $status
-     *
-     * @return mixed
-     */
-    private function getByStatus($eventId, $status)
-    {
-        $query = "
-			SELECT
-				user.*,
-				IF(user.local_email = 0, user.alt_email, user.local_email) AS email,
-				groups.name as groupName,
-				ea.id, ea.status, ea.intention
-			FROM event_attendance ea
-			LEFT JOIN `user` ON `user`.id = ea.user_id
-			LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-			WHERE ea.event_id = {$eventId}
-			AND ea.status = {$status}
-		";
-
-        return $this->db->query($query)->fetchAll();
-    }
-
-    /**
-     * Get all the people pending for an event
-     *
-     * @param int $eventId
-     *
-     * @return mixed
-     */
-    public function getPending($eventId)
-    {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_PENDING);
-    }
-
-    /**
-     * Get all the people approved for an event
-     *
-     * @param int $eventId
-     *
-     * @return mixed
-     */
-    public function getAttending($eventId)
-    {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_ACCEPTED);
-    }
-
-    /**
-     * Get all the people approved for an event
-     *
-     * @param int $eventId
-     *
-     * @return mixed
-     */
-    public function getRejected($eventId)
-    {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_DECLINED);
-    }
-
-    public function getAttendeeList($eventId)
-    {
-        $query = "
-            SELECT u.*, g.name as groupName,
-                ea.id, ea.user_id, ea.status
-            FROM event_attendance ea
-            JOIN `user` u ON u.id = ea.user_id
-            JOIN `groups` g ON g.id = u.group_id
-            WHERE ea.event_id = '{$eventId}'
-        ";
-
-        return $this->db->query($query)->fetchAll();
-    }
-
-    public function getAttendance($attendanceId)
-    {
-        $query = "
-            SELECT *
-            FROM event_attendance
-            WHERE id = {$attendanceId}
-            LIMIT 1
-        ";
-
-        return $this->db->query($query)->fetch();
-    }
-
     public function getAttendanceByEventAndUser($eventId, $userId)
     {
         $query = "
@@ -139,19 +50,9 @@ class Calendar extends DeprecatedModel
         return $this->db->query($query)->fetch();
     }
 
-    public function updateAttendance($attendance)
-    {
-        return $this->db->update('event_attendance', 'id', $attendance);
-    }
-
     public function removeAttendanceByEvent($eventId)
     {
         return $this->db->delete('event_attendance', 'event_id', $eventId);
-    }
-
-    public function removeAttendance($attendanceId)
-    {
-        return $this->db->delete('event_attendance', 'id', $attendanceId);
     }
 
     public function displayColour($id)
