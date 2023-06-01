@@ -168,7 +168,6 @@ class FetchPagesFromCsvCest
         $i->cantSeeResponseContains('Warning: foreach()');
         $i->cantSeeResponseContains('Warning: Undefined array');
         $i->cantSeeResponseContains('ErrorException');
-
     }
 
     /** New Url Provider - reads a csv file to provide an array of data for the fetch all pages test.
