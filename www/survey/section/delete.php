@@ -34,6 +34,7 @@ if ($surveyHandler->isDeleted($section['assess_id'])) {
     error(112);
 }
 
+$now = Alaress_Date_Format::now()->getDatabaseDate();
 if ($questionList) {
     foreach ($questionList as $currentQuestion) {
         $question = $questionHandler->getByID($currentQuestion['question_id']);
@@ -42,19 +43,19 @@ if ($questionList) {
          */
         $questionHandler->update(array(
             'question_id' => $currentQuestion['question_id'],
-            'deleted_at' => 'NOW()',
+            'deleted_at'  => $now,
         ));
         $answerHandler->update(array(
             'question_id' => $currentQuestion['question_id'],
-            'answer_id' => $answer['answer_id'],
-            'deleted_at' => 'NOW()',
+            'answer_id'   => $answer['answer_id'],
+            'deleted_at'  => $now,
         ));
     }
 }
 
 /* Reorder sections because sequence corresponds to section number
  */
-$section['deleted_at'] = 'NOW()';
+$section['deleted_at'] = $now;
 $sectionHandler->update($section);
 $sectionHandler->resequenceSectionsAfterDelete($section['assess_id']);
 SitePage::localRedir('/survey/summary/' . $section['assess_id']);

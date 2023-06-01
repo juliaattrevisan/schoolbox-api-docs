@@ -48,12 +48,12 @@ if ($sectionHandler->isDeleted($section['section_id'])) {
  */
 $questionHandler->update(array(
     'question_id' => $question['question_id'],
-    'deleted_at' => 'NOW()',
+    'deleted_at'  => Alaress_Date_Format::now()->getDatabaseDate(),
 ));
 $answerHandler->update(array(
     'question_id' => $question['question_id'],
     'answer_id' => $answer['answer_id'],
-    'deleted_at' => 'NOW()',
+    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
 ));
 /* Reorder questions because sequence corresponds to question number
  */

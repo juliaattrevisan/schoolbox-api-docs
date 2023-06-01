@@ -24,7 +24,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $data = array(
             'attempt_id' => $attempt_id,
-            'reviewed_at' => 'NOW()'
+            'reviewed_at' => Alaress_Date_Format::now()->getDatabaseDate()
         );
 
         parent::update($data);

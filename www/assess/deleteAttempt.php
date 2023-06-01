@@ -84,7 +84,7 @@ $deleteAttempt = function (array $attempt) use ($responseHandler, $attemptHandle
     $responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
     $attemptHandler->update(array(
         'attempt_id' => $attempt['attempt_id'],
-        'deleted_at' => 'NOW()'
+        'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate()
     ));
 };
 

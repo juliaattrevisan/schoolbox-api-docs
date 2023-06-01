@@ -138,17 +138,17 @@ class Survey_Main extends Evaluation_Main
                                          */
                                 $questionHandler->update(array(
                                     'question_id' => $currentQuestion['question_id'],
-                                    'deleted_at' => 'NOW()',
+                                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                                 ));
 
                                 $answerHandler->update(array(
                                     'answer_id' => $answer['answer_id'],
-                                    'deleted_at' => 'NOW()',
+                                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                                 ));
                             }
                         }
 
-                        $section['deleted_at'] = 'NOW()';
+                        $section['deleted_at'] = Alaress_Date_Format::now()->getDatabaseDate();
                         $sectionHandler->update($section);
                     }
                 }
@@ -157,7 +157,7 @@ class Survey_Main extends Evaluation_Main
                  */
                 $assessHandler->update(array(
                     'assess_id' => $currentAssess['assess_id'],
-                    'deleted_at' => 'NOW()'
+                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate()
                 ));
             }
         }

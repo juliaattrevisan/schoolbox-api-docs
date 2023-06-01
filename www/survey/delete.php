@@ -47,17 +47,17 @@ if (is_array($sectionList) && count($sectionList)) {
                  */
                 $questionHandler->update(array(
                     'question_id' => $currentQuestion['question_id'],
-                    'deleted_at' => 'NOW()',
+                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                 ));
                 $answerHandler->update(array(
                             'question_id' => $currentQuestion['question_id'],
                             'answer_id' => $answer['answer_id'],
-                            'deleted_at' => 'NOW()',
+                            'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                 ));
             }
         }
 
-        $section['deleted_at'] = 'NOW()';
+        $section['deleted_at'] = Alaress_Date_Format::now()->getDatabaseDate();
         $sectionHandler->update($section);
     }
 }
@@ -66,7 +66,7 @@ if (is_array($sectionList) && count($sectionList)) {
  */
 $surveyHandler->update(array(
     'assess_id' => $this->arg[0],
-    'deleted_at' => 'NOW()'
+    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate()
 ));
 $this->setFile(TEMPLATE_content, 'survey/deleted.html');
 $this->setVar(array(

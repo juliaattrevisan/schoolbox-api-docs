@@ -156,8 +156,8 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
     public function create($data)
     {
         $data['availability'] = $this->getAvailability();
-        $data['created_at'] = 'NOW()';
-        $data['updated_at'] = 'NOW()';
+        $data['created_at'] = Alaress_Date_Format::now()->getDatabaseDate();
+        $data['updated_at'] = Alaress_Date_Format::now()->getDatabaseDate();
 
         return parent::create($data);
     }
@@ -169,7 +169,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
      */
     public function delete($data)
     {
-        $data['deleted_at'] = 'NOW()';
+        $data['deleted_at'] = Alaress_Date_Format::now()->getDatabaseDate();
 
         return parent::update($data);
     }

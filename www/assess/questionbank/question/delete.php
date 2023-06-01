@@ -17,7 +17,7 @@ $questionBankHandler = new Assess_Question_Bank();
 if (is_numeric($this->arg[0])) {
     $questionBankHandler->update(array(
             'question_bank_id' => $this->arg[0],
-            'deleted_at' => 'NOW()',
+            'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
         ));
 }
 

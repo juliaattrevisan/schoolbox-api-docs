@@ -40,7 +40,7 @@ foreach ($allAttempts as $currentAttempt) {
     $responseHandler->deleteResponsesForAttempt($currentAttempt['attempt_id']);
     $attemptHandler->update(array(
         'attempt_id' => $currentAttempt['attempt_id'],
-        'deleted_at' => 'NOW()'
+        'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate()
     ));
 }
 
