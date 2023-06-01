@@ -56,7 +56,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      * @throws InvalidArgumentException
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection

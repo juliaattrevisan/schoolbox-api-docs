@@ -86,7 +86,7 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      */
     abstract public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection;
 

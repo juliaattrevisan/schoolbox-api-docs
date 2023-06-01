@@ -51,7 +51,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
      * Find a particular event matching an eventId from all registered sources
      *
      * @param int $eventId
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      */
     public function getEvent($eventId): GenericCollection
     {

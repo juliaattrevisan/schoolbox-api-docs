@@ -106,7 +106,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      * @throws InvalidArgumentException
      * @throws PDOException
      */

@@ -42,7 +42,7 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForCategory extends Calenda
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */

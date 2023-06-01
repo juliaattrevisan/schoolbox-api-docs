@@ -68,7 +68,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return GenericCollection
+     * @return GenericCollection<EventInterface>
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Mapper\DefinitionException
