@@ -514,24 +514,32 @@ class Database implements IDatabase, Serializable
         if (!($table && is_array($array))) {
             return false;
         }
+        if (empty($array) || empty($nowFields)) {
+            return false;
+        }
 
-        $names  = '';
-        $values = '';
-
+        $names  = [];
+        $values = [];
+        $params = [];
+        $quoter = $this->getQuoter();
         foreach ($array as $key => $value) {
-            $name = '`' . $key . '`' . ',';
+            $names[] = $quoter->quoteIdentifier($key);
             if (!is_array($value)) {
-                $names .= $name;
-                $values .= $this->smartQuote($value) . ',';
+                $values[] = '?';
+                $params[] = $value;
             } elseif (isset($value['function'])) {
-                $names .= $name;
-                $values .= $value['function'] . '(' . $this->smartQuote($value['value']) . '),';
+                $values[] = ($value['function'] . '(?)');
+                $params[] = $value['value'];
             }
         }
-        $names  = substr($names, 0, -1);
-        $values = substr($values, 0, -1);
+        foreach ($nowFields as $field) {
+            $names[]  = $quoter->quoteIdentifier($field);
+            $values[] = 'NOW()';
+        }
+        $names  = implode(',', $names);
+        $values = implode(',', $values);
 
-        $query = "INSERT INTO `$table` ($names) VALUES ($values)";
+        $query = "INSERT INTO {$quoter->quoteIdentifier($table)} ($names) VALUES ($values)";
         $this->query($query);
         return true;
     }
