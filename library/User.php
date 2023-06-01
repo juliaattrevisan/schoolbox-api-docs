@@ -41,6 +41,7 @@ class User extends DeprecatedModel
 
     public function getByID($id)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, luCampus.name as campusName,
                         IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
@@ -172,6 +173,8 @@ class User extends DeprecatedModel
             return $this->searchExact($keyword, $offset, $limit, $count);
         }
         // Don't allow LIKE searches on keywords < 2 chars long
+        // TODO fix DeprecatedDatabase::quote
+        // TODO fix DeprecatedDatabase::escapeForLike
         $wherePart = sprintf("( synergy_id = '%s'", $this->db->quote($keyword));
         if (mb_strlen($keyword, 'UTF-8') >= 2) {
             $wherePart .= sprintf(
@@ -236,6 +239,7 @@ class User extends DeprecatedModel
         $limit = 20,
         &$count = null
     ) {
+        // TODO fix DeprecatedDatabase::quote
         $keyword = $this->db->quote($keyword);
 
         //If parent search policy is disabled, only staff will see parents in search results
@@ -315,6 +319,7 @@ class User extends DeprecatedModel
             AND
         ';
 
+        // TODO fix DeprecatedDatabase::quote
         if ($keyword != "") {
             if (is_numeric($keyword)) {
                 $param = $this->db->quote($keyword);
@@ -322,6 +327,7 @@ class User extends DeprecatedModel
             } else {
                 // TODO account for preferred name:
                 //      alternately remove and replace with API search
+                // TODO fix DeprecatedDatabase::escapeForLike
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $firstName = $this->db->getQuoter()->escapeForLike($name[1]);
                     $lastName  = $this->db->getQuoter()->escapeForLike($name[2]);

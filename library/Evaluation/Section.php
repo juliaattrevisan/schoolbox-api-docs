@@ -217,6 +217,7 @@ abstract class Evaluation_Section extends DeprecatedModel
         $sectionList = $this->getList($section['assess_id']);
 
         $completion = [];
+        // TODO fix DeprecatedDatabase::quote
         foreach ($sectionList as $currentSection) {
             $numQuestions = "SELECT
                                  COUNT(assess_response.question_id) AS num

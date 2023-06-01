@@ -13,6 +13,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function getByID($pollID)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT *, UNIX_TIMESTAMP(close) close FROM " . $this->_table .
             " WHERE " . $this->_index . " = '{$this->db->quote($pollID)}'";
         return $this->db->query($query)->fetch();
@@ -20,6 +21,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function getAllByCategory($folder_id)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT * FROM poll WHERE folder_id = '{$this->db->quote((string)$folder_id)}' ORDER BY created DESC";
         return $this->db->query($query)->fetchAll();
     }
@@ -51,6 +53,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function hasVoted($pollID)
     {
+        // TODO fix DeprecatedDatabase::quote
         $poll   = $this->getById($pollID);
         $cutoff = "";
         $date = Alaress_Date_Format::now();
@@ -74,6 +77,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function open($pollID)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT count(*) FROM poll WHERE id = '{$this->db->quote($pollID)}' AND close > NOW()";
         $vote  = $this->db->query($query)->fetchColumn();
         if ($vote > 0) {
@@ -84,6 +88,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function placeVote($pollID, $vote)
     {
+        // TODO fix DeprecatedDatabase::quote
         if (is_numeric($pollID) && is_numeric($vote) && $vote >= 0 && $vote < 10 && !$this->hasVoted($pollID)) {
             $query = "UPDATE poll SET result_" . $vote . " = result_" . $vote . " + 1 WHERE id = '{$this->db->quote($pollID)}'";
             $this->db->query($query);
@@ -108,6 +113,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function homepageClean($cid)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "DELETE l FROM  `" . $this->_table . "` p LEFT JOIN pollLog l ON l.poll_id = p.id WHERE p.folder_id='{$this->db->quote($cid)}'";
         $this->db->query($query);
 
@@ -122,9 +128,11 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function delete($id)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "DELETE FROM pollLog WHERE poll_id = '{$this->db->quote($id)}'";
         $this->db->query($query);
 
+        // TODO fix DeprecatedDatabase::quote
         $query = "DELETE FROM poll WHERE id = '{$this->db->quote($id)}'";
         return $this->db->query($query);
     }

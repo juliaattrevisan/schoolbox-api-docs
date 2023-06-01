@@ -137,6 +137,7 @@ class MyFolder extends DeprecatedModel
      */
     public function hasChildren($folderID)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT f.id as children
                   FROM myFolder f
                   WHERE parent = {$this->db->quote($folderID)}

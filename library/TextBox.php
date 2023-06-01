@@ -61,7 +61,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC')
     {
-
+        // TODO fix DeprecatedDatabase::quote
         // TODO add full search capabilities, currently just used by ajax
         $query = "SELECT textBoxID, categoryID, heading, body, folder.name as cname
                      FROM " . $this->_table . "

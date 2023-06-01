@@ -33,6 +33,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getLatestRevision($wikiID)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '{$this->db->quote($wikiID)}'";
 
         $latestRevisionID = $this->db->query($query)->fetchColumn();
@@ -50,6 +51,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getByID($wikiID, $revisionID = 0)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT r.*, w.categoryID, w.locked, w.slug, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
                   u.title, u.firstname, u.preferred_name, u.lastname, r.userID authorID
                   FROM " . $this->_revisionTable . " r
@@ -74,6 +76,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getRevisionList($wikiID)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.preferred_name, u.lastname
                   FROM " . $this->_revisionTable . " r
                   LEFT JOIN user u ON u.id = r.userID
@@ -106,6 +109,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $orderBySQL = 'ORDER BY ' . $orderBy;
         }
 
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.preferred_name, u.lastname,
                   w.locked, w.categoryID, w.slug
                   FROM wiki w
@@ -127,6 +131,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function homepageClean($cid)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "UPDATE {$this->_table} SET deleted = true WHERE categoryID='{$this->db->quote($cid)}'";
         $this->db->query($query);
     }
@@ -234,6 +239,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         /** @var \Schoolbox\User $user */
         $user     = $_SESSION['user'];
 
+        // TODO fix DeprecatedDatabase::quote
         $keyword  = $this->db->quote($keyword);
         $userId   = $this->db->quote($user->getId());
         $roleId   = $this->db->quote($user->getRole()->getId());
@@ -241,6 +247,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $limit    = intval($limit);
         $sort_dir = (strtolower($sort_dir) === 'desc' ? 'desc' : 'asc');
 
+        // TODO fix DeprecatedDatabase::quoteIdentifier
         $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `wikiRevision`
@@ -326,6 +333,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getByCategoryAndSlug($categoryID, $slug, $revisionID = 0)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT r.*,
                     w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, w.slug,
                     UNIX_TIMESTAMP(r.created) modified, latestRevision, r.userID authorID,

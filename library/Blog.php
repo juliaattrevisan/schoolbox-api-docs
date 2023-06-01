@@ -25,10 +25,9 @@ class Blog extends DeprecatedModel
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
     {
-        $keyword = $this->db->quote($keyword);
-
+        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
-                            MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
+                            MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
                         FROM `blog`
                         JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
                         LEFT JOIN `user` ON `blog`.owner_id = `user`.id
@@ -39,7 +38,7 @@ class Blog extends DeprecatedModel
                             AND `userAccess`.service = 1
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                            AND MATCH(`heading`,`body`) AGAINST (:keyword)
                             AND `blog`.`deleted_at` IS NULL
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
@@ -56,7 +55,7 @@ class Blog extends DeprecatedModel
                                 AND `userAccess`.service = 1
                                 AND `userAccess`.uid = {$_SESSION['id']}
                             WHERE (`perms`.cid OR `userAccess`.sid)
-                                AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                                AND MATCH(`heading`,`body`) AGAINST (:keyword)
                                 AND `blog`.`deleted_at` IS NULL
             ";
 

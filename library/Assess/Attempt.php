@@ -31,6 +31,7 @@ class Assess_Attempt extends Evaluation_Attempt
         }
 
         // Get everything for that question
+        // TODO fix DeprecatedDatabase::quote
         $query = "
             SELECT *
             FROM assess_question aq
@@ -58,6 +59,7 @@ class Assess_Attempt extends Evaluation_Attempt
      */
     public function retrieveLatestReviewableAttemptIds($assessId)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "
             SELECT user_id, attempt_id, reviewed_at
             FROM assess_attempt

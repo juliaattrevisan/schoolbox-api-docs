@@ -282,8 +282,7 @@ class Calendar extends DeprecatedModel
 
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
     {
-        $keyword = $this->db->quote($keyword);
-
+        // TODO fix DeprecatedDatabase::quote
         // TODO remove $_SESSION dependency: or preferably this entire handler
         $sessionUser = $_SESSION['user'] ?? null;
         if (!$sessionUser instanceof User) {
@@ -337,20 +336,20 @@ class Calendar extends DeprecatedModel
             }
         }
 
-        $timeFormat = $this->db->quote(Config::get('calendar_time_format'));
+        // TODO fix DeprecatedDatabase::quote
         $event_query = "
             SELECT DISTINCT
                 event.id, owner,
                 GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-                TIME_FORMAT(start_datetime, '$timeFormat') as startTime,
-                TIME_FORMAT(end_datetime, '$timeFormat') as endTime,
+                TIME_FORMAT(start_datetime, :timeFormat) as startTime,
+                TIME_FORMAT(end_datetime, :timeFormat) as endTime,
                 TIME_TO_SEC(start_datetime) as startTimestamp,
                 TIME_TO_SEC(end_datetime) as endTimestamp,
                 start_datetime, end_datetime,
                 type, event.title, access, location, detail,
                 user.id as uid, user.title AS userTitle, firstname, preferred_name, lastname,
                 eventType, eventColour,
-                MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
+                MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword) AS `score`
             FROM event
                 LEFT JOIN user ON owner = user.id
                 LEFT JOIN luEventType ON type = eventTypeID
@@ -362,7 +361,7 @@ class Calendar extends DeprecatedModel
                     $groupQuery
                     OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
                 )
-                AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+                AND MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword)
                 AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
                 AND event.deleted_at IS NULL
             GROUP BY id
@@ -385,7 +384,7 @@ class Calendar extends DeprecatedModel
                 OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
             )
             AND event.deleted_at IS NULL
-            AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+            AND MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword)
             AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
         ";
 

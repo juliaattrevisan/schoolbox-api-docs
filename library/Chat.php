@@ -137,8 +137,13 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getUsers($category_id)
     {
+        // TODO fix DeprecatedDatabase::quote
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
-        $time  = new DateTime(self::CHAT_POLL_EXPIRY);
+        $time   = new DateTime(self::CHAT_POLL_EXPIRY);
+        $params = [
+            $category_id,
+            $time->format('Y-m-d H:i:s'),
+        ];
         $query = "
             SELECT
                 title,
@@ -151,8 +156,8 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             FROM chat_poll
             LEFT JOIN `user` ON chat_poll.user_id = user.id
             LEFT JOIN `groups` ON user.`group_id` = `groups`.`id`
-            WHERE `category_id` = $category_id
-            AND chat_poll.time >= '{$this->db->quote($time->format('Y-m-d H:i:s'))}'
+            WHERE `category_id` = ?
+            AND chat_poll.time >= ?
         ";
 
         $users = $this->db->query($query)->fetchAll();

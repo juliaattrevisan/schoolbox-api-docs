@@ -252,6 +252,7 @@ class Group extends DeprecatedModel
      */
     public function deleteUser($relationID, $userID)
     {
+        // TODO fix DeprecatedDatabase::quote
         $query = "
 			DELETE FROM userAccess
 			WHERE service = '{$this->db->quote($this->_service)}'
@@ -637,6 +638,7 @@ class Group extends DeprecatedModel
             : '';
         $homepageJoin = $requireHomepage ? ' JOIN homepage_config ON folder.id = homepage_config.cid ' : '';
 
+        // TODO fix DeprecatedDatabase::quote
         $query = "
             SELECT
                 folder.name,
