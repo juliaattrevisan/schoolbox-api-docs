@@ -130,11 +130,6 @@
                 event.data.filesystem = response.hash.split(":")[0];
                 event.stop();
             },
-
-            wordcount: {
-                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_TEXT,
-                maxCharCountAddDefaultEventListeners: true,
-            },
         };
 
         var derived = {};
