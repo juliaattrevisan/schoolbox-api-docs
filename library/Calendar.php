@@ -282,7 +282,6 @@ class Calendar extends DeprecatedModel
 
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
     {
-        // TODO fix DeprecatedDatabase::quote
         // TODO remove $_SESSION dependency: or preferably this entire handler
         $sessionUser = $_SESSION['user'] ?? null;
         if (!$sessionUser instanceof User) {
@@ -336,7 +335,6 @@ class Calendar extends DeprecatedModel
             }
         }
 
-        // TODO fix DeprecatedDatabase::quote
         $event_query = "
             SELECT DISTINCT
                 event.id, owner,

@@ -61,16 +61,17 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC')
     {
-        // TODO fix DeprecatedDatabase::quote
         // TODO add full search capabilities, currently just used by ajax
-        $query = "SELECT textBoxID, categoryID, heading, body, folder.name as cname
-                     FROM " . $this->_table . "
-                    JOIN folder ON categoryID = folder.id
-                  WHERE textBox.deleted = 'false' AND heading like '%" . $this->db->quote($keyword) . "%'
-                  AND folder.deleted_at IS NULL
-                  ORDER BY $sort_by $sort_dir
-                  LIMIT $offset, $limit";
+        $query = "
+            SELECT textBoxID, categoryID, heading, body, folder.name as cname
+            FROM textBox
+            JOIN folder ON categoryID = folder.id
+            WHERE textBox.deleted = 'false' AND heading like ?
+            AND folder.deleted_at IS NULL
+            ORDER BY $sort_by $sort_dir
+            LIMIT $offset, $limit
+        ";
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, ['%' . $this->db->getQuoter()->escapeForLike($keyword) . '%'])->fetchAll();
     }
 }

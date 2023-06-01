@@ -25,8 +25,8 @@ class Blog extends DeprecatedModel
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
     {
-        // TODO fix DeprecatedDatabase::quote
-        $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
+        $params = ['keyword' => $keyword];
+        $query  = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
                         FROM `blog`
                         JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
@@ -59,8 +59,8 @@ class Blog extends DeprecatedModel
                                 AND `blog`.`deleted_at` IS NULL
             ";
 
-        $count = $this->db->query($count_query)->fetchColumn();
+        $count = $this->db->query($count_query, $params)->fetchColumn();
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, $params)->fetchAll();
     }
 }

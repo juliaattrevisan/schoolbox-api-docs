@@ -137,13 +137,12 @@ class MyFolder extends DeprecatedModel
      */
     public function hasChildren($folderID)
     {
-        // TODO fix DeprecatedDatabase::quote
         $query = "SELECT f.id as children
                   FROM myFolder f
-                  WHERE parent = {$this->db->quote($folderID)}
+                  WHERE parent = ?
                   LIMIT 1";
 
-        return $this->db->query($query)->fetchColumn();
+        return $this->db->query($query, [$folderID])->fetchColumn();
     }
 
 

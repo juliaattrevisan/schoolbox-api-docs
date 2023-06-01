@@ -137,7 +137,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getUsers($category_id)
     {
-        // TODO fix DeprecatedDatabase::quote
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
         $time   = new DateTime(self::CHAT_POLL_EXPIRY);
         $params = [
@@ -160,7 +159,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             AND chat_poll.time >= ?
         ";
 
-        $users = $this->db->query($query)->fetchAll();
+        $users = $this->db->query($query, $params)->fetchAll();
 
         if (!empty($users)) {
             $userHandler = new User();

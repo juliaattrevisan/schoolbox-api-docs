@@ -241,35 +241,6 @@ class Group extends DeprecatedModel
     }
 
     /**
-     * Deletes a uid also can optionally delete a user based on its permission
-     *
-     * TODO remove this and update/remove everywhere which uses it:
-     * * group delete
-     *
-     * @param int $relationID
-     * @param int $userID
-     * @return resource
-     */
-    public function deleteUser($relationID, $userID)
-    {
-        // TODO fix DeprecatedDatabase::quote
-        $query = "
-			DELETE FROM userAccess
-			WHERE service = '{$this->db->quote($this->_service)}'
-			AND sid = '{$this->db->quote($relationID)}'
-			AND uid = '{$this->db->quote($userID)}'
-		";
-
-        if ($result = $this->db->query($query)) {
-            $user = $this->extractSessionUser();
-            if ($user) {
-                $this->getUserNotifier()->manualNotifyUpdated($userID, $user);
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Does this user have access to this category ONLY through their children?
      *
      * If the user has read permission, are a parent and aren't directly
@@ -638,22 +609,21 @@ class Group extends DeprecatedModel
             : '';
         $homepageJoin = $requireHomepage ? ' JOIN homepage_config ON folder.id = homepage_config.cid ' : '';
 
-        // TODO fix DeprecatedDatabase::quote
         $query = "
             SELECT
                 folder.name,
                 folder.id,
                 userAccess.type
             FROM folder
-            INNER JOIN userAccess on folder.id = userAccess.sid AND userAccess.service = '{$this->db->quote($this->_service)}'
+            INNER JOIN userAccess on folder.id = userAccess.sid AND userAccess.service = ?
             $homepageJoin
-            WHERE userAccess.uid = '{$this->db->quote($userID)}'
-            AND userAccess.type >= '{$this->db->quote($accessType)}'
+            WHERE userAccess.uid = ?
+            AND userAccess.type >= ?
             AND folder.deleted_at IS NULL
             $exclude_part
         ";
 
-        $query = $this->db->query($query);
+        $query = $this->db->query($query, [$this->_service, $userID, $accessType]);
         foreach ($query as $result) {
             $catList[] = $result;
         }
