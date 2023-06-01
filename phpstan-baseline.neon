@@ -1876,16 +1876,6 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
-			message: "#^Method Group\\:\\:deleteUser\\(\\) should return resource but returns PDOStatement\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
 			message: "#^Property Group\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
 			path: library/Group.php
@@ -1939,11 +1929,6 @@ parameters:
 			message: "#^Constructor of class Page has an unused parameter \\$error\\.$#"
 			count: 1
 			path: library/Page.php
-
-		-
-			message: "#^Method Poll\\:\\:delete\\(\\) should return bool but returns PDOStatement\\.$#"
-			count: 1
-			path: library/Poll.php
 
 		-
 			message: "#^Cannot access offset 'name' on true\\.$#"

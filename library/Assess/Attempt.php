@@ -82,15 +82,4 @@ class Assess_Attempt extends Evaluation_Attempt
         }
         return $results;
     }
-
-    /**
-     * Builds the contents of a `IN()` statement for the list of attempt IDs.
-     *
-     * @param int[] $attemptIds
-     * @return string
-     */
-    private function buildReviewableAttemptsForQuery(array $attemptIds)
-    {
-        return implode(',', array_map([$this->db, 'smartQuote'], $attemptIds));
-    }
 }

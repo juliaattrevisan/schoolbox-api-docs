@@ -340,7 +340,7 @@ class User extends DeprecatedModel
                         or lastname like :name
                         or username like :name
                     ) ";
-                    $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($param) . '%';
+                    $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
                 }
             }
             if (is_array($group)) {
