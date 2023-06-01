@@ -45,6 +45,8 @@ export function getConfigForVideo(overrideValueByKey?: object) {
             const aspectRatio = 16 / 9;
 
             if (node.classList.contains("full-width")) {
+                // TODO: This does not seem to be necessary anymore.
+                // If this is necessary, it will be only for videos in CKEditor content saved prior to 23.0.1.
                 node.style.width = "100%";
                 container.style.height = Math.round(container.getBoundingClientRect().width / aspectRatio) + "px";
             }
@@ -54,6 +56,13 @@ export function getConfigForVideo(overrideValueByKey?: object) {
             // bounds of the container.
             const poster = container.querySelector(".mejs__poster");
             if (poster !== null) {
+                // TODO: This does not seem to be necessary anymore.
+                // If this is necessary, it will be only for videos that do not have a letterboxed poster image.
+                // Letterboxed poster images were added in SA-15531.
+                // Another reason this line might still be useful is if we ever want to switch to another aspect ratio.
+                // Test the effect of the below line by embedding a variety of videos, and then setting aspectRatio
+                // to something overly wide or high (like 24:9, or 9:24) for example.  Then compare the video posters
+                // with or without this line.
                 poster.removeAttribute("style");
             }
 
@@ -73,26 +82,25 @@ export function getConfigForVideo(overrideValueByKey?: object) {
              */
             function fixVideoPlayerDimensions() {
                 if (replacementContainer !== null) {
-                    replacementContainer.style.display = ""; // Set display to blank so we can calculate dimensions.
+                    // Set display to 'block' temporarily so we can calculate dimensions.  This allows the container to
+                    // grow if it is able to, when we set container.style.width to 'auto' below.
+                    replacementContainer.style.display = "block";
                 }
 
-                container.style.width = "auto";
+                container.style.width = "auto"; // Allow container width to grow or shrink as required.
                 const containerW = container.getBoundingClientRect().width;
                 const containerH = Math.round(containerW / aspectRatio);
-
-                container.style.height = containerH + "px";
-                instance.setPlayerSize(containerW, containerH);
+                instance.setPlayerSize(containerW, containerH); // This sets container.style.width and container.style.height to 'px' values.
 
                 if (replacementContainer !== null) {
                     // Set display to inline-block so eg. text-align:right on parent element will cause video to align right.
-                    // This must be done after the dimensions are calculated.
                     replacementContainer.style.display = "inline-block";
                 }
             }
 
-            window.addEventListener("resize", fixVideoPlayerDimensions);
+            fixVideoPlayerDimensions(); // Fix dimensions on page load.
 
-            fixVideoPlayerDimensions();
+            window.addEventListener("resize", fixVideoPlayerDimensions); // Fix dimensions again on resize events.
         },
     };
 
