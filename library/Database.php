@@ -503,12 +503,13 @@ class Database implements IDatabase, Serializable
      *
      * @deprecated use \Schoolbox\Mapper::save()
      *
-     * @param $table
-     * @param $array
-     *
+     * @param string $table     Insert into this table
+     * @param array  $array     Insert this set of key-value pairs into this
+     *                          table's fields
+     * @param array  $nowFields Update these fields with `NOW()`
      * @return bool
      */
-    public function insert($table, $array)
+    public function insert($table, $array, array $nowFields = [])
     {
         if (!($table && is_array($array))) {
             return false;
