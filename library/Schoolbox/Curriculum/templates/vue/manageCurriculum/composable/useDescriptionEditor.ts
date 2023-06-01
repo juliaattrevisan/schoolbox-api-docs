@@ -79,7 +79,7 @@ export function useDescriptionEditor(
                     detail: {
                         targetElements: [`#${ckeditorSelector}`],
                         toolbar: "simple",
-                        maxCharCountAddDefaultEventListeners: false,
+                        addMaxCharCountDefaultEventListeners: false,
                     },
                 })
             );

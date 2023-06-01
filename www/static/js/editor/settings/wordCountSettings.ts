@@ -117,7 +117,7 @@ function updateWordCount(
         }
     };
 
-    if (config.maxCharCountAddDefaultEventListeners) {
+    if (config.addMaxCharCountDefaultEventListeners) {
         let containingForm: HTMLFormElement | null;
         let submitButtons: HTMLElement[];
 
@@ -176,7 +176,7 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
  *  * https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
  *  * https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
  *  * https://vagrant.dev.schoolbox.cloud/curriculum (
- *       Vue example using config.maxCharCountAddDefaultEventListeners: false
+ *       Vue example using config.addMaxCharCountDefaultEventListeners: false
  *       (The default event listeners directly manipulate the DOM, and in Vue land that should be avoided.
  *        Specifically, directly manipulating the DOM can cause reactivity to break in tracked properties.
  *        https://www.danvega.dev/blog/2019/04/18/tips-for-vue-developers-avoid-directly-manipulating-the-dom/)
