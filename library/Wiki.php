@@ -142,9 +142,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function createRevision($data)
     {
-        $data['created'] = 'NOW()';
         $data['userID'] = $_SESSION['id'];
-        $this->db->insert($this->_revisionTable, $data);
+        $this->db->insert($this->_revisionTable, $data, ['created']);
         return $this->db->lastInsertId();
     }
 
