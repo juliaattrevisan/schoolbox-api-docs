@@ -7,8 +7,15 @@
 
 namespace Schoolbox\Test;
 
+use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Iterator\IIterator;
+use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Quoter\IQuoter;
+use Alaress\Database\Statement\FunctionCall\IFunctionCall;
+use Alaress\Database\Statement\IStatement;
+use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -24,7 +31,7 @@ use Traversable;
  * $mapper->getDatabase()->setNextResult('fetch', array(...));
  * </code>
  */
-class MockConnector implements IConnector, IQuoter
+class MockConnector implements IConnector
 {
     /**
      * The test case, required for creating mocks
@@ -131,28 +138,28 @@ class MockConnector implements IConnector, IQuoter
         return $this->mockStatement;
     }
 
-    /**
-     * Mock of quoteIdentifier (used by Schoolbox\Mapper->findByColumnList())
-     *
-     * @param  string $string
-     * @return string
-     */
-    public function quoteIdentifier($string)
-    {
-        return $string;
-    }
+//    /**
+//     * Mock of quoteIdentifier (used by Schoolbox\Mapper->findByColumnList())
+//     *
+//     * @param  string $string
+//     * @return string
+//     */
+//    public function quoteIdentifier($string)
+//    {
+//        return $string;
+//    }
 
 
     /**
      * Returns the mocked statement.
      *
-     * @param string $statement
+     * @param string $sql
      * @param array  $args
      * @return PDOStatement
      */
-    public function query($statement, array $args = null)
+    public function query(string $sql, array $args = null): IStatement
     {
-        return $this->prepare($statement, $args);
+        return $this->prepare($sql, $args);
     }
 
 
@@ -256,5 +263,178 @@ class MockConnector implements IConnector, IQuoter
     public function setNextInsertId($nextInsertId)
     {
         $this->nextInsertId = $nextInsertId;
+    }
+
+    public function connect($hostname, $database, $username, $password, $options = [])
+    {
+    }
+
+    public function reconnect($options = null)
+    {
+    }
+
+    public function enableMultipleActiveResultSets()
+    {
+    }
+
+    public function disableMultipleActiveResultSets()
+    {
+    }
+
+    public function setTimezone($timezone)
+    {
+    }
+
+    public function execute($sql)
+    {
+    }
+
+    public function executeDirectly(string $sql): bool
+    {
+        return true;
+    }
+
+    public function prepareQuery($query, $parameters = [])
+    {
+    }
+
+    public function executeQuery($sql, $parameters = null)
+    {
+        // TODO: Implement executeQuery() method.
+    }
+
+    public function getQueryIterator($sql, $parameters = null)
+    {
+        // TODO: Implement getQueryIterator() method.
+    }
+
+    public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
+    {
+        // TODO: Implement prepareFunctionCall() method.
+    }
+
+    public function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
+    {
+        // TODO: Implement executeFunctionCall() method.
+    }
+
+    public function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
+    {
+        // TODO: Implement prepareStoredProcedure() method.
+    }
+
+    public function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
+    {
+        // TODO: Implement executeStoredProcedure() method.
+    }
+
+    public function getStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null)
+    {
+        // TODO: Implement getStoredProcedureIterator() method.
+    }
+
+    public function inTransaction()
+    {
+        // TODO: Implement inTransaction() method.
+    }
+
+    public function errorInfo()
+    {
+        // TODO: Implement errorInfo() method.
+    }
+
+    public function errorCode()
+    {
+        // TODO: Implement errorCode() method.
+    }
+
+    public function getHostname()
+    {
+        // TODO: Implement getHostname() method.
+    }
+
+    public function getPort()
+    {
+        // TODO: Implement getPort() method.
+    }
+
+    public function getUsername()
+    {
+        // TODO: Implement getUsername() method.
+    }
+
+    public function getPassword()
+    {
+        // TODO: Implement getPassword() method.
+    }
+
+    public function getDatabase()
+    {
+        // TODO: Implement getDatabase() method.
+    }
+
+    public function getCollector()
+    {
+        // TODO: Implement getCollector() method.
+    }
+
+    public function addPostProcessor($callable)
+    {
+        // TODO: Implement addPostProcessor() method.
+    }
+
+    public function prepareInBindings($externalIds, $prefix = 'param')
+    {
+        // TODO: Implement prepareInBindings() method.
+    }
+
+    public function buildPredicateBuilder($table)
+    {
+        // TODO: Implement buildPredicateBuilder() method.
+    }
+
+    public function getRow(string $sql, array $parameters = null)
+    {
+        // TODO: Implement getRow() method.
+    }
+
+    public function getOne(string $sql, array $parameters = null)
+    {
+        // TODO: Implement getOne() method.
+    }
+
+    public function getAll(string $sql, array $parameters = null): array
+    {
+        // TODO: Implement getAll() method.
+    }
+
+    public function getIterator(string $sql, array $parameters = null): IIterator
+    {
+        // TODO: Implement getIterator() method.
+    }
+
+    public function prepareProcedure(string $name): IStoredProcedure
+    {
+        // TODO: Implement prepareProcedure() method.
+    }
+
+    public function legacyQuote($value): string
+    {
+        return $value;
+    }
+
+    public function trimAll(array $rowset): array
+    {
+        return $rowset;
+    }
+
+    public function trimRow(array $row): array
+    {
+        return $row;
+    }
+
+    public function trimField($fieldValue)
+    {
+        return $fieldValue;
     }
 }
