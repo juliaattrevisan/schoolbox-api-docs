@@ -10,8 +10,6 @@
 
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
-use Calendar\Event\Type\Submission\Event as SubmissionEvent;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -22,9 +20,8 @@ $user = $user_mapper->findById($_GET['userId']);
 $viewer = $_SESSION['user'];
 try {
     Calendar_Layout_Full_Ajax_JSON::permissionCheck(
-        $_GET['userId'],
-        $_SESSION['user'],
-        new Group()
+        $user,
+        $viewer,
     );
 } catch (Exception $e) {
     error($e->getCode());

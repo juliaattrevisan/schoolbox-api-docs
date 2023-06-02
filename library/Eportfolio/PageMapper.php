@@ -110,11 +110,11 @@ class PageMapper extends Schoolbox\Mapper
     /**
      * Finds all the pages owned by $ownerId that $viewerId can see
      *
-     * @param int $viewerId
-     * @param int $ownerId
+     * @param Schoolbox\User $viewer
+     * @param Schoolbox\User $owner
      * @return GenericCollection|Page[]
      */
-    public function findViewablePages($viewerId, $ownerId)
+    public function findViewablePages(Schoolbox\User $viewer, Schoolbox\User $owner)
     {
         $viewablePages = $this->createCollection();
 
@@ -122,11 +122,11 @@ class PageMapper extends Schoolbox\Mapper
          */
         $groupHandler = new \Group();
 
-        $isViewerParent = $groupHandler->isParentOfChild($ownerId);
+        $isViewerParent = $viewer->isParentOf($owner);
 
         /* The categories the viewer is involved in
          */
-        $allCategories = $groupHandler->involvedInCategoryList($viewerId);
+        $allCategories = $groupHandler->involvedInCategoryList($viewer->getId());
 
         $categoryIds = array();
 
@@ -137,7 +137,7 @@ class PageMapper extends Schoolbox\Mapper
         }
         /* Get all the pages with their permissions
          */
-        $allPages = $this->findPagesWithPermissions($ownerId);
+        $allPages = $this->findPagesWithPermissions($owner->getId());
 
         foreach ($allPages as $currentPage) {
             /* They can be a superuser
@@ -150,7 +150,7 @@ class PageMapper extends Schoolbox\Mapper
 
             /* They can be the owner of the page
              */
-            $isOwner = ($currentPage->getOwner()->getId() == $viewerId);
+            $isOwner = ($currentPage->getOwner()->getId() === $viewer->getId());
 
             if ($isSuperuser || $isStaff || $isOwner) {
                 $viewablePages->setOffset($currentPage->getPageId(), $currentPage);
@@ -171,7 +171,7 @@ class PageMapper extends Schoolbox\Mapper
                     /* They can be allowed specifically
                      */
                     $isStudent = (($currentPermission->getType() === Permission::TYPE_STUDENT)
-                        && ((int)$currentPermission->getValue() === (int)$viewerId));
+                        && ((int)$currentPermission->getValue() === $viewer->getId()));
 
                     if ($isParent || $isInGroup || $isStudent) {
                         $viewablePages->setOffset($currentPage->getPageId(), $currentPage);

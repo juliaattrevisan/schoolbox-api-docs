@@ -23,17 +23,20 @@ if (!isset($this)) {
  * representation of timetable events; any other selection causes you to see
  * the classical cyclic timetable grid
  */
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
 if (
     \Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === Config::get('timetable_view')
     || (new ValidUsesSudsTimetable())->isSatisfiedBy((string)Config::get('external_type'), (string)Config::get('schooldata_import_data_source'))
 ) {
+    /** @var SitePage $this */
     if (is_numeric($this->arg[0] ?? null)) {
         SitePage::localRedir("/timetable/calendar/{$this->arg[0]}");
     }
     /* Go to the currently-logged in user id
      * Disregard whatever the params might have been (don't need them)
      */
-    SitePage::localRedir("/timetable/calendar/{$_SESSION['user']->getId()}");
+    SitePage::localRedir("/timetable/calendar/{$sessionUser->getId()}");
 }
 
 // If External_DB not enabled do not display page
@@ -67,34 +70,21 @@ $colourList = Timetable_ColourMapper::getInstance()->findAll();
 /** @var Schoolbox\User[] $userList */
 $userList      = [];
 $numTimetables = 0;
-$child_id      = $this->arg[0] ?? 0;
+$childId       = (int)$this->arg[0];
 
-if ($_SESSION['user']->getRole()->isParent()) {
-    if (is_array($_SESSION['children'])) {
-        foreach ($_SESSION['children'] as $child) {
-            //
-            // Was a specific child ID requested? show them only, otherwise
-            // show everyone.
-            if (!$child_id || ($child_id == $child['id'])) {
-                try {
-                    $userList[] = $userMapper->findById($child['id']);
-                } catch (Schoolbox\Mapper\Exception $e) {
-                    //noop, we are getting a list
-                }
-            }
-        }
-    }
+if ($sessionUser->getRole()->isParent()) {
+    $userList = $childId === 0 ? $sessionUser->getChildren() : $sessionUser->getChildren()->filterBy('id', $childId);
     //
     // Requesting a child that isn't yours or does not exist, page not found
     if (empty($userList)) {
         $this->pageNotFound();
     }
 } else {
-    if ($child_id) {
-        if ($_SESSION['user']->getRole()->isStaff() || $child_id == $_SESSION['id']) {
+    if ($childId) {
+        if ($sessionUser->getRole()->isStaff() || $childId === $sessionUser->getId()) {
             //Output a timetable for each campus user is involved in
             try {
-                $userList[] = $userMapper->findById($child_id);
+                $userList[] = $userMapper->findById($childId);
             } catch (Schoolbox\Mapper\Exception $e) {
                 $this->pageNotFound();
             }
@@ -103,8 +93,7 @@ if ($_SESSION['user']->getRole()->isParent()) {
         }
     } else {
         // Output my own timetable (all campuses)
-        /** @var Schoolbox\User $userObject */
-        $userList[] = $_SESSION['user'];
+        $userList[] = $sessionUser;
     }
 }
 

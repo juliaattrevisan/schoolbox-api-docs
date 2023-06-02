@@ -128,7 +128,7 @@ class Renderer extends Handler
 
                 $resultIsStaff               = $groupHandler->isStaff($user['id']);
                 $resultIsStudent             = $groupHandler->isStudent($user['id']);
-                $currentUserIsParentOfResult = $groupHandler->isParentOfChild($user['id']);
+                $currentUserIsParentOfResult = $currentUser->getChildren()->filterBy('id', $user['id'])->count() > 0;
                 $currentUserIsResult         = ($user['id'] == $currentUser->getId());
 
                 /* Hide Due Work link from parents, if Due Work access is restricted or the module is disabled

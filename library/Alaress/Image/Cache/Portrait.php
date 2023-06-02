@@ -114,7 +114,7 @@ class Portrait
             // Student photos:
             // always visible by their parents
             // visible by other students if photos are not protected.
-            if ($group->isParentOfChild($userId)) {
+            if ($sessionUser->isParentOf($currentUser)) {
                 return true;
             }
 

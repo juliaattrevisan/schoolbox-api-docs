@@ -18,7 +18,7 @@ $user = $user_mapper->findByIdWithFallback($_GET['userId']);
 $viewer = $_SESSION['user'];
 
 try {
-    Calendar_Layout_Full_Ajax_JSON::permissionCheck($_GET['userId'], $viewer, new Group());
+    Calendar_Layout_Full_Ajax_JSON::permissionCheck($user, $viewer);
 } catch (Exception $e) {
     error($e->getCode());
 }

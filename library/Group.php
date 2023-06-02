@@ -375,18 +375,6 @@ class Group extends DeprecatedModel
         }
     }
 
-    public function isParentOfChild($childID)
-    {
-        if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
-            foreach ($_SESSION['children'] as $child) {
-                if ($child['id'] == $childID) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public function involvedInGroup($uid, $cid)
     {
         //returns true on user being involved in group

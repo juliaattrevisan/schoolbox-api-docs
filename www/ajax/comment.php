@@ -62,8 +62,8 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
     }
 
     /**
-     * @var $uMap UserMapper
-     * @var $cMap FolderMapper
+     * @var UserMapper   $uMap
+     * @var FolderMapper $cMap
      */
     $uMap = UserMapper::getInstance();
     $cMap = FolderMapper::getInstance();
@@ -82,7 +82,7 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 
     switch ($comment->getCommenter()->getRole()->getType()) {
         case Role::PARENT:
-            if (!$gHandler->isParentOfChild($comment->getStudent()->getId())) {
+            if (!$sessionUser->isParentOf($comment->getStudent())) {
                 respond(400, 'You do not have permission to view this category.');
             }
             break;
@@ -98,7 +98,6 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
             break;
     }
 
-    /** @var $commentMapper CommentMapper */
     $commentMapper = CommentMapper::getInstance();
     if (!$commentMapper->save($comment)) {
         respond(400, 'You do not have permission to view this category.');

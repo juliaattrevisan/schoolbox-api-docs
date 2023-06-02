@@ -1,6 +1,5 @@
 <?php
 
-use Alaress\Mail\Mailer;
 use Schoolbox\Error;
 
 /**
@@ -138,12 +137,12 @@ class Report_Parent extends Report_Abstract
              * If you don't have a child in this year level, you can't view it.
              */
             if (Config::get('restrict_parent_directory')) {
-                if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
-                    foreach ($_SESSION['children'] as $currentChild) {
-                        $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
-                        if ($student['StudentYearLevel'] == $this->getYearLevel()) {
-                            return true;
-                        }
+                /** @var \Schoolbox\User $sessionUser */
+                $sessionUser = $_SESSION['user'];
+                foreach ($sessionUser->getChildren() as $currentChild) {
+                    $student = $this->getExternalUserHandler()->getStudent($currentChild->getExternalId() ?? '');
+                    if ($student['StudentYearLevel'] == $this->getYearLevel()) {
+                        return true;
                     }
                 }
             } else {
@@ -301,15 +300,14 @@ class Report_Parent extends Report_Abstract
      */
     protected function getChildrensYears()
     {
-        $allYears = array();
-        if (is_array($_SESSION['children'] ?? null) && count($_SESSION['children'])) {
-            foreach ($_SESSION['children'] as $currentChild) {
-                $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
-                $allYears[$student['StudentYearLevel']] = true;
-            }
+        $allYears = [];
+        /** @var \Schoolbox\User $sessionUser */
+        $sessionUser = $_SESSION['user'];
+        foreach ($sessionUser->getChildren() as $currentChild) {
+            $student = $this->getExternalUserHandler()->getStudent($currentChild->getExternalId());
+            $allYears[$student['StudentYearLevel']] = true;
         }
-        $allYears = array_keys($allYears);
-        return $allYears;
+        return array_keys($allYears);
     }
 
     /**

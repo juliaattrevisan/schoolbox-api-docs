@@ -6,6 +6,7 @@
  */
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Permission\Access\UserAccess;
 use Custom\Dsfg\ValidJuniorSchoolStudent;
@@ -15,7 +16,8 @@ use Custom\Vist\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
-    private $children;
+    /** @var GenericCollection<\Schoolbox\User>  */
+    private GenericCollection $children;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -24,8 +26,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
-            $this->children = $_SESSION['children'];
+        if ($this->getUser()->getChildren()->count()) {
+            $this->children = $this->getUser()->getChildren();
             return true;
         }
         return false;
@@ -63,15 +65,9 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->getConfigLoader()->get('travelLog_api_caching')
         );
 
-        foreach ($this->children as $child) {
-            // Check if the current child's timetable is viewable and hide if necessary
-            try {
-                $userChild = $this->getUser()->getChildren()->getBy('id', $child['id']);
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                continue;
-            }
-
-            if ($this->getConfigLoader()->get('site_school_code') === 'WSL' && $child['gid'] === 3) {
+        /** @var \Schoolbox\User $userChild */
+        foreach ($this->children as $userChild) {
+            if ($this->getConfigLoader()->get('site_school_code') === 'WSL' && $userChild->getRole()->getId() === 3) {
                 continue;
             }
 
@@ -80,10 +76,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar([
                 'STUDENT_ID' => $userChild->getId(),
                 'STUDENT_EXTERNAL_ID' => $userChild->getExternalId(),
-                'STUDENT_NAME' => Scrub::text($child['name']),
+                'STUDENT_NAME' => Scrub::text($userChild->getFullName()),
                 'STUDENT_YEAR' => $userChild->getYear() ? Scrub::text($userChild->getYear()->getLongName($this->getSitePage()->getLocalisedTerm('year', false, true))) : '',
                 'STUDENT_YEAR_LEVEL' => $userChild->getYear() ? Scrub::text($userChild->getYear()->getName()) : '',
-                'TRAVEL_LOG' => $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true)
+                'TRAVEL_LOG' => $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true),
             ]);
 
             if (
@@ -95,8 +91,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->setVar('pastoral_block', '');
             }
 
-            if (\is_array($child['subjects'])) {
-                foreach ($child['subjects'] as $subject) {
+            if ($userChild->getSubjectCollection()) {
+                foreach ($userChild->getSubjectCollection() as $subject) {
                     if ($subject['perm'] >= UserAccess::ACCESS_READ) {
                         $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
                         $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['matchedCode'])));
