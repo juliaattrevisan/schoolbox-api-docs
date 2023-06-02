@@ -55,7 +55,7 @@ interface IStatement extends OuterIterator
      * Get single column denoted by its index for the next row in the query
      *
      * @param int $column
-     * @return string
+     * @return mixed The column value, or `false` if no rows returned.
      */
     public function fetchColumn($column = 0);
 
