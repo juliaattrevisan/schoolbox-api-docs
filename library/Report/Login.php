@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Database\Factory;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -71,7 +73,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
     protected function setup()
     {
         // set blocks
-        $this->db = Database::getInstance();
+        $this->db = Factory::getInstanceInternal();
         $this->getPage()->setFile('activity_t', 'adminv2/report/login.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
         $this->getPage()->setTitle('Login Report');

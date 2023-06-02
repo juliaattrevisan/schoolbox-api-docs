@@ -10,6 +10,7 @@
 namespace Schoolbox\Engagement;
 
 use Database;
+use Schoolbox\Database\Factory;
 
 class Poll
 {
@@ -23,7 +24,7 @@ class Poll
      */
     public function __construct()
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
     public function votes(\Alaress_Date_Format $start, \Alaress_Date_Format $end)

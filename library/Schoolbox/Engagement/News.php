@@ -10,6 +10,7 @@
 namespace Schoolbox\Engagement;
 
 use Database;
+use Schoolbox\Database\Factory;
 
 class News
 {
@@ -23,7 +24,7 @@ class News
      */
     public function __construct()
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
     public function schoolCreated(\Alaress_Date_Format $start, \Alaress_Date_Format $end)

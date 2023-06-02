@@ -1,5 +1,8 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -37,9 +40,9 @@ class Report_Activity extends Report_Abstract implements Report_IReport
     private $defaultOrderBy = 'time';
 
     /**
-     * @var Database
+     * @var IConnector
      */
-    protected $db;
+    protected IConnector $db;
 
     public function __construct($page)
     {
@@ -57,7 +60,7 @@ class Report_Activity extends Report_Abstract implements Report_IReport
     protected function setup()
     {
         // set blocks
-        $this->db = Database::getInstance();
+        $this->db = Factory::getInstanceInternal();
         $this->getPage()->setFile('activity_t', 'adminv2/report/activity.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
         $this->getPage()->setTitle('Activity Report');

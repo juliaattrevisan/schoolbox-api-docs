@@ -8,6 +8,8 @@
  */
 
 // we should not be in SitePage context for this
+use Schoolbox\Database\Factory;
+
 if (isset($this)) {
     error(2);
 }
@@ -76,7 +78,7 @@ if ($action == 'delete') {
 }
 
 for ($i = 0; $i < count($sql); $i++) {
-    $stmt = Database::getInstance()->prepare($sql[$i]);
+    $stmt = Factory::getInstanceInternal()->prepare($sql[$i]);
     $stmt->execute($vars[$i]);
 }
 

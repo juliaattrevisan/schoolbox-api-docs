@@ -9,6 +9,7 @@
 
 use Schoolbox\CampusMapper;
 use Schoolbox\Comms\News;
+use Schoolbox\Database\Factory;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -59,9 +60,9 @@ class CampusReassignment extends AbstractNotificationTest
         $this->clearRabbit();
 
         // fix email addresses
-        Database::getInstance()->query("UPDATE `user` SET alt_email = CONCAT(LOWER(firstname), '.', LOWER(lastname), '@school.box')");
+        Factory::getInstanceInternal()->query("UPDATE `user` SET alt_email = CONCAT(LOWER(firstname), '.', LOWER(lastname), '@school.box')");
 
-        $this->checkCampusStmt = Database::getInstance()->prepare("
+        $this->checkCampusStmt = Factory::getInstanceInternal()->prepare("
             SELECT COUNT(*)
             FROM userCampus
             WHERE campus = ?
@@ -228,8 +229,8 @@ class CampusReassignment extends AbstractNotificationTest
      */
     private function moveCampus($destinationId)
     {
-        Database::getInstance()->query("DELETE FROM `userCampus`");
-        Database::getInstance()->query("INSERT INTO `userCampus` SELECT id, :c, :c FROM `user`", [ 'c' => (int)$destinationId ]);
+        Factory::getInstanceInternal()->query("DELETE FROM `userCampus`");
+        Factory::getInstanceInternal()->query("INSERT INTO `userCampus` SELECT id, :c, :c FROM `user`", [ 'c' => (int)$destinationId ]);
         $this->currentCampus = $destinationId;
         $this->log->notice("Everyone is now in campus $destinationId");
     }

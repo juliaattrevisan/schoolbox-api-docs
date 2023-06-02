@@ -9,6 +9,7 @@
 *                                                           *
 ************************************************************/
 
+use Schoolbox\Database\Factory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Lumberjack\Logger;
 
@@ -42,7 +43,7 @@ if (PHP_SAPI !== 'cli') {
     function httpError($code, $message)
     {
         if (is_numeric($message)) {
-            $msg = Database::getInstance()->query("SELECT message FROM error WHERE id = $message")->fetchColumn();
+            $msg = Factory::getInstanceInternal()->query("SELECT message FROM error WHERE id = $message")->fetchColumn();
         } else {
             $msg = $message;
         }

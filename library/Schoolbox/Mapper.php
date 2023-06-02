@@ -31,6 +31,7 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Column\Model as ModelColumn;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Database\Factory;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
@@ -446,7 +447,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function setupDatabase()
     {
-        $this->database = \Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
     /**

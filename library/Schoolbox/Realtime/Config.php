@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime;
 
 use Schoolbox\Collection;
+use Schoolbox\Database\Factory;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\Reroute;
@@ -187,7 +188,7 @@ class Config
         }
 
         // TODO move this to a mapper
-        $stmt = \Database::getInstance()->query("
+        $stmt = Factory::getInstanceInternal()->query("
             SELECT n.id namespace_id, s.id source_id, s.key source_key, s.description source_description,
               r.id role_id, COALESCE(rp.mask, 'MU') mask, COALESCE(rp.role_default, 'MU') def
             FROM msg_namespace n

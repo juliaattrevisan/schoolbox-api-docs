@@ -12,6 +12,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Database\Factory;
+
 require_once __DIR__ . '/../conf/core/require.php';
 
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
@@ -24,7 +26,7 @@ if (empty($opts['t'])) {
 
 $table = preg_replace('`[^a-zA-Z_]`', '', $opts['t']);
 
-$stmt = Database::getInstance()->prepare("DESCRIBE `$table`;");
+$stmt = Factory::getInstanceInternal()->prepare("DESCRIBE `$table`;");
 $stmt->execute();
 
 $mapper = array();

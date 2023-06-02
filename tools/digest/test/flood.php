@@ -8,6 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Database\Factory;
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
@@ -19,7 +21,7 @@ $session = $argv[1];
 $count   = intval($argv[2]);
 
 // remove existing
-Database::getInstance()->exec("UPDATE news_items SET item_deleted = 1");
+Factory::getInstanceInternal()->exec("UPDATE news_items SET item_deleted = 1");
 
 
 $rss = new Alaress_Rss_Stream(Config::get('welcome_rss_url'));

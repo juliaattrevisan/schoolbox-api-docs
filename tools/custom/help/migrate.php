@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Database\Factory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -76,7 +77,7 @@ HELP;
 
         /* For each user who doesn't have a portrait_hash...
          */
-        $db            = Database::getInstance();
+        $db            = Factory::getInstanceInternal();
         $storageMapper = StorageMapper::getInstance();
 
         $updateQuery = $db->prepare('

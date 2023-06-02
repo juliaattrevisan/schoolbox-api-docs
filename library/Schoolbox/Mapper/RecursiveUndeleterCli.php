@@ -31,6 +31,7 @@ use Database;
 use PDOException;
 use Schoolbox\Blog;
 use Schoolbox\Collection;
+use Schoolbox\Database\Factory;
 use Schoolbox\Discussion;
 use Schoolbox\IMapper;
 use Schoolbox\Fixtures;
@@ -173,7 +174,7 @@ class RecursiveUndeleterCli extends CliTool\App
      */
     private function connectToDatabase(): void
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
 

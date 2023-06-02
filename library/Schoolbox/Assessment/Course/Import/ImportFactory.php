@@ -8,9 +8,11 @@
 
 namespace Schoolbox\Assessment\Course\Import;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
 use Alaress_Date_Format;
+use Schoolbox\Database\Factory;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -47,8 +49,8 @@ use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
  */
 class ImportFactory
 {
-    /** @var IDatabase */
-    private $database;
+    /** @var IConnector */
+    private IConnector $database;
 
     /**
      * All known Assessables, indexed by assessment.id
@@ -90,7 +92,7 @@ class ImportFactory
         $this->componentInstanceMapper         = $componentInstanceMapper;
         $this->componentConfigDefinitionMapper = $componentConfigDefinitionMapper;
         $this->componentConfigInstanceMapper   = $componentConfigInstanceMapper;
-        $this->database                        = \Database::getInstance();
+        $this->database                        = Factory::getInstanceInternal();
         $this->assessmentCache                 = new GenericCollection(IAssessable::class);
     }
 

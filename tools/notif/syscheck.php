@@ -11,6 +11,7 @@
 
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Lumberjack\Logger;
+use Schoolbox\Database\Factory;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 
@@ -53,7 +54,7 @@ try {
     $d->info("Testing external dependencies are online...");
 
     // test database is online
-    if (!Database::getInstance()->isConnected()) {
+    if (!Factory::getInstanceInternal()->isConnected()) {
         throw new PDOException("Database is not connected");
     }
     $d->notice('MySQL is online', array('char' => '+'));

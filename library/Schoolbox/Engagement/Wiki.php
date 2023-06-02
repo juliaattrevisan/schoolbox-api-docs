@@ -10,6 +10,7 @@
 namespace Schoolbox\Engagement;
 
 use Database;
+use Schoolbox\Database\Factory;
 
 class Wiki
 {
@@ -23,7 +24,7 @@ class Wiki
      */
     public function __construct()
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
     public function revision(\Alaress_Date_Format $start, \Alaress_Date_Format $end)

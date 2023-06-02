@@ -9,21 +9,22 @@
 
 namespace Schoolbox\Engagement;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 
 class Component
 {
     /**
-     * @var Database
+     * @var IConnector
      */
-    private $database;
+    private IConnector $database;
 
     /**
      * Constructor - sets up database
      */
     public function __construct()
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
     public function componentInstances($module = 'homepage')

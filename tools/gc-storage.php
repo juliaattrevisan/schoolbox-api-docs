@@ -16,6 +16,7 @@
  */
 
 use Alaress\Lumberjack\Logger;
+use Schoolbox\Database\Factory;
 use Schoolbox\Resource\Storage\GC;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Application\Daemon;
@@ -33,7 +34,7 @@ new Daemon\Kernel(
     ]
 );
 
-$pdo = Database::getInstance();
+$pdo = Factory::getInstanceInternal();
 
 $threshold = 0;
 if (isset($opts['v'])) {

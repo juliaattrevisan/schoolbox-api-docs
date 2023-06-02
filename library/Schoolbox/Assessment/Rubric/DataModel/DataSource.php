@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Database;
 use PDO;
@@ -46,6 +47,7 @@ use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Collection;
+use Schoolbox\Database\Factory;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -95,13 +97,13 @@ class DataSource
         return self::$instance[$class_name];
     }
 
-    /** @var Database */
-    protected $database;
+    /** @var IConnector */
+    protected IConnector $database;
 
     /** */
     public function __construct()
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
 

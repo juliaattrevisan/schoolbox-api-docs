@@ -6,6 +6,8 @@
  */
 
 //display what has change since the last login for the user
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 
 /**
  * Class Activity
@@ -15,7 +17,7 @@ class Activity
     /**
      * A database connection
      */
-    private Database $db;
+    private IConnector $db;
 
 
     /**
@@ -24,7 +26,7 @@ class Activity
     public function __construct()
     {
         //setup db
-        $this->db = Database::getInstance();
+        $this->db = Factory::getInstanceInternal();
     }
 
 

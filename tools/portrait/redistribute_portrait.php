@@ -14,6 +14,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Database\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -40,8 +41,8 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Redistribute portraits from one user account to all others that have the 
-same external id (synergy_id) value. It takes the most recently updated 
+Redistribute portraits from one user account to all others that have the
+same external id (synergy_id) value. It takes the most recently updated
 account with a portrait hash and gives it to all the others.
 
 Usage: redistribute_portrait.php
@@ -51,7 +52,7 @@ HELP;
             exit;
         }
 
-        $db = Database::getInstance();
+        $db = Factory::getInstanceInternal();
 
         /* Find all the users with multiple external ids
          */
@@ -68,7 +69,7 @@ HELP;
          * This has will be redistributed to all the other accounts
          */
         $mostRecentPortraitStatement = $db->prepare('
-            SELECT id, username, portrait_hash, updated_at 
+            SELECT id, username, portrait_hash, updated_at
             FROM `user`
             WHERE portrait_hash IS NOT NULL
             AND synergy_id = :externalId
