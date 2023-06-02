@@ -25,6 +25,7 @@
 
 namespace Schoolbox\Mapper;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
 use Database;
@@ -63,8 +64,8 @@ class RecursiveUndeleterCli extends CliTool\App
     /** @var array the ids that were supplied in a command-line argument (array of integers or ['*']) */
     private $rootIds;
 
-    /** @var Database */
-    private $database;
+    /** @var IConnector */
+    private IConnector $database;
 
     /** @var Logger */
     private $logger;

@@ -1,5 +1,6 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Database\Factory;
 
 /**
@@ -53,9 +54,9 @@ class Report_Login extends Report_Abstract implements Report_IReport
     );
 
     /**
-     * @var Database
+     * @var IConnector
      */
-    protected $db;
+    protected IConnector $db;
 
     public function __construct($page)
     {

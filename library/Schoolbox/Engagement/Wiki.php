@@ -9,13 +9,13 @@
 
 namespace Schoolbox\Engagement;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Database\Factory;
 
 class Wiki
 {
     /**
-     * @var Database
+     * @var IConnector
      */
     private $database;
 

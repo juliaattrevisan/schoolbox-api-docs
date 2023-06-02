@@ -9,15 +9,15 @@
 
 namespace Schoolbox\Engagement;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Database\Factory;
 
 class Mobile
 {
     /**
-     * @var Database
+     * @var IConnector
      */
-    private $database;
+    private IConnector $database;
 
     /**
      * Constructor - sets up database

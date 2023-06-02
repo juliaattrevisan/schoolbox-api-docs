@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace External\Canvas\Redirect;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\IDatabase;
 use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -57,9 +58,9 @@ class AbstractRedirect
     /**
      * A direct connection to our local schoolbox db
      *
-     * @var IDatabase
+     * @var IConnector
      */
-    protected IDatabase $db;
+    protected IConnector $db;
 
     /**
      * Constructor.

@@ -79,13 +79,14 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         // Delete and save user's selections atomically
-        return $this->database->transact(function () use ($user, $page, $selectionsToSave) {
+        $this->database->transact(function () use ($user, $page, $selectionsToSave) {
             $this->deleteByColumnList([
                 'user_id' => $user->getId(),
                 'page'    => $page,
             ]);
             $this->save($selectionsToSave);
         });
+        return true;
     }
 
 
