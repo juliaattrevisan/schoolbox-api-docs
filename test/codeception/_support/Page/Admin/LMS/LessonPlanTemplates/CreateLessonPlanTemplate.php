@@ -14,6 +14,10 @@ class CreateLessonPlanTemplate
 
     public const BUTTON_SAVE = '#save-button';
 
+    public const BUTTON_DELETE = 'a.class.button icon-delete';
+
+    public const CONFIRM_YES = '#confirm-dialog-confirm-button';
+
     private AcceptanceTester $tester;
 
     /**
@@ -36,7 +40,7 @@ class CreateLessonPlanTemplate
     }
 
     /**
-     * click "Add a new field"
+     * click 'Add a new field"
      */
     public function clickAddNewFieldButton(): void
     {
@@ -72,6 +76,22 @@ class CreateLessonPlanTemplate
     public function clickSaveButton(): void
     {
         $this->tester->click(self::BUTTON_SAVE);
+    }
+
+    /**
+     * click delete button
+     */
+    public function clickDeleteButton(): void
+    {
+        $this->tester->click(Locator::firstElement(self::BUTTON_DELETE));
+    }
+
+    /**
+     * confirm to delete a field: click yes in the confirmation dialog
+     */
+    public function clickConfirmDeleteButton(): void
+    {
+        $this->tester->click(self::CONFIRM_YES);
     }
 
 

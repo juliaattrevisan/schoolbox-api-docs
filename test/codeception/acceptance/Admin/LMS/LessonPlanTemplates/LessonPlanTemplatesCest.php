@@ -6,6 +6,7 @@ use AcceptanceTester;
 use Exception;
 use Page\Admin\LMS\LessonPlanTemplates\CreateLessonPlanTemplate;
 use Page\Admin\LMS\LessonPlanTemplates\LessonPlanTemplateList;
+use Page\Admin\LMS\LessonPlanTemplates\UpdateLessonPlanTemplate;
 
 class LessonPlanTemplatesCest
 {
@@ -24,17 +25,6 @@ class LessonPlanTemplatesCest
         $i->loginAsAdmin();
         $templateList = new LessonPlanTemplateList($i);
         $i->amOnPage($templateList::URL);
-    }
-
-    /**
-     * Deleting Lesson Plan Templates when the test is about to start so it does not get impacted by other tests already executed
-     *
-     * @param AcceptanceTester $i
-     */
-    public function beforeSuite(AcceptanceTester $i): void
-    {
-        $i->amGoingTo("update delete_at for the lesson plan template so it does not impact the news tests");
-        $i->updateInDatabase('lesson_plan_template', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation%"]);
     }
 
     /**
@@ -57,14 +47,69 @@ class LessonPlanTemplatesCest
         $templateName = "Automation Template 1";
 
         $i->amGoingTo('Click add a lesson plan template button in the lesson plan template lists page');
-        $templateList->clickAddLessonPlanTemplateIcon();
+        $templateList->clickAddLessonPlanTemplateButton();
         $i->amGoingTo("Type a template name,add a field name and body and save it");
         $templates->typeName($templateName);
-        $templates->clickAddNewFieldButton();
         $templates->typeFieldTile(1, 'Automation Field 1');
         $templates->fillBody(1, 'Automation Body 1');
         $templates->clickSaveButton();
         $i->amGoingTo("Check the lesson pan template is presented in the template list");
         $i->canSee($templateName);
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     * @beforeSuite
+     *
+     * on adminv2/lesson-plan/template page click the Modify button
+     * Update the Title
+     * Click Add a new field button
+     * Update the existing field title and body
+     * Add a new Field with field title and body
+     * Delete a Field
+     * Click Save
+     * Click the template in the list
+     * Ensure the dialog is presented with the fields properly presented
+     */
+    public function updateLessonPlanTemplate(AcceptanceTester $i): void
+    {
+        $templates = new CreateLessonPlanTemplate($i);
+        $templateList = new LessonPlanTemplateList($i);
+        $templateUpdate = new UpdateLessonPlanTemplate($i);
+
+        $i->amGoingTo('Click the modify button in the lesson plan template lists page');
+        $templateId = $i->grabFromDatabase('lesson_plan_template', 'id', ['deleted_at' => null, 'title like' => "Automation Template 1"]);
+        $templateList->clickModifyLessonPlanTemplateButton($templateId);
+        $i->waitForText('Fields', 3);
+        $i->amGoingTo('Update the field title and body');
+        $templateFieldId = $i->grabFromDatabase('lesson_plan_template_field', 'id', ['deleted_at' => null, 'title like' => "Automation Field 1"]);
+        $templateUpdate->typeFieldTile($templateFieldId, 'Automation Template 1 Updated');
+        $templateUpdate->fillBody($templateFieldId, 'Automation Body 1 Updated');
+        $i->amGoingTo('Add a new field, type a filed title and body and save it');
+        $templates->clickAddNewFieldButton();
+        $templates->typeFieldTile(1, 'Automation Field 2');
+        $templates->fillBody(1, 'Automation Body 2');
+        $templates->clickSaveButton();
+        $i->amGoingTo("Click the template title in the template list and check the fields are updated");
+        $templateList->clickLessonPlanTemplateTitle($templateId);
+        $i->canSee('Automation Template 1 Updated');
+        $i->canSee('Automation Body 1 Updated');
+        $i->canSee('Automation Field 2');
+        $i->canSee('Automation Body 2');
+        $i->amGoingTo("Close the modal dialog");
+        $templateList->clickCloseModal();
+        $i->amGoingTo('Modify a lesson plan template, delete a field, save it');
+        $templateList->clickModifyLessonPlanTemplateButton($templateId);
+        $i->amGoingTo("Click the template title in the template list and check the field deleted is not presented");
+        $templates->clickDeleteButton();
+        $templates->clickConfirmDeleteButton();
+        $templates->clickSaveButton();
+        $i->amGoingTo("Click the template title in the template list and check the fields are updated");
+        $templateList->clickLessonPlanTemplateTitle($templateId);
+        $i->cantSee('Automation Template 1 Updated');
+        $i->cantSee('Automation Body 1 Updated');
+        $i->canSee('Automation Field 2');
+        $i->canSee('Automation Body 2');
     }
 }
