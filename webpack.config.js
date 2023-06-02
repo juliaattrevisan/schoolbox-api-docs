@@ -189,8 +189,9 @@ module.exports = {
         googleFiles: "./library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js",
         viewAllFiles: "./library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js",
 
-        // Most functionality for a home page
+        // Most functionality for a home page and the eportfolio
         updateHomepage: "./templates/core/homepage/js/updateHomepage.js",
+        updateEPortfolio: "./templates/core/eportfolio/js/updateEPortfolio.js",
 
         // Canvas
         canvasAssignments: "./library/Schoolbox/Canvas/templates/vue/canvasAssignments.js",
