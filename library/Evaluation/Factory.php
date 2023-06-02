@@ -146,7 +146,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
     {
         $query = "SELECT moodle
                   FROM assess_luQuestionType
-                  WHERE type_id = ?"
+                  WHERE type_id = ?";
 
         return $this->db->query($query, [$type_id])->fetchColumn();
     }
