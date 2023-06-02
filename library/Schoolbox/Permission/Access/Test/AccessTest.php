@@ -411,7 +411,7 @@ class AccessTest extends TestCase
      */
     public function testCannotConnectToExternalUser(): void
     {
-        $this->expectException(Error::class);
+        $this->expectException(DatabaseException::class);
         $access = $this->newAccess();
         $reflection = new ReflectionClass($access);
         $instance   = $reflection->getProperty('externalUser');
