@@ -31,11 +31,11 @@ class LessonPlanTemplatesCest
      *
      * @param AcceptanceTester $i
      */
-//    public function beforeSuite(AcceptanceTester $i): void
-//    {
-//        $i->amGoingTo("update delete_at for the lesson plan template so it does not impact the news tests");
-//        $i->updateInDatabase('lesson_plan_template', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation%"]);
-//    }
+    public function beforeSuite(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the lesson plan template so it does not impact the news tests");
+        $i->updateInDatabase('lesson_plan_template', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation%"]);
+    }
 
     /**
      * @param AcceptanceTester $i
@@ -65,7 +65,6 @@ class LessonPlanTemplatesCest
         $templates->fillBody(1, 'Automation Body 1');
         $templates->clickSaveButton();
         $i->amGoingTo("Check the lesson pan template is presented in the template list");
-        $i->canSee('Automation Template 1');
-
+        $i->canSee($templateName);
     }
 }
