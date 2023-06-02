@@ -247,6 +247,67 @@ abstract class Base implements IStatement
     }
 
     /**
+     * Returns statement's current value.
+     *
+     * Expects that the statement has been executed.
+     *
+     * @return mixed
+     */
+    public function current(): mixed
+    {
+        return $this->getInnerIterator()?->current();
+    }
+
+    /**
+     * Move forward to next element in the statement.
+     *
+     * Expects that the statement has been executed.
+     *
+     * @return void
+     */
+    public function next(): void
+    {
+        $this->getInnerIterator()?->next();
+    }
+
+    /**
+     * Returns statement's current key.
+     *
+     * Expects that the statement has been executed.
+     *
+     * @return mixed
+     */
+    public function key(): mixed
+    {
+        return $this->getInnerIterator()?->key();
+    }
+
+    /**
+     * Checks if current position in the statement is valid.
+     *
+     * Expects that the statement has been executed.
+     *
+     * @return bool
+     */
+    public function valid(): bool
+    {
+        return $this->getInnerIterator()?->valid() ?? false;
+    }
+
+    /**
+     * Rewind the statement to the start
+     * (probably not possible with most PDO connectors).
+     *
+     * Expects that the statement has been executed.
+     *
+     * @return void
+     */
+    public function rewind(): void
+    {
+        $this->getInnerIterator()?->rewind();
+    }
+
+    /**
      * @inheritdoc
      */
     public static function getDataTypeName($value, $type = null)
