@@ -567,24 +567,29 @@ class Database implements IDatabase, Serializable
             $identifier = array($identifier);
         }
 
-        $set = '';
+        $set    = [];
+        $params = [];
+        $quoter = $this->getQuoter();
         foreach ($array as $key => $value) {
             if (!in_array($key, $identifier)) {
                 if (!is_array($value)) {
-                    $set .= '`' . $key . '`=' . $this->smartQuote($value) . ',';
+                    $set[]    = "{$quoter->quoteIdentifier($key)} = ?";
+                    $params[] = $value;
                 } elseif (isset($value['function'])) {
-                    $set .= '`' . $key . '`=' . $value['function'] . '(' . $this->smartQuote($value['value']) . '),';
+                    $set[]    = "{$quoter->quoteIdentifier($key)} = {$value['function']}(?)";
+                    $params[] = $value;
                 }
             }
         }
-        $set   = substr($set, 0, -1);
-        $query = "UPDATE `$table` SET $set WHERE 1=1";
+        $set   = implode(',', $set);
+        $query = "UPDATE {$quoter->quoteIdentifier($table)} SET $set WHERE 1=1";
 
         foreach ($identifier as $ident) {
-            $query .= " AND `$ident`= " . $this->smartQuote($array[$ident]);
+            $query .= " AND {$quoter->quoteIdentifier($ident)} = ?";
+            $params[] = $ident;
         }
 
-        $this->query($query);
+        $this->query($query, $params);
         return true;
     }
 
