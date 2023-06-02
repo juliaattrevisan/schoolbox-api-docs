@@ -21,6 +21,9 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
+/**
+ * @deprecated 23.1
+ */
 class Model implements ISoftDeletable, JsonSerializable
 {
     use CreatedAtDate;

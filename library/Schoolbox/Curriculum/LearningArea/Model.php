@@ -15,6 +15,8 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
+ * @deprecated 23.1
+ *
  * Model for curriculum learning areas.
  *
  * A learning area is an area of study - common examples include:
@@ -22,10 +24,6 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
  * * Maths
  * * Science
  * I think you get the idea.
- *
- * Whilst the learning area/level mappers are deprecated, this model is not:
- * it is still used by `\Schoolbox\Curriculum\Source\BrowserInterface` and its
- * implementations.
  */
 class Model implements ISoftDeletable, JsonSerializable
 {
