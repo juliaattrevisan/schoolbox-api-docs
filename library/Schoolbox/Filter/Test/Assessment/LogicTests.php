@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Test\MockConnector;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -290,7 +291,11 @@ class LogicTests extends TestCase
      */
     private function getTester(): TestableIdFinder
     {
-        return TestableIdFinder::getInstance(Filter\Mapper::getInstance(), Assessment\Mapper::getInstance());
+        $mockConnector = new MockConnector($this);
+        return TestableIdFinder::getInstance(
+            Filter\Mapper::getInstance()->setDatabase($mockConnector),
+            Assessment\Mapper::getInstance()->setDatabase($mockConnector),
+        );
     }
 
     // ---------------- data providers --------------
