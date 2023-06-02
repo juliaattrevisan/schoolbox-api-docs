@@ -14,7 +14,7 @@ namespace Schoolbox\Test;
  * Class SoftDeleteTestMapper
  *
  * @package Schoolbox\Test
- * @method MockDatabase getDatabase()
+ * @method MockConnector getDatabase()
  */
 class SoftDeleteTestMapper extends AbstractTestMapper
 {

@@ -36,7 +36,7 @@ class MapperTest extends TestCase
     {
         parent::setUp();
         $this->object = new TestMapper($this);
-        $this->db     = new MockDatabase($this);
+        $this->db     = new MockConnector($this);
         $this->object->setDatabase($this->db);
     }
 
