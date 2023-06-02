@@ -631,7 +631,7 @@ class Helper
             // Add empty response if nothing there
             $participationItems[$rowAssessmentId][$rowParticipantId]['response'] ??= null;
         }
-        $statement->closeCursor();
+        $statement->close();
 
 
         // Also fetch most recent response for this item

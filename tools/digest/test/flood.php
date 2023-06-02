@@ -21,7 +21,7 @@ $session = $argv[1];
 $count   = intval($argv[2]);
 
 // remove existing
-Factory::getInstanceInternal()->exec("UPDATE news_items SET item_deleted = 1");
+Factory::getInstanceInternal()->execute("UPDATE news_items SET item_deleted = 1");
 
 
 $rss = new Alaress_Rss_Stream(Config::get('welcome_rss_url'));

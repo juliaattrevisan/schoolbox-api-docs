@@ -1641,11 +1641,6 @@ parameters:
 			path: library/External/Edumate/Connection.php
 
 		-
-			message: "#^Method External_Edumate_Timetable\\:\\:getCycleLength\\(\\) should return int but returns string\\.$#"
-			count: 1
-			path: library/External/Edumate/Timetable.php
-
-		-
 			message: "#^Method External_Isams_Batch_Reader_Timetable\\:\\:getAccountInfo\\(\\) should return Iterator but returns array\\.$#"
 			count: 1
 			path: library/External/Isams/Batch/Reader/Timetable.php
@@ -2602,11 +2597,6 @@ parameters:
 
 		-
 			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Interactions.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Statistics\\\\Interactions\\:\\:uniqueOpens\\(\\) should return int but returns string\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Interactions.php
 
