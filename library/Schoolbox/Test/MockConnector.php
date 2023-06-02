@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Quoter\IQuoter;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
@@ -50,7 +51,7 @@ class MockConnector implements IConnector
     /**
      * The next insert ID to be used.
      *
-     * @var mixed
+     * @var string|false
      */
     protected $nextInsertId;
 
@@ -184,7 +185,7 @@ class MockConnector implements IConnector
      */
     public function getQuoter(): IQuoter
     {
-        return $this;
+        return new Quoter();
     }
 
 
@@ -213,7 +214,7 @@ class MockConnector implements IConnector
      */
     public function transact(callable $callback)
     {
-        return true;
+        return $this;
     }
 
     /**
@@ -250,7 +251,7 @@ class MockConnector implements IConnector
 
     /**
      * @param  null $name
-     * @return int
+     * @return string|false
      */
     public function lastInsertId($name = null)
     {
@@ -258,9 +259,9 @@ class MockConnector implements IConnector
     }
 
     /**
-     * @param int $nextInsertId
+     * @param string|false $nextInsertId
      */
-    public function setNextInsertId($nextInsertId)
+    public function setNextInsertId(string|false $nextInsertId)
     {
         $this->nextInsertId = $nextInsertId;
     }
