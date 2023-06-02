@@ -472,33 +472,6 @@ class Database implements IDatabase, Serializable
 
 
     /**
-     * Quote variable to make safe for sql use
-     *
-     * @deprecated
-     *
-     * @param $value
-     *
-     * @return string
-     */
-    public function smartQuote($value)
-    {
-        $mysqlFuncs = array(
-            'NULL',
-            'NOW()',
-        );
-
-        /* If any non-digits found, assume string. But this might not work for float
-         * or double values, or exponential representations.
-         */
-        // Quote if not integer or special
-        if (!in_array($value, $mysqlFuncs)) {
-            $value = $this->quote($value);
-        }
-
-        return $value;
-    }
-
-    /**
      * Inserts an array into table (does all proper security checks to ensure safe)
      *
      * @deprecated use \Schoolbox\Mapper::save()
