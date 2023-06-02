@@ -13,6 +13,7 @@ namespace Alaress\Database\Statement;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception;
+use Iterator;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -231,6 +232,18 @@ abstract class Base implements IStatement
         } catch (PDOException $e) {
             throw new Exception("Exception error retrieving iterator: " . $e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Returns an iterator over this statement.
+     *
+     * Expects that the statement has been executed.
+     *
+     * @return Iterator|null
+     */
+    public function getInnerIterator(): ?Iterator
+    {
+        return $this->broker->getIterator($this, $this->statement);
     }
 
     /**

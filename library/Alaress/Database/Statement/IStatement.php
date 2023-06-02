@@ -12,10 +12,11 @@ namespace Alaress\Database\Statement;
 
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\IIterator;
+use OuterIterator;
 use PDO;
 use PDOStatement;
 
-interface IStatement
+interface IStatement extends OuterIterator
 {
     /**
      * Get number of rows affected by last executed query
