@@ -79,14 +79,14 @@ class Factory
 
 
     /**
-     * Retrieves static instance of internal database connection (used in Denbigh)
+     * Retrieves static instance of internal database connection.
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
      * @deprecated
-     * @return null|IConnector
+     * @return IConnector
      * @throws DatabaseException
      */
-    public static function getInstanceInternal(): ?IConnector
+    public static function getInstanceInternal(): IConnector
     {
         if (!isset(self::$connectorInternal)) {
             self::$connectorInternal = self::getInstance()->getInternalDatabase();
