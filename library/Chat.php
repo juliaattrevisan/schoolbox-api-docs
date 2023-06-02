@@ -112,9 +112,9 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     /**
      * @param int $category_id
      * @param int $user_id
-     * @return bool|PDOStatement
+     * @return bool
      */
-    public function updatePoll($category_id, $user_id)
+    public function updatePoll($category_id, $user_id): bool
     {
         if (!is_numeric($user_id)) {
             return false;
@@ -124,7 +124,8 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                   VALUES (?, ?, NOW())
                   ON DUPLICATE KEY UPDATE time = NOW()";
 
-        return $this->db->query($query, [$user_id, $category_id]);
+        $this->db->query($query, [$user_id, $category_id]);
+        return true;
     }
 
 
@@ -173,10 +174,10 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     /**
      * @param int $category_id
-     * @return PDOStatement
+     * @return bool
      * @throws Exception
      */
-    public function pruneUsers($category_id)
+    public function pruneUsers($category_id): bool
     {
         $time = new DateTime(self::CHAT_POLL_EXPIRY);
 
@@ -184,7 +185,8 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                   WHERE time < '" . $time->format('Y-m-d H:i:s') . "'
                     AND category_id = $category_id";
 
-        return $this->db->query($query);
+        $this->db->query($query);
+        return true;
     }
 
     /**
