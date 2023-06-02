@@ -17,6 +17,7 @@ use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use BadMethodCallException;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -133,6 +134,7 @@ class MockConnector implements IConnector
      * @param array  $driverOptions Ignored
      *
      * @return PDOStatement|MockObject
+     * @noinspection PhpDocSignatureInspection this returns a mock PDOStatement
      */
     public function prepare(string $statement, array $driverOptions = []): PDOStatement
     {
@@ -155,26 +157,26 @@ class MockConnector implements IConnector
      * Returns the mocked statement.
      *
      * @param string $sql
-     * @param array  $args
-     * @return PDOStatement
+     * @param array  $parameters
+     * @return IStatement
      */
-    public function query(string $sql, array $args = null): IStatement
+    public function query(string $sql, array $parameters = null): IStatement
     {
-        return $this->prepare($sql, $args);
+        throw new BadMethodCallException('Not supported');
     }
 
 
-    /**
-     * Mock of quote
-     *
-     * @param string $string
-     * @param int    $parameter_type
-     * @return string
-     */
-    public function quote($string, $parameter_type = PDO::PARAM_STR)
-    {
-        return $string;
-    }
+//    /**
+//     * Mock of quote
+//     *
+//     * @param string $string
+//     * @param int    $parameter_type
+//     * @return string
+//     */
+//    public function quote($string, $parameter_type = PDO::PARAM_STR)
+//    {
+//        return $string;
+//    }
 
 
     /**
@@ -189,25 +191,25 @@ class MockConnector implements IConnector
     }
 
 
-    /**
-     * Mock of escapeForLike
-     *
-     * @param  string $string
-     * @return string
-     */
-    public function escapeForLike($string)
-    {
-        return $string;
-    }
+//    /**
+//     * Mock of escapeForLike
+//     *
+//     * @param  string $string
+//     * @return string
+//     */
+//    public function escapeForLike($string)
+//    {
+//        return $string;
+//    }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function getEscapedOperand(string $defaultTable, string $columnName): string
-    {
-        return $columnName;
-    }
+//    /**
+//     * @inheritdoc
+//     */
+//    public function getEscapedOperand(string $defaultTable, string $columnName): string
+//    {
+//        return $columnName;
+//    }
 
     /**
      * @inheritdoc
@@ -391,12 +393,12 @@ class MockConnector implements IConnector
 
     public function getIterator(string $sql, array $parameters = null): IIterator
     {
-        throw new \BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported');
     }
 
     public function prepareProcedure(string $name): IStoredProcedure
     {
-        throw new \BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported');
     }
 
     public function legacyQuote($value): string
