@@ -26,7 +26,7 @@ class MapperTest extends TestCase
 
 
     /**
-     * @var MockDatabase
+     * @var MockConnector
      */
     protected $db;
 

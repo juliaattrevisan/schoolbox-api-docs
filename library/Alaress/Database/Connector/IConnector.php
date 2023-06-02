@@ -451,4 +451,46 @@ interface IConnector
      * @return PDOStatement
      */
     public function prepare(string $statement, array $driverOptions = []): PDOStatement;
+
+    /**
+     * Temporary implementation of `\Database::insert`, to ease transition.
+     *
+     * @deprecated use \Schoolbox\Mapper::save()
+     *
+     * @param string $table Insert into this table.
+     * @param array  $array Insert this set of key-value pairs into this table's
+     *                      fields.
+     * @return bool
+     */
+    public function insert(string $table, array $array): bool;
+
+    /**
+     * Temporary implementation of `\Database::update`, to ease transition.
+     *
+     * @deprecated use \Schoolbox\Mapper::save()
+     *
+     * @param string       $table      Update this table.
+     * @param array|string $identifier Keys for `$table`.
+     * @param array        $array      Update this set of key-value pairs in
+     *                                 this table.
+     *                                 Any field which is in `$identifier` will
+     *                                 be used in the WHERE part of the query.
+     *
+     * @return bool
+     */
+    public function update(string $table, array|string $identifier, array $array): bool;
+
+    /**
+     * Temporary implementation of `\Database::delete`, to ease transition.
+     *
+     * @deprecated use \Schoolbox\Mapper::delete()
+     *
+     * @param string        $table      Delete from this table.
+     * @param string        $identifier Key for `$table`.
+     * @param string|array  $value      Delete from `$table` where the column
+     *                                  `$identifier` matches any of these
+     *                                  values.
+     * @return bool
+     */
+    public function delete(string $table, string $identifier, string|array $value): bool;
 }

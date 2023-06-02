@@ -616,4 +616,111 @@ class Base implements Serializable, IConnector
     {
         return isset($fieldValue) ? trim($fieldValue) : null;
     }
+
+
+    /**
+     * Methods copied from DeprecatedDatabase: for sanity's sake these need to
+     * remain copied here.
+     */
+
+
+    /**
+     * @inheritdoc
+     */
+    public function insert(string $table, array $array): bool
+    {
+        if (!($table && is_array($array))) {
+            return false;
+        }
+
+        $names  = [];
+        $values = [];
+        $params = [];
+        $quoter = $this->getQuoter();
+        foreach ($array as $key => $value) {
+            $names[] = $quoter->quoteIdentifier($key);
+            if (!is_array($value)) {
+                $values[] = '?';
+                $params[] = $value;
+            } elseif (isset($value['function'])) {
+                $values[] = ($value['function'] . '(?)');
+                $params[] = $value['value'];
+            }
+        }
+        $names  = implode(',', $names);
+        $values = implode(',', $values);
+
+        $query = "INSERT INTO {$quoter->quoteIdentifier($table)} ($names) VALUES ($values)";
+        $this->query($query, $params);
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function update(string $table, array|string $identifier, array $array): bool
+    {
+        if (!$table) {
+            return false;
+        }
+
+        if (is_array($identifier)) {
+            foreach ($identifier as $ident) {
+                if (!$array[$ident]) {
+                    return false;
+                }
+            }
+        } else {
+            if (!$array[$identifier]) {
+                return false;
+            }
+
+            $identifier = array($identifier);
+        }
+
+        $set    = [];
+        $params = [];
+        $quoter = $this->getQuoter();
+        foreach ($array as $key => $value) {
+            if (!in_array($key, $identifier)) {
+                if (!is_array($value)) {
+                    $set[]    = "{$quoter->quoteIdentifier($key)} = ?";
+                    $params[] = $value;
+                } elseif (isset($value['function'])) {
+                    $set[]    = "{$quoter->quoteIdentifier($key)} = {$value['function']}(?)";
+                    $params[] = $value;
+                }
+            }
+        }
+        $set   = implode(',', $set);
+        $query = "UPDATE {$quoter->quoteIdentifier($table)} SET $set WHERE 1=1";
+
+        foreach ($identifier as $ident) {
+            $query .= " AND {$quoter->quoteIdentifier($ident)} = ?";
+            $params[] = $ident;
+        }
+
+        $this->query($query, $params);
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function delete(string $table, string $identifier, string|array $value): bool
+    {
+        $query  = "DELETE FROM {$this->getQuoter()->quoteIdentifier($table)} WHERE 1 != 1 ";
+        $params = [];
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                $query .= " OR {$this->getQuoter()->quoteIdentifier($identifier)} = ?";
+                $params[] = $item;
+            }
+        } else {
+            $query .= "OR {$this->getQuoter()->quoteIdentifier($identifier)}` = ?";
+            $params[] = $value;
+        }
+        $this->query($query, $params);
+        return true;
+    }
 }

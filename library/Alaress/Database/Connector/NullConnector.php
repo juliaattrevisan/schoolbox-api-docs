@@ -24,7 +24,6 @@ use PDOStatement;
  */
 class NullConnector implements IConnector
 {
-
     /**
      * @inheritDoc
      */
@@ -426,5 +425,32 @@ class NullConnector implements IConnector
     public function trimField($fieldValue)
     {
         return $fieldValue;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function insert(string $table, array $array): bool
+    {
+        throw new Exception('Not supported.');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function update(string $table, array|string $identifier, array $array): bool
+    {
+        throw new Exception('Not supported.');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function delete(string $table, string $identifier, array|string $value): bool
+    {
+        throw new Exception('Not supported.');
     }
 }

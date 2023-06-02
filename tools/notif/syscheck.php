@@ -54,8 +54,10 @@ try {
     $d->info("Testing external dependencies are online...");
 
     // test database is online
-    if (!Factory::getInstanceInternal()->isConnected()) {
-        throw new PDOException("Database is not connected");
+    try {
+        Factory::getInstanceInternal();
+    } catch (\Alaress\Database\Exception $e) {
+        throw new PDOException("Database is not connected", 0, $e);
     }
     $d->notice('MySQL is online', array('char' => '+'));
 
