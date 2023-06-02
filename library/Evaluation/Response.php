@@ -209,7 +209,7 @@ abstract class Evaluation_Response extends DeprecatedModel
         $value = $this->db->query($query, [$attempt_id])->fetchColumn();
 
         if ($value) {
-            return $value;
+            return (int)$value;
         }
 
         return 0;

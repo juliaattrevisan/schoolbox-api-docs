@@ -84,7 +84,7 @@ abstract class Evaluation_Question extends DeprecatedModel
         $sequence = $this->db->query($query, [$section_id])->fetchColumn();
 
         if ($sequence) {
-            return $sequence;
+            return (int)$sequence;
         }
 
         return 1;
