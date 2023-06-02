@@ -101,7 +101,7 @@ class HomepageInitialCest
         $i->click(['css' => 'a[href=\#tabs-sub-1]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
         $i->click("//*[@id='tabs-sub-1']/li[6]");
-        sleep(1);
+        sleep(2);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
     }
 
