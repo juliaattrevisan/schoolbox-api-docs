@@ -67,6 +67,7 @@ function updateWordCount(
     if (config.maxCharCount === -1) {
         return;
     }
+
     const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
     const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
     const limitExceededElement = wordCountContainer.querySelector(".ck-word-count__limit-exceeded") as HTMLSpanElement;
@@ -116,6 +117,11 @@ function updateWordCount(
             }
         }
     };
+
+    // Default event listeners should be added by default (obviously).
+    if (config.addMaxCharCountDefaultEventListeners === undefined) {
+        config.addMaxCharCountDefaultEventListeners = true;
+    }
 
     if (config.addMaxCharCountDefaultEventListeners) {
         let containingForm: HTMLFormElement | null;
