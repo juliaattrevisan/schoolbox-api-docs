@@ -630,7 +630,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @param  IDatabase $database
+     * @param  IConnector $database
      *
      * @return $this
      */
@@ -641,7 +641,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return IDatabase
+     * @return IConnector
      */
     public function getDatabase()
     {
