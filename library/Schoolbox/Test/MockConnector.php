@@ -129,12 +129,12 @@ class MockConnector implements IConnector
     /**
      * Returns the mocked statement.
      *
-     * @param string $query Ignored
-     * @param array  $args  Ignored
+     * @param string $statement     Ignored
+     * @param array  $driverOptions Ignored
      *
      * @return PDOStatement|MockObject
      */
-    public function prepare($query, array $args = [])
+    public function prepare(string $statement, array $driverOptions = []): PDOStatement
     {
         return $this->mockStatement;
     }

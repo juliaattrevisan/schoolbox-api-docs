@@ -50,7 +50,7 @@ class Cleanup implements IStrategy
             /* Remove everything that wasn't touched
              */
             $statement = $this->eventMapper->getDatabase()->prepare("
-                DELETE FROM {$this->eventMapper->getTable()} 
+                DELETE FROM {$this->eventMapper->getTable()}
                 WHERE (updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL)
                 AND classification = :classification
                 AND source = :source

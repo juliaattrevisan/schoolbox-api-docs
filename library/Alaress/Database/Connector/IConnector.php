@@ -19,6 +19,7 @@ use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use PDOException;
+use PDOStatement;
 
 interface IConnector
 {
@@ -438,4 +439,16 @@ interface IConnector
      * @return mixed
      */
     public function trimField($fieldValue);
+
+    /**
+     * Temporary implementation of `\Alaress\IDatabase::prepare`, to ease
+     * transition.
+     *
+     * @deprecated should use `prepareQuery` instead
+     *
+     * @param string $statement
+     * @param array $driverOptions
+     * @return PDOStatement
+     */
+    public function prepare(string $statement, array $driverOptions = []): PDOStatement;
 }

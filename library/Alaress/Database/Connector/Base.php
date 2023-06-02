@@ -19,6 +19,7 @@ use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Transactor\ITransactor;
+use PDOStatement;
 use Serializable;
 
 class Base implements Serializable, IConnector
@@ -276,6 +277,14 @@ class Base implements Serializable, IConnector
         }
 
         return $statement;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function prepare(string $statement, array $driverOptions = []): PDOStatement
+    {
+        return $this->broker->prepare($statement, $driverOptions);
     }
 
     /**
