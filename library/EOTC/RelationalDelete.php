@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace EOTC;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
 use PDO;
@@ -19,18 +20,18 @@ use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
 class RelationalDelete extends Deletable
 {
     /**
-     * @var IDatabase
+     * @var IConnector
      */
-    private IDatabase $database;
+    private IConnector $database;
 
     /**
      * RelationalDelete constructor.
      *
      * @param Mapper          $mapper
      * @param LoggerInterface $logger
-     * @param IDatabase       $database
+     * @param IConnector      $database
      */
-    public function __construct(Mapper $mapper, LoggerInterface $logger, IDatabase $database)
+    public function __construct(Mapper $mapper, LoggerInterface $logger, IConnector $database)
     {
         parent::__construct($mapper, $logger);
 

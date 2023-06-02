@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 use Schoolbox\Admin\Import\Photos\MigrateToStorage;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Database\Factory;
 use Schoolbox\Resource\Storage\Mapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -59,7 +60,7 @@ HELP;
          */
         (new MigrateToStorage(
             $this->getConfig()->get('portrait_dir'),
-            Database::getInstance(),
+            Factory::getInstanceInternal(),
             Mapper::getInstance(),
             $this->getLogger(),
             true

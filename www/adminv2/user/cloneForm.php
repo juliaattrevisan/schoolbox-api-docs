@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Database\Factory;
 use Schoolbox\Role;
 use Schoolbox\RoleCloner;
 use Schoolbox\RoleMapper;
@@ -42,7 +43,7 @@ if ($clone['dest'] == 0) {
 }
 
 try {
-    $kam = new RoleCloner(Database::getInstance());
+    $kam = new RoleCloner(Factory::getInstanceInternal());
     $kam->cloneRole($src, $dest);
 } catch (Exception $e) {
     error(9, $e->getMessage(), 500);

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Photos;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Resource\Storage\Mapper;
@@ -23,9 +24,9 @@ use Schoolbox\Resource\Storage\Mapper;
 class MigrateToStorage
 {
     /**
-     * @var IDatabase
+     * @var IConnector
      */
-    private $db;
+    private IConnector $db;
 
 
     /**
@@ -56,12 +57,12 @@ class MigrateToStorage
      * MigrateToStorage constructor.
      *
      * @param string          $portraitPath
-     * @param IDatabase       $db
+     * @param IConnector      $db
      * @param Mapper          $storageMapper
      * @param LoggerInterface $logger
      * @param bool            $perform
      */
-    public function __construct(string $portraitPath, IDatabase $db, Mapper $storageMapper, LoggerInterface $logger, bool $perform)
+    public function __construct(string $portraitPath, IConnector $db, Mapper $storageMapper, LoggerInterface $logger, bool $perform)
     {
         $this->portraitPath = $portraitPath;
         $this->db = $db;

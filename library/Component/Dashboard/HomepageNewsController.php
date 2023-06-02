@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Database\Factory;
+
 /**
  * Homepage activity dashboard component.
  *
@@ -26,7 +28,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        $feedHandler = new Feed(Database::getInstance(), $this->getUser());
+        $feedHandler = new Feed(Factory::getInstanceInternal(), $this->getUser());
         $groupHandler = new Group();
 
         $userAccess = $groupHandler->involvedInCategoryList(

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\RelationalDelete;
 
+use Schoolbox\Database\Factory;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Turnitin;
@@ -133,7 +134,7 @@ class RelationalDelete implements IRelationalDelete
             new \EOTC\RelationalDelete(
                 \EOTC\EventMetadataMapper::getInstance(),
                 $this->logger,
-                \Database::getInstance(),
+                Factory::getInstanceInternal(),
             ),
 
             // eportfolio_component_blog_image.hash
