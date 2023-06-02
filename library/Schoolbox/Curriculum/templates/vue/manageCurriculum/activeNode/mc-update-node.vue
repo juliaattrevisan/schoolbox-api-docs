@@ -7,6 +7,7 @@ import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 
 const props = defineProps({
     /**
@@ -49,7 +50,7 @@ const updateButtonText = window.Vue.computed(() => {
         return "Updating...";
     }
 
-    return isMaxCharCountExceeded.value ? "Update (disabled because content storage limit exceeded)" : "Update";
+    return "Update" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
 });
 
 /**

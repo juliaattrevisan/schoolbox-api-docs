@@ -6,6 +6,7 @@
 import { useStore } from "./store/manageCurriculumStore";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
 import { useDescriptionEditor } from "./composable/useDescriptionEditor";
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 
 const store = useStore();
 const addCurriculumStore = useAddCurriculumStore();
@@ -30,7 +31,7 @@ const addButtonText = window.Vue.computed(() => {
         return "Adding...";
     }
 
-    return isMaxCharCountExceeded.value ? "Add (disabled because content storage limit exceeded)" : "Add";
+    return "Add" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
 });
 
 /**

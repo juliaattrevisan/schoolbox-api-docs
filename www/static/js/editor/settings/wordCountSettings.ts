@@ -18,6 +18,13 @@ export function getWordCountSettings() {
 }
 
 /**
+ * @returns { String } - Suffix starting with a space character.
+ */
+export function getButtonTextDisabledDueToStorageLimitSuffix() {
+    return " (disabled because content storage limit exceeded)";
+}
+
+/**
  * We add in our own character count element to the word count UI,
  * as we also count html characters
  *
@@ -173,6 +180,29 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
 }
 
 /**
+ * Return the button text for buttons that are <input> or <button>.
+ *
+ * @param { Element } buttonElem
+ */
+function getButtonText(buttonElem: Element) {
+    const buttonTagName = buttonElem.tagName.toLowerCase();
+    let buttonText = null;
+
+    switch (buttonTagName) {
+        case "input":
+            buttonText = buttonElem.getAttribute("value");
+            break;
+        case "button":
+            buttonText = buttonElem.innerHTML;
+            break;
+        default:
+            throw "Unsupported button tag name '" + buttonTagName + "'.";
+    }
+
+    return buttonText ?? "";
+}
+
+/**
  * Add event listeners for the EDITOR__MAX_CHAR_COUNT_EXCEEDED and EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events.
  * When the max char count has been exceeded on the ckeditorSourceEl, disable the form's submit button(s).
  * When the max char count is no longer exceeded on all ckeditor source elements in the form, re-enable the submit button(s).
@@ -208,11 +238,7 @@ function addListenersForDisablingSubmitButtons(
         const buttonTextOriginal: string = getButtonText(submitButton);
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, function () {
-            changeButtonState(
-                submitButton,
-                true,
-                buttonTextOriginal + " (disabled because content storage limit exceeded)"
-            );
+            changeButtonState(submitButton, true, buttonTextOriginal + getButtonTextDisabledDueToStorageLimitSuffix());
         });
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, function () {
@@ -226,29 +252,6 @@ function addListenersForDisablingSubmitButtons(
             }
         });
     }
-}
-
-/**
- * Return the button text for buttons that are <input> or <button>.
- *
- * @param { Element } buttonElem
- */
-function getButtonText(buttonElem: Element) {
-    const buttonTagName = buttonElem.tagName.toLowerCase();
-    let buttonText = null;
-
-    switch (buttonTagName) {
-        case "input":
-            buttonText = buttonElem.getAttribute("value");
-            break;
-        case "button":
-            buttonText = buttonElem.innerHTML;
-            break;
-        default:
-            throw "Unsupported button tag name '" + buttonTagName + "'.";
-    }
-
-    return buttonText ?? "";
 }
 
 /**
