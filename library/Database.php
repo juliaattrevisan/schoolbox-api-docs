@@ -578,10 +578,11 @@ class Database implements IDatabase, Serializable
      *
      * @deprecated use \Schoolbox\Mapper::delete()
      *
-     * @param string $table      Delete from this table.
-     * @param string $identifier Key for `$table`.
-     * @param array  $value      Delete from `$table` where the column
-     *                           `$identifier` matches this value.
+     * @param string        $table      Delete from this table.
+     * @param string        $identifier Key for `$table`.
+     * @param string|array  $value      Delete from `$table` where the column
+     *                                  `$identifier` matches any of these
+     *                                  values.
      *
      * @return bool
      */
