@@ -40,23 +40,15 @@ export function useDescriptionEditor(
         });
 
         const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
-        const submitButtonTextOriginal = submitButton.value === null ? "" : submitButton.value.innerHTML;
 
         // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
         ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
-            if (submitButton.value !== null) {
-                submitButton.value.innerHTML =
-                    submitButtonTextOriginal + " (disabled because content storage limit exceeded)";
-                isMaxCharCountExceeded.value = true;
-            }
+            isMaxCharCountExceeded.value = true;
         });
 
         // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
         ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
-            if (submitButton.value !== null) {
-                submitButton.value.innerHTML = submitButtonTextOriginal;
-                isMaxCharCountExceeded.value = false;
-            }
+            isMaxCharCountExceeded.value = false;
         });
     }
 

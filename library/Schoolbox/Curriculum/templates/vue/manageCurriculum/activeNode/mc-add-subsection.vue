@@ -37,15 +37,20 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 const addButton = ref<HTMLButtonElement | null>(null);
-let isMaxCharCountExceeded = ref<boolean>(false);
+const isMaxCharCountExceeded = ref<boolean>(false);
 
 /**
- * To instantly notify the user that the subsection is being added
- * by updating the button text
+ * To update the button text as the component state changes.
  *
  * @returns { String }
  */
-const addButtonText = window.Vue.computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
+const addButtonText = window.Vue.computed(() => {
+    if (addSubsectionStore.isProcessing) {
+        return "Adding...";
+    }
+
+    return isMaxCharCountExceeded.value ? "Add (disabled because content storage limit exceeded)" : "Add";
+});
 
 /**
  * Only enable the button once the conditions are met

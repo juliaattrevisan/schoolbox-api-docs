@@ -37,15 +37,20 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 const updateButton = ref<HTMLButtonElement | null>(null);
-let isMaxCharCountExceeded = ref<boolean>(false);
+const isMaxCharCountExceeded = ref<boolean>(false);
 
 /**
- * To instantly notify the user that the node is being updated
- * by updating the button text
+ * To update the button text as the component state changes.
  *
  * @returns { string }
  */
-const updateButtonText = window.Vue.computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
+const updateButtonText = window.Vue.computed(() => {
+    if (updateNodeStore.isProcessing) {
+        return "Updating...";
+    }
+
+    return isMaxCharCountExceeded.value ? "Update (disabled because content storage limit exceeded)" : "Update";
+});
 
 /**
  * Only enable the button once the conditions are met

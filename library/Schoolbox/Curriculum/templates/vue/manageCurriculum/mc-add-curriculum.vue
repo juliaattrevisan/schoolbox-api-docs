@@ -18,15 +18,20 @@ const addCurriculumStore = useAddCurriculumStore();
 const ckeditorIdAttr = `new-curriculum`;
 
 const addButton = ref<HTMLButtonElement | null>(null);
-let isMaxCharCountExceeded = ref<boolean>(false);
+const isMaxCharCountExceeded = ref<boolean>(false);
 
 /**
- * To instantly notify the user that the subsection is being added
- * by updating the button text
+ * To update the button text as the component state changes.
  *
  * @returns { String }
  */
-const addButtonText = window.Vue.computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
+const addButtonText = window.Vue.computed(() => {
+    if (addCurriculumStore.isProcessing) {
+        return "Adding...";
+    }
+
+    return isMaxCharCountExceeded.value ? "Add (disabled because content storage limit exceeded)" : "Add";
+});
 
 /**
  * Only enable the button once the conditions are met
