@@ -14,7 +14,6 @@ use Schoolbox\Mapper\Exception;
 
 class SoftDeleteTest extends TestCase
 {
-
     /**
      * The mapper that's being tested.
      *

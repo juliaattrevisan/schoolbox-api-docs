@@ -24,7 +24,6 @@ use function array_merge;
 
 class LogicTests extends TestCase
 {
-
     /**
      * @dataProvider provider_doContextFiltersGuaranteeEmptySet
      * @param null|int[] $uis      UnitImplSpec

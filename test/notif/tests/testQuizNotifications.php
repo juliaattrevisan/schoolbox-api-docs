@@ -29,7 +29,6 @@ use Schoolbox\User;
  */
 class QuizNotifications extends AbstractNotificationTest
 {
-
     /** @var Folder\Model */
     protected $folder;
 

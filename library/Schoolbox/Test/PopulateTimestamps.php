@@ -12,7 +12,6 @@ use Schoolbox\Blog\Homepage\Post as Blog;
 
 class PopulateTimestamps extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @var Blog\Mapper
      */

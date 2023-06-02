@@ -28,7 +28,6 @@ use Schoolbox\Realtime\WorkNotifier;
 
 class TimetableNotifier extends WorkNotifier
 {
-
     /** @var IPublisher */
     private $publisher;
 

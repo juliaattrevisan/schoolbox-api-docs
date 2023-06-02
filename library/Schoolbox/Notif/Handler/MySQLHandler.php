@@ -16,7 +16,6 @@ use Schoolbox\Notif\NotifException;
 
 class MySQLHandler extends AbstractProcessingHandler
 {
-
     protected $sql;
 
     public function __construct($level = Logger::DEBUG, $bubble = true)
