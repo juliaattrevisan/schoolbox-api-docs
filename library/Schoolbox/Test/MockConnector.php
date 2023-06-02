@@ -418,4 +418,19 @@ class MockConnector implements IConnector
     {
         return $fieldValue;
     }
+
+    public function insert(string $table, array $array): bool
+    {
+        return true;
+    }
+
+    public function update(string $table, array|string $identifier, array $array): bool
+    {
+        return true;
+    }
+
+    public function delete(string $table, string $identifier, array|string $value): bool
+    {
+        return true;
+    }
 }
