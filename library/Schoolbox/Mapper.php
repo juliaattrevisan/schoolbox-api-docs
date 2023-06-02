@@ -11,6 +11,9 @@
 namespace Schoolbox;
 
 use Alaress\Cache;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\NullConnector;
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\IQuoter;
@@ -141,9 +144,9 @@ abstract class Mapper implements IMapper, Serializable
     public const SORT_ORDER_DESC = 'desc';
 
     /**
-     * @var IDatabase
+     * @var IConnector
      */
-    protected $database;
+    protected IConnector $database;
 
     /**
      * @var string
@@ -447,7 +450,13 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function setupDatabase()
     {
-        $this->database = Factory::getInstanceInternal();
+        // TODO remove null database connection by removing test dependencies
+        //      upon mappers?
+        try {
+            $this->database = Factory::getInstanceInternal();
+        } catch (DatabaseException $e) {
+            $this->database = new NullConnector();
+        }
     }
 
     /**
