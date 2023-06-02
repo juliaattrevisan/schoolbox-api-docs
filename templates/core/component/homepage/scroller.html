@@ -55,6 +55,10 @@
                                 $(file.previewElement)
                                         .closest('[data-dz-container]')
                                         .find('.dz-preview').remove();
+                            },
+                            success: function (file, response) {
+                                // Set a localStorage item to check when the component is reloaded
+                                localStorage.setItem("refreshComponent{COMPONENT_INSTANCE_ID}", "true");
                             }
                         });
                     </script>
@@ -219,7 +223,7 @@
                                     .find('.dz-preview').remove();
                         },
                         success: function (file, response) {
-                            // Set a localStoerage item to check when the component is reloaded
+                            // Set a localStorage item to check when the component is reloaded
                             localStorage.setItem("refreshComponent{COMPONENT_INSTANCE_ID}", "true");
                         }
                     });

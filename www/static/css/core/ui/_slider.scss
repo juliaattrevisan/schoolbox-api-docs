@@ -4,6 +4,25 @@
 $swipe-color: $iron;
 $swipe-color-hover: $steel;
 
+@mixin swiper-constrain($padding-ratio) {
+    position: relative;
+    padding: $padding-ratio 0 0;
+    overflow: hidden;
+
+    img {
+        position: absolute;
+        max-height: 100%;
+        max-width: 100%;
+        width: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        object-fit: contain;
+    }
+}
+
 .swiper {
     .swiper-wrapper {
         min-height: 5rem;
@@ -29,93 +48,23 @@ $swipe-color-hover: $steel;
 
         // Constrain size of slider for slideshow components to minimise image size effects on page
         .square {
-            position: relative;
-            padding: 100% 0 0;
-            overflow: hidden;
-
-            img {
-                position: absolute;
-                max-height: 100%;
-                max-width: 100%;
-                width: auto;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
-            }
+            @include swiper-constrain(100%);
         }
 
         .portrait {
-            position: relative;
-            padding: 125% 0 0;
-            overflow: hidden;
-
-            img {
-                position: absolute;
-                max-height: 100%;
-                max-width: 100%;
-                width: auto;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
-            }
+            @include swiper-constrain(125%);
         }
 
         .landscape {
-            position: relative;
-            padding: 56.25% 0 0;
-            overflow: hidden;
-
-            img {
-                position: absolute;
-                max-height: 100%;
-                max-width: 100%;
-                width: auto;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
-            }
+            @include swiper-constrain(56.25%);
         }
 
         .panorama {
-            position: relative;
-            padding: 25% 0 0;
-            overflow: hidden;
-
-            img {
-                position: absolute;
-                max-height: 100%;
-                max-width: 100%;
-                width: auto;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
-            }
+            @include swiper-constrain(25%);
         }
 
         .banner {
-            position: relative;
-            padding: 12.8% 0 0;
-            overflow: hidden;
-
-            img {
-                position: absolute;
-                max-height: 100%;
-                max-width: 100%;
-                width: auto;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
-            }
+            @include swiper-constrain(12.8%);
         }
     }
 
