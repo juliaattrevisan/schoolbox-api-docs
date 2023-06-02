@@ -13,6 +13,7 @@ use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use PDOStatement;
 
 /**
  * Implementation of *Alaress\Database\Connector\IConnector* for when
@@ -91,6 +92,15 @@ class NullConnector implements IConnector
      * @inheritDoc
      */
     public function prepareQuery($query, $parameters = [])
+    {
+        throw new Exception('Not supported.');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function prepare(string $statement, array $driverOptions = []): PDOStatement
     {
         throw new Exception('Not supported.');
     }
