@@ -3,11 +3,11 @@
  * to show further info in a modal on a code that's been selected
  */
 
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useAddSubsectionStore } from "./store/mcAddSubsectionStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
-import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 
 const props = defineProps({
     /**

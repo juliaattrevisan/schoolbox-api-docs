@@ -3,11 +3,11 @@
  * to be able to update a nodes name, code and description
  */
 
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
-import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 
 const props = defineProps({
     /**
