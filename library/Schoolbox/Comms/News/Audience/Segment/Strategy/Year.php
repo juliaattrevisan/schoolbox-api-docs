@@ -39,7 +39,7 @@ class Year extends SimpleStrategy
     ) {
         parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired, $studentLocator);
         $yearPrefix             = $l10n->translate('year', false, true);
-        $this->quotedYearPrefix = $yearPrefix ? $userAccessMapper->getDatabase()->quote($yearPrefix) : 'Year';
+        $this->quotedYearPrefix = $yearPrefix ? $userAccessMapper->getDatabase()->legacyQuote($yearPrefix) : 'Year';
     }
 
     public static function getEntityType(): string

@@ -139,7 +139,7 @@ class Sanitiser
 
         /* PDO
          */
-        $this->setKeyword($mapper->getDatabase()->quote($keyword));
+        $this->setKeyword($mapper->getDatabase()->legacyQuote($keyword));
         $this->setUnquotedKeyword($keyword);
     }
 

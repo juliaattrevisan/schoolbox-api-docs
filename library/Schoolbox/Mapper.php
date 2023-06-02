@@ -3672,7 +3672,7 @@ abstract class Mapper implements IMapper, Serializable
             if ($value === true) {
                 return "$column = TRUE";
             }
-            return "$column = " . $this->database->quote($value);
+            return "$column = " . $this->database->legacyQuote($value);
         }
         return '';
     }
