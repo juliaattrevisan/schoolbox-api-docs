@@ -468,7 +468,10 @@ class Database implements IDatabase, Serializable
     }
 
 
-    /// Methods copied from DeprecatedDatabase: will be removed in this PR ///
+    /**
+     * Methods copied from DeprecatedDatabase: for sanity's sake these need to
+     * remain copied here.
+     */
 
 
     /**
@@ -476,9 +479,9 @@ class Database implements IDatabase, Serializable
      *
      * @deprecated use \Schoolbox\Mapper::save()
      *
-     * @param string $table Insert into this table
+     * @param string $table Insert into this table.
      * @param array  $array Insert this set of key-value pairs into this table's
-     *                      fields
+     *                      fields.
      * @return bool
      */
     public function insert($table, $array)
@@ -514,11 +517,15 @@ class Database implements IDatabase, Serializable
      *
      * @deprecated use \Schoolbox\Mapper::save()
      *
-     * @param $table
-     * @param $identifier
-     * @param $array
+     * @param string       $table      Update this table.
+     * @param array|string $identifier Keys for `$table`.
+     * @param array        $array      Update this set of key-value pairs in
+     *                                 this table.
+     *                                 Any field which is in `$identifier` will
+     *                                 be used in the WHERE part of the query.
      *
      * @return bool
+     *
      */
     public function update($table, $identifier, $array)
     {
@@ -567,11 +574,14 @@ class Database implements IDatabase, Serializable
     }
 
     /**
+     * Delete from this table.
+     *
      * @deprecated use \Schoolbox\Mapper::delete()
      *
-     * @param $table
-     * @param $identifier
-     * @param $value
+     * @param string $table      Delete from this table.
+     * @param string $identifier Key for `$table`.
+     * @param array  $value      Delete from `$table` where the column
+     *                           `$identifier` matches this value.
      *
      * @return bool
      */
