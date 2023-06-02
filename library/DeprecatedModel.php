@@ -21,7 +21,7 @@ class DeprecatedModel
     /**
      * A database connection
      */
-    private IConnector $db;
+    protected IConnector $db;
 
     /**
      * @deprecated
