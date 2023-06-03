@@ -1084,9 +1084,9 @@ class UserMapper extends Mapper
      *
      * @param User   $user
      * @param string $hash
-     * @return true
+     * @return void
      */
-    public function storeHash(User $user, string $hash)
+    public function storeHash(User $user, string $hash): void
     {
         $query = "UPDATE {$this->table} SET hash = :hash WHERE id = :userId";
         $this->database->query($query, ['userId' => $user->getId(), 'hash' => $hash]);
