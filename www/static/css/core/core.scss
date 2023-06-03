@@ -163,9 +163,6 @@ $cdn-prefix: "../..";
 // combobox relies on selectize styles
 @import "ui/combobox";
 
-// jqmath
-@import "../../js/math/jqmath-0.4.0";
-
 // jQuery UI
 @import "/node_modules/jquery-ui/themes/base/draggable";
 @import "/node_modules/jquery-ui/themes/base/sortable";
