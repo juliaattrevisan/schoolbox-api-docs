@@ -10,15 +10,8 @@ use Schoolbox\Permission\Access\Access;
 
 class Group extends DeprecatedModel
 {
-    public $cache = array();
-    public $cacheUser = array();
-
-    /**
-     * A copy of the user notifier - it is called when a user changes.
-     *
-     * @var Schoolbox\UserNotifier
-     */
-    protected $userNotifier;
+    public array $cache     = array();
+    public array $cacheUser = array();
 
     /**
      * The service for which this group object is for.
@@ -36,21 +29,6 @@ class Group extends DeprecatedModel
         parent::__construct();
     }
 
-
-    /**
-     * @return Schoolbox\UserNotifier
-     */
-    protected function getUserNotifier()
-    {
-        // only load this if you *actually* need it
-        if (empty($this->userNotifier)) {
-            // TODO SA-8354: audit all places this could be used: replace with mapper
-            $this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
-        }
-        return $this->userNotifier;
-    }
-
-
     public function setService($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_service = $service;
@@ -67,9 +45,9 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT type
 				   FROM userGroups
-				  WHERE cid = '{$categoryId}' AND type >= '" . \Schoolbox\Resource\Group::MODERATED_GROUP . "'";
+				  WHERE cid = ? AND type >= ?";
 
-        $result = $this->db->query($query)->fetchAll();
+        $result = $this->db->query($query, [$categoryId, \Schoolbox\Resource\Group::MODERATED_GROUP])->fetchAll();
 
         /* If there are results, they are already subscribed
            */
@@ -90,9 +68,9 @@ class Group extends DeprecatedModel
      */
     public function getGroupTypeIds($name)
     {
-        $query = "SELECT id FROM `groups` WHERE group_type = \"{$name}\"";
+        $query = "SELECT id FROM `groups` WHERE group_type = ?";
 
-        $allIds = $this->db->query($query)->fetchAll();
+        $allIds = $this->db->query($query, [$name])->fetchAll();
 
         $ids = array();
 
@@ -112,8 +90,8 @@ class Group extends DeprecatedModel
      */
     public function getGroupType($groupID)
     {
-        $query = "SELECT group_type FROM `groups` WHERE id = \"{$groupID}\"";
-        return $this->db->query($query)->fetchColumn();
+        $query = "SELECT group_type FROM `groups` WHERE id = ?";
+        return $this->db->query($query, [$groupID])->fetchColumn();
     }
 
     /**
@@ -158,86 +136,8 @@ class Group extends DeprecatedModel
 
     public function getAllUserAccess($uid)
     {
-        $query = "SELECT service, lu_service.name, sid, type FROM userAccess JOIN lu_service ON service=lu_service.id WHERE uid='$uid'";
-        return $this->db->query($query)->fetchAll();
-    }
-
-    public function groupExists($relationID)
-    {
-        $query = "SELECT cid FROM userGroups WHERE cid = $relationID";
-        $result = $this->db->query($query)->fetch();
-        if ($result['cid']) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function createGroup($relationID, $type = 1)
-    {
-        $data = array(
-            'cid' => $relationID,
-            'type' => $type
-        );
-        return $this->db->insert('userGroups', $data);
-    }
-
-    /**
-     * @deprecated replaced by Schoolbox\Permission\Access\RoleAccessMapper::roleMayOwnFolders()
-     * @param int $userID
-     * @return bool
-     */
-    public function allowOwner($userID)
-    {
-        //checks if the user can become the owner of group
-        if (Config::get('group_staff_only')) {
-            return $this->isStaff($userID);
-        } else {
-            return true;
-        }
-    }
-
-
-    public function isUser($relationID, $userID)
-    {
-        $query = "SELECT uid FROM userAccess WHERE service = '" . $this->_service . "' AND sid = '$relationID' AND uid = '$userID'";
-        $query = $this->db->query($query);
-
-        if ($query->rowCount() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * TODO remove this and update/remove everywhere which uses it:
-     * * sync scripts
-     * * add users to group
-     *
-     * @param int $relationID
-     * @param int $userID
-     * @param int $type
-     * @return bool
-     */
-    public function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
-    {
-        if (!$this->isUser($relationID, $userID)) {
-            $data = array(
-                'uid' => $userID,
-                'sid' => $relationID,
-                'service' => $this->_service,
-                'type' => $type,
-            );
-            if ($result = $this->db->insert('userAccess', $data)) {
-                $user = $this->extractSessionUser();
-                if ($user) {
-                    $this->getUserNotifier()->manualNotifyUpdated($userID, $user);
-                }
-            }
-            return $result;
-        }
-        return false;
+        $query = "SELECT service, lu_service.name, sid, type FROM userAccess JOIN lu_service ON service=lu_service.id WHERE uid=?";
+        return $this->db->query($query, [$uid])->fetchAll();
     }
 
     /**
@@ -360,8 +260,7 @@ class Group extends DeprecatedModel
         $permission = (int)$permission;
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
-        if (
-            $user->getRole()->isStaff()
+        if ($user->getRole()->isStaff()
             && (Config::get('news_staff_post_enabled') == '1')
             && ($this->_service == UserAccess::SERVICE_NEWS)
             && ($permission < UserAccess::ACCESS_WRITE)
