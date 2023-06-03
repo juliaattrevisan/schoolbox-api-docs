@@ -1876,11 +1876,6 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^Property Group\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method HouseMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/HouseMapper.php

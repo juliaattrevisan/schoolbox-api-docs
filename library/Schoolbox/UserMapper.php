@@ -150,7 +150,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setHash']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'undoAlaressUserModification']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidCalendarView']);
 
@@ -296,7 +296,7 @@ class UserMapper extends Mapper
      * @param User $model
      * @return bool Always true
      */
-    public function setHash(User $model)
+    public function updateHash(User $model)
     {
         if ($model->getRetrievablePassword()) {
             $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_school_code') . ':' . $model->getRetrievablePassword()));
