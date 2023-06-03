@@ -8,7 +8,6 @@ use Schoolbox\Notif\Notifactory;
  */
 class MyFolder extends DeprecatedModel
 {
-
     /**
      * @var int
      */
@@ -56,7 +55,7 @@ class MyFolder extends DeprecatedModel
     public function getParent($id)
     {
         $query = "SELECT parent FROM " . $this->_table . " WHERE id = " . (int)$id;
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
 
@@ -140,10 +139,10 @@ class MyFolder extends DeprecatedModel
     {
         $query = "SELECT f.id as children
                   FROM myFolder f
-                  WHERE parent = {$this->db->quote($folderID)}
+                  WHERE parent = ?
                   LIMIT 1";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query, [$folderID])->fetchColumn();
     }
 
 

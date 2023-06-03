@@ -5,6 +5,12 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+/**
+ * Homepage activity dashboard component.
+ *
+ * @deprecated Notifications exist
+ */
 class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract
 {
     /** @var array $feedList */
@@ -20,7 +26,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        $feedHandler = new Feed(DeprecatedDatabase::getInstance(), $this->getUser());
+        $feedHandler = new Feed(Database::getInstance(), $this->getUser());
         $groupHandler = new Group();
 
         $userAccess = $groupHandler->involvedInCategoryList(

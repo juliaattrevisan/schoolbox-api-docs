@@ -52,7 +52,7 @@ if (!empty($_POST)) {
             'notify_author'      => (int)($_POST['notify_author'] ?? false),
             'max_attempts'       => $_POST['max_attempts'],
             'completion_message' => $_POST['completion_message'],
-            'created_at'         => 'NOW()',
+            'created_at'         => Alaress_Date_Format::now()->getDatabaseDate(),
         )
     );
 

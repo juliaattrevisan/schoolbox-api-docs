@@ -10,15 +10,8 @@ use Schoolbox\Permission\Access\Access;
 
 class Group extends DeprecatedModel
 {
-    public $cache = array();
-    public $cacheUser = array();
-
-    /**
-     * A copy of the user notifier - it is called when a user changes.
-     *
-     * @var Schoolbox\UserNotifier
-     */
-    protected $userNotifier;
+    public array $cache     = array();
+    public array $cacheUser = array();
 
     /**
      * The service for which this group object is for.
@@ -36,21 +29,6 @@ class Group extends DeprecatedModel
         parent::__construct();
     }
 
-
-    /**
-     * @return Schoolbox\UserNotifier
-     */
-    protected function getUserNotifier()
-    {
-        // only load this if you *actually* need it
-        if (empty($this->userNotifier)) {
-            // TODO SA-8354: audit all places this could be used: replace with mapper
-            $this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
-        }
-        return $this->userNotifier;
-    }
-
-
     public function setService($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_service = $service;
@@ -67,13 +45,13 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT type
 				   FROM userGroups
-				  WHERE cid = '{$categoryId}' AND type >= '" . \Schoolbox\Resource\Group::MODERATED_GROUP . "'";
+				  WHERE cid = ? AND type >= ?";
 
-        $result = $this->db->getAll($query);
+        $result = $this->db->query($query, [$categoryId, \Schoolbox\Resource\Group::MODERATED_GROUP])->fetchAll();
 
         /* If there are results, they are already subscribed
            */
-        if ($result && count($result)) {
+        if (count($result)) {
             return true;
         }
 
@@ -90,9 +68,9 @@ class Group extends DeprecatedModel
      */
     public function getGroupTypeIds($name)
     {
-        $query = "SELECT id FROM `groups` WHERE group_type = \"{$name}\"";
+        $query = "SELECT id FROM `groups` WHERE group_type = ?";
 
-        $allIds = $this->db->getAll($query);
+        $allIds = $this->db->query($query, [$name])->fetchAll();
 
         $ids = array();
 
@@ -112,8 +90,8 @@ class Group extends DeprecatedModel
      */
     public function getGroupType($groupID)
     {
-        $query = "SELECT group_type FROM `groups` WHERE id = \"{$groupID}\"";
-        return $this->db->getOne($query);
+        $query = "SELECT group_type FROM `groups` WHERE id = ?";
+        return $this->db->query($query, [$groupID])->fetchColumn();
     }
 
     /**
@@ -158,114 +136,8 @@ class Group extends DeprecatedModel
 
     public function getAllUserAccess($uid)
     {
-        $query = "SELECT service, lu_service.name, sid, type FROM userAccess JOIN lu_service ON service=lu_service.id WHERE uid='$uid'";
-        return $this->db->getAll($query);
-    }
-
-    public function groupExists($relationID)
-    {
-        $query = "SELECT cid FROM userGroups WHERE cid = $relationID";
-        $result = $this->db->getRow($query);
-        if ($result['cid']) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function createGroup($relationID, $type = 1)
-    {
-        $data = array(
-            'cid' => $relationID,
-            'type' => $type
-        );
-        return $this->db->insert('userGroups', $data);
-    }
-
-    /**
-     * @deprecated replaced by Schoolbox\Permission\Access\RoleAccessMapper::roleMayOwnFolders()
-     * @param int $userID
-     * @return bool
-     */
-    public function allowOwner($userID)
-    {
-        //checks if the user can become the owner of group
-        if (Config::get('group_staff_only')) {
-            return $this->isStaff($userID);
-        } else {
-            return true;
-        }
-    }
-
-
-    public function isUser($relationID, $userID)
-    {
-        $query = "SELECT uid FROM userAccess WHERE service = '" . $this->_service . "' AND sid = '$relationID' AND uid = '$userID'";
-        $this->db->query($query);
-
-        if ($this->db->countRows() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * TODO remove this and update/remove everywhere which uses it:
-     * * sync scripts
-     * * add users to group
-     *
-     * @param int $relationID
-     * @param int $userID
-     * @param int $type
-     * @return bool
-     */
-    public function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
-    {
-        if (!$this->isUser($relationID, $userID)) {
-            $data = array(
-                'uid' => $userID,
-                'sid' => $relationID,
-                'service' => $this->_service,
-                'type' => $type,
-            );
-            if ($result = $this->db->insert('userAccess', $data)) {
-                $user = $this->extractSessionUser();
-                if ($user) {
-                    $this->getUserNotifier()->manualNotifyUpdated($userID, $user);
-                }
-            }
-            return $result;
-        }
-        return false;
-    }
-
-    /**
-     * Deletes a uid also can optionally delete a user based on its permission
-     *
-     * TODO remove this and update/remove everywhere which uses it:
-     * * group delete
-     *
-     * @param int $relationID
-     * @param int $userID
-     * @return resource
-     */
-    public function deleteUser($relationID, $userID)
-    {
-        $query = "
-			DELETE FROM userAccess
-			WHERE service = '{$this->db->quote($this->_service)}'
-			AND sid = '{$this->db->quote($relationID)}'
-			AND uid = '{$this->db->quote($userID)}'
-		";
-
-        if ($result = $this->db->query($query)) {
-            $user = $this->extractSessionUser();
-            if ($user) {
-                $this->getUserNotifier()->manualNotifyUpdated($userID, $user);
-            }
-        }
-        return $result;
+        $query = "SELECT service, lu_service.name, sid, type FROM userAccess JOIN lu_service ON service=lu_service.id WHERE uid=?";
+        return $this->db->query($query, [$uid])->fetchAll();
     }
 
     /**
@@ -365,27 +237,30 @@ class Group extends DeprecatedModel
             return UserAccess::ACCESS_FULL;
         }
 
+        $params          = [];
         $serviceIdFilter = '';
         if (in_array($this->_service, array(UserAccess::SERVICE_CALENDAR, UserAccess::SERVICE_HOUSEMASTER))) {
-            $serviceIdFilter = "AND sid = {$this->db->smartQuote($relationID)}";
+            $serviceIdFilter = "AND sid = ?";
+            $params[] = $relationID;
         }
 
         // check individual access
         $query = "
             SELECT type
             FROM userAccess
-            WHERE uid = {$this->db->smartQuote($userID)}
+            WHERE uid = ?
             $serviceIdFilter
-            AND ((service = {$this->db->smartQuote($this->_service)}))
+            AND ((service = ?))
             ORDER BY `type` DESC LIMIT 1
         ";
+        $params[] = $userID;
+        $params[] = $this->_service;
 
-        $permission = $this->db->getOne($query);
+        $permission = $this->db->query($query, $params)->fetchColumn();
         $permission = (int)$permission;
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
-        if (
-            $user->getRole()->isStaff()
+        if ($user->getRole()->isStaff()
             && (Config::get('news_staff_post_enabled') == '1')
             && ($this->_service == UserAccess::SERVICE_NEWS)
             && ($permission < UserAccess::ACCESS_WRITE)
@@ -520,7 +395,7 @@ class Group extends DeprecatedModel
 			AND userAccess.sid = folder.id
 			AND folder.deleted_at IS NULL
 			AND folder.id = '$cid'";
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     public function involvedInSubject($code, $userId = null)
@@ -643,16 +518,16 @@ class Group extends DeprecatedModel
                 folder.id,
                 userAccess.type
             FROM folder
-            INNER JOIN userAccess on folder.id = userAccess.sid AND userAccess.service = '{$this->db->quote($this->_service)}'
+            INNER JOIN userAccess on folder.id = userAccess.sid AND userAccess.service = ?
             $homepageJoin
-            WHERE userAccess.uid = '{$this->db->quote($userID)}'
-            AND userAccess.type >= '{$this->db->quote($accessType)}'
+            WHERE userAccess.uid = ?
+            AND userAccess.type >= ?
             AND folder.deleted_at IS NULL
             $exclude_part
         ";
 
-        $this->db->query($query);
-        while ($result = $this->db->getNextArray()) {
+        $query = $this->db->query($query, [$this->_service, $userID, $accessType]);
+        foreach ($query as $result) {
             $catList[] = $result;
         }
 
@@ -668,7 +543,7 @@ class Group extends DeprecatedModel
     public function getGroupName($groupID)
     {
         $query = "SELECT name FROM `groups` WHERE id = \"{$groupID}\"";
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**

@@ -85,7 +85,7 @@ class Survey_Main extends Evaluation_Main
         } else {
             $query = "SELECT *
                       FROM {$this->_table}
-                      WHERE category_id = " . $this->db->smartQuote($category_id) . "
+                      WHERE category_id = ?
                       AND availability = 'survey'
                       AND deleted_at IS NULL
                       ORDER BY created_at DESC";
@@ -95,7 +95,7 @@ class Survey_Main extends Evaluation_Main
             $query .= " LIMIT $limit";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, [$category_id])->fetchAll();
     }
 
 
@@ -109,7 +109,7 @@ class Survey_Main extends Evaluation_Main
     {
         $query = "SELECT assess_id FROM assess WHERE category_id = '{$category_id}' AND availability = 'survey'";
 
-        $allAssess = $this->db->getAll($query);
+        $allAssess = $this->db->query($query)->fetchAll();
 
         if (is_array($allAssess) && count($allAssess)) {
             /* Get a list of questions and answers to softdelete
@@ -138,17 +138,17 @@ class Survey_Main extends Evaluation_Main
                                          */
                                 $questionHandler->update(array(
                                     'question_id' => $currentQuestion['question_id'],
-                                    'deleted_at' => 'NOW()',
+                                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                                 ));
 
                                 $answerHandler->update(array(
                                     'answer_id' => $answer['answer_id'],
-                                    'deleted_at' => 'NOW()',
+                                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                                 ));
                             }
                         }
 
-                        $section['deleted_at'] = 'NOW()';
+                        $section['deleted_at'] = Alaress_Date_Format::now()->getDatabaseDate();
                         $sectionHandler->update($section);
                     }
                 }
@@ -157,7 +157,7 @@ class Survey_Main extends Evaluation_Main
                  */
                 $assessHandler->update(array(
                     'assess_id' => $currentAssess['assess_id'],
-                    'deleted_at' => 'NOW()'
+                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate()
                 ));
             }
         }

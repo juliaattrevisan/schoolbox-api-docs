@@ -5,32 +5,31 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
 
+/**
+ * Feed of all events occurring on a user's homepages.
+ *
+ * @deprecated use `\Schoolbox\Feed\StandardFeed`
+ */
 class Feed
 {
-    /** @var Schoolbox\User */
-    private $user;
-
     /**
-     * @var DeprecatedDatabase
+     * Constructor
+     *
+     * @deprecated use `\Schoolbox\Feed\StandardFeed`
+     *
+     * @param Database        $db   A database connection
+     * @param \Schoolbox\User $user The user to generate the feed for
      */
-    private $db;
-
-
-    /**
-     * @deprecated use \Schoolbox\Feed
-     * @param Schoolbox\User $user
-     */
-    public function __construct(DeprecatedDatabase $db, Schoolbox\User $user)
+    public function __construct(private Database $db, private Schoolbox\User $user)
     {
-        $this->db   = $db;
-        $this->user = $user;
     }
 
     /**
-     * @deprecated use \Schoolbox\Feed::aggregate()
+     * @deprecated use `\Schoolbox\Feed\StandardFeed`
      * @param int $folderId
      * @param int $limit
      * @return array
@@ -105,25 +104,44 @@ class Feed
     public function getFiles($folderId, $limit)
     {
         $file = [];
+        if (empty($folderId)) {
+            return [];
+        }
 
-        $where = $this->getFilterFromCategoryId($folderId);
-
-        $query = "SELECT f.id, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
-						af.description as type, inline, c.name as cat_name, c.id as cat_id
-				  FROM file f
-				  LEFT JOIN storage s on f.hash = s.hash
-				  LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
-				  LEFT JOIN allowedFileTypes af ON afe.extension = af.fileTypeID
-				  LEFT JOIN user u ON u.id = f.owner
-				  LEFT JOIN folder c ON c.id = f.category
-				  WHERE f.category $where AND f.hidden = 0 AND f.deleted_at IS NULL
-				  ORDER BY f.submitted DESC LIMIT 0, $limit";
-
-        $this->db->query($query);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
+        $query = $this->db->prepare(
+            "
+                SELECT
+                    f.id,
+                    u.firstname,
+                    u.preferred_name,
+                    u.lastname,
+                    u.title,
+                    u.id as uid,
+                    synergy_id as external_id,
+                    u.deleted_at as 'u.deleted_at',
+                    UNIX_TIMESTAMP(f.submitted) submitted,
+                    f.description as name,
+                    realname,
+                    af.description as type,
+                    inline,
+                    c.name as cat_name,
+                    c.id as cat_id
+                FROM file f
+                LEFT JOIN storage s on f.hash = s.hash
+                LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
+                LEFT JOIN allowedFileTypes af ON afe.extension = af.fileTypeID
+                LEFT JOIN user u ON u.id = f.owner
+                LEFT JOIN folder c ON c.id = f.category
+                WHERE f.category IN {$where} AND f.hidden = 0 AND f.deleted_at IS NULL
+                ORDER BY f.submitted DESC LIMIT 0, :limit
+            "
+        );
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $link = null;
             if ($row['realname'] != '') {
                 $url  = '<a href="/send.php?id=' . $row['id'] . '" rel="external">' . Scrub::text($row['name']) . '</a>';
@@ -156,20 +174,33 @@ class Feed
     {
         $link = [];
 
-        $where = $this->getFilterFromCategoryId($folderId);
-
-        $query = "SELECT l.id, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
-				  FROM link l
-				  LEFT JOIN user u ON u.id = l.owner
-				  LEFT JOIN folder c ON c.id = l.category
-				  WHERE category $where AND l.hidden = 0
-				  ORDER BY l.submitted DESC LIMIT 0, $limit";
-
-        $this->db->query($query);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
+        $query = $this->db->prepare("
+            SELECT
+                l.id,
+                u.firstname,
+                u.preferred_name,
+                u.lastname,
+                u.title,
+                u.id as uid,
+                synergy_id as external_id,
+                u.deleted_at as 'u.deleted_at',
+                UNIX_TIMESTAMP(l.submitted) submitted,
+                description as name,
+                url,
+                c.name as cat_name,
+                c.id as cat_id
+            FROM link l
+            LEFT JOIN user u ON u.id = l.owner
+            LEFT JOIN folder c ON c.id = l.category
+            WHERE category IN {$where} AND l.hidden = 0
+            ORDER BY l.submitted DESC LIMIT 0, :limit
+        ");
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $url = new Url($row['url']);
             if ($url->isLocalUrl()) {
                 $linkUrl    = $url->getRelativeURL();
@@ -209,8 +240,7 @@ class Feed
      */
     public function getOnlineAssessments($folderIds, $limit): array
     {
-
-        $where = $this->getFilterFromCategoryId($folderIds);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderIds);
 
         // Apply SIVO filter
         if ($this->user->getRole()->isStaff()) {
@@ -225,33 +255,39 @@ class Feed
                     $foldersWithWriteAccess[] = $folderId;
                 }
             }
-            $sivoClause = \count($foldersWithWriteAccess) ? " OR assess.category_id IN (" . \implode(',', $foldersWithWriteAccess) . ')' : '';
+            if (count($foldersWithWriteAccess) > 0) {
+                $sivoClause = " OR assess.category_id IN ("
+                    . Builder::getArrayPlaceholders($foldersWithWriteAccess, 'writeFolderId')
+                    . ')';
+                $params += Builder::getArrayParameters($foldersWithWriteAccess, 'writeFolderId');
+            } else {
+                $sivoClause = '';
+            }
         }
 
-        $query = "
-          SELECT
-              assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
-              u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
-              c.name as cat_name, c.id as cat_id
-          FROM assess
-          JOIN assessment a on assess.assessment_id = a.id
-          LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
-          LEFT JOIN user u ON assess.user_id = u.id
-          LEFT JOIN folder c ON c.id = assess.category_id
-          WHERE assess.category_id $where
-          AND assess.start < NOW()
-          AND assess.deleted_at IS NULL
-          AND assess.availability = 'assess'
-          AND (COALESCE(lwt.staff_or_instructor_visible_only, FALSE) = FALSE {$sivoClause})
-          ORDER BY assess.created_at DESC LIMIT 0, $limit
-        ";
-
-        $this->db->query($query);
+        $query = $this->db->prepare("
+            SELECT
+                assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
+                u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+                c.name as cat_name, c.id as cat_id
+            FROM assess
+            JOIN assessment a on assess.assessment_id = a.id
+            LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
+            LEFT JOIN user u ON assess.user_id = u.id
+            LEFT JOIN folder c ON c.id = assess.category_id
+            WHERE assess.category_id IN {$where}
+            AND assess.start < NOW()
+            AND assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND (COALESCE(lwt.staff_or_instructor_visible_only, FALSE) = FALSE {$sivoClause})
+            ORDER BY assess.created_at DESC LIMIT 0, :limit
+        ");
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
         $onlineAssessments = [];
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $onlineAssessments[] = [
                 'date'        => $row['start'],
                 'type'        => 'icon-quiz',
@@ -285,28 +321,28 @@ class Feed
     {
         $surveys = [];
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
 
-        $query = "
-          SELECT
-              assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
-              u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
-              c.name as cat_name, c.id as cat_id
-          FROM assess
-          LEFT JOIN user u ON assess.user_id = u.id
-          LEFT JOIN folder c ON c.id = assess.category_id
-          WHERE assess.category_id $where
-          AND assess.start < NOW()
-          AND assess.deleted_at IS NULL
-          AND assess.availability = 'survey'
-          ORDER BY assess.created_at DESC LIMIT 0, $limit
-        ";
+        $query = $this->db->prepare("
+            SELECT
+                assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
+                u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+                c.name as cat_name, c.id as cat_id
+            FROM assess
+            LEFT JOIN user u ON assess.user_id = u.id
+            LEFT JOIN folder c ON c.id = assess.category_id
+            WHERE assess.category_id IN {$where}
+            AND assess.start < NOW()
+            AND assess.deleted_at IS NULL
+            AND assess.availability = 'survey'
+            ORDER BY assess.created_at DESC LIMIT 0, :limit
+        ");
 
-        $this->db->query($query);
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $surveys[] = [
                 'date'        => $row['start'],
                 'type'        => 'icon-surveys',
@@ -333,21 +369,22 @@ class Feed
     {
         $folder = [];
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
+        $query = $this->db->prepare("
+            SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', pc.name as cat_name, pc.id as cat_id
+            FROM cmsLog
+            JOIN folder c ON objectId = c.id
+            JOIN user u ON user = u.id
+            JOIN folder pc ON pc.id = c.parent
+            WHERE c.parent IN {$where} AND object = 'folder' AND action = 'create'
+            ORDER BY time DESC LIMIT 0, :limit
+        ");
 
-        $query = "SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', pc.name as cat_name, pc.id as cat_id
-					FROM cmsLog
-					JOIN folder c ON objectId = c.id
-					JOIN user u ON user = u.id
-					JOIN folder pc ON pc.id = c.parent
-					WHERE c.parent $where AND object = 'folder' AND action = 'create'
-					ORDER BY time DESC LIMIT 0, $limit";
-
-        $this->db->query($query);
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $folder[] = [
                 'date'        => $row['submitted'],
                 'type'        => 'icon-folder',
@@ -373,20 +410,21 @@ class Feed
     {
         $forum = [];
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
+        $query = $this->db->prepare("
+            SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
+            FROM forumThread f
+            JOIN user u ON u.id = f.userID
+            LEFT JOIN folder c ON c.id = f.categoryID
+            WHERE f.deleted = 'false' AND f.categoryID IN {$where}
+            ORDER BY `date` DESC LIMIT 0, :limit
+        ");
 
-        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
-					FROM forumThread f
-                    JOIN user u ON u.id = f.userID
-                    LEFT JOIN folder c ON c.id = f.categoryID
-					WHERE f.deleted = 'false' AND f.categoryID $where
-					ORDER BY `date` DESC LIMIT 0, $limit";
-
-        $this->db->query($query);
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $forum[] = [
                 'date'        => $row['submitted'],
                 'type'        => 'icon-forum',
@@ -419,21 +457,23 @@ class Feed
     {
         $wiki = [];
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
 
-        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
-					FROM wikiRevision r
-						JOIN wiki w ON w.wikiID = r.wikiID
-						JOIN user u ON u.id = r.userID
-						LEFT JOIN folder c ON c.id = w.categoryID
-				  	WHERE w.deleted = 'false' AND w.categoryID $where
-					ORDER BY r.created DESC LIMIT 0, $limit";
+        $query = $this->db->prepare("
+            SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
+            FROM wikiRevision r
+            JOIN wiki w ON w.wikiID = r.wikiID
+            JOIN user u ON u.id = r.userID
+            LEFT JOIN folder c ON c.id = w.categoryID
+            WHERE w.deleted = 'false' AND w.categoryID IN {$where}
+            ORDER BY r.created DESC LIMIT 0, :limit
+        ");
 
-        $this->db->query($query);
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $wiki[] = [
                 'date'        => $row['submitted'],
                 'type'        => 'icon-wiki',
@@ -467,22 +507,23 @@ class Feed
     {
         $blog = [];
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
+        $query = $this->db->prepare("
+            SELECT u.id AS uid, u.title, u.firstname, u.preferred_name, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at', b.id AS blogID, heading, UNIX_TIMESTAMP(b.created_at) AS submitted, c.name as cat_name, c.id as cat_id
+            FROM user u
+            JOIN blog b
+            ON u.id = b.owner_id
+            LEFT JOIN folder c ON c.id = folder_id
+            WHERE folder_id IN {$where}
+            AND b.deleted_at IS NULL
+            ORDER BY submitted LIMIT 0, :limit
+        ");
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.preferred_name, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at', b.id AS blogID, heading, UNIX_TIMESTAMP(b.created_at) AS submitted, c.name as cat_name, c.id as cat_id
-			FROM user u
-			JOIN blog b
-			ON u.id = b.owner_id
-			LEFT JOIN folder c ON c.id = folder_id
-			WHERE folder_id $where
-			AND b.deleted_at IS NULL
-			ORDER BY submitted LIMIT 0, $limit";
-
-        $this->db->query($query);
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $blog[] = [
                 'date'        => $row['submitted'],
                 'type'        => 'icon-blog',
@@ -516,23 +557,24 @@ class Feed
     {
         $blogComments = [];
 
-        $where = $this->getFilterFromCategoryId($folderId);
-
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.preferred_name, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
+        $query = $this->db->prepare("
+            SELECT u.id AS uid, u.title, u.firstname, u.preferred_name, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
             UNIX_TIMESTAMP(bc.created_at) AS submitted, b.id AS blogID, heading, folder_id, c.name as cat_name, c.id as cat_id
-			FROM `user` u
-			JOIN blog_comment bc ON u.id = bc.owner_id
-			JOIN blog b ON bc.blog_id = b.id
-			LEFT JOIN folder c ON c.id = folder_id
-			WHERE folder_id $where
-			AND b.deleted_at IS NULL
-			ORDER BY submitted LIMIT 0, $limit";
+            FROM `user` u
+            JOIN blog_comment bc ON u.id = bc.owner_id
+            JOIN blog b ON bc.blog_id = b.id
+            LEFT JOIN folder c ON c.id = folder_id
+            WHERE folder_id IN {$where}
+            AND b.deleted_at IS NULL
+            ORDER BY submitted LIMIT 0, :limit
+        ");
 
-        $this->db->query($query);
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $blogComments[] = [
                 'date'        => $row['submitted'],
                 'type'        => 'icon-blog',
@@ -586,5 +628,38 @@ class Feed
         return null === $row['u.deleted_at']
             ? sprintf('<a href="/search/user/%s">%s</a>', $userId, $userHandler->formatName($row))
             : $userHandler->formatName($row);
+    }
+
+    /**
+     * Builds a set of placeholders and params for use in one of this class'
+     * queries.
+     *
+     * @param array $folderIds
+     * @return array{string, array<string, int>}
+     */
+    private function buildPlaceholdersAndParams(array $folderIds): array
+    {
+        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folderId');
+        $params       = Builder::getArrayParameters($folderIds, 'folderId');
+        return [$placeholders, $params];
+    }
+
+    /**
+     * Executes `$query` with `$params` and `$limit`.
+     *
+     * Assumes `$query` has a placeholder `:limit`.
+     *
+     * @param PDOStatement $query
+     * @param array        $params
+     * @param int          $limit
+     * @return void
+     */
+    private function executeWithLimit(PDOStatement $query, array $params, int $limit): void
+    {
+        foreach ($params as $param => $value) {
+            $query->bindValue($param, $value);
+        }
+        $query->bindValue('limit', $limit, PDO::PARAM_INT);
+        $query->execute();
     }
 }

@@ -1151,51 +1151,6 @@ parameters:
 			path: library/Database.php
 
 		-
-			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$db\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$debug\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 2
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:changeDb\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:close\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:serialize\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Static property DeprecatedDatabase\\:\\:\\$instance \\(DeprecatedDatabase\\) does not accept default value of type false\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Variable \\$subquery might not be defined\\.$#"
-			count: 1
-			path: library/DeprecatedModel.php
-
-		-
 			message: "#^Method EOTC\\\\ActivityLog\\\\Log\\:\\:getId\\(\\) should return string but returns int\\.$#"
 			count: 1
 			path: library/EOTC/ActivityLog/Log.php
@@ -1921,26 +1876,6 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
-			message: "#^Method Group\\:\\:deleteUser\\(\\) should return resource but returns PDOStatement\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
-			message: "#^Property Group\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
-			message: "#^Method Homepage\\:\\:removeAllComponentsFromHomepage\\(\\) invoked with 1 parameter, 0 required\\.$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method HouseMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/HouseMapper.php
@@ -1989,11 +1924,6 @@ parameters:
 			message: "#^Constructor of class Page has an unused parameter \\$error\\.$#"
 			count: 1
 			path: library/Page.php
-
-		-
-			message: "#^Method Poll\\:\\:delete\\(\\) should return bool but returns PDOStatement\\.$#"
-			count: 1
-			path: library/Poll.php
 
 		-
 			message: "#^Cannot access offset 'name' on true\\.$#"

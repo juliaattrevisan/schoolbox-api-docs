@@ -466,4 +466,140 @@ class Database implements IDatabase, Serializable
     {
         $this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
     }
+
+
+    /**
+     * Methods copied from DeprecatedDatabase: for sanity's sake these need to
+     * remain copied here.
+     */
+
+
+    /**
+     * Inserts an array into table (does all proper security checks to ensure safe)
+     *
+     * @deprecated use \Schoolbox\Mapper::save()
+     *
+     * @param string $table Insert into this table.
+     * @param array  $array Insert this set of key-value pairs into this table's
+     *                      fields.
+     * @return bool
+     */
+    public function insert($table, $array)
+    {
+        if (!($table && is_array($array))) {
+            return false;
+        }
+
+        $names  = [];
+        $values = [];
+        $params = [];
+        $quoter = $this->getQuoter();
+        foreach ($array as $key => $value) {
+            $names[] = $quoter->quoteIdentifier($key);
+            if (!is_array($value)) {
+                $values[] = '?';
+                $params[] = $value;
+            } elseif (isset($value['function'])) {
+                $values[] = ($value['function'] . '(?)');
+                $params[] = $value['value'];
+            }
+        }
+        $names  = implode(',', $names);
+        $values = implode(',', $values);
+
+        $query = "INSERT INTO {$quoter->quoteIdentifier($table)} ($names) VALUES ($values)";
+        $this->query($query, $params);
+        return true;
+    }
+
+    /**
+     * Updates a row
+     *
+     * @deprecated use \Schoolbox\Mapper::save()
+     *
+     * @param string       $table      Update this table.
+     * @param array|string $identifier Keys for `$table`.
+     * @param array        $array      Update this set of key-value pairs in
+     *                                 this table.
+     *                                 Any field which is in `$identifier` will
+     *                                 be used in the WHERE part of the query.
+     *
+     * @return bool
+     *
+     */
+    public function update($table, $identifier, $array)
+    {
+        if (!$table) {
+            return false;
+        }
+
+        if (is_array($identifier)) {
+            foreach ($identifier as $ident) {
+                if (!$array[$ident]) {
+                    return false;
+                }
+            }
+        } else {
+            if (!$array[$identifier]) {
+                return false;
+            }
+
+            $identifier = array($identifier);
+        }
+
+        $set    = [];
+        $params = [];
+        $quoter = $this->getQuoter();
+        foreach ($array as $key => $value) {
+            if (!in_array($key, $identifier)) {
+                if (!is_array($value)) {
+                    $set[]    = "{$quoter->quoteIdentifier($key)} = ?";
+                    $params[] = $value;
+                } elseif (isset($value['function'])) {
+                    $set[]    = "{$quoter->quoteIdentifier($key)} = {$value['function']}(?)";
+                    $params[] = $value;
+                }
+            }
+        }
+        $set   = implode(',', $set);
+        $query = "UPDATE {$quoter->quoteIdentifier($table)} SET $set WHERE 1=1";
+
+        foreach ($identifier as $ident) {
+            $query .= " AND {$quoter->quoteIdentifier($ident)} = ?";
+            $params[] = $ident;
+        }
+
+        $this->query($query, $params);
+        return true;
+    }
+
+    /**
+     * Delete from this table.
+     *
+     * @deprecated use \Schoolbox\Mapper::delete()
+     *
+     * @param string        $table      Delete from this table.
+     * @param string        $identifier Key for `$table`.
+     * @param string|array  $value      Delete from `$table` where the column
+     *                                  `$identifier` matches any of these
+     *                                  values.
+     *
+     * @return bool
+     */
+    public function delete($table, $identifier, $value)
+    {
+        $query  = "DELETE FROM {$this->getQuoter()->quoteIdentifier($table)} WHERE 1 != 1 ";
+        $params = [];
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                $query .= " OR {$this->getQuoter()->quoteIdentifier($identifier)} = ?";
+                $params[] = $item;
+            }
+        } else {
+            $query .= "OR {$this->getQuoter()->quoteIdentifier($identifier)}` = ?";
+            $params[] = $value;
+        }
+        $this->query($query, $params);
+        return true;
+    }
 }

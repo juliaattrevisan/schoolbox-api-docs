@@ -1,5 +1,7 @@
 <?php
 
+use Alaress\Database\Predicate\Builder;
+
 /**
  * Assess_Attempt
  *
@@ -31,19 +33,21 @@ class Assess_Attempt extends Evaluation_Attempt
         }
 
         // Get everything for that question
+        $placeholders = Builder::getArrayPlaceholders($attempts, 'attempt');
         $query = "
             SELECT *
             FROM assess_question aq
             INNER JOIN assess_response ar ON aq.question_id = ar.question_id
             INNER JOIN assess_attempt  aa ON ar.attempt_id  = aa.attempt_id
             LEFT  JOIN user            u  ON aa.user_id     = u.id
-            WHERE aq.question_id = '{$this->db->quote($questionId)}'
-            AND   ar.attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
+            WHERE aq.question_id = :questionId
+            AND   ar.attempt_id IN {$placeholders}
             AND ar.deleted_at IS NULL
             ORDER BY u.lastname ASC, u.chosen_name ASC, u.id ASC
         ";
+        $params = ['questionId' => $questionId] + Builder::getArrayParameters($attempts, 'attempt');
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, $params)->fetchAll();
     }
 
     /**
@@ -61,12 +65,12 @@ class Assess_Attempt extends Evaluation_Attempt
         $query = "
             SELECT user_id, attempt_id, reviewed_at
             FROM assess_attempt
-            WHERE assess_id = '{$this->db->quote($assessId)}'
+            WHERE assess_id = ?
             AND   deleted_at IS NULL
             ORDER BY user_id, `start` DESC
         ";
         $results = [];
-        $rows = $this->db->getAll($query);
+        $rows = $this->db->query($query, [$assessId])->fetchAll();
         if (!$rows) {
             return [];
         }
@@ -77,16 +81,5 @@ class Assess_Attempt extends Evaluation_Attempt
             }
         }
         return $results;
-    }
-
-    /**
-     * Builds the contents of a `IN()` statement for the list of attempt IDs.
-     *
-     * @param int[] $attemptIds
-     * @return string
-     */
-    private function buildReviewableAttemptsForQuery(array $attemptIds)
-    {
-        return implode(',', array_map([$this->db, 'smartQuote'], $attemptIds));
     }
 }

@@ -1,6 +1,9 @@
 <?php
 
 use Eportfolio\PageMapper;
+use Eportfolio\Template;
+use Eportfolio\TemplateMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
 /**
@@ -12,14 +15,6 @@ use Schoolbox\UserMapper;
  */
 class Eportfolio
 {
-
-    /**
-     * An instance of dbManager
-     *
-     * @var DeprecatedDatabase|null
-     */
-    private $db = null;
-
     /**
      * The current user id
      *
@@ -50,19 +45,24 @@ class Eportfolio
     private $context = 'eportfolio';
 
     /**
-     * @var UserMapper
+     * User mapper
      */
-    private $userMapper;
+    private UserMapper $userMapper;
 
     /**
-     * @var PageMapper
+     * Eportfolio page mapper
      */
-    private $pageMapper;
+    private PageMapper $pageMapper;
 
     /**
-     * @var array;
+     * Eportfolio template mapper
      */
-    private array $allTemplates;
+    private TemplateMapper $templateMapper;
+
+    /**
+     * @var GenericCollection|Template[];
+     */
+    private GenericCollection $allTemplates;
 
     /**
      * Constructor
@@ -72,13 +72,13 @@ class Eportfolio
      */
     public function __construct($userId, $pageId)
     {
-        $this->setDb(DeprecatedDatabase::getInstance());
         $this->setUserId($userId);
         $this->setPageId($pageId);
 
         // TODO inject these mappers for testability
-        $this->userMapper = UserMapper::getInstance();
-        $this->pageMapper = PageMapper::getInstance();
+        $this->userMapper     = UserMapper::getInstance();
+        $this->pageMapper     = PageMapper::getInstance();
+        $this->templateMapper = TemplateMapper::getInstance();
 
         /* Preload settings for user-built pages
          *
@@ -173,29 +173,11 @@ class Eportfolio
     /**
      * Get all eportfolio_template records
      *
-     * @return array
+     * @return GenericCollection|Template[]
      */
     public function fetchAllTemplates()
     {
-        $allTemplates = [];
-
-        $query = "
-			SELECT id, name
-			FROM {$this->getContext()}Template
-			ORDER BY id
-		";
-
-        $result = $this->getDb()->getAll($query);
-
-        /* Do some transpositionary reflex
-         */
-        if (is_array($result) && count($result)) {
-            foreach ($result as $currentTemplate) {
-                $allTemplates[$currentTemplate['id']] = $currentTemplate['name'];
-            }
-        }
-
-        return $allTemplates;
+        return $this->templateMapper->findAll();
     }
 
     /**
@@ -209,7 +191,7 @@ class Eportfolio
         if (!isset($this->allTemplates)) {
             $this->allTemplates = $this->fetchAllTemplates();
         }
-        return $this->allTemplates[$id];
+        return $this->allTemplates->getBy('id', $id)->getName();
     }
 
     /**
@@ -319,48 +301,38 @@ class Eportfolio
      */
     public function createEportfolioFromTemplate($pageTitle, $templateID)
     {
-        $userId     = $this->db->quote($this->getUserId());
-        $templateID = $this->db->quote($templateID);
+        $userId = $this->getUserId();
 
         /* Retrieve template data
          */
-        $query = "
-			SELECT id AS template, left_column_width, right_column_width
-			FROM {$this->getContext()}Template
-			WHERE id = '{$templateID}'
-		";
-
-        $tpl = $this->db->getRow($query);
+        $template = $this->templateMapper->findById($templateID);
 
         /* Compile an eportfolioConfig record
          */
-        $eportfolioConfig = [
-            'uid'                => $userId,
-            'page_title'         => $pageTitle,
-            'template'           => $templateID,
-            'left_column_width'  => $tpl['left_column_width'],
-            'right_column_width' => $tpl['right_column_width'],
-            'created_at'         => 'NOW()',
-            'updated_at'         => 'NOW()',
-        ];
-
-        foreach (['top', 'left', 'right'] as $position) {
-            $eportfolioConfig = array_merge($eportfolioConfig, [
-                $position . '_head_font'  => Config::get('homepage_colour_head_font'),
-                $position . '_head_bg'    => Config::get('homepage_colour_head_bg'),
-                $position . '_font'       => Config::get('homepage_colour_font'),
-                $position . '_bg_primary' => Config::get('homepage_colour_bg_primary'),
-            ]);
-        }
-
-        /* Insert it
-         */
-        $this->db->insert($this->getContext() . '_page', $eportfolioConfig);
+        $page = $this->pageMapper->createModel();
+        $page->setOwner($this->userMapper->createModel($userId));
+        $page->setPageTitle($pageTitle);
+        $page->setTemplate($templateID);
+        $page->setLeftColumnWidth($template->getLeftColumnWidth());
+        $page->setRightColumnWidth($template->getRightColumnWidth());
+        $page->setTopHeadFont(Config::get('homepage_colour_head_font'));
+        $page->setTopHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setTopFont(Config::get('homepage_colour_font'));
+        $page->setTopBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $page->setLeftHeadFont(Config::get('homepage_colour_head_font'));
+        $page->setLeftHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setLeftFont(Config::get('homepage_colour_font'));
+        $page->setLeftBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $page->setRightHeadFont(Config::get('homepage_colour_head_font'));
+        $page->setRightHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setRightFont(Config::get('homepage_colour_font'));
+        $page->setRightBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $this->pageMapper->save($page);
 
         /* Remember the page that was just created, because we'll apply
          * permissions to it after it gets created
          */
-        $this->setPageId($this->db->insertID());
+        $this->setPageId($page->getPageId());
 
         // retrieve, rearrange and reinsert the componentry
         $cim       = Component_InstanceMapper::getInstance();
@@ -467,77 +439,28 @@ class Eportfolio
      * Save colours for individual pages
      *
      * @param array $listColor
-     * @return PDOStatement
+     * @return void
      */
     public function saveDisplayProperties($listColor)
     {
-
-        $query = "
-			UPDATE {$this->getContext()}_page
-			SET
-		";
-
-        $stack = [];
-
-        foreach ($listColor as $key => $color) {
-            $key = str_replace('font_primary', 'font', $key);
-            $field = $this->db->quote($key);
-            $value = $this->db->quote($color);
-
-            $stack[] = "`{$field}` = '{$value}'";
-        }
-
-        $query .= implode(',', $stack);
-
-        $query .= "
-			WHERE page_id = {$this->getPageId()}
-		";
-
-        return $this->db->query($query);
-    }
-
-    /**
-     * Create/Update a page template
-     *
-     * @param int $template
-     */
-    public function savePageTemplate($template)
-    {
-        $query = "
-			SELECT uid
-			FROM {$this->getContext()}_page
-			WHERE uid = '{$this->getUserId()}'
-		";
-
-        $this->db->query($query);
-
-        if ($row = $this->db->getNextArray()) {
-            $query = "UPDATE {$this->getContext()}_page SET template = '$template' WHERE uid = '{$this->getUserId()}'";
-        } else {
-            $query = "INSERT INTO {$this->getContext()}_page (uid, template) VALUES ('{$this->getUserID()}', '$template')";
-        }
-
-        $this->db->query($query);
+        $page = $this->pageMapper->findById($this->getPageId());
+        $page->setTopHeadFont($listColor['top_head_font']);
+        $page->setTopHeadBg($listColor['top_head_bg']);
+        $page->setTopFont($listColor['top_font_primary']);
+        $page->setTopBgPrimary($listColor['top_bg_primary']);
+        $page->setLeftHeadFont($listColor['left_head_font']);
+        $page->setLeftHeadBg($listColor['left_head_bg']);
+        $page->setLeftFont($listColor['left_font_primary']);
+        $page->setLeftBgPrimary($listColor['left_bg_primary']);
+        $page->setRightHeadFont($listColor['right_head_font']);
+        $page->setRightHeadBg($listColor['right_head_bg']);
+        $page->setRightFont($listColor['right_font_primary']);
+        $page->setRightBgPrimary($listColor['right_bg_primary']);
+        $this->pageMapper->save($page);
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * @param \DeprecatedDatabase|null $db
-     */
-    private function setDb($db)
-    {
-        $this->db = $db;
-    }
-
-    /**
-     * @return \DeprecatedDatabase|null
-     */
-    private function getDb()
-    {
-        return $this->db;
-    }
 
     /**
      * Set user id
