@@ -117,8 +117,7 @@ class Session
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();
-            if (
-                Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
+            if (Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
                 && !empty(Config::get('external_portal'))
             ) {
                 $_SESSION['password'] = $_POST['password'] ?? null;
@@ -248,14 +247,16 @@ class Session
         }
 
         // Store password as hash for DAV authentication later
-        $user->setHash(md5($username . ':' . Config::get('site_school_code') . ':' . $password));
+        if (Config::get('webdav_auth_type') === 'digest') {
+            $userMapper->storeHash($user, md5($username . ':' . Config::get('site_school_code') . ':' . $password));
+        }
 
         // ensure a key is set on login
         if (!$user->getKey()) {
             $user->setKey(substr(md5(uniqid() . time()), 0, 25));
+            $userMapper->save($user);
         }
 
-        $userMapper->save($user);
         return $user;
     }
 
@@ -433,15 +434,14 @@ class Session
         $ldapCaCertHash    = Config::get('ldap_ca_certificate');
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
-            if (
-                $ds && $this->ldapAuth(
-                    $ds,
-                    $username,
-                    $password,
-                    $ldapConfig['searchBase'],
-                    $ldapUsernameField,
-                    $ldapSearchFilter
-                )
+            if ($ds && $this->ldapAuth(
+                $ds,
+                $username,
+                $password,
+                $ldapConfig['searchBase'],
+                $ldapUsernameField,
+                $ldapSearchFilter
+            )
             ) {
                 return true;
             }

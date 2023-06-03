@@ -150,7 +150,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setHash']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'undoAlaressUserModification']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidCalendarView']);
 
@@ -296,7 +296,7 @@ class UserMapper extends Mapper
      * @param User $model
      * @return bool Always true
      */
-    public function updateHash(User $model)
+    public function setHash(User $model)
     {
         if ($model->getRetrievablePassword()) {
             $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_school_code') . ':' . $model->getRetrievablePassword()));
@@ -1076,6 +1076,20 @@ class UserMapper extends Mapper
         $query = "UPDATE {$this->table} SET calendar_view = :calendarView WHERE id = :userId";
         $this->database->query($query, ['userId' => $userId, 'calendarView' => $calendarView]);
         return true;
+    }
+
+    /**
+     * The hash is a function of the password, we use this to store the password when the user logs in
+     * This is dangerous and a security risk and will likely need to be removed in the future
+     *
+     * @param User   $user
+     * @param string $hash
+     * @return true
+     */
+    public function storeHash(User $user, string $hash)
+    {
+        $query = "UPDATE {$this->table} SET hash = :hash WHERE id = :userId";
+        $this->database->query($query, ['userId' => $user->getId(), 'hash' => $hash]);
     }
 
     /**
