@@ -61,7 +61,6 @@ async function onLeave(el, done) {
                     @click.prevent="onCreateNewSelected"
                 >
                 </a>
-                <a href="/curriculum/import" class="icon icon-upload" title="Import Curriculum"></a>
             </nav>
         </template>
     </div>
