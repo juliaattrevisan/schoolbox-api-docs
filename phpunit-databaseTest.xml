@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         bootstrap="test/bootstrap/unit.php"
+         defaultTestSuite="databaseTest"
+>
+  <testsuites>
+    <testsuite name="databaseTest">
+      <directory suffix=".php">library/Alaress/Database/Test</directory>
+      <directory suffix=".php">library/Schoolbox/Database/Test</directory>
+    </testsuite>
+  </testsuites>
+    <listeners>
+        <!-- TODO - This is a temporary hack to compensate for a bug in paratest/phpunit when using code-coverage -->
+        <!--        The correct solution is to upgrade paratest/phpunit -->
+        <!--        See https://github.com/paratestphp/paratest/issues/282 -->
+        <listener class="Alaress\Test\MakeWarningErrorAgainTestListener"></listener>
+    </listeners>
+    <php>
+        <!--
+        Database tests require the Vagrant box's standard instance ID, in order
+        to be granted access to the database.
+        -->
+        <env name="INSTANCE_ID" value="vagrantx" force="true" />
+    </php>
+</phpunit>
