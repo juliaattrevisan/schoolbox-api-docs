@@ -31,25 +31,25 @@ use Traversable;
 class MockConnector implements IConnector
 {
     /**
-     * The test case, required for creating mocks
-     *
-     * @var TestCase
+     * The test case, required for creating mocks.
      */
     protected TestCase $testCase;
 
     /**
-     * The mock statement
-     *
-     * @var PDOStatement|MockObject
+     * The mock statement itself.
      */
     protected PDOStatement|MockObject $mockStatement;
 
     /**
-     * The next insert ID to be used.
-     *
-     * @var string|false
+     * The next insert ID to be retrieved.
      */
     protected string|false $nextInsertId;
+
+    /**
+     * The next full result set to be retrieved.
+     */
+    protected array $resultSet;
+
 
     /**
      * Builds the mock connection, using the test case to build mock statement.
@@ -65,7 +65,7 @@ class MockConnector implements IConnector
     /**
      * Resets this item's mock statement.
      */
-    public function resetStatement()
+    public function resetStatement(): void
     {
         $this->mockStatement = $this->testCase->getMockBuilder(PDOStatement::class)->getMock();
     }
@@ -75,7 +75,7 @@ class MockConnector implements IConnector
      *
      * @param mixed $result
      */
-    public function setNextFetch($result)
+    public function setNextFetch(mixed $result): void
     {
         $this->setResultSet([$result]);
     }
@@ -83,43 +83,43 @@ class MockConnector implements IConnector
     /**
      * Calls $this->setNextResult('fetchAll', $result)
      *
-     * @param mixed $result
+     * @param array $result
      */
-    public function setNextFetchAll($result)
+    public function setNextFetchAll(array $result): void
     {
         $this->setResultSet($result);
     }
 
-
-    /** @var array|Traversable|null */
-    protected $resultSet;
-
-
     /**
-     * @param array|Traversable|null $result
+     * @param array $result
      */
-    protected function setResultSet($result)
+    protected function setResultSet(array $result): void
     {
         $this->resultSet = $result;
         reset($this->resultSet);
 
-        $this->mockStatement->expects($this->testCase->any())
-                             ->method('fetchAll')
-                             ->will($this->testCase->returnValue($this->resultSet));
+        $this->mockStatement
+            ->expects($this->testCase->any())
+            ->method('fetchAll')
+            ->will($this->testCase->returnValue($this->resultSet));
 
-        $this->mockStatement->expects($this->testCase->any())
-                             ->method('fetch')
-                             ->will($this->testCase->returnCallback(function () {
-                                if ($val = current($this->resultSet)) {
-                                    next($this->resultSet);
-                                    return $val;
-                                }
-                                 return null;
-                             }));
+        $this->mockStatement
+            ->expects($this->testCase->any())
+            ->method('fetch')
+            ->will(
+                $this->testCase->returnCallback(function () {
+                    if ($val = current($this->resultSet)) {
+                        next($this->resultSet);
+                        return $val;
+                    }
+                    return null;
+                })
+            );
 
-        $this->mockStatement->expects($this->testCase->any())
-                             ->method('execute')
-                             ->will($this->testCase->returnValue(true));
+        $this->mockStatement
+            ->expects($this->testCase->any())
+            ->method('execute')
+            ->will($this->testCase->returnValue(true));
     }
 
     /**
@@ -135,42 +135,17 @@ class MockConnector implements IConnector
         return $this->mockStatement;
     }
 
-//    /**
-//     * Mock of quoteIdentifier (used by Schoolbox\Mapper->findByColumnList())
-//     *
-//     * @param  string $string
-//     * @return string
-//     */
-//    public function quoteIdentifier($string)
-//    {
-//        return $string;
-//    }
-
-
     /**
      * Returns the mocked statement.
      *
-     * @param string $sql
-     * @param array  $parameters
+     * @param string     $sql
+     * @param array|null $parameters
      * @return IStatement
      */
     public function query(string $sql, array $parameters = null): IStatement
     {
         throw new BadMethodCallException('Not supported');
     }
-
-
-//    /**
-//     * Mock of quote
-//     *
-//     * @param string $string
-//     * @param int    $parameter_type
-//     * @return string
-//     */
-//    public function quote($string, $parameter_type = PDO::PARAM_STR)
-//    {
-//        return $string;
-//    }
 
 
     /**
@@ -184,26 +159,6 @@ class MockConnector implements IConnector
         return new Quoter();
     }
 
-
-//    /**
-//     * Mock of escapeForLike
-//     *
-//     * @param  string $string
-//     * @return string
-//     */
-//    public function escapeForLike($string)
-//    {
-//        return $string;
-//    }
-
-
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getEscapedOperand(string $defaultTable, string $columnName): string
-//    {
-//        return $columnName;
-//    }
 
     /**
      * @inheritdoc
@@ -257,7 +212,7 @@ class MockConnector implements IConnector
     /**
      * @param string|false $nextInsertId
      */
-    public function setNextInsertId(string|false $nextInsertId)
+    public function setNextInsertId(string|false $nextInsertId): void
     {
         $this->nextInsertId = $nextInsertId;
     }
