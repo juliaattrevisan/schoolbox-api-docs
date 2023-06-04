@@ -13,10 +13,10 @@ namespace Alaress\Database\Statement;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception;
-use Iterator;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Traversable;
 
 abstract class Base implements IStatement
 {
@@ -224,7 +224,7 @@ abstract class Base implements IStatement
     /**
      * @inheritdoc
      */
-    public function getIterator($values = null)
+    public function getIterator(?array $values = null): Traversable
     {
         try {
             $this->prepareExecution($values);
@@ -232,79 +232,6 @@ abstract class Base implements IStatement
         } catch (PDOException $e) {
             throw new Exception("Exception error retrieving iterator: " . $e->getMessage(), 0, $e);
         }
-    }
-
-    /**
-     * Returns an iterator over this statement.
-     *
-     * Expects that the statement has been executed.
-     *
-     * @return Iterator|null
-     */
-    public function getInnerIterator(): ?Iterator
-    {
-        return $this->broker->getIterator($this, $this->statement);
-    }
-
-    /**
-     * Returns statement's current value.
-     *
-     * Expects that the statement has been executed.
-     *
-     * @return mixed
-     */
-    public function current(): mixed
-    {
-        return $this->getInnerIterator()?->current();
-    }
-
-    /**
-     * Move forward to next element in the statement.
-     *
-     * Expects that the statement has been executed.
-     *
-     * @return void
-     */
-    public function next(): void
-    {
-        $this->getInnerIterator()?->next();
-    }
-
-    /**
-     * Returns statement's current key.
-     *
-     * Expects that the statement has been executed.
-     *
-     * @return mixed
-     */
-    public function key(): mixed
-    {
-        return $this->getInnerIterator()?->key();
-    }
-
-    /**
-     * Checks if current position in the statement is valid.
-     *
-     * Expects that the statement has been executed.
-     *
-     * @return bool
-     */
-    public function valid(): bool
-    {
-        return $this->getInnerIterator()?->valid() ?? false;
-    }
-
-    /**
-     * Rewind the statement to the start
-     * (probably not possible with most PDO connectors).
-     *
-     * Expects that the statement has been executed.
-     *
-     * @return void
-     */
-    public function rewind(): void
-    {
-        $this->getInnerIterator()?->rewind();
     }
 
     /**

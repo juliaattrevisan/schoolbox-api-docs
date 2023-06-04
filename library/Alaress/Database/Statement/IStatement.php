@@ -12,11 +12,12 @@ namespace Alaress\Database\Statement;
 
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\IIterator;
-use OuterIterator;
+use IteratorAggregate;
 use PDO;
 use PDOStatement;
+use Traversable;
 
-interface IStatement extends OuterIterator
+interface IStatement extends IteratorAggregate
 {
     /**
      * Get number of rows affected by last executed query
@@ -132,7 +133,7 @@ interface IStatement extends OuterIterator
      * @return IIterator
      * @throws Exception
      */
-    public function getIterator($values = null);
+    public function getIterator(?array $values = null): Traversable;
 
     /**
      * Returns the data type name as a string for debugging display purposes only, should be no
