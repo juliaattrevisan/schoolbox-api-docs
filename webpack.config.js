@@ -431,16 +431,10 @@ module.exports = {
                     // Vue
                     "./node_modules/vue/dist/vue.global.prod.js",
                     // jQuery
-                    "./node_modules/jquery/dist/jquery.js",
-                    "./node_modules/jquery-validation/dist/jquery.validate.js",
+                    "./node_modules/jquery/dist/jquery.min.js",
+                    "./node_modules/jquery-validation/dist/jquery.validate.min.js",
                     // jQuery UI
-                    "./node_modules/jquery-ui/ui/version.js",
-                    "./node_modules/jquery-ui/ui/plugin.js",
-                    "./node_modules/jquery-ui/ui/widget.js",
-                    "./node_modules/jquery-ui/ui/disable-selection.js",
-                    "./node_modules/jquery-ui/ui/widgets/mouse.js",
-                    "./node_modules/jquery-ui/ui/widgets/draggable.js",
-                    "./node_modules/jquery-ui/ui/widgets/sortable.js",
+                    "./node_modules/jquery-ui/dist/jquery-ui.min.js",
                     // jQueryUI Touch Punch
                     "./node_modules/@andxor/jquery-ui-touch-punch-fix/jquery.ui.touch-punch.js",
                     // Sound / video player
@@ -448,9 +442,9 @@ module.exports = {
                     // For drag/drop of resources
                     "./node_modules/dropzone/dist/dropzone.js",
                     // Flatpickr date selector
-                    "./node_modules/flatpickr/dist/flatpickr.js",
+                    "./node_modules/flatpickr/dist/flatpickr.min.js",
                     // For feature tours
-                    "./node_modules/intro.js/intro.js",
+                    "./node_modules/intro.js/minified/intro.min.js",
                 ],
                 "masonry.js": [
                     // homepage editing
