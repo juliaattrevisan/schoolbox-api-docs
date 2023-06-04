@@ -1,24 +1,19 @@
 <?php
 
 /**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Test;
 
-use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
-use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Quoter\Mysql\Quoter;
-use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
-use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use BadMethodCallException;
-use PDO;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -40,21 +35,21 @@ class MockConnector implements IConnector
      *
      * @var TestCase
      */
-    protected $testCase;
+    protected TestCase $testCase;
 
     /**
      * The mock statement
      *
-     * @var MockObject|PDOStatement
+     * @var PDOStatement|MockObject
      */
-    protected $mockStatement;
+    protected PDOStatement|MockObject $mockStatement;
 
     /**
      * The next insert ID to be used.
      *
      * @var string|false
      */
-    protected $nextInsertId;
+    protected string|false $nextInsertId;
 
     /**
      * Builds the mock connection, using the test case to build mock statement.
@@ -133,8 +128,7 @@ class MockConnector implements IConnector
      * @param string $statement     Ignored
      * @param array  $driverOptions Ignored
      *
-     * @return PDOStatement|MockObject
-     * @noinspection PhpDocSignatureInspection this returns a mock PDOStatement
+     * @return PDOStatement
      */
     public function prepare(string $statement, array $driverOptions = []): PDOStatement
     {
