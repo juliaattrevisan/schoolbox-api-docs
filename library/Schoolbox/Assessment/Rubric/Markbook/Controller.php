@@ -504,40 +504,41 @@ class Controller extends Base
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
 
-        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
-            SELECT
-                vrm.assessment_id                  AS assessment_id,
-                vrm.student_id                     AS student_id,
-                u.firstname                        AS student_firstname,
-                u.preferred_name                   AS student_preferred_name,
-                u.lastname                         AS student_lastname,
-                vrm.capability_id                  AS capability_id,
-                vrm.capability_mark                AS capability_mark,
-                vrm.capability_human_readable_mark AS capability_human_readable_mark,
-                vrm.capability_max_value           AS capability_max_value,
-                vrm.capability_mark_type_id        AS capability_mark_type_id,
-                vrm.capability_grade_group_id      AS capability_grade_group_id,
-                vrm.descriptor_name                AS descriptor_name,
-                vrm.indicator_id                   AS indicator_id,
-                vrm.indicator_mark                 AS indicator_mark,
-                vrm.indicator_max_value            AS indicator_max_value
-            FROM (
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
+            "
                 SELECT
-                    sb.assessment_id,
-                    sr.owner,
-                    MAX(sr.published_at) AS max_published_at
-                FROM submission_return sr
-                INNER JOIN submission_box sb on sr.box_id = sb.id
-                WHERE {$innerWhere}
-                GROUP BY sb.assessment_id, sr.owner
-            ) latest_feedback
-            INNER JOIN v_rubric_mark vrm ON
-                vrm.feedback_date = latest_feedback.max_published_at AND
-                vrm.assessment_id = latest_feedback.assessment_id AND
-                vrm.student_id    = latest_feedback.owner
-            INNER JOIN user u ON vrm.student_id = u.id
-            WHERE {$outerWhere}
-            ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
+                    vrm.assessment_id                  AS assessment_id,
+                    vrm.student_id                     AS student_id,
+                    u.firstname                        AS student_firstname,
+                    u.preferred_name                   AS student_preferred_name,
+                    u.lastname                         AS student_lastname,
+                    vrm.capability_id                  AS capability_id,
+                    vrm.capability_mark                AS capability_mark,
+                    vrm.capability_human_readable_mark AS capability_human_readable_mark,
+                    vrm.capability_max_value           AS capability_max_value,
+                    vrm.capability_mark_type_id        AS capability_mark_type_id,
+                    vrm.capability_grade_group_id      AS capability_grade_group_id,
+                    vrm.descriptor_name                AS descriptor_name,
+                    vrm.indicator_id                   AS indicator_id,
+                    vrm.indicator_mark                 AS indicator_mark,
+                    vrm.indicator_max_value            AS indicator_max_value
+                FROM (
+                    SELECT
+                        sb.assessment_id,
+                        sr.owner,
+                        MAX(sr.published_at) AS max_published_at
+                    FROM submission_return sr
+                    INNER JOIN submission_box sb on sr.box_id = sb.id
+                    WHERE {$innerWhere}
+                    GROUP BY sb.assessment_id, sr.owner
+                ) latest_feedback
+                INNER JOIN v_rubric_mark vrm ON
+                    vrm.feedback_date = latest_feedback.max_published_at AND
+                    vrm.assessment_id = latest_feedback.assessment_id AND
+                    vrm.student_id    = latest_feedback.owner
+                INNER JOIN user u ON vrm.student_id = u.id
+                WHERE {$outerWhere}
+                ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ",
             array_merge($innerPb->getParams(), $outerPb->getParams()),
         );
