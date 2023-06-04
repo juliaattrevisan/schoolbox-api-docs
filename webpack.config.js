@@ -112,6 +112,10 @@ module.exports = {
             // Global property storage
             "./www/static/js/global/sbProps.js",
         ],
+        mage: {
+            import: ["./www/static/js/form/jquery.mage.js"],
+            dependOn: "main", // ensures jQuery is loaded prior
+        },
 
         // Libraries
         intellischools: "./www/static/js/intellischools/schoolboxIntellischools.js",
@@ -453,7 +457,6 @@ module.exports = {
                     "./www/static/js/masonry/jquery.masonry.js",
                     "./www/static/js/masonry/jquery.masonry.colourPicker.js",
                 ],
-                "mage.js": ["./www/static/js/form/jquery.mage.js"],
                 "dataTables.js": [
                     // DataTables
                     "./node_modules/datatables.net/js/jquery.dataTables.js",
