@@ -9,8 +9,6 @@ namespace Schoolbox\Curriculum\Node;
 
 use Alaress_Date_Format;
 use JsonSerializable;
-use Schoolbox\Curriculum\LearningArea;
-use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits;
@@ -40,20 +38,6 @@ class Model implements ISoftDeletable, JsonSerializable
      * @var GenericCollection<Model>
      */
     protected GenericCollection $children;
-
-    /**
-     * The learning level this node is associated with, if any.
-     *
-     * @deprecated 23.0: learning area and level are no longer set
-     */
-    protected ?LearningLevel\Model $learningLevel = null;
-
-    /**
-     * The learning area this node is associated with, if any.
-     *
-     * @deprecated 23.0: learning area and level are no longer set
-     */
-    protected ?LearningArea\Model $learningArea = null;
 
     /**
      * User-friendly name
@@ -186,54 +170,6 @@ class Model implements ISoftDeletable, JsonSerializable
     public function setCode(string $code): self
     {
         $this->code = $code;
-        return $this;
-    }
-
-    /**
-     * @deprecated
-     *
-     * @return LearningArea\Model|null
-     */
-    public function getLearningArea(): ?LearningArea\Model
-    {
-        trigger_error(sprintf('Property %s::learningArea is deprecated', __CLASS__), E_USER_DEPRECATED);
-        return $this->learningArea;
-    }
-
-    /**
-     * @deprecated
-     *
-     * @param LearningArea\Model|null $learningArea
-     * @return $this
-     */
-    public function setLearningArea(?LearningArea\Model $learningArea): self
-    {
-        trigger_error(sprintf('Property %s::learningArea is deprecated', __CLASS__), E_USER_DEPRECATED);
-        $this->learningArea = $learningArea;
-        return $this;
-    }
-
-    /**
-     * @deprecated
-     *
-     * @return LearningLevel\Model|null
-     */
-    public function getLearningLevel(): ?LearningLevel\Model
-    {
-        trigger_error(sprintf('Property %s::learningLevel is deprecated', __CLASS__), E_USER_DEPRECATED);
-        return $this->learningLevel;
-    }
-
-    /**
-     * @deprecated
-     *
-     * @param LearningLevel\Model|null $learningLevel
-     * @return $this
-     */
-    public function setLearningLevel(?LearningLevel\Model $learningLevel): self
-    {
-        trigger_error(sprintf('Property %s::learningLevel is deprecated', __CLASS__), E_USER_DEPRECATED);
-        $this->learningLevel = $learningLevel;
         return $this;
     }
 

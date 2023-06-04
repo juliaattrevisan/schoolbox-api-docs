@@ -48,10 +48,10 @@ abstract class Evaluation_Section extends DeprecatedModel
     {
         $query = "SELECT MAX(sequence)+1 AS num
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  WHERE assess_id = ?
                   AND deleted_at IS NULL";
 
-        $sequence = $this->db->getOne($query);
+        $sequence = $this->db->query($query, [$assess_id])->fetchColumn();
 
         if ($sequence) {
             return $sequence;
@@ -71,13 +71,13 @@ abstract class Evaluation_Section extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
-                  AND sequence > " . $this->db->smartQuote($sequence) . "
+                  WHERE assess_id = ?
+                  AND sequence > ?
                   AND deleted_at IS NULL
                   ORDER BY sequence
                   LIMIT 1";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$assess_id, $sequence])->fetch();
     }
 
     /**
@@ -91,13 +91,13 @@ abstract class Evaluation_Section extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
-                  AND sequence < " . $this->db->smartQuote($sequence) . "
+                  WHERE assess_id = ?
+                  AND sequence < ?
                   AND deleted_at IS NULL
                   ORDER BY sequence DESC
                   LIMIT 1";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$assess_id, $sequence])->fetch();
     }
 
     /**
@@ -120,10 +120,11 @@ abstract class Evaluation_Section extends DeprecatedModel
                          assess_question.*
                   FROM {$this->_table}
                   INNER JOIN assess_question ON assess_section.section_id = assess_question.section_id
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  WHERE assess_id = ?
                   AND assess_section.deleted_at IS NULL
                   AND assess_question.deleted_at IS NULL
-                  AND {$this->_table}.{$this->_index} = " . $this->db->smartQuote($section_id);
+                  AND {$this->_table}.{$this->_index} = ?";
+        $params = [$assess_id, $section_id];
 
         if ($sectionExclusion) {
             $query .= " AND question_id IS NOT NULL";
@@ -132,12 +133,13 @@ abstract class Evaluation_Section extends DeprecatedModel
         /* Optionally filter by question
          */
         if ($question_id) {
-            $query .= " AND question_id = '$question_id'";
+            $query .= " AND question_id = ?";
+            $params[] = $question_id;
         }
 
         $query .= " ORDER BY sectionSequence, assess_question.sequence";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, $params)->fetchAll();
     }
 
     /**
@@ -165,13 +167,13 @@ abstract class Evaluation_Section extends DeprecatedModel
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
                   LEFT JOIN assess_luQuestionType ON assess_question.type_id = assess_luQuestionType.type_id
                   LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
-                  WHERE assess_response.attempt_id = " . $this->db->smartQuote($attempt_id) . "
-                  AND assess_question.section_id = " . $this->db->smartQuote($section_id) . "
+                  WHERE assess_response.attempt_id = ?
+                  AND assess_question.section_id = ?
                   AND assess_response.deleted_at IS NULL
                   AND assess_question.deleted_at IS NULL
                   ORDER BY IF(assess_section.random = '1', assess_response.response_id, assess_question.sequence)";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, [$attempt_id, $section_id])->fetchAll();
     }
 
     /**
@@ -184,11 +186,11 @@ abstract class Evaluation_Section extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  WHERE assess_id = ?
                   AND deleted_at IS NULL
                   ORDER BY sequence";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, [$assess_id])->fetchAll();
     }
 
     /**
@@ -223,19 +225,20 @@ abstract class Evaluation_Section extends DeprecatedModel
                              FROM assess_response
                              LEFT JOIN assess_question on assess_response.question_id = assess_question.question_id
                              LEFT JOIN assess_section on assess_section.section_id = assess_question.section_id
-                             WHERE attempt_id = '{$this->db->quote($attemptId)}'
-                             AND assess_section.section_id = '{$this->db->quote($currentSection['section_id'])}'
+                             WHERE attempt_id = ?
+                             AND assess_section.section_id = ?
                              AND assess_response.deleted_at IS NULL
                              AND assess_section.deleted_at IS NULL
                              AND assess_question.deleted_at IS NULL";
+            $params = [$attemptId, $currentSection['section_id']];
 
             $numResponses = $numQuestions;
             $numResponses .= " AND assess_response.response IS NOT NULL";
             $numResponses .= " AND assess_response.response != 'N;'";
             $numResponses .= " AND assess_response.response != ''";
 
-            $currentSection['numQuestions'] = $this->db->getOne($numQuestions);
-            $currentSection['numResponses'] = $this->db->getOne($numResponses);
+            $currentSection['numQuestions'] = $this->db->query($numQuestions, $params)->fetchColumn();
+            $currentSection['numResponses'] = $this->db->query($numResponses, $params)->fetchColumn();
 
             if ($currentSection['numQuestions'] > 0) {
                 $currentSection['percentageComplete'] = round(100 * $currentSection['numResponses'] / $currentSection['numQuestions']);
@@ -285,10 +288,10 @@ abstract class Evaluation_Section extends DeprecatedModel
     {
         $query = "SELECT COUNT(section_id)
                   FROM assess_section
-                  WHERE section_id = " . $this->db->smartQuote($section_id) . "
+                  WHERE section_id = ?
                   AND deleted_at IS NULL";
 
-        $result = $this->db->getOne($query);
+        $result = $this->db->query($query, [$section_id])->fetchColumn();
 
         if (!$result) {
             return true;

@@ -39,7 +39,6 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('search', self::TYPE_STRING);
         $this->uses('report_id', self::TYPE_INTEGER);
-        $this->uses('search_result', self::TYPE_STRING);
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');

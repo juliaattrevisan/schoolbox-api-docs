@@ -24,7 +24,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $data = array(
             'attempt_id' => $attempt_id,
-            'reviewed_at' => 'NOW()'
+            'reviewed_at' => Alaress_Date_Format::now()->getDatabaseDate()
         );
 
         parent::update($data);
@@ -80,12 +80,12 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
+                  WHERE assess.assess_id = ?
                   AND assess_attempt.deleted_at IS NULL
                   AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, [$assess_id])->fetchAll();
     }
 
 
@@ -109,13 +109,13 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
-                  AND assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  WHERE assess.assess_id = ?
+                  AND assess_attempt.attempt_id = ?
                   AND assess_attempt.deleted_at IS NULL
                   AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, [$assess_id, $attempt_id])->fetchAll();
     }
 
     /**
@@ -139,13 +139,13 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
-                  WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
-                  AND assess_question.section_id = '$section_id'
+                  WHERE assess.assess_id = ?
+                  AND assess_question.section_id = ?
                   AND assess_response.deleted_at IS NULL
                   AND assess_attempt.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, [$assess_id, $section_id])->fetchAll();
     }
 
     /**
@@ -169,14 +169,14 @@ abstract class Evaluation_Attempt extends DeprecatedModel
             LEFT JOIN assess_response ar  ON aa.attempt_id = ar.attempt_id
             LEFT JOIN assess_question aq  ON ar.question_id = aq.question_id
             LEFT JOIN assess_section  aqs ON aq.section_id = aqs.section_id
-            WHERE aa.assess_id   = " . $this->db->smartQuote($assess_id) . "
-            AND   aa.attempt_id  = " . $this->db->smartQuote($attempt_id) . "
+            WHERE aa.assess_id   = ?
+            AND   aa.attempt_id  = ?
             AND   aqs.assess_id  = aa.assess_id
             AND   aq.deleted_at  IS NULL
             AND   ar.deleted_at IS NULL
         ";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query, [$assess_id, $attempt_id])->fetchColumn();
     }
 
     /**
@@ -190,12 +190,12 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
-                  AND user_id = '$user_id'
+                  WHERE assess_id = ?
+                  AND user_id = ?
                   AND deleted_at IS NULL
                   ORDER BY start DESC";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$assess_id, $user_id])->fetch();
     }
 
     /**
@@ -211,14 +211,14 @@ abstract class Evaluation_Attempt extends DeprecatedModel
             SELECT {$this->_table}.*
             FROM {$this->_table}
             LEFT JOIN assess ON assess.assess_id = {$this->_table}.assess_id
-            WHERE {$this->_table}.assess_id = " . $this->db->smartQuote($assess_id) . "
-            AND {$this->_table}.user_id = '$user_id'
+            WHERE {$this->_table}.assess_id = ?
+            AND {$this->_table}.user_id = ?
             AND {$this->_table}.deleted_at IS NULL
             AND {$this->_table}.finish IS NULL
             ORDER BY {$this->_table}.start DESC
         ";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$assess_id, $user_id])->fetch();
     }
 
     /**
@@ -234,14 +234,14 @@ abstract class Evaluation_Attempt extends DeprecatedModel
         $query = "
             SELECT {$this->_table}.*
             FROM {$this->_table}
-            WHERE {$this->_table}.assess_id = " . $this->db->smartQuote($assess_id) . "
-            AND {$this->_table}.user_id = " . $this->db->smartQuote($user_id) . "
-            AND {$this->_table}.attempt_id =  " . $this->db->smartQuote($attempt_id) . "
+            WHERE {$this->_table}.assess_id = ?
+            AND {$this->_table}.user_id = ?
+            AND {$this->_table}.attempt_id = ?
             AND {$this->_table}.deleted_at IS NULL
             AND {$this->_table}.finish IS NULL
         ";
 
-        if ($this->db->getRow($query)) {
+        if ($this->db->query($query, [$assess_id, $user_id, $attempt_id])->fetch()) {
             return true;
         }
 
@@ -261,11 +261,11 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                       COALESCE(SUM(assess_response.mark),0) AS totalMarks
                   FROM assess_attempt
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  WHERE assess_attempt.attempt_id = ?
                   AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
-        $result = $this->db->getOne($query);
+        $result = $this->db->query($query, [$attempt_id])->fetchColumn();
 
         /* Null marks return 0.00 for formatting
          */
@@ -288,12 +288,12 @@ abstract class Evaluation_Attempt extends DeprecatedModel
         $query = "
             SELECT COUNT(*)
             FROM {$this->_table}
-            WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
-            AND user_id = '$user_id'
+            WHERE assess_id = ?
+            AND user_id = ?
             AND deleted_at IS NULL
         ";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query, [$assess_id, $user_id])->fetchColumn();
     }
 
     /**
@@ -313,10 +313,10 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
-                  WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
-                  AND user_id = '$uid'";
+                  WHERE attempt_id = ?
+                  AND user_id = ?";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query, [$attempt_id, $uid])->fetchColumn();
     }
 
     /**
@@ -331,9 +331,9 @@ abstract class Evaluation_Attempt extends DeprecatedModel
             SELECT `user`.firstname, `user`.preferred_name, `user`.lastname
             FROM assess_attempt
             LEFT JOIN `user` ON assess_attempt.user_id = `user`.id
-            WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+            WHERE assess_attempt.attempt_id = ?
         ";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$attempt_id])->fetch();
     }
 }

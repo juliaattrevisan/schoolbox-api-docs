@@ -1079,6 +1079,20 @@ class UserMapper extends Mapper
     }
 
     /**
+     * The hash is a function of the password, we use this to store the password when the user logs in
+     * This is dangerous and a security risk and will likely need to be removed in the future
+     *
+     * @param User   $user
+     * @param string $hash
+     * @return void
+     */
+    public function storeHash(User $user, string $hash): void
+    {
+        $query = "UPDATE {$this->table} SET hash = :hash WHERE id = :userId";
+        $this->database->query($query, ['userId' => $user->getId(), 'hash' => $hash]);
+    }
+
+    /**
      * Pre-save callback for ensuring a user's calendar View is valid
      *
      * @param  User $user

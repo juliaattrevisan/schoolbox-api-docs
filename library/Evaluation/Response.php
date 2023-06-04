@@ -43,10 +43,10 @@ abstract class Evaluation_Response extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
-                  AND question_id = " . $this->db->smartQuote($question_id);
+                  WHERE attempt_id = ?
+                  AND question_id = ?";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$attempt_id, $question_id])->fetch();
     }
 
     /**
@@ -70,11 +70,11 @@ abstract class Evaluation_Response extends DeprecatedModel
                   LEFT JOIN assess_question ON assess_question.question_id = {$this->_table}.question_id
                   LEFT JOIN assess_luQuestionType ON assess_luQuestionType.type_id = assess_question.type_id
                   LEFT JOIN assess_answer ON assess_answer.question_id = assess_question.question_id
-                  WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  WHERE assess_attempt.attempt_id = ?
                   AND automated_marking = 'true'
                   AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query, [$attempt_id])->fetchAll();
     }
 
     /**
@@ -115,11 +115,11 @@ abstract class Evaluation_Response extends DeprecatedModel
 
         $query = "SELECT question_id
                   FROM assess_question
-                  WHERE section_id = " . $this->db->smartQuote($section_id) . "
+                  WHERE section_id = ?
                   AND deleted_at IS NULL
                   ORDER BY sequence";
 
-        $allQuestions = $this->db->getAll($query) ?: [];
+        $allQuestions = $this->db->query($query, [$section_id])->fetchAll() ?: [];
 
         /* Optionally randomise
          */
@@ -160,12 +160,12 @@ abstract class Evaluation_Response extends DeprecatedModel
                   FROM {$this->_table}
                   LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
                   LEFT JOIN assess_question ON assess_question.question_id = {$this->_table}.question_id
-                  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  WHERE {$this->_table}.attempt_id = ?
                   AND assess_attempt.reviewed_at IS NULL
                   AND assess_question.deleted_at IS NULL
                   AND automarked_already = 'true'";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query, [$attempt_id])->fetchColumn();
     }
 
     /**
@@ -181,12 +181,12 @@ abstract class Evaluation_Response extends DeprecatedModel
                   FROM {$this->_table}
                   LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
                   LEFT JOIN assess_question ON assess_question.question_id = {$this->_table}.question_id
-                  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  WHERE {$this->_table}.attempt_id = ?
                   AND assess_attempt.reviewed_at IS NULL
                   AND assess_question.deleted_at IS NULL
                   AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query, [$attempt_id])->fetchColumn();
     }
 
     /**
@@ -201,12 +201,12 @@ abstract class Evaluation_Response extends DeprecatedModel
                   FROM assess_question
                   LEFT JOIN {$this->_table} ON assess_question.question_id = {$this->_table}.question_id
                   LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
-                  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  WHERE {$this->_table}.attempt_id = ?
                   AND assess_attempt.reviewed_at IS NULL
                   AND assess_question.deleted_at IS NULL
                   AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
-        $value = $this->db->getOne($query);
+        $value = $this->db->query($query, [$attempt_id])->fetchColumn();
 
         if ($value) {
             return $value;
@@ -225,9 +225,9 @@ abstract class Evaluation_Response extends DeprecatedModel
     {
         $query = "UPDATE {$this->_table}
                   SET deleted_at = NOW()
-                  WHERE attempt_id = " . $this->db->smartQuote($attempt_id);
+                  WHERE attempt_id = ?";
 
-        return $this->db->query($query);
+        return $this->db->query($query, [$attempt_id]);
     }
 
     /**
@@ -242,11 +242,11 @@ abstract class Evaluation_Response extends DeprecatedModel
         $query = "
             SELECT *
             FROM assess_response
-            WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
-            AND question_id = " . $this->db->smartQuote($question_id) . "
+            WHERE attempt_id = ?
+            AND question_id = ?
             AND assess_response.deleted_at IS NULL";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$attempt_id, $question_id])->fetch();
     }
 
     /**
@@ -257,7 +257,7 @@ abstract class Evaluation_Response extends DeprecatedModel
      */
     public function getResponsesToQuestion($question_id)
     {
-        $query = "SELECT * FROM assess_response WHERE question_id = " . $this->db->smartQuote($question_id) . " AND deleted_at IS NULL";
-        return $this->db->getAll($query);
+        $query = "SELECT * FROM assess_response WHERE question_id = ? AND deleted_at IS NULL";
+        return $this->db->query($query, [$question_id])->fetchAll();
     }
 }

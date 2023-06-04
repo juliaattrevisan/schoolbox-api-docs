@@ -9,7 +9,6 @@
  */
 class Bulk_Calendar extends Bulk_Abstract
 {
-
     /**
      * @var string|null
      */
@@ -73,7 +72,7 @@ class Bulk_Calendar extends Bulk_Abstract
         if (is_file($this->getFile())) {
             /* Calendar Owner overrideco
              */
-            if ($this->owner != null && is_numeric($this->owner)) {
+            if (is_numeric($this->owner)) {
                 $userMapper = new \Schoolbox\UserMapper();
                 $user = $userMapper->findById($this->owner);
                 $author = $user;

@@ -12,7 +12,6 @@
  */
 class Assess_Question extends Evaluation_Question
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -32,7 +31,7 @@ class Assess_Question extends Evaluation_Question
                   OR availability = 'assess'
                   ORDER BY type_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -52,7 +51,7 @@ class Assess_Question extends Evaluation_Question
 			ORDER BY assess_question.section_id, assess_question.sequence
 		";
 
-        $allQuestions = $this->db->getAll($query);
+        $allQuestions = $this->db->query($query)->fetchAll();
 
         /* PHP traversal because assess_question.sequence resets to 1 for each section
          * This makes navigation across sections non-trivial with a simple "next" link
@@ -85,7 +84,7 @@ class Assess_Question extends Evaluation_Question
 			ORDER BY assess_question.section_id, assess_question.sequence
 		";
 
-        $allQuestions = $this->db->getAll($query);
+        $allQuestions = $this->db->query($query)->fetchAll();
 
         /* PHP traversal because assess_question.sequence resets to 1 for each section
          * This makes navigation across sections non-trivial with a simple "next" link

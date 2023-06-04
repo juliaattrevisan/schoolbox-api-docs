@@ -37,95 +37,6 @@ class Calendar extends DeprecatedModel
         parent::__construct();
     }
 
-    /**
-     * Get a list of people who are attending/pending for a particular
-     * event attendance
-     *
-     * @param int $eventId
-     * @param int $status
-     *
-     * @return mixed
-     */
-    private function getByStatus($eventId, $status)
-    {
-        $query = "
-			SELECT
-				user.*,
-				IF(user.local_email = 0, user.alt_email, user.local_email) AS email,
-				groups.name as groupName,
-				ea.id, ea.status, ea.intention
-			FROM event_attendance ea
-			LEFT JOIN `user` ON `user`.id = ea.user_id
-			LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-			WHERE ea.event_id = {$eventId}
-			AND ea.status = {$status}
-		";
-
-        return $this->db->getAll($query);
-    }
-
-    /**
-     * Get all the people pending for an event
-     *
-     * @param int $eventId
-     *
-     * @return mixed
-     */
-    public function getPending($eventId)
-    {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_PENDING);
-    }
-
-    /**
-     * Get all the people approved for an event
-     *
-     * @param int $eventId
-     *
-     * @return mixed
-     */
-    public function getAttending($eventId)
-    {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_ACCEPTED);
-    }
-
-    /**
-     * Get all the people approved for an event
-     *
-     * @param int $eventId
-     *
-     * @return mixed
-     */
-    public function getRejected($eventId)
-    {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_DECLINED);
-    }
-
-    public function getAttendeeList($eventId)
-    {
-        $query = "
-            SELECT u.*, g.name as groupName,
-                ea.id, ea.user_id, ea.status
-            FROM event_attendance ea
-            JOIN `user` u ON u.id = ea.user_id
-            JOIN `groups` g ON g.id = u.group_id
-            WHERE ea.event_id = '{$eventId}'
-        ";
-
-        return $this->db->getAll($query);
-    }
-
-    public function getAttendance($attendanceId)
-    {
-        $query = "
-            SELECT *
-            FROM event_attendance
-            WHERE id = {$attendanceId}
-            LIMIT 1
-        ";
-
-        return $this->db->getRow($query);
-    }
-
     public function getAttendanceByEventAndUser($eventId, $userId)
     {
         $query = "
@@ -136,22 +47,12 @@ class Calendar extends DeprecatedModel
             LIMIT 1
         ";
 
-        return $this->db->getRow($query);
-    }
-
-    public function updateAttendance($attendance)
-    {
-        return $this->db->update('event_attendance', 'id', $attendance);
+        return $this->db->query($query)->fetch();
     }
 
     public function removeAttendanceByEvent($eventId)
     {
         return $this->db->delete('event_attendance', 'event_id', $eventId);
-    }
-
-    public function removeAttendance($attendanceId)
-    {
-        return $this->db->delete('event_attendance', 'id', $attendanceId);
     }
 
     public function displayColour($id)
@@ -160,7 +61,7 @@ class Calendar extends DeprecatedModel
             //build cache of colours on first call
             $query  = "SELECT eventTypeID, eventColour FROM luEventType";
             $result = $this->db->query($query);
-            while ($row = $this->db->getNextArray($result)) {
+            foreach ($result as $row) {
                 $this->colourSet[$row['eventTypeID']] = $row['eventColour'];
             }
         }
@@ -252,7 +153,7 @@ class Calendar extends DeprecatedModel
     public function getTypeList()
     {
         $query = "SELECT eventTypeID, eventType, eventColour FROM luEventType WHERE deleted_at IS NULL ORDER BY sequence ASC";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 
@@ -277,13 +178,11 @@ class Calendar extends DeprecatedModel
 			WHERE e.{$this->_index} = $eventID
 		";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
     {
-        $keyword = $this->db->quote($keyword);
-
         // TODO remove $_SESSION dependency: or preferably this entire handler
         $sessionUser = $_SESSION['user'] ?? null;
         if (!$sessionUser instanceof User) {
@@ -337,20 +236,24 @@ class Calendar extends DeprecatedModel
             }
         }
 
-        $timeFormat = $this->db->quote(Config::get('calendar_time_format'));
+        $params = [
+            'timeFormat' => Config::get('calendar_time_format'),
+            'keyword'    => $keyword,
+            'userId'     => $sessionUser->getId(),
+        ];
         $event_query = "
             SELECT DISTINCT
                 event.id, owner,
                 GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-                TIME_FORMAT(start_datetime, '$timeFormat') as startTime,
-                TIME_FORMAT(end_datetime, '$timeFormat') as endTime,
+                TIME_FORMAT(start_datetime, :timeFormat) as startTime,
+                TIME_FORMAT(end_datetime, :timeFormat) as endTime,
                 TIME_TO_SEC(start_datetime) as startTimestamp,
                 TIME_TO_SEC(end_datetime) as endTimestamp,
                 start_datetime, end_datetime,
                 type, event.title, access, location, detail,
                 user.id as uid, user.title AS userTitle, firstname, preferred_name, lastname,
                 eventType, eventColour,
-                MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
+                MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword) AS `score`
             FROM event
                 LEFT JOIN user ON owner = user.id
                 LEFT JOIN luEventType ON type = eventTypeID
@@ -358,11 +261,11 @@ class Calendar extends DeprecatedModel
                 LEFT JOIN event_role ON event.id = event_role.event_id
                 LEFT JOIN event_folder ON event.id = event_folder.event_id
             WHERE (
-                    (access = '1' AND owner = '" . intval($sessionUser->getId()) . "')
+                    (access = '1' AND owner = :userId)
                     $groupQuery
-                    OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
+                    OR (access = '3' AND $campusQuery $groupChunk OR owner = :userId)
                 )
-                AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+                AND MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword)
                 AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
                 AND event.deleted_at IS NULL
             GROUP BY id
@@ -380,17 +283,17 @@ class Calendar extends DeprecatedModel
                 LEFT JOIN event_role ON event.id = event_role.event_id
                 LEFT JOIN event_folder ON event.id = event_folder.event_id
             WHERE (
-                (access = '1' AND owner = '" . intval($sessionUser->getId()) . "')
+                (access = '1' AND owner = :userId)
                 $groupQuery
-                OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
+                OR (access = '3' AND $campusQuery $groupChunk OR owner = :userId)
             )
             AND event.deleted_at IS NULL
-            AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+            AND MATCH (`event`.`title`, `detail`, `location`) AGAINST (:keyword)
             AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
         ";
 
-        $events = $this->db->getAll($event_query);
-        $count  = $this->db->getOne($count_query);
+        $events = $this->db->query($event_query, $params)->fetchAll();
+        $count  = $this->db->query($count_query, $params)->fetchColumn();
 
         return $events;
     }
@@ -626,7 +529,7 @@ class Calendar extends DeprecatedModel
             EventModel::ACCESS_CAMPUS
         );
 
-        $allEvents = $this->db->getAll($query);
+        $allEvents = $this->db->query($query)->fetchAll();
 
         /* Standardised output
          */
@@ -713,7 +616,7 @@ class Calendar extends DeprecatedModel
         $output = [];
         $query  = "SELECT role_id FROM event_role WHERE event_id = " . intval($eventID);
         $result = $this->db->query($query);
-        while ($event = $this->db->getNextArray($result)) {
+        foreach ($result as $event) {
             $output[] = $event['group_id'];
         }
         return $output;
@@ -731,7 +634,7 @@ class Calendar extends DeprecatedModel
         $output = [];
         $query  = "SELECT campus_id FROM event_campus WHERE event_id = " . intval($eventID);
         $result = $this->db->query($query);
-        while ($event = $this->db->getNextArray($result)) {
+        foreach ($result as $event) {
             $output[] = $event['campus_id'];
         }
         return $output;
@@ -752,7 +655,7 @@ class Calendar extends DeprecatedModel
                     WHERE event_id = {$eventId}
                     AND folder.deleted_at IS NULL";
         $result = $this->db->query($query);
-        while ($event = $this->db->getNextArray($result)) {
+        foreach ($result as $event) {
             $output[] = $event['folder_id'];
         }
         return $output;

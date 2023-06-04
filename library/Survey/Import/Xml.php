@@ -62,7 +62,7 @@ class Survey_Import_Xml extends Evaluation_Import_Xml
             'availability'       => $this->getAvailability(),
             'anonymous_result'   => $parser->getAnonymousResult(),
             'notify_author'      => $parser->getNotifyAuthor(),
-            'created_at'         => 'NOW()',
+            'created_at'         => Alaress_Date_Format::now()->getDatabaseDate(),
         );
 
         return $this->getAssessHandler()->create($dataArr);

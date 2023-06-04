@@ -18,6 +18,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
+use Schoolbox\User\Log\Mapper as LoginLogMapper;
 
 class Session
 {
@@ -33,10 +34,6 @@ class Session
      * @var Access
      */
     private $access;
-    /**
-     * @var DeprecatedDatabase
-     */
-    private $db;
 
     /**
      * @param Access|null $access
@@ -44,7 +41,6 @@ class Session
      */
     public function __construct(Access $access = null)
     {
-        $this->db     = DeprecatedDatabase::getInstance();
         $this->access = $access ?? Access::getInstance();
     }
 
@@ -115,23 +111,18 @@ class Session
             session_regenerate_id();
 
             //register users id
-            $_SESSION['title']              = $user->getTitle();
-            $_SESSION['firstname']          = $user->getFirstname();
-            $_SESSION['lastname']           = $user->getLastname();
             $_SESSION['id']                 = $user->getId();
             $_SESSION['sid']                = $user->getExternalId();
-            $_SESSION['gid']                = $user->getRole() ? $user->getRole()->getId() : null;
-            $_SESSION['houseId']            = $user->getSchoolHouse() ? $user->getSchoolHouse()->getId() : null;
-            $_SESSION['year']               = $user->getYear();
-            $_SESSION['local_email']        = $user->getLocalEmail();
-            $_SESSION['alt_email']          = $user->getAltEmail();
+            $_SESSION['gid']                = $user->getRole()->getId();
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();
-            $_SESSION['password']           = $_POST['password'] ?? null;
-            $_SESSION['eportfolio_enabled'] = $user->getEportfolioEnable();
+            if (Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
+                && !empty(Config::get('external_portal'))
+            ) {
+                $_SESSION['password'] = $_POST['password'] ?? null;
+            }
             $_SESSION['ip']                 = $ip;
-            $_SESSION['campus']             = $userHandler->getUserCampus($user->getId());
 
             // add mobile session data
             $sbmAuth = new Authenticator();
@@ -254,18 +245,18 @@ class Session
             $notif->notice("Login failure for " . $user->getUsername(), $notifFailureParams);
             throw new SchoolboxAccessDeniedException();
         }
+
         // Store password as hash for DAV authentication later
-        $save = [
-            'username' => $username,
-            'hash'     => md5($username . ':' . Config::get('site_school_code') . ':' . $password),
-        ];
+        if (Config::get('webdav_auth_type') === 'digest') {
+            $userMapper->storeHash($user, md5($username . ':' . Config::get('site_school_code') . ':' . $password));
+        }
 
         // ensure a key is set on login
         if (!$user->getKey()) {
-            $save['key'] = substr(md5(uniqid() . time()), 0, 25);
+            $user->setKey(substr(md5(uniqid() . time()), 0, 25));
+            $userMapper->save($user);
         }
 
-        $this->db->update('user', 'username', $save);
         return $user;
     }
 
@@ -443,15 +434,14 @@ class Session
         $ldapCaCertHash    = Config::get('ldap_ca_certificate');
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
-            if (
-                $ds && $this->ldapAuth(
-                    $ds,
-                    $username,
-                    $password,
-                    $ldapConfig['searchBase'],
-                    $ldapUsernameField,
-                    $ldapSearchFilter
-                )
+            if ($ds && $this->ldapAuth(
+                $ds,
+                $username,
+                $password,
+                $ldapConfig['searchBase'],
+                $ldapUsernameField,
+                $ldapSearchFilter
+            )
             ) {
                 return true;
             }
@@ -509,19 +499,16 @@ class Session
     {
         // Function to check that host isnt brute forceing the login
         // Returns true if too many logins false if ok
-        $ip          = Session::getIP();
-        $graceperiod = Alaress_Date_Format::now()->addSeconds(0 - Config::get('login_grace'));
+        $ip             = Session::getIP();
+        $graceperiod    = Alaress_Date_Format::now()->addSeconds(0 - Config::get('login_grace'));
+        $loginLogMapper = LoginLogMapper::getInstance();
+        $pb             = $loginLogMapper->getPredicateBuilder()
+            ->equals('ip', $ip)
+            ->isFalse('login')
+            ->greaterThan('date', $graceperiod->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT));
+        $loginLogCount  = $loginLogMapper->countByPredicates($pb);
 
-        $query = "
-            SELECT id
-            FROM login_log
-            WHERE ip    = '{$this->db->quote($ip)}'
-            AND   login = '0'
-            AND   date  > '{$this->db->quote($graceperiod->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
-        ";
-        $this->db->query($query);
-
-        if ($this->db->countRows() < Config::get('login_allowed')) {
+        if ($loginLogCount < Config::get('login_allowed')) {
             return false;
         } else {
             return true;
@@ -545,11 +532,11 @@ class Session
             UserMapper::getInstance()
         );
         //load all relationships for the current user
-        $externalUser->loadChildren([$user]);
-        $externalUser->loadTeachers([$user]);
-        $externalUser->loadParents([$user]);
 
-        $synergy_id = $_SESSION['sid'];
+        $synergyId = $_SESSION['sid'];
+
+        // initialize children, as there are places using getChildren to check permission
+        $externalUser->loadChildren([$user]);
 
         //
         // Children and subjects should be cleared before attempting to add
@@ -557,7 +544,7 @@ class Session
         // adding the same children and subjects again.
         unset($_SESSION['children'], $_SESSION['subjects']);
 
-        if ($synergy_id) {
+        if ($synergyId) {
             if ($user->getRole()->isParent()) {
                 $children = $user->getChildren();
                 //load parent object int the child object

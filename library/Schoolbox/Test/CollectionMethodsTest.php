@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Test;
 
+use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Collection;
@@ -326,7 +327,7 @@ class CollectionMethodsTest extends TestCase
      */
     public function testGetPropertyValuesPropertyDoesNotExist(Collection $collection, string $property): void
     {
-        $this->expectWarning();
+        $this->expectException(InvalidArgumentException::class);
         $collection->getPropertyValues($property);
     }
 

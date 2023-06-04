@@ -9,7 +9,6 @@ use Schoolbox\Notif\Notifactory;
  */
 class MyFile extends DeprecatedModel
 {
-
     /**
      * @var int
      */
@@ -81,7 +80,7 @@ class MyFile extends DeprecatedModel
             $query .= ") ";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 

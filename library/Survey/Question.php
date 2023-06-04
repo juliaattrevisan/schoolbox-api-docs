@@ -12,9 +12,6 @@
  */
 class Survey_Question extends Evaluation_Question
 {
-
-
-
     /**
      * Constructor
      */
@@ -36,6 +33,6 @@ class Survey_Question extends Evaluation_Question
                   WHERE availability = 'all'
                   OR availability = 'survey'
                   ORDER BY type_id";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 }

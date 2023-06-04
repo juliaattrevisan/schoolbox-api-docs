@@ -360,10 +360,10 @@ class Controller extends AbstractController
             $queryLike = "%{$database->getQuoter()->escapeForLike($query)}%";
             //build query to check all possible options Team, sport, division
             $query = "
-            SELECT st.id as teamID, ss.name AS sport, sd.name AS division, st.name AS team
-            FROM sportsfixtures_division as sd
-            JOIN sportsfixtures_sport ss on ss.id = sd.sport_id
-            JOIN sportsfixtures_team st on sd.id = st.division_id
+            SELECT st.id AS teamID, ss.name AS sport, sd.name AS division, st.name AS team
+            FROM sportsfixtures_division AS sd
+            JOIN sportsfixtures_sport ss ON ss.id = sd.sport_id AND ss.deleted_at IS NULL AND sd.deleted_at IS NULL
+            JOIN sportsfixtures_team st ON sd.id = st.division_id AND st.deleted_at IS NULL
             WHERE st.name like :search
                 OR ss.name like :search
                 OR sd.name like :search;

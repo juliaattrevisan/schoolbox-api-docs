@@ -154,7 +154,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             ORDER BY $orderBy $orderDir
         ";
 
-        $handler = DeprecatedDatabase::getInstance();
+        $handler = Database::getInstance();
 
         $this->dataResource = $handler->query($query);
         $this->dataCount    = $this->dataResource->rowCount();

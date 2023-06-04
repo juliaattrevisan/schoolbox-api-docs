@@ -247,8 +247,8 @@ export default {
 </script>
 
 <template>
-    <div id="discussion" class="small-12 island">
-        <section id="threads-section" class="discussion">
+    <div class="small-12 island">
+        <section class="discussion">
             <div class="discussion-threads">
                 <p class="comment-count">
                     Comments <span v-if="!hasComments">(0)</span

@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Role;
 use Schoolbox\User\Formatter;
@@ -41,18 +42,21 @@ class User extends DeprecatedModel
 
     public function getByID($id)
     {
-        $query = "SELECT user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
-                        position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, luCampus.name as campusName,
-                        IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
-                FROM user
-                    LEFT JOIN `groups` ON user.group_id = `groups`.id
-                    LEFT JOIN userCampus ON user.id = userCampus.uid
-                    LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
-                    LEFT JOIN superusers ON user.id = superusers.id
-                    LEFT JOIN lu_year_level ON user.year_id = lu_year_level.id
-                WHERE user.id = '" . $this->db->quote($id) . "'
-                AND user.deleted_at IS NULL";
-        return $this->db->getRow($query);
+        $query = "
+            SELECT
+                user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
+                position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, luCampus.name as campusName,
+                IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
+            FROM user
+            LEFT JOIN `groups` ON user.group_id = `groups`.id
+            LEFT JOIN userCampus ON user.id = userCampus.uid
+            LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
+            LEFT JOIN superusers ON user.id = superusers.id
+            LEFT JOIN lu_year_level ON user.year_id = lu_year_level.id
+            WHERE user.id = ?
+            AND user.deleted_at IS NULL
+        ";
+        return $this->db->query($query, [$id])->fetch();
     }
 
     public function getByUsername($username)
@@ -64,9 +68,9 @@ class User extends DeprecatedModel
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN superusers ON user.id = superusers.id
                     LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
-                WHERE user.username = " . $this->db->smartQuote($username) . "
+                WHERE user.username = ?
                 AND user.deleted_at IS NULL";
-        return $this->db->getRow($query);
+        return $this->db->query($query, [$username])->fetch();
     }
 
     public function getSuperusers()
@@ -74,16 +78,17 @@ class User extends DeprecatedModel
         $query = "SELECT user.id uid, title, firstname, preferred_name, lastname, username, local_email, alt_email
                 FROM superusers JOIN user ON superusers.id = user.id
                 WHERE user.deleted_at IS NULL";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getUserCampus($id)
     {
         $campusList  = array();
         $campusquery = "SELECT campus FROM userCampus WHERE uid = '$id'";
-        $this->db->query($campusquery);
-        if ($this->db->countRows() > 0) {
-            while ($campus = $this->db->getNextArray()) {
+        $query = $this->db->query($campusquery);
+
+        if ($query->rowCount() > 0) {
+            foreach ($query as $campus) {
                 if ($campus['campus']) {
                     $campusList[] = $campus['campus'];
                 }
@@ -105,7 +110,7 @@ class User extends DeprecatedModel
                     LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
                 WHERE user.synergy_id = '$sid'
                 AND user.deleted_at IS NULL";
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
 
@@ -171,20 +176,20 @@ class User extends DeprecatedModel
             return $this->searchExact($keyword, $offset, $limit, $count);
         }
         // Don't allow LIKE searches on keywords < 2 chars long
-        $wherePart = sprintf("( synergy_id = '%s'", $this->db->quote($keyword));
+        $wherePart = "(synergy_id = :keyword";
+        $params    = ['keyword' => $keyword];
         if (mb_strlen($keyword, 'UTF-8') >= 2) {
-            $wherePart .= sprintf(
-                " OR CONCAT_WS(' ', title, firstname, lastname) LIKE '%1\$s'
-                OR CONCAT_WS(' ', firstname, lastname) LIKE '%1\$s'
-                OR CONCAT_WS(' ', title, preferred_name, lastname) LIKE '%1\$s'
-                OR CONCAT_WS(' ', preferred_name, lastname) LIKE '%1\$s'
-                OR CONCAT_WS(' ', title, lastname) LIKE '%1\$s'
-                OR firstname LIKE '%1\$s'
-                OR preferred_name LIKE '%1\$s'
-                OR lastname LIKE '%1\$s'
-                OR username LIKE '%1\$s' ",
-                $this->db->quote('%' . $this->db->escapeForLike($keyword) . '%')
-            );
+            $wherePart .= " OR CONCAT_WS(' ', title, firstname, lastname) LIKE :keywordLike
+                OR CONCAT_WS(' ', firstname, lastname) LIKE :keywordLike
+                OR CONCAT_WS(' ', title, preferred_name, lastname) LIKE :keywordLike
+                OR CONCAT_WS(' ', preferred_name, lastname) LIKE :keywordLike
+                OR CONCAT_WS(' ', title, lastname) LIKE :keywordLike
+                OR firstname LIKE :keywordLike
+                OR preferred_name LIKE :keywordLike
+                OR lastname LIKE :keywordLike
+                OR username LIKE :keywordLike"
+            ;
+            $params['keywordLike'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
         }
         $wherePart .= ') AND user.deleted_at IS NULL';
 
@@ -215,8 +220,8 @@ class User extends DeprecatedModel
         // retreive count
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
 
-        $count       = $this->db->getOne($count_query);
-        return $this->db->getAll($query);
+        $count       = $this->db->query($count_query, $params)->fetchColumn();
+        return $this->db->query($query, $params)->fetchAll();
     }
 
 
@@ -235,8 +240,6 @@ class User extends DeprecatedModel
         $limit = 20,
         &$count = null
     ) {
-        $keyword = $this->db->quote($keyword);
-
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
         $wherePart = ' AND user.deleted_at IS NULL';
@@ -255,10 +258,10 @@ class User extends DeprecatedModel
                     FROM `user`
                     LEFT JOIN `groups` ON `user`.group_id = `groups`.id
                     WHERE (
-                        firstname = '$keyword'
-                        OR preferred_name = '$keyword'
-                        OR lastname = '$keyword'
-                        OR username = '$keyword'
+                        firstname = :keyword
+                        OR preferred_name = :keyword
+                        OR lastname = :keyword
+                        OR username = :keyword
                     )
                     $wherePart
                     ORDER BY lastname, chosen_name ASC
@@ -268,14 +271,14 @@ class User extends DeprecatedModel
                                 FROM `user`
                                 LEFT JOIN `groups` ON `user`.group_id = `groups`.id
                                 WHERE (
-                                    firstname = '$keyword'
-                                    OR preferred_name = '$keyword'
-                                    OR lastname = '$keyword'
-                                    OR username = '$keyword'
+                                    firstname = :keyword
+                                    OR preferred_name = :keyword
+                                    OR lastname = :keyword
+                                    OR username = :keyword
                                 )
                                 $wherePart";
-        $count       = $this->db->getOne($count_query);
-        return $this->db->getAll($query);
+        $count       = $this->db->query($count_query, ['keyword' => $keyword])->fetchColumn();
+        return $this->db->query($query, ['keyword' => $keyword])->fetchAll();
     }
 
     /**
@@ -314,56 +317,57 @@ class User extends DeprecatedModel
             AND
         ';
 
+        $params = [];
         if ($keyword != "") {
             if (is_numeric($keyword)) {
-                $param = $this->db->quote($keyword);
-                $query .= "( synergy_id = $param  ) ";
+                $query .= "( synergy_id = :externalId ) ";
+                $params['externalId'] = [$keyword];
             } else {
                 // TODO account for preferred name:
                 //      alternately remove and replace with API search
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
-                    $firstName = $this->db->escapeForLike($name[1]);
-                    $lastName  = $this->db->escapeForLike($name[2]);
                     $query .= "(
-                        ( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' )
+                        ( firstname like :firstname and lastname like :lastname )
                         or
-                        ( preferred_name like '%{$firstName}%' and lastname like '%{$lastName}%' )
+                        ( preferred_name like :firstname and lastname like :lastname )
                     )";
+                    $params['firstname'] = '%' . $this->db->getQuoter()->escapeForLike($name[1]) . '%';
+                    $params['lastname'] = '%' . $this->db->getQuoter()->escapeForLike($name[2]) . '%';
                 } else {
-                    $param = $this->db->escapeForLike($keyword);
                     $query .= "(
-                        firstname like '%$param%'
-                        or preferred_name like '%$param%'
-                        or lastname like '%$param%'
-                        or username like '%$param%'
+                        firstname like :name
+                        or preferred_name like :name
+                        or lastname like :name
+                        or username like :name
                     ) ";
+                    $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
                 }
             }
             if (is_array($group)) {
                 // If group = [0]: return all matching users regardless of role
                 $group = array_filter($group);
                 if (!empty($group)) {
-                    $query .= "AND group_id IN (" . implode(',', array_map(array($this->db, 'smartQuote'), $group)) . ") ";
+                    $query .= "AND group_id IN " . Builder::getArrayPlaceholders($group, 'group');
+                    $params += Builder::getArrayParameters($group, 'group');
                 }
             } else {
                 if (is_numeric($group) && $group > 0) {
-                    $param = $this->db->quote($group);
-                    $query .= "AND group_id = '$param' ";
+                    $query .= "AND group_id = :groupId ";
+                    $params['groupId'] = $group;
                 }
             }
         } else {
             if ($group) {
-                $param = $this->db->quote($group);
-                $query .= "group_id = '$param' ";
+                $query .= "group_id = :groupId ";
+                $params['groupId'] = $group;
             } else {
                 error(2);
             }
         }
         // Only students in boarding house are fetched
         if (!empty($residentialHouseIds)) {
-            $query .= "AND residential_house_id IN ("
-                . implode(',', array_map('intval', $residentialHouseIds))
-                . ')';
+            $query .= "AND residential_house_id IN " . Builder::getArrayPlaceholders($residentialHouseIds, 'reshouse');
+            $params += Builder::getArrayParameters($residentialHouseIds, 'reshouse');
         }
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $query .= ' AND ' . $searchFilter;
@@ -372,13 +376,13 @@ class User extends DeprecatedModel
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getCampusList()
     {
         $query = "SELECT * FROM luCampus WHERE luCampus.deleted_at IS NULL ORDER BY sequence";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getGroupList()
@@ -386,7 +390,7 @@ class User extends DeprecatedModel
         $query = "SELECT * FROM `groups`
                   WHERE deleted_at IS NULL
                   ORDER BY name";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getUserActivity($uid, $limit = 10)
@@ -399,7 +403,7 @@ class User extends DeprecatedModel
                     WHERE user = $uid
                     ORDER BY time DESC
                     LIMIT 0,$limit";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -409,10 +413,8 @@ class User extends DeprecatedModel
      */
     public function getUserLogins($username, int $limit = 10): array|bool
     {
-        $query = "SELECT date, ip, login FROM login_log WHERE username like "
-            . $this->db->smartQuote($username)
-            . " ORDER BY date DESC LIMIT 0,$limit";
-        return $this->db->getAll($query);
+        $query = "SELECT date, ip, login FROM login_log WHERE username = ? ORDER BY date DESC LIMIT 0,$limit";
+        return $this->db->query($query, [$username])->fetchAll();
     }
 
     /**
@@ -439,7 +441,7 @@ class User extends DeprecatedModel
                         AND synergy_id > 0
                         AND user.deleted_at IS NULL";
         }
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**

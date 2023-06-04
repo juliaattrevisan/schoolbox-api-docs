@@ -82,9 +82,6 @@ module.exports = {
             // Image Lightbox
             "./www/static/js/image-lightbox/imageLightboxInit.ts",
 
-            // Course selector
-            "./www/static/js/course/jquery.course-selector.js",
-
             // Date syncing
             "./www/static/js/alaress-datetime-picker/jquery.sync-dates.js",
 

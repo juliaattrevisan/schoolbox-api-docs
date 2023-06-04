@@ -9,13 +9,13 @@ namespace Homepage;
 
 use AcceptanceTester;
 use Codeception\Util\Locator;
+use Page\Common;
 
 /**
  * Test for attaching a textbox to a page.
  */
 class HomepageInitialCest
 {
-
     /**
      * @var mixed
      */
@@ -101,7 +101,7 @@ class HomepageInitialCest
         $i->click(['css' => 'a[href=\#tabs-sub-1]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
         $i->click("//*[@id='tabs-sub-1']/li[6]");
-        sleep(1);
+        sleep(2);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
     }
 
@@ -110,6 +110,7 @@ class HomepageInitialCest
      * @depends createElement
      * @param AcceptanceTester $i
      * @throws \Codeception\Exception\ModuleException
+     * @throws \Exception
      */
     public function useElement(AcceptanceTester $i): void
     {
@@ -146,12 +147,15 @@ class HomepageInitialCest
         $i->fillField("heading", "Test Text Box Title");
         $i->click(['css' => 'input[type=submit][value=Create\ Text\ Box]']);
         sleep(2);
-        $i->executeJS('for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].setData(\'wow what interesting Text box text\')}');
+        $content = 'wow what interesting Text box text';
+        $i->executeJS('for(var i in window.sbProps.editors) { window.sbProps.editors[i].setData(\'' . $content . '\')}');
         sleep(2);
         $i->scrollTo(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
         $element = Locator::contains('div.component-action section button', 'Save');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
+        sleep(2);
+        $i->canSee('wow what interesting Text box text');
     }
 
     /**

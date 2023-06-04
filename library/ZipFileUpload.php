@@ -17,7 +17,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 class ZipFileUpload extends DeprecatedModel
 {
-
     /**
      * Temporary location
      *
@@ -292,7 +291,7 @@ class ZipFileUpload extends DeprecatedModel
     {
         $errorMessages = [];
         $query         = 'SELECT message FROM error WHERE id = 9';
-        $error         = $this->db->getRow($query);
+        $error         = $this->db->query($query)->fetch();
 
         if (count($this->errorFiles)) {
             foreach ($this->errorFiles as $currentFile) {

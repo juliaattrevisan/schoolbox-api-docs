@@ -79,7 +79,7 @@ class Assess_Main extends Evaluation_Main
             $query .= " LIMIT $limit";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -92,7 +92,7 @@ class Assess_Main extends Evaluation_Main
     {
         $query = "SELECT assess_id FROM assess WHERE category_id = '{$category_id}' AND availability = 'assess'";
 
-        $allAssess = $this->db->getAll($query);
+        $allAssess = $this->db->query($query)->fetchAll();
 
         if (is_array($allAssess) && count($allAssess)) {
             /* Get a list of questions and answers to softdelete
@@ -121,17 +121,17 @@ class Assess_Main extends Evaluation_Main
                                  */
                                 $questionHandler->update(array(
                                     'question_id' => $currentQuestion['question_id'],
-                                    'deleted_at' => 'NOW()',
+                                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                                 ));
 
                                 $answerHandler->update(array(
                                     'answer_id' => $answer['answer_id'],
-                                    'deleted_at' => 'NOW()',
+                                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate(),
                                 ));
                             }
                         }
 
-                        $section['deleted_at'] = 'NOW()';
+                        $section['deleted_at'] = Alaress_Date_Format::now()->getDatabaseDate();
                         $sectionHandler->update($section);
                     }
                 }
@@ -140,7 +140,7 @@ class Assess_Main extends Evaluation_Main
                  */
                 $assessHandler->update(array(
                     'assess_id' => $currentAssess['assess_id'],
-                    'deleted_at' => 'NOW()'
+                    'deleted_at' => Alaress_Date_Format::now()->getDatabaseDate()
                 ));
             }
         }
@@ -153,9 +153,10 @@ class Assess_Main extends Evaluation_Main
      */
     public function getAssessmentType()
     {
-        return $this->db->getOne(
-            "SELECT name FROM lu_work_type WHERE id = " . $this->db->smartQuote(self::ONLINE_ASSESSMENT_TYPE_ID)
-        );
+        return $this->db->query(
+            "SELECT name FROM lu_work_type WHERE id = ?",
+            [self::ONLINE_ASSESSMENT_TYPE_ID],
+        )->fetchColumn();
     }
 
     /**
@@ -178,10 +179,10 @@ class Assess_Main extends Evaluation_Main
         $query = "  SELECT COUNT(assess_id)
                     FROM assess ass
                     JOIN assessment assm on assm.id = ass.assessment_id
-                    WHERE ass.assess_id = " . $this->db->smartQuote($assess_id) . "
+                    WHERE ass.assess_id = ?
                     AND assm.close_date > NOW()";
 
-        $result = $this->db->getOne($query);
+        $result = $this->db->query($query, [$assess_id])->fetchColumn();
 
         if (!$result) {
             return true;

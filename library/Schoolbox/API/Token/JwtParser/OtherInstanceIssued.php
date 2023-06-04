@@ -100,7 +100,6 @@ class OtherInstanceIssued extends Base
             $jwt,
             $keySet,
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
-            [Jwt::SIGNING_ALGORITHM]
         );
 
         // Now the JWT is decoded and verified:

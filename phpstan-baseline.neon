@@ -1151,51 +1151,6 @@ parameters:
 			path: library/Database.php
 
 		-
-			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$db\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$debug\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 2
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:changeDb\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:close\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:serialize\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Static property DeprecatedDatabase\\:\\:\\$instance \\(DeprecatedDatabase\\) does not accept default value of type false\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Variable \\$subquery might not be defined\\.$#"
-			count: 1
-			path: library/DeprecatedModel.php
-
-		-
 			message: "#^Method EOTC\\\\ActivityLog\\\\Log\\:\\:getId\\(\\) should return string but returns int\\.$#"
 			count: 1
 			path: library/EOTC/ActivityLog/Log.php
@@ -1441,11 +1396,6 @@ parameters:
 			path: library/Eportfolio.php
 
 		-
-			message: "#^Method Eportfolio\\\\Page\\:\\:getPermissions\\(\\) should return iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\Collection but returns array\\<Eportfolio\\\\Permission\\>\\|\\(iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\GenericCollection\\)\\.$#"
-			count: 1
-			path: library/Eportfolio/Page.php
-
-		-
 			message: "#^Method Eportfolio_Page_Instance\\:\\:getColours\\(\\) should return array but returns null\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
@@ -1571,11 +1521,6 @@ parameters:
 			path: library/Evaluation/Export/Graph.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Evaluation/Export/Xml.php
-
-		-
 			message: "#^Return type \\(void\\) of method Evaluation_Question\\:\\:update\\(\\) should be compatible with return type \\(bool\\) of method DeprecatedModel\\:\\:update\\(\\)$#"
 			count: 1
 			path: library/Evaluation/Question.php
@@ -1601,26 +1546,6 @@ parameters:
 			path: library/Evaluation/Question/Category.php
 
 		-
-			message: "#^Method External_AscTimetables_Translator_Enrolment\\:\\:translateXmlToArray\\(\\) should return iterable\\<array\\>&Iterator but returns array\\<int, array\\<string, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Enrolment.php
-
-		-
-			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Enrolment\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Enrolment.php
-
-		-
-			message: "#^Method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should return iterable\\<array\\>&Iterator but returns array\\<int, array\\<string, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable.php
-
-		-
-			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable.php
-
-		-
 			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\Account\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/Bridge/Account.php
@@ -1644,11 +1569,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/CliDatabaseCreator.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/CliImporter.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
@@ -1956,26 +1876,6 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
-			message: "#^Method Group\\:\\:deleteUser\\(\\) should return resource but returns PDOStatement\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
-			message: "#^Property Group\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
-			message: "#^Method Homepage\\:\\:removeAllComponentsFromHomepage\\(\\) invoked with 1 parameter, 0 required\\.$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method HouseMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/HouseMapper.php
@@ -2024,11 +1924,6 @@ parameters:
 			message: "#^Constructor of class Page has an unused parameter \\$error\\.$#"
 			count: 1
 			path: library/Page.php
-
-		-
-			message: "#^Method Poll\\:\\:delete\\(\\) should return bool but returns PDOStatement\\.$#"
-			count: 1
-			path: library/Poll.php
 
 		-
 			message: "#^Cannot access offset 'name' on true\\.$#"
@@ -2461,11 +2356,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Event.php
 
 		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$campusCollection \\(iterable\\<Schoolbox\\\\Campus\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<int\\|Schoolbox\\\\Calendar\\\\Relation\\\\Campus\\|Schoolbox\\\\Campus\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
 			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$roleCollection \\(iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
@@ -2599,11 +2489,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between HouseResidential and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/ResHouse.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\Role\\:\\:getValues\\(\\) should return array\\<string\\|null\\> but returns array\\<int, int\\|null\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Role.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
@@ -6096,16 +5981,6 @@ parameters:
 			path: library/Schoolbox/Sync/Grammar/Ruleset.php
 
 		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Ruleset\\:\\:getRulesByPrecedence\\(\\) should return array\\<Schoolbox\\\\Sync\\\\Grammar\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Ruleset.php
-
-		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Ruleset\\:\\:getRulesBySequence\\(\\) should return array\\<Schoolbox\\\\Sync\\\\Grammar\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Ruleset.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Test/UserRulesetTest.php
@@ -6316,11 +6191,6 @@ parameters:
 			path: library/Schoolbox/WebDav/Rules/Ruleset.php
 
 		-
-			message: "#^Method Schoolbox\\\\WebDav\\\\Rules\\\\Ruleset\\:\\:getRules\\(\\) should return array\\<Schoolbox\\\\WebDav\\\\Rules\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/Rules/Ruleset.php
-
-		-
 			message: "#^Property Schoolbox\\\\WebDav\\\\SubjectServer\\\\Server\\:\\:\\$user \\(Schoolbox\\\\User\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/WebDav/SubjectServer/Server.php
@@ -6334,11 +6204,6 @@ parameters:
 			message: "#^Return type \\(iterable\\<Schoolbox\\\\Wiki\\\\Wiki\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Wiki\\\\WikiMapper\\:\\:findForFeed\\(\\) should be compatible with return type \\(iterable\\<Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Feed\\\\FeedableMapperInterface\\:\\:findForFeed\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Wiki/WikiMapper.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Session.php
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
@@ -6467,11 +6332,6 @@ parameters:
 
 		-
 			message: "#^Return type \\(void\\) of method Wiki\\:\\:update\\(\\) should be compatible with return type \\(bool\\) of method DeprecatedModel\\:\\:update\\(\\)$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^Variable \\$coreData might not be defined\\.$#"
 			count: 1
 			path: library/Wiki.php
 

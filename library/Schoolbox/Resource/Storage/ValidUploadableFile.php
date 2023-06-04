@@ -34,6 +34,17 @@ class ValidUploadableFile extends BaseSpecification
     private const MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS = 15;
 
     /**
+     * Constructor
+     *
+     * @param Alaress_Date_Format $now The current time: must be pre-defined for
+     *                                 comparing a known stable time against the
+     *                                 file's expiry.
+     */
+    public function __construct(private Alaress_Date_Format $now)
+    {
+    }
+
+    /**
      * Validate that `$candidate` is uploadable:
      * * it must have a mimetype
      * * its mimetype must be allowed
@@ -71,7 +82,7 @@ class ValidUploadableFile extends BaseSpecification
         $fileExpiry = $candidate->getExpiryAt();
         $assertSize = true;
         if ($fileExpiry) {
-            $latestTempDate = Alaress_Date_Format::now()->addDays(self::MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS);
+            $latestTempDate = (clone $this->now)->addDays(self::MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS);
             if ($fileExpiry->lte($latestTempDate)) {
                 $assertSize = false;
             }

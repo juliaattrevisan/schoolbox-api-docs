@@ -2,37 +2,45 @@
 
 /* This script controls homepage layout functions.  It is used for setting up templates and customising homepage */
 
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource;
 
 class Homepage
 {
-
     /* Used to remove homepage components and reset template
      */
     const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
     const KEEP_EXISTING_HOMEPAGE      = 0;
 
     /**
-     * @var DeprecatedDatabase
-     */
-    private $db;
-
-    /**
      * @var int
      */
     private $cid;
 
+    /**
+     * Homepage config mapper
+     */
+    private Resource\HomepageConfigMapper $homepageConfigMapper;
+
+    /**
+     * Homepage template mapper
+     */
+    private Resource\HomepageTemplateMapper $homepageTemplateMapper;
+
     public function __construct($cid)
     {
-        $this->db  = DeprecatedDatabase::getInstance();
-        $this->cid = $cid;
+        $this->cid                    = $cid;
+        $this->homepageConfigMapper   = Resource\HomepageConfigMapper::getInstance();
+        $this->homepageTemplateMapper = Resource\HomepageTemplateMapper::getInstance();
     }
 
     public function getTemplate()
     {
-        //returns the current template
-        $query = "SELECT template FROM homepage_config WHERE cid = '" . $this->cid . "'";
-        return $this->db->getOne($query);
+        try {
+            return $this->homepageConfigMapper->findById($this->cid)->getTemplate();
+        } catch (MapperException) {
+            return null;
+        }
     }
 
     /**
@@ -42,19 +50,18 @@ class Homepage
      */
     public function getColumnWidths()
     {
-        $query = "SELECT left_column_width, right_column_width
-				  FROM homepage_config
-				  WHERE cid = '{$this->cid}'";
-
-        // Defaults: 70/30
-        $result = $this->db->getRow($query);
-        if (!isset($result['left_column_width'])) {
-            $result['left_column_width'] = 70;
+        try {
+            $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
+            return [
+                'left_column_width'  => $homepageConfig->getLeftColumnWidth(),
+                'right_column_width' => $homepageConfig->getLeftColumnWidth(),
+            ];
+        } catch (MapperException) {
+            return [
+                'left_column_width'  => 70,
+                'right_column_width' => 30,
+            ];
         }
-        if (!isset($result['right_column_width'])) {
-            $result['right_column_width'] = 30;
-        }
-        return $result;
     }
 
     /**
@@ -66,14 +73,10 @@ class Homepage
      */
     public function updateColumnWidths($left, $right)
     {
-
-        $columnWidths = [
-            'cid'                => $this->cid,
-            'left_column_width'  => $left,
-            'right_column_width' => $right,
-        ];
-
-        $this->db->update('homepage_config', 'cid', $columnWidths);
+        $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
+        $homepageConfig->setLeftColumnWidth($left);
+        $homepageConfig->setRightColumnWidth($right);
+        $this->homepageConfigMapper->save($homepageConfig);
     }
 
     /**
@@ -91,13 +94,21 @@ class Homepage
 
     public function getColorList()
     {
-        $query      = "SELECT left_head_font, left_head_bg, left_font as left_font_primary, left_bg_primary,
-						right_head_font, right_head_bg, right_font as right_font_primary, right_bg_primary,
-						top_head_font, top_head_bg, top_font as top_font_primary, top_bg_primary
-						FROM homepage_config WHERE cid = '{$this->cid}'";
-        $colourList = $this->db->getRow($query);
-
-        return $colourList;
+        $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
+        return [
+            'left_head_font'     => $homepageConfig->getLeftHeadFont(),
+            'left_head_bg'       => $homepageConfig->getLeftHeadBg(),
+            'left_font_primary'  => $homepageConfig->getLeftFont(),
+            'left_bg_primary'    => $homepageConfig->getLeftBgPrimary(),
+            'right_head_font'    => $homepageConfig->getRightHeadFont(),
+            'right_head_bg'      => $homepageConfig->getRightHeadBg(),
+            'right_font_primary' => $homepageConfig->getRightFont(),
+            'right_bg_primary'   => $homepageConfig->getRightBgPrimary(),
+            'top_head_font'      => $homepageConfig->getTopHeadFont(),
+            'top_head_bg'        => $homepageConfig->getTopHeadBg(),
+            'top_font_primary'   => $homepageConfig->getTopFont(),
+            'top_bg_primary'     => $homepageConfig->getTopBgPrimary(),
+        ];
     }
 
     /**
@@ -150,12 +161,11 @@ class Homepage
      */
     public function resetHomepageToTemplate($templateID)
     {
-        $categoryID = $this->cid;
-
         if ($templateID != Homepage::KEEP_EXISTING_HOMEPAGE) {
-// if 'remove homepage', delete config and components, then set the templateID to zero
+            // if 'remove homepage',
+            // delete config and components, then set the templateID to zero
             if ($templateID == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-                $templateID = $this->removeAllComponentsFromHomepage($categoryID);
+                $templateID = $this->removeAllComponentsFromHomepage();
             }
 
             // now continue as normal
@@ -167,7 +177,13 @@ class Homepage
             }
 
             // deal with the template
-            $this->db->update('homepage_config', 'cid', ['cid' => $categoryID, 'template' => $templateID]);
+            $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
+            $homepageConfig->setTemplate(
+                $templateID
+                    ? $this->homepageTemplateMapper->findById($templateID)
+                    : null
+            );
+            $this->homepageConfigMapper->save($homepageConfig);
         }
 
         return $templateID;
@@ -181,45 +197,32 @@ class Homepage
      */
     public function createHomepageFromTemplate($templateID)
     {
-        $categoryID = $this->cid;
-
         // locate all the component instances associated with this homepage (if they exist), and clear them out
         $cim        = Component_InstanceMapper::getInstance();
-        $collection = $cim->findByColumnList(['module' => 'homepage', 'identifier' => $categoryID]);
+        $collection = $cim->findByColumnList(['module' => 'homepage', 'identifier' => $this->cid]);
         $cim->delete($collection);
 
-        $categoryID = $this->db->quote($categoryID);
-        $templateID = $this->db->quote($templateID);
-
-        $sql = "
-            SELECT id AS template, left_column_width, right_column_width
-            FROM homepageTemplate
-            WHERE id = $templateID
-        ";
-
-        // retrieve template data
-        $tpl = $this->db->getRow($sql);
-
-        // insert homepage instance into homepage_config
-        $homepageConfig = [
-            'cid'                => $categoryID,
-            'template'           => $templateID,
-            'left_column_width'  => $tpl['left_column_width'],
-            'right_column_width' => $tpl['right_column_width'],
-        ];
-
-        foreach (['top', 'left', 'right'] as $position) {
-            $homepageConfig = array_merge($homepageConfig, [
-                $position . '_head_font'  => Config::get('homepage_colour_head_font'),
-                $position . '_head_bg'    => Config::get('homepage_colour_head_bg'),
-                $position . '_font_primary' => Config::get('homepage_colour_font'),
-                $position . '_bg_primary' => Config::get('homepage_colour_bg_primary'),
-            ]);
-        }
-
-        // remove (if exists) and replace the homepage config with the new template details
-        $this->db->delete('homepage_config', 'cid', $categoryID);
-        $this->db->insert('homepage_config', $homepageConfig);
+        $homepageTemplate = $templateID
+            ? $this->homepageTemplateMapper->findById($templateID)
+            : null;
+        $homepageConfig = $this->homepageConfigMapper->createModel($this->cid);
+        $homepageConfig->setTemplate($homepageTemplate);
+        // TODO make width a const
+        $homepageConfig->setLeftColumnWidth($homepageTemplate?->getLeftColumnWidth() ?? 70);
+        $homepageConfig->setRightColumnWidth($homepageTemplate?->getRightColumnWidth() ?? 30);
+        $homepageConfig->setTopHeadFont(Config::get('homepage_colour_head_font'));
+        $homepageConfig->setTopHeadBg(Config::get('homepage_colour_head_bg'));
+        $homepageConfig->setTopFont(Config::get('homepage_colour_font'));
+        $homepageConfig->setTopBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $homepageConfig->setLeftHeadFont(Config::get('homepage_colour_head_font'));
+        $homepageConfig->setLeftHeadBg(Config::get('homepage_colour_head_bg'));
+        $homepageConfig->setLeftFont(Config::get('homepage_colour_font'));
+        $homepageConfig->setLeftBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $homepageConfig->setRightHeadFont(Config::get('homepage_colour_head_font'));
+        $homepageConfig->setRightHeadBg(Config::get('homepage_colour_head_bg'));
+        $homepageConfig->setRightFont(Config::get('homepage_colour_font'));
+        $homepageConfig->setRightBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $this->homepageConfigMapper->save($homepageConfig);
 
         // retrieve, rearrange and reinsert the componentry
         $cim       = Component_InstanceMapper::getInstance();
@@ -236,7 +239,7 @@ class Homepage
                     ->setId(null)
                     ->setConfig(new \Schoolbox\Collection())
                     ->setModule('homepage')
-                    ->setIdentifier($categoryID);
+                    ->setIdentifier($this->cid);
 
                 $ids = $cim->save($inst);
                 $id  = $ids[0];
@@ -265,11 +268,9 @@ class Homepage
      */
     private function removeAllComponentsFromHomepage()
     {
-        $categoryID = $this->db->quote($this->cid);
-
         // locate all the component instances associated with this homepage, and clear them out
         $cim        = Component_InstanceMapper::getInstance();
-        $collection = $cim->findByColumnList(['module' => 'homepage', 'identifier' => $categoryID]);
+        $collection = $cim->findByColumnList(['module' => 'homepage', 'identifier' => $this->cid]);
         $cim->delete($collection);
 
         return 0;
@@ -277,46 +278,19 @@ class Homepage
 
     public function saveDisplayProperties($listColor)
     {
-        $query = "UPDATE homepage_config SET ";
-        foreach ($listColor as $key => $color) {
-            $key = str_replace('font_primary', 'font', $key);
-            $query .= "`" . $this->db->quote($key) . "` = '" . $this->db->quote($color) . "', ";
-        }
-        $query = substr($query, 0, -2);
-        $query .= " WHERE cid = '" . $this->cid . "'";
-        return $this->db->query($query);
-    }
-
-    public function getConfig($categoryId = null)
-    {
-        if (!is_numeric($categoryId)) {
-            $categoryId = $this->cid;
-        }
-
-        $query = "
-            SELECT `cid`, `template`, `left_column_width`, `right_column_width`, `left_head_font`, `left_head_bg`,
-                `left_font` as `left_font_primary`, `left_bg_primary`, `right_head_font`,
-                `right_head_bg`, `right_font` as `right_font_primary`, `right_bg_primary`,
-                `top_head_font`, `top_head_bg`, `top_font` as `top_font_primary`, `top_bg_primary`
-            FROM homepage_config
-            WHERE `cid` = $categoryId
-        ";
-
-        $config = $this->db->getRow($query);
-
-        return $config;
-    }
-
-    public function setConfig($config, $categoryId = null)
-    {
-        if (!is_numeric($categoryId)) {
-            $categoryId = $this->cid;
-        }
-
-        if ($cleanConfig = $this->getConfig($categoryId)) {
-            $this->db->update('homepage_config', 'cid', $config);
-        } else {
-            $this->db->insert('homepage_config', $config);
-        }
+        $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
+        $homepageConfig->setTopHeadFont($listColor['top_head_font']);
+        $homepageConfig->setTopHeadBg($listColor['top_head_bg']);
+        $homepageConfig->setTopFont($listColor['top_font_primary']);
+        $homepageConfig->setTopBgPrimary($listColor['top_bg_primary']);
+        $homepageConfig->setLeftHeadFont($listColor['left_head_font']);
+        $homepageConfig->setLeftHeadBg($listColor['left_head_bg']);
+        $homepageConfig->setLeftFont($listColor['left_font_primary']);
+        $homepageConfig->setLeftBgPrimary($listColor['left_bg_primary']);
+        $homepageConfig->setRightHeadFont($listColor['right_head_font']);
+        $homepageConfig->setRightHeadBg($listColor['right_head_bg']);
+        $homepageConfig->setRightFont($listColor['right_font_primary']);
+        $homepageConfig->setRightBgPrimary($listColor['right_bg_primary']);
+        $this->homepageConfigMapper->save($homepageConfig);
     }
 }

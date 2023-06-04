@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
 
@@ -32,10 +33,12 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param Mapper $templateMapper
+     * @param ErrorMapper  $errorMapper
+     * @param Mapper       $templateMapper
      * @param Field\Mapper $fieldMapper
      */
     public function __construct(
+        private ErrorMapper $errorMapper,
         private Mapper $templateMapper,
         private Field\Mapper $fieldMapper
     ) {
@@ -89,6 +92,7 @@ class Controller extends Base
      * @throws Exception
      * @throws RouteNotFound
      * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
      */
     public function postCreate(): void
@@ -129,6 +133,12 @@ class Controller extends Base
 
                 $this->fieldMapper->save($field);
             }
+        } else {
+            /* Mandate at least one field existing at all times
+             * If 'field' is empty/unset, surmise that the user happened to
+             * remove all fields...but we don't allow that anymore
+             */
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Go back to list
@@ -168,9 +178,10 @@ class Controller extends Base
      * @param Model $lessonPlanTemplate
      * @return void
      * @throws Exception
-     * @throws RouteNotFound
      * @throws InvalidColumnException
+     * @throws RouteNotFound
      * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
@@ -226,10 +237,11 @@ class Controller extends Base
 
             $this->fieldMapper->deleteByPredicates($pb);
         } else {
-            /* Remove all fields, since none exist in this payload we can only
-             * infer that the user meant to clear everything out...
+            /* Mandate at least one field existing at all times
+             * If 'field' is empty/unset, surmise that the user happened to
+             * remove all fields...but we don't allow that anymore
              */
-            $this->fieldMapper->deleteByColumn('lesson_plan_template_id', $lessonPlanTemplate->getId());
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Then update the template's title in case that might have changed

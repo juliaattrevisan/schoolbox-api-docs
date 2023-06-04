@@ -10,12 +10,13 @@
 
 namespace Eportfolio;
 
-use Eportfolio;
 use Schoolbox;
 
+/**
+ * @method Template findById($identifierValue)
+ */
 class TemplateMapper extends Schoolbox\Mapper
 {
-
     /**
      * Define column/property mapping
      *

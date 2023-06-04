@@ -236,12 +236,14 @@ class QuizSubmission extends SubmissionAbstract
         foreach ($existingFeedbacks as $attempt) {
             /** @var Quiz\Attempt\Answer\Model|null $response */
             $response = $responses->offsetGet($attempt->getId());
-            // check whether the rest are the same
+            // Check whether the rest are the same
+            // Floating point precision in Schoolbox's getMark() is less than in canvas, so an exact match won't always work.
+            // We have to test equality somewhat approximately, but with reasonable certainty.
             if (
                 $response
                 && $attempt->getUser()->getId() === $reviewee->getId()
                 && $attempt->getReviewer()->getId() === $reviewer->getId()
-                && $response->getMark() === (float)$normMark
+                && (abs($response->getMark() - (float)$normMark) < 0.0001)
                 && (string)$response->getComment() === (string)$canvasSubmission['comment']
             ) {
                 $this->log->debug(sprintf('Feedback already exists for attempt: [%s]', $attempt->getId()));

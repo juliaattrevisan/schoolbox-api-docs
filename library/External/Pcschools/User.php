@@ -531,17 +531,6 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * @param  IConnector $database
-     *
-     * @return $this
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
-    }
-
-    /**
      * Builds a parent record list from a row from `getStudentContactList()` or
      * other method that returns a list.
      *

@@ -163,9 +163,11 @@ class FetchPagesFromCsvCest
             $scenario->skip('Error 400 is used sometimes instead of 401');
         }
 
-        $i->seeResponseCodeIs($expected_result);
-
         #THEN
+        $i->seeResponseCodeIs($expected_result);
+        $i->cantSeeResponseContains('Warning: foreach()');
+        $i->cantSeeResponseContains('Warning: Undefined array');
+        $i->cantSeeResponseContains('ErrorException');
     }
 
     /** New Url Provider - reads a csv file to provide an array of data for the fetch all pages test.

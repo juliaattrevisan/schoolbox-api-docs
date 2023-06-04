@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Award\Test;
 
 use Alaress_Date_Format;
+use Error;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Badge;
 
@@ -263,7 +264,8 @@ class ExpiryHelperTest extends TestCase
      */
     public function testDetermineExpiryOnIncompleteObject(Badge\Award\Model $award): void
     {
-        $this->expectError();
+        // Whilst warning messages can no longer be expected, errors can
+        $this->expectException(Error::class);
         (new Badge\Award\ExpiryHelper())->determineExpiry($award);
     }
 

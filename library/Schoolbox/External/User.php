@@ -75,10 +75,10 @@ class User
                 continue;
             }
             $parents = new GenericCollection(\Schoolbox\User::class);
-            /* if the student does not have an externalID
+            /* if the user is not a student or the student does not have an externalID
              * set an empty array and continue
              */
-            if ('' === trim((string)$student->getExternalId())) {
+            if (!$student->getRole()->isStudent() || '' === trim((string)$student->getExternalId())) {
                 $student->setParents($parents);
                 continue;
             }
@@ -130,8 +130,12 @@ class User
                 continue;
             }
             $teachersLoaded = new GenericCollection(\Schoolbox\User::class);
-            $found                                     = [];
-            $subjects                                  = $this->externalUser->getSubjectList($student);
+            if (!$student->getRole()->isStudent() || '' === trim((string)$student->getExternalId())) {
+                $student->setTeacherCollection($teachersLoaded);
+                continue;
+            }
+            $found    = [];
+            $subjects = $this->externalUser->getSubjectList($student);
 
             // Iterate and find teachers associated with each subject
             foreach ($subjects as $subject) {
@@ -173,15 +177,15 @@ class User
                 continue;
             }
             $children = new GenericCollection(\Schoolbox\User::class);
-            /* if the parent does not have an externalID
+            /* if the user is not a parent or the parent does not have an externalID
              * set an empty array and continue
              */
-            if ('' === trim((string)$parent->getExternalId())) {
+            if (!$parent->getRole()->isParent() || '' === trim((string)$parent->getExternalId())) {
                 $parent->setChildren($children);
                 continue;
             }
 
-            $enrolments                             = $this->externalUser->getEnrolledStudents($parent->getExternalId());
+            $enrolments = $this->externalUser->getEnrolledStudents($parent->getExternalId());
             foreach ($enrolments as $child) {
                 try {
                     $children->add($this->userMapper->findByExternalId($child['RelatedID']));

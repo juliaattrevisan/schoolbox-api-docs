@@ -9,10 +9,13 @@
 
 namespace Schoolbox\WebDav\Rules;
 
-use Alaress\Rules\Condition;
 use Alaress\Rules\TokenizedRuleset;
 use Schoolbox\User;
+use SplObjectStorage;
 
+/**
+ * @property SplObjectStorage<Rule> $rules
+ */
 class Ruleset extends TokenizedRuleset
 {
     /** @var Tokenizer */
@@ -103,7 +106,7 @@ class Ruleset extends TokenizedRuleset
 
 
     /**
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRules()
     {

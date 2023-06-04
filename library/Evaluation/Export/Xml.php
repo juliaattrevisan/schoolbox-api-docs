@@ -104,11 +104,6 @@ abstract class Evaluation_Export_Xml
 
         $allQuestions = $this->sectionHandler->getContents($this->assess['assess_id'], $section['section_id']);
 
-        // Filter questions that don't have a type (not sure if this still necessary)
-        $allQuestions = (new \Schoolbox\Collection($allQuestions))->filter(function ($question) {
-            return $question['type_id'];
-        });
-
         if ($allQuestions) {
             foreach ($allQuestions as $idx => $currentQuestion) {
                 $this->renderQuestion($currentQuestion, $idx > 0);

@@ -38,7 +38,7 @@ class Model implements ISoftDeletable, IModel
     private ?Alaress_Date_Format $updatedAtDisplay = null;
 
     /** @var null|int Identifier of corresponding SIS record. NULL if none. */
-    private ?int $externalId;
+    private ?int $externalId = null;
 
     /** @var null|Model Null if does not have a parent. */
     private ?Model $parent = null;

@@ -13,7 +13,6 @@ use Schoolbox\Realtime\ProcessException;
 
 class WorkerResponder
 {
-
     const PROC = './worker.php';
     const ERR_LOG = "/tmp/error-output.txt";
     const CWD  = null;
@@ -35,14 +34,8 @@ class WorkerResponder
      */
     public function __construct($command, $args)
     {
-
-        $this->command = (string)$command;
-        $this->args = json_encode($args);
-
-        if (!is_string($this->command)) {
-            throw new \InvalidArgumentException("Illegal command supplied: must be a string");
-        }
-
+        $this->command  = (string)$command;
+        $this->args     = json_encode($args);
         $descriptorSpec = array(
 //          0 => array("pipe", "r"), // stdin is a pipe that the child will read from
             1 => array("pipe", "w"), // stdout is a pipe that the child will write to

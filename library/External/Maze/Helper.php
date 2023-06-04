@@ -74,7 +74,7 @@ class External_Maze_Helper
                           TT.TTKEY = TH.TT12KEY OR
                           TT.TTKEY = TH.TT13KEY
                   WHERE TH.THKEY = '{$this->getCurrentTHKEY()}'";
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**

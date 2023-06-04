@@ -8,7 +8,12 @@
 export function removeParagraphsInLists(sourceElementHTML: HTMLElement): HTMLElement {
     const listItems = sourceElementHTML.querySelectorAll("li");
     listItems.forEach((listItem) => {
-        if (listItem.querySelector("p")) {
+        // only check for <p> tags if there are no nested lists
+        if (
+            listItem.querySelector("ul") === null &&
+            listItem.querySelector("ol") === null &&
+            listItem.querySelector("p")
+        ) {
             const paragraphs = listItem.getElementsByTagName("p");
             // first insert a <br> tag after each <p> tag
             for (let i = 0; i < paragraphs.length; i += 1) {

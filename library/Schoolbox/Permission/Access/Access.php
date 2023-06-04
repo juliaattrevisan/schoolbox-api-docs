@@ -466,7 +466,7 @@ class Access
         $accessLevel = UserAccess::ACCESS_DENY;
 
         // 2. Check `userAccess` table. (if not already full access)
-        if ($accessLevel !== UserAccess::ACCESS_FULL && $folder->isGroup()) {
+        if ($accessLevel !== UserAccess::ACCESS_FULL) {
             $accessLevel = max($accessLevel, $this->getUserAccessLevel($user, UserAccess::SERVICE_HOMEPAGE, $nnianId, $cache));
         }
 

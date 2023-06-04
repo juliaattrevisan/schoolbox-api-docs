@@ -228,51 +228,52 @@ class Full
             return false;
         };
 
-        /** @var DueWork\Response\Model $currentResponse */
+        /** @var IResponse $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
             /* Only show Submitted submissions (ignore drafts)
              */
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
-                // Exclude feedback which doesn't match the filter
-                /** @var Duework\Feedback\Model[] $includedFeedback */
-                $includedFeedback = $currentResponse->getAllFeedback()->filter($feedbackFilter);
+                if ($currentResponse instanceof DueWork\Response\Model) {
+                    // Exclude feedback which doesn't match the filter
+                    /** @var Duework\Feedback\Model[] $includedFeedback */
+                    $includedFeedback = $currentResponse->getAllFeedback()->filter($feedbackFilter);
 
-                /* Maintain a list of all the Feedbacks that were discovered
-                 * as being part of Responses to ensure they don't get duped
-                 * in the timeline
-                 */
-                foreach ($includedFeedback as $currentFeedback) {
-                    $processedFeedback[] = $currentFeedback->getId();
-
-                    /* Every associated feedback has a set of attached files
-                     * that were added via the attachzone
-                     *
-                     * * If feedback is for specific response, for all files in that *response* that have a KamiDoc,
-                     *   add the file to the feedback.
-                     * * If feedback is floating, we do *not* add any response files to it. Floating feedbacks now
-                     *   only exist if no response exists, hence no response file could have been annotated at the
-                     *   time of feedback creation.
-                     *   --> This doesn't apply for the case where a teacher annotated on a KamiDoc and then
-                     *       published a feedback comment on the quick mark screen. (SA-6760)
+                    /* Maintain a list of all the Feedbacks that were discovered
+                     * as being part of Responses to ensure they don't get duped
+                     * in the timeline
                      */
-                    foreach ($currentResponse->getAllFiles() as $currentFile) {
-                        if ($currentFile->getKami()) {
-                            $currentFeedback->getAllFiles()->add($currentFile);
+                    foreach ($includedFeedback as $currentFeedback) {
+                        $processedFeedback[] = $currentFeedback->getId();
+
+                        /* Every associated feedback has a set of attached files
+                         * that were added via the attachzone
+                         *
+                         * * If feedback is for specific response, for all files in that *response* that have a KamiDoc,
+                         *   add the file to the feedback.
+                         * * If feedback is floating, we do *not* add any response files to it. Floating feedbacks now
+                         *   only exist if no response exists, hence no response file could have been annotated at the
+                         *   time of feedback creation.
+                         *   --> This doesn't apply for the case where a teacher annotated on a KamiDoc and then
+                         *       published a feedback comment on the quick mark screen. (SA-6760)
+                         */
+                        foreach ($currentResponse->getAllFiles() as $currentFile) {
+                            if ($currentFile->getKami()) {
+                                $currentFeedback->getAllFiles()->add($currentFile);
+                            }
                         }
+
+                        /* Sort files alphabetically
+                         */
+                        $currentFeedback->getAllFiles()->sortBy('filename', 'asc');
                     }
 
                     /* Sort files alphabetically
                      */
-                    $currentFeedback->getAllFiles()->sortBy('filename', 'asc');
+                    $currentResponse->getAllFiles()->sortBy('filename', 'asc');
+
+                    // Exclude all feedback except ones explicitly allowed
+                    $currentResponse->setAllFeedback($includedFeedback);
                 }
-
-                /* Sort files alphabetically
-                 */
-                $currentResponse->getAllFiles()->sortBy('filename', 'asc');
-
-                // Exclude all feedback except ones explicitly allowed
-                $currentResponse->setAllFeedback($includedFeedback);
-
                 $this->getRecombined()->add($currentResponse);
             }
         }
@@ -288,7 +289,7 @@ class Full
                 ) {
                     // Adding Kami documents for visibility.
                     // TODO: This needs to be reconsidered once the core solution for SA-6464 is provided.
-                    if (isset($currentResponse)) {
+                    if (isset($currentResponse) && ($currentResponse instanceof  DueWork\Response\Model)) {
                         foreach ($currentResponse->getAllFiles() as $currentFile) {
                             // If the status is other than "done", nobody has viewed it online.
                             if ($currentFile->getKami() && $currentFile->getKami()->isStatusDone()) {

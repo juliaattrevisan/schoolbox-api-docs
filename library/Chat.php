@@ -60,7 +60,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $query .= " ORDER BY time ASC";
 
-        $logs = $this->db->getAll($query);
+        $logs = $this->db->query($query)->fetchAll();
 
         if (!empty($logs)) {
             $userHandler = new User();
@@ -120,14 +120,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             return false;
         }
 
-        $category_id = $this->db->smartQuote($category_id);
-        $user_id     = $this->db->smartQuote($user_id);
-
         $query = "INSERT INTO chat_poll (user_id, category_id, time)
-                  VALUES ($user_id, $category_id, NOW())
+                  VALUES (?, ?, NOW())
                   ON DUPLICATE KEY UPDATE time = NOW()";
 
-        return $this->db->query($query);
+        return $this->db->query($query, [$user_id, $category_id]);
     }
 
 
@@ -138,7 +135,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     public function getUsers($category_id)
     {
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
-        $time  = new DateTime(self::CHAT_POLL_EXPIRY);
+        $time   = new DateTime(self::CHAT_POLL_EXPIRY);
+        $params = [
+            $category_id,
+            $time->format('Y-m-d H:i:s'),
+        ];
         $query = "
             SELECT
                 title,
@@ -151,11 +152,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             FROM chat_poll
             LEFT JOIN `user` ON chat_poll.user_id = user.id
             LEFT JOIN `groups` ON user.`group_id` = `groups`.`id`
-            WHERE `category_id` = $category_id
-            AND chat_poll.time >= '{$this->db->quote($time->format('Y-m-d H:i:s'))}'
+            WHERE `category_id` = ?
+            AND chat_poll.time >= ?
         ";
 
-        $users = $this->db->getAll($query);
+        $users = $this->db->query($query, $params)->fetchAll();
 
         if (!empty($users)) {
             $userHandler = new User();
@@ -278,6 +279,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $query .= " LIMIT $index, $limit";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This maintains an audit trail of every record a staff member views, and all the searches that they perform (and the
+ * This maintains an audit trail of every record a staff member views, and all the searches that they perform
  * results that these searches returned)
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -21,30 +21,26 @@ class Model
     use Id;
     use CreatedAtDate;
 
-    /** @var User $user Schoolbox user whose actions we are tracking */
-    private $user;
+    /**
+     * Schoolbox user whose actions we are tracking
+     */
+    private User $user;
 
-    /** @var null|Pastoral $pastoral */
-    private $pastoral;
+    private ?Pastoral $pastoral = null;
 
-    /** @var null|User $student */
-    private $student;
+    private ?User $student = null;
 
-    /** @var null|integer $reportId */
-    private $reportId;
+    private ?int $reportId = null;
 
-    /** @var null|string $search */
-    private $search;
+    private ?string $search = null;
 
-    /** @var null|string $searchResult */
-    private $searchResult;
 
     /**
-     * @param User $student
+     * @param User|null $student
      *
      * @return $this
      */
-    public function setStudent(User $student = null)
+    public function setStudent(User $student = null): self
     {
         $this->student = $student;
 
@@ -54,7 +50,7 @@ class Model
     /**
      * @return null|User
      */
-    public function getStudent()
+    public function getStudent(): ?User
     {
         return $this->student;
     }
@@ -64,7 +60,7 @@ class Model
      *
      * @return $this
      */
-    public function setPastoral(Pastoral $pastoral = null)
+    public function setPastoral(Pastoral $pastoral = null): self
     {
         $this->pastoral = $pastoral;
 
@@ -74,7 +70,7 @@ class Model
     /**
      * @return null|Pastoral
      */
-    public function getPastoral()
+    public function getPastoral(): ?Pastoral
     {
         return $this->pastoral;
     }
@@ -84,7 +80,7 @@ class Model
      *
      * @return self
      */
-    public function setUser(User $user)
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -94,7 +90,7 @@ class Model
     /**
      * @return User
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -104,7 +100,7 @@ class Model
      *
      * @return $this
      */
-    public function setReportId($reportId = null)
+    public function setReportId($reportId = null): self
     {
         $this->reportId = $reportId;
 
@@ -114,7 +110,7 @@ class Model
     /**
      * @return null|integer
      */
-    public function getReportId()
+    public function getReportId(): ?int
     {
         return $this->reportId;
     }
@@ -124,7 +120,7 @@ class Model
      *
      * @return $this
      */
-    public function setSearch($search = null)
+    public function setSearch($search = null): self
     {
         $this->search = $search;
 
@@ -134,28 +130,8 @@ class Model
     /**
      * @return null|string
      */
-    public function getSearch()
+    public function getSearch(): ?string
     {
         return $this->search;
-    }
-
-    /**
-     * @param null|string $searchResult
-     *
-     * @return $this
-     */
-    public function setSearchResult($searchResult = null)
-    {
-        $this->searchResult = $searchResult;
-
-        return $this;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getSearchResult()
-    {
-        return $this->searchResult;
     }
 }

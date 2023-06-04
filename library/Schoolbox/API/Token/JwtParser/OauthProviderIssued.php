@@ -81,7 +81,6 @@ class OauthProviderIssued extends Base
         $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
         $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
         $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
-        $algs              = ['RS256'];
 
         // Verify the JWT
         $sessionLength = (int)$this->config->get('session_length');
@@ -92,7 +91,6 @@ class OauthProviderIssued extends Base
             $jwt,
             JwtLibrary\JWK::parseKeySet($jwks),
             $sessionLength,
-            $algs,
         );
 
         if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {

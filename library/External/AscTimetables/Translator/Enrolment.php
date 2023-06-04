@@ -12,7 +12,7 @@ class External_AscTimetables_Translator_Enrolment extends External_AscTimetables
     /**
      * Translates the input XML file to a timetable structure.
      *
-     * @return Iterator|array[]
+     * @return array[]
      */
     public function translateXmlToArray()
     {

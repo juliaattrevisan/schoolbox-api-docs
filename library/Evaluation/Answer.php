@@ -168,7 +168,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
                  FROM {$this->_table}
                  WHERE question_id = '$question_id'";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
@@ -184,7 +184,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
                   FROM {$this->_table}
                   WHERE question_id = '$question_id'";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
@@ -212,7 +212,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
             'section_id' => $section_id,
             'question_id' => $question_id,
             'response' => $processedResponse,
-            'updated_at' => 'NOW()',
+            'updated_at' => Alaress_Date_Format::now()->getDatabaseDate(),
         );
 
         /* If they have already responded to this question in this attempt,

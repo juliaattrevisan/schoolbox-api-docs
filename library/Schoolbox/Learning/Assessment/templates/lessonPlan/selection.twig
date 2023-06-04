@@ -111,9 +111,18 @@
             <div class="small-12 columns">
                 <div class="empty-state">
                     <i class="icon-lesson-plan"></i>
-                    <p>
-                        There are no available lesson plan templates. Please contact a Superuser at your school if you wish to use Lesson Plans, as you will require a template
-                    </p>
+                    {% set templateCreateRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getCreate') %}
+
+                    {% if templateCreateRoute %}
+                        <p>
+                            No lesson plan templates have been created.
+                            <a href="{{ templateCreateRoute }}">Click here</a> to build a lesson plan template.
+                        </p>
+                    {% else %}
+                        <p>
+                            There are no available lesson plan templates. Please contact a Superuser at your school if you wish to use Lesson Plans, as you will require a template
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -131,21 +140,19 @@
         });
     </script>
 
-    {% if lessonPlanTemplates.all|length %}
-        {# submit button is only available if any of the following are true:
-         #   * a template is selected
-         #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
+    {# submit button is only available if any of the following are true:
+     #   * a template is selected
+     #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
+     #}
+    {% if lessonPlanMeta.template %}
+        {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+    {% elseif lessonPlanMeta.mageAsync %}
+        {# Don't provide a Create button at the bottom; users must choose a template,
+         # not submit a form, in this Selection step. They have to do it by clicking
+         # the title or Use Template via the modal.
          #}
-        {% if lessonPlanMeta.template %}
+        <div class="hide">
             {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-        {% elseif lessonPlanMeta.mageAsync %}
-            {# Don't provide a Create button at the bottom; users must choose a template,
-             # not submit a form, in this Selection step. They have to do it by clicking
-             # the title or Use Template via the modal.
-             #}
-            <div class="hide">
-                {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-            </div>
-        {% endif %}
+        </div>
     {% endif %}
 </fieldset>

@@ -27,7 +27,7 @@ class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
      * TODO: This is on assumption that course section code matches "sis_source_id of course" - year (likely to be 4 digits... but may be 2 digits)
      * @inheritDoc
      */
-    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year): ?string
+    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year, ?string $termSisSourceId): ?string
     {
         if (empty($year)) {
             return $sisSourceId;

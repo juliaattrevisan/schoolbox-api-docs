@@ -1812,6 +1812,7 @@ abstract class Kernel
                         new JwtParser\OtherInstanceIssued($userMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
+                        new JwtParser\InstanceRegistryIssued($userMapper, $config),
                     );
                 }
             )

@@ -30,7 +30,7 @@
         }
     },
     "require": {
-        "php": "8.0.*",
+        "php": "8.0.* || 8.2.*",
         "symfony/http-foundation": "^6.0.9",
         "league/oauth2-client": "^2.4",
         "sabre/dav": "^4.2.1",
@@ -51,7 +51,6 @@
         "aura/web": "~2.2.0",
         "aura/session": "~2.1.0",
         "0x46616c6b/etherpad-lite-client": "~0.6",
-        "easyrdf/easyrdf": "~1.1.1",
         "caxy/php-htmldiff": "~0.1.3",
         "imagine/imagine": "^1.0.1",
         "mpratt/embera": "~2.0",
@@ -66,7 +65,7 @@
         "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-posix": "*",
-        "firebase/php-jwt": "^5.0",
+        "firebase/php-jwt": "^6.5.0",
         "ext-openssl": "*",
         "stomp-php/stomp-php": "~5.0.0",
         "cboden/ratchet": "^0.4.1",
@@ -99,7 +98,7 @@
         "ext-ldap": "*",
         "oat-sa/lib-lti1p3-deep-linking": "^4.0",
         "oat-sa/lib-lti1p3-nrps": "^7.0",
-        "intelliscl/sdk": "dev-main#0d14a54b1550a8087412d94733e27610741a26e6",
+        "intelliscl/sdk": "dev-main#974ee202ec0675ecd1ab4c0b23895526955c251b",
         "apple/apn-push": "^3.1",
         "symfony/mime": "^6.0.9",
         "symfony/mailer": "^v6.0.8",
@@ -133,7 +132,8 @@
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "ramsey/composer-repl": true
+            "ramsey/composer-repl": true,
+            "php-http/discovery": true
         }
     }
 }
