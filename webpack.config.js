@@ -24,7 +24,6 @@ const babelOptions = {
 module.exports = {
     entry: {
         // https://webpack.js.org/configuration/entry-context/
-
         main: [
             // custom validation built on top of jQuery Validation
             "./www/static/js/form/jquery.alaressValidate.js",
@@ -113,22 +112,6 @@ module.exports = {
             // Global property storage
             "./www/static/js/global/sbProps.js",
         ],
-        masonry: {
-            import: [
-                // homepage editing
-                "./www/static/js/masonry/jquery.masonry.js",
-                "./www/static/js/masonry/jquery.masonry.colourPicker.js",
-            ],
-        },
-        mage: {
-            import: ["./www/static/js/form/jquery.mage.js"],
-        },
-        dataTables: {
-            import: [
-                "./node_modules/datatables.net/js/jquery.dataTables.js",
-                "./node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js",
-            ],
-        },
 
         // Libraries
         intellischools: "./www/static/js/intellischools/schoolboxIntellischools.js",
@@ -464,6 +447,17 @@ module.exports = {
                     "./node_modules/flatpickr/dist/flatpickr.js",
                     // For feature tours
                     "./node_modules/intro.js/intro.js",
+                ],
+                "masonry.js": [
+                    // homepage editing
+                    "./www/static/js/masonry/jquery.masonry.js",
+                    "./www/static/js/masonry/jquery.masonry.colourPicker.js",
+                ],
+                "mage.js": ["./www/static/js/form/jquery.mage.js"],
+                "dataTables.js": [
+                    // DataTables
+                    "./node_modules/datatables.net/js/jquery.dataTables.js",
+                    "./node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js",
                 ],
             },
         }),
