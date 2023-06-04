@@ -391,7 +391,7 @@ class Controller extends Base
                 vr.indicator_sequence,
                 vr.indicator_id
         ";
-        $stmt = $this->internalDb->prepareQuery($sql, ['none' => MarkType::TYPE_NONE]);
+        $stmt = $this->internalDb->prepareQuery($sql, ['none' => MarkType::TYPE_NONE] + $pb->getParams());
 
         $capabilities = [];
         $indicators   = [];
@@ -401,7 +401,7 @@ class Controller extends Base
         $decimalHydrator          = new Decimal();
         $integerHydrator          = new Integer();
 
-        foreach ($stmt->getIterator($pb->getParams()) as $row) {
+        foreach ($stmt->getIterator() as $row) {
             if ($lastObservedAssessmentId !== $row['assessment_id']) {
                 // Has the assessment we're looking at changed? Reset the capabilities
                 $capabilities = [];
@@ -538,9 +538,9 @@ class Controller extends Base
             INNER JOIN user u ON vrm.student_id = u.id
             WHERE {$outerWhere}
             ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
-            ");
-
-        $params = array_merge($innerPb->getParams(), $outerPb->getParams());
+            ",
+            array_merge($innerPb->getParams(), $outerPb->getParams()),
+        );
 
         $assessmentsForStudent = [];
         $capabilityMarks       = [];
@@ -550,7 +550,7 @@ class Controller extends Base
         $lastObservedCapabilityId = null;
         $lastObservedStudentId    = null;
 
-        foreach ($getAuthoritativeMarksQuery->getIterator($params) as $i => $row) {
+        foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
             if ($lastObservedStudentId !== $row['student_id']) {
                 // Has the student we're looking at changed? Reset the list of assessments for them
                 $assessmentsForStudent = [];
