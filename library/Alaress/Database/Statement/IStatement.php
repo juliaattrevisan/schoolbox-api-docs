@@ -129,11 +129,10 @@ interface IStatement extends IteratorAggregate
     /**
      * Execute stored procedure and return an iterator
      *
-     * @param array|null $values
      * @return IIterator
      * @throws Exception
      */
-    public function getIterator(?array $values = null): Traversable;
+    public function getIterator(): IIterator;
 
     /**
      * Returns the data type name as a string for debugging display purposes only, should be no
