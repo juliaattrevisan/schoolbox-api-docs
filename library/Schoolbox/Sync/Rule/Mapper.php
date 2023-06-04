@@ -23,7 +23,6 @@ use Schoolbox\Sync;
  */
 class Mapper extends Schoolbox\Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *
