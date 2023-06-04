@@ -9,8 +9,6 @@ namespace Schoolbox\Curriculum\Node;
 
 use Alaress_Date_Format;
 use JsonSerializable;
-use Schoolbox\Curriculum\LearningArea;
-use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits;

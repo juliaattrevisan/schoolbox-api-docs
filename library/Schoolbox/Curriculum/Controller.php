@@ -13,8 +13,6 @@ namespace Schoolbox\Curriculum;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Curriculum\Node;
-use Schoolbox\Curriculum\LearningArea;
-use Schoolbox\Curriculum\LearningLevel;
 
 class Controller extends Base
 {
@@ -113,33 +111,6 @@ class Controller extends Base
             'children',
         );
         $this->response->content->set($this->buildJsonOutput($tree));
-    }
-
-    /**
-     * Gets a list of LearningArea\Model or LearningLevel\Model objects as a
-     * list, grouped by source.
-     *
-     * @param  LearningArea\Model[]|LearningLevel\Model[] $list
-     * @return array
-     */
-    protected function getAsGroupedList($list)
-    {
-        $returnList = array();
-        foreach ($list as $item) {
-            $sourceId = $item->getSource()->getId();
-            if (!array_key_exists($sourceId, $returnList)) {
-                $returnList[$sourceId] = array(
-                    'id'   => $sourceId,
-                    'name' => $item->getSource()->getName(),
-                    'list' => array(),
-                );
-            }
-            $returnList[$sourceId]['list'][] = array(
-                'id'    => $item->getId(),
-                'name'  => $item->getName(),
-            );
-        }
-        return array_values($returnList);
     }
 
     /**
