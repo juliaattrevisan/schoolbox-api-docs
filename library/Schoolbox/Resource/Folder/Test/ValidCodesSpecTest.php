@@ -18,6 +18,7 @@ use Schoolbox\Resource\Folder;
 use PHPUnit\Framework;
 use Alaress\Database\Predicate;
 use Alaress\Database\Quoter\Mysql;
+use Schoolbox\Test\MockConnector;
 
 /**
  * @covers \Schoolbox\Resource\Folder\ValidCodesSpec
@@ -210,11 +211,7 @@ class ValidCodesSpecTest extends TestCase
     {
         /** @var Folder\Code\Mapper|MockObject $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
-
-        $mockDatabase = $this->createMock(MockDatabase::class);
-        $mockDatabase
-            ->method('escapeForLike')
-            ->willReturn('mock escaped string');
+        $mockDatabase     = $this->createMock(MockConnector::class);
 
         $folderCodeMapper
             ->method('getPredicateBuilder')
