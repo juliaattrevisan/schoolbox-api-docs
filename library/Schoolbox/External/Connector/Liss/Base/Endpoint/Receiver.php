@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\IDatabase;
 use Alaress\Lumberjack\Logger;
 use PhpXmlRpc\Request;
@@ -244,7 +245,7 @@ class Receiver
     /**
      * Execute each strat in sequence, just like Scheduler does
      *
-     * @param IDatabase         $db
+     * @param IConnector        $db
      * @param GenericCollection $composites
      * @return void
      * @throws \PDOException
@@ -252,7 +253,7 @@ class Receiver
      * @throws \Throwable
      * @throws \UnexpectedValueException
      */
-    private function transact(IDatabase $db, GenericCollection $composites): void
+    private function transact(IConnector $db, GenericCollection $composites): void
     {
         /* Borrow some scheduler.php pieces
          */

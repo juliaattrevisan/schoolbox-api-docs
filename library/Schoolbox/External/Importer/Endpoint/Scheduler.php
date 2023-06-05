@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -72,9 +73,9 @@ class Scheduler
     public const LOCK_NAME = 'schooldata_import';
 
     /**
-     * @var IDatabase
+     * @var IConnector
      */
-    private $db;
+    private IConnector $db;
 
     /**
      * One of [hourly, twiceDaily, daily]
@@ -123,7 +124,7 @@ class Scheduler
     /**
      * Scheduler constructor.
      *
-     * @param IDatabase                                $db
+     * @param IConnector                               $db
      * @param string                                   $frequency
      * @param string[]                                 $customHours
      * @param IFactory                                 $factory
@@ -133,7 +134,7 @@ class Scheduler
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
      */
     public function __construct(
-        IDatabase $db,
+        IConnector $db,
         string $frequency,
         array $customHours,
         IFactory $factory,
