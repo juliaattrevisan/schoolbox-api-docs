@@ -56,9 +56,6 @@ class TestPostProcessor extends TestCase
      */
     public function testPostProcessor()
     {
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $db2Test = $factory->createDb2();

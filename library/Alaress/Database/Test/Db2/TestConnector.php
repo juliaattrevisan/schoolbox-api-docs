@@ -35,14 +35,6 @@ class TestConnector extends TestCase
      */
     public function testConnect()
     {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $db2Test = $factory->createDb2();
@@ -63,14 +55,6 @@ class TestConnector extends TestCase
      */
     public function testSerialize()
     {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $connectorOriginal = $factory->createDb2();
