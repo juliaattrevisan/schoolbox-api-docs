@@ -65,7 +65,7 @@ class Reloader extends App
             join `assessment_course_unit_specification` `acus` on (`a`.`id` = `acus`.`assessment_id`))
             join `course_unit_specification` `cus` on (`acus`.`course_unit_specification_id` = `cus`.`id`))
             join `course_specification` `cs` on (`cus`.`course_specification_id` = `cs`.`id`))
-            join `folder` `f` on (`cus`.`folder_id` = `f`.`id`))
+            join `folder` `f` on (`cs`.`folder_id` = `f`.`id`))
         union
         select `a`.`id` AS `assessment_id`,
                `f`.`id` AS `folder_id`,
@@ -108,7 +108,7 @@ class Reloader extends App
             join `assessment_course_unit_specification` `acus` on (`p`.`assessment_id` = `acus`.`assessment_id`))
             join `course_unit_specification` `cus` on (`acus`.`course_unit_specification_id` = `cus`.`id`))
             join `course_specification` `cs` on (`cus`.`course_specification_id` = `cs`.`id`))
-            join `folder` `f` on (`cus`.`folder_id` = `f`.`id`))
+            join `folder` `f` on (`cs`.`folder_id` = `f`.`id`))
         order by `assessment_id`;
     ";
 
