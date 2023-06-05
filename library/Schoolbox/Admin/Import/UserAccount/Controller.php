@@ -129,7 +129,7 @@ class Controller extends Base
             'template' => "@{$this->basename}/preview.twig",
             'data' => $this->getBaseData() + [
                 'log' => [
-                    'lines' => $this->parseLogLines($logger),
+                    'lines' => $this->parseLogLines($logger, true),
                 ],
                 'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
@@ -161,7 +161,7 @@ class Controller extends Base
             'template' => "@{$this->basename}/import.twig",
             'data' => $this->getBaseData() + [
                 'log' => [
-                    'lines' => $this->parseLogLines($logger)
+                    'lines' => $this->parseLogLines($logger, false)
                 ],
             ],
         ]);
@@ -261,12 +261,15 @@ class Controller extends Base
      * Parses lines out of the logger.
      *
      * @param CacheableLoggerInterface $logger
+     * @param bool                     $preview
      * @return array
-     * @throws \Schoolbox\File\Exception
+     * @throws \JsonException
+     * @throws \League\Flysystem\FilesystemException
      */
-    protected function parseLogLines($logger): array
+    protected function parseLogLines(CacheableLoggerInterface $logger, bool $preview): array
     {
-        $stream   = $this->filesystemProxy->readStream($logger->flushToStorage());
+        $expiryAt = $preview ? \Alaress_Date_Format::now()->addDays(1) : null;
+        $stream   = $this->filesystemProxy->readStream($logger->flushToStorage('UserAccountImport.log', $expiryAt));
         $logLines = [];
 
         while ($line = fgets($stream)) {

@@ -10,18 +10,16 @@
 namespace Schoolbox\Notif;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\File;
 use Schoolbox\Resource\Storage;
 
 interface CacheableLoggerInterface extends LoggerInterface
 {
-
     /**
      * Flush your internal cache to storage
      *
-     * @param string $basename
-     * @throws File\Exception
+     * @param string                    $basename
+     * @param \Alaress_Date_Format|null $expiryAt
      * @return Storage\Model
      */
-    public function flushToStorage($basename = '');
+    public function flushToStorage(string $basename = '', \Alaress_Date_Format|null $expiryAt = null): Storage\Model;
 }

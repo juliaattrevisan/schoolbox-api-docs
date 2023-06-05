@@ -9,8 +9,8 @@
 namespace Schoolbox;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Lumberjack\Logger;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Notif\CacheableLoggerInterface;
 
 /**
  * Class UserBulkMapper
@@ -32,14 +32,14 @@ class UserBulkMapper extends UserMapper
      *
      * @var string
      */
-    private $outputMessage = '';
+    private string $outputMessage = '';
 
 
     /**
      * Bulk modify logger
-     * @var Logger
+     * @var CacheableLoggerInterface
      */
-    private $logger;
+    private CacheableLoggerInterface $logger;
 
 
     /**
@@ -47,8 +47,7 @@ class UserBulkMapper extends UserMapper
      */
     protected function postSetup()
     {
-        $file         = fopen($this->getConfigLoader()->get('logs_dir') . '/audit.log', 'a');
-        $this->logger = new Logger($file, null, 200, [], true);
+        $this->logger = $this->getDi()->get('ups.logger');
     }
 
 
@@ -199,6 +198,7 @@ class UserBulkMapper extends UserMapper
      */
     public function getOutputMessage(): string
     {
+        $this->logger->flushToStorage('UserBulkModify.log', \Alaress_Date_Format::now()->addMonths(3));
         return $this->outputMessage;
     }
 }
