@@ -440,7 +440,7 @@ module.exports = {
                     // Sound / video player
                     "./node_modules/mediaelement/build/mediaelement-and-player.min.js",
                     // For drag/drop of resources
-                    "./node_modules/dropzone/dist/dropzone.js",
+                    "./node_modules/dropzone/dist/dropzone-min.js",
                     // Flatpickr date selector
                     "./node_modules/flatpickr/dist/flatpickr.min.js",
                     // For feature tours
