@@ -114,8 +114,8 @@ function onCancelSelected() {
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
-        <section>
-            <form>
+        <form>
+            <section>
                 <fieldset class="content">
                     <legend class="title">Update</legend>
                     <div class="small-12 columns">
@@ -162,8 +162,8 @@ function onCancelSelected() {
                         </ul>
                     </div>
                 </fieldset>
-            </form>
-        </section>
+            </section>
+        </form>
     </div>
 </template>
 

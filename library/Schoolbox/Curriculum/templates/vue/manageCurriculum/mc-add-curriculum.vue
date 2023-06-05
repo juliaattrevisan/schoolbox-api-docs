@@ -96,8 +96,8 @@ function onCancelSelected() {
 <template>
     <div class="row">
         <div class="small-12 island">
-            <section>
-                <form>
+            <form>
+                <section>
                     <fieldset class="content">
                         <legend>Add new Curriculum</legend>
                         <div class="small-12 columns">
@@ -144,8 +144,8 @@ function onCancelSelected() {
                             </ul>
                         </div>
                     </fieldset>
-                </form>
-            </section>
+                </section>
+            </form>
         </div>
     </div>
 </template>
