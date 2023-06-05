@@ -3,7 +3,6 @@
  * to view a nodes description and all the places the node is used
  */
 
-import { ref } from "vue";
 import type { BadgeUsageObject, Usage } from "@schoolboxCurriculum/types/Node";
 import NodeUsageDetails from "@schoolboxCurriculum/vue/usage/node-usage-details.vue";
 import BadgeModal from "@schoolboxBadge/vue/badge-modal";
@@ -17,8 +16,8 @@ interface Props {
 const props = defineProps<Props>();
 const activeNodeStore = useActiveNodeStore();
 const nodeUsageStore = useNodeUsageStore();
-const isBadgeModalOpen = ref(false); // whether the modal to display the badge details is open
-const currentBadge = ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
+const isBadgeModalOpen = window.Vue.ref(false); // whether the modal to display the badge details is open
+const currentBadge = window.Vue.ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
 
 /**
  * Opens a modal window for viewing this badge's full details.

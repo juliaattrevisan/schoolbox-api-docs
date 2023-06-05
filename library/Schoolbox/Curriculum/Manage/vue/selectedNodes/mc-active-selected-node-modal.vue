@@ -3,17 +3,16 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { ref, computed, watch } from "vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 const selectedNodesStore = useSelectedNodesStore();
-const modalEl = ref(null);
+const modalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => selectedNodesStore.hasActiveNode,
     (hasActiveNode) => {
         if (hasActiveNode) {
@@ -27,7 +26,7 @@ watch(
  *
  * @returns { String }
  */
-const title = computed(() => {
+const title = window.Vue.computed(() => {
     if (selectedNodesStore.activeNode?.code && selectedNodesStore.activeNode.code !== "") {
         return `[${selectedNodesStore.activeNode.code}] ${selectedNodesStore.activeNode.name}`;
     } else {
@@ -40,7 +39,7 @@ const title = computed(() => {
  *
  * @returns { String }
  */
-const breadcrumbs = computed(() => {
+const breadcrumbs = window.Vue.computed(() => {
     if (selectedNodesStore.activeNode?.breadcrumbs.length > 0) {
         const justNames = selectedNodesStore.activeNode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(" > ");

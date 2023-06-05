@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import BadgeList from "./badge-list";
 
-createApp({
+window.Vue.createApp({
     components: {
         BadgeList,
     },

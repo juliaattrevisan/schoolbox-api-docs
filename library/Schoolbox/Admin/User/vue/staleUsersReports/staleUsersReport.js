@@ -1,8 +1,7 @@
-import { createApp } from "vue";
 import StaleUsersReport from "./stale-users-report";
 import { ClientTable } from "v-tables-3-select-rows";
 
-const app = createApp({
+const app = window.Vue.createApp({
     components: {
         StaleUsersReport,
     },

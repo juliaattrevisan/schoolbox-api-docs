@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import ClassSelector from "./class-selector";
 
-createApp({
+window.Vue.createApp({
     components: {
         ClassSelector,
     },

@@ -3,7 +3,6 @@
  * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
 
-import { ref, computed, onMounted } from "vue";
 import { ResizeObserver } from "vue3-resize";
 import "vue3-resize/dist/vue3-resize.css";
 import debounce from "lodash/debounce";
@@ -22,7 +21,7 @@ const props = defineProps({
     },
 });
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     primaryMenuItems = Array.from(primary.value.querySelectorAll("li")); //get all the list menu list items
     primaryMenuItems.splice(0, 2); //remove the side menu button and the logo
     primaryMenuItemsMaxXPos = primaryMenuItems.map(
@@ -39,12 +38,12 @@ function onContainerResize() {
     updateTopNavItems();
 }
 
-const menuData = ref(topMenuData);
-const topBar = ref(null);
-const primary = ref(null);
+const menuData = window.Vue.ref(topMenuData);
+const topBar = window.Vue.ref(null);
+const primary = window.Vue.ref(null);
 let primaryMenuItems;
 let primaryMenuItemsMaxXPos;
-const secondary = ref(null);
+const secondary = window.Vue.ref(null);
 
 /**
  * Show/hide top nav items based on space available

@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import PastoralRecordComments from "./pastoral-record-comments";
 
-createApp({
+window.Vue.createApp({
     components: {
         PastoralRecordComments,
     },

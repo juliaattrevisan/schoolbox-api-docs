@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import AssessmentCalendar from "./assessment-calendar";
 
-createApp({
+window.Vue.createApp({
     components: {
         AssessmentCalendar,
     },

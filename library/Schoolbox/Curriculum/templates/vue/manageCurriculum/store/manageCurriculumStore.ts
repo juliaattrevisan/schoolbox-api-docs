@@ -2,7 +2,6 @@
  * Handles the load of the curriculum data
  */
 
-import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { UNSET_ID, getIdHash, isValidHash } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
@@ -13,20 +12,20 @@ import Toast from "@schoolboxVue/components/toast.vue";
 export const useStore = defineStore("manageCurriculum", () => {
     let apiEndpoint = ""; // where to load the curriculum api from
     let uiLimit = 0;
-    const isLoading = ref(true); // to display loading note
-    const hasLoadError = ref(false); // to display loading error
-    const isProcessing = ref(false); // to notify that an action is taking place, like updating a member access
-    const isReadOnly = ref(true); // can only view the currently selected codes, not edit them
-    const hasId = ref(false); // whether we should traverse directly to a node id on page load
-    const id = ref(UNSET_ID); // the id of the node to traverse directly to
-    const toastEl = ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
+    const isLoading = window.Vue.ref(true); // to display loading note
+    const hasLoadError = window.Vue.ref(false); // to display loading error
+    const isProcessing = window.Vue.ref(false); // to notify that an action is taking place, like updating a member access
+    const isReadOnly = window.Vue.ref(true); // can only view the currently selected codes, not edit them
+    const hasId = window.Vue.ref(false); // whether we should traverse directly to a node id on page load
+    const id = window.Vue.ref(UNSET_ID); // the id of the node to traverse directly to
+    const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
 
     /**
      * When load is complete and was a success
      *
      * @returns { boolean } whether the nodes have loaded
      */
-    const hasLoadedOk = computed(() => !isLoading.value && !hasLoadError.value);
+    const hasLoadedOk = window.Vue.computed(() => !isLoading.value && !hasLoadError.value);
 
     /**
      * Get the url of the curriculum api

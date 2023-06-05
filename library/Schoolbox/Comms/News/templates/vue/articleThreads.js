@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import ArticleThreads from "./article-threads";
 
-createApp({
+window.Vue.createApp({
     components: {
         ArticleThreads,
     },

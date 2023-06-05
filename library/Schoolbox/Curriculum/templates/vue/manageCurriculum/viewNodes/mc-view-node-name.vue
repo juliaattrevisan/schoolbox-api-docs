@@ -4,7 +4,6 @@
  * will also highlight any matches in the current search query when search is active
  */
 
-import { computed } from "vue";
 import { escapeRegExp } from "@js/util/jsUtils";
 import { useNodesStore } from "../store/mcNodesStore";
 import { useViewNodesStore } from "./store/mcViewNodesStore";
@@ -57,7 +56,7 @@ const searchStore = useSearchStore();
  *
  * @returns { boolean }
  */
-const isDisabled = computed(() => {
+const isDisabled = window.Vue.computed(() => {
     if (props.isActive || nodesStore.isLoading) {
         // while the node is being updated
         return true;
@@ -70,7 +69,7 @@ const isDisabled = computed(() => {
  *
  * @returns { boolean }
  */
-const isParentNode = computed(() => {
+const isParentNode = window.Vue.computed(() => {
     if (props.depth === 0) {
         return true;
     }
@@ -83,7 +82,7 @@ const isParentNode = computed(() => {
  *
  * @returns { boolean }
  */
-const isButton = computed(() => {
+const isButton = window.Vue.computed(() => {
     if (searchStore.isActive) {
         //when search is active, we can jump to the selected node
         return true;
@@ -106,7 +105,7 @@ const isButton = computed(() => {
  *
  * @returns { string }
  */
-const fontWeight = computed(() => (isParentNode.value && !searchStore.isActive ? "bold" : "normal"));
+const fontWeight = window.Vue.computed(() => (isParentNode.value && !searchStore.isActive ? "bold" : "normal"));
 
 /**
  * reset the structure to that node or traverse to the next node level
@@ -126,7 +125,7 @@ function onNameSelected() {
  *
  * @returns { string } - the highlighted title
  */
-const highlightTitleSearch = computed(() => {
+const highlightTitleSearch = window.Vue.computed(() => {
     if (searchStore.isActive) {
         return highlightSearchInElement(props.title);
     }

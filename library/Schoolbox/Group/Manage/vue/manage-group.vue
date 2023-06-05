@@ -3,7 +3,6 @@
  * All the functionality to be able to manage a group
  */
 
-import { ref, onBeforeMount, onMounted } from "vue";
 import Endpoints from "./mgEndpoints";
 import { useStore } from "./store/manageGroupStore";
 import { useMembersStore } from "./store/mgMembersStore";
@@ -94,17 +93,17 @@ const props = defineProps({
     yearLevelLabel: {
         type: String,
         required: true,
-    }
+    },
 });
 
 const store = useStore();
-const toastEl = ref(null);
+const toastEl = window.Vue.ref(null);
 
 /**
  * set the endpoints here, and the stores can just reference the object
  * rather than having to pass them through as props as these values wont change
  */
-onBeforeMount(() => {
+window.Vue.onBeforeMount(() => {
     Endpoints.GROUP_DATA = props.groupDataEndpoint;
     Endpoints.REMOVE_MEMBERS = props.removeMembersEndpoint;
     Endpoints.UPDATE_MEMBERS = props.updateMembersEndpoint;
@@ -117,13 +116,13 @@ onBeforeMount(() => {
 /**
  * Start loading the group data
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     store.toastEl = toastEl;
     store.showSetting = props.showSetting === "1";
     store.groupStaffOnly = props.groupStaffOnly;
     // NOTE: Endpoints.SEND_EMAIL will be blank if the route is not authorised for the user
     store.emailEnabled = props.emailEnabled && Endpoints.SEND_EMAIL;
-    store.yearLevelLabel = props.yearLevelLabel
+    store.yearLevelLabel = props.yearLevelLabel;
     checkForStorybook();
     store.loadData();
 });

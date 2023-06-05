@@ -3,7 +3,6 @@
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useRemoveMembersStore } from "../store/mgRemoveMembersStore";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
@@ -12,12 +11,12 @@ import { useMembersStore } from "../store/mgMembersStore";
 const store = useStore();
 const removeMembersStore = useRemoveMembersStore();
 const membersStore = useMembersStore(); //to keep track of selectedMembers
-const removeModalEl = ref(null);
+const removeModalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => removeMembersStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
@@ -54,7 +53,7 @@ removeMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const removeButtonText = computed(() => (removeMembersStore.isProcessing ? "Removing..." : "Yes"));
+const removeButtonText = window.Vue.computed(() => (removeMembersStore.isProcessing ? "Removing..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -62,7 +61,7 @@ const removeButtonText = computed(() => (removeMembersStore.isProcessing ? "Remo
  *
  * @returns { Boolean }
  */
-const isCloseModalDisabled = computed(() => removeMembersStore.isProcessing);
+const isCloseModalDisabled = window.Vue.computed(() => removeMembersStore.isProcessing);
 
 /**
  * to close the modal

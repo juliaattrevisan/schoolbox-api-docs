@@ -4,15 +4,14 @@
  * button to easily add/remove all search results
  */
 
-import { ref, computed, watch, nextTick } from "vue";
 import { gsap } from "gsap/all";
 import { useSearchStore } from "../store/mgSearchStore";
 import MgSelectAllSearchResults from "./mg-select-all-search-results.vue";
 import MgAddMembersSearchResult from "./mg-search-result.vue";
 
 const searchStore = useSearchStore();
-const searchResultsContainerEl = ref(null);
-const searchResultsEl = ref(null);
+const searchResultsContainerEl = window.Vue.ref(null);
+const searchResultsEl = window.Vue.ref(null);
 
 /**
  * show select all option for adding / removing codes only if there's
@@ -20,27 +19,27 @@ const searchResultsEl = ref(null);
  *
  * @returns { Boolean }
  */
-const showSelectAll = computed(() => {
+const showSelectAll = window.Vue.computed(() => {
     return searchStore.filteredResults.length > 1;
 });
 
 /**
  * so can slide down to show searching
  */
-watch(
+window.Vue.watch(
     () => searchStore.isLoading,
     () => {
-        nextTick(() => animate());
+        window.Vue.nextTick(() => animate());
     }
 );
 
 /**
  * to slide up and down based on the amount of results
  */
-watch(
+window.Vue.watch(
     () => searchStore.filteredResults,
     () => {
-        nextTick(() => animate());
+        window.Vue.nextTick(() => animate());
     }
 );
 
@@ -82,7 +81,7 @@ function animate() {
 
 <style lang="scss" scoped>
 .search-results-container {
-    height: 0; //will animate the results within with the watch() above
+    height: 0; //will animate the results within with the window.Vue.watch() above
     overflow: hidden;
     position: relative;
 }

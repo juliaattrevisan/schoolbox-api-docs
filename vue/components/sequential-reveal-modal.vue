@@ -10,7 +10,6 @@
  * But to add more would just be a case of adding more slots in the template.
  */
 
-import { ref, watch } from "vue";
 import { generateUUID } from "@js/util/jsUtils";
 
 const props = defineProps({
@@ -65,14 +64,14 @@ const props = defineProps({
 
 const emit = defineEmits(["closed", "nextOpened", "previousOpened"]);
 const uuid = generateUUID();
-const elementId = ref(`reveal-modal-${uuid}`);
-const sequenceIndex = ref(1); // to help track the current sequence index independent of the prop
+const elementId = window.Vue.ref(`reveal-modal-${uuid}`);
+const sequenceIndex = window.Vue.ref(1); // to help track the current sequence index independent of the prop
 let $modal;
 
 /**
  * to open the first modal in sequence
  */
-watch(
+window.Vue.watch(
     () => props.isOpen,
     (isOpen) => {
         if (isOpen) {
@@ -89,7 +88,7 @@ watch(
 /**
  * to move to the next modal in sequence
  */
-watch(
+window.Vue.watch(
     () => props.isNextSelected,
     (isNextSelected) => {
         if (isNextSelected) {

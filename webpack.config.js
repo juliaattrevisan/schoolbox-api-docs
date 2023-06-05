@@ -1,8 +1,9 @@
 const path = require("path");
 const webpack = require("webpack");
-const { VueLoaderPlugin } = require("vue-loader");
-const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts"); //https://www.npmjs.com/package/webpack-remove-empty-scripts
-const { styles } = require("@ckeditor/ckeditor5-dev-utils");
+const { VueLoaderPlugin } = require("vue-loader"); // https://www.npmjs.com/package/vue-loader
+const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts"); // https://www.npmjs.com/package/webpack-remove-empty-scripts
+const { styles } = require("@ckeditor/ckeditor5-dev-utils"); // https://www.npmjs.com/package/@ckeditor/ckeditor5-dev-utils
+const MergeIntoSingleFilePlugin = require("webpack-merge-and-include-globally"); // https://www.npmjs.com/package/webpack-merge-and-include-globally
 
 const babelOptions = {
     presets: [
@@ -23,28 +24,9 @@ const babelOptions = {
 module.exports = {
     entry: {
         // https://webpack.js.org/configuration/entry-context/
-
         main: [
-            // jQuery
-            "./node_modules/jquery/dist/jquery.js",
-
-            // jQuery Validation
-            "./node_modules/jquery-validation/dist/jquery.validate.js",
+            // custom validation built on top of jQuery Validation
             "./www/static/js/form/jquery.alaressValidate.js",
-
-            // jQuery UI
-            // dependencies
-            "./node_modules/jquery-ui/ui/version.js",
-            "./node_modules/jquery-ui/ui/plugin.js",
-            "./node_modules/jquery-ui/ui/widget.js",
-            "./node_modules/jquery-ui/ui/disable-selection.js",
-            "./node_modules/jquery-ui/ui/widgets/mouse.js",
-            // interactions
-            "./node_modules/jquery-ui/ui/widgets/draggable.js",
-            "./node_modules/jquery-ui/ui/widgets/sortable.js",
-
-            // jQueryUI Touch Punch
-            "./node_modules/@andxor/jquery-ui-touch-punch-fix/jquery.ui.touch-punch.js",
 
             // Reforge The Shards of Foundation
             // Choose the specific things we are utilising, rather
@@ -71,17 +53,15 @@ module.exports = {
             "./www/static/js/sidemenu/jquery.touch-menu.js",
             "./www/static/js/sidemenu/jquery.scroll-to.js",
 
-            // CKEditor
+            // Modal and video player replacement
             "./www/static/js/editor/jquery.modal.js",
             "./www/static/js/editor/jquery.proxy-replacement.js",
-            "./node_modules/mediaelement/build/mediaelement-and-player.min.js",
 
             // DateTime
             "./www/static/js/vendors/dayjs/dayjsWithPlugins.js",
 
             // Files And Resource Browser
             "./www/static/js/socialstream/browser/browser.js",
-            "./node_modules/dropzone/dist/dropzone.js",
 
             // Notifier
             "./www/static/js/notifications/jquery.notifier.js",
@@ -104,9 +84,6 @@ module.exports = {
             // Date syncing
             "./www/static/js/alaress-datetime-picker/jquery.sync-dates.js",
 
-            // Flatpickr date selector
-            "./node_modules/flatpickr/dist/flatpickr.js",
-
             // Loads Flatpickr into a modal
             "./www/static/js/alaress-datetime-picker/attacher.datepicker.js",
             "./www/static/js/alaress-datetime-picker/alaress-datetime-picker.js",
@@ -119,38 +96,24 @@ module.exports = {
             "./www/static/js/form/jquery.stallSubmit.js",
 
             // Random Scripts
-            // Various javascripts that are so tiny they didn"t get
+            // Various javascripts that are so tiny they didn't get
             // their own files/plugins
             "./www/static/js/miscellaneous/miscellaneous.js",
 
             // Feature tours
-            "./node_modules/intro.js/intro.js",
             "./www/static/js/tour/tour.js",
 
             // MS Immersive Reader
             "./www/static/js/immersive-reader.js",
 
+            // For exporting a calendar link.
             "./www/static/js/calendar/jquery.getExportCalendarLink.js",
 
+            // Global property storage
             "./www/static/js/global/sbProps.js",
         ],
-        masonry: {
-            import: [
-                // homepage editing
-                "./www/static/js/masonry/jquery.masonry.js",
-                "./www/static/js/masonry/jquery.masonry.colourPicker.js",
-            ],
-            dependOn: "main", // ensures jQuery is loaded prior
-        },
         mage: {
             import: ["./www/static/js/form/jquery.mage.js"],
-            dependOn: "main", // ensures jQuery is loaded prior
-        },
-        dataTables: {
-            import: [
-                "./node_modules/datatables.net/js/jquery.dataTables.js",
-                "./node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js",
-            ],
             dependOn: "main", // ensures jQuery is loaded prior
         },
 
@@ -289,34 +252,10 @@ module.exports = {
         // https://webpack.js.org/configuration/module/
         rules: [
             {
-                test: require.resolve("jquery"),
-                loader: "expose-loader", // see https://webpack.js.org/loaders/expose-loader/ - expose these to the global scope, allowing access to the properties in twig / other JS files
-                options: {
-                    exposes: [
-                        { globalName: "$", override: true },
-                        { globalName: "jQuery", override: true },
-                    ],
-                },
-            },
-            {
-                test: require.resolve("dropzone"),
-                loader: "expose-loader",
-                options: {
-                    exposes: { globalName: "Dropzone", moduleLocalName: "Dropzone", override: true },
-                },
-            },
-            {
-                test: require.resolve("dayjs"),
+                test: require.resolve("dayjs"), // see https://webpack.js.org/loaders/expose-loader/ - expose these to the global scope, allowing access to the properties in twig / other JS files
                 loader: "expose-loader",
                 options: {
                     exposes: { globalName: "dayjs", override: true },
-                },
-            },
-            {
-                test: require.resolve("intro.js"),
-                loader: "expose-loader",
-                options: {
-                    exposes: { globalName: "IntroJs", moduleLocalName: "introJs", override: true },
                 },
             },
             {
@@ -454,11 +393,13 @@ module.exports = {
             },
         ],
     },
+    externals: {
+        vue: "Vue", // as Vue is loaded seperately via a <script> tag, we need to notify webpack that it is available globally, so any .vue files will still bundle as expected
+    },
     cache: true,
     resolve: {
         // https://webpack.js.org/configuration/resolve/
         alias: {
-            vue$: "vue/dist/vue.esm-bundler.js",
             "@schoolboxLibrary": path.resolve(__dirname, "library/Schoolbox"),
             "@schoolboxCalendarEvent": path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
@@ -482,6 +423,40 @@ module.exports = {
             __VUE_PROD_DEVTOOLS__: false,
         }),
         new VueLoaderPlugin(), // to handle .vue files
-        new RemoveEmptyScriptsPlugin(),
+        new RemoveEmptyScriptsPlugin(), // to remove .js files that are empty after exporting css
+        new MergeIntoSingleFilePlugin({
+            // to merge all vendor files into a single file
+            files: {
+                "vendors.js": [
+                    // Vue
+                    "./node_modules/vue/dist/vue.global.prod.js",
+                    // jQuery
+                    "./node_modules/jquery/dist/jquery.min.js",
+                    "./node_modules/jquery-validation/dist/jquery.validate.min.js",
+                    // jQuery UI
+                    "./node_modules/jquery-ui/dist/jquery-ui.min.js",
+                    // jQueryUI Touch Punch
+                    "./node_modules/@andxor/jquery-ui-touch-punch-fix/jquery.ui.touch-punch.js",
+                    // Sound / video player
+                    "./node_modules/mediaelement/build/mediaelement-and-player.min.js",
+                    // For drag/drop of resources
+                    "./node_modules/dropzone/dist/dropzone.js",
+                    // Flatpickr date selector
+                    "./node_modules/flatpickr/dist/flatpickr.min.js",
+                    // For feature tours
+                    "./node_modules/intro.js/minified/intro.min.js",
+                ],
+                "masonry.js": [
+                    // homepage editing
+                    "./www/static/js/masonry/jquery.masonry.js",
+                    "./www/static/js/masonry/jquery.masonry.colourPicker.js",
+                ],
+                "dataTables.js": [
+                    // DataTables
+                    "./node_modules/datatables.net/js/jquery.dataTables.js",
+                    "./node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js",
+                ],
+            },
+        }),
     ],
 };

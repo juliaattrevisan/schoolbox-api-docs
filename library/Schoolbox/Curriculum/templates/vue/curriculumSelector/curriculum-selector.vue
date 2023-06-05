@@ -3,7 +3,6 @@
  * To select Curriculum Nodes to assign to something like a Due Work
  */
 
-import { ref, onMounted, nextTick } from "vue";
 import { ResizeObserver } from "vue3-resize";
 import "vue3-resize/dist/vue3-resize.css";
 import { useStore } from "./store/curriculumSelectorStore";
@@ -68,12 +67,12 @@ const props = defineProps({
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const curriculumSelectorEl = ref(null);
+const curriculumSelectorEl = window.Vue.ref(null);
 
 /**
  * Start loading the curriculum data
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     store.init(props);
     checkContainerWidth();
 });
@@ -82,7 +81,7 @@ onMounted(() => {
  * so can respond to dimenion changes if required
  */
 async function checkContainerWidth() {
-    await nextTick();
+    await window.Vue.nextTick();
     store.updateContainerWidth(curriculumSelectorEl.value.offsetWidth);
 }
 

@@ -32,7 +32,7 @@ $(function () {
 
             if (typeof tour !== "undefined") {
                 // Grab an instance of IntroJS
-                var tourCurrent = IntroJs();
+                var tourCurrent = introJs();
 
                 // The tour object will eventually include steps that aren't just tooltips for IntroJS to render
                 //

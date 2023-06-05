@@ -3,7 +3,6 @@
  * Bulk update the currently selected members access rights
  */
 
-import { ref, watch, computed } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useMembersStore } from "../store/mgMembersStore";
 import { useUpdateMembersStore } from "../store/mgUpdateMembersStore";
@@ -14,13 +13,13 @@ const store = useStore(); //to disable buttons on processing
 const membersStore = useMembersStore(); //to keep track of selectedMembers
 const updateMembersStore = useUpdateMembersStore(); //to update member access
 const rejectMembersStore = useRejectMembersStore(); //to reject the selected members
-const areAllSelectedOnWaitingList = ref(false); //to determine whether we can show the approve membership button if all selected are awaiting membership
-const changeMemberAccess = ref(""); //to bulk update members access rights
+const areAllSelectedOnWaitingList = window.Vue.ref(false); //to determine whether we can show the approve membership button if all selected are awaiting membership
+const changeMemberAccess = window.Vue.ref(""); //to bulk update members access rights
 
 /**
  * if all selected members are on the waiting list we should show for bulk approval
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedMembers,
     () => {
         if (
@@ -40,7 +39,7 @@ watch(
  *
  * @returns { String }
  */
-const appproveButtonText = computed(() => {
+const appproveButtonText = window.Vue.computed(() => {
     if (areAllSelectedOnWaitingList.value && updateMembersStore.isSelectedProcessing) {
         return "Approving...";
     } else {
@@ -87,7 +86,7 @@ updateMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const rejectButtonText = computed(() => {
+const rejectButtonText = window.Vue.computed(() => {
     if (areAllSelectedOnWaitingList.value && rejectMembersStore.isSelectedProcessing) {
         return "Rejecting...";
     } else {

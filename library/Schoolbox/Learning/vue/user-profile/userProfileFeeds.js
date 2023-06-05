@@ -1,21 +1,20 @@
-import { createApp } from "vue";
 import ActivityFeed from "../../Moment/Evidence/vue/feed";
 import GoalFeed from "../../Badge/Award/vue/goal-feed";
 import AchievementFeed from "../../Badge/Award/vue/achievement-feed";
 
-createApp({
+window.Vue.createApp({
     components: {
         ActivityFeed,
     },
 }).mount("#activity-feed");
 
-createApp({
+window.Vue.createApp({
     components: {
         GoalFeed,
     },
 }).mount("#goal-feed");
 
-createApp({
+window.Vue.createApp({
     components: {
         AchievementFeed,
     },

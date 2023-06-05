@@ -5,7 +5,6 @@
  * Classes can also be manually entered, with pressing enter adding matched results
  */
 
-import { ref, computed, onMounted } from "vue";
 import ClassSelectorSelectAll from "./class-selector-select-all";
 import ClassSelectorSearchResult from "./class-selector-search-result";
 import ClassSelectorSelectedClass from "./class-selector-selected-class";
@@ -58,9 +57,9 @@ const props = defineProps({
  *
  ****************************************************************/
 
-const isLoading = ref(true);
-const hasLoadError = ref(false);
-const classes = ref([]); //all the classes data
+const isLoading = window.Vue.ref(true);
+const hasLoadError = window.Vue.ref(false);
+const classes = window.Vue.ref([]); //all the classes data
 
 /**
  * a class has already been previously selected, so the class-selector is not enabled
@@ -68,7 +67,7 @@ const classes = ref([]); //all the classes data
  *
  * @returns { Boolean }
  */
-const hasPreviouslySelectedClass = computed(() => {
+const hasPreviouslySelectedClass = window.Vue.computed(() => {
     return props.previouslySelectedClass.id !== undefined;
 });
 
@@ -77,7 +76,7 @@ const hasPreviouslySelectedClass = computed(() => {
  *
  * @returns { Boolean }
  */
-const isClassSelectorActive = computed(() => {
+const isClassSelectorActive = window.Vue.computed(() => {
     return props.previouslySelectedClass.id === undefined;
 });
 
@@ -86,7 +85,7 @@ const isClassSelectorActive = computed(() => {
  *
  * @returns { String }
  */
-const inputPlaceholder = computed(() => {
+const inputPlaceholder = window.Vue.computed(() => {
     if (isLoading.value) {
         return "Loading classes, please wait...";
     } else if (hasLoadError.value) {
@@ -96,7 +95,7 @@ const inputPlaceholder = computed(() => {
     }
 });
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     if (hasPreviouslySelectedClass.value) {
         //when this is set, the class-selector is disabled from a parent outside this Vue component
         addPreviouslySelectedClass();
@@ -146,19 +145,19 @@ async function loadClassList() {
  *
  ****************************************************************/
 
-const query = ref(""); //the search string to match against
-const queryInputEl = ref(null);
+const query = window.Vue.ref(""); //the search string to match against
+const queryInputEl = window.Vue.ref(null);
 const minQueryLength = 1; //should be able to search for just '3', if we want all of Grade 3
 const CAPPED_RESULTS_LENGTH = 100; //the maximum amount of results to show
-const isResultsCapped = ref(false); //to show a 'refine your search' note
-const resultsNotShownCount = ref(0); //a total of the results not visible in the list
+const isResultsCapped = window.Vue.ref(false); //to show a 'refine your search' note
+const resultsNotShownCount = window.Vue.ref(0); //a total of the results not visible in the list
 
 /**
  * the search string broken into words, to search for each word
  *
  * @returns { Array } the search string broken into single words
  */
-const queryWordList = computed(() => {
+const queryWordList = window.Vue.computed(() => {
     const queryTrimmed = query.value.trim(); //remove any front or back white space
     const re = /\s*(?:,|$)\s*/; //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
     const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
@@ -171,7 +170,7 @@ const queryWordList = computed(() => {
  *
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
-const results = computed(() => {
+const results = window.Vue.computed(() => {
     isResultsCapped.value = false;
     if (query.value.length < minQueryLength) {
         return [];
@@ -197,7 +196,7 @@ const results = computed(() => {
  *
  * @returns { Boolean }
  */
-const showSelectAll = computed(() => {
+const showSelectAll = window.Vue.computed(() => {
     return results.value.length > 1;
 });
 
@@ -225,7 +224,7 @@ function searchForName(classItem) {
  *
  ****************************************************************/
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     initKeyboardEvents();
     initMouseEvents();
 });
@@ -262,7 +261,7 @@ function onEnterKeySelected() {
     clearInput();
 }
 
-const classSelectorEl = ref(null);
+const classSelectorEl = window.Vue.ref(null);
 
 /**
  * to be able to close the search results
@@ -289,14 +288,14 @@ function clearInput() {
  *
  ****************************************************************/
 
-const selectedClasses = ref([]); //the classes currently selected
+const selectedClasses = window.Vue.ref([]); //the classes currently selected
 
 /**
  * determine display of elements based on whether any classes are selected
  *
  * @returns { Boolean } all relevant search results, once we've reached the minQueryLength
  */
-const hasSelectedClasses = computed(() => {
+const hasSelectedClasses = window.Vue.computed(() => {
     return selectedClasses.value.length > 0;
 });
 
@@ -305,7 +304,7 @@ const hasSelectedClasses = computed(() => {
  *
  * @returns { String }
  */
-const selectedClassIds = computed(() => {
+const selectedClassIds = window.Vue.computed(() => {
     const selectedClassIdList = selectedClasses.value.map((selectedClasss) => selectedClasss.id);
     return selectedClassIdList.join(",");
 });
@@ -343,7 +342,7 @@ function toggleResult(toggledClass) {
  *
  * @returns { Boolean }
  */
-const isAllResultsSelected = computed(() => {
+const isAllResultsSelected = window.Vue.computed(() => {
     if (selectedClasses.value.length > 0) {
         const alreadySelectedClasses = results.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
         return alreadySelectedClasses.length === results.value.length ? true : false;
@@ -357,7 +356,7 @@ const isAllResultsSelected = computed(() => {
  *
  * @returns { Boolean }
  */
-const isSomeResultsSelected = computed(() => {
+const isSomeResultsSelected = window.Vue.computed(() => {
     if (selectedClasses.value.length > 0) {
         const alreadySelectedClasses = results.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
         return alreadySelectedClasses.length >= 1 && alreadySelectedClasses.length !== results.value.length

@@ -3,7 +3,6 @@
  * To cancel or confirm the current node selection
  */
 
-import { computed } from "vue";
 import { useModalStore } from "../store/csModalStore";
 import { useSelectedNodesStore } from "../store/csSelectedNodesStore";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
@@ -33,7 +32,7 @@ function onSelected() {
  *
  * @returns { String }
  */
-const saveText = computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Update"));
+const saveText = window.Vue.computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Update"));
 
 /**
  * If there's no nodes currently selected and we haven't selected any
@@ -41,7 +40,7 @@ const saveText = computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Upd
  *
  * @returns { String }
  */
-const isSaveDisabled = computed(() => selectedNodesStore.hasNoNodes && modalSelectedNodesStore.hasNoNodes);
+const isSaveDisabled = window.Vue.computed(() => selectedNodesStore.hasNoNodes && modalSelectedNodesStore.hasNoNodes);
 </script>
 
 <template>

@@ -2,7 +2,6 @@
  * Handles the store add a new subsection to an existing node
  */
 
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
@@ -40,10 +39,10 @@ function getFormData(subsection: Partial<Node>, node: Node) {
 }
 
 export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
-    const isProcessing = ref(false);
-    const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const subsection = ref<Partial<Node>>(getSubsection());
-    const id = ref(UNSET_ID); // the id of the last updated node
+    const isProcessing = window.Vue.ref(false);
+    const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
+    const subsection = window.Vue.ref<Partial<Node>>(getSubsection());
+    const id = window.Vue.ref(UNSET_ID); // the id of the last updated node
 
     /**
      * to display a prompt to confirm adding a node to a subsection

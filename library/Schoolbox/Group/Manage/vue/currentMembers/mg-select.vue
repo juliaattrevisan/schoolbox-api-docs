@@ -4,7 +4,6 @@
  * on the members currently selected
  */
 
-import { ref, computed, watch, onMounted } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useMembersStore } from "../store/mgMembersStore";
 import { useRemoveMembersStore } from "../store/mgRemoveMembersStore";
@@ -15,10 +14,10 @@ import Endpoints from "../mgEndpoints";
 const store = useStore(); //to disable butons on processing
 const membersStore = useMembersStore(); //to keep track of selectedMembers
 const removeMembersStore = useRemoveMembersStore(); //to remove selectedMembers
-const isShiftKeySelected = ref(false);
-const shiftSelectNoteEl = ref(null);
+const isShiftKeySelected = window.Vue.ref(false);
+const shiftSelectNoteEl = window.Vue.ref(null);
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     initShiftKeyDetection();
 });
 
@@ -41,7 +40,7 @@ function initShiftKeyDetection() {
 /**
  * remove the note once a selection with shift key down has been detected
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedMembers,
     () => {
         if (membersStore.selectedMembers.length > 1 && isShiftKeySelected.value) {
@@ -56,7 +55,7 @@ watch(
  *
  * @returns { String }
  */
-const selectedMembersCountWithRowName = computed(() => {
+const selectedMembersCountWithRowName = window.Vue.computed(() => {
     if (membersStore.selectedMembersCount === 0) {
         return `No Members`;
     } else {

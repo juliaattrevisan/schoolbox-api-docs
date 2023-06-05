@@ -3,7 +3,6 @@
  * To be able to enable/disable or delete a node
  */
 
-import { computed } from "vue";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
@@ -20,7 +19,7 @@ const selectedNodesStore = useSelectedNodesStore();
  *
  * @returns { boolean } whether the checkbox should be disabled
  */
-const isDisabled = computed(() => {
+const isDisabled = window.Vue.computed(() => {
     return selectedNodesStore.childNodesIds.includes(props.node.id) || props.isActive;
 });
 
@@ -29,7 +28,7 @@ const isDisabled = computed(() => {
  *
  * @returns { boolean }
  */
-const isChecked = computed(() => {
+const isChecked = window.Vue.computed(() => {
     return (
         selectedNodesStore.nodesIds.includes(props.node.id) || selectedNodesStore.childNodesIds.includes(props.node.id)
     );

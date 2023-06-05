@@ -2,7 +2,6 @@
 import Toast from "@schoolboxVue/components/toast";
 import mixinFilter from "@schoolboxVue/mixins/filter";
 import { stringify } from "qs";
-import { reactive } from "vue";
 
 const SORT_OPTION_CREATED = "created";
 const SORT_OPTION_OCCURRED = "occurred";
@@ -152,7 +151,7 @@ export default {
             if (response.ok) {
                 const jsonResponse = await response.json();
                 this.data[studentIndex].records.data = this.data[studentIndex].records.data.concat(jsonResponse.data);
-                this.data[studentIndex].records.metadata = reactive(jsonResponse.metadata);
+                this.data[studentIndex].records.metadata = window.Vue.reactive(jsonResponse.metadata);
                 this.$refs.toast.timeout("Loaded", true);
             } else {
                 this.$refs.toast.timeout("Loading failed", false);

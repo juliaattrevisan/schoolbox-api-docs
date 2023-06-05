@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import NewsItemFormActions from "./news-item-form-actions";
 
-createApp({
+window.Vue.createApp({
     components: {
         NewsItemFormActions,
     },

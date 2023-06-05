@@ -4,7 +4,6 @@
  * From here curriclum nodes can be selected
  */
 
-import { ref, watch } from "vue";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
@@ -14,8 +13,8 @@ import CsModalNode from "./cs-modal-node.vue";
 const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
 const nodesStore = useNodesStore();
-const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
-const nodesContainerEl = ref(null); //to scroll back to top on any selection change
+const depth = window.Vue.ref(0); //to increment each time we go down the node tree to visually indicate children
+const nodesContainerEl = window.Vue.ref(null); //to scroll back to top on any selection change
 
 /**
  * Clear the current search query
@@ -28,7 +27,7 @@ function onClearSearchSelected() {
  * to scroll back to top on any selection change, otherwise the
  * scroll may be at the bottom on change, which is a bit odd
  */
-watch(
+window.Vue.watch(
     () => modalViewNodesStore.nodes,
     () => {
         if (nodesContainerEl.value) {

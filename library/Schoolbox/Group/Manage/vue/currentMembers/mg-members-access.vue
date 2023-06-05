@@ -3,7 +3,6 @@
  * To view and update each members status
  */
 
-import { ref, computed } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useUpdateMembersStore } from "../store/mgUpdateMembersStore";
 import { useRejectMembersStore } from "../store/mgRejectMembersStore";
@@ -20,7 +19,7 @@ const props = defineProps({
 });
 
 const store = useStore();
-const isProcessing = ref(false); //so only the just selected member is active
+const isProcessing = window.Vue.ref(false); //so only the just selected member is active
 
 /*****************************************************************
  *
@@ -36,7 +35,7 @@ const updateMembersStore = useUpdateMembersStore();
  *
  * @returns { String }
  */
-const approveButtonText = computed(() =>
+const approveButtonText = window.Vue.computed(() =>
     updateMembersStore.isProcessing && isProcessing.value ? "Approving..." : "Approve"
 );
 
@@ -93,7 +92,7 @@ const rejectMembersStore = useRejectMembersStore();
  *
  * @returns { String }
  */
-const rejectButtonText = computed(() =>
+const rejectButtonText = window.Vue.computed(() =>
     rejectMembersStore.isProcessing && isProcessing.value ? "Rejecting..." : "Reject"
 );
 

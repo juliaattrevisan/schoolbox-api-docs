@@ -3,7 +3,6 @@
  * To search the currently selected curriculum node
  */
 
-import { computed, watch } from "vue";
 import debounce from "lodash/debounce";
 import { useViewNodesStore } from "../viewNodes/store/mcViewNodesStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mcSearchStore";
@@ -26,14 +25,14 @@ const searchStore = useSearchStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !viewNodesStore.isActive || props.isDisabled);
+const isDisabled = window.Vue.computed(() => !viewNodesStore.isActive || props.isDisabled);
 
 /**
  * Only enable search once a first node is selected
  *
  * @returns { String }
  */
-const placeholder = computed(() => {
+const placeholder = window.Vue.computed(() => {
     if (!viewNodesStore.isActive) {
         return "Expand a curriculum to enable search...";
     } else {
@@ -44,7 +43,7 @@ const placeholder = computed(() => {
 /**
  * start searching once the search is active, watching the query string for input
  */
-watch(
+window.Vue.watch(
     () => searchStore.query,
     () => {
         if (searchStore.isActive) {

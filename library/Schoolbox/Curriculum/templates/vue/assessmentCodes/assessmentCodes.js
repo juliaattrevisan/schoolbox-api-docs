@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import AssessmentCodes from "./assessment-codes";
 
-createApp({
+window.Vue.createApp({
     components: {
         AssessmentCodes,
     },

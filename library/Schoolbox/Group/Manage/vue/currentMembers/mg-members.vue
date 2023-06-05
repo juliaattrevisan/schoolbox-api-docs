@@ -3,7 +3,6 @@
  * Display the group members in a table display
  */
 
-import { ref, watch, nextTick } from "vue";
 import { EventBus } from "v-tables-3-select-rows";
 import { useMembersStore } from "../store/mgMembersStore";
 import { useStore } from "../store/manageGroupStore";
@@ -22,7 +21,7 @@ import AccessTypes from "./mgAccessTypes";
 
 const membersStore = useMembersStore();
 const store = useStore();
-const tableEl = ref(null);
+const tableEl = window.Vue.ref(null);
 const tableColumns = [
     "name",
     "firstName",
@@ -142,7 +141,7 @@ async function onLoaded() {
  * options is always available and are visible on mobile
  */
 async function addSearchNote() {
-    await nextTick(); //ensure the dom is updated
+    await window.Vue.nextTick(); //ensure the dom is updated
     const searchNote = document.createElement("p");
     searchNote.classList.add("meta");
     searchNote.style.marginTop = "0.25rem";
@@ -171,7 +170,7 @@ function onRowSelected(currentSelection) {
  * ensure the table selection is also cleared when 'Clear Selection' is selected
  * or when the selected members have been removed
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedMembers,
     (newSelectedMembers, oldSelectedMembers) => {
         if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) {
@@ -190,7 +189,7 @@ watch(
 /**
  * to update the table display based on the selected filters change
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedFilters,
     (newSelectedFilters, oldSelectedFilters) => {
         let selectedFilter = []; //to membersStore the filter that has been toggled

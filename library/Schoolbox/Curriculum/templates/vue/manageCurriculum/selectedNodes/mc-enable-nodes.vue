@@ -3,7 +3,6 @@
  * To be able to enabled a node on confirmation
  */
 
-import { ref, computed, watch } from "vue";
 import { useStore } from "../store/manageCurriculumStore";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";
@@ -12,12 +11,12 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const enableNodesStore = useEnableNodesStore();
-const modalEl = ref(null);
+const modalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => enableNodesStore.isOpen,
     (isOpen) => {
         isOpen ? modalEl.value.open() : modalEl.value.close();
@@ -54,7 +53,7 @@ enableNodesStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const enabledButtonText = computed(() => {
+const enabledButtonText = window.Vue.computed(() => {
     if (enableNodesStore.isProcessing && enableNodesStore.enabled) {
         return "Enabling...";
     } else if (enableNodesStore.isProcessing && !enableNodesStore.enabled) {
@@ -70,7 +69,7 @@ const enabledButtonText = computed(() => {
  *
  * @returns { Boolean }
  */
-const isModalDisabled = computed(() => enableNodesStore.isProcessing);
+const isModalDisabled = window.Vue.computed(() => enableNodesStore.isProcessing);
 
 /**
  * to close the modal

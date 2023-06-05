@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import RecordMediaModal from "./record-media-modal";
 
-createApp({
+window.Vue.createApp({
     components: {
         RecordMediaModal,
     },

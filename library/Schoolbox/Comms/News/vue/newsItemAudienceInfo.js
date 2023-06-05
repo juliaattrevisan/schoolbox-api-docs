@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import NewsItemAudienceInfo from "./news-item-audience-info";
 
-createApp({
+window.Vue.createApp({
     components: {
         NewsItemAudienceInfo,
     },

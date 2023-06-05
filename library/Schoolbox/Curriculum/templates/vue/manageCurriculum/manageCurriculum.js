@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import ManageCurriculum from "./manage-curriculum";
 import { createPinia } from "pinia";
-createApp({
+window.Vue.createApp({
     components: {
         ManageCurriculum,
     },

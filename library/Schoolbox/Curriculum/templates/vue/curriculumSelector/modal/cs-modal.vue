@@ -3,7 +3,6 @@
  * The modal that's used to help select curriculum
  */
 
-import { ref, watch } from "vue";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import BadgeDetail from "@schoolboxBadge/vue/badgeDetail.vue";
@@ -15,15 +14,15 @@ import CsModalNodes from "./cs-modal-nodes.vue";
 import CsModalFooter from "./cs-modal-footer.vue";
 
 const modalStore = useModalStore();
-const isNextSelected = ref(false); // to move to the next modal if a badge usage is selected
+const isNextSelected = window.Vue.ref(false); // to move to the next modal if a badge usage is selected
 const modalNodeUsageStore = useModalNodeUsageStore();
-const selectedNodeDetails = ref(getEmptyNode());
+const selectedNodeDetails = window.Vue.ref(getEmptyNode());
 
 /**
  * to show the selected badge that has been selected in a linked usage
  * from cs-modal-node-usage-details
  */
-watch(
+window.Vue.watch(
     () => modalStore.selectedBadge,
     (newValue, oldValue) => {
         if (newValue && newValue !== oldValue) {

@@ -3,7 +3,6 @@
  * A single search result that be selected / unselected with a checkbox status
  */
 
-import { computed } from "vue";
 import { escapeRegExp } from "@js/util/jsUtils";
 import { useSearchStore } from "./store/csSearchStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
@@ -30,7 +29,7 @@ const props = defineProps({
  *
  * @returns { String }
  */
-const title = computed(() => {
+const title = window.Vue.computed(() => {
     if (props.result.code && props.result.code !== "") {
         return `[${props.result.code}] ${props.result.name}`;
     } else {
@@ -43,7 +42,7 @@ const title = computed(() => {
  *
  * @returns { HTML }
  */
-const highlightTitleSearch = computed(() => highlightSearchInElement(title.value));
+const highlightTitleSearch = window.Vue.computed(() => highlightSearchInElement(title.value));
 
 /**
  * To highlight where the search string matches within the settings result
@@ -69,7 +68,7 @@ function highlightSearchInElement(toHighlight) {
  *
  * @returns { Boolean }
  */
-const isNodeSelected = computed(() => {
+const isNodeSelected = window.Vue.computed(() => {
     return selectedNodesStore.nodes.some((node) => props.result.id === node.id);
 });
 

@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import ClassList from "./class-list";
 
-createApp({
+window.Vue.createApp({
     components: {
         ClassList,
     },

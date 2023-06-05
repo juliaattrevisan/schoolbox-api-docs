@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import AdminSettingsSearch from "./admin-settings-search";
 
-createApp({
+window.Vue.createApp({
     components: {
         AdminSettingsSearch,
     },

@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import BadgeListForm from "./badge-list-form";
 
-createApp({
+window.Vue.createApp({
     components: {
         BadgeListForm,
     },

@@ -3,7 +3,6 @@
  * To display a single activity linked to a node
  */
 
-import { computed } from "vue";
 import type {
     Usage,
     CourseUsageObject,
@@ -25,7 +24,7 @@ const emit = defineEmits(["select"]);
 /**
  * To get the icon for the usage
  */
-const usageIcon = computed(() => {
+const usageIcon = window.Vue.computed(() => {
     if (props.usage.discriminator === ActivityTypes.LEARNING_ACTIVITY) {
         // there's various types of learning activity icons
         return getUsageIcon(props.usage.object.type);

@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import CalendarComponent from "./calendar-component.vue";
 
 const calendars = document.querySelectorAll('[id^="calendar-"]');
@@ -14,7 +13,7 @@ calendars.forEach((calendar) => {
      * that as a flag
      */
     if (!calendar.hasAttribute("data-loaded")) {
-        createApp({
+        window.Vue.createApp({
             components: {
                 CalendarComponent,
             },

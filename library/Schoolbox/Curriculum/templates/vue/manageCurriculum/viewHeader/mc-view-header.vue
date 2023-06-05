@@ -3,7 +3,6 @@
  * The header containing the breadcrumbs and search input
  */
 
-import { computed } from "vue";
 import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
@@ -22,7 +21,7 @@ const nodesStore = useNodesStore();
  *
  * @returns { boolean }
  */
-const isDisabled = computed(
+const isDisabled = window.Vue.computed(
     () => nodeUsageStore.isOpen || updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading
 );
 </script>

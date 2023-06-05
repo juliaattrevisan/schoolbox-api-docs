@@ -2,15 +2,14 @@
  * To request further details on a nodes usage
  */
 
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useActiveNodeStore } from "./mcActiveNodeStore";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 
 export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
-    const isProcessing = ref(false);
-    const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const hasLoadError = ref(false);
+    const isProcessing = window.Vue.ref(false);
+    const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
+    const hasLoadError = window.Vue.ref(false);
 
     /**
      * retrieve all the details of the nodes usage

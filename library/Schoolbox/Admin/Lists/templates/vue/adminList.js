@@ -1,8 +1,7 @@
-import { createApp } from "vue";
 import { createPinia } from "pinia";
 import AdminList from "./admin-list";
 
-createApp({
+window.Vue.createApp({
     components: {
         AdminList,
     },

@@ -4,7 +4,6 @@
  * further details revealed via a modal
  */
 
-import { computed } from "vue";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 
@@ -33,7 +32,7 @@ const selectedNodesStore = useSelectedNodesStore();
  *
  * @returns { boolean }
  */
-const isDisabled = computed(() => selectedNodesStore.isLoading);
+const isDisabled = window.Vue.computed(() => selectedNodesStore.isLoading);
 
 /**
  * To open a modal that shows further info on the selected node

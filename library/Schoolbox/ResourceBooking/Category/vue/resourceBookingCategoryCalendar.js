@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import ResourceBookingCategoryCalendar from "./resource-booking-category-calendar";
 
-createApp({
+window.Vue.createApp({
     components: {
         ResourceBookingCategoryCalendar,
     },

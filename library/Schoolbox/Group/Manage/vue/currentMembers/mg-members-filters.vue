@@ -3,16 +3,15 @@
  * So we can easily filter group members by access type
  */
 
-import { computed } from "vue";
 import filterTypes from "./mgAccessTypes";
 import { useMembersStore } from "../store/mgMembersStore";
 
 const membersStore = useMembersStore(); //to access the selectedFilters and notify of any changes
 
-const isShowWaitingListChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.WAITING));
-const isShowReadAccessChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.READ));
-const isShowWriteAccessChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.WRITE));
-const isShowAdminAccessChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.ADMIN));
+const isShowWaitingListChecked = window.Vue.computed(() => membersStore.selectedFilters.includes(filterTypes.WAITING));
+const isShowReadAccessChecked = window.Vue.computed(() => membersStore.selectedFilters.includes(filterTypes.READ));
+const isShowWriteAccessChecked = window.Vue.computed(() => membersStore.selectedFilters.includes(filterTypes.WRITE));
+const isShowAdminAccessChecked = window.Vue.computed(() => membersStore.selectedFilters.includes(filterTypes.ADMIN));
 
 /**
  * Dispatch to filter the member display

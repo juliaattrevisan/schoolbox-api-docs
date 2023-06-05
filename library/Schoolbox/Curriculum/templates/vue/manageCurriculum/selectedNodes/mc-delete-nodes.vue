@@ -3,7 +3,6 @@
  * To be able to delete a node on confirmation
  */
 
-import { ref, computed, watch } from "vue";
 import { useStore } from "../store/manageCurriculumStore";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
@@ -12,12 +11,12 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const deleteNodesStore = useDeleteNodesStore();
-const modalEl = ref(null);
+const modalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => deleteNodesStore.isOpen,
     (isOpen) => {
         isOpen ? modalEl.value.open() : modalEl.value.close();
@@ -54,7 +53,7 @@ deleteNodesStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const deleteButtonText = computed(() => (deleteNodesStore.isProcessing ? "Deleting..." : "Yes"));
+const deleteButtonText = window.Vue.computed(() => (deleteNodesStore.isProcessing ? "Deleting..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -62,7 +61,7 @@ const deleteButtonText = computed(() => (deleteNodesStore.isProcessing ? "Deleti
  *
  * @returns { Boolean }
  */
-const isModalDisabled = computed(() => deleteNodesStore.isProcessing);
+const isModalDisabled = window.Vue.computed(() => deleteNodesStore.isProcessing);
 
 /**
  * to close the modal

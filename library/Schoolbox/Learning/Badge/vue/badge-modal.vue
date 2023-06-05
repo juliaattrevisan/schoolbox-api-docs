@@ -4,7 +4,6 @@
  * then a selected curriculum code details
  */
 
-import { ref } from "vue";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
@@ -28,8 +27,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["closed"]);
-const isNextSelected = ref(false);
-const selectedNodeDetails = ref(getEmptyNode());
+const isNextSelected = window.Vue.ref(false);
+const selectedNodeDetails = window.Vue.ref(getEmptyNode());
 
 /**
  * a code has been selected in the detail modal

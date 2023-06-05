@@ -4,7 +4,6 @@
  * or to CRUD via the actions
  */
 
-import { ref, computed, onMounted } from "vue";
 import { gsap } from "gsap/all";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";
@@ -47,12 +46,12 @@ const modalViewNodesStore = useModalViewNodesStore();
 const modalActiveNodeStore = useModalActiveNodeStore();
 const modalSearchStore = useModalSearchStore();
 const modalNodeUsageStore = useModalNodeUsageStore();
-const viewNodeEl = ref(null); //to animate the node
+const viewNodeEl = window.Vue.ref(null); //to animate the node
 
 /**
  * to animate on the node
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     if (props.depth === 0) {
         //we only need to animate the first node, as the rest are contained within
         animateOn();
@@ -82,14 +81,14 @@ function animateOn() {
  *
  * @returns { Number }
  */
-const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * To better highlight the current top level node from its children
  *
  * @returns { String }
  */
-const borderBottomColour = computed(() => {
+const borderBottomColour = window.Vue.computed(() => {
     if (modalSearchStore.isActive || props.depth !== 0) {
         return `var(--body-background)`;
     } else if (props.depth === 0) {
@@ -102,28 +101,34 @@ const borderBottomColour = computed(() => {
  *
  * @returns { Boolean }
  */
-const showChildren = computed(() => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2);
+const showChildren = window.Vue.computed(
+    () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2
+);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.node.code && props.node.code !== "");
+const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { String }
  */
-const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
+const title = window.Vue.computed(() =>
+    hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`
+);
 
 /**
  * If there's another node being viewed
  *
  * @returns { boolean }
  */
-const isViewingAnother = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id);
+const isViewingAnother = window.Vue.computed(
+    () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id
+);
 
 /**
  * Whether the usage should be displayed, shouldn't be if the modal is currently closed,
@@ -131,14 +136,16 @@ const isViewingAnother = computed(() => modalNodeUsageStore.isOpen && modalActiv
  *
  * @returns { boolean }
  */
-const showUsage = computed(() => modalStore.isOpen && props.node.id !== UNSET_ID);
+const showUsage = window.Vue.computed(() => modalStore.isOpen && props.node.id !== UNSET_ID);
 
 /**
  * If this is the active node being viewed
  *
  * @returns { boolean }
  */
-const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id);
+const isViewing = window.Vue.computed(
+    () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id
+);
 </script>
 
 <template>

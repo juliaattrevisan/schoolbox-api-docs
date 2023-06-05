@@ -3,20 +3,19 @@
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch, onMounted } from "vue";
 import { useStore } from "./store/manageGroupStore";
 import { useSettingsStore } from "./store/mgSettingsStore";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 const store = useStore();
 const settingsStore = useSettingsStore();
-const updateModalEl = ref(null);
+const updateModalEl = window.Vue.ref(null);
 
 /**
  * we want to force the setting of the Access on the group
  * straight away if it's not already set
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     if (settingsStore.isAccessNotSet) {
         settingsStore.isPromptOpen = true;
         let href = window.location.href;
@@ -29,7 +28,7 @@ onMounted(() => {
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => settingsStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? updateModalEl.value.open() : updateModalEl.value.close();
@@ -66,7 +65,7 @@ settingsStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const updateButtonText = computed(() => (settingsStore.isProcessing ? "Updating..." : "Update"));
+const updateButtonText = window.Vue.computed(() => (settingsStore.isProcessing ? "Updating..." : "Update"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -74,7 +73,7 @@ const updateButtonText = computed(() => (settingsStore.isProcessing ? "Updating.
  *
  * @returns { Boolean }
  */
-const isUpdateModalDisabled = computed(() => settingsStore.isProcessing);
+const isUpdateModalDisabled = window.Vue.computed(() => settingsStore.isProcessing);
 
 /**
  * to close the modal

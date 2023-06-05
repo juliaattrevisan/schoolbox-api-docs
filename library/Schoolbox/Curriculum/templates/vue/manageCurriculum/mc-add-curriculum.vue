@@ -3,7 +3,6 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { computed, watch } from "vue";
 import { useStore } from "./store/manageCurriculumStore";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
 import { useDescriptionEditor } from "./composable/useDescriptionEditor";
@@ -16,7 +15,7 @@ const addCurriculumStore = useAddCurriculumStore();
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `new-curriculum`);
+const ckeditorInstance = window.Vue.computed(() => `new-curriculum`);
 
 /**
  * Use a customised ckeditor for the description field
@@ -29,7 +28,7 @@ const descriptionField = useDescriptionEditor(
 /**
  * And watch for changes on this field so we can update the description in the store
  */
-watch(descriptionField, (newValue: string) => {
+window.Vue.watch(descriptionField, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;
 });
 
@@ -39,7 +38,7 @@ watch(descriptionField, (newValue: string) => {
  *
  * @returns { String }
  */
-const addButtonText = computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
+const addButtonText = window.Vue.computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
 
 /**
  * submit save
@@ -76,7 +75,7 @@ function onCancelSelected() {
  *
  * @returns { Boolean }
  */
-const isAddDisabled = computed(() => {
+const isAddDisabled = window.Vue.computed(() => {
     if (typeof addCurriculumStore.curriculum.name === "string") {
         return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
     }

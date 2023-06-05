@@ -4,7 +4,6 @@
  * From here curriclum codes can be selected for further travesal or editing
  */
 
-import { ref, watch } from "vue";
 import { useNodesStore } from "../store/mcNodesStore";
 import { useViewNodesStore } from "./store/mcViewNodesStore";
 import { useSearchStore } from "../store/mcSearchStore";
@@ -14,8 +13,8 @@ import McViewNode from "./mc-view-node.vue";
 const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 const searchStore = useSearchStore();
-const depth = ref(0); // to increment each time we go down the node tree to visually indicate children
-const nodesContainerEl = ref<HTMLDivElement | null>(null); // to scroll back to top on any selection change
+const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
+const nodesContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // to scroll back to top on any selection change
 
 /**
  * Clear the current search query
@@ -28,7 +27,7 @@ function onClearSearchSelected() {
  * to scroll back to top on any selection change, otherwise the
  * scroll may be at the bottom on change, which is a bit odd
  */
-watch(
+window.Vue.watch(
     () => viewNodesStore.nodesWithSearch,
     () => {
         if (nodesContainerEl.value) {
@@ -47,11 +46,7 @@ watch(
         <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
             <i class="icon-curriculum"></i>
             <p>No Curriculum matches your current search.</p>
-            <button
-                title="Clear the current search"
-                data-test-clear-search
-                @click.prevent="onClearSearchSelected"
-            >
+            <button title="Clear the current search" data-test-clear-search @click.prevent="onClearSearchSelected">
                 Clear search
             </button>
         </div>

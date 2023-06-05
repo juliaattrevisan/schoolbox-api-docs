@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import PastoralClassReport from "./pastoral-class-report.vue";
 
-createApp({
+window.Vue.createApp({
     components: {
         PastoralClassReport,
     },

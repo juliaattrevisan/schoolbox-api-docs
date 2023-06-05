@@ -3,7 +3,6 @@
  * To search for members to add
  */
 
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import debounce from "lodash/debounce";
 import { useAddMembersStore } from "../store/mgAddMembersStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mgSearchStore";
@@ -12,14 +11,14 @@ import MgSearchResults from "./mg-search-results.vue";
 
 const addMembersStore = useAddMembersStore();
 const searchStore = useSearchStore();
-const searchEl = ref(null);
+const searchEl = window.Vue.ref(null);
 
 /**
  * Update the input place holder text depending on the currentFromSelect
  *
  * @returns { String }
  */
-const inputPlaceholder = computed(() => {
+const inputPlaceholder = window.Vue.computed(() => {
     const placeholderOptions = {
         [FromTypes.NAME]: "Search users...",
         [FromTypes.GROUP]: "Search groups...",
@@ -32,7 +31,7 @@ const inputPlaceholder = computed(() => {
 /**
  * add relevant keyboard and mouse events
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     document.addEventListener("keyup", onKeyUp);
     document.addEventListener("click", onMouseClick);
 });
@@ -40,7 +39,7 @@ onMounted(() => {
 /**
  * remove relevant keyboard and mouse events
  */
-onUnmounted(() => {
+window.Vue.onUnmounted(() => {
     document.removeEventListener("keyup", onKeyUp);
     document.removeEventListener("click", onMouseClick);
 });
@@ -91,7 +90,7 @@ function onMouseClick(event) {
 /**
  * start searching once the search is active, watching the query string for input
  */
-watch(
+window.Vue.watch(
     () => searchStore.query,
     () => {
         if (searchStore.isSearchActive) {

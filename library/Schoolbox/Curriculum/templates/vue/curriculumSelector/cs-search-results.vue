@@ -4,15 +4,14 @@
  * button to easily add/remove all search results
  */
 
-import { ref, watch, computed, nextTick } from "vue";
 import { gsap } from "gsap/all";
 import { useSearchStore } from "./store/csSearchStore";
 import CsSelectAllSearchResults from "./cs-select-all-search-results.vue";
 import CsSearchResult from "./cs-search-result.vue";
 
 const searchStore = useSearchStore();
-const searchResultsContainerEl = ref(null);
-const searchResultsEl = ref(null);
+const searchResultsContainerEl = window.Vue.ref(null);
+const searchResultsEl = window.Vue.ref(null);
 
 /**
  * show select all option for adding / removing codes only if there's
@@ -20,17 +19,17 @@ const searchResultsEl = ref(null);
  *
  * @returns { Boolean }
  */
-const showSelectAll = computed(() => {
+const showSelectAll = window.Vue.computed(() => {
     return searchStore.filteredResults.length > 1;
 });
 
 /**
  * to slide up and down the search results
  */
-watch(
+window.Vue.watch(
     () => searchStore.filteredResults,
     () => {
-        nextTick(() => {
+        window.Vue.nextTick(() => {
             const targetHeight = searchResultsEl.value.offsetHeight;
             gsap.to(searchResultsContainerEl.value, {
                 duration: 0.3,
@@ -66,7 +65,7 @@ watch(
 
 <style lang="scss" scoped>
 .search-results-container {
-    height: 0; //will animate the results within with the watch() above
+    height: 0; //will animate the results within with the window.Vue.watch() above
     position: relative;
     overflow: hidden;
 }

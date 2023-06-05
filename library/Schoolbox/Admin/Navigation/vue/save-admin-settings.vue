@@ -7,8 +7,6 @@
 
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
 import debounce from "lodash/debounce";
-import { ref, computed, onMounted } from "vue";
-
 const props = defineProps({
     formId: {
         //the id of the form to listen to changes to
@@ -27,19 +25,19 @@ const props = defineProps({
     },
 });
 
-const saveContainer = ref(null);
-const hasFormDataChange = ref(false);
-const isAtBottomOfPage = ref(false);
-const initialFormDataValues = ref("");
-const currentFormDataValues = ref("");
+const saveContainer = window.Vue.ref(null);
+const hasFormDataChange = window.Vue.ref(false);
+const isAtBottomOfPage = window.Vue.ref(false);
+const initialFormDataValues = window.Vue.ref("");
+const currentFormDataValues = window.Vue.ref("");
 
 /**
  * Only show the save button if there's a form data change
  * or the bottom of the page is visible
  */
-const showSaveButton = computed(() => hasFormDataChange.value || isAtBottomOfPage.value);
+const showSaveButton = window.Vue.computed(() => hasFormDataChange.value || isAtBottomOfPage.value);
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     initIntersectionObserver();
     initFormData();
     initFormChangeListeners();

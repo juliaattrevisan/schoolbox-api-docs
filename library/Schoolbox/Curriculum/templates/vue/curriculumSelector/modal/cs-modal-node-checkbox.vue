@@ -3,7 +3,6 @@
  * to select a node within the current modal session
  */
 
-import { computed } from "vue";
 import { generateUUID } from "@js/util/jsUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
@@ -33,28 +32,28 @@ const props = defineProps({
  *
  * @returns { Boolean }
  */
-const isIdSet = computed(() => props.node.id !== UNSET_ID);
+const isIdSet = window.Vue.computed(() => props.node.id !== UNSET_ID);
 
 /**
  * If there's a code available, which means it can be selected
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.node.code && props.node.code !== "");
+const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Only show the checkbox if the node has an id and a code
  *
  * @returns { Boolean }
  */
-const isVisible = computed(() => isIdSet.value && hasCode.value);
+const isVisible = window.Vue.computed(() => isIdSet.value && hasCode.value);
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => modalSelectedNodesStore.isSelected(props.node));
+const isChecked = window.Vue.computed(() => modalSelectedNodesStore.isSelected(props.node));
 
 /**
  * add or remove based on the current status

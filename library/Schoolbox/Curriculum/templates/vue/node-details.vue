@@ -3,7 +3,6 @@
  * To view all details including breadcrumbs and description on a curriculum node
  */
 
-import { ref, computed, watch } from "vue";
 import { getBreadcrumbs, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 const props = defineProps({
@@ -16,15 +15,15 @@ const props = defineProps({
     },
 });
 
-const isActive = ref(false);
-const node = ref(null);
-const isLoading = ref(true);
-const hasLoadError = ref(false);
+const isActive = window.Vue.ref(false);
+const node = window.Vue.ref(null);
+const isLoading = window.Vue.ref(true);
+const hasLoadError = window.Vue.ref(false);
 
 /**
  * when there's a new node, we should load all the details to display
  */
-watch(
+window.Vue.watch(
     () => props.node,
     (newNode) => {
         if (newNode.id === UNSET_ID) {
@@ -67,7 +66,7 @@ async function load() {
  *
  * @returns { String }
  */
-const title = computed(() => {
+const title = window.Vue.computed(() => {
     if (node.value?.code && node.value.code !== "") {
         return `[${node.value.code}] ${node.value.name}`;
     } else {
@@ -80,7 +79,7 @@ const title = computed(() => {
  *
  * @returns { String }
  */
-const breadcrumbs = computed(() => {
+const breadcrumbs = window.Vue.computed(() => {
     if (node.value?.breadcrumbs.length > 0) {
         const justNames = node.value.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(" > ");

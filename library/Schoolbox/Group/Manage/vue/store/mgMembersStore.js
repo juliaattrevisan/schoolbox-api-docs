@@ -2,7 +2,6 @@
  * Handles the store of the current Manage Group page
  */
 
-import { nextTick } from "vue";
 import { defineStore } from "pinia";
 import { useStore } from "./manageGroupStore";
 import AccessTypes from "../currentMembers/mgAccessTypes";
@@ -178,7 +177,7 @@ export const useMembersStore = defineStore("mgMembers", {
          * @param { Boolean }
          */
         async refreshMembers(isTableChange = false) {
-            await nextTick();
+            await window.Vue.nextTick();
             this.members.forEach((member) => {
                 member.isNew = false;
                 member.justUpdated = false;

@@ -4,7 +4,6 @@
  * will also highlight any matches in the current search query when search is active
  */
 
-import { computed } from "vue";
 import { escapeRegExp } from "@js/util/jsUtils";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
@@ -57,7 +56,7 @@ const modalSearchStore = useModalSearchStore();
  *
  * @returns { boolean }
  */
-const isDisabled = computed(() => {
+const isDisabled = window.Vue.computed(() => {
     if (props.isActive || nodesStore.isLoading) {
         // while the node is being updated
         return true;
@@ -70,7 +69,7 @@ const isDisabled = computed(() => {
  *
  * @returns { Boolean }
  */
-const isParentNode = computed(() => {
+const isParentNode = window.Vue.computed(() => {
     if (props.depth === 0) {
         return true;
     } else {
@@ -84,7 +83,7 @@ const isParentNode = computed(() => {
  *
  * @returns { Boolean }
  */
-const isButton = computed(() => {
+const isButton = window.Vue.computed(() => {
     if (modalSearchStore.isActive) {
         //when search is active, we can jump to the selected node
         return true;
@@ -107,7 +106,7 @@ const isButton = computed(() => {
  *
  * @returns { string }
  */
-const fontWeight = computed(() => (isParentNode.value && !modalSearchStore.isActive ? "bold" : "normal"));
+const fontWeight = window.Vue.computed(() => (isParentNode.value && !modalSearchStore.isActive ? "bold" : "normal"));
 
 /**
  * traverse to the next nodel level
@@ -127,7 +126,7 @@ function onNameSelected() {
  *
  * @returns { HTML }
  */
-const highlightTitleSearch = computed(() => {
+const highlightTitleSearch = window.Vue.computed(() => {
     if (modalSearchStore.isActive) {
         return highlightSearchInElement(props.title);
     } else {

@@ -3,19 +3,18 @@
  * To list all the currently selected Curriculum codes
  */
 
-import { ref, computed, watch, nextTick, onMounted } from "vue";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import CsSelectedNode from "./cs-selected-node.vue";
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const selectEl = ref(null);
+const selectEl = window.Vue.ref(null);
 
 /**
  * to listen for any clears of the selected codes from outside the Vue app
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     document.addEventListener("SEARCH_SELECT__UPDATE_SELECTION", (event) => {
         if (selectEl.value.getAttribute("id") === event.detail.elementId) {
             //just in case there are multiple on the page
@@ -31,7 +30,7 @@ onMounted(() => {
  *
  * @returns { String }
  */
-const ids = computed(() => {
+const ids = window.Vue.computed(() => {
     return selectedNodesStore.nodesIds.join(",");
 });
 
@@ -41,10 +40,10 @@ const ids = computed(() => {
  * except when the <select> is first displayed in the DOM.
  * We listen for this in library/Schoolbox/Filter/templates/panel.twig
  */
-watch(
+window.Vue.watch(
     () => selectedNodesStore.nodesIds,
     () => {
-        nextTick(() => {
+        window.Vue.nextTick(() => {
             //nextTick to ensure the dom has updated so we can access with the latest changes
             const event = new Event("change");
             selectEl.value.dispatchEvent(event);

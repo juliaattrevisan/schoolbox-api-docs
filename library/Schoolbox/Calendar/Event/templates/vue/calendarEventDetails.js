@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import CalendarEventDetails from "./calendar-event-details";
 
-createApp({
+window.Vue.createApp({
     components: {
         CalendarEventDetails,
     },

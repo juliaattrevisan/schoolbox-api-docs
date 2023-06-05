@@ -7,17 +7,16 @@
  * however this whole component is ripe for a re-do, so more could be added in the near future
  */
 
-import { ref, onMounted } from "vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     findNodeLinks();
 });
 
-const selectedNode = ref(getEmptyNode());
-const modalEl = ref(null);
+const selectedNode = window.Vue.ref(getEmptyNode());
+const modalEl = window.Vue.ref(null);
 
 /**
  * find any links on the page that should open the details modal

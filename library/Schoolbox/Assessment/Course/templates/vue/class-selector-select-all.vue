@@ -6,8 +6,6 @@
  * results currently shown
  */
 
-import { computed } from "vue";
-
 const emit = defineEmits(["select-all"]);
 
 const props = defineProps({
@@ -30,7 +28,7 @@ const props = defineProps({
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => {
+const isChecked = window.Vue.computed(() => {
     return props.isAllResultsSelected ? true : false;
 });
 

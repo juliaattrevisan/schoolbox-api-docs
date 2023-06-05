@@ -1,7 +1,6 @@
-import { createApp } from "vue";
 import NewsAuthored from "./news-authored";
 
-createApp({
+window.Vue.createApp({
     components: {
         NewsAuthored,
     },

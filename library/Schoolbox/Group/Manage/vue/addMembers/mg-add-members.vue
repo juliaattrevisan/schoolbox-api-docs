@@ -3,7 +3,6 @@
  * Add members to the group
  */
 
-import { computed } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useAddMembersStore } from "../store/mgAddMembersStore";
 import { useSearchStore } from "../store/mgSearchStore";
@@ -20,7 +19,7 @@ const searchStore = useSearchStore();
  *
  * @returns { String }
  */
-const inputDetails = computed(() => {
+const inputDetails = window.Vue.computed(() => {
     const placeholderOptions = {
         [FromTypes.NAME]: "You may add users individually by typing their name and selecting from the list.",
         [FromTypes.GROUP]: "Add all users that belong to another group.",
@@ -62,7 +61,7 @@ addMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const addButtonText = computed(() => (addMembersStore.isProcessing ? "Adding..." : "Add Members"));
+const addButtonText = window.Vue.computed(() => (addMembersStore.isProcessing ? "Adding..." : "Add Members"));
 </script>
 
 <template>

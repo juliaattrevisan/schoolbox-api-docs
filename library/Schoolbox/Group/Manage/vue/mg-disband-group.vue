@@ -3,7 +3,6 @@
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch } from "vue";
 import { timeout } from "@js/util/jsUtils";
 import { useStore } from "./store/manageGroupStore";
 import { useDisbandStore } from "./store/mgDisbandStore";
@@ -11,13 +10,13 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 const store = useStore();
 const disbandStore = useDisbandStore();
-const removeModalEl = ref(null);
-const hasDisbanded = ref(false); //to toggle the successful disband note
+const removeModalEl = window.Vue.ref(null);
+const hasDisbanded = window.Vue.ref(false); //to toggle the successful disband note
 
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => disbandStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
@@ -63,7 +62,7 @@ async function redirect() {
  *
  * @returns { String }
  */
-const disbandButtonText = computed(() => (disbandStore.isProcessing ? "Disbanding..." : "Yes"));
+const disbandButtonText = window.Vue.computed(() => (disbandStore.isProcessing ? "Disbanding..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -72,7 +71,7 @@ const disbandButtonText = computed(() => (disbandStore.isProcessing ? "Disbandin
  *
  * @returns { Boolean }
  */
-const isCloseModalDisabled = computed(() => disbandStore.isProcessing || hasDisbanded.value);
+const isCloseModalDisabled = window.Vue.computed(() => disbandStore.isProcessing || hasDisbanded.value);
 
 /**
  * to close the modal

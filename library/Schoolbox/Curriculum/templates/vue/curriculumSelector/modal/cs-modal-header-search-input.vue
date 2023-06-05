@@ -3,7 +3,6 @@
  * To search the currently selected curriculum node
  */
 
-import { computed, watch } from "vue";
 import debounce from "lodash/debounce";
 import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../store/csModalSearchStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
@@ -26,14 +25,14 @@ const modalViewNodesStore = useModalViewNodesStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !modalViewNodesStore.isActive || props.isDisabled);
+const isDisabled = window.Vue.computed(() => !modalViewNodesStore.isActive || props.isDisabled);
 
 /**
  * Only enable search once a first node is selected
  *
  * @returns { String }
  */
-const placeholder = computed(() => {
+const placeholder = window.Vue.computed(() => {
     if (!modalViewNodesStore.isActive) {
         return "Expand a curriculum to enable search...";
     } else {
@@ -44,7 +43,7 @@ const placeholder = computed(() => {
 /**
  * start searching once the search is active, watching the query string for input
  */
-watch(
+window.Vue.watch(
     () => modalSearchStore.query,
     () => {
         if (modalSearchStore.isActive) {

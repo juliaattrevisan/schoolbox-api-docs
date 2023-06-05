@@ -3,7 +3,6 @@
  * To search for codes or select the browse button to open the modal
  */
 
-import { ref, watch, computed, onMounted, onUnmounted } from "vue";
 import debounce from "lodash/debounce";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useModalStore } from "./store/csModalStore";
@@ -12,7 +11,7 @@ import { useSearchStore, DEBOUNCE_AMOUNT } from "./store/csSearchStore";
 const store = useStore();
 const modalStore = useModalStore();
 const searchStore = useSearchStore();
-const queryInputEl = ref(null); //to deterch if the search input is currently active
+const queryInputEl = window.Vue.ref(null); //to deterch if the search input is currently active
 
 const props = defineProps({
     /**
@@ -28,7 +27,7 @@ const props = defineProps({
  *
  * @returns { String }
  */
-const inputPlaceholder = computed(() => {
+const inputPlaceholder = window.Vue.computed(() => {
     if (store.isLoading) {
         return "Loading Curriculum Codes...";
     } else if (store.hasLoadError) {
@@ -41,7 +40,7 @@ const inputPlaceholder = computed(() => {
 /**
  * add relevant keyboard and mouse events
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("keyup", onKeyUp);
     document.addEventListener("click", onMouseClick);
@@ -50,7 +49,7 @@ onMounted(() => {
 /**
  * remove relevant keyboard and mouse events
  */
-onUnmounted(() => {
+window.Vue.onUnmounted(() => {
     document.removeEventListener("keydown", onKeyDown);
     document.removeEventListener("keyup", onKeyUp);
     document.removeEventListener("click", onMouseClick);
@@ -110,7 +109,7 @@ function onMouseClick(event) {
 /**
  * start searching once the search is active, watching the query string for input
  */
-watch(
+window.Vue.watch(
     () => searchStore.query,
     () => {
         if (searchStore.isActive) {

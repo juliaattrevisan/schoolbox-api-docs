@@ -4,7 +4,6 @@
  */
 
 import { useStore } from "../store/manageCurriculumStore";
-import { computed, watch } from "vue";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useAddSubsectionStore } from "./store/mcAddSubsectionStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
@@ -28,14 +27,14 @@ const addSubsectionStore = useAddSubsectionStore();
  *
  * @returns { Number }
  */
-const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 /**
  * Use a customised ckeditor for the description field
@@ -45,7 +44,7 @@ const descriptionField = useDescriptionEditor(addSubsectionStore.subsection.desc
 /**
  * And watch for changes on this field so we can update the description in the store
  */
-watch(descriptionField, (newValue) => {
+window.Vue.watch(descriptionField, (newValue) => {
     addSubsectionStore.subsection.description = newValue;
 });
 
@@ -55,7 +54,7 @@ watch(descriptionField, (newValue) => {
  *
  * @returns { String }
  */
-const addButtonText = computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
+const addButtonText = window.Vue.computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
 
 /**
  * submit save
@@ -92,7 +91,7 @@ function onCancelSelected() {
  *
  * @returns { Boolean }
  */
-const isAddDisabled = computed(() => {
+const isAddDisabled = window.Vue.computed(() => {
     return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
 });
 </script>

@@ -4,7 +4,6 @@
  * providing various group wide tools
  */
 
-import { watch, nextTick } from "vue";
 import { useStore } from "./store/manageGroupStore";
 import { useMembersStore } from "./store/mgMembersStore";
 import { useSettingsStore } from "./store/mgSettingsStore";
@@ -19,7 +18,7 @@ const disbandStore = useDisbandStore();
 /**
  * listen for hasLoadedOk so we can check whether we need to initiation foundation
  */
-watch(
+window.Vue.watch(
     () => store.hasLoadedOk,
     (hasLoadedOk) => {
         if (hasLoadedOk) {
@@ -32,7 +31,7 @@ watch(
  * ensure the jelly tot menu works,
  */
 async function initFoundation() {
-    await nextTick();
+    await window.Vue.nextTick();
     $(document).foundation();
 }
 
