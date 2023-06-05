@@ -1512,9 +1512,20 @@ class Mapper extends BaseMapper
             $unitImplementation = $assessment->getContextUnitImplementation();
             $unitSpecification  = $assessment->getContextUnitSpecification();
         }
+
+        // Spec assessments: relate to their course's folder, instead of their
+        // usual context folder.
+        // This replicates the possible bug documented in SA-15828, where the
+        // original assessment relation view related specs to their course's
+        // folder.
+        if ($unitSpecification) {
+            $folder = $unitSpecification->getCourse()->getFolder();
+        } else {
+            $folder = $assessment->getAssessmentContext()->getFolder();
+        }
         $params = [
             'assessmentId'               => $assessment->getId(),
-            'folderId'                   => $assessment->getAssessmentContext()->getFolder()->getId(),
+            'folderId'                   => $folder->getId(),
             'projectAssessmentId'        => $contextProject?->getId(),
             'courseImplementationId'     => $unitImplementation?->getCourse()?->getId(),
             'courseUnitImplementationId' => $unitImplementation?->getId(),
