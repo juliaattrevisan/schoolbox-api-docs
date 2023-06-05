@@ -73,10 +73,10 @@ export default class ResourceEditing extends Plugin {
     async loadResource(fileRepository, resourceUI, file: File) {
         const uploadElement = resourceUI.getUploadElement(file, this.onCloseClicked);
         resourceUI.checkUploadContainer();
-        const meta = uploadElement.querySelector("[data-progress-meter]");
+        const progressMeter = uploadElement.querySelector("[data-progress-meter]");
         const loader = fileRepository.createLoader(file);
         try {
-            loader.on("change:uploadedPercent", (event, name, value) => (meta.style.width = `${value}%`));
+            loader.on("change:uploadedPercent", (event, name, value) => (progressMeter.style.width = `${value}%`));
             // www/static/js/editor/plugin/uploadAdapter/UploadAdapter.ts is the adapter that uploads files to the server
             const resource: Resource = await loader.upload();
             addResource(this.editor, resource);
@@ -93,6 +93,7 @@ export default class ResourceEditing extends Plugin {
             if (this.uploadedCount === this.totalUploadCount) {
                 this.editor.disableReadOnlyMode("auto-resource");
             }
+            fileRepository.destroyLoader(loader);
         }
     }
 
