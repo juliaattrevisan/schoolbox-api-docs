@@ -5816,21 +5816,6 @@ parameters:
 			path: library/Schoolbox/Resource/Search/Results.php
 
 		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\GC\\\\Check\\\\DbCheck\\:\\:\\$db \\(PDO\\) does not accept Database\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/GC/Check/DbCheck.php
-
-		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\GC\\\\Check\\\\SoftLinks\\:\\:\\$scanStmt \\(PDOStatement\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/GC/Check/SoftLinks.php
-
-		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\GC\\\\Check\\\\SoftLinks\\:\\:\\$softStmt \\(PDOStatement\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/GC/Check/SoftLinks.php
-
-		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 2
 			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
