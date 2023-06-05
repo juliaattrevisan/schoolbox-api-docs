@@ -81,7 +81,7 @@ class Indicator extends CliTool\App
             vr.capability_name,
             vr.indicator_id,
             vr.indicator_name
-        FROM       assessment_relation var
+        FROM       mv_assessment_relation var
         INNER JOIN v_rubric              vr ON var.assessment_id = vr.assessment_id
         INNER JOIN assessment            a  ON var.assessment_id = a.id
         WHERE vr.indicator_id = :indicatorId

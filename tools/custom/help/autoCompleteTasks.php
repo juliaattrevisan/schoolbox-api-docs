@@ -75,8 +75,8 @@ HELP;
 
         // finds all tasks that require to update
         $courseTaskStatement = $db->prepareQuery("select `t`.id as id from task as `t`
-            join assessment_relation on assessment_relation.assessment_id = `t`.assessment_id
-            join course_implementation on (assessment_relation.course_implementation_id = course_implementation.id and course_implementation.course_specification_id = :courseId);
+            join mv_assessment_relation on mv_assessment_relation.assessment_id = `t`.assessment_id
+            join course_implementation on (mv_assessment_relation.course_implementation_id = course_implementation.id and course_implementation.course_specification_id = :courseId);
         ");
         $courseTaskStatement->execute(['courseId' => $this->getOpt(self::OPT_COURSE_ID)]);
         $tasks = $courseTaskStatement->fetchColumnArray('id');

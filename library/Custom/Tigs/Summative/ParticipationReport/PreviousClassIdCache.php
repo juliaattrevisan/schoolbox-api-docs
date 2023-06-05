@@ -106,7 +106,7 @@ class PreviousClassIdCache
             SELECT DISTINCT ar.folder_id
             FROM `submission_return` sr
             INNER JOIN submission_box sb ON sr.box_id = sb.id
-            INNER JOIN assessment_relation ar ON sb.assessment_id = ar.assessment_id
+            INNER JOIN mv_assessment_relation ar ON sb.assessment_id = ar.assessment_id
             INNER JOIN folder f ON ar.folder_id = f.id
             INNER JOIN assessment a ON ar.assessment_id = a.id
             WHERE sr.`owner` = :ownerId

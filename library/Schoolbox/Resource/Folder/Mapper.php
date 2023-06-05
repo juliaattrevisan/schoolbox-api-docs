@@ -2096,7 +2096,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getJoinColumnString('codes', 'fc')}
             FROM {$this->getTable()} f
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-            INNER JOIN assessment_relation var   ON var.folder_id     = f.id
+            INNER JOIN mv_assessment_relation var   ON var.folder_id     = f.id
             INNER JOIN assessment             a     ON var.assessment_id = a.id
             INNER JOIN participant_plan       pp    ON a.id              = pp.assessment_id
             INNER JOIN participant            p     ON pp.id             = p.participant_plan_id
@@ -2142,7 +2142,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getJoinColumnString('codes', 'fc')}
             FROM {$this->getTable()} f
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-            INNER JOIN assessment_relation var ON var.folder_id     = f.id
+            INNER JOIN mv_assessment_relation var ON var.folder_id     = f.id
             INNER JOIN assessment             a   ON var.assessment_id = a.id
         ";
         $query = "

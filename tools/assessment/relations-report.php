@@ -16,7 +16,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
  * Report on any inconsistencies between the data in the assessment relation
- * cache table `assessment_relation`, and the query which populates that table.
+ * materialized view `mv_assessment_relation`, and the query which populates
+ * that view.
  */
 
 $app     = new Reporter();

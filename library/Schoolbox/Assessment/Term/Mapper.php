@@ -265,7 +265,7 @@ class Mapper extends BaseMapper
                   JOIN {$this->getJoinSql('term_year_level', '', 'lyl')}
                   JOIN folder_year_level fyl      ON fyl.year_level_id = lyl.id
                   JOIN folder                     ON folder.id = fyl.folder_id AND folder.deleted_at IS NULL
-                  JOIN assessment_relation var ON var.folder_id = folder.id
+                  JOIN mv_assessment_relation var ON var.folder_id = folder.id
                   JOIN assessment a               ON a.id = var.assessment_id AND a.deleted_at IS NULL
                   JOIN participant_plan pp        ON pp.assessment_id = a.id AND pp.deleted_at IS NULL
                   JOIN participant p              ON p.participant_plan_id = pp.id AND p.excluded_at IS NULL
