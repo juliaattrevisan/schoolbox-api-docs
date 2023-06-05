@@ -1131,26 +1131,6 @@ parameters:
 			path: library/DAV/Auth/Digest.php
 
 		-
-			message: "#^Method Database\\:\\:createUniqueParameterName\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Database.php
-
-		-
-			message: "#^Method Database\\:\\:serialize\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Database.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Database.php
-
-		-
-			message: "#^Parameter \\#1 \\$name \\(null\\) of method Database\\:\\:lastInsertId\\(\\) should be compatible with parameter \\$name \\(string\\) of method Alaress\\\\IDatabase\\:\\:lastInsertId\\(\\)$#"
-			count: 1
-			path: library/Database.php
-
-		-
 			message: "#^Method EOTC\\\\ActivityLog\\\\Log\\:\\:getId\\(\\) should return string but returns int\\.$#"
 			count: 1
 			path: library/EOTC/ActivityLog/Log.php
@@ -5994,16 +5974,6 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
-			message: "#^Parameter \\#1 \\$name \\(null\\) of method Schoolbox\\\\Test\\\\MockDatabase\\:\\:lastInsertId\\(\\) should be compatible with parameter \\$name \\(string\\) of method Alaress\\\\IDatabase\\:\\:lastInsertId\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Test/MockDatabase.php
-
-		-
-			message: "#^Return type \\(int\\) of method Schoolbox\\\\Test\\\\MockDatabase\\:\\:lastInsertId\\(\\) should be compatible with return type \\(string\\) of method Alaress\\\\IDatabase\\:\\:lastInsertId\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Test/MockDatabase.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getName\\(\\)\\.$#"
