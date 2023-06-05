@@ -47,7 +47,6 @@
                 "@fullcalendar/resource-timeline": "~5.11.3",
                 "@fullcalendar/timegrid": "~5.11.3",
                 "@fullcalendar/vue3": "~5.11.3",
-                "@gsap/business": "~3.11.5",
                 "@melloware/coloris": "~0.19.1",
                 "@microsoft/immersive-reader-sdk": "~1.3.0",
                 "@phudak/ckeditor5-emoji": "~1.1.1",
@@ -60,7 +59,7 @@
                 "dropzone": "~6.0.0-beta.2",
                 "filesize": "~10.0.7",
                 "flatpickr": "~4.6.13",
-                "gsap": "~3.11.5",
+                "gsap": "npm:@gsap/business@^3.11.5",
                 "highcharts": "~9.3.3",
                 "highcharts-vue": "~1.4.0",
                 "intro.js": "~2.9.3",
@@ -3565,12 +3564,6 @@
             "resolved": "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz",
             "integrity": "sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==",
             "dev": true
-        },
-        "node_modules/@gsap/business": {
-            "version": "3.11.5",
-            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.11.5.tgz",
-            "integrity": "sha512-4eYfbB7c+s9N+ImkqU5ZoaNEkDm9SEZb6NfHYsvGr5hM4bIN/8wKObbpl+/pNRRPl0XopxRNz4E6hc4a0j76ZA==",
-            "license": "This package should only be used by individuals/companies with an active Business Green Club GreenSock membership. See https://greensock.com/club/. Licensing: https://greensock.com/licensing/"
         },
         "node_modules/@happy-dom/jest-environment": {
             "version": "8.1.0",
@@ -28428,9 +28421,11 @@
             }
         },
         "node_modules/gsap": {
+            "name": "@gsap/business",
             "version": "3.11.5",
-            "resolved": "https://registry.npmjs.org/gsap/-/gsap-3.11.5.tgz",
-            "integrity": "sha512-Q89nKCLgoX5xUjznh9LcaIUkz54k1voNucT1Rpf9SJNFIQznBwFqt5qUUQbeVInFyN/n18OUJkpeI6CNEDt74w=="
+            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.11.5.tgz",
+            "integrity": "sha512-4eYfbB7c+s9N+ImkqU5ZoaNEkDm9SEZb6NfHYsvGr5hM4bIN/8wKObbpl+/pNRRPl0XopxRNz4E6hc4a0j76ZA==",
+            "license": "This package should only be used by individuals/companies with an active Business Green Club GreenSock membership. See https://greensock.com/club/. Licensing: https://greensock.com/licensing/"
         },
         "node_modules/handlebars": {
             "version": "4.7.7",
@@ -45794,11 +45789,6 @@
             "resolved": "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz",
             "integrity": "sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==",
             "dev": true
-        },
-        "@gsap/business": {
-            "version": "3.11.5",
-            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.11.5.tgz",
-            "integrity": "sha512-4eYfbB7c+s9N+ImkqU5ZoaNEkDm9SEZb6NfHYsvGr5hM4bIN/8wKObbpl+/pNRRPl0XopxRNz4E6hc4a0j76ZA=="
         },
         "@happy-dom/jest-environment": {
             "version": "8.1.0",
@@ -65281,9 +65271,9 @@
             "dev": true
         },
         "gsap": {
-            "version": "3.11.5",
-            "resolved": "https://registry.npmjs.org/gsap/-/gsap-3.11.5.tgz",
-            "integrity": "sha512-Q89nKCLgoX5xUjznh9LcaIUkz54k1voNucT1Rpf9SJNFIQznBwFqt5qUUQbeVInFyN/n18OUJkpeI6CNEDt74w=="
+            "version": "npm:@gsap/business@3.11.5",
+            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.11.5.tgz",
+            "integrity": "sha512-4eYfbB7c+s9N+ImkqU5ZoaNEkDm9SEZb6NfHYsvGr5hM4bIN/8wKObbpl+/pNRRPl0XopxRNz4E6hc4a0j76ZA=="
         },
         "handlebars": {
             "version": "4.7.7",
