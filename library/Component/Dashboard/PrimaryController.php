@@ -10,7 +10,6 @@
 
 class Component_Dashboard_PrimaryController extends Component_Dashboard_ControllerAbstract
 {
-
     protected $homeroom;
 
     /**

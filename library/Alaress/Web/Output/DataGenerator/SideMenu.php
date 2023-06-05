@@ -59,28 +59,17 @@ class SideMenu implements IDataGenerator
 
         $subjectGroups = [];
 
-            foreach ($this->currentUser->getSubjectCollection() as $subject) {
-                if ($this->access->getFolderAccess($this->currentUser, $subject->getFolderId()) >= UserAccess::ACCESS_READ) {
-                    if (!isset($subjectGroups[$subject->getClassType()])) {
-                        $subjectGroups[$subject->getClassType()] = [];
-                    }
-                    $subjectGroups[$subject->getClassType()][] = $subject;
+        foreach ($this->currentUser->getSubjectCollection() as $subject) {
+            if ($this->access->getFolderAccess($this->currentUser, $subject->getFolderId()) >= UserAccess::ACCESS_READ) {
+                if (!isset($subjectGroups[$subject->getClassType()])) {
+                    $subjectGroups[$subject->getClassType()] = [];
                 }
+                $subjectGroups[$subject->getClassType()][] = $subject;
             }
-            uksort($subjectGroups, function ($a, $b) {
-                return strnatcmp($a, $b);
-            });
-
-//        // Sort the subjects within each subjectGroup
-//        foreach ($subjectGroups as $subjectGroup => $subjects) {
-//            // Each value is an array, so sort each array
-//            usort($subjects, function ($a, $b) {
-//                return strnatcmp($a['name'] . $a['code'], $b['name'] . $b['code']);
-//            });
-//
-//            // Need to assign back, as $subjects is localised variable
-//            $subjectGroups[$subjectGroup] = $subjects;
-//        }
+        }
+        uksort($subjectGroups, function ($a, $b) {
+            return strnatcmp($a, $b);
+        });
 
         // Get the menu sections in their correct order
 

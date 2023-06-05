@@ -13,8 +13,6 @@ use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledE
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
@@ -29,20 +27,6 @@ class Session
      * @var bool
      */
     private $useLoginLog = true;
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-    /**
-     * @param Access|null $access
-     * @throws Exception
-     */
-    public function __construct(Access $access = null)
-    {
-        $this->access = $access ?? Access::getInstance();
-    }
 
     /**
      * Is this a valid session ID? If not, this session should be thrown out
@@ -442,7 +426,8 @@ class Session
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
             if (
-                $ds && $this->ldapAuth(
+                $ds
+                && $this->ldapAuth(
                     $ds,
                     $username,
                     $password,

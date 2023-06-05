@@ -3501,11 +3501,6 @@ parameters:
 			path: library/Schoolbox/External/Profile/Student/Mapper.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between array and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/SubjectMapper.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/AbstractIdFinder.php

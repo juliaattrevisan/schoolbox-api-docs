@@ -22,7 +22,6 @@ use Schoolbox\GenericCollection;
  */
 class PageMapper extends Schoolbox\Mapper
 {
-
     /**
      * Define column/property mapping
      *

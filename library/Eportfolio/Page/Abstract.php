@@ -19,7 +19,6 @@ use Schoolbox\User;
 
 abstract class Eportfolio_Page_Abstract
 {
-
     /**
      * An instance of sitepage
      *

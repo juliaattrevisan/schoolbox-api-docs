@@ -102,14 +102,12 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
     if (!$commentMapper->save($comment)) {
         respond(400, 'You do not have permission to view this category.');
     }
-}
-
-// we are expecting one of three scenarios, all require you to be the owner:
-// 1. get comment as it exists
-// 2. update comment
-// 3. delete comment
-// permissions check regardless of method
-else {
+} else {
+    // we are expecting one of three scenarios, all require you to be the owner:
+    // 1. get comment as it exists
+    // 2. update comment
+    // 3. delete comment
+    // permissions check regardless of method
     if (isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
         $a = new Authenticator();
         $sessionUser = $a->getSessionUser();

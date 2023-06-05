@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 class SubjectMapper extends Schoolbox\External\Mapper
 {
-
     /**
     * Defines mapping for this mapper.
     *
