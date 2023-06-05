@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace External\Canvas\Redirect;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\IDatabase;
 use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;

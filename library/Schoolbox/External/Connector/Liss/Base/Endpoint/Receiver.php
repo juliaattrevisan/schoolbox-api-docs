@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\IDatabase;
 use Alaress\Lumberjack\Logger;
 use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;

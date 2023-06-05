@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 

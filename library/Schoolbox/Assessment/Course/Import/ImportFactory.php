@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\IDatabase;
 use Alaress_Date_Format;
 use Schoolbox\Database\Factory;
 use Schoolbox\Learning\AssessmentContext;

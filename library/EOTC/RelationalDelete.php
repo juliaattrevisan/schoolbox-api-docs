@@ -11,7 +11,6 @@ namespace EOTC;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\IDatabase;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;

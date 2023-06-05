@@ -18,7 +18,6 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
-use Alaress\IDatabase;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use PDO;
@@ -643,7 +642,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @return IConnector
      */
-    public function getDatabase()
+    public function getDatabase(): IConnector
     {
         return $this->database;
     }

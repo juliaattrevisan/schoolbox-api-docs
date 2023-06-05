@@ -15,8 +15,6 @@ namespace Custom\Help\Hero;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Quoter\IQuoter;
-use Alaress\IDatabase;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Acquisition
