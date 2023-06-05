@@ -19,7 +19,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Acquisition
 {
-
     /**
      * Course Specification Id
      * This comes from the /course/modify screen, as is an integer in the url

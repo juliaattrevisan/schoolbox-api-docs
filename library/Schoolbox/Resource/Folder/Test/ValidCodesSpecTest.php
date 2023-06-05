@@ -26,7 +26,6 @@ use Schoolbox\Test\MockConnector;
  */
 class ValidCodesSpecTest extends TestCase
 {
-
     // Tests
 
     /**
