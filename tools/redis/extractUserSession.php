@@ -136,6 +136,7 @@ $app = new class extends CliTool\App {
             fwrite($this->getOutStream(), sprintf("subject: %s\n", (string)$redisSessionUser->getSubjectCollection()?->count()));
             fwrite($this->getOutStream(), sprintf("child: %s\n", (string)$redisSessionUser->getChildren()?->count()));
             fwrite($this->getOutStream(), sprintf("teacher: %s\n", (string)$redisSessionUser->getTeacherCollection()?->count()));
+            fwrite($this->getOutStream(), sprintf("userAccess: %s\n", (string)$redisSessionUser->getAccessList()->count()));
             fwrite($this->getOutStream(), sprintf("summary: %s,%s,%s,%s,%s,%s\n", $key, $redisSessionUser->getUsername(), $sessionUserSize, $redisSessionUser->getRole()->getType(), $_SESSION['lasttime'], $_SESSION['ip']));
             session_unset();
         }

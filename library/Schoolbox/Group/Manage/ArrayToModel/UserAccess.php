@@ -11,6 +11,7 @@ namespace Schoolbox\Group\Manage\ArrayToModel;
 
 use InvalidArgumentException;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
+use Schoolbox\User;
 
 /**
  * Translator for translating an array representation of UserAccess into a model.
@@ -28,7 +29,7 @@ class UserAccess
     /**
      * Translate the array representation of the group access into a model.
      */
-    public function __invoke(array $array, ?object $model): object
+    public function __invoke(array $array, ?object $model, ?User $user): object
     {
         if (!$model) {
             $model = (new UserAccessModel())
@@ -42,7 +43,8 @@ class UserAccess
             if (
                 $this->groupStaffOnly
                 && $array['accessType'] === UserAccessModel::MEMBERSHIP_ADMIN
-                && !$model->getUser()->getRole()->isStaff()
+                && $user
+                && !$user->getRole()->isStaff()
             ) {
                 throw new InvalidArgumentException('Only staff can be a group admin');
             }

@@ -100,7 +100,7 @@ class Controller extends Base
         if ($group) {
             $userAccessList = $this->userAccessMapper->findForFolder($group->getFolder())
                                                      ->indexByCallback(static function (UserAccess $userAccess) {
-                                                         return $userAccess->getUser()->getId();
+                                                         return $userAccess->getUid();
                                                      });
             $memberList     = $this->userMapper->findByColumn('id', $userAccessList->keys());
 
@@ -170,14 +170,14 @@ class Controller extends Base
             $requestBody['accessTypes']
         );
 
-        $users        = $this->userMapper->findByColumnList(['id' => array_keys($newAccesses)]);
+        $users        = $this->userMapper->findByColumnList(['id' => array_keys($newAccesses)])->indexBy('id');
         $originalAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
         $userAccesses = $originalAccesses->deepClone();
 
         $translator = new ArrayToModel\UserAccess($this->getConfigLoader()->get(ConfigMapper::NAME_GROUP_STAFF_ONLY));
         try {
-            $userAccesses->map(function ($userAccess) use ($newAccesses, $translator) {
-                return $translator($newAccesses[$userAccess->getUser()->getId()], $userAccess);
+            $userAccesses->map(function (UserAccess $userAccess) use ($newAccesses, $translator, $users) {
+                return $translator($newAccesses[$userAccess->getUid()], $userAccess, $users->offsetGet($userAccess->getUid()));
             });
         } catch (InvalidArgumentException $e) {
             $this->sendJsonError('Failed to update member: ' . $e->getMessage(), 400);
@@ -196,8 +196,8 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
                 [
-                    'members' => $userAccesses->map(function ($userAccess) {
-                        $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
+                    'members' => $userAccesses->map(function ($userAccess) use ($users) {
+                        $array               = (new ModelToArray\User($this->l10n))($users->offsetGet($userAccess->getUid()));
                         $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
                         return $array;
                     }),
@@ -223,7 +223,7 @@ class Controller extends Base
         $existingAccesses = $this->userAccessMapper->findForFolderUser($folder, $users)->indexByCallback(
             static function ($ua) {
                 /** @var UserAccess $ua */
-                return $ua->getUser()->getId();
+                return $ua->getUid();
             }
         );
 
@@ -235,7 +235,7 @@ class Controller extends Base
                 continue;
             }
             /** @var UserAccess $userAccess */
-            $userAccess = (new ArrayToModel\UserAccess($groupStaffOnly))($requestBody, null);
+            $userAccess = (new ArrayToModel\UserAccess($groupStaffOnly))($requestBody, null, $user);
             $userAccess->setUser($user)
                        ->setServiceIdentifier($folder->getId());
             $newAccesses->add($userAccess);

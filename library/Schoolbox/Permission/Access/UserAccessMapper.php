@@ -92,7 +92,7 @@ class UserAccessMapper extends Mapper
         /** @var WriteCache|null $cache */
         $cache = self::getDi()->get('subscriptionCache');
         if ($cache) {
-            $cache->cacheUsers(INSTANCE_ID, [ $model->getUser()->getId() ]);
+            $cache->cacheUsers(INSTANCE_ID, [ $model->getUid() ]);
         }
     }
 
@@ -280,7 +280,7 @@ class UserAccessMapper extends Mapper
         )->map(function ($ua) use ($users) {
             /** @var UserAccess $ua */
             // don't needlessly hold stub replicas of the user in memory
-            return $ua->setUser($users->offsetGet($ua->getUser()->getId()));
+            return $ua->setUser($users->offsetGet($ua->getUid()));
         });
     }
 

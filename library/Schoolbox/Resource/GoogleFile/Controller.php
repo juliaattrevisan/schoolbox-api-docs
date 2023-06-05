@@ -267,7 +267,7 @@ class Controller extends Base
 
         $map = [];
         foreach ($accesses as $access) {
-            $currentUser = $users->getOffset($access->getUser()->getId());
+            $currentUser = $users->getOffset($access->getUid());
             if (!$currentUser || !$currentUser->getEmail()) {
                 // this user doesn't have email, ignore
                 continue;
