@@ -41,3 +41,9 @@
 .padding-none {
     padding: 0;
 }
+
+// Utility class to provide work breaking where required. Good to use whenever something
+// might return a URL in a string as these won't break by default
+.u-break-word {
+    word-break: break-word;
+}

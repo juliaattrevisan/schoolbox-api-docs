@@ -366,7 +366,7 @@ data:
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
-    <div class="admin-content">
+    <div class="admin-content ssl-renewal-help">
         <div class="small-12 island">
             <h2 class="subheader">SSL Renewal Help</h2>
             <section class="content">
@@ -408,7 +408,7 @@ data:
             <div class="small-12 island">
                 <h3 class="subheader">Diagnostics</h3>
                 <section class="content">
-                    <div id="diagnostics-{{ idx }}" data-alart class="alert-box"><span class="loader"></span>Testing in progress,
+                    <div id="diagnostics-{{ idx }}" data-alart class="alert-box u-break-word"><span class="loader"></span>Testing in progress,
                         please wait...
                     </div>
                 </section>
@@ -439,11 +439,11 @@ data:
                             </tr>
                             <tr>
                                 <th>URI:</th>
-                                <td id="request-uri-letsencrypt-{{ idx }}">Loading...</td>
+                                <td id="request-uri-letsencrypt-{{ idx }}" class="u-break-word">Loading...</td>
                             </tr>
                             <tr>
                                 <th>Headers:</th>
-                                <td>user-agent: {{ USER_AGENT_STRING_LETS_ENCRYPT }}</td>
+                                <td class="u-break-word">user-agent: {{ USER_AGENT_STRING_LETS_ENCRYPT }}</td>
                             </tr>
                         </table>
                     </div>
@@ -458,11 +458,11 @@ data:
                             </tr>
                             <tr>
                                 <th>Headers:</th>
-                                <td id="response-headers-letsencrypt-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-headers-letsencrypt-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                             <tr>
                                 <th>Body:</th>
-                                <td id="response-body-letsencrypt-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-body-letsencrypt-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                         </table>
                     </div>
@@ -499,11 +499,11 @@ data:
                             </tr>
                             <tr>
                                 <th>Headers:</th>
-                                <td id="response-headers-chrome-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-headers-chrome-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                             <tr>
                                 <th>Body:</th>
-                                <td id="response-body-chrome-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-body-chrome-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                         </table>
                     </div>
