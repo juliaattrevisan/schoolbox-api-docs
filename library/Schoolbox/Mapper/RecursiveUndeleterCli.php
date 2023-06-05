@@ -28,7 +28,6 @@ namespace Schoolbox\Mapper;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
-use Database;
 use PDOException;
 use Schoolbox\Blog;
 use Schoolbox\Collection;

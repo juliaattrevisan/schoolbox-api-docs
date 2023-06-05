@@ -12,8 +12,6 @@ namespace Alaress\Database\Test;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
-use Database;
-use InvalidArgumentException;
 
 trait TestConnectorTrait
 {

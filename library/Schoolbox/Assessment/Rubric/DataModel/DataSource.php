@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;

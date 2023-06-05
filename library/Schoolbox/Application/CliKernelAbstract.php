@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Aura\Di\Container;
-use Database;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
 use PDOException;

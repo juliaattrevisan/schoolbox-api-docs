@@ -12,7 +12,6 @@ namespace Alaress\Database\Test\Db2;
 
 use Alaress\Database\Factory;
 use Alaress\Database\Test\TestConnectorTrait;
-use Database;
 use PHPUnit\Framework\TestCase;
 
 /**

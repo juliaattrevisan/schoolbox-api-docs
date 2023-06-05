@@ -11,7 +11,6 @@ namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
-use Database;
 use InvalidArgumentException;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use RuntimeException;

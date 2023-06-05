@@ -12,7 +12,6 @@ namespace Alaress\Database\Test\Mysql;
 
 use Alaress\Database\Factory;
 use Alaress\Database\Test\TestConnectorTrait;
-use Database;
 use PHPUnit\Framework\TestCase;
 
 class TestPostProcessor extends TestCase

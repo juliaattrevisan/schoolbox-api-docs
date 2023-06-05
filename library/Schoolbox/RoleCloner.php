@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Schoolbox;
 
 use Alaress\Database\Connector\IConnector;
-use Database;
 use PDO;
 
 class RoleCloner

@@ -12,7 +12,6 @@ namespace Alaress\Database\Test\Mysql;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
-use Database;
 use PHPUnit\Framework\TestCase;
 
 class TestConnector extends TestCase
