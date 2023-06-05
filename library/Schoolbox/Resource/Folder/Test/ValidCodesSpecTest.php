@@ -18,7 +18,6 @@ use Schoolbox\Resource\Folder;
 use PHPUnit\Framework;
 use Alaress\Database\Predicate;
 use Alaress\Database\Quoter\Mysql;
-use Schoolbox\Test\MockDatabase;
 
 /**
  * @covers \Schoolbox\Resource\Folder\ValidCodesSpec
