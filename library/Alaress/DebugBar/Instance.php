@@ -45,6 +45,13 @@ class Instance
     /**
      * Is the debug bar on or off?
      *
+     * Note that this only affects whether database queries are shown in the
+     * debug bar, and is currently always false: this is because of the
+     * catch-22 situation where:
+     * - the debug mode setting is stored in the config DB
+     * - queries in debug mar must have a debug mode DB connection, and it's
+     *   not possible to tell whether to create one without connecting to the DB
+     *
      * @return bool
      */
     public static function isEnabled()

@@ -326,19 +326,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * Initialise connections to databases, etc.
-     *
-     * @return void
-     * @throws \Schoolbox\External\Exception
-     */
-    protected function initialiseExternalConnections(): void
-    {
-        // MySQL connection configuration
-        Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, ['throw' => true]);
-    }
-
-
-    /**
      * Register any error handling required
      *
      * @return void

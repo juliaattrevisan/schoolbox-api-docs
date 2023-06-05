@@ -223,7 +223,6 @@ abstract class Kernel
         $this->shutdownHandler = new ShutdownHandler();
 
         // run the launch sequence
-        $this->initialiseExternalConnections();
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
@@ -251,15 +250,6 @@ abstract class Kernel
     {
         return \posix_getuid() === 0;
     }
-
-
-    /**
-     * Initialise connections to databases, etc.
-     *
-     * @return void
-     * @throws \Schoolbox\External\Exception
-     */
-    abstract protected function initialiseExternalConnections(): void;
 
     /**
      * Called after DI services are registered.

@@ -21,14 +21,6 @@ seen in `\Alaress\Application\Kernel::__construct`.
 
 Some kernel variants may have additional responsibilities.
 
-### Initialize database connection
-
-`initialiseExternalConnections` is used to set up the initial database
-connection which other dependencies depend upon to fetch configuration.
-
-> This may not be required anymore, because a connection was created in
-> [instance configuration](../configuration/instance-configuration.md) already.
-
 
 ### Register error/exception/shutdown handling
 
