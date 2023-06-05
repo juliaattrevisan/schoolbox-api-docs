@@ -831,6 +831,9 @@ abstract class Kernel
             /** @var BookmarkMapper $bookMarkMapper */
             $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
 
+            /** @var Access $access */
+            $access = $mapperFactory->get(Access::class);
+
             /** @var Predis\ClientInterface $redisStorage */
             $redisStorage = $di->get('redis.storage');
             $output
@@ -861,10 +864,10 @@ abstract class Kernel
                     new Output\DataGenerator\SideMenu(
                         $config,
                         $session->getAuthUser(),
-                        $session,
                         $sideMenuSectionMapper,
                         $sideMenuMapper,
-                        $bookMarkMapper
+                        $bookMarkMapper,
+                        $access
                     )
                 )
                 ->addDataGenerator('scripts', new Output\DataGenerator\Scripts($config, $_SERVER));

@@ -70,7 +70,7 @@ $colourList = Timetable_ColourMapper::getInstance()->findAll();
 /** @var Schoolbox\User[] $userList */
 $userList      = [];
 $numTimetables = 0;
-$childId       = (int)$this->arg[0];
+$childId       = (int)($this->arg[0] ?? 0);
 
 if ($sessionUser->getRole()->isParent()) {
     $userList = $childId === 0 ? $sessionUser->getChildren() : $sessionUser->getChildren()->filterBy('id', $childId);

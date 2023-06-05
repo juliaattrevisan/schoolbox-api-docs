@@ -76,42 +76,51 @@ class SubjectMapper extends Schoolbox\External\Mapper
 
 
     /**
-    * Gets all subjects for the given student.
+    * Gets all subjects for the given student/staff.
+    * This returns subjects only in SB
     *
     * @param User $user
     * @return SubjectCollection
     */
-    public function findAllForStudent(User $user)
+    public function findAllForUser(User $user): SubjectCollection
     {
         $subjects = $this->external_user->getSubjectList($user);
 
         // if no subjects, just return an empty collection
-        if ($subjects === false) {
+        if (empty($subjects)) {
             return new SubjectCollection();
         }
 
-        $category_statement = $this->database->prepare('
-			SELECT c.id, GROUP_CONCAT(co.code) AS code
-			FROM folder c
-			LEFT JOIN folder_code co ON co.folder_id = c.id AND co.deleted_at IS NULL
-			WHERE (co.code=? OR co.code=?)
-		');
-        $add_id_map = function ($subject) use ($category_statement) {
-            $category_statement->execute([
-                $subject['code'],
-                $subject['campusCode'] . "/" . $subject['code']
-            ]);
-            if ($row = $category_statement->fetch()) {
-                $subject['id']   = $row['id'];
-//              $subject['code'] = $row['code'];
+        $folderMapper = Schoolbox\Resource\Folder\Mapper::getInstance();
+        $subjectCollection = new SubjectCollection();
+        foreach ($subjects as $subject) {
+            $folder = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
+            if (!$folder || $subjectCollection->offsetExists($folder->getId())) {
+                continue;
             }
-            return $subject;
-        };
-        $id_filter = function ($subject) {
-            return isset($subject['id']);
-        };
-        return new SubjectCollection(
-            array_filter(array_map($add_id_map, $subjects), $id_filter)
+            $subjectCollection->offsetset(
+                $folder->getId(),
+                (new Subject())
+                    ->setFolderId($folder->getId())
+                    ->setMatchedCode($folder->getMatchedCode())
+                    ->setName($folder->getName())
+                    ->setCode($subject['code'] ?? null)
+                    ->setCampusCode($subject['campusCode'])
+                    ->setClassType($subject['classType'])
+            );
+        }
+        return $subjectCollection->sortByCallback(
+            static function (Subject $a, Subject $b): int {
+                $type = strnatcasecmp($a->getClassType(), $b->getClassType());
+                if ($type === 0) {
+                    $name = strnatcasecmp($a->getName(), $b->getName());
+                    if ($name === 0) {
+                        return strnatcasecmp($a->getMatchedCode(), $b->getMatchedCode());
+                    }
+                    return $name;
+                }
+                return $type;
+            }
         );
     }
 }

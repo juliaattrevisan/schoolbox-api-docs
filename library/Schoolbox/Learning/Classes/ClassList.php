@@ -89,13 +89,9 @@ class ClassList
             // Iterate all subjects from the SIS and try to find folders with that class code
 
             foreach ($this->user->getSubjectCollection() as $subject) {
-                $folder                       = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
-                if (!$folder) {
-                    continue;
-                }
-                $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
-                $classTypes[$folder->getId()] = $subject['classType'] ?? '';
+                $classTypes[$subject->getFolderId()] = $subject->getClassType();
             }
+            $folderList = $this->folderMapper->findByColumn('id', $this->user->getSubjectCollection()->getPropertyValues('folderId'));
         }
 
         // Add in other folders with feedback during the term, this will pick up archived classes

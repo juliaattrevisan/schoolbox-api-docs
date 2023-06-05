@@ -64,10 +64,12 @@ class Controller extends Base
 
         // Iterate all subjects from the SIS and try to find folders with that class code
         foreach ($user->getSubjectCollection() as $subject) {
-            $folder = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
-            if (!$folder) {
+            try {
+                $folder = $this->folderMapper->findCheaplyById($subject->getFolderId());
+            } catch (MapperException $e) {
                 continue;
             }
+            //$folder = $this->folderMapper->findForCampusAndClass($subject->getCampusCode() ?? '', $subject->getCode());
             $classList = $classList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
         }
 

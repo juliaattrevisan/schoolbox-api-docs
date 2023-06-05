@@ -13,7 +13,7 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
     /**
      * A list of subjects to show
      *
-     * @var array
+     * @var \Schoolbox\External\SubjectCollection
      */
     protected $subject_list;
 
@@ -31,8 +31,8 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
      */
     public function execute()
     {
-        $this->subject_list = $_SESSION['subjects'];
-        return !empty($this->subject_list);
+        $this->subject_list = $this->getUser()->getHideTimetable() ? new \Schoolbox\External\SubjectCollection() : $this->getUser()->getSubjectCollection();
+        return $this->subject_list->count() > 0;
     }
 
     /**
@@ -50,11 +50,12 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
         // Stupid blocks
         $this->setBlock($templateHandle, "subject", "subject_block");
         $this->setVar('subject_block', '');
+        /** @var \Schoolbox\External\Subject $subject */
         foreach ($this->subject_list as $subject) {
             $this->setVar([
-                'SUBJECT_CODE' => Scrub::text($subject['code']),
-                'SUBJECT_CODE_URL' => urlencode(urlencode($subject['code'])),
-                'SUBJECT_NAME' => $subject['name']
+                'SUBJECT_CODE' => Scrub::text($subject->getMatchedCode()),
+                'SUBJECT_CODE_URL' => urlencode(urlencode($subject->getMatchedCode())),
+                'SUBJECT_NAME' => $subject->getName(),
             ]);
             $this->parse('subject_block', 'subject', true);
         }

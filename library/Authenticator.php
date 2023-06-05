@@ -90,9 +90,6 @@ class Authenticator
      */
     public function appendSession(int $userID): bool
     {
-        /**
-         * @var UserMapper $userMapper
-         */
         $userMapper = UserMapper::getInstance();
 
         try {
@@ -101,11 +98,9 @@ class Authenticator
 
             /**
              * Map subjects onto the user object retrieved, and dump into session
-             *
-             * @var SubjectMapper $subjectMapper
              */
             $subjectMapper = SubjectMapper::getInstance();
-            $user->setSubjectCollection($subjectMapper->findAllForStudent($user));
+            $user->setSubjectCollection($subjectMapper->findAllForUser($user));
             $this->setSessionUser($user);
 
             // indicate that session creation was successful
