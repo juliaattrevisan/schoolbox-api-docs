@@ -92,8 +92,10 @@ class Notifactory
             $this->conf = $conf;
         } elseif (extension_loaded('pdo')) {
             try {
-                // try for a config mapper instance
-//                Database::reinitialise();
+                // Reinitialise of the DB connection should not be necessary,
+                // as the database connection should already be connected.
+                // If not, though:
+//                \Schoolbox\Database\Factory::getInstanceInternal()->reconnect();
 
                 $this->conf = ConfigLoader::getInstance();
                 $this->conf->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS);
