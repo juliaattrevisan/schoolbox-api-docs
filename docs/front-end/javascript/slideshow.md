@@ -2,13 +2,13 @@
 
 Used for all image slideshows on Schoolbox.
 
-This is a wrapper around the image slider plugin we use - [Swiper](https://swiperjs.com/), with lazy loading and other preferred settings set by default.
+This is a wrapper around the image slideshow plugin we use - [Swiper](https://swiperjs.com/), with lazy loading and other preferred settings set by default.
 
 ## Initialising
 
 You must have your HTML in the correct layout in order for this plugin to work.
 ```html
-<div class="swiper" id="example-imageslider">
+<div class="swiper" id="example-imageslideshow">
     <div class="swiper-wrapper">
         <div class="swiper-slide">
             <img src="/path/to/img/1" alt="" loading="lazy">
@@ -32,7 +32,7 @@ Then just initialise with JS like so:
 document.dispatchEvent(
     new CustomEvent("swiperInitialize", {
         detail: {
-            target: document.getElementById("example-imageslider"),
+            target: document.getElementById("example-imageslideshow"),
             options: {},
         },
     })
@@ -40,7 +40,7 @@ document.dispatchEvent(
 ````
 
 ## Styles
-Styles can be found in `www/static/css/foundation/ui/_slider.scss`.
+Styles can be found in `www/static/css/foundation/ui/__slideshow_.scss`.
 
 ## Parameters
 You can send any of the options Swiper takes, see the [Swiper docs](https://swiperjs.com/swiper-api#parameters) for the list of Swiper parameters.
@@ -142,5 +142,5 @@ These are the Swiper parameters we set by default with this wrapper.
 </table>
 
 ## Known bugs & behaviors
-- Previously lazy loading was handeled by us, however, the lazy loading API we used was removed as of SwiperJS v9.0.0 and it now relies on native browser lazy loading. Unfortuantely, this means the slider will no longer wait for the first image to finish loading before auto-playing.
-- If you have a lot of images on the Image Slider on the Dashboard, you can get a boatload of navigation dots - we might consider hiding them if there's more than 10 or so images at which point navigation dots are pretty useless.
+- Previously lazy loading was handeled by us, however, the lazy loading API we used was removed as of SwiperJS v9.0.0 and it now relies on native browser lazy loading. Unfortuantely, this means the slideshow will no longer wait for the first image to finish loading before auto-playing.
+- If you have a lot of images on the Image Slideshow on the Dashboard, you can get a boatload of navigation dots - we might consider hiding them if there's more than 10 or so images at which point navigation dots are pretty useless.

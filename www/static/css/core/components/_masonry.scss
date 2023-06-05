@@ -180,7 +180,7 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-comment;
     color: $icon-color-chat;
 }
-.icon-masonry-Component_Homepage_ScrollerController:before {
+.icon-masonry-Component_Homepage_SlideshowController:before {
     @extend .icon-image-slideshow;
     color: $icon-color-image-slideshow;
 }
@@ -324,10 +324,6 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-image-gallery;
     color: $icon-color-image-gallery;
 }
-.icon-masonry-Component_Dashboard_ImageSliderController:before {
-    @extend .icon-image-slideshow;
-    color: $icon-color-image-slideshow;
-}
 .icon-masonry-Component_Dashboard_NewsController:before {
     @extend .icon-news;
     color: $icon-color-news;
@@ -340,7 +336,7 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-rss;
     color: $icon-color-rss-feed;
 }
-.icon-masonry-Component_Dashboard_ScrollerController:before {
+.icon-masonry-Component_Dashboard_SlideshowController:before {
     @extend .icon-image-slideshow;
     color: $icon-color-image-slideshow;
 }

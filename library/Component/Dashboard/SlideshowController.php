@@ -13,7 +13,7 @@
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 
-class Component_Dashboard_ScrollerController extends Component_Dashboard_ControllerAbstract
+class Component_Dashboard_SlideshowController extends Component_Dashboard_ControllerAbstract
 {
     /**
      * @var FileMapper
@@ -49,7 +49,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'scroller')) {
+        if (!parent::loadTemplate($templateHandle, 'slideshow')) {
             return false;
         }
 
@@ -59,10 +59,10 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
-        $this->setBlock('image_scroller', 'linked_image', 'linked_image_block');
-        $this->setBlock('image_scroller', 'unlinked_image', 'unlinked_image_block');
-        $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
+        $this->setBlock($templateHandle, 'image_slideshow', 'image_slideshow_block');
+        $this->setBlock('image_slideshow', 'linked_image', 'linked_image_block');
+        $this->setBlock('image_slideshow', 'unlinked_image', 'unlinked_image_block');
+        $this->setBlock('image_slideshow', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'has_header', 'has_header_block');
 
         /* Hide header bar if desired
@@ -100,7 +100,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         /* Prevent multiple galleries from other categories stacking up in the wrong place
          * and initialise empty gallery by default
          */
-        $this->setVar('image_scroller_block', '');
+        $this->setVar('image_slideshow_block', '');
 
         // Load images for the current homepage
         $opts = [
@@ -119,7 +119,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         }
 
         // Have update form to back to this homepage, not the gallery's homepage
-        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
+        $this->setVar('IMAGESLIDESHOW_CATEGORY_ID', $this->getSource()->getId());
 
         // Iterate
         if (!$allFiles->count()) {
@@ -164,7 +164,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 $this->setVar('linked_image_block', '');
             }
 
-            $this->parse('image_scroller_block', 'image_scroller', true);
+            $this->parse('image_slideshow_block', 'image_slideshow', true);
         }
 
         return true; // everything went according to plan

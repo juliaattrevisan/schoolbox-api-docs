@@ -125,7 +125,7 @@ class ComponentsCest
         $i->canSee('Image');
         $homepage->checkComponentIcon('Component_Homepage_ImageGalleryController');
         $i->canSee('Image Gallery');
-        $homepage->checkComponentIcon('Component_Homepage_ScrollerController');
+        $homepage->checkComponentIcon('Component_Homepage_SlideshowController');
         $i->canSee('Image Slideshow');
         $homepage->checkComponentIcon('Component_Homepage_RandImageController');
         $i->canSee('Random Image');
