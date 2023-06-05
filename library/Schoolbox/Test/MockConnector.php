@@ -17,7 +17,6 @@ use BadMethodCallException;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Traversable;
 
 /**
  * A mock database connector, compatible with Schoolbox\Mapper.
@@ -25,7 +24,7 @@ use Traversable;
  * To use:
  * <code>
  * $mapper->setDatabase(new MockDatabase($phpunit_test_case));
- * $mapper->getDatabase()->setNextResult('fetch', array(...));
+ * $mapper->getDatabase()->setNextFetch([...]);
  * </code>
  */
 class MockConnector implements IConnector
@@ -50,7 +49,6 @@ class MockConnector implements IConnector
      */
     protected array $resultSet;
 
-
     /**
      * Builds the mock connection, using the test case to build mock statement.
      *
@@ -71,7 +69,9 @@ class MockConnector implements IConnector
     }
 
     /**
-     * Calls $this->setNextResult('fetch', $result)
+     * Sets the next row which would be fetched from the database.
+     *
+     * @see PDOStatement::fetch
      *
      * @param mixed $result
      */
@@ -81,7 +81,9 @@ class MockConnector implements IConnector
     }
 
     /**
-     * Calls $this->setNextResult('fetchAll', $result)
+     * Sets the next result set which would be fetched from the database.
+     *
+     * @see PDOStatement::fetchAll
      *
      * @param array $result
      */
@@ -91,9 +93,21 @@ class MockConnector implements IConnector
     }
 
     /**
+     * Sets the next insert ID to be fetched.
+     *
+     * @param string|false $nextInsertId
+     */
+    public function setNextInsertId(string|false $nextInsertId): void
+    {
+        $this->nextInsertId = $nextInsertId;
+    }
+
+    /**
+     * Internal method for setting a result set.
+     *
      * @param array $result
      */
-    protected function setResultSet(array $result): void
+    private function setResultSet(array $result): void
     {
         $this->resultSet = $result;
         reset($this->resultSet);
@@ -123,6 +137,33 @@ class MockConnector implements IConnector
     }
 
     /**
+     * Helper for raising exceptions for unsupported methods.
+     *
+     * @param string $methodName
+     * @return never-return
+     * @throws BadMethodCallException
+     */
+    private function raiseUnsupportedMethodException(string $methodName): void
+    {
+        throw new BadMethodCallException(
+            sprintf('%s does not support method %s', __CLASS__, $methodName)
+        );
+    }
+
+
+    /**
+     * Methods defined in base connector, overridden to use mock values
+     */
+
+    /**
+     * @inheritdoc
+     */
+    public function lastInsertId($name = null)
+    {
+        return $this->nextInsertId;
+    }
+
+    /**
      * Returns the mocked statement.
      *
      * @param string $statement     Ignored
@@ -136,29 +177,18 @@ class MockConnector implements IConnector
     }
 
     /**
-     * Returns the mocked statement.
-     *
-     * @param string     $sql
-     * @param array|null $parameters
-     * @return IStatement
-     */
-    public function query(string $sql, array $parameters = null): IStatement
-    {
-        throw new BadMethodCallException('Not supported');
-    }
-
-
-    /**
-     * This object has itself been set up as an `IQuoter` implementation, so it
-     * may just return itself.
-     *
-     * @return IQuoter
+     * @inheritdoc
      */
     public function getQuoter(): IQuoter
     {
         return new Quoter();
     }
 
+
+    /**
+     * Transaction methods are implemented but do nothing: they are required
+     * within other methods
+     */
 
     /**
      * @inheritdoc
@@ -171,21 +201,13 @@ class MockConnector implements IConnector
     /**
      * @inheritdoc
      */
-    public function onPersist(callable $callback)
-    {
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
     public function beginTransaction()
     {
         return true;
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function commit()
     {
@@ -193,195 +215,425 @@ class MockConnector implements IConnector
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function rollback()
     {
         return true;
     }
 
+
     /**
-     * @param  null $name
-     * @return string|false
+     * No other connector methods are supported
      */
-    public function lastInsertId($name = null)
+
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
+    public function query(string $sql, array $parameters = null): IStatement
     {
-        return $this->nextInsertId;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
     /**
-     * @param string|false $nextInsertId
+     * Not supported
+     *
+     * @throws BadMethodCallException
      */
-    public function setNextInsertId(string|false $nextInsertId): void
+    public function onPersist(callable $callback)
     {
-        $this->nextInsertId = $nextInsertId;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function connect($hostname, $database, $username, $password, $options = [])
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function reconnect($options = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function enableMultipleActiveResultSets()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function disableMultipleActiveResultSets()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function setTimezone($timezone)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function execute($sql)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function executeDirectly(string $sql): bool
     {
-        return true;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function prepareQuery($query, $parameters = [])
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function executeQuery($sql, $parameters = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getQueryIterator($sql, $parameters = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function inTransaction()
     {
-        return false;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function errorInfo()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function errorCode()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getHostname()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getPort()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getUsername()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getPassword()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getDatabase()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getCollector()
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function addPostProcessor($callable)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function prepareInBindings($externalIds, $prefix = 'param')
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function buildPredicateBuilder($table)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getRow(string $sql, array $parameters = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getOne(string $sql, array $parameters = null)
     {
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getAll(string $sql, array $parameters = null): array
     {
-        return [];
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function getIterator(string $sql, array $parameters = null): IIterator
     {
-        throw new BadMethodCallException('Not supported');
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function prepareProcedure(string $name): IStoredProcedure
     {
-        throw new BadMethodCallException('Not supported');
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function legacyQuote($value): string
     {
-        return $value;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function trimAll(array $rowset): array
     {
-        return $rowset;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function trimRow(array $row): array
     {
-        return $row;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function trimField($fieldValue)
     {
-        return $fieldValue;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function insert(string $table, array $array): bool
     {
-        return true;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function update(string $table, array|string $identifier, array $array): bool
     {
-        return true;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 
+    /**
+     * Not supported
+     *
+     * @throws BadMethodCallException
+     */
     public function delete(string $table, string $identifier, array|string $value): bool
     {
-        return true;
+        $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 }
