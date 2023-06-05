@@ -9,35 +9,53 @@
 
 namespace Schoolbox\Resource\Storage\GC\Check;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\IStatement;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
 use PDO;
-use PDOStatement;
 use Psr\Log\LoggerInterface;
 
 class SoftLinks implements Check
 {
-    /** @var Database */
-    protected $db;
+    /**
+     * Database connection
+     */
+    protected IConnector $db;
 
-    /** @var string */
-    protected $dbName;
+    /**
+     * Which database is being examined?
+     */
+    protected string $dbName;
 
-    /** @var PDOStatement */
-    protected $scanStmt;
+    /**
+     * Table scan statement
+     */
+    protected IStatement $scanStmt;
 
-    /** @var PDOStatement */
-    protected $softStmt;
+    /**
+     * Soft delete fields statement
+     */
+    protected IStatement $softStmt;
 
-    /** @var PDOStatement[] */
-    protected $hashTestStmts;
+    /**
+     * A list of hash test statements
+     *
+     * @var array<IStatement>
+     */
+    protected array $hashTestStmts = [];
 
-    /** @var array */
-    protected $sources;
+    /**
+     * A list of sources, keyed by table and containing
+     *
+     * @var array<string, array{fields: array<string>, delete: string}>
+     */
+    protected array $sources = [];
 
-    /** @var LoggerInterface */
-    protected $log;
+    /**
+     * A logger
+     */
+    protected LoggerInterface $log;
 
     /**
      * This is the list of tables that contain text-type fields, but WILL NOT contain storage hashes anywhere within those fields
@@ -46,9 +64,9 @@ class SoftLinks implements Check
      * but if their schema changed for any reason in future to include possible hash references,
      * it would need to be known that they should be removed from this list.
      *
-     * @var array
+     * @var array<string>
      */
-    protected $blacklist = [
+    protected array $blacklist = [
         'assess_luQuestionType', 'folder', 'class', 'component_config_definition', 'component_config_instance', 'error', 'file', 'myFile', 'myFolder', 'msg_source',
         'user_profile', 'dropbox', 'etherpad_pad', 'user_assume_log', 'submission_mark_type', 'storage', 'homepageTemplate', 'luCampus', 'luResidentialHouse',
         'lu_resource_moderation_type', 'user', 'eportfolio_coverphoto', 'reportcard_comment', 'eotc_metadata', 'eotc_status', 'eotc_config',
@@ -70,21 +88,28 @@ class SoftLinks implements Check
     /**
      * @var int
      */
-    private $limit;
+    private int $limit;
 
 
     /**
-     * @param Database        $db
-     * @param string          $dbName
-     * @param LoggerInterface $log
-     * @param int             $limit
-     * @param array           $blacklist
+     * Constructor
+     *
+     * @param IConnector           $db
+     * @param string               $dbName
+     * @param LoggerInterface|null $log
+     * @param int                  $limit
+     * @param array                $blacklist
      */
-    public function __construct(Database $db, $dbName, LoggerInterface $log = null, $limit = 0, $blacklist = [])
-    {
+    public function __construct(
+        IConnector $db,
+        string $dbName,
+        LoggerInterface $log = null,
+        int $limit = 0,
+        array $blacklist = []
+    ) {
         $this->db     = $db;
         $this->dbName = $dbName;
-        $this->log    = $log ?: new Logger('null', [new NullHandler()]);
+        $this->log    = $log ?? new Logger('null', [new NullHandler()]);
         $this->limit  = $limit;
 
         $this->cacheTables($blacklist);
@@ -97,7 +122,7 @@ class SoftLinks implements Check
      * @param array $blacklist
      * @return self
      */
-    public function cacheTables(array $blacklist)
+    public function cacheTables(array $blacklist): self
     {
         // fallback to default if nothing specified
         $blacklist = $blacklist ?: $this->blacklist;
@@ -113,9 +138,9 @@ class SoftLinks implements Check
 
 
     /**
-     * @return PDOStatement
+     * @return IStatement
      */
-    protected function getScannableFieldsStatement()
+    protected function getScannableFieldsStatement(): IStatement
     {
         // lazyload
         if (empty($this->scanStmt)) {
@@ -144,9 +169,9 @@ class SoftLinks implements Check
 
 
     /**
-     * @return PDOStatement
+     * @return IStatement
      */
-    protected function getSoftDeleteFieldsStatement()
+    protected function getSoftDeleteFieldsStatement(): IStatement
     {
         if (empty($this->softStmt)) {
             $blacklist = implode("', '", $this->blacklist);
@@ -169,7 +194,7 @@ class SoftLinks implements Check
      * @param string $table
      * @return int
      */
-    protected function fetchRowCount($table)
+    protected function fetchRowCount(string $table): int
     {
         return (int)$this->db->query("SELECT COUNT(*) FROM $table")->fetchColumn();
     }
@@ -178,9 +203,9 @@ class SoftLinks implements Check
     /**
      * Fetch a table-indexed array of the fields we're operating on
      *
-     * @return array
+     * @return array<string, array{fields: array<string>, delete: string}>
      */
-    protected function fetchSourceMap()
+    protected function fetchSourceMap(): array
     {
         $sources = [];
         $i       = 0;
@@ -235,9 +260,9 @@ class SoftLinks implements Check
 
 
     /**
-     * @return array
+     * @return array<string>
      */
-    protected function getTableList()
+    protected function getTableList(): array
     {
         return array_keys($this->sources);
     }
@@ -245,9 +270,9 @@ class SoftLinks implements Check
 
     /**
      * @param string $table
-     * @return array
+     * @return array<string>
      */
-    protected function getTableFields($table)
+    protected function getTableFields(string $table): array
     {
         return $this->sources[$table]['fields'];
     }
@@ -257,7 +282,7 @@ class SoftLinks implements Check
      * @param string $table
      * @return string
      */
-    protected function getTableSoftDeleteShard($table)
+    protected function getTableSoftDeleteShard(string $table): string
     {
         return $this->sources[$table]['delete'];
     }
@@ -270,7 +295,7 @@ class SoftLinks implements Check
      * @param string $hash
      * @return bool
      */
-    protected function tableContainsHash($table, $hash)
+    protected function tableContainsHash(string $table, string $hash): bool
     {
 
         // prepare on-demand
@@ -295,13 +320,13 @@ class SoftLinks implements Check
     /**
      * Takes an array of hashes, and returns the subset that this check regards as 'stale'
      *
-     * @param array $test
-     * @return array
+     * @param array<string> $previous
+     * @return array<string>
      */
-    public function getStale(array $test)
+    public function getStale(array $previous): array
     {
         if ($this->limit) {
-            $test = array_slice($test, 0, $this->limit);
+            $previous = array_slice($previous, 0, $this->limit);
         }
 
         $debug   = $this->log instanceof \Alaress\Lumberjack\Logger && $this->log->getThreshold() <= Logger::DEBUG;
@@ -309,14 +334,14 @@ class SoftLinks implements Check
         foreach ($this->getTableList() as $table) {
             $fields = $this->getTableFields($table);
 
-            if (!count($test)) {
+            if (!count($previous)) {
                 $this->log->info("No more hashes to test; bailing out");
                 break;
             }
 
             // stats
             $rowCount = $this->fetchRowCount($table);
-            $progress = (int)(count($test) / 100) ?: 1;
+            $progress = (int)(count($previous) / 100) ?: 1;
             $i        = 0;
             $seen     = [];
             $hit      = false;
@@ -328,10 +353,10 @@ class SoftLinks implements Check
 
             $this->log->debug(sprintf("Scanning `%s` (`%s`) [%s records]", $table, implode('`, `', $fields), $rowCount));
 
-            foreach ($test as $k => $hash) {
+            foreach ($previous as $k => $hash) {
                 if ($this->tableContainsHash($table, $hash)) {
                     // remove from list
-                    unset($test[$k]);
+                    unset($previous[$k]);
                     $seen[$hash] = true;
                     $hit = true;
                 }
@@ -351,6 +376,6 @@ class SoftLinks implements Check
             }
         }
 
-        return array_values($test);
+        return array_values($previous);
     }
 }

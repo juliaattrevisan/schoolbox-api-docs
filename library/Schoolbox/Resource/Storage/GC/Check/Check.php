@@ -11,11 +11,11 @@ namespace Schoolbox\Resource\Storage\GC\Check;
 
 interface Check
 {
-
     /**
      * Takes an array of hashes, and returns the subset that this check regards as 'stale'
-     * @param array $previous
-     * @return array
+     *
+     * @param array<string> $previous A list of hashes to check.
+     * @return array<string>
      */
-    public function getStale(array $previous);
+    public function getStale(array $previous): array;
 }
