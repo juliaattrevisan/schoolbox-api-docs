@@ -28,7 +28,6 @@ use Sentry\State\HubInterface;
  */
 abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements LoggerAwareInterface
 {
-
     // Exit Statuses.
     // Apps may use custom exit statuses so long as they don't collide with these, say starting at 100
     public const EXIT_STATUS_OK           = 0;   // The requested action was successfully performed.

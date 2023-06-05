@@ -121,7 +121,7 @@ $stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $ker
             // Reinitialise of the DB connection should not be necessary,
             // as the database connection should already be connected.
             // If not, though:
-//            \Schoolbox\Database\Factory::getInstanceInternal()->reconnect();
+        //            \Schoolbox\Database\Factory::getInstanceInternal()->reconnect();
 
             // if the interrogation says to dismiss the message, we do
             if (interrogate($frame, $d, $di)) {

@@ -15,7 +15,6 @@ use DebugBar\StandardDebugBar;
 
 class Instance
 {
-
     /**
      * @return StandardDebugBar
      */
