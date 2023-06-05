@@ -63,14 +63,6 @@ use Schoolbox\Learning\Assessment\Redirect;
 class Kernel extends WebKernelAbstract
 {
     /**
-     * @inheritdoc
-     */
-    protected function initialiseDebugging(): void
-    {
-    }
-
-
-    /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
      * @param Di\Container $di

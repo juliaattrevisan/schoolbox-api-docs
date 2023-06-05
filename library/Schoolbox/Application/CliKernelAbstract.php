@@ -317,15 +317,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @inheritdoc
-     */
-    protected function initialiseDebugging(): void
-    {
-        // no debugging for CLI Kernels
-    }
-
-
-    /**
      * Register any error handling required
      *
      * @return void

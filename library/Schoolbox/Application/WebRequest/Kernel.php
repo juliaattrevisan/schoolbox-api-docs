@@ -472,35 +472,6 @@ class Kernel extends WebKernelAbstract
 
 
     /**
-     * Initialise debugging
-     *
-     * @return void
-     * @throws \DebugBar\DebugBarException
-     * @throws \Schoolbox\External\Exception
-     */
-    protected function initialiseDebugging(): void
-    {
-        // Set up the debug bar, and add listeners for various parts of the debug bar
-        // (database calls, XHProf)
-        // Should go in a DI container instead of a static class.
-        if (DebugBar::isEnabled()) {
-            DebugBar::init();
-
-            $debugBar = DebugBar::getInstance();
-
-            // Throw away existing connection and reconnect with persistence off
-            $database = Database::getInstance();
-            $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
-
-            $collector = $database->getCollector();
-            if (!$debugBar->hasCollector($collector->getName())) {
-                $debugBar->addCollector($collector);
-            }
-        }
-    }
-
-
-    /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
      * @param Container $di
