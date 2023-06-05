@@ -4147,16 +4147,8 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         $mappedFields = array_keys($mappedFields);
-
-        $db = $this->getDatabase();
-
-        if (!$db instanceof \Database) {
-            throw new Exception("No db in " . get_class($this));
-        }
-
-        $stmt = $db->query("SHOW COLUMNS FROM {$this->table}");
-
-        $knownFields = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $stmt         = $this->getDatabase()->query("SHOW COLUMNS FROM {$this->table}");
+        $knownFields  = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         return array_values(array_diff($knownFields, $mappedFields));
     }
