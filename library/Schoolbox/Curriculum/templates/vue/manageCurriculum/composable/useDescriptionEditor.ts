@@ -7,6 +7,7 @@
  */
 
 import { EditorEvent } from "@js/editor/event/editorEvent";
+import { Ref } from "vue";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
 /**
