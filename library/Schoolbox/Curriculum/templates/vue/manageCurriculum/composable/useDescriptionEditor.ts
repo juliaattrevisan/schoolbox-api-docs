@@ -6,6 +6,7 @@
  * It's linked specifically to description as we are removing embed media buttons which is currently specific just to these description fields
  */
 
+import { EditorEvent } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
 /**
@@ -13,14 +14,12 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  *
  * @param { string } $initialValue - the initial string value to input into the ckeditor
  * @param { string } ckeditorSelector - the selector to target the CKEditor
- * @param { Ref<HTMLButtonElement> } submitButton
  * @param { Ref<boolean> } isMaxCharCountExceeded
  * @returns { string } - the initial value
  */
 export function useDescriptionEditor(
     $initialValue: string,
     ckeditorSelector: string,
-    submitButton: Ref<HTMLButtonElement | null>,
     isMaxCharCountExceeded: Ref<boolean>
 ) {
     const initialValue = window.Vue.ref($initialValue);

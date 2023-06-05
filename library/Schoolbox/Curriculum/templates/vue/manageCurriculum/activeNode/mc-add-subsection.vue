@@ -37,8 +37,7 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
  */
 const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
-const addButton = ref<HTMLButtonElement | null>(null);
-const isMaxCharCountExceeded = ref<boolean>(false);
+const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
@@ -72,7 +71,6 @@ const isAddDisabled = window.Vue.computed(() => {
 const descriptionField = useDescriptionEditor(
     addSubsectionStore.subsection?.description as string,
     ckeditorIdAttr.value,
-    addButton,
     isMaxCharCountExceeded
 );
 

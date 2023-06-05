@@ -18,8 +18,7 @@ const addCurriculumStore = useAddCurriculumStore();
  */
 const ckeditorIdAttr = `new-curriculum`;
 
-const addButton = ref<HTMLButtonElement | null>(null);
-const isMaxCharCountExceeded = ref<boolean>(false);
+const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
@@ -53,7 +52,6 @@ const isAddDisabled = window.Vue.computed(() => {
 const descriptionFieldValue = useDescriptionEditor(
     addCurriculumStore.curriculum?.description as string,
     ckeditorIdAttr,
-    addButton,
     isMaxCharCountExceeded
 );
 
