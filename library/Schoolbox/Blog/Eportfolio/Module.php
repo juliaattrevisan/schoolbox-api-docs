@@ -213,23 +213,25 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
                     function ($params, User $loggedInUser) {
-                        $commentOwner = $params['comment']->getOwner();
+                        if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
+                            $commentOwner = $params['comment']->getOwner();
 
-                        if ($commentOwner->getRole()->isStaff()) {
-                            if (!$loggedInUser->getRole()->isStaff()) {
-                                throw new Unauthorized();
+                            if ($commentOwner->getRole()->isStaff()) {
+                                if (!$loggedInUser->getRole()->isStaff()) {
+                                    throw new Unauthorized();
+                                }
+                            } else {
+                                if ($loggedInUser->getId() === $commentOwner->getId()) {
+                                    return;
+                                }
                             }
-                        } else {
-                            if ($loggedInUser->getId() === $commentOwner->getId()) {
+
+                            $page = $params['comment']->getBlog()->getPage();
+                            $auth = new Eportfolio_Authenticator($loggedInUser, $page->getOwner(), $page->getPageId());
+
+                            if ($auth->canModify()) {
                                 return;
                             }
-                        }
-
-                        $page = $params['comment']->getBlog()->getPage();
-                        $auth = new Eportfolio_Authenticator($loggedInUser, $page->getOwner(), $page->getPageId());
-
-                        if ($auth->canModify()) {
-                            return;
                         }
 
                         // Otherwise, not authorised.
