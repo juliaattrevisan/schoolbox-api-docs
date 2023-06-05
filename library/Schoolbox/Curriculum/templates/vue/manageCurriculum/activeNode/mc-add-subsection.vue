@@ -3,6 +3,7 @@
  * to show further info in a modal on a code that's been selected
  */
 
+import { computed, ref, watch } from "vue";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
@@ -26,25 +27,25 @@ const addSubsectionStore = useAddSubsectionStore();
 /**
  * to gradually and more marginLeft to indicate node level depth
  *
- * @returns { Number }
+ * @returns { number }
  */
-const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
  *
- * @returns { String }
+ * @returns { string }
  */
-const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorIdAttr = computed(() => `description-${activeNodeStore.node.id}`);
 
-const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+const isMaxCharCountExceeded = ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
  *
- * @returns { String }
+ * @returns { string }
  */
-const addButtonText = window.Vue.computed(() => {
+const addButtonText = computed(() => {
     if (addSubsectionStore.isProcessing) {
         return "Adding...";
     }
@@ -55,9 +56,9 @@ const addButtonText = window.Vue.computed(() => {
 /**
  * Only enable the button once the conditions are met
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
-const isAddDisabled = window.Vue.computed(() => {
+const isAddDisabled = computed(() => {
     return (
         isMaxCharCountExceeded.value ||
         addSubsectionStore.subsection.name?.trim().length === 0 ||
@@ -77,7 +78,7 @@ const descriptionField = useDescriptionEditor(
 /**
  * And watch for changes on this field, so we can update the description in the store
  */
-window.Vue.watch(descriptionField, (newValue) => {
+watch(descriptionField, (newValue) => {
     addSubsectionStore.subsection.description = newValue;
 });
 

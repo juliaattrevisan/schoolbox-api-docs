@@ -3,6 +3,7 @@
  * to show further info in a modal on a code that's been selected
  */
 
+import { computed, ref, watch } from "vue";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useStore } from "./store/manageCurriculumStore";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
@@ -13,19 +14,17 @@ const addCurriculumStore = useAddCurriculumStore();
 
 /**
  * Store a reference to the ckeditor used for the description
- *
- * @returns { String }
  */
 const ckeditorIdAttr = `new-curriculum`;
 
-const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+const isMaxCharCountExceeded = ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
  *
- * @returns { String }
+ * @returns { string }
  */
-const addButtonText = window.Vue.computed(() => {
+const addButtonText = computed(() => {
     if (addCurriculumStore.isProcessing) {
         return "Adding...";
     }
@@ -36,9 +35,9 @@ const addButtonText = window.Vue.computed(() => {
 /**
  * Only enable the button once the conditions are met
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
-const isAddDisabled = window.Vue.computed(() => {
+const isAddDisabled = computed(() => {
     return (
         isMaxCharCountExceeded.value ||
         addCurriculumStore.curriculum.name?.trim().length === 0 ||
@@ -58,7 +57,7 @@ const descriptionFieldValue = useDescriptionEditor(
 /**
  * And watch for changes on this field, so we can update the description in the store
  */
-window.Vue.watch(descriptionFieldValue, (newValue: string) => {
+watch(descriptionFieldValue, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;
 });
 

@@ -7,7 +7,7 @@
  */
 
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import { Ref } from "vue";
+import { Ref, ref } from "vue";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
 /**
@@ -16,6 +16,7 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  * @param { string } $initialValue - the initial string value to input into the ckeditor
  * @param { string } ckeditorSelector - the selector to target the CKEditor
  * @param { Ref<boolean> } isMaxCharCountExceeded
+ *  - true if the CKEditor field content storage limit was found to have been exceeded at last check
  * @returns { string } - the initial value
  */
 export function useDescriptionEditor(
@@ -23,13 +24,15 @@ export function useDescriptionEditor(
     ckeditorSelector: string,
     isMaxCharCountExceeded: Ref<boolean>
 ) {
-    const initialValue = window.Vue.ref($initialValue);
+    const initialValue = ref($initialValue);
 
     /**
      * When a new editor is created
+     *
+     * @param { object } event - Javascript event object
      */
-    function onEditorCreated(event) {
-        const editor = event.detail.editor;
+    function onEditorCreated(event: object) {
+        const editor = event.detail.editor as object;
 
         if (initialValue.value !== null) {
             editor.setData(initialValue.value); // set the initial data
