@@ -9,8 +9,9 @@
 
 namespace Schoolbox\Database\Test\Resource\Folder;
 
-use Alaress;
-use Alaress\IDatabase;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as DatabaseException;
+use Alaress\Database\Test\TestConnectorTrait;
 use OverflowException;
 use Schoolbox;
 use Schoolbox\Collection;
@@ -23,12 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class MapperTest extends TestCase
 {
-    use Alaress\Database\Test\TestConnectorTrait;
-
-    /**
-     * @var Alaress\IDatabase
-     */
-    private $database;
+    use TestConnectorTrait;
 
     /** @var array */
     private static $tree = [
@@ -96,12 +92,10 @@ class MapperTest extends TestCase
     public function setUp(): void
     {
         $this->connectSchoolbox();
-        $this->database = \Database::getInstance();
-        $this->database->beginTransaction();
-        $this->database->query("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
-        $this->database->query('DELETE FROM `folder_code`');
-
-        self::iterate($this->database, 0, self::$tree);
+        $this->schoolbox->beginTransaction();
+        $this->schoolbox->query("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
+        $this->schoolbox->query('DELETE FROM `folder_code`');
+        self::iterate($this->schoolbox, 0, self::$tree);
     }
 
     /**
@@ -109,15 +103,15 @@ class MapperTest extends TestCase
      */
     public function tearDown(): void
     {
-        $this->database->rollback();
+        $this->schoolbox->rollback();
     }
 
     /**
-     * @param IDatabase $db
-     * @param int       $parent
-     * @param array     $folders
+     * @param IConnector $db
+     * @param int        $parent
+     * @param array      $folders
      */
-    private static function iterate(IDatabase $db, $parent, array $folders)
+    private static function iterate(IConnector $db, $parent, array $folders)
     {
         foreach ($folders as $id => $sub) {
             $params = [
@@ -128,7 +122,7 @@ class MapperTest extends TestCase
 
             try {
                 $db->query('INSERT INTO `folder` (`id`, `name`, `parent`) VALUES (:id, :nm, :pa)', $params);
-            } catch (\PDOException $e) {
+            } catch (DatabaseException) {
                 $db->query('UPDATE `folder` SET `name` = :nm, `parent` = :pa, deleted_at = NULL WHERE id = :id', $params);
             }
 
