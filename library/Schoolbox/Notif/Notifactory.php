@@ -93,7 +93,7 @@ class Notifactory
         } elseif (extension_loaded('pdo')) {
             try {
                 // try for a config mapper instance
-                Database::reinitialise();
+//                Database::reinitialise();
 
                 $this->conf = ConfigLoader::getInstance();
                 $this->conf->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS);
