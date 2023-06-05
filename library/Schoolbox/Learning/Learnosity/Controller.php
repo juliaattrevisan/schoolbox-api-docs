@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Web\Controller\Base;
 use LearnositySdk\Request\Init;
-use LearnositySdk\Utils\Uuid;
+use LearnositySdk\Utils\Uuid as LearnosityUuid;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
 
@@ -50,15 +50,15 @@ class Controller extends Base
      */
     public function getExample()
     {
-        $user_id = Uuid::generate();
-        $session_id = Uuid::generate();
+        $userId = LearnosityUuid::generate();
+        $sessionId = LearnosityUuid::generate();
         $consumerKey = 'yis0TYCu7U9V4o7M';
         $consumerSecret = '74c5fd430cf1242a527f6223aebd42d30464be22';
 
         $request = [
-            'user_id'              => $user_id,
+            'user_id'              => $userId,
             'activity_template_id' => 'quickstart_examples_activity_template_001',
-            'session_id'           => $session_id,
+            'session_id'           => $sessionId,
             'activity_id'          => 'quickstart_examples_activity_001',
             'rendering_type'   => 'assess',
             'type'             => 'submit_practice',
@@ -70,13 +70,12 @@ class Controller extends Base
             'consumer_key' => $consumerKey
         ];
 
-        $init = new Init(
+        $initOptions = (new Init(
             'items',
             $security,
             $consumerSecret,
-            $request);
-
-        $initOptions = $init->generate();
+            $request
+        ))->generate();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/index.twig', [
             'initOptions' => $initOptions
