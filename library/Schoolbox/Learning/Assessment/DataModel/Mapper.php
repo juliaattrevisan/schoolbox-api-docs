@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\LTI\Assessment as LtiAssessment;
@@ -493,6 +494,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
                 {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
+                {$this->getJoinColumnString('assessment_course_unit_specification.course', 'usc')},
+                {$this->getJoinColumnString('assessment_course_unit_specification.course.folder', 'uscf')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
@@ -517,6 +520,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course', 'us', 'usc', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course.folder', 'usc', 'uscf', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
@@ -838,8 +843,39 @@ class Mapper extends BaseMapper
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
             } elseif ($row['us.id']) {
                 // Unit spec
-                $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us')
-                    ->setFolder($this->hydrateJoin($row, 'assessment_course_unit_specification.folder', 'usf'));
+                // Be sure to hydrate course spec's folder, too
+                /** @var UnitSpec\Model $unitSpec */
+                $unitSpec = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification',
+                    'us'
+                );
+
+                /** @var Folder\Model $unitSpecFolder */
+                $unitSpecFolder = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification.folder',
+                    'usf',
+                );
+                $unitSpec->setFolder($unitSpecFolder);
+
+                /** @var CourseSpec\Model $courseSpec */
+                $courseSpec = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification.course',
+                    'usc',
+                );
+
+                /** @var Folder\Model $courseSpecFolder */
+                $courseSpecFolder = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification.course.folder',
+                    'uscf',
+                );
+
+                $courseSpec->setFolder($courseSpecFolder);
+                $unitSpec->setCourse($courseSpec);
+                $context = $unitSpec;
             } elseif ($row['ui.id']) {
                 // Unit impl
                 /** @var UnitImpl\Model $unitImpl */
