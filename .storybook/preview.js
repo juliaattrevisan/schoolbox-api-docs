@@ -9,19 +9,21 @@
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
 import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to load mock data into stories
-import { app } from "@storybook/vue3"; //so can add in v-tables-3-select-rows and pinia
+import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
 
 initialize({
     // Initialize MSW
-    onUnhandledRequest: "bypass",
+    onUnhandledRequest: "bypass", // If you want MSW to bypass unhandled requests and not do anything
 });
 
 export const decorators = [mswDecorator]; // Provide the MSW addon decorator globally, so any story can use
 
-app.use(ClientTable); //so can use v-tables-3-select-rows in stories
-app.use(createPinia()); //so can use pinia in stories
+setup((app) => {
+    app.use(ClientTable); //so can use v-tables-3-select-rows in stories
+    app.use(createPinia()); //so can use pinia in stories
+});
 
 export const parameters = {
     chromatic: {
