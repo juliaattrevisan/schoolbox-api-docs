@@ -61,7 +61,14 @@
                 fontSize: String(fontSize) + settings.unit,
                 padding: String(fontSize / 4) + settings.unit,
             });
-
+            /**
+             * Using padding-bottom values such as 7.0175438596491% to provide appropriate height for
+             * tiles can lead to display issues when there's one tile per row. Refer to: SA-15725.
+             * To resolve we need to instead set a rounded height and remove the padding-bottom.
+             * Prior to setting the height, on each resize we need to first set it to auto and revert
+             * the padding-bottom to ensure we can accurately calculate the height.
+             */
+            tile.css({ height: "auto", paddingBottom: tile.parent().data("padding-bottom") });
             // If the title is taller than the tile:
             // reduce the tile's top and bottom padding so it fits.
             const titleHeight = tileTitle.outerHeight();
@@ -74,6 +81,8 @@
                     paddingBottom: newPadding,
                 });
             }
+            // Use the height to display the tile instead of padding-bottom.
+            tile.css({ height: `${Math.round(tileHeight)}px`, paddingBottom: 0 });
         });
     };
 })(jQuery);
