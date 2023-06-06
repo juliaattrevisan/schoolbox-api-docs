@@ -18,7 +18,6 @@ use Schoolbox\Collection;
  */
 class Filter extends Base
 {
-
     /**
      * Known filter types
      */
