@@ -194,15 +194,6 @@ $alert-default-background: css-darken($body-bg, 10%);
     }
 }
 
-/**
- *  The blanket adding of a bottom margin is causing issues in some areas. I can't identify the use case for
- *  why alert boxes need a 16px margin below them, but regardless, this prevents the random whitespace/bottom margin issue
- *  if an alert-box is the last child element within a parent.
-**/
-.alert-box:last-child {
-    margin-bottom: 0;
-}
-
 .alert-box:empty {
     display: none;
 }
