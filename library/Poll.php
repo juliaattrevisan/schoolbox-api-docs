@@ -57,21 +57,20 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     {
         $poll   = $this->getById($pollID);
         $date   = Alaress_Date_Format::now();
+        $query  = "SELECT count(*) FROM pollLog WHERE poll_id = ? AND user_id = ?";
         $params = [$pollID, $_SESSION['id']];
         switch ($poll['frequency']) {
             case "hourly":
+                $query .= ' AND created > ?';
                 $params[] = $date->addHours(-1)->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT);
                 break;
             case "daily":
+                $query .= ' AND created > ?';
                 $params[] = $date->addDays(-1)->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT);
                 break;
         }
 
-        $query = "
-            SELECT count(*)
-            FROM pollLog
-            WHERE poll_id = ? AND user_id = ? AND created > ?";
-        $vote  = $this->db->query($query, $params)->fetchColumn();
+        $vote = $this->db->query($query, $params)->fetchColumn();
 
         if ($vote > 0) {
             return true;
