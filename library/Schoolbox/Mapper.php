@@ -2867,7 +2867,7 @@ abstract class Mapper implements IMapper
         // (the column: whatever the key is in this model.)
         $join_identifier = $this->getJoinDefinition($join);
         $mapping         = $this->map->getOffsetByColumn($join_identifier['this_key']);
-        $key_value_list  = $this->getModelAsCollection($object)->getColumnValues($mapping['property']);
+        $key_value_list  = $this->getModelAsCollection($object)->getPropertyValues($mapping['property']);
         // If the join is a many or one to one relation:
         // it is likely that each value is an object (because the mapping was defined as a model type).
         $join_mapper = $this->getJoinMapper($join);
@@ -3635,7 +3635,7 @@ abstract class Mapper implements IMapper
     public function hydrateCollection($collection, $identifier = null)
     {
         $identifier = $identifier ? : $this->getIdentifier();
-        return $this->findByColumn($identifier['column'], $collection->getColumnValues($identifier['property']));
+        return $this->findByColumn($identifier['column'], $collection->getPropertyValues($identifier['property']));
     }
 
     /**
@@ -4227,8 +4227,8 @@ abstract class Mapper implements IMapper
         unset($updated[null]);
 
         // extract IDs
-        $existingIds = $existing->getColumnValues($foreignIdProperty);
-        $updatedIds  = $updated->getColumnValues($foreignIdProperty);
+        $existingIds = $existing->getPropertyValues($foreignIdProperty);
+        $updatedIds  = $updated->getPropertyValues($foreignIdProperty);
 
         // determine what to do
         $delete = array_diff($existingIds, $updatedIds);

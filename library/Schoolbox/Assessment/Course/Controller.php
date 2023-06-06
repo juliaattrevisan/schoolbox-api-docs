@@ -1137,7 +1137,7 @@ class Controller extends Base\Base
     protected function getLinkSuggestions(Folder $folder): Collection
     {
         // obtain curriculum codes...
-        $codes = $folder->getCurriculumNodes()->getColumnValues('code');
+        $codes = $folder->getCurriculumNodes()->getPropertyValues('code');
 
         // find all the folders that match this code, then filter for coarseness
         $courseFolders = $this->folderMapper->findByCurriculumCode($codes)->filter(function ($result) {

@@ -525,7 +525,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     private function getUserCampusName()
     {
         if ($this->user->getCampusCollection()->count()) {
-            return implode(', ', $this->user->getCampusCollection()->getColumnValues('name'));
+            return implode(', ', $this->user->getCampusCollection()->getPropertyValues('name'));
         }
 
         /* No campuses at all (for some reason)

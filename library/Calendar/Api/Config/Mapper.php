@@ -182,7 +182,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                     $config instanceof Calendar_Api_Config_Connector_Vcal
                     && !$user->isSuperuser()
                     && !$config->hasPermissions(
-                        $user->getCampusCollection()->getColumnValues('id'),
+                        $user->getCampusCollection()->getPropertyValues('id'),
                         $user->getRole()->getId()
                     )
                 ) {

@@ -243,7 +243,7 @@ class Controller extends BaseController
             $optionsBuilder = $this->optionsMapper->getPredicateBuilder();
             $optionsBuilder->equals('filter_page_id', $pageFilter->getId());
             if ($pageFilter->getOptions()->count()) {
-                $optionsBuilder->notIn('key', $pageFilter->getOptions()->getColumnValues('key'));
+                $optionsBuilder->notIn('key', $pageFilter->getOptions()->getPropertyValues('key'));
             }
             $this->optionsMapper->deleteByPredicates($optionsBuilder);
         }
@@ -251,7 +251,7 @@ class Controller extends BaseController
         // Delete any defaults for roleTypes that don't have access to the page
         $defaultsBuilder = $this->defaultsMapper->getPredicateBuilder();
         $defaultsBuilder
-            ->in('filter_option_id', $optionsToSave->getColumnValues('id'))
+            ->in('filter_option_id', $optionsToSave->getPropertyValues('id'))
             ->notIn('role_type', Page\Model::getPageRoleTypes()[$page]);
         $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
 

@@ -388,8 +388,8 @@ abstract class AbstractController extends BaseController
     {
         $fileIds   = json_decode("[$fileIdsCSV]", true);
         $files     = $this->fileMapper->findByColumn('id', $fileIds);
-        $folders   = new Collection($files->getColumnValues('folder'));
-        $folderIds = array_unique($folders->getColumnValues('id'));
+        $folders   = new Collection($files->getPropertyValues('folder'));
+        $folderIds = array_unique($folders->getPropertyValues('id'));
 
         $data = [
             'files'  => $fileIds,

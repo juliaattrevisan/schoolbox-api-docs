@@ -299,7 +299,7 @@ class Factory extends NullableContext\Factory
 
         if ($directFolders->count()) {
             $builder = $this->folderMapper->getPredicateBuilder();
-            $builder->in('f.id', $directFolders->getColumnValues('id'));
+            $builder->in('f.id', $directFolders->getPropertyValues('id'));
             $placeholders = implode('AND', $builder->getWhere());
 
             $query = "
@@ -347,7 +347,7 @@ class Factory extends NullableContext\Factory
 
         if ($indirectFolders->count()) {
             $builder = $this->folderMapper->getPredicateBuilder();
-            $builder->in('ci.folder_id', $indirectFolders->getColumnValues('id'));
+            $builder->in('ci.folder_id', $indirectFolders->getPropertyValues('id'));
             $placeholders = implode('AND', $builder->getWhere());
 
             $query = "

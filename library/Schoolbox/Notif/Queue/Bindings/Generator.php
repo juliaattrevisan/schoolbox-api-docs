@@ -246,7 +246,7 @@ class Generator implements GeneratorInterface
 
                     // parent bindings
                     // *.notify.parent.{childId}.#
-                    foreach ($childCollection->getColumnValues('id') as $id) {
+                    foreach ($childCollection->getPropertyValues('id') as $id) {
                         $bindings['parent'][] = "$id.#";
                     }
                 }
@@ -301,7 +301,7 @@ class Generator implements GeneratorInterface
 
             /** @var Collection|Role[] $roleCollection */
             foreach ($roles as $rType => $roleCollection) {
-                $this->roleCache[$rType] = $roleCollection->getColumnValues('id');
+                $this->roleCache[$rType] = $roleCollection->getPropertyValues('id');
             }
         }
         return $this->roleCache;

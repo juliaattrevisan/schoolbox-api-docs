@@ -144,7 +144,7 @@ class MapperTest extends TestCase
      */
     private function getSortedIds(Collection $folders)
     {
-        $folderIds = $folders->getColumnValues('id');
+        $folderIds = $folders->getPropertyValues('id');
         sort($folderIds);
 
         return $folderIds;
@@ -214,7 +214,7 @@ class MapperTest extends TestCase
 
         $expected = [2,20,21,22,23,24,25,26,27,28,29];
 
-        $this->assertEquals($expected, $folders->getColumnValues('id'));
+        $this->assertEquals($expected, $folders->getPropertyValues('id'));
     }
 
 
@@ -295,6 +295,6 @@ class MapperTest extends TestCase
         $lineage = Mapper::getInstance()->findParents($folder, $stopFolder, $cheaply);
 
         // no sorting
-        $this->assertEquals($expected, $lineage->getColumnValues('id'));
+        $this->assertEquals($expected, $lineage->getPropertyValues('id'));
     }
 }

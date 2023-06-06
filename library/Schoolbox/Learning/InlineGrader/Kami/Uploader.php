@@ -437,7 +437,7 @@ class Uploader
     private function saveKamiModelCollection(GenericCollection $models): array
     {
         if ($this->dryRun) {
-            return $models->getColumnValues('id');
+            return $models->getPropertyValues('id');
         }
         return $this->kamiMapper->save($models);
     }

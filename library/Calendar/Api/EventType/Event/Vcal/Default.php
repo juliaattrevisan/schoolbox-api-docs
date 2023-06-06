@@ -191,7 +191,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         if (
             $this->getUser()->isSuperuser()
             || $decodedConfig->hasPermissions(
-                $this->getUser()->getCampusCollection()->getColumnValues('id'),
+                $this->getUser()->getCampusCollection()->getPropertyValues('id'),
                 $this->getUser()->getRole()->getId()
             )
         ) {

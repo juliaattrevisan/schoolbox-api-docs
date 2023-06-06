@@ -60,7 +60,7 @@ class External_Schooledge_User implements External_UserInterface
         $quotedId    = $this->database->legacyQuote($externalId);
         $campusCodes = array_map(
             [$this->database, 'legacyQuote'],
-            $campusList->getColumnValues('extTimetableCode')
+            $campusList->getPropertyValues('extTimetableCode')
         );
         if (empty($campusCodes)) {
             return [];

@@ -199,8 +199,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $commentCollection = $this->mapper->findByColumn('blog_id', $blog->getId());
 
         /** @var User[]|Collection $userCollection */
-        $userCollection = new Collection($commentCollection->getColumnValues('owner'));
-        $userIds        = array_unique($userCollection->getColumnValues('id'));
+        $userCollection = new Collection($commentCollection->getPropertyValues('owner'));
+        $userIds        = array_unique($userCollection->getPropertyValues('id'));
 
         foreach ($userIds as $id) {
             // send this to anyone who has commented on the blog in question

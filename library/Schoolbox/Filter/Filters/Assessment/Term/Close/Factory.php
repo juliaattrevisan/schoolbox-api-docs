@@ -47,6 +47,6 @@ class Factory extends AssessmentTermFilter\Factory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, new Collection($this->getAllSortedTerms()->getColumnValues('id')));
+        return new KeyConverter($filter, new Collection($this->getAllSortedTerms()->getPropertyValues('id')));
     }
 }

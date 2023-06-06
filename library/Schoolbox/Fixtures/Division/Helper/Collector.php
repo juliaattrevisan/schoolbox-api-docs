@@ -104,7 +104,7 @@ class Collector
 
         $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
             'team_id',
-            $teams->getColumnValues('id'),
+            $teams->getPropertyValues('id'),
             ['order' => ['team_id' => 'asc', 'sequence' => 'asc']]
         );
         foreach ($teamPlayers as $teamPlayer) {

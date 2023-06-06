@@ -53,7 +53,7 @@ class User extends SchoolboxUser
      */
     public function getUserAccessRead(): array
     {
-        return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_READ)->getColumnValues('serviceIdentifier');
+        return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_READ)->getPropertyValues('serviceIdentifier');
     }
 
     /**
@@ -80,7 +80,7 @@ class User extends SchoolboxUser
      */
     public function getUserAccessWrite(): array
     {
-        return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_WRITE)->getColumnValues('serviceIdentifier');
+        return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_WRITE)->getPropertyValues('serviceIdentifier');
     }
 
     /**

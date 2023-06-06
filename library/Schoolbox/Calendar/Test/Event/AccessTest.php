@@ -229,7 +229,7 @@ class AccessTest extends TestCase
                 return in_array($access->getServiceIdentifier(), $groups);
             });
 
-            $relatedAccessLevels = $relatedAccessList->getColumnValues('accessLevel');
+            $relatedAccessLevels = $relatedAccessList->getPropertyValues('accessLevel');
 
             if (empty($relatedAccessLevels)) {
                 return 0;

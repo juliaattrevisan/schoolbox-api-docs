@@ -352,21 +352,6 @@ class Collection implements ICollection, Serializable, ArrayAccess
     }
 
     /**
-     * Gets values for the given model *property* in the collection.
-     *
-     * TODO WARNING - Method is misnamed, this actually inspects the model 'property', not 'column'.
-     *
-     * @param string $property
-     * @return array
-     * @deprecated 17.5 Use 'getPropertyValues' instead. Retained for backwards comparability
-     * @todo Remove 18.0
-     */
-    public function getColumnValues(string $property): array
-    {
-        return $this->getPropertyValues($property);
-    }
-
-    /**
      * Gets values for the given model property in the collection.
      *
      * @param string $property
