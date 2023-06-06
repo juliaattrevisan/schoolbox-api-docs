@@ -135,7 +135,7 @@ class Controller extends Base
              * https://canvas.instructure.com/doc/api/courses.html#method.courses.user_index
              * grab all courses for the user, where the course is available, and the user is enrolled
              */
-            $courses = $connection->retrieve('get', "/api/v1/users/${userId}/courses", [
+            $courses = $connection->retrieve('get', "/api/v1/users/{$userId}/courses", [
             'state'             => 'available',
             'enrollment_state'  => 'active',
             ]);

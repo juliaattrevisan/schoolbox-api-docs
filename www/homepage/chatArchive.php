@@ -161,7 +161,7 @@ if ($filter['page'] >= $totalPages) {
 }
 
 // set pagination button destinations
-$pageSlug = "${filter['folder']}/${filter['year']}/${filter['month']}/";
+$pageSlug = "{$filter['folder']}/{$filter['year']}/{$filter['month']}/";
 
 if ($totalPages > 1) {
     for ($j = 1; $j <= $totalPages; $j++) {
