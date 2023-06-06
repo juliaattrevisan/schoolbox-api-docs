@@ -376,7 +376,7 @@ class User extends DeprecatedModel
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, $params)->fetchAll();
     }
 
     public function getCampusList()
