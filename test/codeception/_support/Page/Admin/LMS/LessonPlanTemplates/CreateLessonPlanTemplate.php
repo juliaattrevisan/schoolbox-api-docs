@@ -32,6 +32,8 @@ class CreateLessonPlanTemplate
 
     /**
      * type a lesson plan template title
+     * @param $templateName
+     * @return void
      */
     public function typeName($templateName): void
     {
@@ -41,6 +43,7 @@ class CreateLessonPlanTemplate
 
     /**
      * click 'Add a new field"
+     * @return void
      */
     public function clickAddNewFieldButton(): void
     {
@@ -51,6 +54,9 @@ class CreateLessonPlanTemplate
 
     /**
      * type a field title
+     * @param int    $templateFieldNumber
+     * @param string $templateFieldTitle
+     * @return void
      */
     public function typeFieldTile(int $templateFieldNumber, string $templateFieldTitle): void
     {
@@ -61,7 +67,9 @@ class CreateLessonPlanTemplate
 
     /**
      * type a field body description
+     * @param int    $templateFieldNumber
      * @param string $body
+     * @return $this
      */
     public function fillBody(int $templateFieldNumber, string $body): self
     {
@@ -72,6 +80,8 @@ class CreateLessonPlanTemplate
 
     /**
      * checkbox field visible to students
+     * @param int $templateFieldNumber
+     * @return void
      */
     public function clickCheckboxVisibleStudents(int $templateFieldNumber): void
     {
@@ -80,6 +90,7 @@ class CreateLessonPlanTemplate
 
     /**
      * click SAVE button
+     * @return void
      */
     public function clickSaveButton(): void
     {
@@ -88,6 +99,7 @@ class CreateLessonPlanTemplate
 
     /**
      * click delete button
+     * @return void
      */
     public function clickDeleteButton(): void
     {
@@ -96,6 +108,7 @@ class CreateLessonPlanTemplate
 
     /**
      * confirm to delete a field: click yes in the confirmation dialog
+     * @return void
      */
     public function clickConfirmDeleteButton(): void
     {
@@ -104,6 +117,8 @@ class CreateLessonPlanTemplate
 
     /**
      * create a Lesson Plan Template
+     * @param string $templateName
+     * @return void
      */
     public function createLessonPlanTemplate(string $templateName): void
     {

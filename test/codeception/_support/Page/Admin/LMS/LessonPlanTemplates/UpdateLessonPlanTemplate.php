@@ -20,6 +20,9 @@ class UpdateLessonPlanTemplate
 
     /**
      * type a field title
+     * @param int    $templateFieldNumber
+     * @param string $templateFieldTitle
+     * @return void
      */
     public function typeFieldTile(int $templateFieldNumber, string $templateFieldTitle): void
     {
@@ -30,11 +33,12 @@ class UpdateLessonPlanTemplate
 
     /**
      * type a field body description
+     * @param int    $templateFieldNumber
      * @param string $body
+     * @return $this
      */
     public function fillBody(int $templateFieldNumber, string $body): self
     {
-        $templateField = 'input#field-title-' . $templateFieldNumber;
         $this->tester->fillRichTextField('field-body-' . $templateFieldNumber, $body);
         return $this;
     }

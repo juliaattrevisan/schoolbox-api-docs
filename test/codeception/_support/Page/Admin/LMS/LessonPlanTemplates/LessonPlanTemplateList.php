@@ -27,6 +27,7 @@ class LessonPlanTemplateList
 
     /**
      * click add lesson plan template icon
+     * @return void
      */
     public function clickAddLessonPlanTemplateButton(): void
     {
@@ -35,6 +36,8 @@ class LessonPlanTemplateList
 
     /**
      * click modify lesson plan template icon by passing the lesson plan template id
+     * @param int $templateIdNumber
+     * @return void
      */
     public function clickModifyLessonPlanTemplateButton(int $templateIdNumber): void
     {
@@ -43,6 +46,8 @@ class LessonPlanTemplateList
 
     /**
      * click the lesson plan template title by passing the lesson plan template id
+     * @param int $templateIdNumber
+     * @return void
      */
     public function clickLessonPlanTemplateTitle(int $templateIdNumber): void
     {
@@ -51,6 +56,8 @@ class LessonPlanTemplateList
 
     /**
      * click 3-dot button for a lesson plan template by passing the lesson plan template id
+     * @param int $templateIdNumber
+     * @return void
      */
     public function clickLessonPlanTemplateMenu(int $templateIdNumber): void
     {
@@ -59,6 +66,8 @@ class LessonPlanTemplateList
 
     /**
      * click disable/enable lesson plan on the 3-dot menu dropdown
+     * @param int $templateIdNumber
+     * @return void
      */
     public function clickDisableEnableVisibility(int $templateIdNumber): void
     {
@@ -66,7 +75,9 @@ class LessonPlanTemplateList
     }
 
     /**
-     * click disable/enable lesson plan on the 3-dot menu dropdown
+     * lick ddelete lesson plan on the 3-dot menu dropdown
+     * @param int $templateIdNumber
+     * @return void
      */
     public function clickDeleteTemplate(int $templateIdNumber): void
     {
@@ -75,6 +86,7 @@ class LessonPlanTemplateList
 
     /**
      * click the close button on the modal dialog
+     * @return void
      */
     public function clickCloseModal(): void
     {
