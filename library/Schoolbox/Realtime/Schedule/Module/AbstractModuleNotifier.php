@@ -334,7 +334,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      * @param array $serialized
      * @return void
      */
-    public function unserialize(array $serialized): void
+    public function __unserialize(array $serialized): void
     {
         if (!is_array($serialized)) {
             throw new RuntimeException("Could not unserialize notifier instance");
