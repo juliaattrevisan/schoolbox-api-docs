@@ -4,6 +4,9 @@
  * Usage:
  *    import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils";
  *    const player = new MediaElementPlayer(el, getConfigForVideo());
+ *
+ * @param { object } overrideValueByKey - object containing key:value pairs that will override defaults.
+ * @returns { object } - configuration object including overridden values.
  */
 export function getConfigForVideo(overrideValueByKey?: object) {
     let config = {
@@ -21,13 +24,13 @@ export function getConfigForVideo(overrideValueByKey?: object) {
         stretching: "none",
 
         /**
-         * @param media - the <mediaelementwrapper> DOM node (contains the <video> node)
-         * @param node - the <video> DOM node
-         * @param instance - the relevant instance of MediaElementPlayer
+         * @param { HTMLElement } media - the <mediaelementwrapper> DOM node (contains the <video> node)
+         * @param { HTMLElement } node - the <video> DOM node
+         * @param { MediaElementPlayer } instance - the relevant instance of MediaElementPlayer
          *
          * See: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
          */
-        success: function (media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
+        success(media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
             if (instance.node.nodeName.toLowerCase() === "audio") {
                 // The below code to fix aspect ratio need not be run when the instance is an audio player.
                 return;
@@ -48,7 +51,7 @@ export function getConfigForVideo(overrideValueByKey?: object) {
                 // TODO: This does not seem to be necessary anymore.
                 // If this is necessary, it will be only for videos in CKEditor content saved prior to 23.0.1.
                 node.style.width = "100%";
-                container.style.height = Math.round(container.getBoundingClientRect().width / aspectRatio) + "px";
+                container.style.height = `${Math.round(container.getBoundingClientRect().width / aspectRatio)}px`;
             }
 
             // Ensure the video poster fills the container with the correct aspect ratio, and has black bars
@@ -74,15 +77,15 @@ export function getConfigForVideo(overrideValueByKey?: object) {
              * Ensure the video container adjusts in size correctly as the window size changes (both when it
              * is playing and not playing).
              * If this function is removed (with the MediaElementPlayer 'stretching' option remaining as 'none'):
-             *  * downsizing the window from a large size will cause a horizontal scrollbar to appear on the
+             *  - downsizing the window from a large size will cause a horizontal scrollbar to appear on the
              *    video container
-             *  * when upsizing the window from a small size, the video will remain small as the surrounding
+             *  - when upsizing the window from a small size, the video will remain small as the surrounding
              *    space grows
-             *  * The video content size will not change as the window grows/shrinks.
+             *  - The video content size will not change as the window grows/shrinks.
              */
             function fixVideoPlayerDimensions() {
                 if (replacementContainer !== null) {
-                    // Set display to 'block' temporarily so we can calculate dimensions.  This allows the container to
+                    // Set display to 'block' temporarily, so we can calculate dimensions.  This allows the container to
                     // grow if it is able to, when we set container.style.width to 'auto' below.
                     replacementContainer.style.display = "block";
                 }
