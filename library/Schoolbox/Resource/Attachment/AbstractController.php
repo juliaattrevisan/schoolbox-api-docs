@@ -30,7 +30,12 @@ abstract class AbstractController implements ControllerInterface
     /**
      * @var int
      */
-    protected $defaultFolderId = 0;
+    protected      $defaultFolderId = 0;
+
+    /**
+     * The template which this controller uses.
+     */
+    private string $template;
 
     /**
      * @param bool   $multi

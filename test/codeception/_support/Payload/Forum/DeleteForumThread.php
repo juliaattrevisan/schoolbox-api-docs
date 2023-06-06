@@ -16,9 +16,20 @@ class DeleteForumThread extends \Payload\Request
     use PostTrait;
     use FormTrait;
 
+    /**
+     * The type of item to delete:
+     * * "deletePost" to delete a single post
+     * * "deleteThread" to delete an entire thread
+     */
+    private string $deleteForum;
+
+    /**
+     * The ID of the thread or post to delete
+     */
+    private int $id;
+
     public function __construct(int $threadID, int $id, string $deleteForum)
     {
-        $this->threadID = $threadID;
         $this->deleteForum = $deleteForum;
         $this->id = $id;
         $this->setReferer("/forum/thread/" . $threadID);

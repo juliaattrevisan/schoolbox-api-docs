@@ -13,6 +13,12 @@ class ModifyLessonPlanTemplate extends \Payload\Request
 {
     use PostTrait;
 
+
+    /**
+     * The lesson plan template ID to enable/disable.
+     */
+    private int $lessonPlanTemplateId;
+
     /**
      * modify a lesson plan template by passing the lesson plan id, name and lesson fields details
      * @param string $lessonPlanTemplateName
@@ -20,10 +26,10 @@ class ModifyLessonPlanTemplate extends \Payload\Request
      * @param string $visibility
      * @param string $body
      */
-    public function __construct(string $lessonPlanTemplateName, int $lessonPanTemplateId, array $lessons)
+    public function __construct(string $lessonPlanTemplateName, int $lessonPlanTemplateId, array $lessons)
     {
-        $this->lessonPanTemplateId = $lessonPanTemplateId;
-        $this->setReferer("/adminv2/lesson-plan/template/update/$this->lessonPanTemplateId");
+        $this->lessonPlanTemplateId = $lessonPlanTemplateId;
+        $this->setReferer("/adminv2/lesson-plan/template/update/$this->lessonPlanTemplateId");
         //lesson plan title
         $this->setFormParam('title', $lessonPlanTemplateName);
         //create one or more lesson plan fields
@@ -36,6 +42,6 @@ class ModifyLessonPlanTemplate extends \Payload\Request
 
     protected function getUrl(): string
     {
-        return "/adminv2/lesson-plan/template/update/$this->lessonPanTemplateId";
+        return "/adminv2/lesson-plan/template/update/$this->lessonPlanTemplateId";
     }
 }
