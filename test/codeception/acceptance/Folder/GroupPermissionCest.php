@@ -198,4 +198,41 @@ class GroupPermissionCest
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->cantSee('Group Restricted');
     }
+
+    public function inheritPermissions(AcceptanceTester $i): void
+    {
+        $createFolder           = new CreateFolder($i);
+        $manageGroup            = new ManageGroup($i);
+        $folderName             = "Group Root";
+        $homepageTemplateOption = "Course";
+
+        $i->amGoingTo('create a group with none permission to teachers');
+        $createFolder->typeName($folderName);
+        $createFolder->setHomepageTemplate($homepageTemplateOption);
+        $createFolder->setAccessPermission('groupWrite1');
+        $createFolder->setAccessPermission('groupNone2');
+        $i->amGoingTo('set write permission to senior student');
+        $createFolder->setAccessPermission('groupNone3');
+        $createFolder->setAccessPermission('groupNone4');
+        $i->amGoingTo('set read permission to junior student');
+        $createFolder->setAccessPermission('groupNone5');
+        $i->amGoingTo('set none permission to middle student');
+        $createFolder->setAccessPermission('groupNone6');
+        $createFolder->clickCreateGroupToggle();
+        $createFolder->clickCreateFolderButton();
+
+        $manageGroup->waitManageGroupTitleToBePresented();
+        $manageGroup->setAccessPermission('type-1');
+        $manageGroup->clickUpdateButton();
+
+        $i->amGoingTo('Add Jack Coles as group admin');
+        $manageGroup->clickFromRadioButton('list');
+        $manageGroup->search('jcoles');
+        $manageGroup->selectUser(22);
+        $manageGroup->clickFromRadioButton('role');
+        $i->click('Add Members');
+
+
+
+    }
 }
