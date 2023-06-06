@@ -15,7 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
 
-class SitePage extends Page
+class SitePage
 {
     /**
      * The site that this SitePage uses to get templates from
@@ -31,9 +31,9 @@ class SitePage extends Page
 
     /**
      * List of arguments passed in URL
-     * @var array
+     * @var array<string>
      */
-    public $arg = array();
+    public array $arg = [];
 
     /** @var string $currentTab */
     private $currentTab;
@@ -51,16 +51,26 @@ class SitePage extends Page
     private $config;
 
     /**
+     * The root folder for templates which SitePage uses.
+     */
+    protected string $templateRoot;
+
+    /**
+     * The PHPLib templating engine SitePage uses.
+     */
+    public Template $template;
+
+    /**
      * Constructor
      *
      * @param ContainerInterface $di
      */
     public function __construct(ContainerInterface $di)
     {
-        parent::__construct();
-
-        $this->di     = $di;
-        $this->config = $di->get('config');
+        $this->di           = $di;
+        $this->config       = $di->get('config');
+        $this->templateRoot = SITE_root . '/templates';
+        $this->template     = new Template($this->templateRoot);
 
         if (isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
@@ -416,6 +426,21 @@ class SitePage extends Page
     public function error($ec, $message = '', $code = 400)
     {
         throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
+    }
+
+    public function setVar($var, $value = '')
+    {
+        $this->template->setVar($var, $value);
+    }
+
+    public function setBlock($parent, $handle, $name = '')
+    {
+        $this->template->setBlock($parent, $handle, $name);
+    }
+
+    public function parse($target, $handle, $append = false)
+    {
+        $this->template->parse($target, $handle, $append);
     }
 
     /**
