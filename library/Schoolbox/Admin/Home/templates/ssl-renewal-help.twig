@@ -366,7 +366,7 @@ data:
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
-    <div class="admin-content ssl-renewal-help">
+    <div class="admin-content">
         <div class="small-12 island">
             <h2 class="subheader">SSL Renewal Help</h2>
             <section class="content">
@@ -407,11 +407,9 @@ data:
 
             <div class="small-12 island">
                 <h3 class="subheader">Diagnostics</h3>
-                <section class="content">
-                    <div id="diagnostics-{{ idx }}" data-alart class="alert-box u-break-word"><span class="loader"></span>Testing in progress,
-                        please wait...
-                    </div>
-                </section>
+                <div id="diagnostics-{{ idx }}" data-alert class="alert-box u-break-word"><span class="loader"></span>Testing in progress,
+                    please wait...
+                </div>
             </div>
 
             <div id="common-causes-wrap-{{ idx }}" class="small-12 island hide">
@@ -430,7 +428,7 @@ data:
 
             <div id="request-response-letsencrypt-{{ idx }}" class="hide">
                 <div id="request-details-le-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Request (User Agent: Let's Encrypt)</h3>
                         <table>
                             <tr>
@@ -449,7 +447,7 @@ data:
                     </div>
                 </div>
                 <div id="response-details-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Response</h3>
                         <table>
                             <tr>
@@ -471,7 +469,7 @@ data:
 
             <div id="request-response-chrome-{{ idx }}" class="hide">
                 <div id="request-details-chrome-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Request (User Agent: Chrome)</h3>
                         <table>
                             <tr>
@@ -490,7 +488,7 @@ data:
                     </div>
                 </div>
                 <div id="response-details-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Response</h3>
                         <table>
                             <tr>

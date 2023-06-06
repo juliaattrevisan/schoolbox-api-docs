@@ -113,15 +113,3 @@ select {
 time {
     white-space: nowrap;
 }
-
-/**
- *  There is a rule somewhere applying a width: 100%; (and more) to medium range
- *  .small-12.island classes. We need to apply this to small range items too.
- *  This is in response to SA-15529.
- */
-@media #{$small-only} {
-    .medium-12.island {
-        max-width: 100%;
-        width: 100%;
-    }
-}

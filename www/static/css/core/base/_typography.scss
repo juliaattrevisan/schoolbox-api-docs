@@ -199,13 +199,6 @@ dl {
     margin-bottom: $list-margin-bottom;
 }
 
-// Not sure why every list gets a bottom margin but when they're the last item in a parent it causes whitespace issues.
-ul:last-child,
-ol:last-child,
-dl:last-child {
-    margin-bottom: 0;
-}
-
 ul {
     margin-#{$default-float}: $list-side-margin;
 }
