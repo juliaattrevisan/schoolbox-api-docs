@@ -717,7 +717,7 @@ class Base implements Serializable, IConnector
                 $params[] = $item;
             }
         } else {
-            $query .= "OR {$this->getQuoter()->quoteIdentifier($identifier)}` = ?";
+            $query .= "OR {$this->getQuoter()->quoteIdentifier($identifier)} = ?";
             $params[] = $value;
         }
         $this->query($query, $params);
