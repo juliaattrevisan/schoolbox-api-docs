@@ -14,9 +14,9 @@ class CreateLessonPlanTemplate
 
     public const BUTTON_SAVE = '#save-button';
 
-    public const BUTTON_DELETE = 'a.class.button icon-delete';
+    public const BUTTON_DELETE = 'a.button.icon-delete';
 
-    public const CONFIRM_YES = '#confirm-dialog-confirm-button';
+    public const CONFIRM_YES = 'a#confirm-dialog-confirm-button.button.submit';
 
     private AcceptanceTester $tester;
 
@@ -65,9 +65,20 @@ class CreateLessonPlanTemplate
      */
     public function fillBody(int $templateFieldNumber, string $body): self
     {
-        $templateField = 'input#field-title-new' . $templateFieldNumber;
+//        $templateField = 'input#field-title-new' . $templateFieldNumber;
         $this->tester->fillRichTextField('field-body-new' . $templateFieldNumber, $body);
         return $this;
+    }
+
+
+    /**
+     * checkbox field visible to students
+     */
+    public function clickCheckboxVisibleStudents(int $templateFieldNumber): void
+    {
+//        $this->tester->click('input#field-new-visibility-' . $templateFieldNumber);
+        $this->tester->click('label[for="field-new-visibility-' . $templateFieldNumber.'"]');
+
     }
 
     /**
@@ -91,7 +102,7 @@ class CreateLessonPlanTemplate
      */
     public function clickConfirmDeleteButton(): void
     {
-        $this->tester->click(self::CONFIRM_YES);
+        $this->tester->click(Locator::lastElement(self::CONFIRM_YES));
     }
 
 
@@ -104,4 +115,6 @@ class CreateLessonPlanTemplate
         $this->typeName($templateName);
         $this->clickSaveButton();
     }
+
+
 }

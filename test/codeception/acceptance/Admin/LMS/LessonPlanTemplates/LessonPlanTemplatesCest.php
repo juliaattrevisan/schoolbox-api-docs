@@ -101,15 +101,25 @@ class LessonPlanTemplatesCest
         $templateList->clickCloseModal();
         $i->amGoingTo('Modify a lesson plan template, delete a field, save it');
         $templateList->clickModifyLessonPlanTemplateButton($templateId);
-        $i->amGoingTo("Click the template title in the template list and check the field deleted is not presented");
         $templates->clickDeleteButton();
         $templates->clickConfirmDeleteButton();
         $templates->clickSaveButton();
-        $i->amGoingTo("Click the template title in the template list and check the fields are updated");
+        $i->amGoingTo("Click the template title in the template list and check the field deleted is not presented");
         $templateList->clickLessonPlanTemplateTitle($templateId);
         $i->cantSee('Automation Template 1 Updated');
         $i->cantSee('Automation Body 1 Updated');
         $i->canSee('Automation Field 2');
         $i->canSee('Automation Body 2');
+        $i->cantSee('This field is not visible to students');
+        $templateList->clickCloseModal();
+        $i->amGoingTo('Modify a lesson plan template, uncheck the visible to students and save it');
+        $templateList->clickModifyLessonPlanTemplateButton($templateId);
+        $templateFieldId = $i->grabFromDatabase('lesson_plan_template_field', 'id', ['deleted_at' => null, 'title like' => "Automation Field 2"]);
+        $templates->clickCheckboxVisibleStudents($templateFieldId);
+        $templates->clickSaveButton();
+        $i->amGoingTo("Click the template is presenting the message invisible to students on the modal");
+        $templateList->clickLessonPlanTemplateTitle($templateId);
+        $i->canSee('This field is not visible to students');
+
     }
 }
