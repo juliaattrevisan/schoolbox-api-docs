@@ -11,7 +11,6 @@ namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
-use Database;
 use InvalidArgumentException;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use RuntimeException;
@@ -210,21 +209,6 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $this->outputError($e, $message, $info, $error, $code);
             }
         }
-    }
-
-
-    /**
-     * @inheritdoc
-     * @throws \Schoolbox\External\Exception
-     */
-    protected function initialiseExternalConnections(): void
-    {
-        $database = Database::getInstance();
-        // Catch-22:
-        // I don't know if debug is enabled until I connect to the database.
-        // The only solution is to allow the config query to run and then throw
-        // away my connection, and create a fresh one with debug enabled.
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd);
     }
 
     /**

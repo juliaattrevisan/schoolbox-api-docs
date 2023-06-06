@@ -11,11 +11,11 @@ namespace Schoolbox\Notif\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Schoolbox\Database\Factory;
 use Schoolbox\Notif\NotifException;
 
 class MySQLHandler extends AbstractProcessingHandler
 {
-
     protected $sql;
 
     public function __construct($level = Logger::DEBUG, $bubble = true)
@@ -42,7 +42,7 @@ class MySQLHandler extends AbstractProcessingHandler
         }
 
         // TODO DEGLOBALISE
-        $stmt = \Database::getInstance()->prepare($this->sql);
+        $stmt = Factory::getInstanceInternal()->prepare($this->sql);
 
         try {
             $stmt->execute($record['context']);

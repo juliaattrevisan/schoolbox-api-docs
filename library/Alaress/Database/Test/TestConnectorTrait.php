@@ -12,8 +12,6 @@ namespace Alaress\Database\Test;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
-use Database;
-use InvalidArgumentException;
 
 trait TestConnectorTrait
 {
@@ -39,14 +37,6 @@ trait TestConnectorTrait
      */
     private function connectDb2Test()
     {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $this->db2Test = $factory->createDb2();
@@ -65,14 +55,6 @@ trait TestConnectorTrait
      */
     private function connectSchoolbox()
     {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $this->schoolbox = $factory->createMysql();
@@ -91,14 +73,6 @@ trait TestConnectorTrait
      */
     private function connectSqlsrvTest()
     {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $this->mssqlTest = $factory->createSqlsrv();

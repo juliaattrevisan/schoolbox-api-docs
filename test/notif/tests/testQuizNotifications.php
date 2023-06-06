@@ -10,6 +10,7 @@
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
+use Schoolbox\Database\Factory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
@@ -28,7 +29,6 @@ use Schoolbox\User;
  */
 class QuizNotifications extends AbstractNotificationTest
 {
-
     /** @var Folder\Model */
     protected $folder;
 
@@ -100,7 +100,7 @@ class QuizNotifications extends AbstractNotificationTest
         $this->clearRabbit();
 
         // fetch the group with the largest number of subscribers
-        $this->folderId = Database::getInstance()->query('
+        $this->folderId = Factory::getInstanceInternal()->query('
             SELECT sid
             FROM userAccess ua
             JOIN folder f ON f.id = ua.sid AND ua.service = 1
@@ -111,7 +111,7 @@ class QuizNotifications extends AbstractNotificationTest
             LIMIT 1
         ')->fetchColumn();
 
-        $this->adminId = Database::getInstance()->query('
+        $this->adminId = Factory::getInstanceInternal()->query('
             SELECT uid
             FROM userAccess
             WHERE `type` = 3
@@ -169,13 +169,13 @@ class QuizNotifications extends AbstractNotificationTest
         $recipient = $this->getUser($recipientId);
 
         if (preg_match('`/assess/[A-Za-z]+/(\d+)`', $message['href'], $matches)) {
-            list (, $quizId) = $matches;
+            [, $quizId] = $matches;
         } else {
             // This message is targeted to the parent, and therefore doesn't reference the quiz.
             // Extract quiz ID out of topics
             foreach ($message['topics'] as $topic) {
                 if (preg_match('`INFO\\.notify\\.parent\\.\\d+\\.assess\\.(\\d+).updated`', $topic, $matches)) {
-                    list (, $quizId) = $matches;
+                    [, $quizId] = $matches;
                     break;
                 }
             }

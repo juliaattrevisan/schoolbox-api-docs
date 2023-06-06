@@ -12,7 +12,6 @@ namespace Alaress\Database\Test\Mysql;
 
 use Alaress\Database\Factory;
 use Alaress\Database\Test\TestConnectorTrait;
-use Database;
 use PHPUnit\Framework\TestCase;
 
 class TestPostProcessor extends TestCase
@@ -43,9 +42,6 @@ class TestPostProcessor extends TestCase
      */
     public function testPostProcessor()
     {
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $schoolbox = $factory->createMysql();
@@ -63,15 +59,15 @@ class TestPostProcessor extends TestCase
         // ----------------------------------------------------------------------------------------------------------------
 
         $statement = $schoolbox->executeQuery("
-            SELECT '     douglas' AS name UNION 
-            SELECT '  damian' AS name UNION 
-            SELECT '  doctor    ' AS name UNION 
-            SELECT '  steve' AS name UNION 
-            SELECT ' andy    ' AS name UNION 
-            SELECT ' nat    ' AS name UNION 
-            SELECT 'amri    ' AS name UNION 
+            SELECT '     douglas' AS name UNION
+            SELECT '  damian' AS name UNION
+            SELECT '  doctor    ' AS name UNION
+            SELECT '  steve' AS name UNION
+            SELECT ' andy    ' AS name UNION
+            SELECT ' nat    ' AS name UNION
+            SELECT 'amri    ' AS name UNION
             SELECT 'stu ' AS name UNION
-            SELECT 'zfuturedevs' AS name 
+            SELECT 'zfuturedevs' AS name
         ");
 
         $count = 0;

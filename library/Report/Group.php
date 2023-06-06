@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Database\Factory;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -154,7 +156,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             ORDER BY $orderBy $orderDir
         ";
 
-        $handler = Database::getInstance();
+        $handler = Factory::getInstanceInternal();
 
         $this->dataResource = $handler->query($query);
         $this->dataCount    = $this->dataResource->rowCount();

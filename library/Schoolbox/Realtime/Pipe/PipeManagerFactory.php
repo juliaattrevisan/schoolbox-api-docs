@@ -12,7 +12,6 @@ namespace Schoolbox\Realtime\Pipe;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Database;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\Session\Serialize\HandlerInterface;

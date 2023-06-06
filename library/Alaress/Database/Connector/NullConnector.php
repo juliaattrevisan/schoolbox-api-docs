@@ -13,6 +13,7 @@ use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use PDOStatement;
 
 /**
  * Implementation of *Alaress\Database\Connector\IConnector* for when
@@ -23,7 +24,6 @@ use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
  */
 class NullConnector implements IConnector
 {
-
     /**
      * @inheritDoc
      */
@@ -91,6 +91,15 @@ class NullConnector implements IConnector
      * @inheritDoc
      */
     public function prepareQuery($query, $parameters = [])
+    {
+        throw new Exception('Not supported.');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function prepare(string $statement, array $driverOptions = []): PDOStatement
     {
         throw new Exception('Not supported.');
     }
@@ -416,5 +425,32 @@ class NullConnector implements IConnector
     public function trimField($fieldValue)
     {
         return $fieldValue;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function insert(string $table, array $array): bool
+    {
+        throw new Exception('Not supported.');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function update(string $table, array|string $identifier, array $array): bool
+    {
+        throw new Exception('Not supported.');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function delete(string $table, string $identifier, array|string $value): bool
+    {
+        throw new Exception('Not supported.');
     }
 }

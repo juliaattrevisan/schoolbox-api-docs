@@ -12,10 +12,12 @@ namespace Alaress\Database\Statement;
 
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\IIterator;
+use IteratorAggregate;
 use PDO;
 use PDOStatement;
+use Traversable;
 
-interface IStatement
+interface IStatement extends IteratorAggregate
 {
     /**
      * Get number of rows affected by last executed query
@@ -54,7 +56,7 @@ interface IStatement
      * Get single column denoted by its index for the next row in the query
      *
      * @param int $column
-     * @return string
+     * @return mixed The column value, or `false` if no rows returned.
      */
     public function fetchColumn($column = 0);
 
@@ -127,11 +129,10 @@ interface IStatement
     /**
      * Execute stored procedure and return an iterator
      *
-     * @param array|null $values
      * @return IIterator
      * @throws Exception
      */
-    public function getIterator($values = null);
+    public function getIterator(): IIterator;
 
     /**
      * Returns the data type name as a string for debugging display purposes only, should be no

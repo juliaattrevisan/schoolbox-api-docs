@@ -23,7 +23,6 @@ use Schoolbox\Sync;
  */
 class Mapper extends Schoolbox\Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *
@@ -84,7 +83,7 @@ class Mapper extends Schoolbox\Mapper
      */
     public function findNextAvailableSequence($roleType)
     {
-        return $this->database->query('
+        return (int)$this->database->query('
           SELECT COALESCE(MAX(sequence), 0) + 1
           FROM ups_rule
           WHERE role_type = ?

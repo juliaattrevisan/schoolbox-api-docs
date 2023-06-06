@@ -11,19 +11,18 @@ declare(strict_types=1);
 
 namespace Schoolbox;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
 use PDO;
 
 class RoleCloner
 {
-
-    /** @var Database */
-    protected $db;
+    /** @var IConnector */
+    protected IConnector $db;
 
     /**
-     * @param Database $db
+     * @param IConnector $db
      */
-    public function __construct(Database $db)
+    public function __construct(IConnector $db)
     {
         $this->db = $db;
     }

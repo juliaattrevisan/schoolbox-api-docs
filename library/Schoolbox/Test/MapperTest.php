@@ -17,7 +17,6 @@ namespace Schoolbox\Test;
  */
 class MapperTest extends TestCase
 {
-
     /**
      * The mapper that's being tested.
      *
@@ -27,7 +26,7 @@ class MapperTest extends TestCase
 
 
     /**
-     * @var MockDatabase
+     * @var MockConnector
      */
     protected $db;
 
@@ -36,7 +35,7 @@ class MapperTest extends TestCase
     {
         parent::setUp();
         $this->object = new TestMapper($this);
-        $this->db     = new MockDatabase($this);
+        $this->db     = new MockConnector($this);
         $this->object->setDatabase($this->db);
     }
 

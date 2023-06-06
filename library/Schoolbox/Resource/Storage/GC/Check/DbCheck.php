@@ -9,22 +9,22 @@
 
 namespace Schoolbox\Resource\Storage\GC\Check;
 
-use Database;
-use PDO;
+use Alaress\Database\Connector\IConnector;
 
 abstract class DbCheck implements Check
 {
-    /** @var PDO */
-    protected $db;
+    /**
+     * Database connection
+     */
+    protected IConnector $db;
 
     /**
-     * @param Database $db
+     * @param IConnector $db
      */
-    public function __construct(Database $db)
+    public function __construct(IConnector $db)
     {
         $this->db = $db;
     }
-
 
     /**
      * Return the SQL condition that this check uses to regard a file as 'stale'.
@@ -32,14 +32,13 @@ abstract class DbCheck implements Check
      *
      * @return string
      */
-    abstract protected function getStaleCondition();
-
+    abstract protected function getStaleCondition(): string;
 
     /**
-     * @param array $previous
-     * @return array
+     * @param array<string> $previous
+     * @return array<string>
      */
-    public function getStale(array $previous)
+    public function getStale(array $previous): array
     {
         $cond   = $this->getStaleCondition();
         $prev   = implode("', '", $previous);

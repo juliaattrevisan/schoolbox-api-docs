@@ -54,7 +54,7 @@ abstract class Evaluation_Section extends DeprecatedModel
         $sequence = $this->db->query($query, [$assess_id])->fetchColumn();
 
         if ($sequence) {
-            return $sequence;
+            return (int)$sequence;
         }
 
         return 1;
@@ -237,8 +237,8 @@ abstract class Evaluation_Section extends DeprecatedModel
             $numResponses .= " AND assess_response.response != 'N;'";
             $numResponses .= " AND assess_response.response != ''";
 
-            $currentSection['numQuestions'] = $this->db->query($numQuestions, $params)->fetchColumn();
-            $currentSection['numResponses'] = $this->db->query($numResponses, $params)->fetchColumn();
+            $currentSection['numQuestions'] = (int)$this->db->query($numQuestions, $params)->fetchColumn();
+            $currentSection['numResponses'] = (int)$this->db->query($numResponses, $params)->fetchColumn();
 
             if ($currentSection['numQuestions'] > 0) {
                 $currentSection['percentageComplete'] = round(100 * $currentSection['numResponses'] / $currentSection['numQuestions']);

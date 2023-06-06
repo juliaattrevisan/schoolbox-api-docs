@@ -12,7 +12,6 @@ use Schoolbox\Blog\Homepage\Post as Blog;
 
 class PopulateTimestamps extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @var Blog\Mapper
      */
@@ -138,7 +137,7 @@ class PopulateTimestamps extends \PHPUnit\Framework\TestCase
      */
     private function getBlogMapper()
     {
-        $db         = new MockDatabase($this);
+        $db         = new MockConnector($this);
         $blogMapper = Blog\Mapper::getInstance();
         $blogMapper->setDatabase($db);
         return $blogMapper;

@@ -25,12 +25,13 @@
 
 namespace Schoolbox\Mapper;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
-use Database;
 use PDOException;
 use Schoolbox\Blog;
 use Schoolbox\Collection;
+use Schoolbox\Database\Factory;
 use Schoolbox\Discussion;
 use Schoolbox\IMapper;
 use Schoolbox\Fixtures;
@@ -62,8 +63,8 @@ class RecursiveUndeleterCli extends CliTool\App
     /** @var array the ids that were supplied in a command-line argument (array of integers or ['*']) */
     private $rootIds;
 
-    /** @var Database */
-    private $database;
+    /** @var IConnector */
+    private IConnector $database;
 
     /** @var Logger */
     private $logger;
@@ -173,7 +174,7 @@ class RecursiveUndeleterCli extends CliTool\App
      */
     private function connectToDatabase(): void
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
 

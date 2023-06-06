@@ -473,7 +473,7 @@ class Component_InstanceMapper extends BaseMapper
 
         foreach ($instanceCollection as $instance) {
             /* @var $instance Component_Instance */
-            $instanceIDs[]            = $this->database->quote($instance->getId(), PDO::PARAM_INT);
+            $instanceIDs[]            = $this->database->legacyQuote($instance->getId());
             $sourceInstanceCollection = $this->findByColumnList([
                 'module'     => 'dashboard',
                 'identifier' => $instance->getIdentifier(),

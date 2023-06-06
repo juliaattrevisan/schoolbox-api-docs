@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Permission\Access\Test;
 
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql;
@@ -410,7 +411,7 @@ class AccessTest extends TestCase
      */
     public function testCannotConnectToExternalUser(): void
     {
-        $this->expectException(Error::class);
+        $this->expectException(DatabaseException::class);
         $access = $this->newAccess();
         $reflection = new ReflectionClass($access);
         $instance   = $reflection->getProperty('externalUser');

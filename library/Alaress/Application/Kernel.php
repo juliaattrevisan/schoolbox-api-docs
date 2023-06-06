@@ -223,13 +223,11 @@ abstract class Kernel
         $this->shutdownHandler = new ShutdownHandler();
 
         // run the launch sequence
-        $this->initialiseExternalConnections();
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
         $this->installDependencies($this->di);
         $this->postInstallDependencies();
-        $this->initialiseDebugging();
         $this->checkServerApiEnvironment();
     }
 
@@ -252,15 +250,6 @@ abstract class Kernel
         return \posix_getuid() === 0;
     }
 
-
-    /**
-     * Initialise connections to databases, etc.
-     *
-     * @return void
-     * @throws \Schoolbox\External\Exception
-     */
-    abstract protected function initialiseExternalConnections(): void;
-
     /**
      * Called after DI services are registered.
      */
@@ -269,13 +258,6 @@ abstract class Kernel
         $config = new ConfigLoader();
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL)));
     }
-
-    /**
-     * Initialise debugging
-     *
-     * @return void
-     */
-    abstract protected function initialiseDebugging(): void;
 
     /**
      * Register any error handling required

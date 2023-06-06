@@ -169,8 +169,8 @@ class Mapper extends \Schoolbox\Mapper
                 WHERE deleted_at IS NULL
             ";
 
-            $maxSequence = $this->getDatabase()->query($query)->fetchColumn();
-            $nextSequence = $maxSequence !== null ? $maxSequence + 1 : $model::sequenceBase();
+            $maxSequence  = $this->getDatabase()->query($query)->fetchColumn();
+            $nextSequence = $maxSequence !== null ? ((int)$maxSequence + 1) : $model::sequenceBase();
 
             $model->setSequence($nextSequence);
         }

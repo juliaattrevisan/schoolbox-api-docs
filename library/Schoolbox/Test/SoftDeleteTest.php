@@ -14,7 +14,6 @@ use Schoolbox\Mapper\Exception;
 
 class SoftDeleteTest extends TestCase
 {
-
     /**
      * The mapper that's being tested.
      *
@@ -26,7 +25,7 @@ class SoftDeleteTest extends TestCase
     {
         parent::setUp();
         $this->object = new SoftDeleteTestMapper();
-        $this->object->setDatabase(new MockDatabase($this));
+        $this->object->setDatabase(new MockConnector($this));
     }
 
     public function testSoftDeleteNotDeleted()

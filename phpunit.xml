@@ -20,10 +20,6 @@
       <exclude>library/Schoolbox/Database/Test</exclude>
       <exclude>library/Schoolbox/Profile/Test/Generator.php</exclude>
     </testsuite>
-    <testsuite name="databaseTest">
-      <directory suffix=".php">library/Alaress/Database/Test</directory>
-      <directory suffix=".php">library/Schoolbox/Database/Test</directory>
-    </testsuite>
   </testsuites>
     <listeners>
         <!-- TODO - This is a temporary hack to compensate for a bug in paratest/phpunit when using code-coverage -->
@@ -32,6 +28,13 @@
         <listener class="Alaress\Test\MakeWarningErrorAgainTestListener"></listener>
     </listeners>
     <php>
-        <env name="INSTANCE_ID" value="vagrantx" force="true" />
+        <!--
+            The standard test suite uses a fake instance ID, to ensure that
+            there is no database connection.
+            The Vagrant environment by default has a connection, even in tests:
+            the CI environment does not, which can cause Vagrant and CI to
+            report different errors.
+        -->
+        <env name="INSTANCE_ID" value="null" force="true" />
     </php>
 </phpunit>

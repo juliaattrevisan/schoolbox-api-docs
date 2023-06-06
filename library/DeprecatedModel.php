@@ -5,6 +5,9 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 require_once(dirname(__FILE__) . '/../www/conf/conf.php');
 /**
  * @deprecated
@@ -15,14 +18,17 @@ class DeprecatedModel
     protected $_table;
     protected $_index;
 
-    /** @var Database */
-    protected Database $db;
+    /**
+     * A database connection
+     */
+    protected IConnector $db;
+
     /**
      * @deprecated
      */
     public function __construct()
     {
-        $this->db = Database::getInstance();
+        $this->db = Factory::getInstanceInternal();
     }
 
     /**

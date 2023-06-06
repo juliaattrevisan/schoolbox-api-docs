@@ -17,7 +17,7 @@ class HardLinks extends DbCheck
      *
      * @return string
      */
-    protected function getStaleCondition()
+    protected function getStaleCondition(): string
     {
         // all the places hard links occur
         $queries = [

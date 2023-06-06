@@ -17,7 +17,6 @@ use Survey\Import\Parser\IParser as SurveyParser;
  */
 class Survey_Import_Xml extends Evaluation_Import_Xml
 {
-
     /**
      * Gets a version-dependent parser that knows how to interpret a specific version format, but
      * respect a consistent API of representing the file's data.

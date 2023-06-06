@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Aura\Di\Container;
-use Database;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
 use PDOException;
@@ -28,7 +27,6 @@ use Sentry\State\HubInterface;
  */
 abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements LoggerAwareInterface
 {
-
     // Exit Statuses.
     // Apps may use custom exit statuses so long as they don't collide with these, say starting at 100
     public const EXIT_STATUS_OK           = 0;   // The requested action was successfully performed.
@@ -313,28 +311,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     {
         $this->getShutdownHandler()->registerFunction([$this, 'onShutdown']);
         register_shutdown_function($this->getShutdownHandler());
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function initialiseDebugging(): void
-    {
-        // no debugging for CLI Kernels
-    }
-
-
-    /**
-     * Initialise connections to databases, etc.
-     *
-     * @return void
-     * @throws \Schoolbox\External\Exception
-     */
-    protected function initialiseExternalConnections(): void
-    {
-        // MySQL connection configuration
-        Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, ['throw' => true]);
     }
 
 

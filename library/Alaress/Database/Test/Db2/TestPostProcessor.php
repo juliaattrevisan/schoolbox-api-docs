@@ -12,7 +12,6 @@ namespace Alaress\Database\Test\Db2;
 
 use Alaress\Database\Factory;
 use Alaress\Database\Test\TestConnectorTrait;
-use Database;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -56,9 +55,6 @@ class TestPostProcessor extends TestCase
      */
     public function testPostProcessor()
     {
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
         $factory = new Factory();
 
         $db2Test = $factory->createDb2();

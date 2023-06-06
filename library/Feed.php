@@ -5,6 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
@@ -21,10 +22,10 @@ class Feed
      *
      * @deprecated use `\Schoolbox\Feed\StandardFeed`
      *
-     * @param Database        $db   A database connection
-     * @param \Schoolbox\User $user The user to generate the feed for
+     * @param IConnector     $db   A database connection
+     * @param Schoolbox\User $user The user to generate the feed for
      */
-    public function __construct(private Database $db, private Schoolbox\User $user)
+    public function __construct(private IConnector $db, private Schoolbox\User $user)
     {
     }
 

@@ -35,7 +35,6 @@ use Throwable;
 use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
-use Database;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 
@@ -468,35 +467,6 @@ class Kernel extends WebKernelAbstract
         $sitePage->initSession();
         $sitePage->loadContent($pageName);
         $sitePage->outputPage();
-    }
-
-
-    /**
-     * Initialise debugging
-     *
-     * @return void
-     * @throws \DebugBar\DebugBarException
-     * @throws \Schoolbox\External\Exception
-     */
-    protected function initialiseDebugging(): void
-    {
-        // Set up the debug bar, and add listeners for various parts of the debug bar
-        // (database calls, XHProf)
-        // Should go in a DI container instead of a static class.
-        if (DebugBar::isEnabled()) {
-            DebugBar::init();
-
-            $debugBar = DebugBar::getInstance();
-
-            // Throw away existing connection and reconnect with persistence off
-            $database = Database::getInstance();
-            $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
-
-            $collector = $database->getCollector();
-            if (!$debugBar->hasCollector($collector->getName())) {
-                $debugBar->addCollector($collector);
-            }
-        }
     }
 
 

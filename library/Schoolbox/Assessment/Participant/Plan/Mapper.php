@@ -133,7 +133,9 @@ class Mapper extends BaseMapper
             $args  = $pb->getParams();
         }
 
-        return $this->hydrateSelect($this->database->query($query, $args));
+        $statement = $this->database->prepare($query);
+        $statement->execute($args);
+        return $this->hydrateSelect($statement);
     }
 
 

@@ -121,7 +121,7 @@ class Mapper extends Schoolbox\Mapper
                 self::COL_DELETED_AT
             );
             $maxSequence = $this->getDatabase()->query($sql)->fetchColumn();
-            $nextSequence = $maxSequence !== null ? $maxSequence + 1 : $model::sequenceBase();
+            $nextSequence = $maxSequence !== null ? ((int)$maxSequence + 1) : $model::sequenceBase();
             $model->setSequence($nextSequence);
         }
         return true;

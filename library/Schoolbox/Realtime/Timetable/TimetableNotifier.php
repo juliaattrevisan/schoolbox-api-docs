@@ -18,6 +18,7 @@ use Monolog\Logger;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
+use Schoolbox\Database\Factory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Alert\IPublisher;
 use Schoolbox\Realtime\Alert\RedisPublisher;
@@ -27,7 +28,6 @@ use Schoolbox\Realtime\WorkNotifier;
 
 class TimetableNotifier extends WorkNotifier
 {
-
     /** @var IPublisher */
     private $publisher;
 
@@ -275,7 +275,7 @@ class TimetableNotifier extends WorkNotifier
         $instance = $bob->build();
 
         // get the IDs of all users in this campus
-        $stmt = \Database::getInstance()->prepare('
+        $stmt = Factory::getInstanceInternal()->prepare('
             SELECT u.id
             FROM `user` u
             LEFT JOIN userCampus c on u.id = c.uid

@@ -9,21 +9,22 @@
 
 namespace Schoolbox\Engagement;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 
 class DueWork
 {
     /**
-     * @var Database
+     * @var IConnector
      */
-    private $database;
+    private IConnector $database;
 
     /**
      * Constructor - sets up database
      */
     public function __construct()
     {
-        $this->database = Database::getInstance();
+        $this->database = Factory::getInstanceInternal();
     }
 
     public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end)

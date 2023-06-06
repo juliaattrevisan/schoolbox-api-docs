@@ -11,11 +11,13 @@
 namespace Schoolbox;
 
 use Alaress\Cache;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\NullConnector;
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
-use Alaress\IDatabase;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use PDO;
@@ -31,6 +33,7 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Column\Model as ModelColumn;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Database\Factory;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
@@ -140,9 +143,9 @@ abstract class Mapper implements IMapper, Serializable
     public const SORT_ORDER_DESC = 'desc';
 
     /**
-     * @var IDatabase
+     * @var IConnector
      */
-    protected $database;
+    protected IConnector $database;
 
     /**
      * @var string
@@ -446,7 +449,13 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function setupDatabase()
     {
-        $this->database = \Database::getInstance();
+        // TODO remove null database connection by removing test dependencies
+        //      upon mappers?
+        try {
+            $this->database = Factory::getInstanceInternal();
+        } catch (DatabaseException $e) {
+            $this->database = new NullConnector();
+        }
     }
 
     /**
@@ -620,7 +629,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @param  IDatabase $database
+     * @param  IConnector $database
      *
      * @return $this
      */
@@ -631,9 +640,9 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return IDatabase
+     * @return IConnector
      */
-    public function getDatabase()
+    public function getDatabase(): IConnector
     {
         return $this->database;
     }
@@ -3662,7 +3671,7 @@ abstract class Mapper implements IMapper, Serializable
             if ($value === true) {
                 return "$column = TRUE";
             }
-            return "$column = " . $this->database->quote($value);
+            return "$column = " . $this->database->legacyQuote($value);
         }
         return '';
     }
@@ -4137,16 +4146,8 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         $mappedFields = array_keys($mappedFields);
-
-        $db = $this->getDatabase();
-
-        if (!$db instanceof \Database) {
-            throw new Exception("No db in " . get_class($this));
-        }
-
-        $stmt = $db->query("SHOW COLUMNS FROM {$this->table}");
-
-        $knownFields = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $stmt         = $this->getDatabase()->query("SHOW COLUMNS FROM {$this->table}");
+        $knownFields  = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         return array_values(array_diff($knownFields, $mappedFields));
     }

@@ -9,21 +9,21 @@
 
 namespace Schoolbox\Resource\Storage\GC\Check;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
 
 class ExpiryDate extends DbCheck
 {
-
     /** @var int */
-    protected $window;
+    protected int $window;
+
     /**
-     * @param Database $db
+     * @param IConnector $db
      * @param int $window
      */
-    public function __construct(Database $db, $window)
+    public function __construct(IConnector $db, int $window)
     {
         parent::__construct($db);
-        $this->window = (int)$window;
+        $this->window = $window;
     }
     /**
      * Return the SQL condition that this check uses to regard a file as 'stale'.
@@ -31,7 +31,7 @@ class ExpiryDate extends DbCheck
      *
      * @return string
      */
-    protected function getStaleCondition()
+    protected function getStaleCondition(): string
     {
         return "last_accessed < DATE_SUB(NOW(), INTERVAL $this->window MONTH)";
     }

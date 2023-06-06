@@ -9,8 +9,8 @@
 
 namespace Schoolbox;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\IDatabase;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Mapper\Exception;
 
@@ -51,9 +51,9 @@ interface IMapper
 
 
     /**
-     * @return IDatabase
+     * @return IConnector
      */
-    public function getDatabase();
+    public function getDatabase(): IConnector;
 
     /**
      * Retrieves identifier column name.

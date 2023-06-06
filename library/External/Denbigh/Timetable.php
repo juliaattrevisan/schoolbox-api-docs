@@ -148,13 +148,14 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId
-                '
+                ',
+                [
+                    'externalUserId' => $externalUserId,
+                ],
             );
         }
 
-        $lessonIterator = $queryTimetable->getIterator([
-            'externalUserId' => $externalUserId,
-        ]);
+        $lessonIterator = $queryTimetable->getIterator();
 
         foreach ($lessonIterator as $lesson) {
             $period = $lesson['period'];
@@ -307,14 +308,15 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId AND
                                 l.day = :dayNumber
-                '
+                ',
+                [
+                    'externalUserId' => $externalUserId,
+                    'dayNumber'      => $dayNumber,
+                ],
             );
         }
 
-        $lessonIterator = $queryTimetable->getIterator([
-            'externalUserId' => $externalUserId,
-            'dayNumber'      => $dayNumber,
-        ]);
+        $lessonIterator = $queryTimetable->getIterator();
 
         foreach ($lessonIterator as $lesson) {
             $period = $lesson['period'];

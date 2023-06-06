@@ -118,7 +118,10 @@ $stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $ker
             // do this for every message that comes in
             $d->info("Processing message (arrived at $date)", [ 'char' => '>' ]);
 
-            Database::reinitialise();
+            // Reinitialise of the DB connection should not be necessary,
+            // as the database connection should already be connected.
+            // If not, though:
+        //            \Schoolbox\Database\Factory::getInstanceInternal()->reconnect();
 
             // if the interrogation says to dismiss the message, we do
             if (interrogate($frame, $d, $di)) {

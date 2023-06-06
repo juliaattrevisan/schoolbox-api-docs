@@ -13,14 +13,12 @@
 
 namespace Custom\Help\Hero;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Quoter\IQuoter;
-use Alaress\IDatabase;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Acquisition
 {
-
     /**
      * Course Specification Id
      * This comes from the /course/modify screen, as is an integer in the url
@@ -48,16 +46,16 @@ class Acquisition
     /**
      * Builder expects an IQuoter: pass in `getQuoter` from this object
      *
-     * @var IDatabase
+     * @var IConnector
      */
     private $db;
 
     /**
      * Acquisition constructor.
      *
-     * @param IDatabase $db
+     * @param IConnector $db
      */
-    public function __construct(IDatabase $db)
+    public function __construct(IConnector $db)
     {
         $this->db = $db;
     }
