@@ -65,6 +65,7 @@
              * Using padding-bottom values such as 7.0175438596491% to provide appropriate height for
              * tiles can lead to display issues when there's one tile per row. Refer to: SA-15725.
              * To resolve we need to instead set a rounded height and remove the padding-bottom.
+             * We get the padding-bottom from the parent as it's the easiest way to get percentage values.
              * Prior to setting the height, on each resize we need to first set it to auto and revert
              * the padding-bottom to ensure we can accurately calculate the height.
              */
