@@ -2799,7 +2799,7 @@ abstract class Mapper implements IMapper
         } catch (UnderflowException $e) {
             return [];
         }
-        if (count($rows)) {
+        if ($rows !== false) {
             /** @var IColumnType[] $hydrators */
             $hydrators = [];
             foreach ($columnList as $column) {
