@@ -60,6 +60,7 @@ class LessonPlanTemplatesCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
+     * @depends createLessonPlanTemplate
      * @beforeSuite
      *
      * on adminv2/lesson-plan/template page click the Modify button
@@ -120,6 +121,37 @@ class LessonPlanTemplatesCest
         $i->amGoingTo("Click the template is presenting the message invisible to students on the modal");
         $templateList->clickLessonPlanTemplateTitle($templateId);
         $i->canSee('This field is not visible to students');
+    }
 
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     * @beforeSuite
+     *
+     * on adminv2/lesson-plan/template page
+     * disable the lesson plan template
+     * enable the lesson plan template
+     * delete the template
+     */
+    public function deleteLessonPlanTemplate(AcceptanceTester $i): void
+    {
+
+        $templates = new CreateLessonPlanTemplate($i);
+        $templateList = new LessonPlanTemplateList($i);
+
+        $i->amGoingTo('Disable the lesson plan template');
+        $templateId = $i->grabFromDatabase('lesson_plan_template', 'id', ['deleted_at' => null, 'title like' => "Automation Template 1"]);
+        $templateList->clickLessonPlanTemplateMenu($templateId);
+        $templateList->clickDisableEnableVisibility($templateId);
+        $templateList->clickLessonPlanTemplateMenu($templateId);
+        $i->canSee('Enable Visibility');
+        $i->amGoingTo('Enable the lesson plan template');
+        $templateList->clickDisableEnableVisibility($templateId);
+        $templateList->clickLessonPlanTemplateMenu($templateId);
+        $i->canSee('Disable Visibility');
+        $i->amGoingTo('Delete the lesson plan template');
+        $templateList->clickDeleteTemplate($templateId);
+        $templates->clickConfirmDeleteButton();
+        $i->cantSee('Automation Template 1');
     }
 }

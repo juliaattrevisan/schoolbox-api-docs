@@ -65,7 +65,6 @@ class CreateLessonPlanTemplate
      */
     public function fillBody(int $templateFieldNumber, string $body): self
     {
-//        $templateField = 'input#field-title-new' . $templateFieldNumber;
         $this->tester->fillRichTextField('field-body-new' . $templateFieldNumber, $body);
         return $this;
     }
@@ -76,9 +75,7 @@ class CreateLessonPlanTemplate
      */
     public function clickCheckboxVisibleStudents(int $templateFieldNumber): void
     {
-//        $this->tester->click('input#field-new-visibility-' . $templateFieldNumber);
-        $this->tester->click('label[for="field-new-visibility-' . $templateFieldNumber.'"]');
-
+        $this->tester->click('label[for="field-new-visibility-' . $templateFieldNumber . '"]');
     }
 
     /**
@@ -105,8 +102,6 @@ class CreateLessonPlanTemplate
         $this->tester->click(Locator::lastElement(self::CONFIRM_YES));
     }
 
-
-
     /**
      * create a Lesson Plan Template
      */
@@ -115,6 +110,4 @@ class CreateLessonPlanTemplate
         $this->typeName($templateName);
         $this->clickSaveButton();
     }
-
-
 }

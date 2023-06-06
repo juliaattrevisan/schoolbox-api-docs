@@ -11,11 +11,7 @@ class LessonPlanTemplateList
 
     public const ICON_ADD = 'a.icon-add';
 
-    public const ICON_DELETE = 'a.button.icon-delete';
-
     public const ICON_MODAL_CLOSE = 'a.close-reveal-modal';
-
-
 
     private AcceptanceTester $tester;
 
@@ -54,11 +50,27 @@ class LessonPlanTemplateList
     }
 
     /**
-     * click the delete button for a lesson plan template field
+     * click 3-dot button for a lesson plan template by passing the lesson plan template id
      */
-    public function clickDeleteLessonPlanTemplateTitle(): void
+    public function clickLessonPlanTemplateMenu(int $templateIdNumber): void
     {
-        $this->tester->click(self::ICON_DELETE);
+        $this->tester->click('a[data-dropdown="lpt-' . $templateIdNumber . '"]');
+    }
+
+    /**
+     * click disable/enable lesson plan on the 3-dot menu dropdown
+     */
+    public function clickDisableEnableVisibility(int $templateIdNumber): void
+    {
+        $this->tester->click('a[href="/adminv2/lesson-plan/template/toggle/' . $templateIdNumber . '"]');
+    }
+
+    /**
+     * click disable/enable lesson plan on the 3-dot menu dropdown
+     */
+    public function clickDeleteTemplate(int $templateIdNumber): void
+    {
+        $this->tester->click('a[href="/adminv2/lesson-plan/template/delete/' . $templateIdNumber . '"]');
     }
 
     /**

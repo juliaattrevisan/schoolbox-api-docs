@@ -6,7 +6,6 @@ use AcceptanceTester;
 
 class UpdateLessonPlanTemplate
 {
-
     private AcceptanceTester $tester;
 
     /**
