@@ -3,7 +3,6 @@
  * to be able to update a nodes name, code and description
  */
 
-import { computed, ref, watch } from "vue";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
@@ -29,23 +28,23 @@ const updateNodeStore = useUpdateNodeStore();
  *
  * @returns { number }
  */
-const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
  *
  * @returns { string }
  */
-const ckeditorIdAttr = computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
-const isMaxCharCountExceeded = ref<boolean>(false);
+const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
  *
  * @returns { string }
  */
-const updateButtonText = computed(() => {
+const updateButtonText = window.Vue.computed(() => {
     if (updateNodeStore.isProcessing) {
         return "Updating...";
     }
@@ -58,7 +57,7 @@ const updateButtonText = computed(() => {
  *
  * @returns { boolean }
  */
-const isUpdateDisabled = computed(() => {
+const isUpdateDisabled = window.Vue.computed(() => {
     return (
         isMaxCharCountExceeded.value ||
         updateNodeStore.activeNodeCopy.name.trim().length === 0 ||
@@ -78,7 +77,7 @@ const descriptionField = useDescriptionEditor(
 /**
  * And watch for changes on this field, so we can update the description in the store
  */
-watch(descriptionField, (newValue) => {
+window.Vue.watch(descriptionField, (newValue) => {
     updateNodeStore.activeNodeCopy.description = newValue;
 });
 
