@@ -29,7 +29,7 @@ class UserAccess
     /**
      * Translate the array representation of the group access into a model.
      */
-    public function __invoke(array $array, ?object $model, ?User $user): object
+    public function __invoke(array $array, ?object $model): object
     {
         if (!$model) {
             $model = (new UserAccessModel())
@@ -43,8 +43,7 @@ class UserAccess
             if (
                 $this->groupStaffOnly
                 && $array['accessType'] === UserAccessModel::MEMBERSHIP_ADMIN
-                && $user
-                && !$user->getRole()->isStaff()
+                && !$model->getUser()->getRole()->isStaff()
             ) {
                 throw new InvalidArgumentException('Only staff can be a group admin');
             }

@@ -96,7 +96,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
         }
 
         if ($method == Mapper::METHOD_CREATE) {
-            if ($group->isFree() && $userAccess->getUid() == $bundle->getEvent()->getEffector()->getId()) {
+            if ($group->isFree() && $userAccess->getUser()->getId() == $bundle->getEvent()->getEffector()->getId()) {
                 // if user added themselves
                 $bundle->attach(self::TRIGGER_JOINED, self::IMMEDIATELY);
             } elseif ($userAccess->getAccessLevel() == UserAccess::ACCESS_DENY) {
@@ -148,14 +148,14 @@ class UserAccessNotifier extends AbstractModuleNotifier
             return new Envelope();
         }
 
-        if ($userAccess->getUid() === $effector->getId()) {
+        if ($userAccess->getUser()->getId() === $effector->getId()) {
             $envelope = $this->notifyAdmin(self::USER_JOINED, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
         } else {
             $envelope = $this->notifyAdmin(self::EFFECTOR_ADDED_USER, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
         }
 
         $bob = $this->getBob(self::EFFECTOR_ADDED_YOU, self::TRIGGER_APPROVED, $folder, $userAccess, $effector, false);
-        $envelope->targetToUser($userAccess->getUid(), $bob->build());
+        $envelope->targetToUser($userAccess->getUser(), $bob->build());
 
         return $envelope;
     }
@@ -207,7 +207,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
             return new Envelope();
         }
 
-        if ($userAccess->getUid() === $effector->getId()) {
+        if ($userAccess->getUser()->getId() === $effector->getId()) {
             $envelope = $this->notifyAdmin(self::USER_LEFT, self::TRIGGER_LEFT, $folder, $userAccess, $effector);
         } else {
             $envelope = $this->notifyAdmin(self::EFFECTOR_REMOVED_USER, self::TRIGGER_LEFT, $folder, $userAccess, $effector);
@@ -215,7 +215,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
         $bob = $this->getBob(self::EFFECTOR_REMOVED_YOU, self::TRIGGER_APPROVED, $folder, $userAccess, $effector, false);
         $bob->setHref('/');
-        $envelope->targetToUser($userAccess->getUid(), $bob->build());
+        $envelope->targetToUser($userAccess->getUser(), $bob->build());
         return $envelope;
     }
 
@@ -316,7 +316,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
             return new Envelope();
         }
 
-        if ($userAccess->getUid() == $effector->getId()) {
+        if ($userAccess->getUser()->getId() == $effector->getId()) {
             $envelope = $this->notifyAdmin(self::USER_JOINED, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
         } else {
             $envelope = $this->notifyAdmin(self::EFFECTOR_ADDED_USER, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
@@ -353,7 +353,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
         $bob = $this->getBob($messageText, self::TRIGGER_APPROVED, $folder, $userAccess, $effector, false);
         $bob->putMeta('time', (\Alaress_Date_Format::now())->getUnixTimeStamp());
-        $envelope->targetToUser($userAccess->getUid(), $bob->build());
+        $envelope->targetToUser($userAccess->getUser(), $bob->build());
         return $envelope;
     }
 
@@ -416,10 +416,10 @@ class UserAccessNotifier extends AbstractModuleNotifier
         if (str_contains($body, ':user')) {
             // hydrate user
             try {
-                $accessUser = $this->userMapper->findById($userAccess->getUid());
+                $accessUser = $this->userMapper->findById($userAccess->getUser()->getId());
             } catch (Exception $e) {
                 // should not happen, but falling back to unknown user
-                $accessUser = $userAccess->getUid();
+                $accessUser = $userAccess->getUser();
             }
             $params['user'] = new UserParam($accessUser, ParameterInterface::STACKING_APPEND);
             $icon           = $this->getUserIcon($accessUser);

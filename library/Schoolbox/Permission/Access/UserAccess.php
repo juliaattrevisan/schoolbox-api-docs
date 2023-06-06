@@ -140,8 +140,6 @@ class UserAccess implements IModel
     /** @var int */
     protected $sid;
 
-    protected int $uid;
-
     /** @var int */
     protected $accessLevel;
 
@@ -210,32 +208,19 @@ class UserAccess implements IModel
      */
     public function setUser($user): self
     {
-        $this->uid = $user->getId();
+        $this->user = $user;
         return $this;
     }
 
-    /**
-     * @param int $uid
-     * @return $this
-     */
-    public function setUid(int $uid): self
-    {
-        $this->uid = $uid;
-        return $this;
-    }
 
     /**
      * @return User
      */
     public function getUser()
     {
-        return (new User())->setId($this->uid);
+        return $this->user;
     }
 
-    public function getUid()
-    {
-        return $this->uid;
-    }
 
     /**
      * @param int $service
