@@ -21,27 +21,15 @@ require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootst
 class Controller extends Base
 {
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
+    public function __construct(
+        private ErrorMapper $errorMapper,
+        private UserMapper $userMapper
+    ) {
     }
 
 

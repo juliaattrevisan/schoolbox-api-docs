@@ -38,7 +38,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn()
         );
 
-        $this->register('GET', '/', 'getExample', $getPerms, null);
+        $this->register('GET', '', 'getExample', $getPerms, null);
     }
 
 
