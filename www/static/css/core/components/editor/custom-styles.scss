@@ -8,20 +8,6 @@
     display: block;
 }
 
-.cke_editable {
-    margin: 0;
-
-    /* Anchor elements display a little flag
-     */
-    a[id] {
-        padding-left: 16px;
-        margin-left: 4px;
-        background-image: url("#{$cdn-prefix}/js/ckeditor/plugins/schoolboxanchor/anchor.png");
-        background-repeat: no-repeat;
-        background-position: 0 0;
-    }
-}
-
 /**
  *  Rules specific for content being displayed that has been created within CKEditor.
  *  Basically replicate the CKEditor styles over to our own content;

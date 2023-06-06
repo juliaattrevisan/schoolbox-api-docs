@@ -1,6 +1,6 @@
 <script>
 import { Chart } from "highcharts-vue";
-import filesize from "filesize";
+import { filesize } from "filesize";
 
 export default {
     /**

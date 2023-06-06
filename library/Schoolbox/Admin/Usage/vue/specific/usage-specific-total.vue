@@ -1,5 +1,5 @@
 <script>
-import filesize from "filesize";
+import { filesize } from "filesize";
 
 export default {
     /**
