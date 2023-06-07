@@ -276,26 +276,6 @@ parameters:
 			path: library/Alaress/Date/Test/LaravelTimestampAlaressDateRelativeTest.php
 
 		-
-			message: "#^Function mssql_get_last_message not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
-			message: "#^Function mssql_num_rows not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
-			message: "#^Function mssql_query not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
-			message: "#^Function mssql_rows_affected not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
 			message: "#^Instanceof between null and Throwable will always evaluate to false\\.$#"
 			count: 1
 			path: library/Alaress/Jitter/Jitter.php
@@ -5444,11 +5424,6 @@ parameters:
 			message: "#^Return type \\(Schoolbox\\\\Resource\\\\Storage\\\\IStorage\\|null\\) of method Schoolbox\\\\Resource\\\\AbstractFolder\\:\\:getCoverImage\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\:\\:getCoverImage\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/AbstractFolder.php
-
-		-
-			message: "#^Access to an undefined property Schoolbox\\\\Resource\\\\Attachment\\\\AbstractController\\:\\:\\$template\\.$#"
-			count: 2
-			path: library/Schoolbox/Resource/Attachment/AbstractController.php
 
 		-
 			message: "#^Strict comparison using \\=\\=\\= between false and string will always evaluate to false\\.$#"
