@@ -1,14 +1,24 @@
 <?php
 
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Alaress\Test;
 
 use PHPUnit\Framework\TestCase;
 
 /**
+ * Test for parsing multibyte path info.
  *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * `mb_pathinfo` no longer exists, as standard `pathinfo` is fine: this
+ * documents what it used to do. They key differences were:
+ * * `mb_pathinfo` was aware of query-string parameters: `pathinfo` is not
+ * * `mb_pathinfo` returned null dirname if the path had no dir:
+ *   `pathinfo` returns '.'
+ * * `mb_pathinfo` returned null filename or basename if the path didn't have
+ *    those attributes: `pathinfo` returns an empty string
  */
 class MultibytePathInfoTest extends TestCase
 {
@@ -21,27 +31,27 @@ class MultibytePathInfoTest extends TestCase
     {
         // [input, path, basename, ext, filename]
         return [
-            'foo.doc'                           => ['foo.doc', null, 'foo.doc', 'doc', 'foo'],
-            'foo.'                              => ['foo.', null, 'foo.', '', 'foo'],
-            '.foo'                              => ['.foo', null, '.foo', 'foo', null],
-            'foo'                               => ['foo', null, 'foo', null, 'foo'],
-            'foo.tar.gz'                        => ['foo.tar.gz', null, 'foo.tar.gz', 'gz', 'foo.tar'],
-            'foo.tar..gz'                       => ['foo.tar..gz', null, 'foo.tar..gz', 'gz', 'foo.tar.'],
+            'foo.doc'                           => ['foo.doc', '.', 'foo.doc', 'doc', 'foo'],
+            'foo.'                              => ['foo.', '.', 'foo.', '', 'foo'],
+            '.foo'                              => ['.foo', '.', '.foo', 'foo', ''],
+            'foo'                               => ['foo', '.', 'foo', '', 'foo'],
+            'foo.tar.gz'                        => ['foo.tar.gz', '.', 'foo.tar.gz', 'gz', 'foo.tar'],
+            'foo.tar..gz'                       => ['foo.tar..gz', '.', 'foo.tar..gz', 'gz', 'foo.tar.'],
             '怎样节约用水.jpeg'                 => [
                 '怎样节约用水.jpeg',
-                null,
+                '.',
                 '怎样节约用水.jpeg',
                 'jpeg',
                 '怎样节约用水',
             ],
             '_怎样节约用水.jpeg'                => [
                 '_怎样节约用水.jpeg',
-                null,
+                '.',
                 '_怎样节约用水.jpeg',
                 'jpeg',
                 '_怎样节约用水',
             ],
-            'אַהֲוָא.jpeg'                      => ['אַהֲוָא.jpeg', null, 'אַהֲוָא.jpeg', 'jpeg', 'אַהֲוָא'],
+            'אַהֲוָא.jpeg'                      => ['אַהֲוָא.jpeg', '.', 'אַהֲוָא.jpeg', 'jpeg', 'אַהֲוָא'],
             '/foo/אַהֲוָא.jpeg'                 => ['/foo/אַהֲוָא.jpeg', '/foo', 'אַהֲוָא.jpeg', 'jpeg', 'אַהֲוָא'],
             '/foo/_אַהֲוָא.jpeg'                => ['/foo/_אַהֲוָא.jpeg', '/foo', '_אַהֲוָא.jpeg', 'jpeg', '_אַהֲוָא'],
             '/foo/bar/_אַהֲוָא.jpeg'            => [
@@ -51,20 +61,20 @@ class MultibytePathInfoTest extends TestCase
                 'jpeg',
                 '_אַהֲוָא',
             ],
-            '/foo/bar/'                         => ['/foo/bar/', '/foo', 'bar', null, 'bar'],
+            '/foo/bar/'                         => ['/foo/bar/', '/foo', 'bar', '', 'bar'],
             'clone_adobeppcc.jpg?itok=AlstqiJ0' => [
                 'clone_adobeppcc.jpg?itok=AlstqiJ0',
-                null,
+                '.',
                 'clone_adobeppcc.jpg?itok=AlstqiJ0',
-                'jpg',
+                'jpg?itok=AlstqiJ0',
                 'clone_adobeppcc',
             ],
             '/files/350564/original/...'        => [
                 '/files/350564/original/file-20200731-29-1pb85px.jpg?ixlib=rb-1.1.0&rect=0%2C184%2C2995%2C1495&q=45&auto=format&w=1356&h=668&fit=crop',
                 '/files/350564/original',
                 'file-20200731-29-1pb85px.jpg?ixlib=rb-1.1.0&rect=0%2C184%2C2995%2C1495&q=45&auto=format&w=1356&h=668&fit=crop',
-                'jpg',
-                'file-20200731-29-1pb85px',
+                '0&rect=0%2C184%2C2995%2C1495&q=45&auto=format&w=1356&h=668&fit=crop',
+                'file-20200731-29-1pb85px.jpg?ixlib=rb-1.1',
             ],
             '/assets/img/favicon.6c717b9f.svg'  => [
                 '/assets/img/favicon.6c717b9f.svg',
