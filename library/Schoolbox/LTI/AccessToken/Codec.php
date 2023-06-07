@@ -66,6 +66,7 @@ class Codec implements ICodec
             throw new TypeError('$rawValue must be an AccessToken instance');
         }
 
+        /** @noinspection PhpDeprecationInspection - this is used internally only */
         $serializedToken = [
             self::FIELD_IDENTIFIER      => $rawValue->getIdentifier(),
             self::FIELD_USER_IDENTIFIER => $rawValue->getUserIdentifier(),
@@ -103,6 +104,7 @@ class Codec implements ICodec
         foreach ($decoded[self::FIELD_SCOPES] as $scope) {
             $token->addScope(new Scope($scope));
         }
+        /** @noinspection PhpDeprecationInspection - this is used internally only */
         $token->setExpiryDateTime(
             DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $decoded[self::FIELD_EXPIRY]),
         );
