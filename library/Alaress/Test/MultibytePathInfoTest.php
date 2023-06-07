@@ -12,9 +12,11 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test for parsing multibyte path info.
  *
- * `mb_pathinfo` no longer exists, as standard `pathinfo` is fine: this
- * documents what it used to do. They key differences were:
- * * `mb_pathinfo` was aware of query-string parameters: `pathinfo` is not
+ * `mb_pathinfo` no longer exists, as `pathinfo(parse_url($path, PHP_URL_PATH))`
+ * is multi-byte aware AFAICT: this documents what `mb_pathinfo` used to do.
+ * The key differences were:
+ * * `mb_pathinfo` attempted to include the query string in the basename:
+ *   `parse_url` strips them before they even get to `pathinfo`
  * * `mb_pathinfo` returned null dirname if the path had no dir:
  *   `pathinfo` returns '.'
  * * `mb_pathinfo` returned null filename or basename if the path didn't have
@@ -65,16 +67,16 @@ class MultibytePathInfoTest extends TestCase
             'clone_adobeppcc.jpg?itok=AlstqiJ0' => [
                 'clone_adobeppcc.jpg?itok=AlstqiJ0',
                 '.',
-                'clone_adobeppcc.jpg?itok=AlstqiJ0',
-                'jpg?itok=AlstqiJ0',
+                'clone_adobeppcc.jpg',
+                'jpg',
                 'clone_adobeppcc',
             ],
             '/files/350564/original/...'        => [
                 '/files/350564/original/file-20200731-29-1pb85px.jpg?ixlib=rb-1.1.0&rect=0%2C184%2C2995%2C1495&q=45&auto=format&w=1356&h=668&fit=crop',
                 '/files/350564/original',
-                'file-20200731-29-1pb85px.jpg?ixlib=rb-1.1.0&rect=0%2C184%2C2995%2C1495&q=45&auto=format&w=1356&h=668&fit=crop',
-                '0&rect=0%2C184%2C2995%2C1495&q=45&auto=format&w=1356&h=668&fit=crop',
-                'file-20200731-29-1pb85px.jpg?ixlib=rb-1.1',
+                'file-20200731-29-1pb85px.jpg',
+                'jpg',
+                'file-20200731-29-1pb85px',
             ],
             '/assets/img/favicon.6c717b9f.svg'  => [
                 '/assets/img/favicon.6c717b9f.svg',
@@ -96,7 +98,7 @@ class MultibytePathInfoTest extends TestCase
         string $input,
         ?string $expectedDirname,
     ) {
-        $info = pathinfo($input, PATHINFO_DIRNAME);
+        $info = pathinfo(parse_url($input, PHP_URL_PATH), PATHINFO_DIRNAME);
         $this->assertSame($expectedDirname, $info);
     }
 
@@ -111,7 +113,7 @@ class MultibytePathInfoTest extends TestCase
         ?string $expectedDirname,
         ?string $expectedBasename,
     ) {
-        $info = pathinfo($input, PATHINFO_BASENAME);
+        $info = pathinfo(parse_url($input, PHP_URL_PATH), PATHINFO_BASENAME);
         $this->assertSame($expectedBasename, $info);
     }
 
@@ -128,7 +130,7 @@ class MultibytePathInfoTest extends TestCase
         ?string $expectedBasename,
         ?string $expectedExtension,
     ) {
-        $info = pathinfo($input, PATHINFO_EXTENSION);
+        $info = pathinfo(parse_url($input, PHP_URL_PATH), PATHINFO_EXTENSION);
         $this->assertSame($expectedExtension, $info);
     }
 
@@ -147,7 +149,7 @@ class MultibytePathInfoTest extends TestCase
         ?string $expectedExtension,
         ?string $expectedFilename,
     ) {
-        $info = pathinfo($input, PATHINFO_FILENAME);
+        $info = pathinfo(parse_url($input, PHP_URL_PATH), PATHINFO_FILENAME);
         $this->assertSame($expectedFilename, $info);
     }
 }
