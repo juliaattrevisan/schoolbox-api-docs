@@ -44,7 +44,11 @@ try {
          * @var array $opts
          */
 
-        // the passive part is important: it means the queue won't be created if it doesn't already exist
+        // the passive part was allegedly important:
+        // it meant the queue won't be created if it doesn't already exist.
+        // However: I've found no reference at all to that option in the AMQP
+        // library, and since scheduled is scheduled to go away I think this can
+        // be ignored.
         $mq = (new ConnectorFactory($di->get('config')))->build(['passive' => true]);
         $q  = Schedule\Broker::QUEUE;
 

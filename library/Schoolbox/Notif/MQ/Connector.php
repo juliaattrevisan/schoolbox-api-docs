@@ -13,6 +13,8 @@ use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\Notification\Instance\Instance;
 use PhpAmqpLib\Connection\AbstractConnection;
+use PhpAmqpLib\Connection\AMQPConnectionConfig;
+use PhpAmqpLib\Connection\AMQPConnectionFactory;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
 
@@ -35,9 +37,9 @@ class Connector extends AMQPConnector
     public const AMQP_CONNECTION_OPTION_HEARTBEAT = 'heartbeat';
 
     /**
-     * @var AMQPStreamConnection|null
+     * @var AbstractConnection|null
      */
-    private ?AMQPStreamConnection $conn = null;
+    private ?AbstractConnection $conn = null;
 
     /**
      * Constructor
@@ -73,19 +75,18 @@ class Connector extends AMQPConnector
 
         // Connection doesn't exist: create it
         if (!$this->conn) {
-            $this->conn = AMQPStreamConnection::create_connection(
-                [
-                    [
-                        self::AMQP_CONNECTION_OPTION_HOST     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_HOST],
-                        self::AMQP_CONNECTION_OPTION_PORT     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_PORT],
-                        self::AMQP_CONNECTION_OPTION_USER     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_USER],
-                        self::AMQP_CONNECTION_OPTION_PASSWORD => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_PASSWORD],
-                        self::AMQP_CONNECTION_OPTION_VHOST    => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_VHOST],
-                    ],
-                ],
-                $this->connectionOptions,
-            );
+            $connectionConfig = new AMQPConnectionConfig();
+            $connectionConfig->setIoType(AMQPConnectionConfig::IO_TYPE_STREAM);
+            $connectionConfig->setHost($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HOST]);
+            $connectionConfig->setPort($this->connectionOptions[self::AMQP_CONNECTION_OPTION_PORT]);
+            $connectionConfig->setUser($this->connectionOptions[self::AMQP_CONNECTION_OPTION_USER]);
+            $connectionConfig->setPassword($this->connectionOptions[self::AMQP_CONNECTION_OPTION_PASSWORD]);
+            $connectionConfig->setVhost($this->connectionOptions[self::AMQP_CONNECTION_OPTION_VHOST]);
+            if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT])) {
+                $connectionConfig->setHeartbeat($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT]);
+            }
 
+            $this->conn = AMQPConnectionFactory::create($connectionConfig);
             if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT])) {
                 $heartbeat = new PCNTLHeartbeatSender($this->conn);
                 $heartbeat->register();
