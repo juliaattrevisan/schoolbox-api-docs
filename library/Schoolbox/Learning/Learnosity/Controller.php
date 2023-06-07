@@ -58,6 +58,8 @@ class Controller extends Base
             'consumer_key' => $consumerKey
         ];
 
+        new \Alaress_Probe($request, $security);
+
         $initOptions = (new Init(
             'items',
             $security,
