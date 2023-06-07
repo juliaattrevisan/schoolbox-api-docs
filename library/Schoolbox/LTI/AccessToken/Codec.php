@@ -11,7 +11,6 @@ namespace Schoolbox\LTI\AccessToken;
 
 use Alaress\Codec\ICodec;
 use DateTimeImmutable;
-use DateTimeInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\AccessToken;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
@@ -28,6 +27,14 @@ class Codec implements ICodec
     private const FIELD_CLIENT_ID       = 'clientId';
     private const FIELD_SCOPES          = 'scopes';
     private const FIELD_EXPIRY          = 'expiry';
+
+    /**
+     * Date format used for encoding/decoding expiry.
+     *
+     * This matches the deprecated format `\DateTimeInterface::ISO8601`: however
+     * it is safe to use this internally.
+     */
+    private const DATE_FORMAT = 'Y-m-d\TH:i:sO';
 
     /**
      * Fields which must be in the decoded value, otherwise the decoded value
@@ -66,13 +73,12 @@ class Codec implements ICodec
             throw new TypeError('$rawValue must be an AccessToken instance');
         }
 
-        /** @noinspection PhpDeprecationInspection - this is used internally only */
         $serializedToken = [
             self::FIELD_IDENTIFIER      => $rawValue->getIdentifier(),
             self::FIELD_USER_IDENTIFIER => $rawValue->getUserIdentifier(),
             self::FIELD_CLIENT_ID       => $rawValue->getClient()->getIdentifier(),
             self::FIELD_SCOPES          => $rawValue->getScopes(),
-            self::FIELD_EXPIRY          => $rawValue->getExpiryDateTime()->format(DateTimeInterface::ISO8601),
+            self::FIELD_EXPIRY          => $rawValue->getExpiryDateTime()->format(self::DATE_FORMAT),
         ];
         return json_encode($serializedToken);
     }
@@ -104,9 +110,8 @@ class Codec implements ICodec
         foreach ($decoded[self::FIELD_SCOPES] as $scope) {
             $token->addScope(new Scope($scope));
         }
-        /** @noinspection PhpDeprecationInspection - this is used internally only */
         $token->setExpiryDateTime(
-            DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $decoded[self::FIELD_EXPIRY]),
+            DateTimeImmutable::createFromFormat(self::DATE_FORMAT, $decoded[self::FIELD_EXPIRY]),
         );
         return $token;
     }
