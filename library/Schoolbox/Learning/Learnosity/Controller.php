@@ -54,7 +54,7 @@ class Controller extends Base
         ];
 
         $security = [
-            'domain'       => 'alpha.dev.schoolbox.cloud',
+            'domain'       => 'localhost',
             'consumer_key' => $consumerKey
         ];
 
