@@ -169,8 +169,10 @@ class Session
      * @throws SchoolboxNotFoundException        if user doesn't exist
      * @throws SchoolboxPasswordExpiredException if ldap password expired
      */
-    public function authenticate($username, $password)
-    {
+    public function authenticate(
+        string $username,
+        #[SensitiveParameter] string $password,
+    ): ?User {
         if (empty($username) || empty($password)) {
             throw new SchoolboxAccessDeniedException();
         }
@@ -262,8 +264,12 @@ class Session
      *               failed.
      * @throws MapperException
      */
-    public function ldapConnect(string $host, string $username, string $password, ?string $ldapCaCertHash)
-    {
+    public function ldapConnect(
+        string $host,
+        string $username,
+        #[SensitiveParameter] string $password,
+        ?string $ldapCaCertHash,
+    ) {
         if ($host) {
             if ($ldapCaCertHash) {
                 // Copy this file to local cache somewhere (stream_dir I guess)
@@ -329,7 +335,7 @@ class Session
     private function ldapAuth(
         mixed $ds,
         string $username,
-        string $password,
+        #[SensitiveParameter] string $password,
         string $userDn,
         string $usernameField,
         string $searchFilter
@@ -399,7 +405,7 @@ class Session
      * @return bool
      * @throws MapperException
      */
-    private function authenticateLDAP($username, $password)
+    private function authenticateLDAP(string $username, #[SensitiveParameter] string $password): bool
     {
         $ldapConfigs = [
             [
@@ -448,7 +454,7 @@ class Session
      * @param string $password
      * @return bool
      */
-    private function authenticateSQL($username, $password)
+    private function authenticateSQL(string $username, #[SensitiveParameter] string $password): bool
     {
         $passwordValidator = new \Schoolbox\User\Password\Validator(
             \Schoolbox\UserMapper::getInstance(),

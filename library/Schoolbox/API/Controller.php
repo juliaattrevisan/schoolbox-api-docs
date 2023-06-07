@@ -25,6 +25,7 @@ use Schoolbox\MobileApp\ServiceMapper;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
 use Schoolbox\Url\Uri;
+use SensitiveParameter;
 
 class Controller extends Base
 {
@@ -298,9 +299,8 @@ class Controller extends Base
      * @throws SchoolboxAccessDeniedException    if the password is incorrect
      * @throws SchoolboxAccountDisabledException if the account is disabled
      */
-    private function authenticateViaPostData(string $username, string $password): User
+    private function authenticateViaPostData(string $username, #[SensitiveParameter] string $password): User
     {
-        // TODO this used to remember the authenticated user: should it?
         return $this->auth->authenticate($username, $password);
     }
 

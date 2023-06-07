@@ -716,6 +716,8 @@ class UserMapper extends Mapper
 
 
     /**
+     * TODO come back to this and remove it
+     *
      * @deprecated Don't even ask what a password hashing method is doing in a mapper.
      *             (this will be removed in 16 and replaced with `password_hash`)
      *

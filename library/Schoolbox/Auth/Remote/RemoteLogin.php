@@ -12,6 +12,7 @@ namespace Schoolbox\Auth\Remote;
 use GuzzleHttp\ClientInterface;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Psr\Http\Message\UriInterface;
+use SensitiveParameter;
 
 /**
  * Class for creating a session which is authenticated as a particular user.
@@ -59,7 +60,7 @@ class RemoteLogin
      * @return string|null The session cookie value, or null if none was found
      *                     (i.e. if auth failed).
      */
-    public function authenticate(string $username, string $password): ?string
+    public function authenticate(string $username, #[SensitiveParameter] string $password): ?string
     {
         $url      = (string)$this->baseUrl->withPath('/login');
         $headers  = ['Origin' => $this->baseUrl->getHost()];

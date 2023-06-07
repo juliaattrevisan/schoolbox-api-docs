@@ -34,8 +34,10 @@ class Authenticator
      * @return User
      * @throws SchoolboxAccessDeniedException
      */
-    public function authenticate(string $username, string $password): User
-    {
+    public function authenticate(
+        string $username,
+        #[SensitiveParameter] string $password,
+    ): User {
         $s    = new Session();
         $user = $s->authenticate($username, $password);
         if ($user instanceof User) {
