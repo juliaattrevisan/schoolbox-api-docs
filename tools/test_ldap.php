@@ -26,10 +26,10 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         $this->testLdap($this->getConfig()->get('ldap_host'), $this->getConfig()->get('ldap_user'));
 
         $this->getLogger()->notice("Testing alternate...");
-        $this->testLdap($this->getConfig()->get('ldap_host_alt'),$this->getConfig()->get('ldap_user_alt'));
+        $this->testLdap($this->getConfig()->get('ldap_host_alt'), $this->getConfig()->get('ldap_user_alt'));
 
         $this->getLogger()->notice("Testing tertiary...");
-        $this->testLdap($this->getConfig()->get('ldap_host_ter'),$this->getConfig()->get('ldap_user_ter'));
+        $this->testLdap($this->getConfig()->get('ldap_host_ter'), $this->getConfig()->get('ldap_user_ter'));
     }
 
     /**

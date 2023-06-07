@@ -55,7 +55,6 @@ class LinkDecoratorTest extends TestCase
 
 
         $this->linkable = new class implements Linkable {
-
             /**
              * @return Link[]
              */

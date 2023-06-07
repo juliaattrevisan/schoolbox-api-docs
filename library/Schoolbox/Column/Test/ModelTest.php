@@ -16,7 +16,6 @@ use Schoolbox\Test\TestModel;
 
 class ModelTest extends TestCase
 {
-
     /**
      * @var Model
      */

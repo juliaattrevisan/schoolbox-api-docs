@@ -21,7 +21,6 @@ use InvalidArgumentException;
  */
 class Cronterpreter
 {
-
     /** @var string */
     protected $timeFormat;
 

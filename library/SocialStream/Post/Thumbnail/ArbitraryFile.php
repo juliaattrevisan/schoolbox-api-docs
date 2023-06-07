@@ -12,7 +12,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class ArbitraryFile extends Thumbnail
 {
-
     /**
      * Some kind of resource that is not an image
      * such as a pdf, a docx, etc.

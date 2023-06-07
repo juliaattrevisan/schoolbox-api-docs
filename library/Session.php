@@ -117,7 +117,8 @@ class Session
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();
-            if (Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
+            if (
+                Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
                 && !empty(Config::get('external_portal'))
             ) {
                 $_SESSION['password'] = $_POST['password'] ?? null;
@@ -441,14 +442,15 @@ class Session
         $ldapCaCertHash    = Config::get('ldap_ca_certificate');
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
-            if ($ds && $this->ldapAuth(
-                $ds,
-                $username,
-                $password,
-                $ldapConfig['searchBase'],
-                $ldapUsernameField,
-                $ldapSearchFilter
-            )
+            if (
+                $ds && $this->ldapAuth(
+                    $ds,
+                    $username,
+                    $password,
+                    $ldapConfig['searchBase'],
+                    $ldapUsernameField,
+                    $ldapSearchFilter
+                )
             ) {
                 return true;
             }
