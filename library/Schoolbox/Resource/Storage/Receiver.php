@@ -89,8 +89,8 @@ class Receiver implements IReceiver
         $storage = $this->storageMapper->createModel();
 
         // Set file type metadata and expiry
-        $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
-        $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
+        $storage->setFilename(pathinfo($basename, PATHINFO_FILENAME));
+        $storage->setExtension(pathinfo($basename, PATHINFO_EXTENSION));
         $storage->setExpiryAt($expiryAt);
 
         //if filename is longer than the db limit, error out here

@@ -94,8 +94,8 @@ class Model implements IStorage, \Alaress\Json\Serializable, Linkable
     public function setBasename($basename)
     {
         return $this
-            ->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME))
-            ->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
+            ->setFilename(pathinfo($basename, PATHINFO_FILENAME))
+            ->setExtension(pathinfo($basename, PATHINFO_EXTENSION));
     }
 
     /**

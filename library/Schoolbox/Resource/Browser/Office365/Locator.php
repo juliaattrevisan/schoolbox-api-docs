@@ -164,7 +164,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
             throw new InvalidArgumentException('Not a file');
         }
 
-        $filename = mb_pathinfo($item['name'], PATHINFO_FILENAME);
+        $filename = pathinfo($item['name'], PATHINFO_FILENAME);
 
         $file = Resource\File\Mapper::getInstance()->createModel();
         $file->setId($item['id']);
