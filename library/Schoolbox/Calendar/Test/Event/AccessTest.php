@@ -68,7 +68,7 @@ class AccessTest extends TestCase
                 // User::getAccessList() when access list is not set
 
                 /** @var User|MockObject $mockUser */
-                $mockUser = $this->getMockBuilder(User::class)->setMethods($overload)->getMock();
+                $mockUser = $this->getMockBuilder(User::class)->addMethods($overload ?? [])->getMock();
                 $mockUser->setId($id);
                 $mockUser->setAccessList(new GenericCollection(UserAccess::class));
                 $mockUser->setChildren(new GenericCollection(User::class));
