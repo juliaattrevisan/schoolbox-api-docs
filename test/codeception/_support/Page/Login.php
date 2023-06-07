@@ -64,7 +64,7 @@ class Login
      * @param $password
      * @param $rememberMe
      */
-    public function login($username, $password, $rememberMe)
+    public function login($username, #[SensitiveParameter] $password, $rememberMe)
     {
         $this->tester->fillField(self::FIELD_USERNAME, $username);
         $this->tester->fillField(self::FIELD_PASSWORD, $password);

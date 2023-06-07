@@ -55,7 +55,7 @@ class AcceptanceTester extends Actor
      * @param string $password
      * @throws Exception
      */
-    public function login(string $username, string $password): void
+    public function login(string $username, #[SensitiveParameter] string $password): void
     {
         $i = $this;
 

@@ -11,6 +11,7 @@ namespace Payload\Authentication;
 
 use Payload\PostTrait;
 use Payload\Request;
+use SensitiveParameter;
 
 class Login extends Request
 {
@@ -31,7 +32,7 @@ class Login extends Request
         $this->setFormParam('username', $username);
     }
 
-    public function setPassword(string $password): void
+    public function setPassword(#[SensitiveParameter] string $password): void
     {
         $this->setFormParam('password', $password);
     }
