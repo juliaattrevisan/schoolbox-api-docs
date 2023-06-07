@@ -30,7 +30,9 @@ class AccessTest extends TestCase
     /** @var Role[] */
     private $roles;
 
-    /** @var User[] */
+    /**
+     * @var array<User|MockObject>
+     */
     private $users;
 
     /** @var Event[] */
