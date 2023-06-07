@@ -1030,8 +1030,8 @@ class Controller extends Base
             // Only set owner if this is a new record
             if (!$record->getId()) {
                 $record->setOwner($this->getUser());
+                $record->setExternalId(null);
             }
-            $record->setExternalId(null);
             $this->pastoralDataSource->save($record);
 
             // Store the first records ID for use as parent for subsequent copies
