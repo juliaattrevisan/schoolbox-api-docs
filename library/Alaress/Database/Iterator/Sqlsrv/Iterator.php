@@ -18,7 +18,7 @@ class Iterator extends Base
     /**
      * @inheritdoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->rowIndex = -1;
 

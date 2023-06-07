@@ -18,7 +18,7 @@ class Iterator extends Base
     /**
      * @inheritdoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         // DB2 does not implement rewinding or scrollable cursors, just cheating and re-executing the statement.
 

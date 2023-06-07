@@ -18,7 +18,7 @@ class Iterator extends Base
     /**
      * @inheritdoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         // MySQL does not implement rewinding or scrollable cursors, just cheating and re-executing the statement.
 
