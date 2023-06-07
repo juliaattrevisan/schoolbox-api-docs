@@ -155,17 +155,6 @@ class GoogleController extends AbstractController
 
 
     /**
-     * @param string $view
-     * @return self
-     */
-    private function addView(string $view): self
-    {
-        $this->views[self::VIEW_PREFIX . $view] = true;
-        return $this;
-    }
-
-
-    /**
      * @param string $feature
      * @return self
      */
