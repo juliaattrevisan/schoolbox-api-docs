@@ -86,12 +86,8 @@ class MultibytePathInfoTest extends TestCase
         string $input,
         ?string $expectedDirname,
     ) {
-        $info = mb_pathinfo($input);
-        if (!isset($expectedDirname)) {
-            $this->assertArrayNotHasKey('dirname', $info);
-        } else {
-            $this->assertSame($expectedDirname, $info['dirname']);
-        }
+        $info = pathinfo($input, PATHINFO_DIRNAME);
+        $this->assertSame($expectedDirname, $info);
     }
 
     /**
@@ -105,12 +101,8 @@ class MultibytePathInfoTest extends TestCase
         ?string $expectedDirname,
         ?string $expectedBasename,
     ) {
-        $info = mb_pathinfo($input);
-        if (!isset($expectedBasename)) {
-            $this->assertArrayNotHasKey('basename', $info);
-        } else {
-            $this->assertSame($expectedBasename, $info['basename']);
-        }
+        $info = pathinfo($input, PATHINFO_BASENAME);
+        $this->assertSame($expectedBasename, $info);
     }
 
     /**
@@ -126,12 +118,8 @@ class MultibytePathInfoTest extends TestCase
         ?string $expectedBasename,
         ?string $expectedExtension,
     ) {
-        $info = mb_pathinfo($input);
-        if (!isset($expectedExtension)) {
-            $this->assertArrayNotHasKey('extension', $info);
-        } else {
-            $this->assertSame($expectedExtension, $info['extension']);
-        }
+        $info = pathinfo($input, PATHINFO_EXTENSION);
+        $this->assertSame($expectedExtension, $info);
     }
 
     /**
@@ -149,11 +137,7 @@ class MultibytePathInfoTest extends TestCase
         ?string $expectedExtension,
         ?string $expectedFilename,
     ) {
-        $info = mb_pathinfo($input);
-        if (!isset($expectedFilename)) {
-            $this->assertArrayNotHasKey('filename', $info);
-        } else {
-            $this->assertSame($expectedFilename, $info['filename']);
-        }
+        $info = pathinfo($input, PATHINFO_FILENAME);
+        $this->assertSame($expectedFilename, $info);
     }
 }
