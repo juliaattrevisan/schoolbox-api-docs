@@ -9,10 +9,10 @@ echo "<pre>";
 echo "IDP metadata:\n\n";
 
 if (Config::get('saml_idp_metadata_url')) {
-    if ($idpMetadata_raw) {
+    if ($idpMetadata ?? false) {
         try {
-            $check = OneLogin\Saml2\IdPMetadataParser::parseXML($idpMetadata_raw);
-            print_r($check['idp']);
+            $check = OneLogin\Saml2\IdPMetadataParser::parseXML($idpMetadata->getStreamContents());
+            print_r($check['idp'] ?? '');
         } catch (Exception $e) {
             echo "Error: unable to read SAML Identity Provider (IDP) metadata from:\n" . Config::get('saml_idp_metadata_url') . "\n";
         }
@@ -24,7 +24,7 @@ if (Config::get('saml_idp_metadata_url')) {
 }
 
 echo "\nOverall IDP configuration (IDP Metadata + Schoolbox configuration):\n";
-
+/** @var array $settingsInfo */
 print_r($settingsInfo['idp']);
 
 echo "</pre>";

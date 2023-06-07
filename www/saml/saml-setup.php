@@ -9,6 +9,7 @@ use RobRichards\XMLSecLibs\XMLSecurityDSig;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$logger = Config::get('saml_debug') ? new \Alaress\Lumberjack\Logger() : new \Alaress\Lumberjack\Logger(null);
 
 $spBaseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
 
@@ -40,11 +41,11 @@ $settingsInfo = array (
 
 // requestedAuthnContext
 if (Config::get('saml_auth_context') !== 'unspecified') {
-    $settingsInfo['security']['requestedAuthnContext'] = [useSAMLKerberos() ? Constants::AC_WINDOWS : Constants::AC_PASSWORD_PROTECTED];
+    $settingsInfo['security']['requestedAuthnContext'] = [useSAMLKerberos($logger) ? Constants::AC_WINDOWS : Constants::AC_PASSWORD_PROTECTED];
     $settingsInfo['security']['requestedAuthnContextComparison'] = Config::get('saml_auth_comparison');
 }
 
-SAMLDebugLog(json_encode($settingsInfo));
+$logger->info(json_encode($settingsInfo));
 
 try {
     $url = new \Schoolbox\Url\Uri(Config::get('saml_idp_metadata_url'));
@@ -59,7 +60,7 @@ try {
             $settingsInfo = IdPMetadataParser::injectIntoSettings($settingsInfo, IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
         } catch (Exception $e) {
             $cache->invalidateCache();
-            SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
+            $logger->info("Invalidating cache as we failed to get valid metadata from IDP");
         }
     }
 } catch (Exception $e) {
@@ -98,12 +99,12 @@ $settingsInfo['sp'] = [
  *
  * @return boolean
  */
-function useSAMLKerberos()
+function useSAMLKerberos(\Alaress\Lumberjack\Logger $logger)
 {
 
     // If whitelist not in use, don't use kerberos at all
     if (trim(Config::get('saml_krb_whitelist')) == '') {
-        SAMLDebugLog("Kerberos whitelist not in use");
+        $logger->info("Kerberos whitelist not in use");
         return false;
     }
 
@@ -111,7 +112,7 @@ function useSAMLKerberos()
 
 
     if (!IpUtils::checkIp(Session::getIP(), array_map('trim', explode(',', Config::get('saml_krb_whitelist'))))) {
-        SAMLDebugLog("IP not in kerberos whitelist");
+        $logger->info("IP not in kerberos whitelist");
         return false;
     }
 
@@ -128,11 +129,11 @@ function useSAMLKerberos()
      *
      * Errs on the side of kerberos than non-kerberos
      */
-    SAMLDebugLog("IP in kerberos whitelist, attempting browser/platform check");
+    $logger->info("IP in kerberos whitelist, attempting browser/platform check");
 
     $browser = new BrowserDetection();
 
-    SAMLDebugLog(json_encode($browser->getUserAgent()));
+    $logger->info(json_encode($browser->getUserAgent()));
     if (!$browser->isMobile()) {
         if ($browser->getPlatform() == BrowserDetection::PLATFORM_WINDOWS || $browser->getPlatform() == BrowserDetection::PLATFORM_MACINTOSH) {
             switch ($browser->getName()) {
@@ -174,9 +175,10 @@ function useSAMLKerberos()
     }
 }
 
-function SAMLDebugLog($msg)
-{
-    if (Config::get('saml_debug')) {
-        file_put_contents(Config::get('logs_dir') . "/saml.log", "[" . date("Y-m-d H:i:s") . "] " . $_SERVER['REMOTE_ADDR'] . " " . $msg . "\n", FILE_APPEND);
-    }
-}
+//function $logger->info($msg)
+//{
+//    if (Config::get('saml_debug')) {
+//
+//        file_put_contents(Config::get('logs_dir') . "/saml.log", "[" . date("Y-m-d H:i:s") . "] " . $_SERVER['REMOTE_ADDR'] . " " . $msg . "\n", FILE_APPEND);
+//    }
+//}
