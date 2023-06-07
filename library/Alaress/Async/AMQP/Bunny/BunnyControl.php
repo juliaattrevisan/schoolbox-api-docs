@@ -11,6 +11,7 @@ namespace Alaress\Async\AMQP\Bunny;
 
 use ReflectionProperty;
 use RuntimeException;
+use SensitiveParameter;
 
 /**
  * Class BunnyControl
@@ -97,9 +98,10 @@ class BunnyControl implements ControlInterface
      * This constructor accepts config arguments the same as the `rabbitmqadmin` on commandline
      * Refer to `rabbitmqadmin --help` for valid values (note keys are dash-separated names rather than camelCased).
      *
-     * @param array $config
+     * @param array $config Configuration: as this may contain a password, this
+     *                      is a sensitive parameter.
      */
-    public function __construct(array $config = [])
+    public function __construct(#[SensitiveParameter] array $config = [])
     {
         foreach ($config as $key => $value) {
             $property = score2camel($key, '-');
