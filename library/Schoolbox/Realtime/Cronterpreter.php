@@ -28,7 +28,7 @@ class Cronterpreter
     /**
      * @param string $timeFormat
      */
-    function __construct($timeFormat)
+    public function __construct($timeFormat)
     {
         $this->setTimeFormat($timeFormat);
     }
