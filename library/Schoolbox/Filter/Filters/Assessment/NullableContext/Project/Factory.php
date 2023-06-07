@@ -35,7 +35,6 @@ use UnexpectedValueException;
  */
 class Factory extends NullableContext\Factory
 {
-
     /**
      * @var Folder\Mapper
      */

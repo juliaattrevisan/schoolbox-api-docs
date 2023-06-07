@@ -20,7 +20,6 @@ use stdClass;
 
 class ObjectReaderTest extends TestCase
 {
-
     /** @var Student */
     protected $dummyUser;
 

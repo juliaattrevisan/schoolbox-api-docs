@@ -18,7 +18,6 @@ use Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
  */
 class Factory extends AssessmentTermFilter\Factory
 {
-
     /**
      * @inheritdoc
      * @param Filter\Model $filter

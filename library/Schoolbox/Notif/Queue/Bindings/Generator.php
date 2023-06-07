@@ -24,7 +24,6 @@ use Schoolbox\UserMapper;
 
 class Generator implements GeneratorInterface
 {
-
     /** @var \External_UserInterface */
     protected $xUserHandler;
 

@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class CampusMembershipFilter extends ContextFilter
 {
-
     /**
      * Returns true if this message is considered valid, or false if it should be dismissed
      *

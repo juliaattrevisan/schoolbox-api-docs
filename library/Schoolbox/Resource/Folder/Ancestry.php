@@ -23,7 +23,6 @@ use Schoolbox\Collection;
  */
 class Ancestry
 {
-
     /**
      * Maximum number of traversals before bugging out
      */
