@@ -309,7 +309,11 @@ class Session
             if ($ds) {
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                $bind = @ldap_bind($ds, $this->ldapEscape($username), utf8_encode($password));
+                $bind = @ldap_bind(
+                    $ds,
+                    $this->ldapEscape($username),
+                    mb_convert_encoding($password, 'UTF-8', 'ISO-8859-1'),
+                );
                 if ($bind) {
                     return $ds;
                 }
@@ -359,7 +363,7 @@ class Session
             $dn = $entries[0]['dn'] ?? null;
             // if the user exists
             if ($dn) {
-                $bind = @ldap_bind($ds, $dn, utf8_encode($password));
+                $bind = @ldap_bind($ds, $dn, mb_convert_encoding($password, 'UTF-8', 'ISO-8859-1'));
 
                 // failed to bind. find out why.
                 if (!$bind) {
