@@ -45,7 +45,7 @@ class ModelTest extends TestCase
             ->setIsViewed(false)
             ->setFile('contents');
         $this->test_mapper = $this->getMockBuilder(TestMapper::class)
-                                  ->addMethods(['findById', 'findOneByColumn'])
+                                  ->onlyMethods(['findById', 'findOneByColumn'])
                                   ->getMock();
         $this->test_mapper
             ->expects($this->any())

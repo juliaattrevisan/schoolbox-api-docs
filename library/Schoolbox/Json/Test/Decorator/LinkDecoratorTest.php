@@ -36,7 +36,7 @@ class LinkDecoratorTest extends TestCase
     {
         $this->router = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()
-            ->addMethods([ 'generate' ])
+            ->onlyMethods([ 'generate' ])
             ->getMock();
 
         $this->router
@@ -46,7 +46,7 @@ class LinkDecoratorTest extends TestCase
 
         $this->auth = $this->getMockBuilder(Authorizer::class)
             ->disableOriginalConstructor()
-            ->addMethods([ 'isPathAuthorizedForUser' ])
+            ->onlyMethods([ 'isPathAuthorizedForUser' ])
             ->getMock();
 
         $this->auth

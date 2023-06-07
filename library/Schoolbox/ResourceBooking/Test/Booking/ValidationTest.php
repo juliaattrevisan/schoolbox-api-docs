@@ -83,14 +83,14 @@ class ValidationTest extends TestCase
 
         // Stub external timetable, don't allow it to use it ist own constractor
         $externalTimetable = $this->getMockBuilder(External_Timetable::Class)
-                                  ->addMethods(['__construct'])
+                                  ->onlyMethods(['__construct'])
                                   ->disableOriginalConstructor()
                                   ->getMock();
 
         /** @var External_Timetable $externalTimetable */
         $mockValidation = $this->getMockBuilder(Validation::Class)
                                ->setConstructorArgs([$user, $bookingMapper, $statusMapper, $termMapper, $externalTimetable, $campusMapper, $mockConfig, $externalEventMapper])
-                               ->addMethods(['getTimetableRoomEvents']) // we need this to be a stub
+                               ->onlyMethods(['getTimetableRoomEvents']) // we need this to be a stub
                                ->getMock();
 
         return $mockValidation;
