@@ -11,6 +11,7 @@ namespace Schoolbox\External\Importer\User\Hydrator;
 use Schoolbox\CampusMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User as UserModel;
+use SensitiveParameter;
 
 /**
  * Sets campuses for a user based on a lookup.
@@ -46,7 +47,7 @@ class Campus implements HydratorInterface
     /**
      * @inheritdoc
      */
-    public function hydrate($row, UserModel $user)
+    public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel
     {
         // Does the field exist in $row?
         if (isset($row[$this->fieldname])) {

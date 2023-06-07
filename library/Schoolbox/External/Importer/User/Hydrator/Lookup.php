@@ -9,6 +9,7 @@
 namespace Schoolbox\External\Importer\User\Hydrator;
 
 use Schoolbox\User as UserModel;
+use SensitiveParameter;
 
 /**
  * Sets a field value based on a lookup.
@@ -53,7 +54,7 @@ class Lookup implements HydratorInterface
     /**
      * @inheritdoc
      */
-    public function hydrate($row, UserModel $user)
+    public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel
     {
         // Does the field exist in $row?
         if (isset($row[$this->fieldname])) {

@@ -10,6 +10,7 @@ namespace Schoolbox\External\Importer\User\Hydrator;
 
 use Alaress\Password\Service as PasswordService;
 use Schoolbox\User as UserModel;
+use SensitiveParameter;
 
 /**
  * Sets the user's password, if it exists in the row and it isn't empty.
@@ -39,7 +40,7 @@ class Password extends Field
     /**
      * @inheritdoc
      */
-    public function hydrate($row, UserModel $user)
+    public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel
     {
         if (isset($row[$this->fieldname]) && strlen($row[$this->fieldname]) > 0) {
             $password = $this->passwordService->hash($row[$this->fieldname]);
