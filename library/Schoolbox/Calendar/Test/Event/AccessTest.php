@@ -60,7 +60,7 @@ class AccessTest extends TestCase
 
     /**
      * @param string $key
-     * @return mixed|User
+     * @return User|MockObject
      */
     private function getUser($key)
     {
@@ -106,10 +106,13 @@ class AccessTest extends TestCase
             // Create a mock returns for users
 
             // Mock returns for studentWithParent, who is a child of $this->users['parentWithStudent']
-            $this->users['studentWithParent']->method('getParents')->willReturnCallback(function () {
+            /** @var User|MockObject $studentWithParents */
+            $studentWithParents = $this->users['studentWithParent'];
+            $studentWithParents->method('getParents')->willReturnCallback(function () {
                 $collection = new Collection();
                 return $collection->add($this->users['parentWithStudent']);
             });
+            $this->users['studentWithParent'] = $studentWithParents;
         }
 
         return $this->users[$key];
