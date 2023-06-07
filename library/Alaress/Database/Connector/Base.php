@@ -675,7 +675,7 @@ class Base implements Serializable, IConnector
                 return false;
             }
 
-            $identifier = array($identifier);
+            $identifier = [$identifier];
         }
 
         $set    = [];
@@ -697,7 +697,7 @@ class Base implements Serializable, IConnector
 
         foreach ($identifier as $ident) {
             $query .= " AND {$quoter->quoteIdentifier($ident)} = ?";
-            $params[] = $ident;
+            $params[] = $array[$ident];
         }
 
         $this->query($query, $params);
