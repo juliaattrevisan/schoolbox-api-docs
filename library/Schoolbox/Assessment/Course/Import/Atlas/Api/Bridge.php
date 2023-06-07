@@ -198,7 +198,7 @@ class Bridge
 
         // Await request completion
         /** @noinspection PhpUnhandledExceptionInspection */
-        $responses        = Promise\unwrap($asyncRequests);
+        $responses        = Promise\Utils::unwrap($asyncRequests);
         $result           = [];
         $nextPageRequests = [];
         foreach ($responses as $requestName => $response) {

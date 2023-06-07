@@ -11,8 +11,8 @@ namespace Schoolbox\Gotenberg;
 
 use Gotenberg\Modules\Chromium;
 use Gotenberg\Modules\PdfEngines;
-use Http\Client\HttpClient;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Realtime\Pipe\PipeManager;
@@ -57,13 +57,13 @@ class Client
     /**
      * Constructor
      *
-     * @param HttpClient  $httpClient The HTTP client used for sending requests.
-     * @param string      $apiHost    The URL which hosts the Gotenberg API.
-     * @param string|null $apiKey     The Gotenberg API key (if required).
-     * @param int|null    $apiVersion The Gotenberg API version (if known)
+     * @param ClientInterface $httpClient The HTTP client for sending requests.
+     * @param string          $apiHost    The URL which hosts the Gotenberg API.
+     * @param string|null     $apiKey     The Gotenberg API key (if required).
+     * @param int|null        $apiVersion The Gotenberg API version (if known)
      */
     public function __construct(
-        private HttpClient $httpClient,
+        private ClientInterface $httpClient,
         private string $apiHost,
         private ?string $apiKey,
         private ?int $apiVersion,

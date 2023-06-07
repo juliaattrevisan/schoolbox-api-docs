@@ -64,7 +64,7 @@ class Cronterpreter
      */
     public function interpret($crontab)
     {
-        $cron = CronExpression::factory($crontab);
+        $cron = new CronExpression($crontab);
 
         // parse out a human-readable form of the cron
         $test = [
