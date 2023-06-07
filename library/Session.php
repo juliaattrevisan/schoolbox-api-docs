@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use LDAP\Connection as LDAPConnection;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
@@ -274,7 +275,7 @@ class Session
      * @param string|null $ldapCaCertHash If provided, hash of a local path to a cert.
      *                                    This must be a local file, because the
      *                                    LDAP extension needs to access this file.
-     * @return bool|resource The connection, or false if none could be created.
+     * @return LDAPConnection|null The connection, or null if none could be created.
      * @throws MapperException
      */
     public function ldapConnect(string $host, string $username, string $password, ?string $ldapCaCertHash)
@@ -319,29 +320,29 @@ class Session
                 }
             }
         }
-        return false;
+        return null;
     }
 
 
     /**
      * Authenticates a username/password against the provided LDAP connection.
      *
-     * @param bool|resource $ds            An LDAP connection
-     * @param string        $username      The username to authenticate in the
-     *                                     LDAP connection
-     * @param string        $password      The password for user $username
-     * @param string        $userDn        What is the distinguished name of the
-     *                                     directory which contains usernames?
-     * @param string        $usernameField Which field in $userDn contains the
-     *                                     username?
-     * @param string        $searchFilter  What other filters should be applied
-     *                                     to the username field search?
+     * @param ?LDAPConnection $ds            An LDAP connection, if created
+     * @param string          $username      The username to authenticate in the
+     *                                       LDAP connection
+     * @param string          $password      The password for user $username
+     * @param string          $userDn        What is the distinguished name of
+     *                                       the directory containing usernames?
+     * @param string          $usernameField Which field in $userDn contains the
+     *                                       username?
+     * @param string          $searchFilter  What other filters get applied to
+     *                                       the username field search?
      * @return bool
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
      */
     private function ldapAuth(
-        $ds,
+        ?LDAPConnection $ds,
         string $username,
         string $password,
         string $userDn,
