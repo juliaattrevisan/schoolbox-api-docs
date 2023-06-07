@@ -34,17 +34,17 @@ class Scrub
     /**
      * Singleton CommonMark instance used by this class in `linkifyText`.
      *
-     * @var CommonMark\MarkdownConverterInterface|null
+     * @var CommonMark\ConverterInterface|null
      */
-    private static ?CommonMark\MarkdownConverterInterface $linkifyConverter = null;
+    private static ?CommonMark\ConverterInterface $linkifyConverter = null;
 
 
     /**
      * Singleton CommonMark instance used by this class in `markdown`.
      *
-     * @var CommonMark\MarkdownConverterInterface|null
+     * @var CommonMark\ConverterInterface|null
      */
-    private static ?CommonMark\MarkdownConverterInterface $markdownConverter = null;
+    private static ?CommonMark\ConverterInterface $markdownConverter = null;
 
 
     /**
@@ -421,11 +421,11 @@ class Scrub
      * Create a cut-down Markdown converter which does little more than parse
      * links out of text.
      *
-     * @return CommonMark\MarkdownConverterInterface
+     * @return CommonMark\ConverterInterface
      */
-    private static function getLinkifyingMarkdownConverter(): CommonMark\MarkdownConverterInterface
+    private static function getLinkifyingMarkdownConverter(): CommonMark\ConverterInterface
     {
-        if (!self::$linkifyConverter instanceof CommonMark\MarkdownConverterInterface) {
+        if (!self::$linkifyConverter instanceof CommonMark\ConverterInterface) {
             $environment = new CommonMark\Environment\Environment(
                 [
                     'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
@@ -451,7 +451,7 @@ class Scrub
      */
     public static function linkifyText(string $text): string
     {
-        return self::getLinkifyingMarkdownConverter()->convertToHtml($text);
+        return self::getLinkifyingMarkdownConverter()->convert($text);
     }
 
 
@@ -459,11 +459,11 @@ class Scrub
      * Create a cut-down Markdown converter which does little more than parse
      * links out of text.
      *
-     * @return CommonMark\MarkdownConverterInterface
+     * @return CommonMark\ConverterInterface
      */
-    private static function getMarkdownConverter(): CommonMark\MarkdownConverterInterface
+    private static function getMarkdownConverter(): CommonMark\ConverterInterface
     {
-        if (!self::$markdownConverter instanceof CommonMark\MarkdownConverterInterface) {
+        if (!self::$markdownConverter instanceof CommonMark\ConverterInterface) {
             $environment = new CommonMark\Environment\Environment(
                 [
                     'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
@@ -488,7 +488,7 @@ class Scrub
      */
     public static function markdown(?string $text): string
     {
-        $html = self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
+        $html = self::getMarkdownConverter()->convert((string)$text)->getContent();
 
         // Ensure no linebreak exists between <li> and any other immediately following tag.  (See SA-15196).
         // Eg. "<li>\n<a href='google.com'>Link</a>" needs to become "<li><a href='google.com'>Link</a>".
