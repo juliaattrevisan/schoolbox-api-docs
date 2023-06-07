@@ -7,6 +7,7 @@ use Codeception\TestInterface;
 use IntegrationTester;
 use Payload;
 use Codeception\Scenario;
+use SensitiveParameter;
 
 class FetchPagesFromCsvCest
 {
@@ -97,7 +98,7 @@ class FetchPagesFromCsvCest
      * @param string            $username
      * @param string            $password
      */
-    protected function loginUser(IntegrationTester $i, string $username, string $password)
+    protected function loginUser(IntegrationTester $i, string $username, #[SensitiveParameter] string $password): void
     {
         $loginPayload = new Payload\Authentication\Login();
         $loginPayload->setUsername($username);
