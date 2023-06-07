@@ -66,68 +66,6 @@ function score2pascal($score, $delim = '_')
 }
 
 /**
- * This function exists because pathinfo() breaks non-latin things
- *
- * @deprecated replace with a modern URI parser.
- *             This method is used to break down file basenames into filename
- *             and extension: that should be the responsibility of a dedicated
- *             URI parsing class.
- *
- * @see http://php.net/manual/en/function.pathinfo.php#107461
- *
- * @param string $filepath
- * @param int    $options
- * @return array|string
- */
-function mb_pathinfo($filepath, $options = null)
-{
-    $regexp = <<<REGEXP
-%^
-(?P<dirname>.*?)
-(?P<basename>[^/\\\\]*?)
-[\\\\/]*
-$%imx
-REGEXP;
-
-    preg_match($regexp, $filepath, $m);
-
-    $map = [
-        PATHINFO_DIRNAME   => 'dirname',
-        PATHINFO_BASENAME  => 'basename',
-        PATHINFO_EXTENSION => 'extension',
-        PATHINFO_FILENAME  => 'filename'
-    ];
-
-    $ret = [];
-
-    if (isset($m['dirname']) && $m['dirname']) {
-        // Trim trailing /
-        $ret[$map[PATHINFO_DIRNAME]] = preg_replace('%[\\\\/]$%', '', $m['dirname']);
-    }
-    if (isset($m['basename']) && $m['basename']) {
-        $ret[$map[PATHINFO_BASENAME]] = $m['basename'];
-        $params = explode('?', $m['basename']);
-        $parts = explode('.', $params[0]);
-        if (count($parts) === 1) {
-            $filename = $m['basename'];
-        } else {
-            preg_match('/\w+/', array_pop($parts), $match);
-            $ret[$map[PATHINFO_EXTENSION]] = $match[0] ?? '';
-            $filename                      = implode('.', $parts);
-        }
-        if (strlen($filename)) {
-            $ret[$map[PATHINFO_FILENAME]] = $filename;
-        }
-    }
-
-    if ($options && isset($map[$options])) {
-        return array_key_exists($map[$options], $ret) ? $ret[$map[$options]] : '';
-    }
-
-    return $ret;
-}
-
-/**
  * Convenience wrapper for consistent temp file naming
  *
  * @param string $prefix
