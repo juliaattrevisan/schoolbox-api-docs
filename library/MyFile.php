@@ -83,27 +83,6 @@ class MyFile extends DeprecatedModel
         return $this->db->query($query)->fetchAll();
     }
 
-
-    /**
-     * @deprecated
-     *
-     * @param int $fileID
-     * @param string $action
-     */
-    public function logAction($fileID, $action)
-    {
-        $logEntry = [
-            'object'   => 'myfile',
-            'objectId' => $fileID,
-            'action'   => $action,
-            'user'     => $_SESSION['id'],
-        ];
-
-        $notif = Notifactory::create(Notif::TOPIC_CMS);
-        $notif->info("CRUD", $logEntry);
-    }
-
-
     /**
      * @deprecated
      *
@@ -112,7 +91,6 @@ class MyFile extends DeprecatedModel
      */
     public function delete($fileID)
     {
-        $this->logAction($fileID, "delete");
         return parent::update([
             'id'         => $fileID,
             'deleted_at' => Alaress_Date_Format::now()->getDatabase(),
