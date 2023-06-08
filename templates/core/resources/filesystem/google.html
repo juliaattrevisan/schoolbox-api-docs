@@ -61,9 +61,19 @@
                   googleAccessTokenType: '{GOOGLE_ACCESS_TOKEN_TYPE}',
                   listener: false,
                   modalId: null,
-                  views: [{VIEWS}],
+
+                  /* TODO I'm not sure that views is even used anymore
+                   *  We might be able to delete it. Commenting this node
+                   *  doesn't seem to affect anything
+                   */
+                  views: [],
                   features: [{FEATURES}],
                   authBtn: '#auth-btn',
+
+                  /* An empty mimeTypes array is unfiltered, and will
+                   * show all files of any mimetype in the google picker
+                   */
+                  mimeTypes: ['{MIME_TYPES}'],
 
                   onSelect: function (docs, token) {
                       window.top.postMessage(JSON.stringify({text: 'Collecting files from Google, please wait...'}), location.origin);
