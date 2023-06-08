@@ -407,11 +407,9 @@ data:
 
             <div class="small-12 island">
                 <h3 class="subheader">Diagnostics</h3>
-                <section class="content">
-                    <div id="diagnostics-{{ idx }}" data-alart class="alert-box"><span class="loader"></span>Testing in progress,
-                        please wait...
-                    </div>
-                </section>
+                <div id="diagnostics-{{ idx }}" data-alert class="alert-box u-break-word"><span class="loader"></span>Testing in progress,
+                    please wait...
+                </div>
             </div>
 
             <div id="common-causes-wrap-{{ idx }}" class="small-12 island hide">
@@ -430,7 +428,7 @@ data:
 
             <div id="request-response-letsencrypt-{{ idx }}" class="hide">
                 <div id="request-details-le-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Request (User Agent: Let's Encrypt)</h3>
                         <table>
                             <tr>
@@ -439,17 +437,17 @@ data:
                             </tr>
                             <tr>
                                 <th>URI:</th>
-                                <td id="request-uri-letsencrypt-{{ idx }}">Loading...</td>
+                                <td id="request-uri-letsencrypt-{{ idx }}" class="u-break-word">Loading...</td>
                             </tr>
                             <tr>
                                 <th>Headers:</th>
-                                <td>user-agent: {{ USER_AGENT_STRING_LETS_ENCRYPT }}</td>
+                                <td class="u-break-word">user-agent: {{ USER_AGENT_STRING_LETS_ENCRYPT }}</td>
                             </tr>
                         </table>
                     </div>
                 </div>
                 <div id="response-details-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Response</h3>
                         <table>
                             <tr>
@@ -458,11 +456,11 @@ data:
                             </tr>
                             <tr>
                                 <th>Headers:</th>
-                                <td id="response-headers-letsencrypt-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-headers-letsencrypt-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                             <tr>
                                 <th>Body:</th>
-                                <td id="response-body-letsencrypt-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-body-letsencrypt-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                         </table>
                     </div>
@@ -471,7 +469,7 @@ data:
 
             <div id="request-response-chrome-{{ idx }}" class="hide">
                 <div id="request-details-chrome-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Request (User Agent: Chrome)</h3>
                         <table>
                             <tr>
@@ -490,7 +488,7 @@ data:
                     </div>
                 </div>
                 <div id="response-details-{{ idx }}">
-                    <div class="medium-12 large-6 island">
+                    <div class="small-12 large-6 island">
                         <h3 class="subheader">Response</h3>
                         <table>
                             <tr>
@@ -499,11 +497,11 @@ data:
                             </tr>
                             <tr>
                                 <th>Headers:</th>
-                                <td id="response-headers-chrome-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-headers-chrome-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                             <tr>
                                 <th>Body:</th>
-                                <td id="response-body-chrome-{{ idx }}"><span class="loader"></span></td>
+                                <td id="response-body-chrome-{{ idx }}" class="u-break-word"><span class="loader"></span></td>
                             </tr>
                         </table>
                     </div>

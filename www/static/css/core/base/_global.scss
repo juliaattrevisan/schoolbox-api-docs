@@ -1,16 +1,16 @@
 /*
-    The following global styles is a combination of: 
+    The following global styles is a combination of:
     1. A CSS reset from: https://www.joshwcomeau.com/css/custom-css-reset/
     2. Foundations own overrides
     3. Our own specific tweaks
 
-    We had previously used normalize (github.com/necolas/normalize.css) 
+    We had previously used normalize (github.com/necolas/normalize.css)
     But it hasn't been updated in over five years and browsers have moved
     on quite a bit since then. Addtionally, Foundation itself pretty
-    aggresively sets everything to how it sees fit. 
+    aggresively sets everything to how it sees fit.
 
-    Moving forward I've tried to tidy up such global overrides as much as possible. 
-    This is so as we update our UI components, we can minimise the legacy that 
+    Moving forward I've tried to tidy up such global overrides as much as possible.
+    This is so as we update our UI components, we can minimise the legacy that
     gets in the way and hopefully make it easier for new components to exist
     in the existing setup.
 */
