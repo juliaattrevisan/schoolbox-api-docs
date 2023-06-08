@@ -1871,16 +1871,6 @@ parameters:
 			path: library/MyFile.php
 
 		-
-			message: "#^Access to an undefined property Page\\:\\:\\$arg\\.$#"
-			count: 1
-			path: library/Page.php
-
-		-
-			message: "#^Constructor of class Page has an unused parameter \\$error\\.$#"
-			count: 1
-			path: library/Page.php
-
-		-
 			message: "#^Cannot access offset 'name' on true\\.$#"
 			count: 1
 			path: library/PortfolioWebDAV.php
