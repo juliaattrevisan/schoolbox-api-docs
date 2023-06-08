@@ -91,10 +91,12 @@ class ClassList
                 $classTypes[$subject['id']] = $subject['classType'];
             }
             $folderList = $this->folderMapper->findByColumn(
-                'id', $this->user->getSubjectCollection()->map(
-                static function (array $subject) {
-                    return $subject['id'];
-                })
+                'id',
+                $this->user->getSubjectCollection()->map(
+                    static function (array $subject) {
+                        return $subject['id'];
+                    }
+                )
             );
         }
 
