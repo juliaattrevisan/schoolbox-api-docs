@@ -20,8 +20,8 @@
         <exclude name="Generic.Files.LineLength"/>
 
         <!-- For the time being: allow non-namespaced and underscore-namespaced classes -->
-        <exclude name="Generic.Classes.ValidClassName"/>
-        <exclude name="Generic.Classes.ClassDeclaration"/>
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+        <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps"/>
     </rule>
 
 </ruleset>
