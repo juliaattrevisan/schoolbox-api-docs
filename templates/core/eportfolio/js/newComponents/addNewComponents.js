@@ -9,7 +9,7 @@ import {
 } from "@js/util/domUtils";
 import { getNewComponent } from "./getNewComponent";
 import { saveComponentOrder } from "../existingComponents/saveComponentOrder";
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 
 gsap.registerPlugin(Draggable, Flip);
 

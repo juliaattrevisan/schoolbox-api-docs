@@ -3,7 +3,7 @@
  *
  */
 
-import { UPDATE_URL } from "../updateHomepage";
+import { UPDATE_URL } from "../updateEPortfolio";
 import { getLoadedHTML } from "@js/util/domUtils";
 
 /**

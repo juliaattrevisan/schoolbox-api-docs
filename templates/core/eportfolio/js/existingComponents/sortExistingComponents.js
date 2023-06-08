@@ -15,7 +15,7 @@ import {
 } from "@js/util/domUtils";
 import { saveComponentOrder } from "./saveComponentOrder";
 import { slideUp, slideDown } from "@js/util/animateUtils";
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 import { isOpen as isSettingsPanelOpen } from "./updateComponentsSettings";
 import { isOpen as isRemovePanelOpen } from "./removeComponents";
 import { isOpen as isComponentOpen } from "./collapseComponents";

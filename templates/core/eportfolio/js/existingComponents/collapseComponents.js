@@ -4,8 +4,8 @@
  */
 
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
-import { EXISTING_COMPONENT_SELECTOR } from "../updateHomepage";
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import { EXISTING_COMPONENT_SELECTOR } from "../updateEPortfolio";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 
 const ANIMATE_CLOSED_POSITION = 180;
 const ANIMATE_OPEN_POSITION = 0;

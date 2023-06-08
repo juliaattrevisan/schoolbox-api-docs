@@ -3,8 +3,8 @@
  *
  */
 
-import { UPDATE_URL } from "../updateHomepage";
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import { UPDATE_URL } from "../updateEPortfolio";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 import { getFormData } from "./editColumns";
 import { resetColours } from "./editColumnsColours";
 

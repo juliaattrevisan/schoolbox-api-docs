@@ -4,7 +4,7 @@
  *
  */
 
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../updateHomepage";
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../updateEPortfolio";
 import { updateRemovedComponent } from "./removeComponents";
 
 /**

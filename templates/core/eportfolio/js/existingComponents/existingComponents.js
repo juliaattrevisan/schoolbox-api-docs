@@ -3,7 +3,7 @@
  *
  */
 
-import { canEditHomepage } from "../updateHomepage";
+import { canEditEportfolio } from "../updateEPortfolio";
 import { initCollapseComponents } from "./collapseComponents";
 import { initSortExistingComponents } from "./sortExistingComponents";
 import { initUpdateComponentsSettings } from "./updateComponentsSettings";
@@ -14,7 +14,7 @@ import { initRemoveComponents } from "./removeComponents";
  */
 export function initExistingComponents() {
     initCollapseComponents();
-    if (canEditHomepage()) {
+    if (canEditEportfolio()) {
         initSortExistingComponents();
         initUpdateComponentsSettings();
         initRemoveComponents();

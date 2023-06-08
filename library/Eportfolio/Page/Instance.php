@@ -63,10 +63,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         // Set up blocks and stuff
 
         $this->getPage()->setTitle($this->getEportfolioHandler()->getSettingsPageTitle());
+        $this->getPage()->setBlock('custom_head', 'colour_list', 'colour_list_block');
         $this->getPage()->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
-        $this->getPage()->setBlock('modify_layout', 'colour_list', 'colour_list_block');
         $this->getPage()->setBlock('customise_page', 'eportfolio_component_tab', 'eportfolio_component_tab_block');
         $this->getPage()->setBlock('customise_page', 'eportfolio_component_page', 'eportfolio_component_page_block');
         $this->getPage()->setBlock('eportfolio_component_page', 'eportfolio_component', 'eportfolio_component_block');

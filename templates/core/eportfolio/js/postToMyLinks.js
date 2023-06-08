@@ -1,5 +1,5 @@
 /**
- * Adds this homepage page to my links
+ * Adds this eportfolio page to my links
  *
  */
 
@@ -39,7 +39,7 @@ async function postLink() {
  */
 function getFormData() {
     const formData = new FormData();
-    formData.append("url", document.getElementById("homepageURL").value);
+    formData.append("url", document.getElementById("eportfolioURL").value);
     formData.append("description", document.getElementById("heading").value);
     return formData;
 }
@@ -49,7 +49,7 @@ function getFormData() {
  */
 function displayLinkOnPage() {
     const link = document.createElement("a");
-    link.setAttribute("href", document.getElementById("homepageURL").value);
+    link.setAttribute("href", document.getElementById("eportfolioURL").value);
     link.innerText = document.getElementById("heading").value;
 
     const linkListItem = document.createElement("li");

@@ -11,7 +11,7 @@ import { initNewComponents } from "./newComponents/newComponents";
 import { initUpdatePlaceHolders } from "./updatePlaceHolders";
 
 export const EXISTING_COMPONENT_SELECTOR = "[data-component]";
-export const UPDATE_URL = "/homepage/configForm.php";
+export const UPDATE_URL = "/eportfolio/configForm.php";
 
 /**
  * To retrieve the component id
@@ -29,8 +29,8 @@ export function getComponentID(component) {
  *
  * @returns { Boolean }
  */
-export function canEditHomepage() {
-    return document.getElementById("component-lock-switch") ? true : false; //this element won't be on the page if is read-only
+export function canEditEportfolio() {
+    return true;
 }
 
 /**
@@ -39,8 +39,8 @@ export function canEditHomepage() {
 document.addEventListener("DOMContentLoaded", () => {
     initPostToMyLinks();
     initExistingComponents();
-    if (canEditHomepage()) {
-        initToggleLockComponents();
+    if (canEditEportfolio()) {
+        // initToggleLockComponents();
         initEditColumns();
         initNewComponents();
         initUpdatePlaceHolders();

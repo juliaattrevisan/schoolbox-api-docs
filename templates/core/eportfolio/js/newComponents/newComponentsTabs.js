@@ -4,22 +4,22 @@
  *
  */
 
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 
 /**
  * To ensure only the new components tab or the edit columns view is open at once
  */
 export function initNewComponentsTab() {
-    const homepage = $("#component-layout");
+    const eportfolio = $("#component-layout");
 
     // Fix slider on tab
     $("[data-tab]").on("toggled", function (event, tab) {
         tab.foundation("reflow");
         const tabData = tab.data(); // What tab is this?
         if ("hideEmpty" in tabData) {
-            homepage.removeClass("show-empty");
+            eportfolio.removeClass("show-empty");
         } else if ("showEmpty" in tabData) {
-            homepage.addClass("show-empty");
+            eportfolio.addClass("show-empty");
         }
     });
 
@@ -30,7 +30,7 @@ export function initNewComponentsTab() {
         },
         onTabClose: function () {
             document.dispatchEvent(new Event(UpdateEPortfolioEvents.NEW_COMPONENTS_TABS_CLOSED));
-            homepage.removeClass("show-empty");
+            eportfolio.removeClass("show-empty");
         },
     });
 }

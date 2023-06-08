@@ -6,7 +6,7 @@
  *
  */
 
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 
 /**
  * Start listening for the relevant events

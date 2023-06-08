@@ -216,6 +216,22 @@
         transition: max-height 0.2s ease-in, opacity 0.2s ease-in;
     }
 }
+#tabs-eportfolio .component-tabs {
+    display: block;
+    max-height: 0;
+    visibility: hidden;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
+
+    &.active {
+        display: block;
+        max-height: 1000px;
+        visibility: visible;
+        opacity: 1;
+        transition: max-height 0.2s ease-in, opacity 0.2s ease-in;
+    }
+}
 
 .component-palette [data-component-palette] {
     transition: all 0.15s;

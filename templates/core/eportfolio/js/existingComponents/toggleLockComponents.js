@@ -4,8 +4,8 @@
  *
  */
 
-import { EXISTING_COMPONENT_SELECTOR } from "../updateHomepage";
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import { EXISTING_COMPONENT_SELECTOR } from "../updateEPortfolio";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 
 /**
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch

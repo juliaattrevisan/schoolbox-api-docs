@@ -3,7 +3,7 @@
  *
  */
 
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 
 /**
  * Start listening for button events

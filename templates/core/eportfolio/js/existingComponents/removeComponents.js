@@ -5,9 +5,9 @@
 
 import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../updateHomepage";
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../updateEPortfolio";
 import { close as closeSettingsPanel } from "./updateComponentsSettings";
-import UpdateEPortfolioEvents from "../updateEPorfolioEvents";
+import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
 
 const ANIMATE_CLOSED_POSITION = 0;
 const ANIMATE_OPEN_POSITION = 180;

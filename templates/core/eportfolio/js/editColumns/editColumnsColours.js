@@ -9,7 +9,7 @@
  */
 
 const COLOUR_PICKERS_SELECTOR = "[data-colorpicker]";
-const COLOURS = colours; //is a global variable from templates/core/homepage/index.html
+const COLOURS = colours; //is a global variable from templates/core/eportfolio/index.html
 
 /**
  * Change the column colours
@@ -119,8 +119,8 @@ function onColourChange(element, colour) {
 function updateColour(colourId, colour) {
     COLOURS.pickers[colourId] = colour; //update the object for possible future save / reset / undo
     const colourProperty = `--${colourId.replace(/_/g, "-")}`;
-    const homepage = document.getElementById("component-layout");
-    homepage.style.setProperty(colourProperty, colour);
+    const eportfolio = document.getElementById("component-layout");
+    eportfolio.style.setProperty(colourProperty, colour);
 }
 
 /**
