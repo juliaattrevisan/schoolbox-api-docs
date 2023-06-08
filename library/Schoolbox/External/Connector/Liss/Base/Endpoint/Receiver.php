@@ -39,12 +39,6 @@ use SensitiveParameter;
 class Receiver
 {
     /**
-     * A file in your vagrant: /var/log/schoolbox/vagrantx
-     */
-    private const LOG_FILE = 'liss.log';
-
-
-    /**
      * Log message when authentication fails
      */
     private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/schoolCode in your instance.';
@@ -91,7 +85,6 @@ class Receiver
      * @param string                                   $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
      * @param string                                   $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
      * @param bool                                     $storageLogging    Decide whether to log actual liss payloads to local file storage
-     * @param string                                   $logDir            Path to a local log file
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper   Log the import in the suds control panel
      * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a local file storage record
      */
@@ -104,7 +97,6 @@ class Receiver
         private string $defaultType,
         private string $teacherIdentifier,
         private bool $storageLogging,
-        private string $logDir,
         private \Schoolbox\User $superuser,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
@@ -118,18 +110,7 @@ class Receiver
         $this->defaultType = trim($defaultType);
         $this->teacherIdentifier = trim($teacherIdentifier);
 
-        /* Path to a log file which you can: tail -n100 -f
-         * so you can see what's going on. Continuously appends.
-         */
-        $logFile = fopen(sprintf(
-            '%s/%s',
-            $this->logDir,
-            self::LOG_FILE
-        ), 'ab');
-
-        /* TODO Reset this log level to INFO once we are safely on the way
-         */
-        $this->log = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
+        $this->log = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');
     }
 
 

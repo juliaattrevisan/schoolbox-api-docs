@@ -64,7 +64,14 @@ class Logger implements LoggerInterface
      * @param array    $fields
      * @param bool     $porcelain
      */
-    public function __construct($outStream = STDOUT, $errStream = null, $threshold = Monologger::INFO, $fields = array(), $porcelain = false)
+    public function __construct(
+        $outStream = STDOUT,
+        $errStream = null,
+        $threshold = Monologger::INFO,
+        $fields = array(),
+        $porcelain = false,
+        ?string $module = null
+    )
     {
         $this->out = $outStream;
         $this->err = $errStream;
@@ -85,6 +92,10 @@ class Logger implements LoggerInterface
 
         if (in_array(self::FIELD_PID, $fields)) {
             $processors[] = new ProcessIdProcessor();
+        }
+
+        if ($module) {
+            $processors[] = new ModuleProcessor($module);
         }
 
         $this->log = new Monologger('cli', array(), $processors);

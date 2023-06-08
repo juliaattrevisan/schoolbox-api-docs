@@ -9,7 +9,9 @@ use RobRichards\XMLSecLibs\XMLSecurityDSig;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-$logger = Config::get('saml_debug') ? new \Alaress\Lumberjack\Logger() : new \Alaress\Lumberjack\Logger(null);
+$logger = Config::get('saml_debug')
+    ? new \Alaress\Lumberjack\Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'saml')
+    : new \Alaress\Lumberjack\Logger(null);
 
 $spBaseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
 
@@ -174,11 +176,3 @@ function useSAMLKerberos(\Alaress\Lumberjack\Logger $logger)
         return false;
     }
 }
-
-//function $logger->info($msg)
-//{
-//    if (Config::get('saml_debug')) {
-//
-//        file_put_contents(Config::get('logs_dir') . "/saml.log", "[" . date("Y-m-d H:i:s") . "] " . $_SERVER['REMOTE_ADDR'] . " " . $msg . "\n", FILE_APPEND);
-//    }
-//}
