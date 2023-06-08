@@ -147,6 +147,24 @@ class MyFolder extends DeprecatedModel
 
 
     /**
+     * @param int $folderID
+     * @param string $action
+     */
+    public function logAction($folderID, $action)
+    {
+        $logEntry = [
+            'object'   => 'myfolder',
+            'objectId' => $folderID,
+            'action'   => $action,
+            'user'     => $_SESSION['id'],
+        ];
+
+        $notif = Notifactory::create(Notif::TOPIC_CMS);
+        $notif->info("CRUD", $logEntry);
+    }
+
+
+    /**
      * @param array $data
      * @return int|string
      */
@@ -154,6 +172,8 @@ class MyFolder extends DeprecatedModel
     {
         $data['owner'] = $this->owner;
         $folderID      = parent::create($data);
+
+        $this->logAction($folderID, "create");
 
         return $folderID;
     }
@@ -165,6 +185,7 @@ class MyFolder extends DeprecatedModel
      */
     public function update($data)
     {
+        $this->logAction($data['id'], "modify");
         return parent::update($data);
     }
 
@@ -178,6 +199,8 @@ class MyFolder extends DeprecatedModel
         // delete files
         $fileHandler = new MyFile();
         $fileHandler->deleteByParent($folderID);
+
+        $this->logAction($folderID, "delete");
         return parent::delete($folderID);
     }
 }
