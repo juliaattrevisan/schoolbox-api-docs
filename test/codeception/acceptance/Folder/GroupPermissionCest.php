@@ -6,6 +6,7 @@ use AcceptanceTester;
 use Exception;
 use Page\Group\ManageGroup;
 use Page\Folder\CreateFolder;
+use Page\Resources\Resources;
 
 class GroupPermissionCest
 {
@@ -199,11 +200,23 @@ class GroupPermissionCest
         $i->cantSee('Group Restricted');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @throws Exception
+     *
+     * create a group with Jack Coles as admin
+     * create a sub folder to that group
+     * access that sub folder as Jack Coles
+     * access that sub folder as Jana Reed to see access denied
+     */
     public function inheritPermissions(AcceptanceTester $i): void
     {
         $createFolder           = new CreateFolder($i);
         $manageGroup            = new ManageGroup($i);
+        $resources              = new Resources($i);
         $folderName             = "Group Root";
+        $subFolderName          = "Group 1";
         $homepageTemplateOption = "Course";
 
         $i->amGoingTo('create a group with none permission to teachers');
@@ -225,14 +238,38 @@ class GroupPermissionCest
         $manageGroup->setAccessPermission('type-1');
         $manageGroup->clickUpdateButton();
 
-        $i->amGoingTo('Add Jack Coles as group admin');
-        $manageGroup->clickFromRadioButton('list');
+        $i->amGoingTo('Add Jack Coles into the group');
         $manageGroup->search('jcoles');
         $manageGroup->selectUser(22);
         $manageGroup->clickFromRadioButton('role');
         $i->click('Add Members');
+        $i->amGoingTo('Making Jack Coles the group admin via database');
+        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null,'name like' => $folderName]);
+        $i->updateInDatabase('userAccess', ['type' => '3'], ['sid' => $folderId]);
 
+        $i->amGoingTo('Create a sub folder under the group');
+        $i->amOnPage($createFolder::URL_RESOURCES);
+        $resources->clickFolderName($folderName);
+        $i->waitForText("Homepage", 5);
+        $resources->clickMenuItem('folder');
+        $createFolder->typeName($subFolderName);
+        $createFolder->setHomepageTemplate($homepageTemplateOption);
+        $createFolder->clickCreateFolderButton();
 
+        $i->amGoingTo('Impersonate Jack Coles and access the sub folder');
+        $i->impersonate('Jack Coles');
+        $i->amOnPage($createFolder::URL_RESOURCES);
+        $resources->clickFolderName($folderName);
+        $resources->clickFolderName($subFolderName);
+        $resources->clickMenuItem('home');
+        $i->canSee('Group 1');
+        $i->cantSee('You do not have permission to view this page.');
 
+        $i->amGoingTo('Impersonate Jana Reed and access the sub folder');
+        $i->impersonate('Jana Reed');
+        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null,'name like' => $subFolderName]);
+        $i->amOnPage('/homepage/' . $folderId);
+        $i->cantSee('Group 1');
+        $i->canSee('You do not have permission to view this page.');
     }
 }

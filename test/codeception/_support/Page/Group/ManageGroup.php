@@ -72,7 +72,7 @@ class ManageGroup
      */
     public function clickFromRadioButton($option): void
     {
-        $this->tester->click('label[for=' . $option .']');
+        $this->tester->click('label[for=' . $option . ']');
     }
 
     /**
@@ -95,6 +95,4 @@ class ManageGroup
     {
         $this->tester->click('label[for=checkbox-' . $userId . ']');
     }
-
-
 }
