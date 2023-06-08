@@ -9,15 +9,19 @@
 
 namespace Schoolbox\Realtime\Schedule\Event;
 
+use Alaress\Serializable\LegacySerializable;
 use JsonSerializable;
 use RuntimeException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Serializable;
 
-class Event implements CrudEventInterface, JsonSerializable
+class Event implements CrudEventInterface, JsonSerializable, Serializable
 {
+    use LegacySerializable;
+
     /** @var User */
     protected $effector;
 

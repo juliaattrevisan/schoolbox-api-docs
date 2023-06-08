@@ -13,8 +13,9 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Serializable;
 
-interface ModuleNotifierInterface
+interface ModuleNotifierInterface extends Serializable
 {
     const IMMEDIATELY = 0;
     const ONE_HOUR    = 3600;
