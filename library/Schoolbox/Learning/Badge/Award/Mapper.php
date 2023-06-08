@@ -377,7 +377,8 @@ class Mapper extends \Schoolbox\Mapper
             $query .= ' WHERE (' . implode(') AND (', $wheres) . ')';
         }
         $query     .= ' ORDER BY badge_user.awarded_at DESC ';
-        $statement = $this->getDatabase()->prepare($query, $pb->getParams());
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($pb->getParams());
 
         return $this->hydrateSelect($statement);
     }
