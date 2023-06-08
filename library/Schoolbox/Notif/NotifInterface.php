@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 
 interface NotifInterface extends LoggerInterface
 {
-
     /**
      * You will need to add to `\Schoolbox\Notif\Notif::SYSTEM_TOPICS` if you
      * want to log this topic to a log file.

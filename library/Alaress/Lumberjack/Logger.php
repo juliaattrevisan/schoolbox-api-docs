@@ -68,17 +68,16 @@ class Logger implements LoggerInterface
         $outStream = STDOUT,
         $errStream = null,
         $threshold = Monologger::INFO,
-        $fields = array(),
+        $fields = [],
         $porcelain = false,
         ?string $module = null
-    )
-    {
-        $this->out = $outStream;
-        $this->err = $errStream;
+    ) {
+        $this->out       = $outStream;
+        $this->err       = $errStream;
         $this->porcelain = $porcelain;
 
 
-        $processors = array(new MicrotimeProcessor());
+        $processors = [new MicrotimeProcessor()];
 
         if (in_array(self::FIELD_MEM, $fields)) {
             $processors[] = new MemoryUsageProcessor(false);
@@ -98,7 +97,7 @@ class Logger implements LoggerInterface
             $processors[] = new ModuleProcessor($module);
         }
 
-        $this->log = new Monologger('cli', array(), $processors);
+        $this->log = new Monologger('cli', [], $processors);
         $this->setLevel($threshold);
     }
 

@@ -16,7 +16,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RangeException;
-use RuntimeException;
 use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
