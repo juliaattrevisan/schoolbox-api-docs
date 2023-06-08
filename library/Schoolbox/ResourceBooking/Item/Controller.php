@@ -206,7 +206,7 @@ class Controller extends Base
                     'currentTerm'  => $this->termMapper->findForToday(),
                     'selectedDate' => $calendarDate->format('Y-m-d'),
                     'calendarView' => $this->request->query->get('view') === 'day' ? 'timeGridDay' : '',
-                    'token'        => $_SESSION['key'],
+                    'token'        => $this->getUser()->getKey(),
                 ],
             ]
         );

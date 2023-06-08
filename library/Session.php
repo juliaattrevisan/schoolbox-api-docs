@@ -94,18 +94,17 @@ class Session
             session_regenerate_id();
 
             //register users id
-            $_SESSION['id']                 = $user->getId();
-            $_SESSION['sid']                = $user->getExternalId();
-            $_SESSION['key']                = $user->getKey();
-            $_SESSION['lasttime']           = time();
-            $_SESSION['username']           = $user->getUsername();
+            $_SESSION['id']       = $user->getId();
+            $_SESSION['sid']      = $user->getExternalId();
+            $_SESSION['lasttime'] = time();
+            $_SESSION['username'] = $user->getUsername();
             if (
                 Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
                 && !empty(Config::get('external_portal'))
             ) {
                 $_SESSION['password'] = $_POST['password'] ?? null;
             }
-            $_SESSION['ip']                 = $ip;
+            $_SESSION['ip'] = $ip;
 
             // add mobile session data
             $sbmAuth = new Authenticator();
@@ -136,7 +135,7 @@ class Session
                     'username' => $user->getUsername(),
                     'ip'       => $ip,
                     'login'    => 1,
-                    'jwtId'    => $jwtId
+                    'jwtId'    => $jwtId,
                 ]);
             }
 
