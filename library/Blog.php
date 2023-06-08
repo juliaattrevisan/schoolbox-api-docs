@@ -27,9 +27,9 @@ class Blog extends DeprecatedModel
     {
         /** @var \Schoolbox\User $user */
         $user     = $_SESSION['user'];
-        $params = ['keyword ' => $keyword];
+        $keyword = $this->db->legacyQuote($keyword);
         $query  = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
-                            MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
+                            MATCH(`heading`,`body`) AGAINST ($keyword) AS `score`
                         FROM `blog`
                         JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
                         LEFT JOIN `user` ON `blog`.owner_id = `user`.id
@@ -40,7 +40,7 @@ class Blog extends DeprecatedModel
                             AND `userAccess`.service = 1
                             AND `userAccess`.uid = {$user->getId()}
                         WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`heading`,`body`) AGAINST (:keyword)
+                            AND MATCH(`heading`,`body`) AGAINST ($keyword)
                             AND `blog`.`deleted_at` IS NULL
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
@@ -57,12 +57,12 @@ class Blog extends DeprecatedModel
                                 AND `userAccess`.service = 1
                                 AND `userAccess`.uid = {$user->getId()}
                             WHERE (`perms`.cid OR `userAccess`.sid)
-                                AND MATCH(`heading`,`body`) AGAINST (:keyword)
+                                AND MATCH(`heading`,`body`) AGAINST ($keyword)
                                 AND `blog`.`deleted_at` IS NULL
             ";
 
-        $count = $this->db->query($count_query, $params)->fetchColumn();
+        $count = $this->db->query($count_query)->fetchColumn();
 
-        return $this->db->query($query, $params)->fetchAll();
+        return $this->db->query($query)->fetchAll();
     }
 }

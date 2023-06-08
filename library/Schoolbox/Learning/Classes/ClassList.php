@@ -30,7 +30,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class ClassList
 {
-
     /** @var User */
     private $user;
 
@@ -91,7 +90,12 @@ class ClassList
             foreach ($this->user->getSubjectCollection() as $subject) {
                 $classTypes[$subject['id']] = $subject['classType'];
             }
-            $folderList = $this->folderMapper->findByColumn('id', $this->user->getSubjectCollection()->getPropertyValues('folderId'));
+            $folderList = $this->folderMapper->findByColumn(
+                'id', $this->user->getSubjectCollection()->map(
+                static function (array $subject) {
+                    return $subject['id'];
+                })
+            );
         }
 
         // Add in other folders with feedback during the term, this will pick up archived classes
