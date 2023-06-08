@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
-use function count;
-
 use InvalidArgumentException;
 use PDO;
 use Schoolbox\Collection;
@@ -29,6 +27,8 @@ use Alaress\Database\Predicate;
 use PDOException;
 use UnderflowException;
 use UnexpectedValueException;
+
+use function count;
 
 /**
  * A factory for building 'Project' filter objects

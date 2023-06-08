@@ -41,7 +41,7 @@ class Event implements CrudEventInterface, JsonSerializable
      * @param Mapper $mapper
      * @param array $diff
      */
-    function __construct($subject, $verb, $object, $mapper, $diff = null)
+    public function __construct($subject, $verb, $object, $mapper, $diff = null)
     {
         $this->effector = $subject;
         $this->action   = $verb;

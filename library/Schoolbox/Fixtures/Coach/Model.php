@@ -18,14 +18,14 @@ use Schoolbox\User;
  */
 class Model implements \JsonSerializable, ISoftDeletable
 {
-    const PREFIX_EXISTING_TAG   = 'existing';
-    const PREFIX_NEW_FROM_USER  = 'newFromUser';
-    const PREFIX_NEW_FROM_INPUT = 'newFromInput';
-
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
+
+    const PREFIX_EXISTING_TAG   = 'existing';
+    const PREFIX_NEW_FROM_USER  = 'newFromUser';
+    const PREFIX_NEW_FROM_INPUT = 'newFromInput';
 
     /**
      * The name of this coach.
