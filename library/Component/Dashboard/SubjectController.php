@@ -49,12 +49,12 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
         // Stupid blocks
         $this->setBlock($templateHandle, "subject", "subject_block");
         $this->setVar('subject_block', '');
-        /** @var \Schoolbox\External\Subject $subject */
+        /** @var array $subject */
         foreach ($this->subject_list as $subject) {
             $this->setVar([
-                'SUBJECT_CODE' => Scrub::text($subject->getMatchedCode()),
-                'SUBJECT_CODE_URL' => urlencode(urlencode($subject->getMatchedCode())),
-                'SUBJECT_NAME' => $subject->getName(),
+                'SUBJECT_CODE' => Scrub::text($subject['matchedCode']),
+                'SUBJECT_CODE_URL' => urlencode(urlencode($subject['matchedCode'])),
+                'SUBJECT_NAME' => $subject['name'],
             ]);
             $this->parse('subject_block', 'subject', true);
         }

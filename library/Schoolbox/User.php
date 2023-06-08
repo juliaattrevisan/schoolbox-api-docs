@@ -18,7 +18,6 @@ use House;
 use HouseResidential;
 use Config;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
@@ -193,7 +192,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      *
      * Not guaranteed to have been loaded: thus, this may be null.
      *
-     * @var SubjectCollection|Subject[]|null
+     * @var SubjectCollection|null
      */
     protected $subject_collection;
 
@@ -1017,7 +1016,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return SubjectCollection|Subject[]|null
+     * @return SubjectCollection|null
      */
     public function getSubjectCollection()
     {

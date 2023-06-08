@@ -89,7 +89,7 @@ class ClassList
             // Iterate all subjects from the SIS and try to find folders with that class code
 
             foreach ($this->user->getSubjectCollection() as $subject) {
-                $classTypes[$subject->getFolderId()] = $subject->getClassType();
+                $classTypes[$subject['id']] = $subject['classType'];
             }
             $folderList = $this->folderMapper->findByColumn('id', $this->user->getSubjectCollection()->getPropertyValues('folderId'));
         }

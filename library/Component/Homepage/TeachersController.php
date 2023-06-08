@@ -128,9 +128,9 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                     );
 
                     foreach ($classCodesComplete as $classCode) {
-                        /** @var \Schoolbox\External\Subject $subjectCurrent */
+                        /** @var array $subjectCurrent */
                         foreach ($user->getSubjectCollection() as $subjectCurrent) {
-                            if ($codeMatcher->isMatch($classCode, $subjectCurrent->getCampusCode(), $subjectCurrent->getCode())) {
+                            if ($codeMatcher->isMatch($classCode, $subjectCurrent['campusCode'], $subjectCurrent['code'])) {
                                 $classCodesRetained[] = $classCode;
                                 break;
                             }

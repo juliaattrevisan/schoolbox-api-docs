@@ -16,7 +16,6 @@ use InvalidArgumentException;
 use PDO;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
-use Schoolbox\External\Subject;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -586,8 +585,8 @@ class Folder extends SimpleStrategy
      */
     private function parseSubjectIds(User $user): array
     {
-        return $user->getSubjectCollection()->map(static function (Subject $subject) {
-            return $subject->getFolderId();
+        return $user->getSubjectCollection()->map(static function (array $subject) {
+            return $subject['id'];
         })->getAll();
     }
 

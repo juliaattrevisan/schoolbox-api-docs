@@ -90,11 +90,11 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             if ($userChild->getSubjectCollection()) {
-                /** @var \Schoolbox\External\Subject $subject */
+                /** @var array $subject */
                 foreach ($userChild->getSubjectCollection() as $subject) {
-                    if ($this->getAccess()->getFolderAccess($this->getUser(), $subject->getFolderId()) >= UserAccess::ACCESS_READ) {
-                        $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject->getName()));
-                        $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject->getMatchedCode())));
+                    if ($this->getAccess()->getFolderAccess($this->getUser(), $subject['id']) >= UserAccess::ACCESS_READ) {
+                        $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
+                        $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['matchedCode'])));
                         $this->parse("subject_item", "subject_block", true);
                     }
                 }

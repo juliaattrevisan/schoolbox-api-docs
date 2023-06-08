@@ -99,22 +99,23 @@ class SubjectMapper extends Schoolbox\External\Mapper
             }
             $subjectCollection->offsetset(
                 $folder->getId(),
-                (new Subject())
-                    ->setFolderId($folder->getId())
-                    ->setMatchedCode($folder->getMatchedCode())
-                    ->setName($folder->getName())
-                    ->setCode($subject['code'] ?? null)
-                    ->setCampusCode($subject['campusCode'])
-                    ->setClassType($subject['classType'])
+                [
+                    'id' => $folder->getId(),
+                    'matchedCode' => $folder->getMatchedCode(),
+                    'name' => $folder->getName(),
+                    'code' => $subject['code'],
+                    'campusCode' => $subject['campusCode'],
+                    'classType' => $subject['classType'],
+                ]
             );
         }
         return $subjectCollection->sortByCallback(
-            static function (Subject $a, Subject $b): int {
-                $type = strnatcasecmp($a->getClassType(), $b->getClassType());
+            static function (array $a, array $b): int {
+                $type = strnatcasecmp($a['classType'], $b['classType']);
                 if ($type === 0) {
-                    $name = strnatcasecmp($a->getName(), $b->getName());
+                    $name = strnatcasecmp($a['name'], $b['name']);
                     if ($name === 0) {
-                        return strnatcasecmp($a->getMatchedCode(), $b->getMatchedCode());
+                        return strnatcasecmp($a['matchedCode'], $b['matchedCode']);
                     }
                     return $name;
                 }

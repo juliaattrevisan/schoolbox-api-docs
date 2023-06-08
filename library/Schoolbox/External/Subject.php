@@ -19,123 +19,48 @@ class Subject implements IModel
 {
     use CreateCollection;
 
-    private ?int $folderId;
-
-    private string $name;
-
-    private ?string $code;
-
-    private ?string $campusCode;
-
-    private ?string $matchedCode;
-
-    private ?string $classType;
+    /**
+     * @var int
+     */
+    protected $id;
 
     /**
-     * @param string|null $code
-     * @return self
+     * @var string
      */
-    public function setCode(?string $code): self
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $code;
+
+    public function setCode($code)
     {
         $this->code = $code;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode(): string
+    public function getCode()
     {
         return $this->code;
     }
 
-    /**
-     * @param int|null $id
-     * @return self
-     */
-    public function setFolderId(?int $id): self
+    public function setId($id)
     {
-        $this->folderId = $id;
-        return $this;
+        $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
-    public function getFolderId(): int
+    public function getId()
     {
-        return $this->folderId;
+        return $this->id;
     }
 
-    /**
-     * @param $name
-     * @return self
-     */
-    public function setName($name): self
+    public function setName($name)
     {
         $this->name = $name;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCampusCode(): string
-    {
-        return $this->campusCode;
-    }
-
-    /**
-     * @param string $campusCode
-     * @return self
-     */
-    public function setCampusCode(string $campusCode): self
-    {
-        $this->campusCode = $campusCode;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClassType(): string
-    {
-        return $this->classType;
-    }
-
-    /**
-     * @param string $classType
-     * @return self
-     */
-    public function setClassType(string $classType): self
-    {
-        $this->classType = $classType;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getMatchedCode(): ?string
-    {
-        return $this->matchedCode;
-    }
-
-    /**
-     * @param string|null $matchedCode
-     * @return self
-     */
-    public function setMatchedCode(?string $matchedCode): self
-    {
-        $this->matchedCode = $matchedCode;
-        return $this;
     }
 }

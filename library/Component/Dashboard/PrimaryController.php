@@ -20,8 +20,8 @@ class Component_Dashboard_PrimaryController extends Component_Dashboard_Controll
     public function execute()
     {
         foreach ($this->getUser()->getSubjectCollection() as $subject) {
-            if (stristr($subject->getCode(), 'HR') || stristr($subject->getCode(), 'EN')) {
-                $this->homeroom = $subject->getCode();
+            if (stristr($subject['code'], 'HR') || stristr($subject['code'], 'EN')) {
+                $this->homeroom = $subject['code'];
                 break;
             }
         }

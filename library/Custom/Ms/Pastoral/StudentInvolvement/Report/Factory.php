@@ -688,7 +688,7 @@ class Factory
         if ($folder->getCodes()) {
             foreach ($student->getSubjectCollection() as $subject) {
                 foreach ($folder->getCodes() as $code) {
-                    if ($code->getCode() === $subject->getCode()) {
+                    if ($code->getCode() === $subject['code']) {
                         // Student is involved, even if they have no grades.
                         // Try to get them anyway.
                         return [

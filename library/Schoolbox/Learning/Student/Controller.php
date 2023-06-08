@@ -65,7 +65,7 @@ class Controller extends Base
         // Iterate all subjects from the SIS and try to find folders with that class code
         foreach ($user->getSubjectCollection() as $subject) {
             try {
-                $folder = $this->folderMapper->findCheaplyById($subject->getFolderId());
+                $folder = $this->folderMapper->findCheaplyById($subject['id']);
             } catch (MapperException $e) {
                 continue;
             }
