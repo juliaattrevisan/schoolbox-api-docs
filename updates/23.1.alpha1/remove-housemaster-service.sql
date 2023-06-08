@@ -1,10 +1,8 @@
 # Delete any references to lu_service.name="Housemaster"
 SET @serviceIdHousemaster = (SELECT id FROM lu_service WHERE name="Housemaster");
-#DELETE FROM userAccess WHERE service=@serviceIdHousemaster;
+DELETE FROM userAccess WHERE service=@serviceIdHousemaster;
 
-#DELETE FROM lu_service WHERE name="Housemaster";
-
-
+DELETE FROM lu_service WHERE name="Housemaster";
 
 # Also maybe delete tables?
 # luResidentialHouse
