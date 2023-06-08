@@ -188,15 +188,6 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_HOUSEMASTER => [
-            'name' => 'Housemaster',
-            'identifier' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
         UserAccess::SERVICE_RESOURCE_BOOKING => [
             'name' => 'Resource Booking',
             'identifier' => self::IDENTIFIER_NONE,
