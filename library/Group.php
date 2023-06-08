@@ -239,7 +239,7 @@ class Group extends DeprecatedModel
 
         $params          = [];
         $serviceIdFilter = '';
-        if (in_array($this->_service, array(UserAccess::SERVICE_CALENDAR, UserAccess::SERVICE_HOUSEMASTER))) {
+        if ($this->_service == UserAccess::SERVICE_CALENDAR) {
             $serviceIdFilter = "AND sid = ?";
             $params[] = $relationID;
         }
