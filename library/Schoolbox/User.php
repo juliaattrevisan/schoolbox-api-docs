@@ -477,7 +477,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function hasPositionTitle()
     {
-        $positionTitle = trim($this->positionTitle);
+        $positionTitle = trim($this->positionTitle ?? '');
         return !empty($positionTitle);
     }
 
