@@ -18,6 +18,10 @@
     <!-- Our base rule: set to PSR12-->
     <rule ref="PSR12" >
         <exclude name="Generic.Files.LineLength"/>
+
+        <!-- For the time being: allow non-namespaced and underscore-namespaced classes -->
+        <exclude name="Generic.Classes.ValidClassName"/>
+        <exclude name="Generic.Classes.ClassDeclaration"/>
     </rule>
 
 </ruleset>
