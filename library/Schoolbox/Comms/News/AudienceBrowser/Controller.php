@@ -131,15 +131,15 @@ class Controller extends Base
         // Special case for folder, only show involved folders in the list
         if (Audience\Segment\Strategy\Folder::getEntityType() === $entityType) {
             $involvedFolders = $this->folderMapper->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE)->sortNaturally('name');
+            $valueLabels = [];
 
+            // Here we want only the folders in which the user is directly involved.  The purpose is to allow the user
+            // to find this subset of folders quickly.  Contrast with getSearch(), where we want the user to be able
+            // to find any folder to which they have access (the full set).
             if ($involvedFolders->count()) {
-                $valueLabels = [];
                 foreach ($involvedFolders as $folder) {
                     $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
                 }
-            } else {
-                // No involved folders? Fall back to folders with WRITE+ access
-                $valueLabels = $this->buildValueLabels($strategy, $codec);
             }
         } else {
             // Normal case
