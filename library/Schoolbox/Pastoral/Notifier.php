@@ -101,7 +101,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         if (empty($dependencies["accessLevelCensor"])) {
-            $dependencies["accessLevelCensor"] = new AccessLevelCensor();
+            $dependencies["accessLevelCensor"] = new AccessLevelCensor(\Schoolbox\Pastoral\Group\Member\Mapper::getInstance());
         }
 
         if (empty($dependencies["roleMapper"])) {

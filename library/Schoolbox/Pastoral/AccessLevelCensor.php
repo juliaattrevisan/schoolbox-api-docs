@@ -26,19 +26,17 @@ use function spl_object_hash;
  */
 class AccessLevelCensor
 {
-    /** @var PastoralGroupMemberMapper|null $pastoralGroupMemberMapper */
-    private ?PastoralGroupMemberMapper $pastoralGroupMemberMapper;
-
     /**
      * @var Collection <int, GenericCollection>
      */
     private Collection $pastoralGroupMembershipCollection;
 
 
-    public function __construct()
+    public function __construct(
+        private PastoralGroupMemberMapper $pastoralGroupMemberMapper
+    )
     {
         $this->pastoralGroupMembershipCollection = new Collection();
-        $this->pastoralGroupMemberMapper         = PastoralGroupMemberMapper::getInstance();
     }
 
     /**

@@ -399,7 +399,7 @@ class Controller extends Base
 
         $access = [];
 
-        $accessLevel       = (new AccessLevelCensor())->getAccessLevel($record, $this->getUser());
+        $accessLevel       = (new AccessLevelCensor($this->pastoralGroupMemberMapper))->getAccessLevel($record, $this->getUser());
         $access['public']  = $accessLevel > PastoralAccessMapper::ACCESS_DENY;
         $access['private'] = $accessLevel > PastoralAccessMapper::ACCESS_PUBLIC;
 
@@ -666,7 +666,7 @@ class Controller extends Base
         /**
          * confirm if the user can view / edit the private part of the record
          */
-        $accessLevel  = (new AccessLevelCensor())->getAccessLevel($record, $this->getUser());
+        $accessLevel  = (new AccessLevelCensor($this->pastoralGroupMemberMapper))->getAccessLevel($record, $this->getUser());
         $allowPrivate = $accessLevel > PastoralAccessMapper::ACCESS_PUBLIC;
 
         /**
