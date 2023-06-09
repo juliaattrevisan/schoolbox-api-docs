@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Pastoral\Access;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -67,7 +68,7 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
      *
      * @return null|int
      */
-    public function getAccessLevel(User $user): ?int
+    public function getAccessLevel(User $user, $pastoralGroupMemberships): ?int
     {
         if ($this->getUser() instanceof User) {
             return $this->getUserAccessLevel($user);
@@ -76,7 +77,7 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
             return $this->getRoleAccessLevel($user);
         }
         if ($this->getGroup() instanceof Group) {
-            return $this->getPastoralGroupAccessLevel($user);
+            return $this->getPastoralGroupAccessLevel($pastoralGroupMemberships);
         }
         // This will only happen if this model is a stub. Treat this as unknown
         return null;
@@ -160,17 +161,17 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
     /**
      * Returns the accessLevel granted by this record to the specified user via 'User' access
      *
-     * @param User $user
+     * @param GenericCollection $groupsMemberships
      * @return int|null
      */
-    private function getPastoralGroupAccessLevel(User $user): ?int
+    private function getPastoralGroupAccessLevel(GenericCollection $groupsMemberships): ?int
     {
         $thisGroup = $this->getGroup();
         if (!$thisGroup) {
             return null;
         }
 
-        foreach ($user->getPastoralGroupsMemberships() as $groupsMembership) {
+        foreach ($groupsMemberships as $groupsMembership) {
             if ($thisGroup->getId() === $groupsMembership->getGroup()->getId()) {
                 return $this->access;
             }

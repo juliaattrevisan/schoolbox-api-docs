@@ -536,13 +536,9 @@ class DataSource
     private function getPermissionClause(User $viewer, ?int $studentId, ?int $typeId, ?int $subtypeId = null, string $alias = 'p'): array
     {
         // Hydrate pastoral group membership, if not yet set
-        if ($viewer->getPastoralGroupsMemberships() === null) {
-            $viewer->setPastoralGroupsMemberships(
-                $this->accessLevelCensor->getPastoralGroupMemberMapper()->findByColumn('user_id', $viewer->getId())
-            );
-        }
+        $groupsMemberships = $this->accessLevelCensor->getPastoralGroupMemberships($viewer);
         $pastoralGroupIds = [];
-        foreach ($viewer->getPastoralGroupsMemberships() as $groupsMembership) {
+        foreach ($groupsMemberships as $groupsMembership) {
             $pastoralGroupIds[] = $groupsMembership->getGroup()->getId();
         }
 

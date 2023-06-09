@@ -1340,28 +1340,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return GenericCollection|Pastoral\Group\Member\Model[]|null
-     */
-    public function getPastoralGroupsMemberships(): ?GenericCollection
-    {
-        return $this->pastoralGroupsMemberships;
-    }
-
-    /**
-     * @param Collection|Pastoral\Group\Member\Model[] $pastoralGroupsMemberships
-     * @return $this
-     */
-    public function setPastoralGroupsMemberships(Collection $pastoralGroupsMemberships): self
-    {
-        if (!$this->pastoralGroupsMemberships) {
-            $this->pastoralGroupsMemberships = Pastoral\Group\Member\Model::createCollection();
-        }
-
-        $this->pastoralGroupsMemberships->replaceWith($pastoralGroupsMemberships);
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function getLearningMomentsEnabled(): bool

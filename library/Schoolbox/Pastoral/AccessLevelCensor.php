@@ -26,19 +26,19 @@ use function spl_object_hash;
  */
 class AccessLevelCensor
 {
-    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    private $pastoralGroupMemberMapper;
+    /** @var PastoralGroupMemberMapper|null $pastoralGroupMemberMapper */
+    private ?PastoralGroupMemberMapper $pastoralGroupMemberMapper;
 
     /**
-     * Gets PastoralGroupMemberMapper
-     * @return PastoralGroupMemberMapper
+     * @var Collection <int, GenericCollection>
      */
-    public function getPastoralGroupMemberMapper(): PastoralGroupMemberMapper
+    private Collection $pastoralGroupMembershipCollection;
+
+
+    public function __construct()
     {
-        if ($this->pastoralGroupMemberMapper === null) {
-            $this->pastoralGroupMemberMapper = PastoralGroupMemberMapper::getInstance();
-        }
-        return $this->pastoralGroupMemberMapper;
+        $this->pastoralGroupMembershipCollection = new Collection();
+        $this->pastoralGroupMemberMapper         = PastoralGroupMemberMapper::getInstance();
     }
 
     /**
@@ -229,19 +229,13 @@ class AccessLevelCensor
      */
     public function getRawAccessLevel(Model $record, User $user): int
     {
-        // Hydrate group membership
-        if ($user->getPastoralGroupsMemberships() === null) {
-            $user->setPastoralGroupsMemberships(
-                $this->getPastoralGroupMemberMapper()->findByColumn('user_id', $user->getId())
-            );
-        }
-
         // Otherwise start with deny access, and work our way up the permission levels
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
+        /** @var \Schoolbox\Pastoral\Access\Model $access */
         foreach ($record->getAccess() as $access) {
             $access->setPastoral($record);
-            $accessLevelCurrent = $access->getAccessLevel($user);
+            $accessLevelCurrent = $access->getAccessLevel($user, $this->getPastoralGroupMemberships($user));
 
             if ($accessLevelCurrent === null) {
                 // The access rule didn't apply to this user, continue to the next one
@@ -268,5 +262,19 @@ class AccessLevelCensor
     public function isPastoralModerator(User $user): bool
     {
         return null !== $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
+    }
+
+    /**
+     * @param User $user
+     * @return GenericCollection
+     */
+    public function getPastoralGroupMemberships(User $user): GenericCollection
+    {
+        $pastoralGroupMemberships = $this->pastoralGroupMembershipCollection->offsetGet($user->getId());
+        if (!$pastoralGroupMemberships) {
+            $pastoralGroupMemberships = $this->pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
+            $this->pastoralGroupMembershipCollection->offsetSet($user->getId(), $pastoralGroupMemberships);
+        }
+        return $pastoralGroupMemberships;
     }
 }
