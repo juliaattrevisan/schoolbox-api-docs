@@ -27,7 +27,6 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Pastoral;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
@@ -259,9 +258,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * @var GenericCollection|User[]|null
      */
     private $children = null;
-
-    /** @var GenericCollection|Pastoral\Group\Member\Model[] */
-    private $pastoralGroupsMemberships;
 
     /** If set, it'll be used to build email address, instead of Config option */
     private ?string $emailDomain = null;
