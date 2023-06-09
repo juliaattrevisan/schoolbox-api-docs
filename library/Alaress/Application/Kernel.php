@@ -1653,7 +1653,12 @@ abstract class Kernel
                 PastoralDataSource::class,
                 [
                     'mapper'              => $mapperFactory->getLazy(PastoralMapper::class),
-                    'accessLevelCensor'   => $di->lazyNew(AccessLevelCensor::class),
+                    'accessLevelCensor'   => $di->lazyNew(
+                        AccessLevelCensor::class,
+                        [
+                            'pastoralGroupMemberMapper' => $mapperFactory->getLazy(\Schoolbox\Pastoral\Group\Member\Mapper::class),
+                        ]
+                    ),
                     'pastoralAuditMapper' => $mapperFactory->getLazy(PastoralAuditMapper::class),
                 ]
             )
@@ -1663,8 +1668,13 @@ abstract class Kernel
             $di->lazyNew(
                 PastoralRevisionDataSource::class,
                 [
-                    'mapper'            => $mapperFactory->getLazy(PastoralRevisionMapper::class),
-                    'accessLevelCensor' => $di->lazyNew(AccessLevelCensor::class),
+                    'mapper' => $mapperFactory->getLazy(PastoralRevisionMapper::class),
+                    'accessLevelCensor' => $di->lazyNew(
+                        AccessLevelCensor::class,
+                        [
+                            'pastoralGroupMemberMapper' => $mapperFactory->getLazy(\Schoolbox\Pastoral\Group\Member\Mapper::class),
+                        ]
+                    ),
                 ]
             )
         );

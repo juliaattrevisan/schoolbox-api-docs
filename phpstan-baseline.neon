@@ -5946,11 +5946,6 @@ parameters:
 			path: library/Schoolbox/User.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/User.php
-
-		-
 			message: "#^Property Schoolbox\\\\User\\:\\:\\$accessList \\(iterable\\<Schoolbox\\\\Permission\\\\Access\\\\UserAccess\\>&Schoolbox\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/User.php
