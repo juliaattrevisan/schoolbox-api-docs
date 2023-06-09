@@ -52,19 +52,19 @@ class Registry
      *                     raised.
      * @return bool
      */
-    public static function raisesDeprecationWarning(string $path): bool
+    public static function silenceWarningsForPath(string $path): bool
     {
         foreach (Registry::PATH_WHITELIST as $whitelistedPath) {
             if (str_contains($path, $whitelistedPath)) {
-                return true;
+                return false;
             }
         }
 
         foreach (Registry::PATH_BLACKLIST as $blacklistedPath) {
             if (str_contains($path, $blacklistedPath)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 }

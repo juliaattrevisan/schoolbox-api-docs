@@ -213,7 +213,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             } elseif ($errorType & (E_DEPRECATED | E_USER_DEPRECATED)) {
                 // Deprecation notices:
                 // silence (for now) if raised in a vendor library
-                return !Registry::raisesDeprecationWarning($error['file']);
+                return Registry::silenceWarningsForPath($error['file']);
             }
         }
         return true;

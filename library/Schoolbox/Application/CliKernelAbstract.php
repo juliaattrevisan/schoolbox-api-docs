@@ -176,7 +176,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             case E_USER_DEPRECATED:
                 // Deprecation notices:
                 // silence (for now) if raised in a vendor library
-                if (Registry::raisesDeprecationWarning($errFile)) {
+                if (!Registry::silenceWarningsForPath($errFile)) {
                     $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
                 }
                 return true;
