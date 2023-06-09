@@ -1,3 +1,11 @@
+<style>
+    /* This prevents a rule in _typography.scss from adding the href after the content. */
+    @media print {
+        a[href]:after {
+            content: none !important;
+        }
+    }
+</style>
 <div class="row">
     <div class="small-12 column">
         <div class="actions-small-1">
