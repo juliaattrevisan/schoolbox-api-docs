@@ -173,7 +173,12 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             case E_STRICT:
             case E_DEPRECATED:
             case E_USER_DEPRECATED:
-                $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
+                // Deprecation notices:
+                // silence (for now) if raised in a vendor library
+                // TODO exclude selectively, or log elsewhere?
+                if (!str_contains($errFile, '/vendor/')) {
+                    $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
+                }
                 return true;
 
             default:
