@@ -19,6 +19,7 @@ use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
 use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
+use Schoolbox\Deprecation\Registry;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
@@ -212,11 +213,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             } elseif ($errorType & (E_DEPRECATED | E_USER_DEPRECATED)) {
                 // Deprecation notices:
                 // silence (for now) if raised in a vendor library
-                // TODO exclude selectively, or log elsewhere?
-                if (str_contains($error['file'], '/vendor/')) {
-                    return true;
-                }
-                return false;
+                return !Registry::raisesDeprecationWarning($error['file']);
             }
         }
         return true;
