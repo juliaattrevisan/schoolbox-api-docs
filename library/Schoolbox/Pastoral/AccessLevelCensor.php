@@ -31,11 +31,12 @@ class AccessLevelCensor
      */
     private Collection $pastoralGroupMembershipCollection;
 
-
+    /**
+     * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
+     */
     public function __construct(
         private PastoralGroupMemberMapper $pastoralGroupMemberMapper
-    )
-    {
+    ) {
         $this->pastoralGroupMembershipCollection = new Collection();
     }
 
