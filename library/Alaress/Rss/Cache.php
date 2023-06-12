@@ -9,7 +9,6 @@
  */
 class Alaress_Rss_Cache extends Alaress_Cache_Abstract
 {
-
     /**
      * A prefix for cached filenames
      *

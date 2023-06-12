@@ -9,7 +9,6 @@
  */
 class TextFormatter
 {
-
     /**
      * Create a greeting string. If it's 5pm, change to Evening
      *
