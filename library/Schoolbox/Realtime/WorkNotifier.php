@@ -13,7 +13,6 @@ use Alaress\Lumberjack\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
-use Serializable;
 
 abstract class WorkNotifier
 {

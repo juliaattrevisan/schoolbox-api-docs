@@ -101,22 +101,40 @@ class MailNotifier extends WorkNotifier
     }
 
     /**
-     * @return string the string representation of the object or null
+     * Array representation of object
+     *
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->factory);
+        return ['factory' => $this->factory];
     }
 
 
     /**
-     * @param string $serialized
+     * Constructs the object
+     *
+     * @param array|string|IListFactory $serialized
+     *        Prior to 23.1 `serialize` always returned a string or maybe an
+     *        `IListFactory`: now it returns an array.
+     *        Should handle all cases, though I doubt this is necessary:
+     *        instances of this class once serialized are not stored, only
+     *        passed to workers.
+     *        (See `\Alaress\Scheduler\AbstractScheduler::dispatchTrigger`)
+     *
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array|string|IListFactory $serialized): void
     {
+        if (is_string($serialized)) {
+            $factory = unserialize($serialized);
+        } elseif ($serialized instanceof IListFactory) {
+            $factory = $serialized;
+        } else {
+            $factory = $serialized['factory'] ?? null;
+        }
         $this->__construct(
-            unserialize($serialized),
+            $factory,
             UserMapper::getInstance(),
             new EmailFactory(Loader::getInstance(), DKIMMapper::getInstance())
         );
