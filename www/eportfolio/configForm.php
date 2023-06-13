@@ -17,10 +17,10 @@ $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 // Update page, or its stuff
 
-if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
+if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
     // Check permissions
 
-    $eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
+    $eportfolioHandler = new Eportfolio($_SESSION['id'], $_REQUEST['page_id']);
     $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $eportfolioHandler->getPageInstance()->getOwner(), $eportfolioHandler->getPageInstance()->getPageId());
 
     if ($authenticator->canModify()) {
@@ -219,9 +219,9 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             // Softdelete this page and redirect back to profile
             $eportfolioHandler->softdelete();
             SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/profile");
-        } elseif (($_POST['type'] == 'config') && $_POST['component']) {
+        } elseif (isset($_GET['type']) && ($_GET['type'] == 'config') && $_GET['component']) {
             // Update config options from homepage
-            $config = $_POST;
+            $config = $_GET;
 
             /** @var Component_Instance $instance */
             $instance                        = $componentInstanceMapper->findByInstanceId($config['component']);

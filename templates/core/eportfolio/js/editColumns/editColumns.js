@@ -29,7 +29,7 @@ export function initEditColumns() {
  */
 export function getFormData() {
     const formData = new FormData();
-    formData.append("cid", document.getElementById("categoryID").value);
+    formData.append("page_id", document.getElementById("pageID").value);
     appendWidth(formData);
     appendColours(formData);
     return formData;

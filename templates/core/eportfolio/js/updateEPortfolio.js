@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initPostToMyLinks();
     initExistingComponents();
     if (canEditEportfolio()) {
-        // initToggleLockComponents();
         initEditColumns();
         initNewComponents();
         initUpdatePlaceHolders();

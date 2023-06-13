@@ -163,7 +163,7 @@ async function removeComponent(component, confirmDeleteButton) {
  */
 function getFormData(component) {
     const formData = new FormData();
-    formData.append("cid", document.getElementById("categoryID").value);
+    formData.append("page_id", document.getElementById("pageID").value);
     formData.append("delete", getComponentID(component));
     formData.append("component", component.querySelector("[data-defn-id]").value);
     return formData;

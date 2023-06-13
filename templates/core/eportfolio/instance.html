@@ -43,125 +43,6 @@
     // <!-- END colour_list -->
 </script>
 
-<script>
-    // $(function() {
-
-    //     var url = '/eportfolio/configForm.php';
-
-    //     var eportfolio = $('#component-layout');
-    //     eportfolio.masonry({
-    //         context: {
-    //             page_id: '{PAGE_ID}'
-    //         },
-    //         component: {
-    //             url: url,
-    //             calcSequenceData: function (columns) {
-    //                 var masonry = this,
-    //                     data  = { type: 'components' },
-    //                     order = ['left','right','top','bottom'];
-
-    //                 $.each(columns, function (position, column) {
-    //                     var key = 'column' + (order.indexOf(position) + 1);
-
-    //                     data[key] = column.children(masonry.options.component.selector).map(function () {
-    //                         /*
-    //                          * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
-    //                          * and always appear in the same positions. So we do a check to see if
-    //                          * an id is set. If it isn't, and we don't do the check, the script breaks
-    //                          * and components cannot be relocated successfully
-    //                          */
-    //                         if (this.id) {
-    //                             return this.id.substr(9);
-    //                         }
-    //                     }).toArray().join(',');
-    //                 });
-
-    //                 return data;
-    //             }
-    //         },
-    //         column: {
-    //             leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
-    //             placeholderTpl: '<div class="masonry-placeholder" />'
-    //         },
-    //         palette: {
-    //             url: url,
-    //             selector: '#eportfolio-page-controls-tab-1',
-    //             containerSelector: '.tabs-content',
-    //             handleSelector: '[data-component-palette]'
-    //         },
-    //         colourPicker: {
-    //             selector: '#eportfolio-page-controls-tab-2',
-    //             colours: colours,
-    //             restoreBtnSelector: '[data-role="reset-to-default"]',
-    //             cancelBtnSelector: '[data-role="undo"]',
-    //             saveBtnSelector: '[data-role="save"]',
-    //             saveLabelSelector: '[data-relation="saveLayout"]',
-    //             url: url
-    //         },
-    //         slider: {
-    //             selector: '[data-interaction="column-width"]',
-    //             url: url
-    //         }
-    //     });
-
-    //     // Fix slider on tab
-    //     $('[data-tab]').on('toggled', function (event, tab) {
-    //         tab.foundation('reflow');
-    //     });
-
-	// 	// all forms should submit without prevention
-	// 	$("#component-layout").on('submit', 'form',  function() {
-	// 		window.check = false;
-	// 	});
-
-	// 	$('#addIndividualPermission').selectizeSelector({
-	// 		multiple: true,
-	// 		value: {USER_LIST},
-	// 		ajax: {
-	// 			url:      '/eportfolio/search.php',
-	// 			type:     'GET',
-	// 			data:     {groupID: '{STUDENT_GROUP_IDS}'},
-	// 			dataType: 'json'
-	// 		}
-	// 	});
-
-    //     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-    //         detail: {
-    //             targetElements: ['[data-html-editor]'],
-    //         }
-    //     }));
-
-
-    //     $('[data-interaction="delete"]').click(function(e){
-    //         e.preventDefault();
-    //         $(this).confirmDialog({
-    //             text: "Are you sure you wish to delete this page from your ePortfolio?",
-    //             confirmEvent: $.confirmDialog.submitForm
-    //         })
-    //     });
-
-    //     $('[data-tab]').on('toggled', function (event, tab) {
-    //         // What tab is this?
-    //         var tabData = tab.data();
-    //         if ('hideEmpty' in tabData) {
-    //             eportfolio.removeClass('show-empty');
-    //         } else if ('showEmpty' in tabData) {
-    //             eportfolio.addClass('show-empty');
-    //         }
-    //     });
-
-    //     /* Tab toggler
-    //      * Deal with special components placeholder
-    //      */
-    //     $.fn.tabActivator({
-    //         onTabClose: function(tabActivator) {
-    //             eportfolio.removeClass('show-empty');
-    //         }
-    //     });
-
-    // });
-</script>
-
 <!-- BEGIN modify_layout -->
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/colourPicker.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
@@ -180,22 +61,25 @@
     </div>
     <nav>
         <!-- BEGIN edit_page -->
-        <span data-tab>
-            <span class="tab-title" data-show-empty>
-                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator id="add-component"></a>
+        <form method="post" action="/eportfolio/configForm.php" class="no-margin inline-block">
+            <span data-tab>
+                <span class="tab-title" data-show-empty>
+                    <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator id="add-component"></a>
+                </span>
+                <span class="tab-title" data-hide-empty>
+                    <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator id="edit-column"></a>
+                </span>
+                <span class="tab-title" data-hide-empty>
+                    <a class="icon-modify" href="#tabs-3" title="Edit the page and its permissions" data-tab-activator id="edit-page"></a>
+                </span>
+                <span class="tab-title" data-hide-empty>
+                    <a class="icon-delete" title="Delete this page" data-interaction="delete"></a>
+                </span>
             </span>
-            <span class="tab-title" data-hide-empty>
-                <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator id="edit-column"></a>
-            </span>
-            <span class="tab-title" data-hide-empty>
-                <a class="icon-modify" href="#tabs-3" title="Edit the page and its permissions" data-tab-activator id="edit-page"></a>
-            </span>
-        </span>
+            <input type="hidden" name="page_id" value="{PAGE_ID}" />
+            <input type="hidden" name="deletePage" value="true" />
+        </form>
         <!-- END edit_page -->
-
-        <input type="hidden" name="page_id" value="{PAGE_ID}" />
-        <input type="hidden" name="deletePage" value="true" />
-        <a class="icon-delete" title="Delete this page" data-interaction="delete"></a>
     </nav>
 </div>
 
@@ -227,9 +111,10 @@
                              data-count="{EPORTFOLIO_COMPONENT_COUNT}"
                              data-multi="{EPORTFOLIO_COMPONENT_MULTIPLE_STATE}"
                              data-component-palette>
-                            <a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="{EPORTFOLIO_COMPONENT_CLASS}" title="{EPORTFOLIO_COMPONENT_DESCRIPTION}">
+                            <a href="#" data-component-id="{EPORTFOLIO_COMPONENT_ID}" data-component-definition-id="{EPORTFOLIO_COMPONENT_DEFINITION_ID}" class="{EPORTFOLIO_COMPONENT_CLASS}" title="{EPORTFOLIO_COMPONENT_DESCRIPTION}">
                                 <span class="size-32 icon-masonry icon-masonry-{EPORTFOLIO_COMPONENT_CLASS}"></span>
                                 <p>{EPORTFOLIO_COMPONENT_NAME}</p>
+                                <p class="meta">(<span data-relation="count">{EPORTFOLIO_COMPONENT_COUNT}</span>)</p>
                             </a>
                         </div>
                     </li>
@@ -417,11 +302,94 @@
 </div>
 
 <div id="component-layout" class="row">
-    <div class="small-12 column column-top" data-position="top">{component_position_top}</div>
-    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column column-left" data-position="left">{component_position_left}</div>
-    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column column-right" data-position="right">{component_position_right}</div>
+    <div class="small-12 column column-top" data-position="top" data-components-container>{component_position_top}</div>
+    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column column-left" data-position="left" data-components-container>{component_position_left}</div>
+    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column column-right" data-position="right" data-components-container>{component_position_right}</div>
 </div>
 
-<input type="hidden" id="categoryID" value="{ID}" />
+<input type="hidden" id="pageID" value="{PAGE_ID}" />
 
 <div id="resource-browser" class="hide"></div>
+
+<script>
+    $(function() {
+
+    //     var url = '/eportfolio/configForm.php';
+
+    //     var eportfolio = $('#component-layout');
+    //     eportfolio.masonry({
+    //         context: {
+    //             page_id: '{PAGE_ID}'
+    //         },
+    //         component: {
+    //             url: url,
+    //             calcSequenceData: function (columns) {
+    //                 var masonry = this,
+    //                     data  = { type: 'components' },
+    //                     order = ['left','right','top','bottom'];
+
+    //                 $.each(columns, function (position, column) {
+    //                     var key = 'column' + (order.indexOf(position) + 1);
+
+    //                     data[key] = column.children(masonry.options.component.selector).map(function () {
+    //                         /*
+    //                          * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+    //                          * and always appear in the same positions. So we do a check to see if
+    //                          * an id is set. If it isn't, and we don't do the check, the script breaks
+    //                          * and components cannot be relocated successfully
+    //                          */
+    //                         if (this.id) {
+    //                             return this.id.substr(9);
+    //                         }
+    //                     }).toArray().join(',');
+    //                 });
+
+    //                 return data;
+    //             }
+    //         },
+    //         colourPicker: {
+    //             selector: '#eportfolio-page-controls-tab-2',
+    //             colours: colours,
+    //             restoreBtnSelector: '[data-role="reset-to-default"]',
+    //             cancelBtnSelector: '[data-role="undo"]',
+    //             saveBtnSelector: '[data-role="save"]',
+    //             saveLabelSelector: '[data-relation="saveLayout"]',
+    //             url: url
+    //         },
+    //         slider: {
+    //             selector: '[data-interaction="column-width"]',
+    //             url: url
+    //         }
+    //     });
+
+		$('#addIndividualPermission').selectizeSelector({
+			multiple: true,
+			value: {USER_LIST},
+			ajax: {
+				url:      '/eportfolio/search.php',
+				type:     'GET',
+				data:     {groupID: '{STUDENT_GROUP_IDS}'},
+				dataType: 'json'
+			}
+		});
+
+        $('[data-interaction="delete"]').click(function(e){
+            e.preventDefault();
+            $(this).confirmDialog({
+                text: "Are you sure you wish to delete this page from your ePortfolio?",
+                confirmEvent: $.confirmDialog.submitForm
+            })
+        });
+
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['[data-html-editor]'],
+            }
+        }));
+
+        // all forms should submit without prevention
+        $("#component-layout").on('submit', 'form',  function() {
+            window.check = false;
+        });
+    });
+</script>

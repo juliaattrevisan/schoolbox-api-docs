@@ -41,7 +41,7 @@ function getFormData(component) {
     formData.append("column3", getContainerComponentIDs(document.querySelector('[data-position="top"]'))); //top panel... I know right?!
     formData.append("movedComponentId", getComponentID(component));
     formData.append("type", "components");
-    formData.append("cid", document.getElementById("categoryID").value);
+    formData.append("page_id", document.getElementById("pageID").value);
     return formData;
 }
 
