@@ -13,7 +13,6 @@
 namespace Alaress\Image\Cache;
 
 use External_User;
-use Group;
 use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\Resource\Storage;
@@ -89,9 +88,6 @@ class Portrait
     ): bool {
         $externalId = $user->getExternalId();
 
-        // TODO kill it! kill it with fire!
-        $group = new Group();
-
         /* Staff members can always see all portraits
          */
         if ($sessionUser->getRole()->isStaff()) {
@@ -103,11 +99,7 @@ class Portrait
         $users = $userMapper->findByColumn('synergy_id', $externalId);
 
         foreach ($users as $currentUser) {
-            /* Everyone can always see their own face
-             */
-            $userId = $currentUser->getId();
-
-            if ($sessionUser->getId() === $userId) {
+            if ($sessionUser->getId() === $currentUser->getId()) {
                 return true;
             }
 
@@ -118,14 +110,13 @@ class Portrait
                 return true;
             }
 
-            if (!$protectStudentPhotos && $group->isStudent($userId) && $sessionUser->getRole()->isStudent()) {
+            if (!$protectStudentPhotos && $currentUser->getRole()->isStudent() && $sessionUser->getRole()->isStudent()) {
                 return true;
             }
 
             // Staff photos:
             // visible by students and parents, if staff photos aren't protected.
-            if ($group->isStaff($userId)) {
-
+            if ($currentUser->getRole()->isStaff()) {
                 /**
                  * Options in protect_teacher_photo are;
                  *  PROTECT_TEACHER_PHOTOS_FROM_NONE     => Staff, parents and students can see photo
