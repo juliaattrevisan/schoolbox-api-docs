@@ -100,9 +100,8 @@ class MimetypeMapper extends Schoolbox\Mapper
      */
     public function getByFilename($filename)
     {
-
         // Copied from AllowedFile methods getExtension() and getMimetype()
-        $extension = mb_pathinfo($filename, PATHINFO_EXTENSION);
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $query = "
 			SELECT {$this->getColumnString('aft')}
 			FROM allowedFileExtension afe

@@ -900,7 +900,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         /** @var FolderCode\Mapper $codeMapper */
         $codeMapper = $this->getJoinMapper('codes');
 
-        $folderIds      = $folders->getColumnValues($this->getIdentifierColumn());
+        $folderIds      = $folders->getPropertyValues($this->getIdentifierColumn());
         $folderCodes    = $codeMapper->findByColumn('folder_id', $folderIds);
         $codesPerFolder = $folderCodes->groupByCallback(function (FolderCode\Model $code) {
             return $code->getFolder()->getId();
@@ -1266,7 +1266,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // The above query will not have fetched any codes that weren't in $subjectList.
         /** @var GenericCollection[]|FolderCode\Model[][] $foldersCodes */
         $foldersCodes = $this->getJoinMapper('codes')
-                            ->findByColumn('folder_id', $folders->getColumnValues('id'))
+                            ->findByColumn('folder_id', $folders->getPropertyValues('id'))
                             ->groupByCallback(function (Code\Model $code) {
                                 return $code->getFolder()->getId();
                             });

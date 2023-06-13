@@ -84,7 +84,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         // * of type Quiz or DueWork
         // * not an AssessmentSpec
         $folders             = $this->getFolderMapper()->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE);
-        $folderIds           = $folders->getColumnValues('id');
+        $folderIds           = $folders->getPropertyValues('id');
         $taughtAssessmentIds = $this->idFinder->findIdsByFilters(
             [
                 Filters\Assessment\AssessmentType\Definition::class           => [

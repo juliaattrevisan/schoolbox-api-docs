@@ -610,9 +610,9 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * Specify data which should be serialized to JSON
      *
-     * @return mixed
+     * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id'        => $this->getId(),

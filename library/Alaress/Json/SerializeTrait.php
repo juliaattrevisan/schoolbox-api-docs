@@ -11,6 +11,7 @@ namespace Alaress\Json;
 
 use Alaress\Json\Decorator\IDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
+use ReturnTypeWillChange;
 
 /**
  * Trait SerializeTrait. Should be used to realize \JsonSerializable on models.
@@ -19,12 +20,12 @@ use Alaress\Json\Decorator\PropertyDecorator;
  */
 trait SerializeTrait
 {
-
     /**
      * @param IDecorator ...$decorators
      * @return array
      */
-    public function jsonSerialize(IDecorator ...$decorators)
+    #[ReturnTypeWillChange]
+    public function jsonSerialize(IDecorator ...$decorators): array
     {
         if (!\count($decorators)) {
             // to preserve default json_encode behaviour, enforce the property decorator

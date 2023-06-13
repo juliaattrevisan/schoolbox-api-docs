@@ -19,6 +19,7 @@ use RangeException;
 use RuntimeException;
 use Monolog;
 use Alaress\Lumberjack;
+use Schoolbox\Deprecation\Registry;
 use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\State\HubInterface;
 
@@ -173,7 +174,11 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             case E_STRICT:
             case E_DEPRECATED:
             case E_USER_DEPRECATED:
-                $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
+                // Deprecation notices:
+                // silence (for now) if raised in a vendor library
+                if (!Registry::silenceWarningsForPath($errFile)) {
+                    $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
+                }
                 return true;
 
             default:

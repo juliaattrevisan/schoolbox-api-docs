@@ -176,7 +176,7 @@ class Module extends BaseModule
         // Load UnitImpls (filtering by class if a class is selected) inside CourseImpls,
 
         $columnList = [
-            'course_implementation_id' => $courseImplementations->getColumnValues('id'),
+            'course_implementation_id' => $courseImplementations->getPropertyValues('id'),
         ];
         if ($classFolder) {
             $columnList['c.folder_id'] = $classFolder->getId();
@@ -196,7 +196,7 @@ class Module extends BaseModule
 
         // Load Assessments in Unit Impls (regardless of due date - as we need them for navigation)
         /** @var GenericCollection|IAssessable[] $assessmentImpls */
-        $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationIds($unitImplementations->getColumnValues('id'))->indexBy('id');
+        $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationIds($unitImplementations->getPropertyValues('id'))->indexBy('id');
         foreach ($assessmentImpls as $assessmentImpl) {
             $unitImplementation = $unitImplementations[$assessmentImpl->getContext()->getId()];
             $unitImplementation->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);

@@ -197,7 +197,7 @@ class Controller extends Base
             new FlyoutNodes($this->router, $this->pastoralTypeMapper)
         ))->prefixBreadcrumbs([
             [$pastoralCareProper, $this->router->generate('pastoral.getIndex')],
-            ["Manage ${pastoralCareProper} Record Settings", $this->router->generate('pastoralAudience.getAudiences')],
+            ["Manage {$pastoralCareProper} Record Settings", $this->router->generate('pastoralAudience.getAudiences')],
         ]);
 
 

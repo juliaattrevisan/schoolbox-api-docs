@@ -295,7 +295,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         /** @var Collection|EventPermission[] $permissionCollection */
         $permissionCollection = EventPermissionMapper::getInstance()->findByColumnList(
             array(
-                'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
+                'campus_id' => $relEvent->getCampusCollection()->getPropertyValues('id'),
                 'status_id' => $eventMetadata->getStatus()->getId()
             )
         );
@@ -499,7 +499,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 // ...relevant staff...
                 $bob->setHref($hrefReg)
                     ->setParam('event', new Param($relEventNote, $hrefReg));
-                foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
+                foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getPropertyValues('id') as $userId) {
                     $envelope->targetToUser($userId, $bob->build());
                 }
 
@@ -513,7 +513,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     // tell relevant staff
                     $bob->setHref($hrefReg)
                         ->setParam('event', new Param($relEventNote, $hrefReg));
-                    foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
+                    foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getPropertyValues('id') as $userId) {
                         $envelope->targetToUser($userId, $bob->build());
                     }
 

@@ -9,7 +9,6 @@
  */
 class Alaress_Rss_Cache extends Alaress_Cache_Abstract
 {
-
     /**
      * A prefix for cached filenames
      *
@@ -37,6 +36,6 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract
     public function load()
     {
         libxml_use_internal_errors(true);
-        return new SimpleXMLElement($this->cachedFile, null, true);
+        return new SimpleXMLElement($this->cachedFile, 0, true);
     }
 }

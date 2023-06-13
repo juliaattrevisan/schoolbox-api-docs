@@ -9,7 +9,6 @@
  */
 class TextFormatter
 {
-
     /**
      * Create a greeting string. If it's 5pm, change to Evening
      *
@@ -67,9 +66,9 @@ class TextFormatter
         }
 
         $summary   = mb_substr($content, 0, $chars, $encoding);
-        $position  = mb_strrpos($summary, '.', null, $encoding) + 1;
-        $positionQ = mb_strrpos($summary, '?', null, $encoding) + 1;
-        $positionB = mb_strrpos($summary, '!', null, $encoding) + 1;
+        $position  = mb_strrpos($summary, '.', 0, $encoding) + 1;
+        $positionQ = mb_strrpos($summary, '?', 0, $encoding) + 1;
+        $positionB = mb_strrpos($summary, '!', 0, $encoding) + 1;
 
         if ($position > 1 && $position > $positionQ && $position > $positionB) {
             $output = mb_substr($summary, 0, $position, $encoding);
@@ -78,7 +77,7 @@ class TextFormatter
         } else if ($positionB > 1) {
             $output = mb_substr($summary, 0, $positionB, $encoding);
         } else {
-            $position = mb_strrpos($summary, ' ', null, $encoding);
+            $position = mb_strrpos($summary, ' ', 0, $encoding);
             $output   = mb_substr($summary, 0, $position, $encoding);
 
             $addEllipsis = true;

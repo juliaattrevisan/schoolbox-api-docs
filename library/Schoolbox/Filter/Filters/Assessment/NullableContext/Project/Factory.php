@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
-use function count;
-
 use InvalidArgumentException;
 use PDO;
 use Schoolbox\Collection;
@@ -30,12 +28,13 @@ use PDOException;
 use UnderflowException;
 use UnexpectedValueException;
 
+use function count;
+
 /**
  * A factory for building 'Project' filter objects
  */
 class Factory extends NullableContext\Factory
 {
-
     /**
      * @var Folder\Mapper
      */
@@ -299,7 +298,7 @@ class Factory extends NullableContext\Factory
 
         if ($directFolders->count()) {
             $builder = $this->folderMapper->getPredicateBuilder();
-            $builder->in('f.id', $directFolders->getColumnValues('id'));
+            $builder->in('f.id', $directFolders->getPropertyValues('id'));
             $placeholders = implode('AND', $builder->getWhere());
 
             $query = "
@@ -347,7 +346,7 @@ class Factory extends NullableContext\Factory
 
         if ($indirectFolders->count()) {
             $builder = $this->folderMapper->getPredicateBuilder();
-            $builder->in('ci.folder_id', $indirectFolders->getColumnValues('id'));
+            $builder->in('ci.folder_id', $indirectFolders->getPropertyValues('id'));
             $placeholders = implode('AND', $builder->getWhere());
 
             $query = "

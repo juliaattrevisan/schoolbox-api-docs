@@ -19,7 +19,7 @@ use Exception;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RangeException;
-use React\EventLoop\Factory;
+use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
@@ -103,7 +103,7 @@ class Kernel extends CliKernelAbstract
         error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->name = $name;
 
-        $this->loop = $this->di->values['react.loop'] = Factory::create();
+        $this->loop = $this->di->values['react.loop'] = Loop::get();
 
         foreach (posix_getrlimit() as $key => $value) {
             [$strength, $attr] = explode(' ', $key);

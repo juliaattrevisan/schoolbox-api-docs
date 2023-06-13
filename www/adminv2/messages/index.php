@@ -104,14 +104,14 @@ if ($enabled) {
 
         if ($schedule) {
             try {
-                $datecron = CronExpression::factory($schedule)
-                                          ->setPart(CronExpression::MINUTE, '*')
-                                          ->setPart(CronExpression::HOUR, '*');
+                $datecron = (new CronExpression($schedule))
+                    ->setPart(CronExpression::MINUTE, '*')
+                    ->setPart(CronExpression::HOUR, '*');
 
-                $timecron = CronExpression::factory($schedule)
-                                          ->setPart(CronExpression::DAY, '*')
-                                          ->setPart(CronExpression::MONTH, '*')
-                                          ->setPart(CronExpression::WEEKDAY, '*');
+                $timecron = (new CronExpression($schedule))
+                    ->setPart(CronExpression::DAY, '*')
+                    ->setPart(CronExpression::MONTH, '*')
+                    ->setPart(CronExpression::WEEKDAY, '*');
             } catch (InvalidArgumentException $e) {
                 // no schedule for group
             }

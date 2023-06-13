@@ -646,7 +646,7 @@ class CohortAnalysis
     public function getEffort()
     {
         $tally     = [];
-        $folderIds = $this->classFolderCache->getColumnValues('id');
+        $folderIds = $this->classFolderCache->getPropertyValues('id');
         $userIds   = array_keys($this->courseGrades);
 
         /** @var Collection|Collection[]|FolderLog[][] $accessLogs */
@@ -662,7 +662,7 @@ class CohortAnalysis
                 'user'    => $this->userCache[$userId],
                 'hits'    => empty($accessLogs[$userId])
                     ? 0
-                    : array_sum($accessLogs[$userId]->getColumnValues('hitcount')),
+                    : array_sum($accessLogs[$userId]->getPropertyValues('hitcount')),
                 'average' => $normMark,
             ];
         }

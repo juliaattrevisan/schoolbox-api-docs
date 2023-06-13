@@ -29,6 +29,11 @@ class LearningMoments
     public const LEARNING_MOMENT_DELETE_BUTTON = 'a[title="Delete"]';
 
     /**
+     * This test's acceptance tester actor.
+     */
+    private AcceptanceTester $tester;
+
+    /**
      * Constructor
      *
      * @param AcceptanceTester $i

@@ -115,14 +115,13 @@ class GenericCollection extends Collection
      *
      * @param mixed $offset
      * @param mixed $value
-     * @return static
+     * @return void
      * @throws UnexpectedValueException
      */
-    public function offsetSet($offset, $value): self
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->checkType($value);
         parent::offsetSet($offset, $value);
-        return $this;
     }
 
 

@@ -21,7 +21,6 @@ use InvalidArgumentException;
  */
 class Cronterpreter
 {
-
     /** @var string */
     protected $timeFormat;
 
@@ -29,7 +28,7 @@ class Cronterpreter
     /**
      * @param string $timeFormat
      */
-    function __construct($timeFormat)
+    public function __construct($timeFormat)
     {
         $this->setTimeFormat($timeFormat);
     }
@@ -64,7 +63,7 @@ class Cronterpreter
      */
     public function interpret($crontab)
     {
-        $cron = CronExpression::factory($crontab);
+        $cron = new CronExpression($crontab);
 
         // parse out a human-readable form of the cron
         $test = [

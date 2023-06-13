@@ -13,6 +13,11 @@ class ManageGroup
     public const SUBMIT_BUTTON = 'input[type=submit][value=Submit]';
     public const UPDATE_BUTTON = 'button.button.submit';
 
+    /**
+     * This test's acceptance tester actor.
+     */
+    private AcceptanceTester $tester;
+
 
     /**
      * Constructor

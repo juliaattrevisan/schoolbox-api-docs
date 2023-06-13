@@ -16,6 +16,7 @@ use ArrayAccess;
 use InvalidArgumentException;
 use ArrayIterator;
 use ICollection;
+use ReturnTypeWillChange;
 
 class Collection implements ICollection, Serializable, ArrayAccess
 {
@@ -107,17 +108,15 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @param  mixed $offset
      * @param  mixed $value
-     *
-     * @return $this
+     * @return void
      */
-    public function offsetSet($offset, $value): self
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (!isset($offset)) {
             $this->stack[] = $value;
         } else {
             $this->stack[$offset] = $value;
         }
-        return $this;
     }
 
     /**
@@ -127,7 +126,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->stack[$offset] ?? null;
     }
@@ -139,7 +138,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->stack[$offset]);
     }
@@ -148,13 +147,11 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * Unsets value in collection
      *
      * @param mixed $offset
-     *
-     * @return $this
+     * @return void
      */
-    public function offsetUnset($offset): self
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->stack[$offset]);
-        return $this;
     }
 
     /**
@@ -352,21 +349,6 @@ class Collection implements ICollection, Serializable, ArrayAccess
             return array_column($input, $column);
         }
         throw new InvalidArgumentException("Invalid input given, must be array or Collection");
-    }
-
-    /**
-     * Gets values for the given model *property* in the collection.
-     *
-     * TODO WARNING - Method is misnamed, this actually inspects the model 'property', not 'column'.
-     *
-     * @param string $property
-     * @return array
-     * @deprecated 17.5 Use 'getPropertyValues' instead. Retained for backwards comparability
-     * @todo Remove 18.0
-     */
-    public function getColumnValues(string $property): array
-    {
-        return $this->getPropertyValues($property);
     }
 
     /**
@@ -1070,6 +1052,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * @param IDecorator ...$decorators
      * @return array
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize(IDecorator ...$decorators): array
     {
         if (\count($decorators) === 0) {

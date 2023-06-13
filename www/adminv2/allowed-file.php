@@ -33,7 +33,7 @@ if ($mimes->count()) {
         $this->setVar('file_extension_block', '');
 
         $extensions   = ExtensionMapper::getInstance()->findByColumn('fileTypeID', $mime->getId());
-        $extensions   = $extensions->getColumnValues('extension');
+        $extensions   = $extensions->getPropertyValues('extension');
         $extensionCSV = implode(',', $extensions);
         if (count($extensions)) {
             foreach ($extensions as $ext) {

@@ -23,7 +23,6 @@ use Schoolbox\Collection;
  */
 class Ancestry
 {
-
     /**
      * Maximum number of traversals before bugging out
      */
@@ -101,7 +100,7 @@ class Ancestry
     public function hasParent(Folder $folder, Folder $parent)
     {
         $parentId    = $parent->getId();
-        $ancestorIds = $this->findParentsCheaply($folder)->getColumnValues('id');
+        $ancestorIds = $this->findParentsCheaply($folder)->getPropertyValues('id');
 
         return in_array($parentId, $ancestorIds);
     }

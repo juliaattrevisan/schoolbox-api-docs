@@ -34,17 +34,17 @@ class Scrub
     /**
      * Singleton CommonMark instance used by this class in `linkifyText`.
      *
-     * @var CommonMark\MarkdownConverterInterface|null
+     * @var CommonMark\ConverterInterface|null
      */
-    private static ?CommonMark\MarkdownConverterInterface $linkifyConverter = null;
+    private static ?CommonMark\ConverterInterface $linkifyConverter = null;
 
 
     /**
      * Singleton CommonMark instance used by this class in `markdown`.
      *
-     * @var CommonMark\MarkdownConverterInterface|null
+     * @var CommonMark\ConverterInterface|null
      */
-    private static ?CommonMark\MarkdownConverterInterface $markdownConverter = null;
+    private static ?CommonMark\ConverterInterface $markdownConverter = null;
 
 
     /**
@@ -58,7 +58,7 @@ class Scrub
      * Cleans plain text of all nasty stuff
      * Can be used on input to database or output
      *
-     * @param string $text
+     * @param string|null $text
      * @return string
      */
     public static function text($text)
@@ -67,14 +67,14 @@ class Scrub
         // Don't think ENT_IGNORE is a problem here.
         // This is used to escape output as text or as an attribute - HTML tags
         // are escaped regardless.
-        return htmlentities($text, ENT_IGNORE | ENT_QUOTES, 'UTF-8');
+        return htmlentities($text ?? '', ENT_IGNORE | ENT_QUOTES, 'UTF-8');
     }
 
 
     /**
      * Scrubs text for XML output.
      *
-     * @param string $text
+     * @param string|null $text
      * @return string
      */
     public static function xml($text)
@@ -83,7 +83,7 @@ class Scrub
         // Don't think ENT_IGNORE is a problem here.
         // This is used to escape output as text or as an attribute - HTML tags
         // are escaped regardless.
-        return htmlspecialchars($text, ENT_QUOTES);
+        return htmlspecialchars($text ?? '', ENT_QUOTES);
     }
 
 
@@ -91,40 +91,19 @@ class Scrub
      * Turns html into plaintext.
      * Note: output will be quite unpredictable if used on input that contains tables or copious formatting.
      * @static
-     * @param string $html
+     * @param string|null $html
      * @return string
      */
     public static function html2text($html)
     {
         // 0: replace all text-style block-level elements with newlines
-        $text = preg_replace('#</(p|h[1-5]|br)>#i', "\n", $html);
+        $text = preg_replace('#</(p|h[1-5]|br)>#i', "\n", $html ?? '');
         // 1: remove all remaining tags from input
         $text = strip_tags($text);
         // 2: all recurring whitespaces (including &nbsp;) to be trimmed
         $text = preg_replace('/(\s|&nbsp;)+/i', ' ', $text);
         // 3: unconvert entities (3 -> 4 is just for normalising any rogue characters)
         return html_entity_decode($text, ENT_QUOTES);
-    }
-
-
-    /**
-     * Convert smart quotes to apostrophes/double quotes
-     *
-     * @static
-     * @param string $text
-     * @return string
-     */
-    public static function smartQuotes($text)
-    {
-        $search  = [chr(145), chr(146), chr(147), chr(148), chr(151)];
-        $replace = ["'", "'", '"', '"', '-'];
-
-        $data = str_replace($search, $replace, $text);
-
-        $search  = ['&#8220;', '&#8221;', '&#8216;', '&#8217;', '&#8243;'];
-        $replace = ['&quot;', '&quot;', '&#39;', '&#39;', '&quot;'];
-
-        return str_replace($search, $replace, $data);
     }
 
 
@@ -442,11 +421,11 @@ class Scrub
      * Create a cut-down Markdown converter which does little more than parse
      * links out of text.
      *
-     * @return CommonMark\MarkdownConverterInterface
+     * @return CommonMark\ConverterInterface
      */
-    private static function getLinkifyingMarkdownConverter(): CommonMark\MarkdownConverterInterface
+    private static function getLinkifyingMarkdownConverter(): CommonMark\ConverterInterface
     {
-        if (!self::$linkifyConverter instanceof CommonMark\MarkdownConverterInterface) {
+        if (!self::$linkifyConverter instanceof CommonMark\ConverterInterface) {
             $environment = new CommonMark\Environment\Environment(
                 [
                     'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
@@ -472,7 +451,7 @@ class Scrub
      */
     public static function linkifyText(string $text): string
     {
-        return self::getLinkifyingMarkdownConverter()->convertToHtml($text);
+        return self::getLinkifyingMarkdownConverter()->convert($text);
     }
 
 
@@ -480,11 +459,11 @@ class Scrub
      * Create a cut-down Markdown converter which does little more than parse
      * links out of text.
      *
-     * @return CommonMark\MarkdownConverterInterface
+     * @return CommonMark\ConverterInterface
      */
-    private static function getMarkdownConverter(): CommonMark\MarkdownConverterInterface
+    private static function getMarkdownConverter(): CommonMark\ConverterInterface
     {
-        if (!self::$markdownConverter instanceof CommonMark\MarkdownConverterInterface) {
+        if (!self::$markdownConverter instanceof CommonMark\ConverterInterface) {
             $environment = new CommonMark\Environment\Environment(
                 [
                     'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
@@ -509,7 +488,7 @@ class Scrub
      */
     public static function markdown(?string $text): string
     {
-        $html = self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
+        $html = self::getMarkdownConverter()->convert((string)$text)->getContent();
 
         // Ensure no linebreak exists between <li> and any other immediately following tag.  (See SA-15196).
         // Eg. "<li>\n<a href='google.com'>Link</a>" needs to become "<li><a href='google.com'>Link</a>".

@@ -33,6 +33,11 @@ abstract class AbstractController implements ControllerInterface
     protected $defaultFolderId = 0;
 
     /**
+     * The template which this controller uses.
+     */
+    private string $template;
+
+    /**
      * @param bool   $multi
      * @param string $mimeFilter
      * @param bool   $useFolder

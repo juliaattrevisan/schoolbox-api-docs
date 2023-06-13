@@ -295,7 +295,7 @@ abstract class AMQPConnector implements AMQPInterface
      */
     public function acceptMessage($message, $channelId = null)
     {
-        $this->getChannel($channelId)->basic_ack($message->delivery_info['delivery_tag']);
+        $this->getChannel($channelId)->basic_ack($message->getDeliveryTag());
         return $this;
     }
 
@@ -343,7 +343,7 @@ abstract class AMQPConnector implements AMQPInterface
      */
     public function rejectMessage($message, $requeue = true, $channelId = null)
     {
-        $this->getChannel($channelId)->basic_reject($message->delivery_info['delivery_tag'], $requeue);
+        $this->getChannel($channelId)->basic_reject($message->getDeliveryTag(), $requeue);
         return $this;
     }
 

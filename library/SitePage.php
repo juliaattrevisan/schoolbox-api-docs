@@ -10,45 +10,66 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Auth\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
 
-class SitePage extends Page
+class SitePage
 {
     /**
-     * The site that this SitePage uses to get templates from
+     * The site that this SitePage uses to get templates from.
+     *
      * @var string
      */
-    public $site;
+    public string $site = '';
 
     /**
      * The dependency injection container, injected into SitePage!
-     * @var ContainerInterface
      */
     protected ContainerInterface $di;
 
     /**
-     * List of arguments passed in URL
-     * @var array
+     * List of arguments passed in URL.
+     *
+     * @var array<string>
      */
-    public $arg = array();
+    public array $arg = [];
 
-    /** @var string $currentTab */
-    private $currentTab;
+    /**
+     * The name of the currently selected tab in the top nav, if any.
+     */
+    private string $currentTab = '';
 
-    /** @var bool $ajax */
-    private $ajax;
+    /**
+     * Is this page output as the response to an AJAX (i.e. async) request?
+     */
+    private bool $ajax = false;
 
-    /** @var bool $lite */
-    private $lite;
+    /**
+     * Is this page output in "lite" mode (i.e. with no site chrome)?
+     */
+    private bool $lite = false;
 
-    /** @var User|null $user */
-    private $user;
+    /**
+     * The current logged-in user, if any.
+     */
+    private ?User $user = null;
 
-    /** @var ConfigLoader */
-    private $config;
+    /**
+     * This Schoolbox instance's config loader.
+     */
+    private IConfigLoader $config;
+
+    /**
+     * The root folder for templates which SitePage uses.
+     */
+    protected string $templateRoot;
+
+    /**
+     * The PHPLib templating engine SitePage uses.
+     */
+    public Template $template;
 
     /**
      * Constructor
@@ -57,10 +78,10 @@ class SitePage extends Page
      */
     public function __construct(ContainerInterface $di)
     {
-        parent::__construct();
-
-        $this->di     = $di;
-        $this->config = $di->get('config');
+        $this->di           = $di;
+        $this->config       = $di->get('config');
+        $this->templateRoot = SITE_root . '/templates';
+        $this->template     = new Template($this->templateRoot);
 
         if (isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
@@ -416,6 +437,21 @@ class SitePage extends Page
     public function error($ec, $message = '', $code = 400)
     {
         throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
+    }
+
+    public function setVar($var, $value = '')
+    {
+        $this->template->setVar($var, $value);
+    }
+
+    public function setBlock($parent, $handle, $name = '')
+    {
+        $this->template->setBlock($parent, $handle, $name);
+    }
+
+    public function parse($target, $handle, $append = false)
+    {
+        $this->template->parse($target, $handle, $append);
     }
 
     /**

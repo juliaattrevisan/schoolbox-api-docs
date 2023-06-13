@@ -30,7 +30,9 @@ class AccessTest extends TestCase
     /** @var Role[] */
     private $roles;
 
-    /** @var User[] */
+    /**
+     * @var array<User|MockObject>
+     */
     private $users;
 
     /** @var Event[] */
@@ -58,7 +60,7 @@ class AccessTest extends TestCase
 
     /**
      * @param string $key
-     * @return mixed|User
+     * @return User|MockObject
      */
     private function getUser($key)
     {
@@ -68,7 +70,7 @@ class AccessTest extends TestCase
                 // User::getAccessList() when access list is not set
 
                 /** @var User|MockObject $mockUser */
-                $mockUser = $this->getMockBuilder(User::class)->setMethods($overload)->getMock();
+                $mockUser = $this->getMockBuilder(User::class)->onlyMethods($overload ?? [])->getMock();
                 $mockUser->setId($id);
                 $mockUser->setAccessList(new GenericCollection(UserAccess::class));
                 $mockUser->setChildren(new GenericCollection(User::class));
@@ -97,20 +99,20 @@ class AccessTest extends TestCase
                 'parent2'               => $newUser(15)->setRole($this->getRole('parent')),
                 'student2'              => $newUser(16)->setRole($this->getRole('student')),
                 'parentWithStudent'     => $newUser(17)->setRole($this->getRole('parent')),
-                'studentWithParent'     => $newUser(18, ['loadParents', 'getParents'])
+                'studentWithParent'     => $newUser(18, ['getParents'])
                                                 ->setRole($this->getRole('student')),
             ];
 
             // Create a mock returns for users
 
             // Mock returns for studentWithParent, who is a child of $this->users['parentWithStudent']
-            $this->users['studentWithParent']->method('loadParents')->willReturnCallback(function () {
-                return $this->users['studentWithParent']; //Makes function do nothing
-            });
-            $this->users['studentWithParent']->method('getParents')->willReturnCallback(function () {
+            /** @var User|MockObject $studentWithParents */
+            $studentWithParents = $this->users['studentWithParent'];
+            $studentWithParents->method('getParents')->willReturnCallback(function () {
                 $collection = new Collection();
                 return $collection->add($this->users['parentWithStudent']);
             });
+            $this->users['studentWithParent'] = $studentWithParents;
         }
 
         return $this->users[$key];
@@ -229,7 +231,7 @@ class AccessTest extends TestCase
                 return in_array($access->getServiceIdentifier(), $groups);
             });
 
-            $relatedAccessLevels = $relatedAccessList->getColumnValues('accessLevel');
+            $relatedAccessLevels = $relatedAccessList->getPropertyValues('accessLevel');
 
             if (empty($relatedAccessLevels)) {
                 return 0;

@@ -36,7 +36,7 @@ class LinkDecoratorTest extends TestCase
     {
         $this->router = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()
-            ->setMethods([ 'generate' ])
+            ->onlyMethods([ 'generate' ])
             ->getMock();
 
         $this->router
@@ -46,7 +46,7 @@ class LinkDecoratorTest extends TestCase
 
         $this->auth = $this->getMockBuilder(Authorizer::class)
             ->disableOriginalConstructor()
-            ->setMethods([ 'isPathAuthorizedForUser' ])
+            ->onlyMethods([ 'isPathAuthorizedForUser' ])
             ->getMock();
 
         $this->auth
@@ -55,7 +55,6 @@ class LinkDecoratorTest extends TestCase
 
 
         $this->linkable = new class implements Linkable {
-
             /**
              * @return Link[]
              */

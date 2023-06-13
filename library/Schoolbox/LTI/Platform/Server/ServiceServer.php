@@ -12,10 +12,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform\Server;
 
-use Http\Message\ResponseFactory;
-use Nyholm\Psr7\Factory\HttplugFactory;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidatorInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandlerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -34,16 +34,16 @@ class ServiceServer implements RequestHandlerInterface
      *
      * @param RequestAccessTokenValidatorInterface    $validator
      * @param LtiServiceServerRequestHandlerInterface $handler
-     * @param ResponseFactory|null                    $factory
+     * @param ResponseFactoryInterface|null           $factory
      * @param LoggerInterface|null                    $logger
      */
     public function __construct(
         private RequestAccessTokenValidatorInterface $validator,
         private LtiServiceServerRequestHandlerInterface $handler,
-        private ?ResponseFactory $factory = null,
+        private ?ResponseFactoryInterface $factory = null,
         private ?LoggerInterface $logger = null,
     ) {
-        $this->factory = $factory ?? new HttplugFactory();
+        $this->factory = $factory ?? new Psr17Factory();
         $this->logger  = $logger ?? new NullLogger();
     }
 
@@ -59,7 +59,7 @@ class ServiceServer implements RequestHandlerInterface
         if (!empty($allowedMethods) && !in_array(strtolower($request->getMethod()), $allowedMethods)) {
             $message = sprintf('Not acceptable request method, accepts: [%s]', implode(', ', $allowedMethods));
             $this->logger->error($message);
-            return $this->factory->createResponse(405, null, [], $message);
+            return $this->factory->createResponse(405, $message);
         }
 
         $allowedContentType = $this->handler->getAllowedContentType();
@@ -71,13 +71,13 @@ class ServiceServer implements RequestHandlerInterface
         ) {
             $message = sprintf('Not acceptable request content type, accepts: %s', $allowedContentType);
             $this->logger->error($message);
-            return $this->factory->createResponse(406, null, [], $message);
+            return $this->factory->createResponse(406, $message);
         }
 
         $validationResult = $this->validator->validate($request, $this->handler->getAllowedScopes());
         if ($validationResult->hasError()) {
             $this->logger->error($validationResult->getError());
-            return $this->factory->createResponse(401, null, [], $validationResult->getError());
+            return $this->factory->createResponse(401, $validationResult->getError());
         }
 
         // The original implementation wraps this block in a try/catch:

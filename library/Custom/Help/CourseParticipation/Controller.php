@@ -279,7 +279,7 @@ class Controller extends Base
         }
 
         $courses   = $this->getCoursesBySchool($schoolCode);
-        $courseIds = $courses->getColumnValues('id');
+        $courseIds = $courses->getPropertyValues('id');
 
         $failures = [];
 

@@ -120,7 +120,7 @@ class ServiceManager implements IServiceManager
                 /** @var Collection $apps */
                 $apps = $reg['registrations'];
 
-                $tokens = $apps->getColumnValues('token');
+                $tokens = $apps->getPropertyValues('token');
 
                 // ensure the log is set
                 $service->setLog($this->log);

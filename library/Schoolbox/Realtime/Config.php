@@ -315,7 +315,7 @@ class Config
      */
     public function persistFollow(User $user, $follow)
     {
-        $involvements = $user->getAccessList()->getColumnValues('serviceIdentifier');
+        $involvements = $user->getAccessList()->getPropertyValues('serviceIdentifier');
 
         // mute anything explicitly passed as 'off' which ALSO appears in the involvement list
         $unfollow = [];

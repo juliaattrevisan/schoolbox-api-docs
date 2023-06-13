@@ -300,13 +300,13 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
                 if ($award['AwardAchievementCode']) {
                     $AwardAchievementDescription = Scrub::text($award['AwardAchievementDescription']);
-                    $tail = "for<b class='award-desc'> ${AwardAchievementDescription}</b>";
+                    $tail = "for<b class='award-desc'> {$AwardAchievementDescription}</b>";
                 } else if ($award['AwardAchievement']) {
                     $AwardAchievement = Scrub::text($award['AwardAchievement']);
-                    $tail = "for<b class='award-desc'> ${AwardAchievement}</b>";
+                    $tail = "for<b class='award-desc'> {$AwardAchievement}</b>";
                 } else if ($award['AwardComment']) {
                     $AwardComment = Scrub::text($award['AwardComment']);
-                    $tail = "for<b class='award-desc'> ${AwardComment}</b>";
+                    $tail = "for<b class='award-desc'> {$AwardComment}</b>";
                 }
 
                 $params = array(

@@ -20,9 +20,8 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Transactor\ITransactor;
 use PDOStatement;
-use Serializable;
 
-class Base implements Serializable, IConnector
+class Base implements IConnector
 {
     /** @var IBroker */
     protected $broker;
@@ -212,38 +211,40 @@ class Base implements Serializable, IConnector
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * @inheritdoc
+     * Array representation of object
+     *
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
         // We serialize just the settings of the database connection
-
-        return serialize([
+        // TODO it can't be safe to store a password in a serialized object!
+        return [
             'hostname' => $this->hostname,
             'username' => $this->username,
             'password' => $this->password,
             'database' => $this->database,
             'brokerClass' => get_class($this->broker)
-        ]);
+        ];
     }
 
     /**
-     * @inheritdoc
+     * Constructs the object
+     *
+     * @param array $serialized
+     *
+     * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $settings = unserialize($serialized);
-
         // We load the settings back into the object
-
-        $this->hostname = $settings['hostname'];
-        $this->username = $settings['username'];
-        $this->password = $settings['password'];
-        $this->database = $settings['database'];
+        $this->hostname = $serialized['hostname'];
+        $this->username = $serialized['username'];
+        $this->password = $serialized['password'];
+        $this->database = $serialized['database'];
 
         // Create the correct broker class
-
-        $this->broker = new $settings['brokerClass']();
+        $this->broker = new $serialized['brokerClass']();
         $this->broker->setConnector($this);
         $this->broker->connect();
     }

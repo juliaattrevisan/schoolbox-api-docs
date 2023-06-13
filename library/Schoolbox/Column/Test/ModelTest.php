@@ -16,7 +16,6 @@ use Schoolbox\Test\TestModel;
 
 class ModelTest extends TestCase
 {
-
     /**
      * @var Model
      */
@@ -45,7 +44,7 @@ class ModelTest extends TestCase
             ->setIsViewed(false)
             ->setFile('contents');
         $this->test_mapper = $this->getMockBuilder(TestMapper::class)
-                                  ->setMethods(['findById', 'findOneByColumn'])
+                                  ->onlyMethods(['findById', 'findOneByColumn'])
                                   ->getMock();
         $this->test_mapper
             ->expects($this->any())

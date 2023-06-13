@@ -280,7 +280,7 @@ class Interval implements JsonSerializable
      *
      * @return int
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): int
     {
         $seconds = $this->getSecondTotal();
         if ($this->isInverted()) {

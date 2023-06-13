@@ -9,11 +9,13 @@
  */
 
 // require SitePage context
-/** @var SitePage $this */
+
+use Schoolbox\Error\Mapper;
+
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-    httpError(400, 101); // resource not available
+    error(Mapper::ERROR_RESOURCE_NOT_FOUND, '', 400);
 }
 
 /** @var SitePage $this */
@@ -28,15 +30,14 @@ $context = $this->arg[0];
 $groupId = $this->arg[1];
 
 if (empty($context) || empty($groupId)) {
-    httpError(400, 2); // info missing
+    error(Mapper::ERROR_INFORMATION_MISSING, '', 400);
 }
 
 try {
     $factoryFactory   = new Component_FactoryFactory();
     $componentFactory = $factoryFactory->build($context, $this->getDi()->get('session')->get('user'), $this, true);
 } catch (Exception $e) {
-    httpError(400, 'Invalid context specified.');
-    exit;
+    error(null, 'Invalid context specified', 400);
 }
 $componentCollection = $componentFactory->buildComponentList($groupId);
 

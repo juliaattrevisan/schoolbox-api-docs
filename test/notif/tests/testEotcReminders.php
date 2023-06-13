@@ -258,7 +258,7 @@ class EotcReminders extends AbstractNotificationTest
             self::FIRST_REMINDER, self::DAILY_REMINDER
         ]);
 
-        $configs = array_combine($configs->getColumnValues('name'), $configs->getColumnValues('value'));
+        $configs = array_combine($configs->getPropertyValues('name'), $configs->getPropertyValues('value'));
 
         /**
          * We gon create a LOT of events

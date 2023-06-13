@@ -58,7 +58,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
         // challenge 'remember me' auth
         $username = $this->rememberer->retrieveUsername();
 
-        if (strlen($username)) {
+        if (strlen($username ?? '')) {
             // found a redis match; attempt to rebuild that session
 
             // For safety's sake regenerate their session ID

@@ -20,7 +20,6 @@ use Schoolbox\User;
  */
 class External_Schooledge_User implements External_UserInterface
 {
-
     /**
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
@@ -60,7 +59,7 @@ class External_Schooledge_User implements External_UserInterface
         $quotedId    = $this->database->legacyQuote($externalId);
         $campusCodes = array_map(
             [$this->database, 'legacyQuote'],
-            $campusList->getColumnValues('extTimetableCode')
+            $campusList->getPropertyValues('extTimetableCode')
         );
         if (empty($campusCodes)) {
             return [];

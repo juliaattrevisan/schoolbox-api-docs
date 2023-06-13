@@ -14,7 +14,6 @@ use JsonSerializable;
 
 class Model implements JsonSerializable
 {
-
     /**
      * Pending booking
      */
@@ -105,7 +104,7 @@ class Model implements JsonSerializable
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id'         => $this->getId(),

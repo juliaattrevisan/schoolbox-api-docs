@@ -12,7 +12,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class ArbitraryFile extends Thumbnail
 {
-
     /**
      * Some kind of resource that is not an image
      * such as a pdf, a docx, etc.
@@ -27,7 +26,7 @@ class ArbitraryFile extends Thumbnail
         $mapper = new \Schoolbox\File\MimetypeMapper();
 
         try {
-            $icon = $mapper->getByFilename($this->getUrl())->getIconFile();
+            $icon = $mapper->getByFilename(parse_url($this->getUrl(), PHP_URL_PATH))->getIconFile();
         } catch (\Schoolbox\File\Exception $e) {
             return '';
         }

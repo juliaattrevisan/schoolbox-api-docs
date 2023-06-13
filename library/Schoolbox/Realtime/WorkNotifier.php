@@ -13,11 +13,9 @@ use Alaress\Lumberjack\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
-use Serializable;
 
-abstract class WorkNotifier implements Serializable
+abstract class WorkNotifier
 {
-
     /** @var IConfigLoader */
     protected $conf;
 
@@ -71,20 +69,25 @@ abstract class WorkNotifier implements Serializable
 
 
     /**
-     * @return string the string representation of the object or null
+     * Array representation of object
+     *
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
         // no serialization
-        return get_class($this);
+        return [];
     }
 
 
     /**
-     * @param string $serialized
+     * Constructs the object
+     *
+     * @param array $serialized
+     *
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         // no serialization
         $this->__construct();

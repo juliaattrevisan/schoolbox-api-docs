@@ -85,7 +85,7 @@ class PreSignedUrlService
             throw new InvalidPresignedUrlDurationExecption("Presigned URL duration must be less than 7 days");
         }
         $expires  = $expireAt->__toString();
-        $fileName = utf8_encode($fileNameOverride ?? $storage->getBasename());
+        $fileName = mb_convert_encoding($fileNameOverride ?? $storage->getBasename(), 'UTF-8', 'ISO-8859-1');
         $cacheControl = implode(',', $cacheControlItems);
 
         $commandObject = $this->s3Client->getCommand('GetObject', [

@@ -429,7 +429,7 @@ class Controller extends BaseController
                 'ns'      => $ns,
                 'sources' => $sources,
                 'perms'   => $this->getConfig()->getPermissionList(),
-                'msgConfig'  => $this->getConfig()->find($rolec->getColumnValues('id')),
+                'msgConfig'  => $this->getConfig()->find($rolec->getPropertyValues('id')),
             ],
         ]);
     }
@@ -510,7 +510,7 @@ class Controller extends BaseController
                         : $this->getRoleMapper()->findByColumn('group_type', $copyTo);
 
                     // we need a list of relevant role IDs
-                    foreach ($list->getColumnValues('id') as $roleId) {
+                    foreach ($list->getPropertyValues('id') as $roleId) {
                         try {
                             $conf[$slug][$key][$roleId] = $this->getConfig()->persistRole($roleId, $slug, $key, $settings);
                         } catch (\Schoolbox\Mapper\Exception $e) {

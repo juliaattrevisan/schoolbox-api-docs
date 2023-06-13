@@ -20,7 +20,6 @@ use stdClass;
 
 class ObjectReaderTest extends TestCase
 {
-
     /** @var Student */
     protected $dummyUser;
 
@@ -250,7 +249,7 @@ class ObjectReaderTest extends TestCase
 
         $output = $reader->read($this->dummyUser, 'campus.name');
 
-        $names = $this->dummyUser->getCampus()->getColumnValues('name');
+        $names = $this->dummyUser->getCampus()->getPropertyValues('name');
 
         $this->assertEquals($names, $output);
     }

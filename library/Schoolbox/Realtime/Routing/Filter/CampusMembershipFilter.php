@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class CampusMembershipFilter extends ContextFilter
 {
-
     /**
      * Returns true if this message is considered valid, or false if it should be dismissed
      *
@@ -27,7 +26,7 @@ class CampusMembershipFilter extends ContextFilter
     {
         // if campus set, must be involved in one or more campuses listed
         if (isset($message->getContext()['campus'])) {
-            $this->assertContextValue($message->getContext()['campus'], $user->getCampusCollection()->getColumnValues('id'), "User not a member of any given campus");
+            $this->assertContextValue($message->getContext()['campus'], $user->getCampusCollection()->getPropertyValues('id'), "User not a member of any given campus");
         }
         return true;
     }

@@ -81,7 +81,7 @@ class Base implements IIterator
     /**
      * @inheritdoc
      */
-    public function current()
+    public function current(): array|bool
     {
         if ($this->rowIndex == -1) {
             throw new DatabaseException('Iterator has not been executed.');
@@ -93,7 +93,7 @@ class Base implements IIterator
     /**
      * @inheritdoc
      */
-    public function next()
+    public function next(): void
     {
         ++$this->rowIndex;
         $this->currentRow = $this->pdoStatement->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
@@ -107,7 +107,7 @@ class Base implements IIterator
     /**
      * @inheritdoc
      */
-    public function key()
+    public function key(): int
     {
         return $this->rowIndex;
     }
@@ -115,7 +115,7 @@ class Base implements IIterator
     /**
      * @inheritdoc
      */
-    public function valid()
+    public function valid(): bool
     {
         return false !== $this->currentRow;
     }
@@ -123,18 +123,16 @@ class Base implements IIterator
     /**
      * @inheritdoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         // If you want to rewind, you'll need to do it in the connector specific class as it is not universally supported
         // the base implementation will do nothing
-
-        return;
     }
 
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         if ($this->statement == null) {
             return 0;

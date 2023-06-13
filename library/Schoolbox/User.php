@@ -79,8 +79,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var string */
     private $altEmail;
 
-    /** @var string */
-    private $positionTitle;
+    /**
+     * User's position title (optional field).
+     */
+    private ?string $positionTitle = null;
 
     /** @var string */
     private $username;
@@ -447,10 +449,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param string $positionTitle
+     * @param string|null $positionTitle
      * @return self
      */
-    public function setPositionTitle($positionTitle)
+    public function setPositionTitle(?string $positionTitle): self
     {
         $this->positionTitle = $positionTitle;
         return $this;
@@ -465,9 +467,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPositionTitle()
+    public function getPositionTitle(): ?string
     {
         return $this->positionTitle;
     }
@@ -477,7 +479,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function hasPositionTitle()
     {
-        $positionTitle = trim($this->positionTitle);
+        $positionTitle = trim($this->positionTitle ?? '');
         return !empty($positionTitle);
     }
 

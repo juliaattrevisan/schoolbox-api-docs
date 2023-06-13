@@ -117,7 +117,8 @@ class Session
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();
-            if (Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
+            if (
+                Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
                 && !empty(Config::get('external_portal'))
             ) {
                 $_SESSION['password'] = $_POST['password'] ?? null;
@@ -274,7 +275,9 @@ class Session
      * @param string|null $ldapCaCertHash If provided, hash of a local path to a cert.
      *                                    This must be a local file, because the
      *                                    LDAP extension needs to access this file.
-     * @return bool|resource The connection, or false if none could be created.
+     * @return mixed The connection: a resource in PHP 8.0 or earlier, a
+     *               `\LDAP\Connection` in 8.1 or later, or false if connection
+     *               failed.
      * @throws MapperException
      */
     public function ldapConnect(string $host, string $username, string $password, ?string $ldapCaCertHash)
@@ -309,35 +312,40 @@ class Session
             if ($ds) {
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                $bind = @ldap_bind($ds, $this->ldapEscape($username), utf8_encode($password));
+                $bind = @ldap_bind(
+                    $ds,
+                    $this->ldapEscape($username),
+                    mb_convert_encoding($password, 'UTF-8', 'ISO-8859-1'),
+                );
                 if ($bind) {
                     return $ds;
                 }
             }
         }
-        return false;
+        return null;
     }
 
 
     /**
      * Authenticates a username/password against the provided LDAP connection.
      *
-     * @param bool|resource $ds            An LDAP connection
-     * @param string        $username      The username to authenticate in the
-     *                                     LDAP connection
-     * @param string        $password      The password for user $username
-     * @param string        $userDn        What is the distinguished name of the
-     *                                     directory which contains usernames?
-     * @param string        $usernameField Which field in $userDn contains the
-     *                                     username?
-     * @param string        $searchFilter  What other filters should be applied
-     *                                     to the username field search?
+     * @param mixed  $ds            An LDAP connection (whether a resource or
+     *                              `\LDAP\Connection` instance), if created
+     * @param string $username      The username to authenticate in the LDAP
+     *                              connection
+     * @param string $password      The password for user $username
+     * @param string $userDn        What is the distinguished name of the
+     *                              directory containing usernames?
+     * @param string $usernameField Which field in $userDn contains the
+     *                              username?
+     * @param string $searchFilter  What other filters get applied to the
+     *                              username field search?
      * @return bool
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
      */
     private function ldapAuth(
-        $ds,
+        mixed $ds,
         string $username,
         string $password,
         string $userDn,
@@ -359,7 +367,7 @@ class Session
             $dn = $entries[0]['dn'] ?? null;
             // if the user exists
             if ($dn) {
-                $bind = @ldap_bind($ds, $dn, utf8_encode($password));
+                $bind = @ldap_bind($ds, $dn, mb_convert_encoding($password, 'UTF-8', 'ISO-8859-1'));
 
                 // failed to bind. find out why.
                 if (!$bind) {
@@ -434,14 +442,15 @@ class Session
         $ldapCaCertHash    = Config::get('ldap_ca_certificate');
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
-            if ($ds && $this->ldapAuth(
-                $ds,
-                $username,
-                $password,
-                $ldapConfig['searchBase'],
-                $ldapUsernameField,
-                $ldapSearchFilter
-            )
+            if (
+                $ds && $this->ldapAuth(
+                    $ds,
+                    $username,
+                    $password,
+                    $ldapConfig['searchBase'],
+                    $ldapUsernameField,
+                    $ldapSearchFilter
+                )
             ) {
                 return true;
             }

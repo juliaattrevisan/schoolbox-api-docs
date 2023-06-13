@@ -315,34 +315,32 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
 
 
     /**
-     * String representation of object
+     * Array representation of object
      *
-     * @return string the string representation of the object or null
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize(array(
+        return [
             get_class($this->conf),
-            $this->namespace
-        ));
+            $this->namespace,
+        ];
     }
 
 
     /**
      * Constructs the object
      *
-     * @param string $serialized the string representation of the object.
+     * @param array $serialized
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $data = unserialize($serialized);
-
-        if (!is_array($data)) {
+        if (!is_array($serialized)) {
             throw new RuntimeException("Could not unserialize notifier instance");
         }
-        $conf            = $data[0];
-        $this->namespace = $data[1];
+        $conf            = $serialized[0];
+        $this->namespace = $serialized[1];
         // the only thing we serialize is the name of the config class
         $this->__construct(method_exists($conf, 'getInstance') ? $conf::getInstance() : new $conf());
     }

@@ -21,7 +21,6 @@ use JsonSerializable;
  */
 class SegmentSelectizeOption implements JsonSerializable
 {
-
     /**
      * The encoded value that represents a segment. eg 'folder:2:x:self'
      * @var string
@@ -74,7 +73,7 @@ class SegmentSelectizeOption implements JsonSerializable
      * This is the format expected by the audience selectize
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'key'       => $this->key,

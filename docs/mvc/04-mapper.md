@@ -7,7 +7,7 @@ The Mapper classes themselves should contain a set of ubiquitous or common datab
 
 ```php
 /**
- * Folder Mapper 
+ * Folder Mapper
  */
 class Mapper extends BaseMapper {
 
@@ -17,9 +17,9 @@ class Mapper extends BaseMapper {
     public function findByCode($code) {
         ...
     }
-    
+
     /**
-     * Find a folder's parent instance 
+     * Find a folder's parent instance
      */
     public function findParent(Folder $folder) {
         ...
@@ -28,11 +28,11 @@ class Mapper extends BaseMapper {
 ```
 
 ## 4.1 Mapper Usage
-Mapper calls can be somewhat expensive to use due to the sheer amount of data being obtained. On very complex data sets this can lead to terrible load times (if it loads at all) and we should avoid this situation if possible. 
+Mapper calls can be somewhat expensive to use due to the sheer amount of data being obtained. On very complex data sets this can lead to terrible load times (if it loads at all) and we should avoid this situation if possible.
 
 > Whenever you access the database try to obtain the minimum amount of data necessary and minimise the number of database calls needed to accomplish this. Avoid postprocessing data where possible.
 
-There are some scenarios where you can't do this very effectively - namely when you can't apply sufficient conditionals in the query itself, such as data being affected by role-based permissions checks (we can't compute those in joins). 
+There are some scenarios where you can't do this very effectively - namely when you can't apply sufficient conditionals in the query itself, such as data being affected by role-based permissions checks (we can't compute those in joins).
 
 ### 4.1.1 Fetch minimal data set vs trimming away
 Obtain the minimum data set instead of getting more than you need, only to delete records you don't want in a postprocessing loop. Use limits and conditionals to restrict the data set.
@@ -80,7 +80,7 @@ foreach ($allResults as $current) {
 ```
 
 ### 4.1.2 Fetching Scalars
-There are convenience methods that allow you to get the values of a particular column/property so that you don't have to hydrate a whole bunch of stuff. 
+There are convenience methods that allow you to get the values of a particular column/property so that you don't have to hydrate a whole bunch of stuff.
 
 ```php
 /* Do: Use this convenience method instead of hydrating everything
@@ -97,7 +97,7 @@ foreach ($allResults as $current) {
 
 /* Don't: this is also not nice
  */
-$mapper->findByColumn('a', $value)->getColumnValues('id');
+$mapper->findByColumn('a', $value)->getPropertyValues('id');
 ```
 
 ### 4.1.3 Queries in loops
@@ -109,14 +109,14 @@ Database connections cost time, as do their queries. Instead of repeatedly getti
  */
 $mapper->findByColumn('a', [1,2,3,4,5,6]);
 
-/* Don't: Get them all individually 
+/* Don't: Get them all individually
  */
 foreach ([1,2,3,4,5,6] as $current) {
     $allResults[] = $mapper->findByColumn('a', $current);
 }
 ```
 
-Note that if you are using your own special queries and PDO, there's a `WHERE IN` equivalent in prepared statements.  
+Note that if you are using your own special queries and PDO, there's a `WHERE IN` equivalent in prepared statements.
 
 ```php
 /* Do: Collate a set of values to obtain in one query
@@ -124,7 +124,7 @@ Note that if you are using your own special queries and PDO, there's a `WHERE IN
 $values = [1,2,3,4,5,6];
 
 $query = "
-    SELECT * 
+    SELECT *
     FROM table
     WHERE FIND_IN_SET(a, :values)
 ";
@@ -136,16 +136,16 @@ $statement->execute([
 ```
 
 ## 4.2 Special Queries
-Less common or otherwise unique queries should be stored in supporting classes instead, which utilise an instance of a corresponding Mapper; otherwise people might misuse it. 
+Less common or otherwise unique queries should be stored in supporting classes instead, which utilise an instance of a corresponding Mapper; otherwise people might misuse it.
 
 One notable pitfall is taking a method that sort of does what you need, then you add what *you* need it to do without considering the impact it has elsewhere (or lack thereof).
 
 Eventually this method loses its specific purpose (reduces cohesion), touches and integrally affects numerous locations (high coupling) and evolves into technical debt. There's been a real-life example of this in an earlier incarnation of `findByParent($id)` in Folder Mapper; not only does it get a parent, but also a count of assessments and a set of configurations.
 
 > Break away specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->prepare()`
- 
+
 An example class follows. Obviously this is a fairly contrived example, but you have an entire class in which to organise your algorithms.
- 
+
 ```php
 class Cat {
     const SPECIAL_FOLDER = 237;
@@ -156,7 +156,7 @@ class Cat {
     public function __construct(Folder\Mapper $folderMapper) {
         $this->setFolderMapper($folderMapper);
     }
-    
+
     /**
      * Do a very specific query that nobody else really needs to know about
      * You can still use these convenience methods to save you from some hardcoding
@@ -167,23 +167,23 @@ class Cat {
             FROM {$folderMapper->getTable()}
             WHERE {$folderMapper->getIdentifierColumn()} = :specialFolder
         ";
-    
+
         $statement = $this->getFolderMapper()->getDatabase()->prepare($query);
         $statement->execute([
             'specialFolder' => self::SPECIAL_FOLDER
         ]);
-        
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             new \Alaress_Probe($row);
         }
     }
 }
-``` 
- 
-## 4.3 Default Hydration
-Some hierarchical objects require complex hydration to take place - for example, File instances need Folder, User and Mimetypes also hydrated for it to be meaningful. 
+```
 
-However, manually defining and constructing this every time you do a database query is longwinded and unnecessary because we can define the default hydration that applies to base `findBy*` methods. This also prevents the usual copy-paste that would otherwise be required. 
+## 4.3 Default Hydration
+Some hierarchical objects require complex hydration to take place - for example, File instances need Folder, User and Mimetypes also hydrated for it to be meaningful.
+
+However, manually defining and constructing this every time you do a database query is longwinded and unnecessary because we can define the default hydration that applies to base `findBy*` methods. This also prevents the usual copy-paste that would otherwise be required.
 
 Instead, we only need to do it once by specifying three methods in our Mapper:
 
@@ -233,7 +233,7 @@ protected function hydrateSelect(\PDOStatement $statement)
     $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
     $collection = new Collection();
-    
+
     while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
         /* Assemble event pieces
@@ -245,20 +245,20 @@ protected function hydrateSelect(\PDOStatement $statement)
         /** @var User $authorItem */
         $authorItem = $authorMapper->hydrate($row, 'a');
         $eventItem->setAuthor($authorItem);
-        
+
         ...
         ...
         ...
-        
+
         $collection->add($eventItem);
     }
-    
+
     return $collection;
 }
 ```
 
 ## 4.4 Caching
-Due to the frequency of hydrations and the need to reduce computational overhead, there's a caching system built into all the base mapper methods prefixed by `find`, such as `findById()`, `findByColumn()`, `findByColumnList()` etc. 
+Due to the frequency of hydrations and the need to reduce computational overhead, there's a caching system built into all the base mapper methods prefixed by `find`, such as `findById()`, `findByColumn()`, `findByColumnList()` etc.
 
 The cache remembers global instantiations of objects. If it was retrieved at some point in the past, it won't be fetched and rehydrated. This saves on some processing at the expense of storage space. We used to make our own hashtables locally but that tradition has since been superseded by the mapper cache.
 
@@ -286,14 +286,14 @@ These base methods should solve most of your database retrieval needs. You can p
 * `findIdsByColumn()` Finds only the scalar ID value of records matched, rather than the full objects, for associative array of column-value pairs.
 * `findByPredicates()` Finds a set of models that match the provided predicates (builds a `WHERE` clause using objects)
 * `findByIdWithFallback()` Finds exactly one model, even if it's been soft-deleted.
-    
+
 There are other public methods in the Mapper which you might find useful in more specific situations.
 
 Note that some methods allow you to specify an `$options` array. In this array you can supply settings for ordering, limits, whether to bypass the cache and whether to include deleted records.
 
 ```php
 $user = $userMapper->findByColumnList(
-    ['username' => $username], 
+    ['username' => $username],
     [
         'cache' => false,
         'deleted' => false,

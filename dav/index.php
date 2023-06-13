@@ -56,4 +56,4 @@ $authBackendFactory = new DAV_Auth_Factory($config);
 $authPlugin         = new Sabre\DAV\Auth\Plugin($authBackendFactory->build());
 $server->addPlugin($authPlugin);
 $server->setBaseUri('/');
-$server->exec();
+$server->start();

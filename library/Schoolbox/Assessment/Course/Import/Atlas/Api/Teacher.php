@@ -88,7 +88,7 @@ class Teacher implements JsonSerializable
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id'        => $this->id,

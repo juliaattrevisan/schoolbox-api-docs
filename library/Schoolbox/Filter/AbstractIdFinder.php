@@ -116,7 +116,7 @@ abstract class AbstractIdFinder implements IdFinder
     protected function buildRegistry(Mapper $filterMapper, IMapper $entityMapper)
     {
         $filterInstances = $filterMapper->findForEntity(get_class($entityMapper));
-        $filterClasses   = $filterInstances->getColumnValues('class');
+        $filterClasses   = $filterInstances->getPropertyValues('class');
         $this->registry  = array_combine($filterClasses, $filterClasses);
     }
 

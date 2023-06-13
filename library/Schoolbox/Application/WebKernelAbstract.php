@@ -19,6 +19,7 @@ use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
 use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
+use Schoolbox\Deprecation\Registry;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
@@ -96,8 +97,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      *
      * @param \Exception|array $e
      * @param array            $stack
+     * @return bool
      */
-    public function shutdownSafely($e = null, $stack = null): void
+    public function shutdownSafely($e = null, $stack = null): bool
     {
         $isException = false;
         if ($e instanceof Throwable) {
@@ -126,9 +128,10 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         // it's almost a guarantee that some kind of minor error will have occurred at some point
         if ($error !== null) {
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
+            $errorType = ((int)$error['type']);
             if (
                 $isException
-                || ((int)$error['type'] & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
+                || ($errorType & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
             ) {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
@@ -207,8 +210,13 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     }
                 }
                 $this->outputError($e, $message, $info, $error, $code);
+            } elseif ($errorType & (E_DEPRECATED | E_USER_DEPRECATED)) {
+                // Deprecation notices:
+                // silence (for now) if raised in a vendor library
+                return Registry::silenceWarningsForPath($error['file']);
             }
         }
+        return true;
     }
 
     /**
@@ -216,16 +224,23 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      */
     protected function registerErrorHandling(): void
     {
-        // noop. WebRequest does not use custom error handling
-        set_error_handler(function ($code, $message, $file, $line) {
-            $this->shutdownSafely([
-                'type' => $code,
-                'message' => $message,
-                'file' => $file,
-                'line' => $line
-            ], debug_backtrace());
-            return true;
-        }, E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR);
+        // Temporarily handle deprecation warnings, so that they may be
+        // temporarily ignored.
+        // We cannot catch 'em all (yet).
+        set_error_handler(
+            function ($code, $message, $file, $line) {
+                return $this->shutdownSafely(
+                    [
+                        'type'    => $code,
+                        'message' => $message,
+                        'file'    => $file,
+                        'line'    => $line
+                    ],
+                    debug_backtrace(),
+                );
+            },
+            E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR | E_DEPRECATED | E_USER_DEPRECATED,
+        );
     }
 
     /**

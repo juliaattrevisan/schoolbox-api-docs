@@ -1401,7 +1401,7 @@ class MapperProxy
      */
     public function sequenceAssessments(Collection $assessables)
     {
-        $this->baseMapper->sequenceAssessments($assessables->getColumnValues('id'));
+        $this->baseMapper->sequenceAssessments($assessables->getPropertyValues('id'));
     }
 
     /**

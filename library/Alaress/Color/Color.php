@@ -15,7 +15,7 @@ namespace Alaress\Color;
 
 use SSNepenthe\ColorUtils;
 
-class Color implements \Serializable
+class Color
 {
     /**
      * @var ColorUtils\Colors\Color
@@ -288,38 +288,35 @@ class Color implements \Serializable
 
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * String representation of object
+     * Array representation of object
      *
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             'r' => $this->getRed(),
             'g' => $this->getGreen(),
             'b' => $this->getBlue(),
             'a' => $this->getAlpha(),
-        ]);
+        ];
     }
 
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
      * Constructs the object
      *
-     * @link http://php.net/manual/en/serializable.unserialize.php
-     *
-     * @param string $serialized <p>
-     *                           The string representation of the object.
-     *                           </p>
+     * @param array $serialized
      *
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $data = unserialize($serialized);
-        $this->colorObject = ColorUtils\rgba($data['r'], $data['g'], $data['b'], $data['a']);
+        $this->colorObject = ColorUtils\rgba(
+            $serialized['r'],
+            $serialized['g'],
+            $serialized['b'],
+            $serialized['a'],
+        );
     }
 }

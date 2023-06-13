@@ -276,26 +276,6 @@ parameters:
 			path: library/Alaress/Date/Test/LaravelTimestampAlaressDateRelativeTest.php
 
 		-
-			message: "#^Function mssql_get_last_message not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
-			message: "#^Function mssql_num_rows not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
-			message: "#^Function mssql_query not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
-			message: "#^Function mssql_rows_affected not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
 			message: "#^Instanceof between null and Throwable will always evaluate to false\\.$#"
 			count: 1
 			path: library/Alaress/Jitter/Jitter.php
@@ -494,11 +474,6 @@ parameters:
 			message: "#^Constructor of class Alaress_Submarine has an unused parameter \\$_\\.$#"
 			count: 1
 			path: library/Alaress/Submarine.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Alaress/Test/MultibytePathInfoTest.php
 
 		-
 			message: "#^Method Alaress_Validator_Abstract\\:\\:setValue\\(\\) should return bool but return statement is missing\\.$#"
@@ -1891,16 +1866,6 @@ parameters:
 			path: library/MyFile.php
 
 		-
-			message: "#^Access to an undefined property Page\\:\\:\\$arg\\.$#"
-			count: 1
-			path: library/Page.php
-
-		-
-			message: "#^Constructor of class Page has an unused parameter \\$error\\.$#"
-			count: 1
-			path: library/Page.php
-
-		-
 			message: "#^Cannot access offset 'name' on true\\.$#"
 			count: 1
 			path: library/PortfolioWebDAV.php
@@ -2321,11 +2286,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Cache/Vcal.php
 
 		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Config\\\\Base\\:\\:\\$data \\(Schoolbox\\\\Collection\\) does not accept array\\<string, mixed\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Config/Filter.php
-
-		-
 			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\:\\:getRoleCollection\\(\\) should return iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
@@ -2409,11 +2369,6 @@ parameters:
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Schoolbox\\\\Calendar\\\\Relation\\\\RoleMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Relation/RoleMapper.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\User\\:\\:method\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
 
 		-
 			message: "#^Property Schoolbox\\\\Campus\\:\\:\\$cycleIdentifier is unused\\.$#"
@@ -5449,11 +5404,6 @@ parameters:
 			message: "#^Return type \\(Schoolbox\\\\Resource\\\\Storage\\\\IStorage\\|null\\) of method Schoolbox\\\\Resource\\\\AbstractFolder\\:\\:getCoverImage\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\:\\:getCoverImage\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/AbstractFolder.php
-
-		-
-			message: "#^Access to an undefined property Schoolbox\\\\Resource\\\\Attachment\\\\AbstractController\\:\\:\\$template\\.$#"
-			count: 2
-			path: library/Schoolbox/Resource/Attachment/AbstractController.php
 
 		-
 			message: "#^Strict comparison using \\=\\=\\= between false and string will always evaluate to false\\.$#"

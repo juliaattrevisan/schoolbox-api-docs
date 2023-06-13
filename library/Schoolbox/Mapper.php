@@ -57,7 +57,7 @@ use function array_keys;
 use function array_map;
 use function count;
 
-abstract class Mapper implements IMapper, Serializable
+abstract class Mapper implements IMapper
 {
     /**
      * Represents a boolean data type.
@@ -2799,7 +2799,7 @@ abstract class Mapper implements IMapper, Serializable
         } catch (UnderflowException $e) {
             return [];
         }
-        if (count($rows)) {
+        if ($rows !== false) {
             /** @var IColumnType[] $hydrators */
             $hydrators = [];
             foreach ($columnList as $column) {
@@ -2867,7 +2867,7 @@ abstract class Mapper implements IMapper, Serializable
         // (the column: whatever the key is in this model.)
         $join_identifier = $this->getJoinDefinition($join);
         $mapping         = $this->map->getOffsetByColumn($join_identifier['this_key']);
-        $key_value_list  = $this->getModelAsCollection($object)->getColumnValues($mapping['property']);
+        $key_value_list  = $this->getModelAsCollection($object)->getPropertyValues($mapping['property']);
         // If the join is a many or one to one relation:
         // it is likely that each value is an object (because the mapping was defined as a model type).
         $join_mapper = $this->getJoinMapper($join);
@@ -3359,59 +3359,67 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Retrieves SQL for building a join that has been defined in hasJoin().
      *
-     * @param string $name        The join's identifier as passed in hasJoin().
-     * @param string $this_alias  The alias to use for this side of the join,
-     *                            defaults to this mapper's table name.
-     * @param string $other_alias The alias to use for the other side of the
-     *                            join, defaults to other mapper's table name.
-     * @param bool $joinDeleted   If true, soft-deleted rows in the joined table
-     *                            will not be filtered out.
-     *                            Defaults to false, as usually you want to
-     *                            ignore the existence of soft-deleted rows.
+     * @param string      $name        The join's identifier as passed in
+     *                                 hasJoin().
+     * @param string|null $thisAlias   The alias to use for this side of the
+     *                                 join, defaults to this mapper's table
+     *                                 name.
+     * @param string|null $otherAlias  The alias to use for the other side of
+     *                                 the join, defaults to other mapper's
+     *                                 table name.
+     * @param bool        $joinDeleted If true, soft-deleted rows in the joined
+     *                                 table will not be filtered out.
+     *                                 Defaults to false, as usually you want to
+     *                                 ignore the existence of soft-deleted
+     *                                 rows.
      *
      * @return string
      * @throws Mapper\DefinitionException if join $name isn't on this mapper
      */
-    public function getJoinSql($name, $this_alias = '', $other_alias = '', $joinDeleted = false)
-    {
-        $join         = $this->getJoinDefinition($name);
-        $this_table   = $this->getTable();
-        $other_mapper = $this->getJoinMapper($name);
-        $other_table  = $other_mapper->getTable();
-        if (strlen($this_alias) === 0) {
-            $this_alias = $this_table;
+    public function getJoinSql(
+        string $name,
+        ?string $thisAlias = '',
+        ?string $otherAlias = '',
+        bool $joinDeleted = false,
+    ): string {
+        $join        = $this->getJoinDefinition($name);
+        $thisTable   = $this->getTable();
+        $otherMapper = $this->getJoinMapper($name);
+        $otherTable  = $otherMapper->getTable();
+        if (strlen($thisAlias ?? '') === 0) {
+            $thisAlias = $thisTable;
         }
-        if (strlen($other_alias) === 0) {
-            $other_alias = $other_table;
+        if (strlen($otherAlias ?? '') === 0) {
+            $otherAlias = $otherTable;
         }
         $params = array(
-            ':this_alias'  => $this_alias,
+            ':this_alias'  => $thisAlias,
             ':this_key'    => $join['this_key'],
-            ':other_table' => $other_table,
-            ':other_alias' => $other_alias,
+            ':other_table' => $otherTable,
+            ':other_alias' => $otherAlias,
             ':other_key'   => $join['other_key'],
         );
         if (isset($join['multi'])) {
             // LEFT JOIN ...
-            $join_sql                 = '`:via_table`   AS `:via_alias`   ON `:this_alias`.`:this_key`   = `:via_alias`.`:via_this_key`
+            $joinSql                  = '`:via_table`   AS `:via_alias`   ON `:this_alias`.`:this_key`   = `:via_alias`.`:via_this_key`
             LEFT JOIN    `:other_table` AS `:other_alias` ON `:other_alias`.`:other_key` = `:via_alias`.`:via_other_key`';
             $params[':via_table']     = $join['multi']['via_table'];
             $params[':via_this_key']  = $join['multi']['this_key'];
             $params[':via_other_key'] = $join['multi']['other_key'];
-            $params[':via_alias']     = "v_$other_alias";
+            $params[':via_alias']     = "v_$otherAlias";
         } else {
-            $join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+            $joinSql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
         }
         if (!$joinDeleted) {
-            $filterSoftDeleteSql = $other_mapper->getSoftDeleteFilterSql($other_alias);
+            $filterSoftDeleteSql = $otherMapper->getSoftDeleteFilterSql($otherAlias);
             if ($filterSoftDeleteSql !== '') {
-                $join_sql .= ' AND ' . $filterSoftDeleteSql;
+                $joinSql .= ' AND ' . $filterSoftDeleteSql;
             }
         }
         if (isset($join['extra']) && strlen($join['extra']) > 0) {
-            $join_sql .= ' AND ' . $join['extra'];
+            $joinSql .= ' AND ' . $join['extra'];
         }
-        return strtr($join_sql, $params);
+        return strtr($joinSql, $params);
     }
 
     /**
@@ -3578,7 +3586,10 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function getLocalObjectCacheKey(Mapper $mapper, array $row, $alias = '')
     {
-        $idCol = trim($mapper->getIdentifierColumn());
+        $idCol = $mapper->getIdentifierColumn();
+        if (isset($idCol)) {
+            $idCol = trim($idCol);
+        }
 
         if (empty($idCol)) {
             // this occurs on things that fundamentally are join tables, so lack a single primary key
@@ -3624,7 +3635,7 @@ abstract class Mapper implements IMapper, Serializable
     public function hydrateCollection($collection, $identifier = null)
     {
         $identifier = $identifier ? : $this->getIdentifier();
-        return $this->findByColumn($identifier['column'], $collection->getColumnValues($identifier['property']));
+        return $this->findByColumn($identifier['column'], $collection->getPropertyValues($identifier['property']));
     }
 
     /**
@@ -4079,24 +4090,23 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * String representation of object
+     * Array representation of object
      *
-     * @return string the string representation of the object or null
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        // we don't need to serialize anything other than the name of the class
-        return '';
+        return [];
     }
 
     /**
      * Constructs the object
      *
-     * @param string $serialized
+     * @param array $serialized
      *
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         // don't need to do anything but run the constructor
         $this->__construct();
@@ -4217,8 +4227,8 @@ abstract class Mapper implements IMapper, Serializable
         unset($updated[null]);
 
         // extract IDs
-        $existingIds = $existing->getColumnValues($foreignIdProperty);
-        $updatedIds  = $updated->getColumnValues($foreignIdProperty);
+        $existingIds = $existing->getPropertyValues($foreignIdProperty);
+        $updatedIds  = $updated->getPropertyValues($foreignIdProperty);
 
         // determine what to do
         $delete = array_diff($existingIds, $updatedIds);

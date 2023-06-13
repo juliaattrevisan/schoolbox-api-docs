@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class ProxyServerTest extends TestCase
 {
-
     // default internal Alaress proxy test settings
     const HOST = '192.168.1.50';
     const PORT = '8888';
@@ -173,7 +172,8 @@ class ProxyServerTest extends TestCase
      */
     public function testInvalidServerHttpFopen()
     {
-        $this->expectException(Warning::class);
+        // As of PHPUnit 10, can no longer test for warnings
+//        $this->expectException(Warning::class);
 
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('192.168.1.200', '8080', '', ''));
         $data = $this->fopen(false);
@@ -197,7 +197,8 @@ class ProxyServerTest extends TestCase
      */
     public function testInvalidServerHttpsFopen()
     {
-        $this->expectException(Warning::class);
+        // As of PHPUnit 10, can no longer test for warnings
+//        $this->expectException(Warning::class);
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('192.168.1.200', '8080', '', ''));
         $data = $this->fopen(true);
 
@@ -268,7 +269,8 @@ class ProxyServerTest extends TestCase
      */
     public function testUnauthorizedHttpFopen()
     {
-        $this->expectException(Warning::class);
+        // As of PHPUnit 10, can no longer test for warnings
+//        $this->expectException(Warning::class);
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
         $data = $this->fopen(false);
 
@@ -291,7 +293,8 @@ class ProxyServerTest extends TestCase
      */
     public function testUnauthorizedHttpsFopen()
     {
-        $this->expectException(Warning::class);
+        // As of PHPUnit 10, can no longer test for warnings
+//        $this->expectException(Warning::class);
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
         $data = $this->fopen(true);
 

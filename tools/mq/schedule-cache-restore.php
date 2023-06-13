@@ -44,7 +44,8 @@ try {
          * @var array $opts
          */
 
-        // the passive part is important: it means the queue won't be created if it doesn't already exist
+        // the passive part is important:
+        // it means the queue won't be created if it doesn't already exist
         $mq = (new ConnectorFactory($di->get('config')))->build(['passive' => true]);
         $q  = Schedule\Broker::QUEUE;
 

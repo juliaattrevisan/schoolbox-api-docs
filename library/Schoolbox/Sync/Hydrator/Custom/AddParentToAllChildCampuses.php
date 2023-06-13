@@ -60,7 +60,7 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
             $childIds = $this->externalUserHandler->getEnrolledStudents($input->getId());
 
             if (is_array($childIds)) {
-                $oldCampuses = $newCampuses = $previous->getCampusCollection()->getColumnValues('id');
+                $oldCampuses = $newCampuses = $previous->getCampusCollection()->getPropertyValues('id');
 
                 $children = $this->userMapper->createCollection();
 

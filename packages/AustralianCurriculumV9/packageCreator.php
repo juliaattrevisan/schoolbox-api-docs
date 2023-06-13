@@ -15,6 +15,8 @@ function processRowsSubStrand($handle, array &$output_rows, int $lastSubject_id,
 
     while (($row = fgetcsv($handle)) !== false) {
         // Sanitize the description, and remove the nbsp characters...
+        // (Suppress inspection: `$row` can't possibly be false here)
+        /** @noinspection PhpAutovivificationOnFalseValuesInspection */
         $row[0] = str_replace(' ', ' ', $row[0]);
 
         $node_id = count($output_rows) + 1;
