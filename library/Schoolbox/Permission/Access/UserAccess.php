@@ -49,13 +49,6 @@ class UserAccess implements IModel
 
     /**
      * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the leave management
-     * system.
-     */
-    public const SERVICE_HOUSEMASTER = 6;
-
-    /**
-     * Value for $this->service:
      * $this->user has $this->accessLevel permission for the resource booking
      * system.
      */
@@ -177,7 +170,6 @@ class UserAccess implements IModel
             self::SERVICE_CALENDAR,
             self::SERVICE_NEWS,
             self::SERVICE_CMS,
-            self::SERVICE_HOUSEMASTER,
             self::SERVICE_RESOURCE_BOOKING,
             self::SERVICE_CURRICULUM,
             self::SERVICE_PASTORAL,
@@ -196,7 +188,6 @@ class UserAccess implements IModel
         return [
             self::SERVICE_HOMEPAGE,
             self::SERVICE_CALENDAR,
-            self::SERVICE_HOUSEMASTER,
         ];
     }
 

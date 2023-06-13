@@ -239,7 +239,7 @@ class Group extends DeprecatedModel
 
         $params          = [];
         $serviceIdFilter = '';
-        if (in_array($this->_service, array(UserAccess::SERVICE_CALENDAR, UserAccess::SERVICE_HOUSEMASTER))) {
+        if ($this->_service == UserAccess::SERVICE_CALENDAR) {
             $serviceIdFilter = "AND sid = ?";
             $params[] = $relationID;
         }
@@ -260,10 +260,11 @@ class Group extends DeprecatedModel
         $permission = (int)$permission;
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
-        if ($user->getRole()->isStaff()
-            && (Config::get('news_staff_post_enabled') == '1')
-            && ($this->_service == UserAccess::SERVICE_NEWS)
-            && ($permission < UserAccess::ACCESS_WRITE)
+        if (
+            $user->getRole()->isStaff()
+            && Config::get('news_staff_post_enabled') == '1'
+            && $this->_service == UserAccess::SERVICE_NEWS
+            && $permission < UserAccess::ACCESS_WRITE
         ) {
             $permission = UserAccess::ACCESS_WRITE;
         }
