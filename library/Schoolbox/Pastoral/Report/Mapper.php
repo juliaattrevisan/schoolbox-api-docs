@@ -245,9 +245,11 @@ class Mapper extends BaseMapper
     {
         $sql = "
             SELECT {$this->getColumnString('report')},
-                   {$this->getJoinColumnString('access', 'access')}
+                   {$this->getJoinColumnString('access', 'access')},
+                   {$this->getJoinColumnString('severity', 'severity')}
             FROM `{$this->getTable()}` `report`
             LEFT JOIN `pastoral_report_access` `access` ON `access`.`pastoral_report_id` = `report`.`id`
+            LEFT JOIN `lu_pastoral_severity` `severity` ON `severity`.`id` = `report`.`severity_id`
             WHERE `report`.`deleted_at` IS NULL
                   AND (`report`.`authors` IS NULL OR CONCAT(',', `report`.`authors`, ',') LIKE :authorLike)
                   AND (`report`.`students` IS NULL OR CONCAT(',', `report`.`students`, ',') LIKE :studentLike)
@@ -280,7 +282,9 @@ class Mapper extends BaseMapper
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             // show all severity levels = severity_id = null
             if ($pastoral->getSeverity()) {
-                $wheres[]                   = "(`severity_id` IS NULL OR :severitySequence >= `severity_id`)";
+                // higher the sequence, higher the severity
+                // find report's record's severity's sequence
+                $wheres[]                   = "(`severity_id` IS NULL OR :severitySequence >= `severity`.`sequence`)";
                 $params['severitySequence'] = $pastoral->getSeverity()->getSequence();
             } else {
                 $wheres[] = "`severity_id` IS NULL";
