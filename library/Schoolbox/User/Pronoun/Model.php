@@ -19,22 +19,22 @@ class Model implements ISoftDeletable, Sequential
     public const OBJECTIVE_DEFAULT = 'them';
     public const POSSESSIVE_DEFAULT = 'their';
 
-    protected string $subjective = self::SUBJECTIVE_DEFAULT;
-    protected string $objective = self::OBJECTIVE_DEFAULT;
-    protected string $possessive = self::POSSESSIVE_DEFAULT;
+    protected ?string $subjective = self::SUBJECTIVE_DEFAULT;
+    protected ?string $objective = self::OBJECTIVE_DEFAULT;
+    protected ?string $possessive = self::POSSESSIVE_DEFAULT;
 
     /**
-     * @param string $subjective
+     * @param ?string $subjective
      */
-    public function setSubjective(string $subjective): void
+    public function setSubjective(?string $subjective): void
     {
         $this->subjective = $subjective;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getSubjective(): string
+    public function getSubjective(): ?string
     {
         return $this->subjective;
     }
@@ -42,15 +42,15 @@ class Model implements ISoftDeletable, Sequential
     /**
      * @param string $objective
      */
-    public function setObjective(string $objective): void
+    public function setObjective(?string $objective): void
     {
         $this->objective = $objective;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getObjective(): string
+    public function getObjective(): ?string
     {
         return $this->objective;
     }
@@ -59,16 +59,16 @@ class Model implements ISoftDeletable, Sequential
      * @param string $possessive
      */
 
-    public function setPossessive(string $possessive): void
+    public function setPossessive(?string $possessive): void
     {
         $this->possessive = $possessive;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
 
-    public function getPossessive(): string
+    public function getPossessive(): ?string
     {
         return $this->possessive;
     }
