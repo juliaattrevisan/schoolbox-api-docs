@@ -67,27 +67,15 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 }
             }
 
-            // Render the component just moved, so it can be re-rendered
-            if ($_POST['movedComponentId'] ?? false) {
-                $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+            // Check if the component has been deleted, so the client can display a warning
+            // otherwise, the client will just re-render the component
+            if ($_POST['movedComponentId']) {
+                $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
                 if (is_object($instance)) {
-                    $cClass = $instance->getDefinition()->getClass();
+                    $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
                 } else {
-                    exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
+                    $page->outputJson(['hasComponentBeenDeleted' => true], false, 200);
                 }
-                $factoryFactory   = new Component_FactoryFactory();
-                $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
-                $renderer         = new Component_Renderer();
-                $eportfolioPage   = new Eportfolio_Page_Instance(
-                    $page,
-                    $eportfolioHandler->getPageInstance()->getOwner()->getId(),
-                    $eportfolioHandler->getPageId(),
-                    UserAccess::ACCESS_FULL
-                );
-
-                /** @var Component_Eportfolio_ControllerAbstract $component */
-                $component = $componentFactory->buildComponent($instance);
-                $renderer->renderEportfolioComponent($page, $eportfolioPage, $component);
             }
         } elseif (is_numeric($_POST['delete'] ?? false)) {
             // Delete the instance and its configuration
