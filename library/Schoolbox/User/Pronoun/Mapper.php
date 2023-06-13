@@ -10,7 +10,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('luPronoun');
+        $this->hasTable('pronoun');
         $this->hasModel(Model::class);
         $this->hasMap(
             array(
