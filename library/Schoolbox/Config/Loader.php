@@ -128,4 +128,15 @@ class Loader implements IConfigLoader
             self::$allConfigs = ConfigMapper::getInstance()->findAllConfigs();
         }
     }
+
+    /**
+     * The config loader may contain sensitive information: therefore, its debug
+     * info should be cleared.
+     *
+     * @return array
+     */
+    public function __debugInfo(): array
+    {
+        return [];
+    }
 }
