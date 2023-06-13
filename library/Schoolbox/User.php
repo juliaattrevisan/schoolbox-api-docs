@@ -27,6 +27,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User\Pronoun\Model;
 use SensitiveParameter;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
@@ -269,6 +270,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** If set, it'll be used to format name, instead of Config option */
     private ?string $nameFormat = null;
 
+    private ?Model $pronoun = null;
 
     public function __construct()
     {
@@ -1399,5 +1401,22 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             }
         }
         return false;
+    }
+
+    /**
+     * @param Model|null $pronoun
+     */
+    public function setPronoun(?Model $pronoun): self
+    {
+        $this->pronoun = $pronoun;
+        return $this;
+    }
+
+    /**
+     * @return Model|null
+     */
+    public function getPronoun(): ?Model
+    {
+        return $this->pronoun;
     }
 }
