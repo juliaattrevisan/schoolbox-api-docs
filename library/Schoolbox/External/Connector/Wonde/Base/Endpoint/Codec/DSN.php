@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec;
 
 use DomainException;
 use Schoolbox\External\Importer\Endpoint\IDSN;
-
 use SensitiveParameter;
 
 use function count;
@@ -29,7 +28,6 @@ use function count;
  */
 class DSN implements IDSN
 {
-
     /**
      * DSN format
      */

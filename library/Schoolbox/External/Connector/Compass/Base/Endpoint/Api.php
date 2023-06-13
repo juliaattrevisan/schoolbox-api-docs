@@ -23,7 +23,6 @@ use SensitiveParameter;
  */
 class Api implements IApi
 {
-
     /**
      * Request timeout
      */

@@ -20,7 +20,6 @@ use SensitiveParameter;
  */
 class Status implements IStatus
 {
-
     /**
      * @var IApi
      */

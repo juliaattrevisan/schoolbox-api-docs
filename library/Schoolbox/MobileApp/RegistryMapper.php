@@ -27,7 +27,6 @@ use SensitiveParameter;
  */
 class RegistryMapper extends Mapper
 {
-
     /**
      * @return void
      */

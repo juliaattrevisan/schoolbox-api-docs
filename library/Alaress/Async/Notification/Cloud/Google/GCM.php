@@ -27,7 +27,6 @@ use SensitiveParameter;
  */
 class GCM extends AbstractService
 {
-
     const GCM_API_URI = 'https://fcm.googleapis.com/fcm/send';
     const MAX_PAYLOAD = 4096;
     const MAX_TOKENS  = 1000;

@@ -20,7 +20,6 @@ use UnexpectedValueException;
 
 class SessionValidator
 {
-
     /** @var ClientInterface */
     protected $redis;
 

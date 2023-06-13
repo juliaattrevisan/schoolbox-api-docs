@@ -20,8 +20,6 @@ use SensitiveParameter;
  */
 class Status implements IStatus
 {
-
-
     /**
      * @var string
      */

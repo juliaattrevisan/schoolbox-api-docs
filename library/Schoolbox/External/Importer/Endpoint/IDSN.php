@@ -13,7 +13,6 @@ use SensitiveParameter;
 
 interface IDSN
 {
-
     /**
      * Take a DSN string and break it down into its constituent parts
      *

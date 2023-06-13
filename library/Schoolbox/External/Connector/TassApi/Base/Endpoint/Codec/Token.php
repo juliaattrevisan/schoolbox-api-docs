@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use External\Tass\Api\Exception\InvalidApiKey;
-
 use SensitiveParameter;
 
 use function base64_decode;

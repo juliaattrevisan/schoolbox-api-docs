@@ -22,7 +22,6 @@ use SimpleXMLElement;
  */
 class Receiver
 {
-
     /**
      * The prefixes we can expect to receive
      * These are the SMSDirectoryData node's @sync attribute

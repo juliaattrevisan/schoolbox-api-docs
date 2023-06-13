@@ -21,7 +21,6 @@ use SensitiveParameter;
  */
 class ValidEventPhotosAvailable extends ValidGeosnapshotAvailable
 {
-
     /**
      * @param string|null $apiKey
      * @param bool        $featureFlag

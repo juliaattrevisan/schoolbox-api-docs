@@ -21,7 +21,6 @@ use SensitiveParameter;
  */
 class WeatherstackClient
 {
-
     /**
      * Used to extract a particular data node out of the apixu payload
      * The node represents today's data

@@ -22,7 +22,6 @@ use SensitiveParameter;
  */
 class DSN implements IDSN
 {
-
     /**
      * Decode a dsn string
      *
