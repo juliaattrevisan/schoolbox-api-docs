@@ -75,14 +75,14 @@ class SubjectMapper extends Schoolbox\External\Mapper
 
 
     /**
-    * Gets all subjects for the given student/staff.
-    * This returns subjects only in SB
-    *
-     * @param User $user
-     * @param User $viewer
+     * Gets all subjects for the given student/staff.
+     * This returns subjects only in SB
+     *
+     * @param User      $user
+     * @param User|null $viewer
      * @return SubjectCollection
      */
-    public function findAllForUser(User $user, User $viewer): SubjectCollection
+    public function findAllForUser(User $user, ?User $viewer): SubjectCollection
     {
         $subjects = $this->external_user->getSubjectList($user);
 
@@ -100,7 +100,7 @@ class SubjectMapper extends Schoolbox\External\Mapper
                 continue;
             }
             try {
-                $folderAccess = $access->getFolderAccess($viewer, $folder->getId());
+                $folderAccess = !$viewer ? Schoolbox\Permission\Access\UserAccess::ACCESS_DENY : $access->getFolderAccess($viewer, $folder->getId());
             } catch (Schoolbox\Mapper\Exception $e) {
                 $folderAccess = Schoolbox\Permission\Access\UserAccess::ACCESS_DENY;
             }

@@ -15,7 +15,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Side\Mapper as MenuItemMapper;
 use Schoolbox\Menu\Side\Section\Mapper as MenuSectionMapper;
 use Schoolbox\Menu\Side\Section\Model as MenuSideSection;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
@@ -32,7 +31,6 @@ class SideMenu implements IDataGenerator
      * @param MenuSectionMapper $menuSectionMapper
      * @param MenuItemMapper    $menuItemMapper
      * @param BookmarkMapper    $bookmarkMapper
-     * @param Access            $access
      */
     public function __construct(
         private IConfigLoader $config,
@@ -40,7 +38,6 @@ class SideMenu implements IDataGenerator
         private MenuSectionMapper $menuSectionMapper,
         private MenuItemMapper $menuItemMapper,
         private BookmarkMapper $bookmarkMapper,
-        private Access $access
     ) {
     }
 

@@ -867,7 +867,6 @@ abstract class Kernel
                         $sideMenuSectionMapper,
                         $sideMenuMapper,
                         $bookMarkMapper,
-                        $access
                     )
                 )
                 ->addDataGenerator('scripts', new Output\DataGenerator\Scripts($config, $_SERVER));
