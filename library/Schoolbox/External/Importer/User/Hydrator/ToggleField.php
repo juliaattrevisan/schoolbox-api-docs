@@ -25,7 +25,6 @@ use SensitiveParameter;
  */
 class ToggleField extends Field
 {
-
     /**
      * Constructor
      *

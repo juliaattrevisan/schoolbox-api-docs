@@ -12,7 +12,6 @@ use Behat\Mink\Element;
 
 class Subcontext_CoreContext extends BaseContext
 {
-
     /**
      * Resets the database to a known clean state.
      *

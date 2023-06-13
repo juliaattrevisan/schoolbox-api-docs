@@ -22,7 +22,6 @@ use SensitiveParameter;
  */
 class BunnyControl implements ControlInterface
 {
-
     const QUEUES                = 'queues';
     const QUEUE_NAME            = 'name';
     const QUEUE_DURABLE         = 'durable';
