@@ -176,11 +176,6 @@
             // Table rows have changed, let DataTables know so it can correctly change the column widths
             table.rows().invalidate().draw();
 
-            /* The div in each th doesn't know the height it should be;
-             * it's meant to be equivalent to the width of a td
-             */
-
-
             // Formally disable setting of averages (they have been gone for a while)
             // $('[data-mark-sheet]').marksheetInputs();
 
