@@ -547,14 +547,33 @@ class Controller extends Base
                 return false;
         }
 
-        if (!$this->getConfigLoader()->get($configName)) {
-            return false;
+        /**
+         * Logic
+         * LMS setting set to off and no year level on the class page - do not show.
+         * LMS setting set to on and no year level on the class page - show.
+         * LMS setting set to off and year level on the class page to on - show.
+         * LMS setting set to off and year level on the class page to off - do not show.
+         * LMS setting set to off and clash on year levels (one says off the other on) - do not show.
+         * LMS setting set to on and clash on year levels (one says off the other on) - show.
+         */
+
+        // Has no Year level on folder: use LMS setting
+        if (0 === $folder->getYearLevels()->count()) {
+            return $this->getConfigLoader()->get($configName);
         }
-        if ($folder->getYearLevels()->count() === 0) {
-            return true;
-        }
+
+        // get options from folder year level
         $propertyValues = array_unique($folder->getYearLevels()->getPropertyValues($propertyName));
-        return count($propertyValues) > 1 ? true : (bool)$propertyValues[0];
+
+        // if the folders yearlevels have the requested setting as different values (some on / some off)
+        // use LMS setting
+        if (2 <= count($propertyValues)) {
+            return $this->getConfigLoader()->get($configName);
+        }
+
+        // year levels all agree on the setting, use year level setting
+        $getProp = "get" . $propertyName;
+        return $folder->getYearLevels()->first()->$getProp();
     }
 
     /**
