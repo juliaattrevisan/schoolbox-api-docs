@@ -24,8 +24,10 @@ $kernel = new Kernel();
 try {
     /* Since you can have identical file contents made by different authors
      * they can circumstantially be mistaken for one another
+     *
+     * It's called fileId purely because it matches the Module's params
      */
-    $submissionFileId = $_GET['submissionFileId'] ?? null;
+    $submissionFileId = $_GET['fileId'] ?? null;
 
     /* Generically exit early if no submission id provided
      */

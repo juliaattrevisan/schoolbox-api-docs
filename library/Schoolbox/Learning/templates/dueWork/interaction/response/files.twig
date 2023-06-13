@@ -15,7 +15,7 @@
         ) %}
         {% set downloadHref = previewHref ~ '?save=true' %}
     {% else %}
-        {% set previewHref = '/storage/fetch.php?hash=' ~ currentFile.hash %}
+        {% set previewHref = '/storage/submission.php?fileId=' ~ currentFile.id %}
         {% set downloadHref = previewHref ~ '&save=true' %}
     {% endif %}
     <div class="list-item">
