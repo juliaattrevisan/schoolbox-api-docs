@@ -79,9 +79,9 @@ class AssessmentAudit
 
         //grab all assignments and associated data
         $statement = $this->database->prepareQuery("SELECT
-        v_assessment_relation.assessment_id AS assessmentId,
+        mv_assessment_relation.assessment_id AS assessmentId,
         assessment.title AS assessmentTitle,
-        v_assessment_relation.folder_id AS folderId,
+        mv_assessment_relation.folder_id AS folderId,
         lu_work_type.name AS assessmentWorkType,
 
         course_implementation.folder_id as course_implementation_folder_id,
@@ -114,7 +114,7 @@ class AssessmentAudit
         unit_imp_folder.deleted_at, course_imp_spec_folder.deleted_at,
         course_spec_folder.deleted_at), true, false) as 'parentDeleted'
 
-        FROM v_assessment_relation
+        FROM mv_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
         JOIN submission_box ON assessment.id = submission_box.assessment_id
         LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
@@ -123,19 +123,19 @@ class AssessmentAudit
         LEFT JOIN submission_grade_group as gradeGroupTable ON submission_box.submission_grade_group_id = gradeGroupTable.id
         LEFT JOIN submission_grade_group as capabilityGradeGroupTable ON submission_box.rubric_capability_grade_group_id = capabilityGradeGroupTable.id
 
-        LEFT JOIN assessment_course_unit_implementation on v_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
-        LEFT JOIN course_specification on v_assessment_relation.course_specification_id = course_specification.id
-        LEFT JOIN course_implementation on v_assessment_relation.course_implementation_id = course_implementation.id
+        LEFT JOIN assessment_course_unit_implementation on mv_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
+        LEFT JOIN course_specification on mv_assessment_relation.course_specification_id = course_specification.id
+        LEFT JOIN course_implementation on mv_assessment_relation.course_implementation_id = course_implementation.id
         LEFT JOIN course_specification course_imp_spec on course_implementation.course_specification_id = course_imp_spec.id
-        LEFT JOIN course_unit_specification on v_assessment_relation.course_unit_specification_id = course_unit_specification.id
-        LEFT JOIN course_unit_implementation on v_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
+        LEFT JOIN course_unit_specification on mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
+        LEFT JOIN course_unit_implementation on mv_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
         LEFT JOIN course_unit_specification as course_unit_implementation_out on course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
         LEFT JOIN folder as unit_spec_folder on course_unit_specification.folder_id = unit_spec_folder.id
         LEFT JOIN folder as unit_imp_folder on course_unit_implementation_out.folder_id = unit_imp_folder.id
         LEFT JOIN folder as course_imp_spec_folder on course_imp_spec.folder_id = course_imp_spec_folder.id
         LEFT JOIN folder as course_spec_folder on course_specification.folder_id = course_spec_folder.id
 
-        WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
+        WHERE mv_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
         AND assessment.deleted_at IS NULL");
 
 

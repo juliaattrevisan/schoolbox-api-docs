@@ -432,8 +432,8 @@ class CourseCest
         $i->seeResponseCodeIs(200);
 
         # taking the class assessments ids for the activities exported above
-        $dueWorkUnitSpec1Id = $i->grabNumRecords('v_assessment_relation');
-        $taskUnitSpec1Id = $i->grabNumRecords('v_assessment_relation');
+        $dueWorkUnitSpec1Id = $i->grabNumRecords('mv_assessment_relation');
+        $taskUnitSpec1Id = $i->grabNumRecords('mv_assessment_relation');
         #WHEN removes 1 due work already exported to the class
         $assessmentPayloadDelete = new Payload\Course\Specification\Delete($course_spec->getId(), $dueWorkUnitSpec1->getId());
         $i->amGoingTo('Send request to delete due work 1 - due work already exported to a class');
@@ -454,7 +454,7 @@ class CourseCest
         $taskUnitSpec1Id = $i->grabFromDatabase('assessment', 'id', ['title' => $taskUnitSpec1->getTitle(),'publish_date !=' => null]);
         $arr = array($dueWorkUnitSpec1Id,$taskUnitSpec1Id);
         foreach ($arr as &$value) {
-            $folderId = $i->grabFromDatabase('v_assessment_relation', 'folder_id', ['assessment_id' => $value]);
+            $folderId = $i->grabFromDatabase('mv_assessment_relation', 'folder_id', ['assessment_id' => $value]);
             $i->assertEquals($folderId, $groupFolder->getId());
         }
 
@@ -515,7 +515,7 @@ class CourseCest
         $taskUnitSpec4Id = $i->grabFromDatabase('assessment', 'id', ['title' => $taskUnitSpec4->getTitle(),'publish_date !=' => null]);
         $arr = array($dueWorkUnitSpec4Id,$taskUnitSpec4Id);
         foreach ($arr as &$value) {
-            $folderId = $i->grabFromDatabase('v_assessment_relation', 'folder_id', ['assessment_id' => $value]);
+            $folderId = $i->grabFromDatabase('mv_assessment_relation', 'folder_id', ['assessment_id' => $value]);
             $i->assertEquals($folderId, $groupFolder->getId());
         }
     }

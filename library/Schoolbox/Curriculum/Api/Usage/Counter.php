@@ -70,7 +70,7 @@ class Counter
                     :assessmentDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_node_for_assessment cnfa
-                INNER JOIN v_assessment_relation var ON cnfa.assessment_id = var.assessment_id
+                INNER JOIN mv_assessment_relation var ON cnfa.assessment_id = var.assessment_id
                 INNER JOIN assessment a ON var.assessment_id = a.id AND a.deleted_at IS NULL
                 INNER JOIN course_unit_specification cus
                     ON var.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL

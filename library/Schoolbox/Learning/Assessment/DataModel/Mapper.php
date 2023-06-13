@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\LTI\Assessment as LtiAssessment;
@@ -175,6 +176,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateOpenSpan']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'validateDatePresence']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateAssessmentRelationView']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteQuiz']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTask']);
@@ -492,6 +494,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
                 {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
+                {$this->getJoinColumnString('assessment_course_unit_specification.course', 'usc')},
+                {$this->getJoinColumnString('assessment_course_unit_specification.course.folder', 'uscf')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
@@ -516,6 +520,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course', 'us', 'usc', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course.folder', 'usc', 'uscf', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
@@ -837,8 +843,39 @@ class Mapper extends BaseMapper
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
             } elseif ($row['us.id']) {
                 // Unit spec
-                $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us')
-                    ->setFolder($this->hydrateJoin($row, 'assessment_course_unit_specification.folder', 'usf'));
+                // Be sure to hydrate course spec's folder, too
+                /** @var UnitSpec\Model $unitSpec */
+                $unitSpec = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification',
+                    'us'
+                );
+
+                /** @var Folder\Model $unitSpecFolder */
+                $unitSpecFolder = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification.folder',
+                    'usf',
+                );
+                $unitSpec->setFolder($unitSpecFolder);
+
+                /** @var CourseSpec\Model $courseSpec */
+                $courseSpec = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification.course',
+                    'usc',
+                );
+
+                /** @var Folder\Model $courseSpecFolder */
+                $courseSpecFolder = $this->hydrateJoin(
+                    $row,
+                    'assessment_course_unit_specification.course.folder',
+                    'uscf',
+                );
+
+                $courseSpec->setFolder($courseSpecFolder);
+                $unitSpec->setCourse($courseSpec);
+                $context = $unitSpec;
             } elseif ($row['ui.id']) {
                 // Unit impl
                 /** @var UnitImpl\Model $unitImpl */
@@ -1465,6 +1502,73 @@ class Mapper extends BaseMapper
                 throw new \InvalidArgumentException(sprintf('Implementation assessments must have a %s date', $type));
             }
         }
+        return true;
+    }
+
+
+    /**
+     * Update the materialized view table `mv_assessment_relation`.
+     *
+     * This will be more fragile than updating with table-level triggers, but
+     * has the advantage of containing all updates within the application to be
+     * debugged there.
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    protected function updateAssessmentRelationView(Model $assessment): bool
+    {
+        $updateQuery = $this->database->prepare('
+            REPLACE INTO mv_assessment_relation (
+                assessment_id,
+                folder_id,
+                project_assessment_id,
+                course_implementation_id,
+                course_unit_implementation_id,
+                course_specification_id,
+                course_unit_specification_id
+            ) VALUES (
+                :assessmentId,
+                :folderId,
+                :projectAssessmentId,
+                :courseImplementationId,
+                :courseUnitImplementationId,
+                :courseSpecificationId,
+                :courseUnitSpecificationId
+            )
+        ');
+
+        // Impl and spec come from project context if there is one:
+        // otherwise, directly from assessment
+        $contextProject = $assessment->getContextProject();
+        if ($contextProject) {
+            $unitImplementation = $contextProject->getAssessmentModel()->getContextUnitImplementation();
+            $unitSpecification  = $contextProject->getAssessmentModel()->getContextUnitSpecification();
+        } else {
+            $unitImplementation = $assessment->getContextUnitImplementation();
+            $unitSpecification  = $assessment->getContextUnitSpecification();
+        }
+
+        // Spec assessments: relate to their course's folder, instead of their
+        // usual context folder.
+        // This replicates the possible bug documented in SA-15828, where the
+        // original assessment relation view related specs to their course's
+        // folder.
+        if ($unitSpecification) {
+            $folder = $unitSpecification->getCourse()->getFolder();
+        } else {
+            $folder = $assessment->getAssessmentContext()->getFolder();
+        }
+        $params = [
+            'assessmentId'               => $assessment->getId(),
+            'folderId'                   => $folder->getId(),
+            'projectAssessmentId'        => $contextProject?->getId(),
+            'courseImplementationId'     => $unitImplementation?->getCourse()?->getId(),
+            'courseUnitImplementationId' => $unitImplementation?->getId(),
+            'courseSpecificationId'      => $unitSpecification?->getCourse()?->getId(),
+            'courseUnitSpecificationId'  => $unitSpecification?->getId(),
+        ];
+        $updateQuery->execute($params);
         return true;
     }
 

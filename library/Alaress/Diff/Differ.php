@@ -15,13 +15,30 @@ namespace Alaress\Diff;
 class Differ
 {
     /**
+     * Constructor
+     *
+     * @param int|string $aKey The key for the value of `$a` in the diff:
+     *                         defaults to 0, so that it is the first value in
+     *                         a list.
+     * @param int|string $bKey The key for the value of `$b` in the diff.
+     *                         defaults to 1, so that it is the second value in
+     *                         a list.
+     */
+    public function __construct(
+        private int|string $aKey = 0,
+        private int|string $bKey = 1,
+    ) {
+    }
+
+    /**
      * Recursively diffs `$a` and `$b`.
      *
      * @param array $a
      * @param array $b
      * @return array A summary of the differences between `$a` and `$b`.
      *               This will have the same key structure as its inputs, and
-     *               the value will be [`$a.value`, `$b.value`].
+     *               the value will be:
+     *               [$this->aKey => `$a.value`, $this->bKey => `$b.value`].
      */
     public function diff(array $a, array $b): array
     {
@@ -63,7 +80,7 @@ class Differ
                     $diff[$key] = $recursiveDiff;
                 }
             } elseif ($aValue !== $bValue) {
-                $diff[$key] = [$aValue, $bValue];
+                $diff[$key] = [$this->aKey => $aValue, $this->bKey => $bValue];
             }
         }
         return $diff;
