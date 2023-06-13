@@ -39,7 +39,7 @@ switch ($this->arg[0]) {
     case 'instant':
         $email = $emailFactory->buildTwigEmail('instantmail.twig', '', null);
         $email->setContext(array(
-            'recipient' => $_SESSION['user']->getFirstname()
+            'recipient' => $_SESSION['user']->getFullName()
         ));
 
         $cctx = $email->getCoreContext();

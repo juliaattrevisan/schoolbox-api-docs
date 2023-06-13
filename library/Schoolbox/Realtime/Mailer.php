@@ -89,7 +89,7 @@ class Mailer
         $email = $this->emailFactory->buildTwigEmail($template, $subject, new Address($address, $recipient->formatName()));
         $email->setLogger($this->log);
         $context              = $decorator->renderAsTwigContext($email->getCoreContext(), 0, $sortDir);
-        $context['recipient'] = $recipient->getFirstname();
+        $context['recipient'] = $recipient->getFullName();
         $email->setContext($context);
 
         // we can only include the reply-to header if there is but one email
