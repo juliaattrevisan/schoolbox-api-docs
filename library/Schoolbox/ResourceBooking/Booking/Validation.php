@@ -8,11 +8,13 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 
+use Calendar\Event\Type\EventInterface;
 use DateTime;
 use Alaress_Date_Format;
 use External_Timetable;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -532,7 +534,7 @@ class Validation
      * @param string $roomCode
      * @param DateTime $startDate
      * @param DateTime $endDate
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      */
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {

@@ -8,11 +8,12 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * A schoobox event handler instance
      *
@@ -37,11 +38,11 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         $collection = $this->calendarHandler->getDayEvents($startTimestamp, $endTimestamp, $allowedEventTypes);
 
@@ -60,9 +61,9 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
      *
      * @param int $eventId
      *
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
         return $this->calendarHandler->getEvent($eventId);
     }

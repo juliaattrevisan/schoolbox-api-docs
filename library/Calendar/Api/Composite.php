@@ -13,8 +13,9 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Calendar\Event\Collection;
+use Calendar\Event\SortStrategy;
 use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 
 class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
 {
@@ -32,37 +33,35 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @internal param $currentDay
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
-        $result = new Collection();
+        $result = new GenericCollection(EventInterface::class);
 
         foreach ($this->api as $currentApi) {
-            $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp, $allowedEventTypes));
+            $result = $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp, $allowedEventTypes));
         }
 
-        $result->sort();
-
-        return $result;
+        return $result->sortByCallback(new SortStrategy());
     }
 
     /**
      * Find a particular event matching an eventId from all registered sources
      *
      * @param int $eventId
-     * @return EventInterface
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId): EventInterface
+    public function getEvent($eventId): GenericCollection
     {
-        $result = new Collection();
+        $result = new GenericCollection(EventInterface::class);
 
         foreach ($this->api as $currentApi) {
-            $result->merge($currentApi->getEvent($eventId));
+            $result = $result->merge($currentApi->getEvent($eventId));
         }
 
-        return $result->getFirst();
+        return $result->first();
     }
 
     /**

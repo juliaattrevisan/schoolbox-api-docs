@@ -8,10 +8,11 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
-use Calendar\Event\Collection;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatus;
@@ -20,7 +21,6 @@ use Schoolbox\User;
 
 abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * Statuses to filter out
      *
@@ -86,9 +86,9 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    abstract public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection;
+    abstract public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection;
 
     /**
      * Find a particular event from this source.
@@ -96,11 +96,11 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      * Not implemented - at least not yet - for resource booking items.
      *
      * @param int $eventId
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
-        return new Collection();
+        return new GenericCollection(EventInterface::class);
     }
 
     /**

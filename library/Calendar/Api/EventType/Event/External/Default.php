@@ -6,11 +6,12 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Calendar\Event\Collection;
+use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\External\Connector\IExternalEvents;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -64,13 +65,13 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @throws InvalidArgumentException
      * @throws MapperException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
-        $stack = new Collection();
+        $stack = new GenericCollection(EventInterface::class);
 
         // Figure out default event type
         try {
@@ -199,10 +200,10 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     /**
      * Making the abstract class happy
      * @param int $eventId
-     * @return string
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
-        return '';
+        return new GenericCollection(EventInterface::class);
     }
 }

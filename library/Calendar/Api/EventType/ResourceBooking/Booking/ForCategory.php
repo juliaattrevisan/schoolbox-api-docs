@@ -8,12 +8,12 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Calendar\Event\Collection;
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_ResourceBooking_Booking_ForCategory extends Calendar_Api_EventType_ResourceBooking_Base
 {
-
     /**
      * Resource category filter. Does not filter by resource category if NULL.
      *
@@ -42,11 +42,11 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForCategory extends Calenda
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         // Get all items out of booking mapper for this resource.
         $bookings = $this->getBookingMapper()->findForCategory(
@@ -56,7 +56,7 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForCategory extends Calenda
             $this->getStatus(),
             $allowedEventTypes
         );
-        $collection = new Collection();
+        $collection = new GenericCollection(EventInterface::class);
         foreach ($bookings as $booking) {
             $calendarEvent = $this->getEventConverter()->convertEventToCalendarEvent(
                 $booking->getEvent(),

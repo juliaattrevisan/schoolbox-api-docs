@@ -6,10 +6,11 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
+use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\Event as EventModel;
 use Schoolbox\Campus;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -318,7 +319,7 @@ class Calendar extends DeprecatedModel
      *                                        * id: if set, only this event ID will be retrieved.
      *                                        If empty, all events for user are retrieved.
      *                                        * type: if set, only events of this type will be retrieved.
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
     public function getDayEvents(User $user, User $viewer, $startTimestamp, $endTimestamp, $filter = [])
     {
@@ -533,7 +534,7 @@ class Calendar extends DeprecatedModel
 
         /* Standardised output
          */
-        $stack = new Collection();
+        $stack = new GenericCollection(EventInterface::class);
 
         if (is_array($allEvents) && count($allEvents)) {
             foreach ($allEvents as $currentEvent) {

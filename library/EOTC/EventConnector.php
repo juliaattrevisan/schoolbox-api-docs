@@ -10,9 +10,10 @@
 
 namespace EOTC;
 
-use Calendar\Event\Collection;
 use Calendar\Event\Type\EOTC\Event;
+use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventType;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -33,12 +34,12 @@ class EventConnector extends EventMapper
      *
      * @param int $eventId
      *
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @throws DefinitionException
      * @throws MapperException
      * @throws \InvalidArgumentException
      */
-    public function getEvent($eventId): Collection
+    public function getEvent($eventId): GenericCollection
     {
         $authorMapper    = $this->getJoinMapper('author');
         $eventTypeMapper = $this->getJoinMapper('eventType');
@@ -64,7 +65,7 @@ class EventConnector extends EventMapper
 
         $row = $statement->fetch();
 
-        $collection = new Collection();
+        $collection = new GenericCollection(EventInterface::class);
 
         if ($row) {
             /** @var Event $eventItem */
@@ -157,13 +158,16 @@ class EventConnector extends EventMapper
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @throws MapperException
      * @throws DefinitionException
      * @throws \InvalidArgumentException
      */
-    public function getDayEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
-    {
+    public function getDayEvents(
+        int $startTimestamp,
+        int $endTimestamp,
+        ?array $allowedEventTypes = null,
+    ): GenericCollection {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
@@ -270,7 +274,7 @@ class EventConnector extends EventMapper
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        $collection = new Collection();
+        $collection = new GenericCollection(EventInterface::class);
 
         /* Anyone in the EOTC permissions sytem can also see it
          * We don't need to iterate with this, since $user doesn't

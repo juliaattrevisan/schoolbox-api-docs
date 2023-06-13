@@ -11,11 +11,11 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Color\Color;
 use Alaress_Date_Format;
-use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\Submission\Event;
 use Calendar_Api_EventType_Interface;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -80,7 +80,7 @@ class Api implements Calendar_Api_EventType_Interface
     /**
      * @inheritDoc
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         $assessments = $this->assessmentDataSource->findAllBetweenDates(
             Alaress_Date_Format::newFromTimestamp($startTimestamp),
@@ -99,7 +99,7 @@ class Api implements Calendar_Api_EventType_Interface
             );
         }
 
-        $stack = new Collection();
+        $stack = new GenericCollection(EventInterface::class);
         foreach ($assessments as $assessment) {
             if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
                 continue;
@@ -117,9 +117,9 @@ class Api implements Calendar_Api_EventType_Interface
     /**
      * @inheritDoc
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
-        $stack = new Collection();
+        $stack = new GenericCollection(EventInterface::class);
 
         try {
             $assessment = $this->assessmentDataSource->findById($eventId);

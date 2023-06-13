@@ -8,8 +8,9 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Calendar\Event\Collection;
+use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\Submission\Event;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -77,16 +78,16 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @throws DomainException
      * @throws LogicException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
-        $stack = new Collection();
+        $stack = new GenericCollection(EventInterface::class);
         // Configuration may not have been set, take this into account.
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
@@ -190,11 +191,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      *
      * @param int $eventId
      *
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
-        $collection = new Collection();
+        $collection = new GenericCollection(EventInterface::class);
 
         /* Fill in your query result set here and populate $collection
          */

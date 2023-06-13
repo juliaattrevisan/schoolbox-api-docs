@@ -641,26 +641,6 @@ parameters:
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
 
 		-
-			message: "#^Method Calendar_Api_EventType_ResourceBooking_Moderation_Default\\:\\:getEvent\\(\\) should return Calendar\\\\Event\\\\Collection but return statement is missing\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
-
-		-
-			message: "#^Method Calendar_Api_EventType_ResourceBooking_Moderation_Default\\:\\:loadPermissions\\(\\) should return Calendar\\\\Event\\\\Collection but return statement is missing\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
-
-		-
-			message: "#^Method Calendar\\\\Event\\\\Collection\\:\\:getFirst\\(\\) should return Calendar\\\\Event\\\\Type\\\\EventBase but return statement is missing\\.$#"
-			count: 1
-			path: library/Calendar/Event/Collection.php
-
-		-
-			message: "#^Method Calendar\\\\Event\\\\Collection\\:\\:setStack\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Calendar/Event/Collection.php
-
-		-
 			message: "#^Argument of an invalid type null supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: library/Calendar/Event/Type/Day/Event.php

@@ -1,5 +1,8 @@
 <?php
 
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
+
 /**
  * Calendar_Api_EventType_Interface
  *
@@ -15,23 +18,26 @@
  */
 interface Calendar_Api_EventType_Interface
 {
-
     /**
      * Get a set of event instances
      *
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection;
+    public function getEvents(
+        int $startTimestamp,
+        int $endTimestamp,
+        ?array $allowedEventTypes = null,
+    ): GenericCollection;
 
 
     /**
      * Get a single event
      *
      * @param int $eventId
-     * @todo What does this return?
+     * @return GenericCollection<EventInterface> A single event in a collection
      */
-    public function getEvent($eventId);
+    public function getEvent($eventId): GenericCollection;
 }

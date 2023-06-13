@@ -1,5 +1,8 @@
 <?php
 
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
+
 /**
  * Calendar_Api_EventType_Event_Schoolbox_Personal
  *
@@ -13,7 +16,6 @@
 
 class Calendar_Api_EventType_Event_Schoolbox_Personal extends Calendar_Api_EventType_Event_Schoolbox_Default
 {
-
     /**
      * Overridden to get personal events only.
      *
@@ -23,10 +25,13 @@ class Calendar_Api_EventType_Event_Schoolbox_Personal extends Calendar_Api_Event
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return \Calendar\Event\Collection
+     * @return GenericCollection<EventInterface>
      */
-    protected function getEventsFromCalendarHandler(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
-    {
+    protected function getEventsFromCalendarHandler(
+        int $startTimestamp,
+        int $endTimestamp,
+        ?array $allowedEventTypes = null,
+    ): GenericCollection {
         /* Manufacture a special $filters array
         /* Do a detection on $allowedEventTypes, if provided and meaningful
          */

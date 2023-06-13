@@ -8,12 +8,12 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Booking;
-use Calendar\Event\Collection;
 
 class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_ResourceBooking_Base
 {
-
     /**
      * Can the current user moderate ANY resource item?
      *
@@ -45,7 +45,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * Loads permissions for resource bookings - whether the user can moderate
      * at all, and the items they're restricted to if any.
      *
-     * @return Collection
+     * @return void
      */
     protected function loadPermissions()
     {
@@ -73,16 +73,16 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @param int        $startTimestamp
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
-
         // If I can't moderate anything - don't even bother looking.
+        $collection = new GenericCollection(EventInterface::class);
         if (!$this->getUserCanModerate()) {
-            return new Collection();
+            return $collection;
         }
 
         // Get bookings and convert them into a collection of calendar events.
@@ -98,8 +98,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
             $params,
             $allowedEventTypes
         );
-        $converter  = new Booking\Util\EventConverter();
-        $collection = new Collection();
+        $converter = new Booking\Util\EventConverter();
         foreach ($bookings as $booking) {
             // Don't add this booking if it's my own, it will show in my
             // resource booking event feed.
@@ -120,11 +119,11 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * Find a particular event from this source
      *
      * @param int $eventId
-     * @return Collection
+     * @return GenericCollection<EventInterface>
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): GenericCollection
     {
-//        return $this->getCalendarHandler()->getEvent($eventId);
+        return new GenericCollection(EventInterface::class);
     }
 
     /**
