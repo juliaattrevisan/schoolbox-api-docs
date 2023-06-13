@@ -17,6 +17,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SensitiveParameter;
 
 /**
  * Parser for JWTs issued by this instance.
@@ -40,7 +41,7 @@ class SelfIssued extends Base
     /**
      * @inheritdoc
      */
-    public function accepts(string $jwt): bool
+    public function accepts(#[SensitiveParameter] string $jwt): bool
     {
         $claims = $this->decodeWithoutVerification($jwt);
         return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $this->determineThisInstanceIssuer();
@@ -49,7 +50,7 @@ class SelfIssued extends Base
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt): User
+    public function determineUser(#[SensitiveParameter] string $jwt): User
     {
         $claims = $this->decode(
             $jwt,

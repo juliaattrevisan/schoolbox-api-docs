@@ -13,6 +13,7 @@ use DomainException;
 use Firebase\JWT as JwtLibrary;
 use Firebase\JWT\Key;
 use InvalidArgumentException;
+use SensitiveParameter;
 use UnexpectedValueException;
 
 /**
@@ -49,7 +50,7 @@ abstract class Base implements IParser
      *                            (e.g. the key is not valid for the given JWT,
      *                            or the signature is invalid)
      */
-    protected function decode(string $jwt, mixed $keyOrKeySet, int $leeway): array
+    protected function decode(#[SensitiveParameter] string $jwt, mixed $keyOrKeySet, int $leeway): array
     {
         // Set leeway for this decode only, set it back once done
         $previousLeeway         = JwtLibrary\JWT::$leeway;
@@ -83,7 +84,7 @@ abstract class Base implements IParser
      *                               any other reason
      *                               (e.g. a segment is invalid JSON).
      */
-    protected function decodeWithoutVerification(string $jwt): array
+    protected function decodeWithoutVerification(#[SensitiveParameter] string $jwt): array
     {
         if (!isset($this->decodeWithoutVerificationResults[$jwt])) {
             $parts = explode('.', $jwt);
@@ -111,7 +112,7 @@ abstract class Base implements IParser
      *                               any other reason
      *                               (e.g. a segment is invalid JSON).
      */
-    protected function decodeHeaders(string $jwt): array
+    protected function decodeHeaders(#[SensitiveParameter] string $jwt): array
     {
         if (!isset($this->decodeHeadersResults[$jwt])) {
             $parts = explode('.', $jwt);

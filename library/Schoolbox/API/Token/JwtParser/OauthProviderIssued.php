@@ -15,6 +15,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SensitiveParameter;
 
 /**
  * Parser for configured oAuth provider-issued JWTs.
@@ -44,7 +45,7 @@ class OauthProviderIssued extends Base
     /**
      * @inheritdoc
      */
-    public function accepts(string $jwt): bool
+    public function accepts(#[SensitiveParameter] string $jwt): bool
     {
         // This JWT could be from either an oAuth provider, or from an LTI tool:
         // Check the token's audience to determine if it is actually from the
@@ -69,7 +70,7 @@ class OauthProviderIssued extends Base
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt): User
+    public function determineUser(#[SensitiveParameter] string $jwt): User
     {
         // Determine JWKS for this provider
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);

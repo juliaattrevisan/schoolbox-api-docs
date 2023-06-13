@@ -19,6 +19,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SensitiveParameter;
 
 /**
  * Parser for JWTs issued by the instance registry.
@@ -47,7 +48,7 @@ class InstanceRegistryIssued extends Base
     /**
      * @inheritdoc
      */
-    public function accepts(string $jwt): bool
+    public function accepts(#[SensitiveParameter] string $jwt): bool
     {
         $claims      = $this->decodeWithoutVerification($jwt);
         $ir_url      = $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL);
@@ -62,7 +63,7 @@ class InstanceRegistryIssued extends Base
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt): User
+    public function determineUser(#[SensitiveParameter] string $jwt): User
     {
         $client = new Client();
         // Retrieve the JWKs from the instance registry.
