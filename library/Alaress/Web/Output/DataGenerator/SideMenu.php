@@ -60,7 +60,7 @@ class SideMenu implements IDataGenerator
         $subjectGroups = [];
 
         foreach ($this->currentUser->getSubjectCollection() as $subject) {
-            if ($this->access->getFolderAccess($this->currentUser, $subject['id']) >= UserAccess::ACCESS_READ) {
+            if ($subject['perm'] >= UserAccess::ACCESS_READ) {
                 if (!isset($subjectGroups[$subject['classType']])) {
                     $subjectGroups[$subject['classType']] = [];
                 }

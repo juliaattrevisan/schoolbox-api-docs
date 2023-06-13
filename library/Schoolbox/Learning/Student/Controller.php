@@ -62,11 +62,7 @@ class Controller extends Base
         $homepageUrls = [];
         $courseListIds = [];
 
-        $classFolderIds = $user->getSubjectCollection()->map(
-            static function (array $subject) {
-                return $subject['id'];
-            }
-        );
+        $classFolderIds = $user->getSubjectCollection()->getIds();
 
         /**
          * if the student is enrolled in classes, then search for courses...

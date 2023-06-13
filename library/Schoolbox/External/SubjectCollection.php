@@ -14,5 +14,16 @@ use Schoolbox\Collection;
 
 class SubjectCollection extends Collection
 {
-
+    /**
+     * Returns folder ids of subjects
+     * @return array
+     */
+    public function getIds(): array
+    {
+        return $this->map(
+            static function (array $subject) {
+                return $subject['id'];
+            }
+        )->getAll();
+    }
 }

@@ -14,7 +14,7 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
      *
      * @var \Schoolbox\External\SubjectCollection
      */
-    protected $subject_list;
+    protected $subjectList;
 
     /**
      * Component name
@@ -30,8 +30,8 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
      */
     public function execute()
     {
-        $this->subject_list = $this->getUser()->getHideTimetable() ? new \Schoolbox\External\SubjectCollection() : $this->getUser()->getSubjectCollection();
-        return $this->subject_list->count() > 0;
+        $this->subjectList = $this->getUser()->getHideTimetable() ? new \Schoolbox\External\SubjectCollection() : $this->getUser()->getSubjectCollection();
+        return $this->subjectList->count() > 0;
     }
 
     /**
@@ -50,7 +50,7 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
         $this->setBlock($templateHandle, "subject", "subject_block");
         $this->setVar('subject_block', '');
         /** @var array $subject */
-        foreach ($this->subject_list as $subject) {
+        foreach ($this->subjectList as $subject) {
             $this->setVar([
                 'SUBJECT_CODE' => Scrub::text($subject['matchedCode']),
                 'SUBJECT_CODE_URL' => urlencode(urlencode($subject['matchedCode'])),

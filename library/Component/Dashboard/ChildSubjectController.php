@@ -92,7 +92,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             if ($userChild->getSubjectCollection()) {
                 /** @var array $subject */
                 foreach ($userChild->getSubjectCollection() as $subject) {
-                    if ($this->getAccess()->getFolderAccess($this->getUser(), $subject['id']) >= UserAccess::ACCESS_READ) {
+                    if ($subject['perm'] >= UserAccess::ACCESS_READ) {
                         $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
                         $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['matchedCode'])));
                         $this->parse("subject_item", "subject_block", true);

@@ -27,7 +27,8 @@ class Component_Dashboard_PrimaryController extends Component_Dashboard_Controll
         }
 
         if (empty($this->homeroom)) {
-            $this->homeroom = $this->getUser()->getSubjectCollection()->first();
+            $firstSubject = $this->getUser()->getSubjectCollection()->first();
+            $this->homeroom = $firstSubject ? $firstSubject['code'] : '';
         }
 
         return true;

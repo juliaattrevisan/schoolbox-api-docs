@@ -63,7 +63,7 @@ class ClassList
 
 
     /**
-     * Returns a set of of classes, along with subsidiary data, suitable for
+     * Returns a set of classes, along with subsidiary data, suitable for
      * rendering on the classes component or page
      *
      * @param Term\Model          $term
@@ -76,7 +76,7 @@ class ClassList
      * @throws DefinitionException
      * @throws UnexpectedValueException
      */
-    public function getClassList(Term\Model $term, Alaress_Date_Format $now)
+    public function getClassList(Term\Model $term, Alaress_Date_Format $now): array
     {
         $classTypes    = [];
         $folderList    = $this->folderMapper->createCollection();
@@ -92,11 +92,7 @@ class ClassList
             }
             $folderList = $this->folderMapper->findByColumn(
                 'id',
-                $this->user->getSubjectCollection()->map(
-                    static function (array $subject) {
-                        return $subject['id'];
-                    }
-                )
+                array_keys($classTypes)
             );
         }
 

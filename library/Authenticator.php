@@ -100,7 +100,7 @@ class Authenticator
              * Map subjects onto the user object retrieved, and dump into session
              */
             $subjectMapper = SubjectMapper::getInstance();
-            $user->setSubjectCollection($subjectMapper->findAllForUser($user));
+            $user->setSubjectCollection($subjectMapper->findAllForUser($user, $user));
             $this->setSessionUser($user);
 
             // indicate that session creation was successful

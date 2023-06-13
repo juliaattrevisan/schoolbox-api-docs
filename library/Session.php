@@ -542,7 +542,7 @@ class Session
                 if ($children->count()) {
                     foreach ($children as $childObject) {
                         if (!$childObject->getHideTimetable()) {
-                            $childObject->setSubjectCollection($subjectMapper->findAllForUser($childObject));
+                            $childObject->setSubjectCollection($subjectMapper->findAllForUser($childObject, $user));
                         } else {
                             $childObject->setSubjectCollection(new \Schoolbox\External\SubjectCollection());
                         }
