@@ -259,8 +259,12 @@ class Controller extends Assessment\Controller
         $actionValidator = new ActionValidator($now, $this->getAccess());
 
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $canAttempt = $assessment->isImplementation() && $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId()
-            && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
+        $canAttempt = (
+            // We do not include $assessment->isImplementation() in this condition because quizzes that are not yet
+            // implemented still need to be previewable.
+            $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId() &&
+            $actionValidator->canAttemptQuiz($this->getUser(), $assessment)
+        );
 
         /**
          * record view
