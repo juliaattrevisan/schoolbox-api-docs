@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\TaskDaemon\Request;
 
 use DateTimeInterface;
+use SensitiveParameter;
 
 /**
  * A strongly-typed representation of a message to be sent to the task daemon.
@@ -127,7 +128,7 @@ class Message
         string $schoolCode,
         ?string $callbackUrl,
         ?array $callbackParams,
-        ?string $callbackToken
+        #[SensitiveParameter] ?string $callbackToken
     ) {
         $this->task           = $task;
         $this->params         = $params;

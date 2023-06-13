@@ -11,6 +11,8 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use External\Tass\Api\Exception\InvalidApiKey;
 
+use SensitiveParameter;
+
 use function base64_decode;
 use function base64_encode;
 use function json_decode;
@@ -44,7 +46,7 @@ class Token
      * @param string $token
      * @throws InvalidApiKey If we can already tell that the API key is invalid
      */
-    public function __construct(string $token)
+    public function __construct(#[SensitiveParameter] string $token)
     {
         // Check not empty
         if (trim($token) === '') {
@@ -107,7 +109,7 @@ class Token
      * @param string $token
      * @return array
      */
-    public function unpackToken(string $token): array
+    public function unpackToken(#[SensitiveParameter] string $token): array
     {
         $encrypted  = base64_decode($token);
         $parameters = openssl_decrypt($encrypted, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);

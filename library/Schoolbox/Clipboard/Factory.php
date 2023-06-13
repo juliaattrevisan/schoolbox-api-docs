@@ -12,6 +12,7 @@ namespace Schoolbox\Clipboard;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
+use SensitiveParameter;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -33,7 +34,7 @@ class Factory
         private bool $perform,
         private LockInterface $lock,
         private string $host,
-        private string $token,
+        #[SensitiveParameter] private string $token,
         private string $timezone
     ) {
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress_Date_Format;
 use Schoolbox\User;
+use SensitiveParameter;
 
 /**
  * Model for password resets
@@ -94,7 +95,7 @@ class Model
      * @param  string $token
      * @return $this
      */
-    public function setToken($token)
+    public function setToken(#[SensitiveParameter] $token)
     {
         $this->token = $token;
         return $this;
