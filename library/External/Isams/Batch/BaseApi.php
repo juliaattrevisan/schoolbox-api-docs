@@ -32,7 +32,7 @@ class External_Isams_Batch_BaseApi
      * @param string $host
      * @param string $apiKey
      */
-    public function __construct($host, $apiKey)
+    public function __construct($host, #[SensitiveParameter] $apiKey)
     {
         $this->host   = $host;
         $this->apiKey = $apiKey;
@@ -110,7 +110,7 @@ class External_Isams_Batch_BaseApi
      *
      * @return $this
      */
-    protected function setApiKey($apiKey)
+    protected function setApiKey(#[SensitiveParameter] $apiKey)
     {
         $this->apiKey = $apiKey;
         return $this;

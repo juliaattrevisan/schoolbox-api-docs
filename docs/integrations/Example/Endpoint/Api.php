@@ -66,7 +66,7 @@ class Api implements IApi
      * @param string $apiKey
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $host, #[SensitiveParameter] string $apiKey)
     {
         $this->client = $this->initClient($host, $apiKey, self::DEFAULT_TIMEOUT);
 

@@ -16,6 +16,7 @@ use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -65,7 +66,7 @@ class Api
      *
      * @param string $apiKey
      */
-    public function __construct(string $apiKey)
+    public function __construct(#[SensitiveParameter] string $apiKey)
     {
         $this->apiKey = $apiKey;
     }

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot;
 
+use SensitiveParameter;
+
 /**
  * Class ValidGeosnapshotAvailable
  *
@@ -23,7 +25,7 @@ class ValidGeosnapshotAvailable
      * @param bool        $featureFlag
      * @return bool
      */
-    public function isConfigured(?string $apiKey, bool $featureFlag): bool
+    public function isConfigured(#[SensitiveParameter] ?string $apiKey, bool $featureFlag): bool
     {
 
         /* Invalid API key; exit early

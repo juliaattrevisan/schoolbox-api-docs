@@ -14,9 +14,9 @@ use GuzzleHttp\Client;
 use Monolog\Logger;
 use OverflowException;
 use RuntimeException;
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use SensitiveParameter;
 
 /**
  * Google Cloud Messaging
@@ -51,7 +51,7 @@ class GCM extends AbstractService
     public function __construct(
         RegistryMapper $registryMapper,
         $appIdentifier,
-        $apiKey,
+        #[SensitiveParameter] $apiKey,
         string $appTitle
     ) {
         parent::__construct($registryMapper, $appIdentifier);

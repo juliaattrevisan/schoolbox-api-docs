@@ -16,6 +16,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use SensitiveParameter;
 
 /**
  * Wrapper around Gotenberg's API.
@@ -65,7 +66,7 @@ class Client
     public function __construct(
         private ClientInterface $httpClient,
         private string $apiHost,
-        private ?string $apiKey,
+        #[SensitiveParameter] private ?string $apiKey,
         private ?int $apiVersion,
     ) {
     }

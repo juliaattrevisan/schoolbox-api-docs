@@ -27,6 +27,7 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
 use Schoolbox\User;
+use SensitiveParameter;
 use stdClass;
 
 /**
@@ -78,7 +79,7 @@ class Connector implements IConnector
      * @param null|string     $apiKey
      * @param null|string     $siteSchoolCode
      */
-    public function __construct(ClientInterface $client, ?bool $enabled, ?string $apiKey, ?string $siteSchoolCode)
+    public function __construct(ClientInterface $client, ?bool $enabled, #[SensitiveParameter] ?string $apiKey, ?string $siteSchoolCode)
     {
         $this->client         = $client;
         $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10

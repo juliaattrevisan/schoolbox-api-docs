@@ -14,6 +14,7 @@ use DomainException;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -74,7 +75,7 @@ class Api implements IApi
      * @throws DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $host, #[SensitiveParameter] string $apiKey)
     {
         $this->host = $host;
 

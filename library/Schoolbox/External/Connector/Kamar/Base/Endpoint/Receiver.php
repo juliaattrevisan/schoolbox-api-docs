@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use RuntimeException;
+use SensitiveParameter;
 use SimpleXMLElement;
 
 /**
@@ -63,7 +64,7 @@ class Receiver
      * @param string $dir
      * @param string $apiKey
      */
-    public function __construct(string $dir, string $apiKey)
+    public function __construct(string $dir, #[SensitiveParameter] string $apiKey)
     {
         $this->dir = $dir;
         $this->suffix = '_' . date('YmdHis') . uniqid('_', true) . '.xml';
