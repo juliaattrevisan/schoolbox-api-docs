@@ -30,7 +30,7 @@ $this::localRedir(
             'assessmentId' => $assessment->getId(),
             'studentId'    => $sessionUser->getId(),
         ]
-    )
+    ) . "?preview=1"
 );
 exit;
 
