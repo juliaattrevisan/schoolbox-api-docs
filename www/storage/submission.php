@@ -53,7 +53,12 @@ try {
     /* Are you the file's owner?
      */
     $submissionFileMapper = \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance();
-    $submissionFile = $submissionFileMapper->findById($submissionFileId);
+
+    try {
+        $submissionFile = $submissionFileMapper->findById($submissionFileId);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(Error\Mapper::ERROR_FILE_NOT_FOUND);
+    }
 
     $isOwner = $_SESSION['user']->getId() === $submissionFile->getSubmission()->getOwner()->getId();
 
