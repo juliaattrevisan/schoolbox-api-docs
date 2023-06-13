@@ -48,7 +48,7 @@ class SideMenu implements IDataGenerator
     public function generate(?array $chromeData = []): array
     {
         // Return nothing if no user logged in
-        if (!$this->currentUser) {
+        if (!$this->currentUser || !$this->currentUser->getId()) {
             return [];
         }
 
