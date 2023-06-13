@@ -135,7 +135,7 @@ class Controller extends UserAccount\Controller
                 continue;
             }
 
-            $period->setCycle($cycles[$class->getPeriod()->getCycle()->getId()]);
+            $period->setCycle($cycles[$period->getCycle()->getId()]);
             $class->setPeriod($period);
 
             $classEntry = $classEntries[$class->getClass()->getId()];
