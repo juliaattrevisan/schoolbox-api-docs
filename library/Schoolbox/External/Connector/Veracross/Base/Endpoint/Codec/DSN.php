@@ -12,6 +12,8 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
 use DomainException;
 use Schoolbox\External\Importer\Endpoint\IDSN;
 
+use SensitiveParameter;
+
 use function count;
 
 /**
@@ -48,7 +50,7 @@ class DSN implements IDSN
      * @return array
      * @throws DomainException
      */
-    public function decode(string $dsn): array
+    public function decode(#[SensitiveParameter] string $dsn): array
     {
         $matches = [];
         preg_match(self::DSN_FORMAT, $dsn, $matches);
@@ -83,7 +85,7 @@ class DSN implements IDSN
      * @param array $parts
      * @return string
      */
-    public function encode(array $parts): string
+    public function encode(#[SensitiveParameter] array $parts): string
     {
         return "schoolroute={$parts['schoolroute']};clientid={$parts['clientid']};clientsecret={$parts['clientsecret']}";
     }

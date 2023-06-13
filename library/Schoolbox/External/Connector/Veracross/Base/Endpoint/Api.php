@@ -128,7 +128,7 @@ class Api implements IApi
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    private function initClient(string $host, string $dsn, int $timeout): Client
+    private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
         $credentials = (new Codec\DSN())->decode($dsn);
 

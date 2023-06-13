@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use SensitiveParameter;
 
 /**
  * Class Status
@@ -37,7 +38,7 @@ class Status implements IStatus
      * @param string $host
      * @param string $dsn
      */
-    public function __construct(string $host, string $dsn)
+    public function __construct(string $host, #[SensitiveParameter] string $dsn)
     {
         $this->host = $host;
         $this->dsn = $dsn;

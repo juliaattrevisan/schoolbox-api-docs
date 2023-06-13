@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 use RuntimeException;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
+use SensitiveParameter;
 
 /**
  * Class Specification
@@ -40,7 +41,7 @@ class Specification implements ISpecification
      * @param string $host
      * @param string $dsn
      */
-    public function __construct(string $host, string $dsn)
+    public function __construct(string $host, #[SensitiveParameter] string $dsn)
     {
         $this->host = $host;
         $this->dsn = $dsn;

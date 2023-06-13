@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
+use SensitiveParameter;
+
 interface IDSN
 {
 
@@ -18,7 +20,7 @@ interface IDSN
      * @param string $dsn
      * @return array
      */
-    public function decode(string $dsn): array;
+    public function decode(#[SensitiveParameter] string $dsn): array;
 
 
     /**
@@ -27,5 +29,5 @@ interface IDSN
      * @param array $parts
      * @return string
      */
-    public function encode(array $parts): string;
+    public function encode(#[SensitiveParameter] array $parts): string;
 }

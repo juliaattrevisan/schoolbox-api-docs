@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
 use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use SensitiveParameter;
 use ZipArchive;
 
 /**
@@ -68,7 +69,7 @@ class PhotoDownloader
      * @param string $zipDir
      * @throws \DomainException
      */
-    public function __construct(string $host, string $dsn, string $zipDir)
+    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $zipDir)
     {
         $this->host = $host;
 

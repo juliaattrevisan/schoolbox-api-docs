@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCodec;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -120,7 +121,7 @@ class Api implements IApi
      * @throws InvalidArgumentException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    public function __construct(string $host, string $dsn, string $module)
+    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $module)
     {
         $this->host = $host;
 
@@ -150,7 +151,7 @@ class Api implements IApi
      * @throws InvalidArgumentException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    private function initClient(string $dsn, string $module, int $timeout): Client
+    private function initClient(#[SensitiveParameter] string $dsn, string $module, int $timeout): Client
     {
         /* Figure out all the credential parts: module, company code, app code, token
          */

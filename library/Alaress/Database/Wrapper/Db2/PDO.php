@@ -12,6 +12,7 @@ namespace Alaress\Database\Wrapper\Db2;
 
 use Alaress\Database\Exception;
 use PDO as BasePDO;
+use SensitiveParameter;
 
 class PDO extends BasePDO
 {
@@ -52,7 +53,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function __construct($dsn, $username = null, $passwd = null, $options = [])
+    public function __construct($dsn, $username = null, #[SensitiveParameter] $passwd = null, $options = [])
     {
         $this->dsn = $dsn;
         $this->username = $username;
