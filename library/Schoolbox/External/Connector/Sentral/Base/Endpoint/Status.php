@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use SensitiveParameter;
 
 /**
  * Class Status
@@ -41,7 +42,7 @@ class Status implements IStatus
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $host, string $key)
+    public function __construct(string $host, #[SensitiveParameter] string $key)
     {
         $this->host = $host;
         $this->key = $key;

@@ -31,6 +31,7 @@ use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use SensitiveParameter;
 use UnexpectedValueException;
 
 /**
@@ -128,8 +129,14 @@ class Factory implements IFactory
      * @param array           $watchlist
      * @param ValidStrats     $validStrats
      */
-    public function __construct(string $host, string $key, bool $perform, LoggerInterface $logger, array $watchlist, ValidStrats $validStrats)
-    {
+    public function __construct(
+        string $host,
+        #[SensitiveParameter] string $key,
+        bool $perform,
+        LoggerInterface $logger,
+        array $watchlist,
+        ValidStrats $validStrats,
+    ) {
         $this->host = $host;
         $this->key = $key;
         $this->perform = $perform;

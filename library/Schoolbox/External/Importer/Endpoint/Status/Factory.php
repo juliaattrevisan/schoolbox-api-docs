@@ -13,6 +13,7 @@ use DomainException;
 use InvalidArgumentException;
 use Schoolbox\External\Connector;
 use Schoolbox\External\Importer\Endpoint;
+use SensitiveParameter;
 
 /**
  * Class Factory
@@ -48,7 +49,7 @@ class Factory
      * @param string $key
      * @param bool   $includePhoto
      */
-    public function __construct(string $host, string $key, bool $includePhoto)
+    public function __construct(string $host, #[SensitiveParameter] string $key, bool $includePhoto)
     {
         $this->host = $host;
         $this->key = $key;

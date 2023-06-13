@@ -10,6 +10,8 @@
 
 namespace Schoolbox\External\Connector;
 
+use SensitiveParameter;
+
 interface ICommunityPortal
 {
     /**
@@ -19,7 +21,7 @@ interface ICommunityPortal
      * @param string $newPassword
      * @return bool
      */
-    public function changePassword($communityId, $newPassword);
+    public function changePassword($communityId, #[SensitiveParameter] $newPassword);
 
     /**
      * Sets the secret key and initialization vector required for encryption/decryption
@@ -27,5 +29,5 @@ interface ICommunityPortal
      * @param string $key
      * @param string $initializationVector
      */
-    public function setSecrets($key, $initializationVector);
+    public function setSecrets(#[SensitiveParameter] $key, #[SensitiveParameter] $initializationVector);
 }

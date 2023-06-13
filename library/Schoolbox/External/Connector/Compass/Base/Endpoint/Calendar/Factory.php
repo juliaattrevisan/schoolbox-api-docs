@@ -16,6 +16,7 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\ApiCertification;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
+use SensitiveParameter;
 
 /**
  * Class Factory
@@ -79,7 +80,7 @@ class Factory
         LoggerInterface $log,
         bool $perform,
         string $host,
-        string $key,
+        #[SensitiveParameter] string $key,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\User\Mapper $eventUserMapper
     ) {

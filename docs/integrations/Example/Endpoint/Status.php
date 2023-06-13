@@ -13,6 +13,7 @@ use GuzzleHttp\Exception\InvalidArgumentException;
 use Laminas\Uri\Exception\InvalidUriPartException;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use SensitiveParameter;
 
 /**
  * Class Status
@@ -36,7 +37,7 @@ class Status implements IStatus
      */
     public function __construct(
         private string $host,
-        private string $key
+        #[SensitiveParameter] private string $key
     ) {
         $this->api = new Api($this->host, $this->key);
     }

@@ -14,6 +14,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
+use SensitiveParameter;
 
 /**
  * Class CalendarFactory
@@ -70,7 +71,7 @@ class CalendarFactory implements IFactory
      */
     public function __construct(
         string $host,
-        string $key,
+        #[SensitiveParameter] string $key,
         bool $perform,
         LoggerInterface $logger
     ) {

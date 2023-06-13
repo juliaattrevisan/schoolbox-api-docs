@@ -22,6 +22,7 @@ use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use SensitiveParameter;
 use UnexpectedValueException;
 
 /**
@@ -192,7 +193,7 @@ class Factory
         LoggerInterface $log,
         bool $perform,
         string $host,
-        string $key,
+        #[SensitiveParameter] string $key,
         string $zipDir,
         bool $includePhoto,
         ?string $file,

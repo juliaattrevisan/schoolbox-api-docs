@@ -19,6 +19,7 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use SensitiveParameter;
 use UnexpectedValueException;
 
 /**
@@ -187,7 +188,7 @@ class Factory
         LoggerInterface $log,
         bool $perform,
         string $host,
-        string $key,
+        #[SensitiveParameter] string $key,
         string $timezone,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,

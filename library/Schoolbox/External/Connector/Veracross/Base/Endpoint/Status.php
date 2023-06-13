@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use SensitiveParameter;
 
 /**
  * Class Status
@@ -27,7 +28,7 @@ class Status implements IStatus
      */
     public function __construct(
         private string $host,
-        private string $key
+        #[SensitiveParameter] private string $key
     ) {
     }
 

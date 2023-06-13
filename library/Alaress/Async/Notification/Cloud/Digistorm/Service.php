@@ -17,6 +17,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use SensitiveParameter;
 
 /**
  * Digistorm notification service
@@ -70,7 +71,7 @@ class Service extends AbstractService
     public function __construct(
         RegistryMapper $registryMapper,
         $appIdentifier,
-        string $key,
+        #[SensitiveParameter] string $key,
         string $appTitle
     ) {
         parent::__construct($registryMapper, $appIdentifier);

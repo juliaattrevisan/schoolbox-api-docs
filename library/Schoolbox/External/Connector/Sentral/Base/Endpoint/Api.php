@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -92,7 +93,7 @@ class Api implements IApi
      * @throws InvalidArgumentException
      * @throws DomainException
      */
-    public function __construct(string $host, string $key)
+    public function __construct(string $host, #[SensitiveParameter] string $key)
     {
         $this->client = $this->initClient($host, $key, self::DEFAULT_TIMEOUT);
 
@@ -113,7 +114,7 @@ class Api implements IApi
      * @throws InvalidArgumentException
      * @throws DomainException
      */
-    private function initClient(string $host, string $key, int $timeout): Client
+    private function initClient(string $host, #[SensitiveParameter] string $key, int $timeout): Client
     {
         /* Remember the actual host value
          *

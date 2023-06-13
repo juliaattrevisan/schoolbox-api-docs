@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use SensitiveParameter;
 
 /**
  * Class Status
@@ -47,7 +48,7 @@ class Status implements IStatus
      * @param string $key
      * @param bool   $includePhoto
      */
-    public function __construct(string $host, string $key, bool $includePhoto)
+    public function __construct(string $host, #[SensitiveParameter] string $key, bool $includePhoto)
     {
         $this->host = $host;
         $this->key = $key;
