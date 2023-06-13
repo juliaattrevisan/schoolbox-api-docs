@@ -4,7 +4,6 @@ namespace Schoolbox\User\Pronoun;
 
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritDoc
      */
@@ -42,7 +41,6 @@ class Mapper extends \Schoolbox\Mapper
             )
         );
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

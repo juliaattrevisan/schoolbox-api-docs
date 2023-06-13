@@ -8,10 +8,10 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model implements ISoftDeletable, Sequential
 {
+    use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
-    use ModelTrait\UpdatedBy;
     use ModelTrait\CreateCollection;
     use ModelTrait\HasSequence;
 
@@ -19,23 +19,9 @@ class Model implements ISoftDeletable, Sequential
     public const OBJECTIVE_DEFAULT = 'them';
     public const POSSESSIVE_DEFAULT = 'their';
 
-
-    protected int $id;
-
     protected string $subjective = self::SUBJECTIVE_DEFAULT;
     protected string $objective = self::OBJECTIVE_DEFAULT;
     protected string $possessive = self::POSSESSIVE_DEFAULT;
-
-    public function setId($id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @param string $subjective

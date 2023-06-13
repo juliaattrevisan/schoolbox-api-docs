@@ -405,6 +405,7 @@ class UserMapper extends Mapper
                 /** @var House $schoolHouse **/
                 $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
 
+                /** @var User\Pronoun\Model **/
                 $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
 
                 $users[$userId] = $this->hydrate($row)
