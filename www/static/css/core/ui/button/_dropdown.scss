@@ -296,6 +296,7 @@ $f-dropdown-icon-align: 0.25rem;
     box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
     overflow-y: auto;
     overflow-x: hidden;
+    margin-bottom: 0;
 
     &.drop-top {
         max-height: none;
@@ -333,12 +334,14 @@ $f-dropdown-icon-align: 0.25rem;
     [class*="icon-"]:before {
         padding-right: 0.8125rem;
     }
+    // This logic needs to be fixed to not apply when within a table.
     @media #{$small-only} {
         //ensure the menu lines up with the button on mobile
-        max-width: 70%;
-        left: auto !important;
+        /* Switched to using vw so that dropdown sizes within smaller elements
+        scale predictably based on available screen width. */
+        max-width: 55vw;
         right: 0px;
-        width: 70% !important;
+        width: 55vw !important;
     }
 }
 

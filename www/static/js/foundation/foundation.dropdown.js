@@ -235,18 +235,8 @@
 
             this.clear_idx();
 
-            if (this.small()) {
-                var p = this.dirs.bottom.call(dropdown, target, settings);
-
-                dropdown.attr("style", "").removeClass("drop-left drop-right drop-top").css({
-                    position: "absolute",
-                    top: p.top,
-                });
-
-                dropdown.css(Foundation.rtl ? "right" : "left", left_offset);
-            }
             // detect if dropdown is in an overflow container
-            else if (parentOverflow !== "visible") {
+            if (parentOverflow !== "visible") {
                 var offset = target[0].offsetTop + target[0].offsetHeight;
 
                 dropdown.attr("style", "").css({
@@ -277,7 +267,8 @@
                  * the height of the target element must also be included in the calculation as the dropdown will be rendered below the target.
                  * also make sure that when we grab the outerheight, we include any margins
                  */
-                var targetRelativeHeight = Math.ceil(target.offset().top) + target.height() + dropdown.outerHeight(true);
+                var targetRelativeHeight =
+                    Math.ceil(target.offset().top) + target.height() + dropdown.outerHeight(true);
 
                 /**
                  * the relative position and height of the dropdown exceeds the document height
