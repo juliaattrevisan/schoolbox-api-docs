@@ -207,7 +207,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-
         /* Redirect to some kind of third party who spawned this assessment
          */
         $externalRedirectUrl = null;
@@ -260,9 +259,12 @@ class Controller extends Assessment\Controller
 
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
         $canAttempt = (
-            // We do not include $assessment->isImplementation() in this condition because quizzes that are not yet
-            // implemented still need to be previewable.
-            $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId() &&
+            $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId() && (
+                $assessment->isImplementation() || (
+                    // Quizzes that are not yet implemented still need to be previewable, but only by those with instructor access.
+                    $this->getRequest()->query['preview'] ?? '0' === '1' && $this->getAccess()->isInstructor($student, $assessment->getContext()->getFolder())
+                )
+            ) &&
             $actionValidator->canAttemptQuiz($this->getUser(), $assessment)
         );
 
