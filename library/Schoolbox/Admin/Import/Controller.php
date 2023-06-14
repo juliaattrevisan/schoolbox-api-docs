@@ -107,11 +107,13 @@ class Controller extends ConfigController
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
-        $externalType = (string)$this->getConfigLoader()->get('external_type');
         $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $dataSource = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
         $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
+
+        $lissUsername = (string)$this->getConfigLoader()->get('external_liss_username');
+        $lissPassword = (string)$this->getConfigLoader()->get('external_liss_password');
 
         $hasIndicator = $host !== '' && $key !== '';
 
@@ -174,7 +176,7 @@ class Controller extends ConfigController
             'hasPerformUpdate' => $hasPerformUpdate,
             /* Decide if the current suds selection uses the cyclic grid
              */
-            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource)
+            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($lissUsername, $lissPassword, $dataSource)
         ])->setTitle('School Data Import'));
     }
 

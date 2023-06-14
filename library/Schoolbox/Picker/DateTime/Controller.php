@@ -279,7 +279,11 @@ class Controller extends Base
         $user = $this->getUser();
 
         // Only cycle based timetable should be returned
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy(
+            (string)$this->getConfigLoader()->get('external_liss_username'),
+            (string)$this->getConfigLoader()->get('external_liss_password'),
+            (string)$this->getConfigLoader()->get('schooldata_import_data_source')
+        )) {
             return false;
         }
 
