@@ -319,11 +319,7 @@ try {
             break;
 
         case 'timetable':
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy(
-                (string)$config->get('external_liss_username'),
-                (string)$config->get('external_liss_password'),
-                (string)$config->get('schooldata_import_data_source')
-            )) {
+            if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('external_liss_username'), (string)$config->get('external_liss_password'), (string)$config->get('schooldata_import_data_source'))) {
                 $api = buildApiClass(
                     Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class,
                     [

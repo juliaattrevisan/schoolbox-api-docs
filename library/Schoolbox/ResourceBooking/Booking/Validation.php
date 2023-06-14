@@ -541,11 +541,7 @@ class Validation
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
         $roomCodes = [$roomCode => true];
 
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy(
-            (string)$this->configLoader->get('external_liss_username'),
-            (string)$this->configLoader->get('external_liss_password'),
-            (string)$this->configLoader->get('schooldata_import_data_source')
-        )) {
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$this->configLoader->get('external_liss_username'), (string)$this->configLoader->get('external_liss_password'), (string)$this->configLoader->get('schooldata_import_data_source'))) {
             $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes);
         } else {
             $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
