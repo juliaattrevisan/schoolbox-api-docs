@@ -262,7 +262,8 @@ class Controller extends Assessment\Controller
             $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId() && (
                 $assessment->isImplementation() || (
                     // Quizzes that are not yet implemented still need to be previewable, but only by those with instructor access.
-                    $this->getRequest()->query['preview'] ?? '0' === '1' && $this->getAccess()->isInstructor($student, $assessment->getContext()->getFolder())
+                    // @see also the similar access level check in www/assess/init.php.
+                    $assessment->isSpecification() && $this->getAccess()->isInstructor($student, $assessment->getContext()->getFolder())
                 )
             ) &&
             $actionValidator->canAttemptQuiz($this->getUser(), $assessment)

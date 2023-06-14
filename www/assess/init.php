@@ -72,7 +72,8 @@ if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
 }
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
-    // I can't attempt a spec assessment
+    // I can't attempt a spec assessment.
+    // A similar condition exists in the 'canAttempt' rule in Learning/Assessment/Quiz/Controller->getSummary(), so this is a double-check.
     if ($assessment->isSpecification()) {
         error(19);
     }
