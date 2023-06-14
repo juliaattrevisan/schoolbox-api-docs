@@ -23,7 +23,6 @@ use Schoolbox\ValueLabelInterface;
  */
 class Lookup
 {
-
     /**
      * A list of mappers to use when retrieving lookup data
      *
