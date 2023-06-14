@@ -99,6 +99,21 @@ class Model implements ISoftDeletable, Sequential
      */
     public function __toString(): string
     {
+        // if both pronoun terms are missing, then return a blank string
+        if (empty($this->subjective) && empty($this->objective)) {
+            return "";
+        }
+        // if missing a pronoun term, dont show a weird /
+        // missing subjective, but objective exists
+        if (empty($this->subjective) && !empty($this->objective)) {
+            return $this->objective;
+        }
+        // missing objective, but subjective exists
+        if (!empty($this->subjective) && empty($this->objective)) {
+            return $this->subjective;
+        }
+
+        // both terms exist display the concat of them
         return sprintf("%s / %s", $this->subjective, $this->objective);
     }
 }

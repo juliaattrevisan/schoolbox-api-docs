@@ -45,4 +45,14 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
+
+    /**
+     * Ensure we return the correct sequence
+     * @param $options
+     * @return \Schoolbox\Collection|\Schoolbox\GenericCollection
+     */
+    public function findAll($options = [])
+    {
+        return parent::findAll($options)->sortBy('sequence', 'asc');
+    }
 }
