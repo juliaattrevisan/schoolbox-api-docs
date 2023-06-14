@@ -27,3 +27,8 @@ VALUES (null, null, null, 1, now(), now()),
        ('they', 'them', 'theirs', 4, now(), now()),
        ('ze', 'hir', 'hirs', 5, now(), now());
 
+
+### admin email signature tooltip
+UPDATE config
+SET description = "Email signatures will only be applied to users that have an email address that matches the School Email Domain.  Available tokens are: [title] [firstname] [surname] [fullname] [email] [position] [subjectivepronoun] [subjectivepronounproper] [objectivepronoun] [objectivepronounproper] [possessivepronoun] [possessivepronounproper]."
+WHERE name = 'email_signature';

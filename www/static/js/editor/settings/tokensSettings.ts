@@ -5,7 +5,20 @@
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import { replaceAllStringSections, StringSection } from "@js/util/stringUtils";
 
-const DEFAULT_TOKENS = ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"];
+const DEFAULT_TOKENS = [
+    "[firstname]",
+    "[preferredname]",
+    "[surname]",
+    "[fullname]",
+    "[house]",
+    "[year]",
+    "[subjectivepronoun]",
+    "[subjectivepronounproper]",
+    "[objectivepronoun]",
+    "[objectivepronounproper]",
+    "[possessivepronoun]",
+    "[possessivepronounproper]",
+];
 
 /**
  * If tokens are enabled, return the tokens settings

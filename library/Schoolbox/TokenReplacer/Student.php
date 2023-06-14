@@ -17,6 +17,12 @@ use Schoolbox\User;
  * Supports the following tokens:
  * * "[firstname]": the student's first name
  * * "[preferredname]": the student's preferred name, falling back to first name, if empty
+ * * "[subjectivepronoun]": the student's subjective pronoun.
+ * * "[subjectivepronounproper]": the student's subjective pronoun, in first Char capitalised.
+ * * "[objectivepronoun]": the student's objective pronoun.
+ * * "[objectivepronounproper]": the student's objective pronoun, in first Char capitalised.
+ * * "[possessivepronoun]": the student's possessive pronoun.
+ * * "[possessivepronounproper]": the student's possessive pronoun, in first Char capitalised.
  * * "[surname]":   the student's surname
  * * "[fullname]":  the student's full name
  * * "[year]":      the student's year level, or an empty string if not defined
@@ -52,12 +58,18 @@ class Student
         return $this->tokenReplacer->replace(
             $body,
             [
-                '[firstname]'     => $student->getFirstname(),
-                '[preferredname]' => $student->getPreferredName() ?? $student->getFirstname(),
-                '[surname]'       => $student->getLastname(),
-                '[fullname]'      => $student->getFullName(),
-                '[year]'          => $student->getYear() ? $student->getYear()->getName() : '',
-                '[house]'         => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : '',
+                '[firstname]'               => $student->getFirstname(),
+                '[preferredname]'           => $student->getPreferredName() ?? $student->getFirstname(),
+                '[surname]'                 => $student->getLastname(),
+                '[fullname]'                => $student->getFullName(),
+                '[year]'                    => $student->getYear() ? $student->getYear()->getName() : '',
+                '[house]'                   => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : '',
+                '[subjectivepronoun]'       => $student->getPronoun()->getSubjective(),
+                '[subjectivepronounproper]' => ucfirst($student->getPronoun()->getSubjective()),
+                '[objectivepronoun]'        => $student->getPronoun()->getObjective(),
+                '[objectivepronounproper]'  => ucfirst($student->getPronoun()->getObjective()),
+                '[possessivepronoun]'       => $student->getPronoun()->getPossessive(),
+                '[possessivepronounproper]' => ucfirst($student->getPronoun()->getPossessive()),
             ]
         );
     }

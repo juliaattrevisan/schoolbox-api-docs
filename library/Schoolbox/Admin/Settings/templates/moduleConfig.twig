@@ -70,7 +70,21 @@
                     targetElements: [`#${el.id}`],
                     baseHref: el.getAttribute("data-href"),
                     hasTokens: el.getAttribute("data-has-tokens") === "1",
-                    tokenList: ["[title]", "[firstname]", "[preferredname]", "[surname]", "[fullname]", "[email]", "[position]"], //surname as that is the language we are using in admin user modify
+                    tokenList: [
+                        "[title]",
+                        "[firstname]",
+                        "[preferredname]",
+                        "[surname]", //surname as that is the language we are using in admin user modify
+                        "[fullname]",
+                        "[email]",
+                        "[position]",
+                        "[subjectivepronoun]",
+                        "[subjectivepronounproper]",
+                        "[objectivepronoun]",
+                        "[objectivepronounproper]",
+                        "[possessivepronoun]",
+                        "[possessivepronounproper]",
+                    ],
                 }
             }))
         });

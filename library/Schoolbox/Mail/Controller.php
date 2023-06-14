@@ -520,6 +520,12 @@ class Controller extends Base
                         '[fullname]'      => $this->getUser()->getFullName(),
                         '[email]'         => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
                         '[position]'      => $this->getUser()->getPositionTitle(),
+                        '[subjectivepronoun]'       => $this->getUser()->getPronoun()->getSubjective(),
+                        '[subjectivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getSubjective()),
+                        '[objectivepronoun]'        => $this->getUser()->getPronoun()->getObjective(),
+                        '[objectivepronounproper]'  => ucfirst($this->getUser()->getPronoun()->getObjective()),
+                        '[possessivepronoun]'       => $this->getUser()->getPronoun()->getPossessive(),
+                        '[possessivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getPossessive()),
                     ]
                 );
         }

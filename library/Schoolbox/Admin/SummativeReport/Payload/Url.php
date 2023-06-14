@@ -174,6 +174,12 @@ class Url
                             //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
                             '[preferredname]' => \Scrub::filename($student->getGivenName() ?: 'unknown'),
                             '[title]'         => \Scrub::filename($student->getTitle() ?: 'unknown'),
+                            '[subjectivepronoun]'       => \Scrub::filename($student->getPronoun()->getSubjective() ?: 'unknown'),
+                            '[subjectivepronounproper]' => \Scrub::filename(ucfirst($student->getPronoun()->getSubjective()) ?: 'unknown'),
+                            '[objectivepronoun]'        => \Scrub::filename($student->getPronoun()->getObjective() ?: 'unknown'),
+                            '[objectivepronounproper]'  => \Scrub::filename(ucfirst($student->getPronoun()->getObjective()) ?: 'unknown'),
+                            '[possessivepronoun]'       => \Scrub::filename($student->getPronoun()->getPossessive() ?: 'unknown'),
+                            '[possessivepronounproper]' => \Scrub::filename(ucfirst($student->getPronoun()->getPossessive()) ?: 'unknown'),
                         ]
                     );
                     //grab the filename excluding the folder paths

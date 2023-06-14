@@ -97,6 +97,12 @@ class Mapper extends BaseMapper
                 '[firstName]',
                 '[lastName]',
                 '[email]',
+                '[subjectivepronoun]',
+                '[subjectivepronounproper]',
+                '[objectivepronoun]',
+                '[objectivepronounproper]',
+                '[possessivepronoun]',
+                '[possessivepronounproper]',
             ];
 
             $vieweeEmail = empty($viewee->getEmail()) ? '' : $viewee->getEmail();
@@ -107,6 +113,12 @@ class Mapper extends BaseMapper
             $viewerLastName = empty($viewer->getLastName()) ? '' : $viewer->getLastName();
             $vieweeFirstName = empty($viewee->getFirstName()) ? '' : $viewee->getFirstName();
             $viewerFirstName = empty($viewer->getFirstName()) ? '' : $viewer->getFirstName();
+            $subjectivePronoun = $viewer->getPronoun()->getSubjective();
+            $subjectivePronounProper = ucfirst($viewer->getPronoun()->getSubjective());
+            $objectivePronoun = $viewer->getPronoun()->getObjective();
+            $objectivePronounProper = ucfirst($viewer->getPronoun()->getObjective());
+            $possessivePronoun = $viewer->getPronoun()->getPossessive();
+            $possessivePronounProper = ucfirst($viewer->getPronoun()->getPossessive());
 
             $array_replace = [
                 \urlencode((string)$viewee->getId()),
@@ -120,7 +132,13 @@ class Mapper extends BaseMapper
                 \urlencode($viewer->getUsername()),
                 \urlencode($viewerFirstName),
                 \urlencode($viewerLastName),
-                \urlencode($viewerEmail)
+                \urlencode($viewerEmail),
+                \urlencode($subjectivePronoun),
+                \urlencode($subjectivePronounProper),
+                \urlencode($objectivePronoun),
+                \urlencode($objectivePronounProper),
+                \urlencode($possessivePronoun),
+                \urlencode($possessivePronounProper),
             ];
 
             $processedButton = clone $button;

@@ -5,6 +5,12 @@
     '[firstName]':  user.firstName,
     '[lastName]':   user.lastName,
     '[email]':      user.email,
+    '[subjectivepronoun]': user.pronoun.subjective,
+    '[subjectivepronounproper]': user.pronoun.subjective | capitalize,
+    '[objectivepronoun]': user.pronoun.objective,
+    '[objectivepronounproper]': user.pronoun.objective |capitalize,
+    '[possessivepronoun]': user.pronoun.possessive,
+    '[possessivepronounproper]': user.pronoun.possessive |capitalize
 } %}
 
 <nav id="nav">

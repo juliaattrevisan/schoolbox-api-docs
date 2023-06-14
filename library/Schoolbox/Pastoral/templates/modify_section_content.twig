@@ -7,7 +7,8 @@
         <p class="meta">
             You may use the following tokens that will be substituted with the
             students details on creation:
-            [firstname], [preferredname], [surname], [fullname], [year], [house]
+            [firstname], [preferredname], [surname], [fullname], [year], [house],
+            [subjectivepronoun], [subjectivepronounproper], [objectivepronoun], [objectivepronounproper], [possessivepronoun], [possessivepronounproper]
         </p>
         <textarea id="body_public" name="body_public">{{ record.bodyPublic }}</textarea>
         {% include 'sub/attachzone.twig' with {attachzone: attachzonePublic} %}
@@ -16,7 +17,8 @@
         <p class="meta">
             You may use the following tokens that will be substituted with the
             students details on creation:
-            [firstname], [preferredname], [surname], [fullname], [year], [house]
+            [firstname], [preferredname], [surname], [fullname], [year], [house],
+            [subjectivepronoun], [subjectivepronounproper], [objectivepronoun], [objectivepronounproper], [possessivepronoun], [possessivepronounproper]
         </p>
         <textarea id="body_private" name="body_private">{{ record.bodyPrivate }}</textarea>
         {% include 'sub/attachzone.twig' with {attachzone: attachzonePrivate} %}
