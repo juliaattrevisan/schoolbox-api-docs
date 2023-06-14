@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint\Test;
 
-use External\IConnector;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
@@ -22,14 +21,15 @@ class ValidUsesSudsTimetableTest extends TestCase
     /**
      * @dataProvider getTestIsSatisfiedByData
      * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable::isSatisfiedBy
-     * @param string|null $externalDb
-     * @param string|null $dataSource
-     * @param bool        $expected
+     * @param string $lissUsername
+     * @param string $lissPassword
+     * @param string $dataSource
+     * @param bool   $expected
      * @return void
      */
-    public function testIsSatisfiedBy(?string $externalDb, ?string $dataSource, bool $expected): void
+    public function testIsSatisfiedBy(string $lissUsername, string $lissPassword, string $dataSource, bool $expected): void
     {
-        $this->assertSame($expected, (new ValidUsesSudsTimetable())->isSatisfiedBy($externalDb, $dataSource));
+        $this->assertSame($expected, (new ValidUsesSudsTimetable())->isSatisfiedBy($lissUsername, $lissPassword, $dataSource));
     }
 
     /**
@@ -39,55 +39,120 @@ class ValidUsesSudsTimetableTest extends TestCase
      */
     public function getTestIsSatisfiedByData(): iterable
     {
-        yield 'null external DB, null timetable' => [
-            null, null, false,
-        ];
-        yield 'null external DB, SUDS timetable' => [
-            null, Factory::COMPASS, false,
-        ];
-        yield 'null external DB, non-SUDS timetable' => [
-            null, Factory::KAMAR, false,
+        /* Most likely synonymous with Live DB connector only, using the cyclic grid
+         */
+        yield 'empty liss username, empty liss password, empty suds selection' => [
+            '', '', '', false,
         ];
 
-        yield 'non-SUDS external DB, null timetable' => [
-            IConnector::EXTERNAL_TYPE_SYNERGETIC, null, false,
-        ];
-        yield 'non-SUDS external DB, SUDS timetable' => [
-            IConnector::EXTERNAL_TYPE_SYNERGETIC, Factory::COMPASS, false,
-        ];
-        yield 'non-SUDS external DB, non-SUDS timetable' => [
-            IConnector::EXTERNAL_TYPE_SYNERGETIC, Factory::KAMAR, false,
+        /* SUDS Connector supplies the timetable data by itself
+         */
+        yield 'empty liss username, empty liss password, SUDS timetable' => [
+            '', '', Factory::COMPASS, true,
         ];
 
-        yield 'SUDS external DB, null timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, null, false,
+        /* SUDS LISS supplies the timetable data on top of some other SUDS Connector
+         */
+        yield 'supplied liss username, supplied liss password, SUDS timetable' => [
+            'qwerty', 'abcdefg', Factory::COMPASS, true,
         ];
-        yield 'SUDS external DB, iSAMS timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::ISAMS, true,
+
+        /* KAMAR populates the cyclic grid
+         */
+        yield 'empty liss username, empty liss password, non-SUDS timetable' => [
+            '', '', Factory::KAMAR, false,
         ];
-        yield 'SUDS external DB, Kamar timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::KAMAR, false,
+
+        /* Partial LISS configuration; returns false
+         * because you can't successfully populate Schedule Timetable like this
+         */
+        yield 'partial liss configuration 1, null timetable' => [
+            'aaaaaaa', '', '', false
         ];
-        yield 'SUDS external DB, Sentral timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::SENTRAL, true,
+
+        /* Partial LISS configuration; returns false
+         * because you can't successfully populate Schedule Timetable like this
+         */
+        yield 'partial liss configuration 2, null timetable' => [
+            '', 'bbbbbbb', '', false
         ];
-        yield 'SUDS external DB, TASS API timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::TASS_API, true,
+
+        /* Partial LISS configuration; returns false
+         * because you can't successfully populate Schedule Timetable like this
+         */
+        yield 'partial liss configuration 3, SUDS timetable' => [
+            'aaaaaaa', '', Factory::COMPASS, false
         ];
-        yield 'SUDS external DB, Compass timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::COMPASS, true,
+
+        /* Partial LISS configuration; returns false
+         * because you can't successfully populate Schedule Timetable like this
+         */
+        yield 'partial liss configuration 4, SUDS timetable' => [
+            '', 'bbbbbbb', Factory::COMPASS, false
         ];
-        yield 'SUDS external DB, Wonde timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::WONDE, true,
+
+        /* Partial LISS configuration; returns false
+         * because you can't successfully populate Schedule Timetable like this
+         */
+        yield 'partial liss configuration 5, non-SUDS timetable' => [
+            'aaaaaaa', '', Factory::KAMAR, false
         ];
-        yield 'SUDS external DB, LISS timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::LISS, true,
+
+        /* Partial LISS configuration; returns false
+         * because you can't successfully populate Schedule Timetable like this
+         */
+        yield 'partial liss configuration 6, non-SUDS timetable' => [
+            '', 'bbbbbbb', Factory::KAMAR, false
         ];
-        yield 'SUDS external DB, CSV timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::CSV, false,
+
+        /* SUDS Connectors that populate Schedule Timetable
+         */
+        yield 'iSAMS timetable' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::ISAMS, true,
         ];
-        yield 'SUDS external DB, empty timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, '', false,
+
+        yield 'Sentral timetable' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::SENTRAL, true,
+        ];
+
+        yield 'TASS API timetable' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::TASS_API, true,
+        ];
+
+        yield 'Compass timetable' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::COMPASS, true,
+        ];
+
+        yield 'Wonde timetable' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::WONDE, true,
+        ];
+
+        yield 'LISS timetable' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::LISS, true,
+        ];
+
+        yield 'Veracross timetable' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::VERACROSS, true,
+        ];
+
+        /* Special cases for Cyclic grid fulfilment
+         * Supplying liss credentials enables Schedule Timetable
+         * Otherwise it fulfils Cyclic Timetable
+         */
+        yield 'KAMAR timetable 1' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::KAMAR, true,
+        ];
+
+        yield 'KAMAR timetable 2' => [
+            '', '', Factory::KAMAR, false,
+        ];
+
+        yield 'CSV timetable 1' => [
+            'a b c d e f g', 'ppyyqq 1 2 3', Factory::CSV, true,
+        ];
+
+        yield 'CSV timetable 2' => [
+            '', '', Factory::CSV, false,
         ];
     }
 }
