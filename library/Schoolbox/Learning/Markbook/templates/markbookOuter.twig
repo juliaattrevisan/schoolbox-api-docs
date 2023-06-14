@@ -42,26 +42,6 @@
     <pop-out-menu-markbook />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/popOutMenuMarkbook.js?v={{ config.site_version }}"></script>
-<style>
-{#
-    Styles to ensure the markbook remains full-width, even when there are not enough columns to fill the screen.
-    DataTables sets the width of these elements as an inline style attribute, so we need to use !important to override them.
-
-    This means when the markbook is filtered, it will remain full-width.
- #}
-.dataTables_scrollHeadInner {
-    width: 100% !important;
-    padding-right: 0px !important;
-}
-
-.dataTables_scrollHeadInner table {
-    width: 100% !important;
-}
-
-.dataTables_scrollBody table {
-    width: 100% !important;
-}
-</style>
 
 {% autoescape 'js' %}
 <script type="text/javascript">
