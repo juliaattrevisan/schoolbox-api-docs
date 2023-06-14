@@ -199,16 +199,24 @@
                     datepickerDate: true,
                 },
                 "plan-open-date": {
-                    required: true,
-                    datepickerDate: true,
+                    required: function () {
+                        return $.inArray("open", options.getAvailableDateFields()) > -1
+                    },
+                    datepickerDate: function () {
+                        return $.inArray("open", options.getAvailableDateFields()) > -1
+                    },
                 },
                 "plan-due-date": {
                     required: true,
                     datepickerDate: true,
                 },
                 "plan-close-date": {
-                    required: true,
-                    datepickerDate: true,
+                    required: function () {
+                        return $.inArray("close", options.getAvailableDateFields()) > -1
+                    },
+                    datepickerDate: function () {
+                        return $.inArray("close", options.getAvailableDateFields()) > -1
+                    },
                 },
                 "plan-participants": {
                     required: function () {
