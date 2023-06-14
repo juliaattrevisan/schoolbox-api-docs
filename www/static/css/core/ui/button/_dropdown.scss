@@ -358,9 +358,6 @@ $f-dropdown-icon-align: 0.25rem;
 }
 
 #tab-control {
-    @media #{$small-only} {
-        width: 99% !important;
-    }
     @media screen and (min-width: 767px) {
         max-width: rem-calc(688);
         width: auto;
