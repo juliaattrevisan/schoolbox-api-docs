@@ -475,6 +475,7 @@ class Controller extends Base
                 'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
+                'pronouns' => $this->pronounMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),

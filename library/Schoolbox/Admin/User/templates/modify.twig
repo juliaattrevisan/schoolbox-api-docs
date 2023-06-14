@@ -126,7 +126,7 @@
                                             <select id="pronoun" name="pronoun">
                                                 {% for pronoun in pronouns %}
                                                     {% if pronoun %}
-                                                        <option value="{{ pronoun.id }}" {% if user.pronoun.id == pronoun.id %}selected{% endif %}>{{ pronoun }}</option>
+                                                        <option value="{{ pronoun.id }}" {% if user.pronoun and (user.pronoun.id == pronoun.id) %}selected{% endif %}>{{ pronoun }}</option>
                                                     {% endif %}
                                                 {% endfor %}
                                             </select>
