@@ -83,9 +83,6 @@ class Module extends BaseModule
             '(?:index|subject|currentReport|printableReport)',
             function ($params) {
                 $student = $this->getUserMapper()->findWithSubjects($params['id']);
-                $student->setSubjectCollection(
-                    $this->getSubjectMapper()->findAllForStudent($student)
-                );
                 try {
                     // School house is actually an integer.
                     // It should be a model, and will be for this purpose.

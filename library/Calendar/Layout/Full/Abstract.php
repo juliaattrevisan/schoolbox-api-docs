@@ -109,25 +109,19 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Does the current user have permission to view this calendar page?
      *
-     * @param int            $userId
+     * @param Schoolbox\User $viewee
      * @param Schoolbox\User $currentUser
-     * @param Group          $groupHandler
+     * @return bool
      * @throws Exception if user doesn't have permission to view calendar.
      *                   The exception's code matches a Schoolbox error code.
-     * @return bool
      */
-    public static function permissionCheck($userId, Schoolbox\User $currentUser, Group $groupHandler): bool
+    public static function permissionCheck(Schoolbox\User $viewee, Schoolbox\User $currentUser): bool
     {
-        if ($currentUser->getId() != $userId) {
-            try {
-                UserMapper::getInstance()->findById($userId);
-            } catch (Exception $e) {
-                throw new Exception('User does not exist', 31, $e);
-            }
+        if ($currentUser->getId() !== $viewee->getId()) {
             if (
                 !$currentUser->getSuperuser() &&
                 !$currentUser->getRole()->isStaff() &&
-                !$groupHandler->isParentOfChild($userId)
+                !$currentUser->isParentOf($viewee)
             ) {
                 throw new Exception('Current user does not have permission to view calendar for this user', 125);
             }

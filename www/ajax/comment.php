@@ -62,8 +62,8 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
     }
 
     /**
-     * @var $uMap UserMapper
-     * @var $cMap FolderMapper
+     * @var UserMapper   $uMap
+     * @var FolderMapper $cMap
      */
     $uMap = UserMapper::getInstance();
     $cMap = FolderMapper::getInstance();
@@ -82,7 +82,7 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 
     switch ($comment->getCommenter()->getRole()->getType()) {
         case Role::PARENT:
-            if (!$gHandler->isParentOfChild($comment->getStudent()->getId())) {
+            if (!$sessionUser->isParentOf($comment->getStudent())) {
                 respond(400, 'You do not have permission to view this category.');
             }
             break;
@@ -98,19 +98,16 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
             break;
     }
 
-    /** @var $commentMapper CommentMapper */
     $commentMapper = CommentMapper::getInstance();
     if (!$commentMapper->save($comment)) {
         respond(400, 'You do not have permission to view this category.');
     }
-}
-
-// we are expecting one of three scenarios, all require you to be the owner:
-// 1. get comment as it exists
-// 2. update comment
-// 3. delete comment
-// permissions check regardless of method
-else {
+} else {
+    // we are expecting one of three scenarios, all require you to be the owner:
+    // 1. get comment as it exists
+    // 2. update comment
+    // 3. delete comment
+    // permissions check regardless of method
     if (isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
         $a = new Authenticator();
         $sessionUser = $a->getSessionUser();

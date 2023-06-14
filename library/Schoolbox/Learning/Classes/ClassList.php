@@ -30,7 +30,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class ClassList
 {
-
     /** @var User */
     private $user;
 
@@ -64,7 +63,7 @@ class ClassList
 
 
     /**
-     * Returns a set of of classes, along with subsidiary data, suitable for
+     * Returns a set of classes, along with subsidiary data, suitable for
      * rendering on the classes component or page
      *
      * @param Term\Model          $term
@@ -77,7 +76,7 @@ class ClassList
      * @throws DefinitionException
      * @throws UnexpectedValueException
      */
-    public function getClassList(Term\Model $term, Alaress_Date_Format $now)
+    public function getClassList(Term\Model $term, Alaress_Date_Format $now): array
     {
         $classTypes    = [];
         $folderList    = $this->folderMapper->createCollection();
@@ -89,13 +88,12 @@ class ClassList
             // Iterate all subjects from the SIS and try to find folders with that class code
 
             foreach ($this->user->getSubjectCollection() as $subject) {
-                $folder                       = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
-                if (!$folder) {
-                    continue;
-                }
-                $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
-                $classTypes[$folder->getId()] = $subject['classType'] ?? '';
+                $classTypes[$subject['id']] = $subject['classType'];
             }
+            $folderList = $this->folderMapper->findByColumn(
+                'id',
+                array_keys($classTypes)
+            );
         }
 
         // Add in other folders with feedback during the term, this will pick up archived classes

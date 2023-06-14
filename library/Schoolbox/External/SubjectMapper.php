@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 class SubjectMapper extends Schoolbox\External\Mapper
 {
-
     /**
     * Defines mapping for this mapper.
     *
@@ -76,42 +75,60 @@ class SubjectMapper extends Schoolbox\External\Mapper
 
 
     /**
-    * Gets all subjects for the given student.
-    *
-    * @param User $user
-    * @return SubjectCollection
-    */
-    public function findAllForStudent(User $user)
+     * Gets all subjects for the given student/staff.
+     * This returns subjects only in SB
+     *
+     * @param User      $user
+     * @param User|null $viewer
+     * @return SubjectCollection
+     */
+    public function findAllForUser(User $user, ?User $viewer): SubjectCollection
     {
         $subjects = $this->external_user->getSubjectList($user);
 
         // if no subjects, just return an empty collection
-        if ($subjects === false) {
+        if (empty($subjects)) {
             return new SubjectCollection();
         }
 
-        $category_statement = $this->database->prepare('
-			SELECT c.id, GROUP_CONCAT(co.code) AS code
-			FROM folder c
-			LEFT JOIN folder_code co ON co.folder_id = c.id AND co.deleted_at IS NULL
-			WHERE (co.code=? OR co.code=?)
-		');
-        $add_id_map = function ($subject) use ($category_statement) {
-            $category_statement->execute([
-                $subject['code'],
-                $subject['campusCode'] . "/" . $subject['code']
-            ]);
-            if ($row = $category_statement->fetch()) {
-                $subject['id']   = $row['id'];
-//              $subject['code'] = $row['code'];
+        $folderMapper = Schoolbox\Resource\Folder\Mapper::getInstance();
+        $access = Schoolbox\Permission\Access\Access::getInstance();
+        $subjectCollection = new SubjectCollection();
+        foreach ($subjects as $subject) {
+            $folder = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
+            if (!$folder || $subjectCollection->offsetExists($folder->getId())) {
+                continue;
             }
-            return $subject;
-        };
-        $id_filter = function ($subject) {
-            return isset($subject['id']);
-        };
-        return new SubjectCollection(
-            array_filter(array_map($add_id_map, $subjects), $id_filter)
+            try {
+                $folderAccess = !$viewer ? Schoolbox\Permission\Access\UserAccess::ACCESS_DENY : $access->getFolderAccess($viewer, $folder->getId());
+            } catch (Schoolbox\Mapper\Exception $e) {
+                $folderAccess = Schoolbox\Permission\Access\UserAccess::ACCESS_DENY;
+            }
+            $subjectCollection->offsetset(
+                $folder->getId(),
+                [
+                    'id' => $folder->getId(),
+                    'matchedCode' => $folder->getMatchedCode(),
+                    'name' => $folder->getName(),
+                    'code' => $subject['code'],
+                    'campusCode' => $subject['campusCode'],
+                    'classType' => $subject['classType'],
+                    'perm' => $folderAccess,
+                ]
+            );
+        }
+        return $subjectCollection->sortByCallback(
+            static function (array $a, array $b): int {
+                $type = strnatcasecmp($a['classType'], $b['classType']);
+                if ($type === 0) {
+                    $name = strnatcasecmp($a['name'], $b['name']);
+                    if ($name === 0) {
+                        return strnatcasecmp($a['matchedCode'], $b['matchedCode']);
+                    }
+                    return $name;
+                }
+                return $type;
+            }
         );
     }
 }

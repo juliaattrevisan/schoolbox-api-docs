@@ -51,6 +51,7 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
+        /** @var \Predis\ClientInterface $redis */
         $redis = $this->getDi()->get('redis.storage');
 
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
@@ -68,10 +69,10 @@ $app = new class extends CliTool\App {
             HELP;
             exit;
         }
-        if (!$this->getOpt(self::OPT_SHORT_USER_ID) && !$this->getOpt(self::OPT_SHORT_REDIS_KEY)) {
-            $this->getLogger()->warning('-u or -k is required.');
-            exit();
-        }
+//        if (!$this->getOpt(self::OPT_SHORT_USER_ID) && !$this->getOpt(self::OPT_SHORT_REDIS_KEY)) {
+//            $this->getLogger()->warning('-u or -k is required.');
+//            exit();
+//        }
 
         $match      = PipeManager::REDIS_SESSION_PREFIX . '*';
         $targetUser = null;
@@ -136,6 +137,8 @@ $app = new class extends CliTool\App {
             fwrite($this->getOutStream(), sprintf("subject: %s\n", (string)$redisSessionUser->getSubjectCollection()?->count()));
             fwrite($this->getOutStream(), sprintf("child: %s\n", (string)$redisSessionUser->getChildren()?->count()));
             fwrite($this->getOutStream(), sprintf("teacher: %s\n", (string)$redisSessionUser->getTeacherCollection()?->count()));
+            fwrite($this->getOutStream(), sprintf("userAccess: %s\n", (string)$redisSessionUser->getAccessList()->count()));
+            fwrite($this->getOutStream(), sprintf("TTL: %s\n", $redis->ttl($key)));
             fwrite($this->getOutStream(), sprintf("summary: %s,%s,%s,%s,%s,%s\n", $key, $redisSessionUser->getUsername(), $sessionUserSize, $redisSessionUser->getRole()->getType(), $_SESSION['lasttime'], $_SESSION['ip']));
             session_unset();
         }

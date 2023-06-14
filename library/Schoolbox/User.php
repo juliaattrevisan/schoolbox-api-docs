@@ -18,7 +18,6 @@ use House;
 use HouseResidential;
 use Config;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
@@ -28,7 +27,6 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Pastoral;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
@@ -193,7 +191,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      *
      * Not guaranteed to have been loaded: thus, this may be null.
      *
-     * @var SubjectCollection|Subject[]|null
+     * @var SubjectCollection|null
      */
     protected $subject_collection;
 
@@ -261,8 +259,8 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     private $children = null;
 
-    /** @var GenericCollection|Pastoral\Group\Member\Model[] */
-    private $pastoralGroupsMemberships;
+    /** @var array<int>|null */
+    private ?array $pastoralGroupIds = null;
 
     /** If set, it'll be used to build email address, instead of Config option */
     private ?string $emailDomain = null;
@@ -285,7 +283,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         if ($this->campusCollection !== null) {
             $this->campusCollection = clone $this->campusCollection;
         }
-//        $this->accessList = clone $this->accessList;
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
         }
@@ -1017,7 +1014,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return SubjectCollection|Subject[]|null
+     * @return SubjectCollection|null
      */
     public function getSubjectCollection()
     {
@@ -1341,24 +1338,24 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return GenericCollection|Pastoral\Group\Member\Model[]|null
+     * @return array<int>|null
      */
-    public function getPastoralGroupsMemberships(): ?GenericCollection
+    public function getPastoralGroupIds(): ?array
     {
-        return $this->pastoralGroupsMemberships;
+        return $this->pastoralGroupIds;
     }
 
     /**
-     * @param Collection|Pastoral\Group\Member\Model[] $pastoralGroupsMemberships
+     * @param array<int> $pastoralGroupIds
      * @return $this
      */
-    public function setPastoralGroupsMemberships(Collection $pastoralGroupsMemberships): self
+    public function setPastoralGroupIds(array $pastoralGroupIds): self
     {
-        if (!$this->pastoralGroupsMemberships) {
-            $this->pastoralGroupsMemberships = Pastoral\Group\Member\Model::createCollection();
+        if (!$this->pastoralGroupIds) {
+            $this->pastoralGroupIds = [];
         }
 
-        $this->pastoralGroupsMemberships->replaceWith($pastoralGroupsMemberships);
+        $this->pastoralGroupIds = $pastoralGroupIds;
         return $this;
     }
 

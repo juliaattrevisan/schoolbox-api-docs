@@ -13,8 +13,6 @@ use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledE
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
@@ -29,20 +27,6 @@ class Session
      * @var bool
      */
     private $useLoginLog = true;
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-    /**
-     * @param Access|null $access
-     * @throws Exception
-     */
-    public function __construct(Access $access = null)
-    {
-        $this->access = $access ?? Access::getInstance();
-    }
 
     /**
      * Is this a valid session ID? If not, this session should be thrown out
@@ -94,7 +78,6 @@ class Session
      */
     public function create(string $username, ?string $jwtId = null): bool
     {
-        $userHandler  = new \User();
         $userMapper   = UserMapper::getInstance();
         $groupHandler = new Group();
 
@@ -111,22 +94,21 @@ class Session
             session_regenerate_id();
 
             //register users id
-            $_SESSION['id']                 = $user->getId();
-            $_SESSION['sid']                = $user->getExternalId();
-            $_SESSION['gid']                = $user->getRole()->getId();
-            $_SESSION['key']                = $user->getKey();
-            $_SESSION['lasttime']           = time();
-            $_SESSION['username']           = $user->getUsername();
+            $_SESSION['id']       = $user->getId();
+            $_SESSION['sid']      = $user->getExternalId();
+            $_SESSION['lasttime'] = time();
+            $_SESSION['username'] = $user->getUsername();
             if (
                 Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
                 && !empty(Config::get('external_portal'))
             ) {
                 $_SESSION['password'] = $_POST['password'] ?? null;
             }
-            $_SESSION['ip']                 = $ip;
+            $_SESSION['ip'] = $ip;
 
             // add mobile session data
             $sbmAuth = new Authenticator();
+            // this populates user's subjectCollection
             $result = $sbmAuth->appendSession($user->getId());
 
             //if no mail enabled or user has elected to use external client set mailhandle to mailto:
@@ -144,7 +126,7 @@ class Session
 
             // If external is off, or user is not a parent, user explicitly has no children (as opposed to unknown)
             if (Config::get('external_enable')) {
-                $this->setSynergyInfo($userMapper, $user);
+                $this->setSynergyInfo($user);
             }
 
             if ($this->getUseLoginLog()) {
@@ -153,7 +135,7 @@ class Session
                     'username' => $user->getUsername(),
                     'ip'       => $ip,
                     'login'    => 1,
-                    'jwtId'    => $jwtId
+                    'jwtId'    => $jwtId,
                 ]);
             }
 
@@ -443,7 +425,8 @@ class Session
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
             if (
-                $ds && $this->ldapAuth(
+                $ds
+                && $this->ldapAuth(
                     $ds,
                     $username,
                     $password,
@@ -526,14 +509,12 @@ class Session
 
 
     /**
-     * @param UserMapper $userMapper
      * @param User       $user
-     * @throws MapperException
      */
-    private function setSynergyInfo(UserMapper $userMapper, User $user)
+    private function setSynergyInfo(User $user)
     {
         $synUser = new External_User();
-        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $subjectMapper = new \Schoolbox\External\SubjectMapper();
         $externalUser = new \Schoolbox\External\User(
             \Schoolbox\Config\ConfigMapper::getInstance()->getConfigLoader()->get('external_type'),
             new \External_Class(),
@@ -556,104 +537,16 @@ class Session
         if ($synergyId) {
             if ($user->getRole()->isParent()) {
                 $children = $user->getChildren();
-                //load parent object int the child object
-                $externalUser->loadParents($children);
 
                 /* Get subject list for each student */
                 if ($children->count()) {
                     foreach ($children as $childObject) {
                         if (!$childObject->getHideTimetable()) {
-                            $subjectList = $synUser->getSubjectList($childObject);
+                            $childObject->setSubjectCollection($subjectMapper->findAllForUser($childObject, $user));
                         } else {
-                            $subjectList = false;
-                        }
-
-                        $subjects = array();
-                        $subjectIDList = array();
-
-                        if (is_array($subjectList)) {
-                            foreach ($subjectList as $subject) {
-                                $cat = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
-
-                                if ($cat instanceof Folder && !\in_array($cat->getId(), $subjectIDList, false)) {
-                                    $subject['id']   = $cat->getId();
-                                    $subject['name'] = $cat->getName();
-                                    $subject['perm'] = $this->access->getFolderAccess($user, $cat->getId());
-                                    // TODO Lawn mow student subjects and parent children subjects to have same format and semantics.
-                                    // TODO Currently, a student's $subject['code'] is the SB folder code,
-                                    // TODO whereas a parent's child $subject['code'] is the SIS code.
-                                    $subject['matchedCode'] = $cat->getMatchedCode();
-                                    $subjects[]      = $subject;
-                                    $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
-                                }
-                            }
-                        }
-
-                        // sorts in the same order as the profile and sidemenu, which is “Type”, “Class Name”, “Class Code”
-                        uasort(
-                            $subjects,
-                            static function (array $a, array $b): int {
-                                $type = strnatcasecmp($a['classType'], $b['classType']);
-                                if ($type === 0) {
-                                    $name = strnatcasecmp($a['name'], $b['name']);
-                                    if ($name === 0) {
-                                        return strnatcasecmp($a['code'], $b['code']);
-                                    }
-                                    return $name;
-                                }
-                                return $type;
-                            }
-                        );
-
-                        $_SESSION['children'][] = array(
-                            'id' => $childObject->getId(),
-                            'sid' => $childObject->getExternalId(),
-                            'gid' => $childObject->getRole()->getId(),
-                            'year' => $childObject->getYear(),
-                            'name' => $childObject->getFullName(),
-                            'subjects' => $subjects
-                        );
-                    }
-                }
-            } else {
-                //user is not parent so get timetable information
-                if (!$user->getHideTimetable()) {
-                    $subjectList = $synUser->getSubjectList($_SESSION['user']);
-                } else {
-                    $subjectList = false;
-                }
-                $catList = array();
-                if (is_array($subjectList)) {
-                    // declare the array
-                    $_SESSION['subjects'] = [];
-
-                    foreach ($subjectList as $subject) {
-                        //check subject exists.. we cant link to subjects that dont exist its ugly
-                        // Ensure the link goes to an actual homepage, too
-                        $result = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
-
-                        if ($result instanceof Folder) {
-                            if (!in_array($result->getId(), $catList)) {
-                                $subject['id'] = $result->getId();
-                                $subject['name'] = $result->getName();
-                                $subject['perm'] = $this->access->getFolderAccess($user, $result->getId());
-                                $subject['code'] = $result->getMatchedCode();
-                                $_SESSION['subjects'][] = $subject;
-
-                                $catList[] = $result->getId(); //check for dupes
-                            }
+                            $childObject->setSubjectCollection(new \Schoolbox\External\SubjectCollection());
                         }
                     }
-
-                    if (is_array($_SESSION['subjects'])) {
-                        usort($_SESSION['subjects'], function ($a, $b) {
-                            return strnatcmp($a['name'], $b['name']);
-                        });
-                    }
-
-                    $_SESSION['timetable'] = 1;
-                } else {
-                    $_SESSION['timetable'] = 0;
                 }
             }
         }

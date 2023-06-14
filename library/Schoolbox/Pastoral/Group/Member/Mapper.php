@@ -91,4 +91,17 @@ class Mapper extends BaseMapper
 
         return $collection;
     }
+
+    /**
+     * @param User $user
+     * @return array
+     */
+    public function findGroupIdsForUser(User $user): array
+    {
+        return $this->findByColumn('user_id', $user->getId())->map(
+            static function (Model $userGroup) {
+                return $userGroup->getGroup()->getId();
+            }
+        )->getAll();
+    }
 }

@@ -565,8 +565,6 @@ class Folder extends SimpleStrategy
             return null;
         }
         foreach ($parent->getChildren() as $child) {
-            // TODO: Consider populating child subject collection here
-            //       (it is never populated at this point)
             if ($child->getSubjectCollection() === null) {
                 continue;
             }
@@ -585,9 +583,7 @@ class Folder extends SimpleStrategy
      */
     private function parseSubjectIds(User $user): array
     {
-        return $user->getSubjectCollection()->map(static function (array $subject) {
-            return $subject['id'];
-        })->getAll();
+        return $user->getSubjectCollection()->getIds();
     }
 
 

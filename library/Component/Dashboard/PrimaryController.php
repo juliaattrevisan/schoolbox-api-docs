@@ -10,7 +10,6 @@
 
 class Component_Dashboard_PrimaryController extends Component_Dashboard_ControllerAbstract
 {
-
     protected $homeroom;
 
     /**
@@ -20,17 +19,16 @@ class Component_Dashboard_PrimaryController extends Component_Dashboard_Controll
      */
     public function execute()
     {
-        if (is_array($_SESSION['subjects'])) {
-            foreach ($_SESSION['subjects'] as $subject) {
-                if (stristr($subject['code'], 'HR') || stristr($subject['code'], 'EN')) {
-                    $this->homeroom = $subject['code'];
-                    break;
-                }
+        foreach ($this->getUser()->getSubjectCollection() as $subject) {
+            if (stristr($subject['code'], 'HR') || stristr($subject['code'], 'EN')) {
+                $this->homeroom = $subject['code'];
+                break;
             }
         }
 
         if (empty($this->homeroom)) {
-            $this->homeroom = $_SESSION['subjects'][0]['code'];
+            $firstSubject = $this->getUser()->getSubjectCollection()->first();
+            $this->homeroom = $firstSubject ? $firstSubject['code'] : '';
         }
 
         return true;

@@ -536,14 +536,10 @@ class DataSource
     private function getPermissionClause(User $viewer, ?int $studentId, ?int $typeId, ?int $subtypeId = null, string $alias = 'p'): array
     {
         // Hydrate pastoral group membership, if not yet set
-        if ($viewer->getPastoralGroupsMemberships() === null) {
-            $viewer->setPastoralGroupsMemberships(
-                $this->accessLevelCensor->getPastoralGroupMemberMapper()->findByColumn('user_id', $viewer->getId())
+        if ($viewer->getPastoralGroupIds() === null) {
+            $viewer->setPastoralGroupIds(
+                $this->accessLevelCensor->getPastoralGroupMemberMapper()->findGroupIdsForUser($viewer)
             );
-        }
-        $pastoralGroupIds = [];
-        foreach ($viewer->getPastoralGroupsMemberships() as $groupsMembership) {
-            $pastoralGroupIds[] = $groupsMembership->getGroup()->getId();
         }
 
         /**
@@ -578,8 +574,8 @@ class DataSource
                 ->equals('user_id', $viewer->getId())
                 ->equals('role_id', $viewer->getRole()->getId())
                 ->equals('role_type', $viewer->getRole()->getType());
-            if (!empty($pastoralGroupIds)) {
-                $paInnerPb1->in('group_id', $pastoralGroupIds);
+            if (!empty($viewer->getPastoralGroupIds())) {
+                $paInnerPb1->in('group_id', $viewer->getPastoralGroupIds());
             }
             $hasAccessPb    = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a1"))
                 ->setParamPrefix("{$alias}a1")
@@ -595,8 +591,8 @@ class DataSource
                 ->equals('user_id', $viewer->getId())
                 ->equals('role_id', $viewer->getRole()->getId())
                 ->equals('role_type', $viewer->getRole()->getType());
-            if (!empty($pastoralGroupIds)) {
-                $paInnerPb2->in('group_id', $pastoralGroupIds);
+            if (!empty($viewer->getPastoralGroupIds())) {
+                $paInnerPb2->in('group_id', $viewer->getPastoralGroupIds());
             }
             $noAccessPb    = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a2"))
                 ->setParamPrefix("{$alias}a2")

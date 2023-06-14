@@ -11,6 +11,7 @@ namespace Schoolbox\Group\Manage\ArrayToModel;
 
 use InvalidArgumentException;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
+use Schoolbox\User;
 
 /**
  * Translator for translating an array representation of UserAccess into a model.

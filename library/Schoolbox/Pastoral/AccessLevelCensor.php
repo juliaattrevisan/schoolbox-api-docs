@@ -26,8 +26,13 @@ use function spl_object_hash;
  */
 class AccessLevelCensor
 {
-    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    private $pastoralGroupMemberMapper;
+    /**
+     * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
+     */
+    public function __construct(
+        private PastoralGroupMemberMapper $pastoralGroupMemberMapper
+    ) {
+    }
 
     /**
      * Gets PastoralGroupMemberMapper
@@ -35,9 +40,6 @@ class AccessLevelCensor
      */
     public function getPastoralGroupMemberMapper(): PastoralGroupMemberMapper
     {
-        if ($this->pastoralGroupMemberMapper === null) {
-            $this->pastoralGroupMemberMapper = PastoralGroupMemberMapper::getInstance();
-        }
         return $this->pastoralGroupMemberMapper;
     }
 
@@ -229,10 +231,10 @@ class AccessLevelCensor
      */
     public function getRawAccessLevel(Model $record, User $user): int
     {
-        // Hydrate group membership
-        if ($user->getPastoralGroupsMemberships() === null) {
-            $user->setPastoralGroupsMemberships(
-                $this->getPastoralGroupMemberMapper()->findByColumn('user_id', $user->getId())
+        // Set pastoral group ids
+        if ($user->getPastoralGroupIds() === null) {
+            $user->setPastoralGroupIds(
+                $this->pastoralGroupMemberMapper->findGroupIdsForUser($user)
             );
         }
 

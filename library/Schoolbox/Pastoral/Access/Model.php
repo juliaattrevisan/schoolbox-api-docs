@@ -170,8 +170,8 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
             return null;
         }
 
-        foreach ($user->getPastoralGroupsMemberships() as $groupsMembership) {
-            if ($thisGroup->getId() === $groupsMembership->getGroup()->getId()) {
+        foreach ($user->getPastoralGroupIds() as $groupId) {
+            if ($thisGroup->getId() === $groupId) {
                 return $this->access;
             }
         }

@@ -519,7 +519,7 @@ class UserMapper extends Mapper
     {
         $user = $this->findById($id);
         $subject_mapper = new External\SubjectMapper();
-        $user->setSubjectCollection($subject_mapper->findAllForStudent($user));
+        $user->setSubjectCollection($subject_mapper->findAllForUser($user, $this->getSessionUser()));
         return $user;
     }
 

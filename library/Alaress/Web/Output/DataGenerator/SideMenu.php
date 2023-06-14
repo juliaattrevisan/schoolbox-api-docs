@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
-use Alaress\Session\Session;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -25,65 +24,21 @@ use Schoolbox\User;
 class SideMenu implements IDataGenerator
 {
     /**
-     * @var User|null
-     */
-    private $currentUser;
-
-
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
-
-
-    /**
-     * @var Session
-     */
-    private $session;
-
-
-    /**
-     * @var MenuSectionMapper
-     */
-    private $menuSectionMapper;
-
-
-    /**
-     * @var MenuItemMapper
-     */
-    private $menuItemMapper;
-
-
-    /**
-     * @var BookmarkMapper
-     */
-    private $bookmarkMapper;
-
-
-    /**
      * Constructor
      *
      * @param IConfigLoader     $config
      * @param null|User         $currentUser
-     * @param Session           $session
      * @param MenuSectionMapper $menuSectionMapper
      * @param MenuItemMapper    $menuItemMapper
      * @param BookmarkMapper    $bookmarkMapper
      */
     public function __construct(
-        IConfigLoader $config,
-        ?User $currentUser,
-        Session $session,
-        MenuSectionMapper $menuSectionMapper,
-        MenuItemMapper $menuItemMapper,
-        BookmarkMapper $bookmarkMapper
+        private IConfigLoader $config,
+        private ?User $currentUser,
+        private MenuSectionMapper $menuSectionMapper,
+        private MenuItemMapper $menuItemMapper,
+        private BookmarkMapper $bookmarkMapper,
     ) {
-        $this->config            = $config;
-        $this->currentUser       = $currentUser;
-        $this->session           = $session;
-        $this->menuSectionMapper = $menuSectionMapper;
-        $this->menuItemMapper    = $menuItemMapper;
-        $this->bookmarkMapper    = $bookmarkMapper;
     }
 
 
@@ -93,7 +48,7 @@ class SideMenu implements IDataGenerator
     public function generate(?array $chromeData = []): array
     {
         // Return nothing if no user logged in
-        if (!$this->currentUser) {
+        if (!$this->currentUser || !$this->currentUser->getId()) {
             return [];
         }
 
@@ -101,33 +56,17 @@ class SideMenu implements IDataGenerator
 
         $subjectGroups = [];
 
-        // TODO eradicate this session dependency
-        // Shouldn't it be in $currentUser?
-        $subjects = $this->session->get('subjects');
-        if (\is_iterable($subjects)) {
-            foreach ($subjects as $subject) {
-                if ($subject['perm'] >= UserAccess::ACCESS_READ) {
-                    if (!isset($subjectGroups[$subject['classType']])) {
-                        $subjectGroups[$subject['classType']] = [];
-                    }
-                    $subjectGroups[$subject['classType']][] = $subject;
+        foreach ($this->currentUser->getSubjectCollection() as $subject) {
+            if ($subject['perm'] >= UserAccess::ACCESS_READ) {
+                if (!isset($subjectGroups[$subject['classType']])) {
+                    $subjectGroups[$subject['classType']] = [];
                 }
+                $subjectGroups[$subject['classType']][] = $subject;
             }
-            uksort($subjectGroups, function ($a, $b) {
-                return strnatcmp($a, $b);
-            });
         }
-
-        // Sort the subjects within each subjectGroup
-        foreach ($subjectGroups as $subjectGroup => $subjects) {
-            // Each value is an array, so sort each array
-            usort($subjects, function ($a, $b) {
-                return strnatcmp($a['name'] . $a['code'], $b['name'] . $b['code']);
-            });
-
-            // Need to assign back, as $subjects is localised variable
-            $subjectGroups[$subjectGroup] = $subjects;
-        }
+        uksort($subjectGroups, function ($a, $b) {
+            return strnatcmp($a, $b);
+        });
 
         // Get the menu sections in their correct order
 
@@ -154,9 +93,6 @@ class SideMenu implements IDataGenerator
         $nodes = $this->menuItemMapper->getCollectionAsTree($nodes);
 
         // Render this thing out
-        // TODO eradicate this session dependency for children
-        // Shouldn't it be in $currentUser?
-
         return [
             'user'      => $this->currentUser,
             'nodes'     => $nodes,
@@ -165,7 +101,7 @@ class SideMenu implements IDataGenerator
             'groups'    => $this->menuItemMapper->findGroupsForUser($this->currentUser),
             'bookmarks' => $this->bookmarkMapper->findByColumn('owner', $this->currentUser->getId()),
             'siteTitle' => $this->config->get('title'),
-            'children'  => $this->session->get('children', []),
+            'children'  => $this->currentUser->getChildren(),
         ];
     }
 }

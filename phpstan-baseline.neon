@@ -3501,11 +3501,6 @@ parameters:
 			path: library/Schoolbox/External/Profile/Student/Mapper.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between array and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/SubjectMapper.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/AbstractIdFinder.php
@@ -5951,11 +5946,6 @@ parameters:
 			path: library/Schoolbox/User.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/User.php
-
-		-
 			message: "#^Property Schoolbox\\\\User\\:\\:\\$accessList \\(iterable\\<Schoolbox\\\\Permission\\\\Access\\\\UserAccess\\>&Schoolbox\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/User.php
@@ -6189,11 +6179,6 @@ parameters:
 			message: "#^Right side of && is always true\\.$#"
 			count: 2
 			path: library/Url.php
-
-		-
-			message: "#^Property User\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/User.php
 
 		-
 			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"

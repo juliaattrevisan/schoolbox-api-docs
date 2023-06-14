@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
 use UnexpectedValueException;
 use PDO;
 use PDOException;
@@ -471,8 +472,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Log a page view
      *
      * @param Model $category
+     * @param Role  $role
      */
-    public function logPageView(Model $category)
+    public function logPageView(Model $category, Role $role)
     {
 
         if (!$category->isRootNode()) {
@@ -488,7 +490,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             $params = array(
                 'cid' => $category->getId(),
-                'gid' => $_SESSION['gid']
+                'gid' => $role->getId(),
             );
 
             $statement = $this->database->prepare($query);

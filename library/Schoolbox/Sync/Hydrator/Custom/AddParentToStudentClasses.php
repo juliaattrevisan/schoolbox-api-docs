@@ -15,11 +15,9 @@ namespace Schoolbox\Sync\Hydrator\Custom;
 use External_User;
 use External_Class;
 use Monolog\Logger;
-use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
-use Schoolbox\External\Subject;
 use Schoolbox\Role;
 use Schoolbox\User as InternalUser;
 use Schoolbox\UserMapper;
@@ -101,7 +99,7 @@ class AddParentToStudentClasses extends AbstractLoggableHydrator
 
                     $subjects = $this->externalUserHandler->getSubjectList($childUser);
 
-                    /** @var Subject $subject */
+                    /** @var array $subject */
                     foreach ($subjects as $subject) {
                         $folder = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
                         if (!$folder) {
