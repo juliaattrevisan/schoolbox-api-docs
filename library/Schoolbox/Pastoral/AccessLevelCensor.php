@@ -27,17 +27,11 @@ use function spl_object_hash;
 class AccessLevelCensor
 {
     /**
-     * @var Collection <int, GenericCollection>
-     */
-    private Collection $pastoralGroupMembershipCollection;
-
-    /**
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
      */
     public function __construct(
         private PastoralGroupMemberMapper $pastoralGroupMemberMapper
     ) {
-        $this->pastoralGroupMembershipCollection = new Collection();
     }
 
     /**
@@ -228,13 +222,19 @@ class AccessLevelCensor
      */
     public function getRawAccessLevel(Model $record, User $user): int
     {
+        // Set pastoral group ids
+        if ($user->getPastoralGroupIds() === null) {
+            $user->setPastoralGroupIds(
+                $this->pastoralGroupMemberMapper->findGroupIdsForUser($user)
+            );
+        }
+
         // Otherwise start with deny access, and work our way up the permission levels
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
-        /** @var \Schoolbox\Pastoral\Access\Model $access */
         foreach ($record->getAccess() as $access) {
             $access->setPastoral($record);
-            $accessLevelCurrent = $access->getAccessLevel($user, $this->getPastoralGroupMemberships($user));
+            $accessLevelCurrent = $access->getAccessLevel($user);
 
             if ($accessLevelCurrent === null) {
                 // The access rule didn't apply to this user, continue to the next one
@@ -261,19 +261,5 @@ class AccessLevelCensor
     public function isPastoralModerator(User $user): bool
     {
         return null !== $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
-    }
-
-    /**
-     * @param User $user
-     * @return GenericCollection
-     */
-    public function getPastoralGroupMemberships(User $user): GenericCollection
-    {
-        $pastoralGroupMemberships = $this->pastoralGroupMembershipCollection->offsetGet($user->getId());
-        if (!$pastoralGroupMemberships) {
-            $pastoralGroupMemberships = $this->pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
-            $this->pastoralGroupMembershipCollection->offsetSet($user->getId(), $pastoralGroupMemberships);
-        }
-        return $pastoralGroupMemberships;
     }
 }

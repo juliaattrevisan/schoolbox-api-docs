@@ -96,18 +96,18 @@ class AccessLevelCensorTest extends TestCase
 
         // owner
         $owner = (new User())->setId($this->guid++)->setUsername('owner')->setRole((new Role())->setType(Role::STAFF));
-        $owner->setAccessList(UserAccess::createCollection());
+        $owner->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         // no Access
         $noAccessUser = (new User())->setId($this->guid++)->setUsername('no_access');
-        $noAccessUser->setAccessList(UserAccess::createCollection());
+        $noAccessUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         // moderator
         $pastoralModerator = (new User())->setId($this->guid++)->setUsername('moderator');
         $pastoralModPerm   = (new UserAccess())->setAccessLevel(UserAccess::ACCESS_FULL)->setService(UserAccess::SERVICE_PASTORAL)->setUser($pastoralModerator);
         $accessList        = UserAccess::createCollection();
         $accessList->add($pastoralModPerm);
-        $pastoralModerator->setAccessList($accessList);
+        $pastoralModerator->setAccessList($accessList)->setPastoralGroupIds([]);
 
         // prepare records without access
         foreach ($this->buildRelatedRecordCollection($owner) as $records) {
@@ -322,18 +322,28 @@ class AccessLevelCensorTest extends TestCase
     private function generateAccessData()
     {
         $privateAccessUser = (new User())->setId($this->guid++)->setUsername('private_user')->setRole((new Role())->setType(Role::STAFF));
-        $privateAccessUser->setAccessList(UserAccess::createCollection());
+        $privateAccessUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         $publicAccessUser = (new User())->setId($this->guid++)->setUsername('public_user')->setRole((new Role())->setType(Role::STAFF));
-        $publicAccessUser->setAccessList(UserAccess::createCollection());
+        $publicAccessUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         $privateAccessRole     = (new Role())->setId($this->guid++)->setType(Role::STAFF);
         $privateAccessRoleUser = (new User())->setId($this->guid++)->setUsername('private_role')->setRole($privateAccessRole);
-        $privateAccessRoleUser->setAccessList(UserAccess::createCollection());
+        $privateAccessRoleUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         $publicAccessRole     = (new Role())->setId($this->guid++)->setType(Role::STAFF);
         $publicAccessRoleUser = (new User())->setId($this->guid++)->setUsername('public_role')->setRole($publicAccessRole);
-        $publicAccessRoleUser->setAccessList(UserAccess::createCollection());
+        $publicAccessRoleUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
+
+        $privateAccessGroupUser = (new User())->setId($this->guid++)->setUsername('private_group')->setRole((new Role())->setType(Role::STAFF));
+        $privateAccessGroup     = (new Pastoral\Group\Model())->setId($this->guid++);
+        $privateAccessGroupUser->setAccessList(UserAccess::createCollection())
+                               ->setPastoralGroupIds([$privateAccessGroup->getId()]);
+
+        $publicAccessGroupUser = (new User())->setId(107)->setUsername('public_group')->setRole((new Role())->setType(Role::STAFF));
+        $publicAccessGroup     = (new Pastoral\Group\Model())->setId($this->guid++);
+        $publicAccessGroupUser->setAccessList(UserAccess::createCollection())
+                              ->setPastoralGroupIds([$publicAccessGroup->getId()]);
 
         return [
             [
@@ -358,6 +368,18 @@ class AccessLevelCensorTest extends TestCase
                 'record'         => 'Public role access',
                 'user'           => $publicAccessRoleUser,
                 'pastoralAccess' => (new PastoralAccess())->setRole($publicAccessRole)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
+                'privateAccess'  => false,
+            ],
+            [
+                'record'         => 'Private group access',
+                'user'           => $privateAccessGroupUser,
+                'pastoralAccess' => (new PastoralAccess())->setGroup($privateAccessGroup)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE),
+                'privateAccess'  => true,
+            ],
+            [
+                'record'         => 'Public group access',
+                'user'           => $publicAccessGroupUser,
+                'pastoralAccess' => (new PastoralAccess())->setGroup($publicAccessGroup)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
                 'privateAccess'  => false,
             ],
         ];

@@ -259,6 +259,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     private $children = null;
 
+    /** @var array<int>|null */
+    private ?array $pastoralGroupIds = null;
+
     /** If set, it'll be used to build email address, instead of Config option */
     private ?string $emailDomain = null;
 
@@ -280,7 +283,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         if ($this->campusCollection !== null) {
             $this->campusCollection = clone $this->campusCollection;
         }
-//        $this->accessList = clone $this->accessList;
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
         }
@@ -1333,6 +1335,28 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getFormattedEmailDisplay(): string
     {
         return '"' . $this->formatName() . '" <' . $this->getEmail() . '>';
+    }
+
+    /**
+     * @return array<int>|null
+     */
+    public function getPastoralGroupIds(): ?array
+    {
+        return $this->pastoralGroupIds;
+    }
+
+    /**
+     * @param array<int> $pastoralGroupIds
+     * @return $this
+     */
+    public function setPastoralGroupIds(array $pastoralGroupIds): self
+    {
+        if (!$this->pastoralGroupIds) {
+            $this->pastoralGroupIds = [];
+        }
+
+        $this->pastoralGroupIds = $pastoralGroupIds;
+        return $this;
     }
 
     /**
