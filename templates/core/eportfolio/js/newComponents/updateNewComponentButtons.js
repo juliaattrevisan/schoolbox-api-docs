@@ -21,8 +21,8 @@ export function initUpdateNewComponentButtons() {
  */
 function initOnComponentAddedListener() {
     document.addEventListener(UpdateEPortfolioEvents.COMPONENT_ADDED, (event) => {
-        const newComponentCount = updateComponentCount(event.detail.component, true);
-        checkButtonStatus(event.detail.component, newComponentCount);
+        const newComponentCount = updateComponentCount(event.detail.paletteElement, true);
+        checkButtonStatus(event.detail.paletteElement, newComponentCount);
     });
 }
 
@@ -31,8 +31,12 @@ function initOnComponentAddedListener() {
  */
 function initOnComponentRemovedListener() {
     document.addEventListener(UpdateEPortfolioEvents.COMPONENT_REMOVED, (event) => {
-        const newComponentCount = updateComponentCount(event.detail.component, false);
-        checkButtonStatus(event.detail.component, newComponentCount);
+        const targetId = event.detail.component.dataset.componentDefinitionId;
+        const counter = document.querySelector(`[data-component-palette] [data-component-definition-id=${targetId}]`);
+        const paletteElement = counter.parentElement.parentElement;
+
+        const newComponentCount = updateComponentCount(paletteElement, false);
+        checkButtonStatus(paletteElement, newComponentCount);
     });
 }
 
@@ -44,43 +48,15 @@ function initOnComponentRemovedListener() {
  *
  * @returns { Number }
  */
-function updateComponentCount(component, isIncrement) {
-    const counterElement = getCounterElement(component);
+function updateComponentCount(paletteElement, isIncrement) {
+    const counterElement = paletteElement.querySelector('[data-relation="count"]');
+    if (!counterElement) {
+        return; // No counter element, so nothing to update
+    }
     const currentComponentCount = parseInt(counterElement.textContent);
     const currentCount = isIncrement ? currentComponentCount + 1 : currentComponentCount - 1;
     counterElement.textContent = currentCount;
     return currentCount;
-}
-
-/**
- * Get the counter element in the palette to increment/decrement
- *
- * @param { Element }
- *
- * @returns { Element }
- */
-function getCounterElement(component) {
-    const targetClassName = getTargetClassName(component);
-    const counter = document.querySelector(`.icon-masonry-${targetClassName}`);
-    const counterElement = counter.parentElement.querySelector('[data-relation="count"]');
-    return counterElement;
-}
-
-/**
- * To select the appropriate item in the palette
- * @todo - Can we change from targeting a class?
- *
- * @param { Element }
- */
-function getTargetClassName(component) {
-    let targetClassName;
-    component.classList.forEach((className) => {
-        if (className.includes("Component_")) {
-            //currently assumed that every component contains this class string at its root...
-            targetClassName = className;
-        }
-    });
-    return targetClassName;
 }
 
 /**
@@ -89,29 +65,13 @@ function getTargetClassName(component) {
  *
  * @param { Number }
  */
-function checkButtonStatus(component, componentCount) {
-    const newComponentButton = getNewComponentButton(component);
+function checkButtonStatus(paletteElement, componentCount) {
     if (componentCount === 0) {
-        newComponentButton.classList.remove("disabled");
-        newComponentButton.style.opacity = 1;
-    } else if (newComponentButton.getAttribute("data-multi") === "one-only") {
-        newComponentButton.classList.add("disabled");
+        paletteElement.classList.remove("disabled");
+        paletteElement.style.opacity = 1;
+    } else if (paletteElement.getAttribute("data-multi") === "one-only") {
+        paletteElement.classList.add("disabled");
     } else {
-        newComponentButton.style.opacity = 1;
+        paletteElement.style.opacity = 1;
     }
-}
-
-/**
- * Get the relevant button in the new component tabs linked to the
- * component current being updated
- *
- * @param { Element }
- *
- * @returns { Element }
- */
-function getNewComponentButton(component) {
-    const targetClassName = getTargetClassName(component);
-    const counter = document.querySelector(`.icon-masonry-${targetClassName}`);
-    const newComponentButton = counter.parentElement.parentElement;
-    return newComponentButton;
 }

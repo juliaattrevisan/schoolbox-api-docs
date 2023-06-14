@@ -49,7 +49,7 @@ async function replaceExistingComponent(component, newComponentHTML) {
  */
 function getFormData(component) {
     const formData = new FormData();
-    formData.append("add", component.querySelector("a").getAttribute("data-component-id")); //this is to retrieve the new component id to know which type of component to create
+    formData.append("add", component.querySelector("a").getAttribute("data-component-definition-id")); //this is to retrieve the new component id to know which type of component to create
     formData.append("cid", document.getElementById("categoryID").value);
     return formData;
 }

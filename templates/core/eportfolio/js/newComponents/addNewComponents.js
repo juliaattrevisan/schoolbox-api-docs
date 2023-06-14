@@ -548,7 +548,7 @@ async function addNewComponent() {
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
     document.dispatchEvent(
-        new CustomEvent(UpdateEPortfolioEvents.COMPONENT_ADDED, { detail: { component: newComponent } })
+        new CustomEvent(UpdateEPortfolioEvents.COMPONENT_ADDED, { detail: { component: newComponent, paletteElement: __newComponentClone } })
     );
     await gsap.to(newComponent, {
         //fade in the updated component
