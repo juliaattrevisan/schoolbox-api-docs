@@ -742,6 +742,16 @@ class Controller extends Base
             }
         }
 
+        /* Pronoun Logic
+         *
+         */
+        $user->setPronoun(null);
+        if ($post['pronoun']) {
+            $pronoun = new User\Pronoun\Model();
+            $pronoun->setId($post['pronoun']);
+            $user->setPronoun($pronoun);
+        }
+
 
         /* If the config allows you to post images yourself, then
          * deal with the files you threw up into the attachzone

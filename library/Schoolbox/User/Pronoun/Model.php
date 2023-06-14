@@ -92,4 +92,13 @@ class Model implements ISoftDeletable, Sequential
             'term' => sprintf("%s / %s", $this->subjective, $this->objective)
         ];
     }
+
+    /**
+     * helpful standard return / display function
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return sprintf("%s / %s", $this->subjective, $this->objective);
+    }
 }
