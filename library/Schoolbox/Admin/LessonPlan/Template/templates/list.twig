@@ -63,7 +63,7 @@
                                     </div>
                                 </div>
                                 {% set enableRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.postToggleEnableState', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
-                                {% set deleteRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.postDelete', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
+                                {% set deleteRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.delete', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
                                 <nav>
                                     {# Fudge some accessibility text here later, I guess #}
                                     {% if updateRoute %}
@@ -139,9 +139,13 @@
                                                             toast.toastActivate({
                                                                 text: "Deleting..."
                                                             });
-
-                                                            $.post(element.attr('href'), function() {
-                                                            })
+                                                            $.ajax(
+                                                                {
+                                                                    type: 'DELETE',
+                                                                  url: element.attr('href'),
+                                                                    success: function() {}
+                                                                }
+                                                            )
                                                             .done(function() {
                                                                 toast.toastTimeout({
                                                                     text: 'Saved',
