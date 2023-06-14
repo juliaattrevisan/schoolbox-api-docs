@@ -72,7 +72,6 @@ class Authenticator
      * Constructor.
      *
      * @param int             $externalEnable
-     * @param string          $externalType
      * @param string          $username
      * @param string          $password
      * @param LoggerInterface $log
@@ -80,14 +79,12 @@ class Authenticator
      */
     public function __construct(
         int $externalEnable,
-        string $externalType,
         string $username,
         string $password,
         LoggerInterface $log,
         Value $dataObject
     ) {
         $this->externalEnable = $externalEnable;
-        $this->externalType = $externalType;
         $this->username = $username;
         $this->password = $password;
         $this->dataObject = $dataObject;

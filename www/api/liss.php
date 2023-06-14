@@ -18,7 +18,6 @@ $superuser = \Schoolbox\UserMapper::getInstance()->findByUsername(\Schoolbox\Use
 
 $liss = new Receiver(
     (int)$config->get('external_enable'),
-    $config->get('external_type'),
     $config->get('external_liss_username'),
     $config->get('external_liss_password'),
     $config->get('external_liss_exclusions'),

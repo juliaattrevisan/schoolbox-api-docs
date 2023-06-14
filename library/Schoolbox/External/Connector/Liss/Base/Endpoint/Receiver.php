@@ -83,7 +83,6 @@ class Receiver
      * Constructor.
      *
      * @param int                                      $externalEnable    Whether the external db was enabled
-     * @param string                                   $externalType      Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
      * @param string                                   $username          LISS username, as per config
      * @param string                                   $password          LISS password, as per config
      * @param string                                   $exclusionList     A csv list of event types that we should skip
@@ -96,7 +95,6 @@ class Receiver
      */
     public function __construct(
         private int $externalEnable,
-        private string $externalType,
         private string $username,
         private string $password,
         private string $exclusionList,
@@ -205,7 +203,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -354,7 +352,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -372,7 +370,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -390,7 +388,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -408,7 +406,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -426,7 +424,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -444,7 +442,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -462,7 +460,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -480,7 +478,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -498,7 +496,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
