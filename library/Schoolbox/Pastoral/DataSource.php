@@ -574,8 +574,8 @@ class DataSource
                 ->equals('user_id', $viewer->getId())
                 ->equals('role_id', $viewer->getRole()->getId())
                 ->equals('role_type', $viewer->getRole()->getType());
-            if (!empty($pastoralGroupIds)) {
-                $paInnerPb1->in('group_id', $pastoralGroupIds);
+            if (!empty($viewer->getPastoralGroupIds())) {
+                $paInnerPb1->in('group_id', $viewer->getPastoralGroupIds());
             }
             $hasAccessPb    = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a1"))
                 ->setParamPrefix("{$alias}a1")
