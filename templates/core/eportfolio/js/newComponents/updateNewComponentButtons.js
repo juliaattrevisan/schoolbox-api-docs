@@ -51,7 +51,7 @@ function initOnComponentRemovedListener() {
 function updateComponentCount(paletteElement, isIncrement) {
     const counterElement = paletteElement.querySelector('[data-relation="count"]');
     if (!counterElement) {
-        return; // No counter element, so nothing to update
+        return isIncrement; // No counter element, so nothing to update
     }
     const currentComponentCount = parseInt(counterElement.textContent);
     const currentCount = isIncrement ? currentComponentCount + 1 : currentComponentCount - 1;
