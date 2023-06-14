@@ -35,6 +35,15 @@ class AccessLevelCensor
     }
 
     /**
+     * Gets PastoralGroupMemberMapper
+     * @return PastoralGroupMemberMapper
+     */
+    public function getPastoralGroupMemberMapper(): PastoralGroupMemberMapper
+    {
+        return $this->pastoralGroupMemberMapper;
+    }
+
+    /**
      * Filters records and record content that the specified user is not permitted to view.
      *
      * * Records the user is NOT permitted to see are removed completely from graph, becoming NULL
