@@ -7,11 +7,11 @@
 
 namespace Payload\Admin\LMS\LessonPlanTemplate;
 
-use Payload\PostTrait;
+use Payload\DeleteTrait;
 
 class DeleteLessonPlanTemplate extends \Payload\Request
 {
-    use PostTrait;
+    use DeleteTrait;
 
     private int $lessonPanTemplateId;
 
