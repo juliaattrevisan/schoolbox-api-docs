@@ -334,14 +334,26 @@ $f-dropdown-icon-align: 0.25rem;
     [class*="icon-"]:before {
         padding-right: 0.8125rem;
     }
-    // This logic needs to be fixed to not apply when within a table.
     @media #{$small-only} {
-        //ensure the menu lines up with the button on mobile
-        /* Switched to using vw so that dropdown sizes within smaller elements
-        scale predictably based on available screen width. */
-        max-width: 55vw;
-        right: 0px;
-        width: 55vw !important;
+        /*
+            Switched to using vw so that dropdown widths are based on screen space
+            rather than %; if this was embedded within specific parent elements % was
+            calculated on the encapsulating element, which had problems (tables, etc).
+
+            Combining the below properties makes the logic operate like minmax on grids.
+            - Attempt to make yourself 70vw wide.
+            - However, don't ever grow larger than the maximum space you'd take on a
+            single line.
+            - ...and don't ever reduce below what is needed (without jank word breaks).
+
+            It may seem weird to include the width: 70vw AND max-width: max-content but
+            without this, the element will sit at max-content and never reduce in size
+            when screen size is reduced. 70vw kicks in as soon as max-content is no
+            longer sustainable and allows normal wrapping rules to kick in.
+        */
+        min-width: min-content;
+        max-width: max-content;
+        width: 70vw;
     }
 }
 

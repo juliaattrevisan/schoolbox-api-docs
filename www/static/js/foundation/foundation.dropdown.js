@@ -296,7 +296,7 @@
                     p = t.offset();
 
                 p.top = Math.floor(p.top - o.top);
-                p.left = Math.floor(p.left - o.left);
+                p.left = Math.round(p.left - o.left);
 
                 //set some flags on the p object to pass along
                 p.missRight = false;
