@@ -182,7 +182,7 @@ HELP;
      */
     public function runAsRoot(): ?bool
     {
-        return parent::runAsRoot();
+        return null;
     }
 };
 
