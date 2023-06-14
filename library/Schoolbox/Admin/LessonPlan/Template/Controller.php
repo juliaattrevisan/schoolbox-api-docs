@@ -268,7 +268,7 @@ class Controller extends Base
      * @return void
      * @throws Exception
      */
-    public function postDelete(Model $lessonPlanTemplate): void
+    public function delete(Model $lessonPlanTemplate): void
     {
         $this->templateMapper->delete($lessonPlanTemplate);
     }
