@@ -6181,11 +6181,6 @@ parameters:
 			path: library/Url.php
 
 		-
-			message: "#^Property User\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/User.php
-
-		-
 			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
 			count: 1
 			path: library/Wiki.php
