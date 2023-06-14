@@ -5,8 +5,9 @@ namespace Schoolbox\User\Pronoun;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Sequential;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\ValueLabelInterface;
 
-class Model implements ISoftDeletable, Sequential
+class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
@@ -85,11 +86,11 @@ class Model implements ISoftDeletable, Sequential
      *
      * @return array
      */
-    public function getTerm()
+    public function findValueLabelPair()
     {
         return [
-            'id' => $this->getId(),
-            'term' => sprintf("%s / %s", $this->subjective, $this->objective)
+            'value' => $this->getId(),
+            'label' => $this->__toString(),
         ];
     }
 
