@@ -65,10 +65,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
         /** @var \Schoolbox\User $userChild */
         foreach ($this->children as $userChild) {
-            if ($this->getConfigLoader()->get('site_school_code') === 'WSL' && $userChild->getRole()->getId() === 3) {
-                continue;
-            }
-
             $i++;
 
             $this->setVar([
