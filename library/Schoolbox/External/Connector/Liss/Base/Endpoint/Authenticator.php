@@ -26,7 +26,7 @@ class Authenticator
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
-    private const WRONG_CONNECTOR_MESSAGE = 'External Database must be activated and the selected connector must be schoolbox; exiting';
+    private const EXTERNAL_DB_MESSAGE = 'External Database must be activated; exiting';
 
 
     /**
@@ -35,15 +35,6 @@ class Authenticator
      * @var int
      */
     private int $externalEnable;
-
-
-    /**
-     * Whether the external db is the "schoolbox" connector
-     * or something else (it only works with "schoolbox" connector)
-     *
-     * @var string
-     */
-    private string $externalType;
 
 
     /**
@@ -110,13 +101,12 @@ class Authenticator
      */
     public function isAuthenticated(): bool
     {
-        /* Must be using external database and schoolbox connector
+        /* Must be using external database
          */
         $externalEnable = (bool)$this->externalEnable;
-        $externalType = IConnector::EXTERNAL_TYPE_SCHOOLBOX === $this->externalType;
 
-        if (!($externalEnable && $externalType)) {
-            $this->log->info(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$externalEnable) {
+            $this->log->info(self::EXTERNAL_DB_MESSAGE);
 
             return false;
         }
