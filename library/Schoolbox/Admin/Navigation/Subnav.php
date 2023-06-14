@@ -541,6 +541,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the drop down list of titles available for users.',
                     ],
+                    '/adminv2/lists/user-pronoun'                       => [
+                        'name'        => 'User Pronouns',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Configure the drop down list of pronouns available for users.',
+                    ],
                     '/adminv2/lists/submission-type'                  => [
                         'name'        => 'Work Types',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),

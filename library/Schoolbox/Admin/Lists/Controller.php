@@ -1171,6 +1171,40 @@ class Controller extends Base
                 ],
             ]
         ];
+        $return['user-pronoun'] = [
+            'title'             => 'User Pronouns',
+            'mapper'            => \Schoolbox\User\Pronoun\Mapper::class,
+            'delete'            => true,
+            'showId'            => true,
+            'fields'            => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 3,
+                    'readonly'  => true,
+                ],
+                'subjective' => [
+                    'caption'   => 'Subjective',
+                    'width'     => 3,
+                    'maxLength' => 250,
+                    'default'   => '',
+                    'tooltip'    => 'The Subjective Pronoun, used to identify the person (he / she / they)',
+                ],
+                'objective' => [
+                    'caption'   => 'Objective',
+                    'width'     => 3,
+                    'maxLength' => 250,
+                    'default'   => '',
+                    'tooltip'    => 'The Objective Pronoun, eg. (him / her / them)',
+                ],
+                'possessive' => [
+                    'caption'   => 'Possessive',
+                    'width'     => 3,
+                    'maxLength' => 250,
+                    'default'   => '',
+                    'tooltip'    => 'The Objective Pronoun, used to identify something belonging to the person (his / hers / theirs)',
+                ]
+            ]
+        ];
 
         return $return;
     }
