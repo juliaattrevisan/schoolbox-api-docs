@@ -12,13 +12,6 @@ use Schoolbox\User\Formatter;
 
 class User extends DeprecatedModel
 {
-    /**
-     * A copy of the user notifier - it is called when a user changes.
-     *
-     * @var Schoolbox\UserNotifier
-     */
-    protected $userNotifier;
-
     public function __construct()
     {
         $this->_table = "user";
@@ -26,19 +19,6 @@ class User extends DeprecatedModel
         parent::__construct();
     }
 
-
-    /**
-     * @return Schoolbox\UserNotifier
-     */
-    protected function getUserNotifier()
-    {
-        // only load this if you *actually* need it
-        if (empty($this->userNotifier)) {
-            // TODO SA-8354: audit all places this could be used: replace with mapper
-            $this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
-        }
-        return $this->userNotifier;
-    }
 
     public function getByID($id)
     {
@@ -79,25 +59,6 @@ class User extends DeprecatedModel
                 FROM superusers JOIN user ON superusers.id = user.id
                 WHERE user.deleted_at IS NULL";
         return $this->db->query($query)->fetchAll();
-    }
-
-    public function getUserCampus($id)
-    {
-        $campusList  = array();
-        $campusquery = "SELECT campus FROM userCampus WHERE uid = '$id'";
-        $query = $this->db->query($campusquery);
-
-        if ($query->rowCount() > 0) {
-            foreach ($query as $campus) {
-                if ($campus['campus']) {
-                    $campusList[] = $campus['campus'];
-                }
-            }
-        } else {
-            //Place user in campus 1 by default in not assigned
-            $campusList[] = 1;
-        }
-        return $campusList;
     }
 
     public function getBySynergy($sid)
@@ -393,19 +354,6 @@ class User extends DeprecatedModel
         return $this->db->query($query)->fetchAll();
     }
 
-    public function getUserActivity($uid, $limit = 10)
-    {
-        $query = "SELECT object, action, time, c.name AS folder, f.description AS file, l.description AS link
-                    FROM cmsLog
-                    LEFT JOIN folder c ON c.id = objectId
-                    LEFT JOIN file f ON f.id = objectId
-                    LEFT JOIN link l ON l.id = objectId
-                    WHERE user = $uid
-                    ORDER BY time DESC
-                    LIMIT 0,$limit";
-        return $this->db->query($query)->fetchAll();
-    }
-
     /**
      * @param string $username
      * @param int $limit
@@ -415,33 +363,6 @@ class User extends DeprecatedModel
     {
         $query = "SELECT date, ip, login FROM login_log WHERE username = ? ORDER BY date DESC LIMIT 0,$limit";
         return $this->db->query($query, [$username])->fetchAll();
-    }
-
-    /**
-     * Gets all in the system who are in a particular groupID
-     *
-     * @param int|array $groupID
-     * @param bool $hasSynergy If true (default: false), only returns users with synergy IDs
-     * @return array
-     */
-    public function getByGroup($groupID, $hasSynergy = false)
-    {
-        $query = "SELECT *
-                  FROM {$this->_table}
-                  WHERE group_id";
-        if (is_array($groupID)) {
-            $query .= " IN " . '(' . implode(',', $groupID) . ')';
-        } else {
-            $query .= " = '$groupID'";
-        }
-        /* Optionally exclude those without synergy ids
-              */
-        if ($hasSynergy) {
-            $query .= " AND synergy_id IS NOT NULL
-                        AND synergy_id > 0
-                        AND user.deleted_at IS NULL";
-        }
-        return $this->db->query($query)->fetchAll();
     }
 
     /**
