@@ -116,7 +116,9 @@ HELP;
             /* Delete the Awards component for everyone except SMGS St Michaels
              */
             $this->purgeComponent('Component_Dashboard_StMichaelsAwardsController');
-        } elseif ('lc' !== $siteLocation) {
+        }
+
+        if ('lc' !== $siteLocation) {
             /* Delete the Survey Backpack component for everyone except LC Loyola College
              */
             $this->purgeComponent('Custom\\Lc\\Survey\\Component\\Eportfolio\\Controller');
@@ -132,17 +134,37 @@ HELP;
      */
     private function purgeComponent(string $controllerClass): void
     {
+        $this->getLogger()->debug(sprintf(
+            'Deleting component config instances belonging to %s',
+            $controllerClass
+        ));
+
         $this->getDatabaseInternal()->executeQuery(self::DELETE_CONFIG_INSTANCES, [
             'controllerClass' => $controllerClass
         ]);
+
+        $this->getLogger()->debug(sprintf(
+            'Deleting component config definitions belonging to %s',
+            $controllerClass
+        ));
 
         $this->getDatabaseInternal()->executeQuery(self::DELETE_CONFIG_DEFINITIONS, [
             'controllerClass' => $controllerClass
         ]);
 
+        $this->getLogger()->debug(sprintf(
+            'Deleting component instances belonging to %s',
+            $controllerClass
+        ));
+
         $this->getDatabaseInternal()->executeQuery(self::DELETE_COMPONENT_INSTANCES, [
             'controllerClass' => $controllerClass
         ]);
+
+        $this->getLogger()->debug(sprintf(
+            'Deleting component definition belonging to %s',
+            $controllerClass
+        ));
 
         $this->getDatabaseInternal()->executeQuery(self::DELETE_COMPONENT_DEFINITIONS, [
             'controllerClass' => $controllerClass
