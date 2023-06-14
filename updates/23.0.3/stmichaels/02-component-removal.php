@@ -119,9 +119,15 @@ HELP;
         }
 
         if ('lc' !== $siteLocation) {
-            /* Delete the Survey Backpack component for everyone except LC Loyola College
+            /* Delete the Survey Backpack eportfolio component for everyone except LC Loyola College
              */
             $this->purgeComponent('Custom\\Lc\\Survey\\Component\\Eportfolio\\Controller');
+
+            /* Delete the Classroom Learning Snapshot for everyone except LC Loyola College
+             * Not sure if this has proliferated in the wild, but it's the other half of the
+             * Loyola Survey Backpack eportfolio component
+             */
+            $this->purgeComponent('Custom\\Lc\\Survey\\Component\\Homepage\\Controller');
         }
     }
 
