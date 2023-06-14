@@ -129,7 +129,7 @@ export default {
 </script>
 
 <template>
-    <div class="event-container hithere" ref="eventContainer" :class="getAttendanceClass">
+    <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
         <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
         <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete" />
         <span
