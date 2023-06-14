@@ -1187,21 +1187,21 @@ class Controller extends Base
                     'width'     => 3,
                     'maxLength' => 250,
                     'default'   => '',
-                    'tooltip'    => 'The Subjective Pronoun, used to identify the person (he / she / they)',
+                    'tooltip'    => 'The subjective pronoun used to identify the person. For example: he, she, or they.',
                 ],
                 'objective' => [
                     'caption'   => 'Objective',
                     'width'     => 3,
                     'maxLength' => 250,
                     'default'   => '',
-                    'tooltip'    => 'The Objective Pronoun, eg. (him / her / them)',
+                    'tooltip'    => 'The objective pronoun used to identify the person. For example: him, her, them.',
                 ],
                 'possessive' => [
                     'caption'   => 'Possessive',
                     'width'     => 3,
                     'maxLength' => 250,
                     'default'   => '',
-                    'tooltip'    => 'The Objective Pronoun, used to identify something belonging to the person (his / hers / theirs)',
+                    'tooltip'    => 'The possessive pronoun used to identify something belonging to the person. For example: his, hers, theirs.',
                 ]
             ]
         ];
