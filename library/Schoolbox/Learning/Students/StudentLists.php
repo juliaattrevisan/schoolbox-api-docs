@@ -175,6 +175,7 @@ class StudentLists
 
         $studentSisRecord['id']                     = $user->getId();
         $studentSisRecord['preferred']              = $user->getPreferredName();
+        $studentSisRecord['pronoun']                = $user->getPronoun()->__toString();
         $studentSisRecord['email']                  = $user->getEmail();
         $studentSisRecord['lastAccessTime']         = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
         $studentSisRecord['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();
