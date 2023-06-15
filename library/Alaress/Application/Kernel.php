@@ -46,6 +46,7 @@ use External_User;
 use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
+use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -627,6 +628,19 @@ abstract class Kernel
 
         // Web request/response factory
         $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
+
+        // New PSR-7 compliant request object
+        $di->set(
+            'request',
+            $di->lazy(
+                function () {
+                    // This will be a ServerRequestInterface,
+                    // but of a discovered rather than defined type.
+                    // That should be fine: they all obey the same interface.
+                    return (new Psr17Factory())->createServerRequestFromGlobals();
+                }
+            ),
+        );
 
         // SitePage :D
         $di->set(
