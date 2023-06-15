@@ -122,13 +122,12 @@ class Controller extends BaseController
      */
     public function createThread(IThreadLocation $context): void
     {
-        /** @var \stdClass $data */
         $data = $this->psr7Request->getParsedBody();
 
         /* Presume a new thread if you accessed this method
          * but check whether you are actually allowed, first.
          */
-        $thread = $this->threadMapper->createModel()->setOpen($data->open);
+        $thread = $this->threadMapper->createModel()->setOpen($data['open']);
 
         try {
             /* associate() will throw 409 Conflict if you can't/aren't supposed to
@@ -188,13 +187,12 @@ class Controller extends BaseController
      */
     public function createCommentInThread(Model $thread, IThreadLocation $context): void
     {
-        /** @var \stdClass $data */
         $data = $this->psr7Request->getParsedBody();
 
         $comment = $this->commentMapper->createModel()
             ->setThread($thread)
             ->setAuthor($this->getUser())
-            ->setContent($data->content);
+            ->setContent($data['content']);
 
         $this->commentMapper->hasModuleNotifier($context->getCommentNotifier());
         $this->commentMapper->save($comment);

@@ -133,20 +133,20 @@ class Controller extends Base
             // Convert this to a grade group and its levels
             $gradeLevelGroup = $this->gradeLevelGroupMapper
                 ->createModel()
-                ->setId($gradeLevelGroupPayload->id)
-                ->setName($gradeLevelGroupPayload->name)
+                ->setId($gradeLevelGroupPayload['id'])
+                ->setName($gradeLevelGroupPayload['name'])
                 ->setUpdatedBy($this->getUser())
                 ->setGradeLevels($this->gradeLevelMapper->createCollection());
 
-            foreach ($gradeLevelGroupPayload->levels as $gradeLevelPayload) {
+            foreach ($gradeLevelGroupPayload['levels'] as $gradeLevelPayload) {
                 $gradeLevel = $this->gradeLevelMapper
                     ->createModel()
-                    ->setId($gradeLevelPayload->id)
+                    ->setId($gradeLevelPayload['id'])
                     ->setGroup($gradeLevelGroup)
-                    ->setRawGrade((float)$gradeLevelPayload->rawGrade)
-                    ->setLowerBound((float)$gradeLevelPayload->lowerBound)
+                    ->setRawGrade((float)$gradeLevelPayload['rawGrade'])
+                    ->setLowerBound((float)$gradeLevelPayload['lowerBound'])
                     ->setUpdatedBy($this->getUser())
-                    ->setCaption($gradeLevelPayload->caption);
+                    ->setCaption($gradeLevelPayload['caption']);
                 $gradeLevelGroup->getGradeLevels()->add($gradeLevel);
             }
 

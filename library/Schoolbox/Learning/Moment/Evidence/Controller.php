@@ -248,8 +248,6 @@ class Controller extends Base
      */
     public function postMomentForUsers(Collection $users): void
     {
-        // requestBody is a stdclass from JSON, I'd rather work with arrays:
-        // encode then decode
         $requestBody = $this->psr7Request->getParsedBody();
 
         //unless there are mapper errors (and those will change it to 500 as required
