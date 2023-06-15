@@ -25,6 +25,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\User\Pronoun\Model;
 use Schoolbox\UserMapper;
 use Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -520,12 +521,12 @@ class Controller extends Base
                         '[fullname]'      => $this->getUser()->getFullName(),
                         '[email]'         => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
                         '[position]'      => $this->getUser()->getPositionTitle(),
-                        '[subjectivepronoun]'       => $this->getUser()->getPronoun()->getSubjective(),
-                        '[subjectivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getSubjective()),
-                        '[objectivepronoun]'        => $this->getUser()->getPronoun()->getObjective(),
-                        '[objectivepronounproper]'  => ucfirst($this->getUser()->getPronoun()->getObjective()),
-                        '[possessivepronoun]'       => $this->getUser()->getPronoun()->getPossessive(),
-                        '[possessivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getPossessive()),
+                        '[subjectivepronoun]'       => $this->getUser()->getPronoun()->getSubjective() ?: Model::SUBJECTIVE_DEFAULT,
+                        '[subjectivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getSubjective() ?: Model::SUBJECTIVE_DEFAULT),
+                        '[objectivepronoun]'        => $this->getUser()->getPronoun()->getObjective() ?: Model::OBJECTIVE_DEFAULT,
+                        '[objectivepronounproper]'  => ucfirst($this->getUser()->getPronoun()->getObjective() ?: Model::OBJECTIVE_DEFAULT),
+                        '[possessivepronoun]'       => $this->getUser()->getPronoun()->getPossessive() ?: Model::POSSESSIVE_DEFAULT,
+                        '[possessivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
                     ]
                 );
         }
