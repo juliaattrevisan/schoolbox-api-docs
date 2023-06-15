@@ -167,6 +167,16 @@ class Module extends BaseModule
         );
         $preloadResponseFile   = fn (array $params) => $this->preloadResponseFile($params);
 
+        /* Download a submission file
+         */
+        $this->register(
+            self::METHOD_GET,
+            $participantPattern . '/responses/{responseId:\d+}/files/{fileId:\d+}/download',
+            'getResponseFileDownload',
+            $hasResponseFileAccess,
+            $preloadResponseFile,
+        );
+
         // View for an individual response file
         $this->register(
             self::METHOD_GET,

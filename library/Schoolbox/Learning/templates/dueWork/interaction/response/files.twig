@@ -16,7 +16,16 @@
         {% set downloadHref = previewHref ~ '?save=true' %}
     {% else %}
         {% set previewHref = '/storage/fetch.php?hash=' ~ currentFile.hash %}
-        {% set downloadHref = previewHref ~ '&save=true' %}
+        {% set downloadHref = routeLookupIfAuthorized('learningDueWorkResponse.getResponseFileDownload', {
+            assessment: assessment,
+            assessmentId: assessment.id,
+            student: participant.user,
+            studentId: participant.user.id,
+            response: response,
+            responseId: response.id,
+            file: currentFile,
+            fileId: currentFile.id,
+        }) %}
     {% endif %}
     <div class="list-item">
         <div class="card attachment small-12">
