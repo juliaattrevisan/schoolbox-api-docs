@@ -74,7 +74,7 @@ echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
   vagrant up;
   vagrant provision;
 ```
-* (optional) install the [gitsync script](https://github.com/alaress/git-scripts) to keep upstream insync with origin
+* Install the [Git Scripts](https://github.com/alaress/git-scripts) suite of tools. If the `jira-issue-tag` doesn't work after install, add the file from the downloaded zip file at `git-scripts-master/hooks/prepare-commit-msg.jira-issue-tag` into `.git/hooks/` and remove the `.jira-issue-tag` from the file name.
 
 ## Live environment
 
