@@ -17,6 +17,7 @@ use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use SensitiveParameter;
@@ -268,15 +269,24 @@ class Receiver
             (new PayloadCache($this->storageMapper))->cache('classmemberships', $this->superuser, $message);
         }
 
-        $composites = new TimetableCalendar\ClassMemberships(
-            $this->log(),
-            true,
-            \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-            \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
-            $message
-        );
+        /* This is the equivalent of a combined Scheduler.php and Factory.php
+         * since the liss receiver immediately processes upon receiving data
+         *
+         * Since we are receiving a push from schools,
+         * we are always in Perform mode
+         */
+        $composites = (new GenericCollection(IStrategy::class))
+            ->add(new TimetableCalendar\ClassMemberships(
+                $this->log(),
+                true,
+                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
+                $message
+            ));
 
-        $composites->import();
+        /* Shank a database instance
+         */
+        $this->transact($this->importLogMapper->getDatabase(), $composites);
 
         return $this->generateResponse('publishClassMemberships finished.');
     }
