@@ -261,7 +261,7 @@ async function onPopOutSelected(event: CustomEvent) {
         isExcluded.value = "true" === event.detail.isExcluded; //make bool from string issues....
         assessmentType.value = event.detail.assessmentType;
         referenceElement.value = event.detail.target;
-        if ("Due Work" !== assessmentType.value) {
+        if ("Task" === assessmentType.value || "Project" === assessmentType.value) {
             hasLoadError.value = false;
             isLoading.value = false;
             activityItems.value = [];
