@@ -62,7 +62,7 @@ class PayloadCache
         $filename = sprintf(
             'suds_liss_%s_%s.log',
             $name,
-            $now->getDatabase()
+            $now->getUsingFormat('Ymd_His')
         );
 
         return $this->storageMapper->acceptStream($filename, $payload, false, $expiryAt, $superuser);
