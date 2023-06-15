@@ -17,6 +17,7 @@ use GuzzleHttp\Middleware;
 use Predis\ClientInterface as RedisClient;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SensitiveParameter;
 
 /**
  * Factory class for the bridge between Atlas calls and their implementation.
@@ -53,7 +54,7 @@ class BridgeFactory
      * @param string      $token
      * @param RedisClient $redisClient
      */
-    public function __construct(string $token, RedisClient $redisClient)
+    public function __construct(#[SensitiveParameter] string $token, RedisClient $redisClient)
     {
         $this->token       = $token;
         $this->redisClient = $redisClient;

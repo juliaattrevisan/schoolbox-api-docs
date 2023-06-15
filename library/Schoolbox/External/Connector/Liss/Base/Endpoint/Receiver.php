@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
+use SensitiveParameter;
 
 /**
  * Class Receiver
@@ -98,7 +99,7 @@ class Receiver
         private int $externalEnable,
         private string $externalType,
         private string $username,
-        private string $password,
+        #[SensitiveParameter] private string $password,
         private string $exclusionList,
         private string $defaultType,
         private string $teacherIdentifier,

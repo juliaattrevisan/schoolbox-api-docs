@@ -14,6 +14,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
+use SensitiveParameter;
 
 class Registry implements ISoftDeletable
 {
@@ -73,7 +74,7 @@ class Registry implements ISoftDeletable
      * @param string $token
      * @return $this
      */
-    public function setToken($token)
+    public function setToken(#[SensitiveParameter] $token)
     {
         $this->token = $token;
         return $this;

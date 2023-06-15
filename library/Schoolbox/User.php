@@ -27,6 +27,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
+use SensitiveParameter;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
@@ -721,7 +722,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * @param string|null $password
      * @return self
      */
-    public function setPassword(?string $password): self
+    public function setPassword(#[SensitiveParameter] ?string $password): self
     {
         $this->password = $password;
         return $this;

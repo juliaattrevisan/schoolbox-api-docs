@@ -12,13 +12,14 @@ namespace Schoolbox\External\Connector\Pcschools\Base;
 
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ICommunityPortal;
+use SensitiveParameter;
 
 class CommunityPortal extends Base implements ICommunityPortal
 {
     /**
      * @inheritDoc
      */
-    public function changePassword($communityId, $newPassword)
+    public function changePassword($communityId, #[SensitiveParameter] $newPassword)
     {
         return true;
     }
@@ -26,7 +27,7 @@ class CommunityPortal extends Base implements ICommunityPortal
     /**
      * @inheritdoc
      */
-    public function setSecrets($key, $initializationVector)
+    public function setSecrets(#[SensitiveParameter] $key, #[SensitiveParameter] $initializationVector)
     {
     }
 }

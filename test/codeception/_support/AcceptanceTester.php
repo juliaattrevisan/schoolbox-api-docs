@@ -51,13 +51,12 @@ class AcceptanceTester extends Actor
     /**
      * Login to Schoolbox
      *
-     * @param $username
-     * @param $password
+     * @param string $username
+     * @param string $password
      * @throws Exception
      */
-    public function login($username, $password)
+    public function login(string $username, #[SensitiveParameter] string $password): void
     {
-
         $i = $this;
 
         // if snapshot exists - skipping login

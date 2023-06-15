@@ -9,6 +9,7 @@
 namespace Page;
 
 use AcceptanceTester;
+use SensitiveParameter;
 
 /**
  * Login page object
@@ -43,12 +44,11 @@ class Login
     /**
      * Log in as this user via SAML
      *
-     * @param $username
-     * @param $password
-     * @param $rememberMe
+     * @param string $username
+     * @param string $password
      * @throws \Exception
      */
-    public function loginSAML($username, $password)
+    public function loginSAML(string $username, #[SensitiveParameter] string $password): void
     {
         $this->tester->click(self::SAML_BUTTON);
         $this->tester->waitForText("ADFS Schoolbox", 5);
@@ -64,7 +64,7 @@ class Login
      * @param $password
      * @param $rememberMe
      */
-    public function login($username, $password, $rememberMe)
+    public function login($username, #[SensitiveParameter] $password, $rememberMe)
     {
         $this->tester->fillField(self::FIELD_USERNAME, $username);
         $this->tester->fillField(self::FIELD_PASSWORD, $password);

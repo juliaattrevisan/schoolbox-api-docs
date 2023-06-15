@@ -17,6 +17,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SensitiveParameter;
 
 /**
  * Parser for JWTs issued by another instance.
@@ -50,7 +51,7 @@ class OtherInstanceIssued extends Base
     /**
      * @inheritdoc
      */
-    public function accepts(string $jwt): bool
+    public function accepts(#[SensitiveParameter] string $jwt): bool
     {
         $claims = $this->decodeWithoutVerification($jwt);
         return isset($claims[self::CLAIM_INSTANCE_ID]);
@@ -59,7 +60,7 @@ class OtherInstanceIssued extends Base
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt): User
+    public function determineUser(#[SensitiveParameter] string $jwt): User
     {
         // Look up the instance in the registry, and get its public key so that
         // the JWT can be verified.

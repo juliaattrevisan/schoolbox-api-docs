@@ -10,6 +10,7 @@ namespace Schoolbox\External\Importer\User\Hydrator;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User as UserModel;
+use SensitiveParameter;
 
 /**
  * Sets a field in the user based on the value of a key in the imported row,
@@ -57,7 +58,7 @@ class Field implements HydratorInterface
     /**
      * @inheritdoc
      */
-    public function hydrate($row, UserModel $user)
+    public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel
     {
         if (isset($row[$this->fieldname])) {
             if ($this->trim) {

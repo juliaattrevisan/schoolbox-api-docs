@@ -13,6 +13,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
+use SensitiveParameter;
 
 /**
  * Establish connectivity to Turnitin
@@ -94,7 +95,7 @@ class Api
      * @param string $apiKey
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $version, string $host, string $apiKey)
+    public function __construct(string $version, string $host, #[SensitiveParameter] string $apiKey)
     {
         $this->host = $host;
         $this->apiKey = $apiKey;

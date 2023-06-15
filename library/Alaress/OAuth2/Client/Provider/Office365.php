@@ -13,6 +13,7 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use SensitiveParameter;
 
 class Office365 extends AbstractProvider
 {
@@ -49,7 +50,7 @@ class Office365 extends AbstractProvider
      * @param AccessToken $token
      * @return string
      */
-    public function urlUserDetails(AccessToken $token)
+    public function urlUserDetails(#[SensitiveParameter] AccessToken $token)
     {
         return null;
     }
@@ -63,7 +64,7 @@ class Office365 extends AbstractProvider
      * @param AccessToken $token
      * @return mixed
      */
-    public function userDetails($response, AccessToken $token)
+    public function userDetails($response, #[SensitiveParameter] AccessToken $token)
     {
         return null;
     }
@@ -78,7 +79,7 @@ class Office365 extends AbstractProvider
         return 'https://login.windows.net/common/oauth2/token';
     }
 
-    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    public function getResourceOwnerDetailsUrl(#[SensitiveParameter] AccessToken $token)
     {
         return 'https://outlook.office.com/api/v1.0/me';
     }
@@ -100,7 +101,7 @@ class Office365 extends AbstractProvider
         //if no error... please proceed...
     }
 
-    protected function createResourceOwner(array $response, AccessToken $token)
+    protected function createResourceOwner(array $response, #[SensitiveParameter] AccessToken $token)
     {
         // TODO: Implement createResourceOwner() method.
     }

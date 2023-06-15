@@ -13,6 +13,7 @@ use DomainException;
 use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
+use SensitiveParameter;
 
 /**
  * Class Specification
@@ -48,7 +49,7 @@ class Specification implements ISpecification
      * @param string $dsn
      * @param bool   $includePhoto
      */
-    public function __construct(string $host, string $dsn, bool $includePhoto)
+    public function __construct(string $host, #[SensitiveParameter] string $dsn, bool $includePhoto)
     {
         $this->host = $host;
         $this->dsn = $dsn;

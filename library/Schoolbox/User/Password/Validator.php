@@ -12,6 +12,7 @@ use Alaress\Password\Service;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SensitiveParameter;
 
 /**
  * Password validator
@@ -56,11 +57,11 @@ class Validator
      * password verification and generation is intentionally computationally
      * expensive.
      *
-     * @param  string $username
-     * @param  string $password
+     * @param string $username
+     * @param string $password
      * @return bool
      */
-    public function checkPassword($username, $password)
+    public function checkPassword(string $username, #[SensitiveParameter] string $password): bool
     {
         $user = $this->userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
         if (!$user instanceof User) {
@@ -98,7 +99,7 @@ class Validator
      * @param User   $user
      * @param string $password
      */
-    protected function saveUserPassword(User $user, $password)
+    protected function saveUserPassword(User $user, #[SensitiveParameter] string $password): void
     {
         $user
             ->setRetrievablePassword($password)

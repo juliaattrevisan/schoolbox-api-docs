@@ -14,6 +14,7 @@ use DomainException;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -22,7 +23,6 @@ use RuntimeException;
  */
 class Api implements IApi
 {
-
     /**
      * Request timeout
      */
@@ -65,7 +65,7 @@ class Api implements IApi
      * @param string $apiKey
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $host, #[SensitiveParameter] string $apiKey)
     {
         $this->client = $this->initClient($host, $apiKey, self::DEFAULT_TIMEOUT);
 
@@ -85,7 +85,7 @@ class Api implements IApi
      * @return Client
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    private function initClient(string $host, string $key, int $timeout): Client
+    private function initClient(string $host, #[SensitiveParameter] string $key, int $timeout): Client
     {
         /* SIS-API-Key: this header tuple depends on your sis
          * Find out what this should actually be called

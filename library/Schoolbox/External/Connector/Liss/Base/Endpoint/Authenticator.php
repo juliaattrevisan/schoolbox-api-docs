@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 use External\IConnector;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
+use SensitiveParameter;
 
 /**
  * Class Authenticator
@@ -91,7 +92,7 @@ class Authenticator
         int $externalEnable,
         string $externalType,
         string $username,
-        string $password,
+        #[SensitiveParameter] string $password,
         LoggerInterface $log,
         Value $dataObject
     ) {

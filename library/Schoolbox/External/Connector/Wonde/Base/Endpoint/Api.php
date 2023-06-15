@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Wonde\Base\Endpoint;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -20,7 +21,6 @@ use GuzzleHttp\TransferStats;
  */
 class Api implements IApi
 {
-
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
      *
@@ -74,7 +74,7 @@ class Api implements IApi
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey, int $timeout = self::DEFAULT_TIMEOUT)
+    public function __construct(string $host, #[SensitiveParameter] string $apiKey, int $timeout = self::DEFAULT_TIMEOUT)
     {
         $this->client = $this->initClient($host, $apiKey, $timeout);
 
@@ -95,7 +95,7 @@ class Api implements IApi
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    private function initClient(string $host, string $dsn, int $timeout): Client
+    private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
         $credentials = (new Codec\DSN())->decode($dsn);
 

@@ -12,7 +12,6 @@ use Behat\Mink\Element;
 
 class Subcontext_CoreContext extends BaseContext
 {
-
     /**
      * Resets the database to a known clean state.
      *
@@ -58,7 +57,7 @@ class Subcontext_CoreContext extends BaseContext
      * @param string $password
      * @throws Exception if login failed
      */
-    public function login($username, $password)
+    public function login(string $username, #[SensitiveParameter] string $password): void
     {
         $this->loginAttempt($username, $password);
         $this->waitForLink('go-msg', 10000);
@@ -75,7 +74,7 @@ class Subcontext_CoreContext extends BaseContext
      * @param string $password
      * @throws Exception if either username or password input aren't found
      */
-    public function loginAttempt($username, $password)
+    public function loginAttempt(string $username, #[SensitiveParameter] string $password): void
     {
         // Logout first
         $this->logout();

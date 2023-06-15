@@ -22,6 +22,7 @@ use Schoolbox\External;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
+use SensitiveParameter;
 
 /**
  * Class Controller
@@ -297,7 +298,7 @@ class Controller extends Web\Controller\Base
      * @return void
      * @throws InvalidArgumentException
      */
-    private function authenticate(string $key): void
+    private function authenticate(#[SensitiveParameter] string $key): void
     {
         if (!$key) {
             throw new InvalidArgumentException('No authentication token was supplied.', 401);

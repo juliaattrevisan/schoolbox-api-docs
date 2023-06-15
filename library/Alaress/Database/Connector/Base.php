@@ -20,6 +20,7 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Transactor\ITransactor;
 use PDOStatement;
+use SensitiveParameter;
 
 class Base implements IConnector
 {
@@ -80,12 +81,17 @@ class Base implements IConnector
      * @param string $database
      * @param string $username
      * @param string $password
-     * @param array $options Database connection options
+     * @param array  $options Database connection options
      * @return bool
      * @throws \Alaress\Database\Exception
      */
-    public function connect($hostname, $database, $username, $password, $options = [])
-    {
+    public function connect(
+        string $hostname,
+        string $database,
+        string $username,
+        #[SensitiveParameter] string $password,
+        array $options = [],
+    ): bool {
         $this->options = $options;
         $this->username = $username;
         $this->password = $password;

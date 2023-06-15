@@ -21,6 +21,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
+use SensitiveParameter;
 
 /**
  * Class Factory
@@ -152,7 +153,7 @@ class Factory
         LoggerInterface $log,
         bool $perform,
         string $host,
-        string $key,
+        #[SensitiveParameter] string $key,
         \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
         \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
         \Schoolbox\CampusMapper $campusMapper,

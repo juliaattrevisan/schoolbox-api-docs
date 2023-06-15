@@ -14,6 +14,7 @@ use Alaress_Curl_Url;
 use RuntimeException;
 use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -60,7 +61,7 @@ class Api implements IApi
      * @param string $apiKey
      * @param string $module
      */
-    public function __construct(string $host, string $apiKey, string $module)
+    public function __construct(string $host, #[SensitiveParameter] string $apiKey, string $module)
     {
         $this->host   = $host;
         $this->apiKey = $apiKey;

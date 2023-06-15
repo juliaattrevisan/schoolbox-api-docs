@@ -15,6 +15,7 @@ use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
+use SensitiveParameter;
 
 /**
  * Class Api
@@ -104,7 +105,7 @@ class Api implements IApi
      */
     public function __construct(
         private string $host,
-        private string $apiKey,
+        #[SensitiveParameter] private string $apiKey,
         private int $timeout = self::DEFAULT_TIMEOUT,
         private ?Timecop $timecop = null
     ) {
@@ -127,7 +128,7 @@ class Api implements IApi
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    private function initClient(string $host, string $dsn, int $timeout): Client
+    private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
         $credentials = (new Codec\DSN())->decode($dsn);
 

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector;
 
 use Schoolbox\External\Importer\Endpoint\IDSN;
+use SensitiveParameter;
 
 /**
  * This generally manages the production of DSN-related stuff like
@@ -68,7 +69,7 @@ class DSNFactory
      * @param string $key
      * @return array|null
      */
-    public function produceDSNParts(string $type, string $key): ?array
+    public function produceDSNParts(string $type, #[SensitiveParameter] string $key): ?array
     {
         $dsn = $this->produce($type);
 

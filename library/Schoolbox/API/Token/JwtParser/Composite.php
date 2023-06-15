@@ -11,6 +11,7 @@ namespace Schoolbox\API\Token\JwtParser;
 
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\User;
+use SensitiveParameter;
 
 /**
  * Composite parser: takes one or more parsers, and passes calls to `accepts`
@@ -39,7 +40,7 @@ class Composite implements IParser
     /**
      * @inheritdoc
      */
-    public function accepts(string $jwt): bool
+    public function accepts(#[SensitiveParameter] string $jwt): bool
     {
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($jwt)) {
@@ -52,7 +53,7 @@ class Composite implements IParser
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt): User
+    public function determineUser(#[SensitiveParameter] string $jwt): User
     {
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($jwt)) {

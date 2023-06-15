@@ -17,6 +17,7 @@ use BadMethodCallException;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use SensitiveParameter;
 
 /**
  * A mock database connector, compatible with Schoolbox\Mapper.
@@ -252,8 +253,13 @@ class MockConnector implements IConnector
      *
      * @throws BadMethodCallException
      */
-    public function connect($hostname, $database, $username, $password, $options = [])
-    {
+    public function connect(
+        string $hostname,
+        string $database,
+        string $username,
+        #[SensitiveParameter] string $password,
+        array $options = [],
+    ): bool {
         $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
 

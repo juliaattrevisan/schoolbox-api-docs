@@ -15,11 +15,11 @@ use Predis\ClientInterface;
 use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;
 use Schoolbox\Realtime\SessionException;
+use SensitiveParameter;
 use UnexpectedValueException;
 
 class SessionValidator
 {
-
     /** @var ClientInterface */
     protected $redis;
 
@@ -128,7 +128,7 @@ class SessionValidator
      * @throws CommunicationException
      * @return string
      */
-    protected function findUser($token, $label, $prefix)
+    protected function findUser(#[SensitiveParameter] $token, $label, $prefix)
     {
         if (!$token) {
             throw new SessionException("No $label provided on which to search.");

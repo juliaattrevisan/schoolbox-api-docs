@@ -23,7 +23,6 @@ use UnexpectedValueException;
 
 class Controller extends Base
 {
-
     /** @var IConnector */
     private $db;
 

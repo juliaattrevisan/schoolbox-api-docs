@@ -24,6 +24,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage;
+use SensitiveParameter;
 use UnexpectedValueException;
 
 /**
@@ -723,7 +724,7 @@ class UserMapper extends Mapper
      * @return string
      * @throws \PDOException
      */
-    public function hashPassword($password)
+    public function hashPassword(#[SensitiveParameter] string $password): string
     {
         $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
         $statement->execute([$password]);

@@ -15,6 +15,7 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\IConfigLoader;
+use SensitiveParameter;
 use UnexpectedValueException;
 
 class CommunityPortal implements ICommunityPortal
@@ -58,7 +59,7 @@ class CommunityPortal implements ICommunityPortal
     /**
      * @inheritdoc
      */
-    public function setSecrets($key, $initializationVector)
+    public function setSecrets(#[SensitiveParameter] $key, #[SensitiveParameter] $initializationVector)
     {
         $this->key = $key;
         $this->initializationVector = $initializationVector;
@@ -72,7 +73,7 @@ class CommunityPortal implements ICommunityPortal
      * @return bool
      * @throws UnexpectedValueException if either key or IV was not set
      */
-    public function changePassword($communityId, $newPassword)
+    public function changePassword($communityId, #[SensitiveParameter] $newPassword)
     {
         // Not setting passwords? just return false
         if (!$this->allowUpdate) {

@@ -15,6 +15,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SensitiveParameter;
 
 /**
  * Class RegistryMapper
@@ -26,7 +27,6 @@ use Schoolbox\UserMapper;
  */
 class RegistryMapper extends Mapper
 {
-
     /**
      * @return void
      */
@@ -58,7 +58,7 @@ class RegistryMapper extends Mapper
      * @return Registry
      * @throws Mapper\Exception
      */
-    public function findByTokenAndProviderForUser(int $userId, string $token, string $provider): Registry
+    public function findByTokenAndProviderForUser(int $userId, #[SensitiveParameter] string $token, string $provider): Registry
     {
         // mobile_app_registry.provider is a dead field:
         // look up the service's provider

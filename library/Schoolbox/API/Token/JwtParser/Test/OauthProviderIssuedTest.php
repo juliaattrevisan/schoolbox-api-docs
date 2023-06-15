@@ -17,6 +17,7 @@ use Schoolbox\API\Token\JwtParser\OauthProviderIssued;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\UserMapper;
+use SensitiveParameter;
 
 /**
  * @covers \Schoolbox\API\Token\JwtParser\OauthProviderIssued
@@ -31,8 +32,11 @@ class OauthProviderIssuedTest extends TestCase
      * @param bool                $expected
      * @return void
      */
-    public function testAccepts(OauthProviderIssued $parser, string $jwt, bool $expected): void
-    {
+    public function testAccepts(
+        OauthProviderIssued $parser,
+        #[SensitiveParameter] string $jwt,
+        bool $expected,
+    ): void {
         $this->assertSame($expected, $parser->accepts($jwt));
     }
 

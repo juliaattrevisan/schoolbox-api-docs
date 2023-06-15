@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use Schoolbox\User;
+use SensitiveParameter;
 
 /**
  * Class StudentPhotosAvailable
@@ -31,7 +32,7 @@ class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
      * @param User        $viewee
      * @return bool
      */
-    public function isSatisifiedBy(?string $apiKey, bool $featureFlag, User $viewer, User $viewee): bool
+    public function isSatisifiedBy(#[SensitiveParameter] ?string $apiKey, bool $featureFlag, User $viewer, User $viewee): bool
     {
 
         /* Invalid API key; exit early

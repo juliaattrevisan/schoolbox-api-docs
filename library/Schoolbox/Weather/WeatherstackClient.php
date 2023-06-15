@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Weather;
 
 use Alaress_Date_Format;
+use SensitiveParameter;
 
 /**
  * Class ApixuClient
@@ -20,7 +21,6 @@ use Alaress_Date_Format;
  */
 class WeatherstackClient
 {
-
     /**
      * Used to extract a particular data node out of the apixu payload
      * The node represents today's data
@@ -46,7 +46,7 @@ class WeatherstackClient
      * @param string $apiKey
      * @param string $apiUrl
      */
-    public function __construct(string $apiKey, string $apiUrl)
+    public function __construct(#[SensitiveParameter] string $apiKey, string $apiUrl)
     {
         $this->apiKey = $apiKey;
         $this->apiUrl = $apiUrl;

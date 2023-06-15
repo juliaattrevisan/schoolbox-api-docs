@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Codec;
 
 use Schoolbox\External\Importer\Endpoint\IDSN;
+use SensitiveParameter;
 
 /**
  * Class DSN
@@ -22,14 +23,13 @@ use Schoolbox\External\Importer\Endpoint\IDSN;
  */
 class DSN implements IDSN
 {
-
     /**
      * Decode a dsn string
      *
      * @param string $dsn
      * @return array
      */
-    public function decode(string $dsn): array
+    public function decode(#[SensitiveParameter] string $dsn): array
     {
         return [
             'key' => $dsn
@@ -43,7 +43,7 @@ class DSN implements IDSN
      * @param array $parts
      * @return string
      */
-    public function encode(array $parts): string
+    public function encode(#[SensitiveParameter] array $parts): string
     {
         return $parts['key'];
     }

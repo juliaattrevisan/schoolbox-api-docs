@@ -15,6 +15,7 @@ use GuzzleHttp\RequestOptions;
 use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\External;
+use SensitiveParameter;
 
 /**
  * Responsible for fetching data from canvas api
@@ -37,7 +38,7 @@ class Connector
      * @param string $apiKey
      * @param string $apiSecret
      */
-    public function __construct(string $apiKey, string $apiSecret)
+    public function __construct(#[SensitiveParameter] string $apiKey, string $apiSecret)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;

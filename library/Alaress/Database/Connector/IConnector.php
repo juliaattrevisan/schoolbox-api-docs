@@ -20,6 +20,7 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use PDOException;
 use PDOStatement;
+use SensitiveParameter;
 
 interface IConnector
 {
@@ -30,10 +31,16 @@ interface IConnector
      * @param string $database
      * @param string $username
      * @param string $password
-     * @param array $options
+     * @param array  $options
      * @return bool
      */
-    public function connect($hostname, $database, $username, $password, $options = []);
+    public function connect(
+        string $hostname,
+        string $database,
+        string $username,
+        #[SensitiveParameter] string $password,
+        array $options = [],
+    ): bool;
 
     /**
      * Reconnect to the database (optionally- with new options)

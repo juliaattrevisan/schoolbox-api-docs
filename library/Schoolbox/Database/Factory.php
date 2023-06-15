@@ -116,7 +116,16 @@ class Factory
     {
         $connectorInternal = $this->factory->createMysql();
 
-        if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
+        $host = SQL_host;
+        $db   = SQL_db;
+        $user = SQL_user;
+        $pass = SQL_passwd;
+
+        /** @phpstan-ignore-next-line - these values are not always defined */
+        if (!isset($host, $db, $user, $pass)) {
+            throw new DatabaseException("Schoolbox database not configured.");
+        }
+        if (!$connectorInternal->connect($host, $db, $user, $pass)) {
             throw new DatabaseException("Unable to connect to Schoolbox database.");
         }
 

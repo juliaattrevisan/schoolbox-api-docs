@@ -8,6 +8,8 @@
 
 namespace Alaress\Password;
 
+use SensitiveParameter;
+
 /**
  * Password hash abstraction class.
  *
@@ -44,10 +46,10 @@ class Service
     /**
      * Hashes password.
      *
-     * @param  string $password
-     * @return bool|string
+     * @param string $password
+     * @return string
      */
-    public function hash($password)
+    public function hash(#[SensitiveParameter] string $password): string
     {
         return password_hash($password, $this->algorithm, ['cost' => $this->cost]);
     }
@@ -55,11 +57,11 @@ class Service
     /**
      * Verifies that $password matches $hash (in a timing-safe manner)
      *
-     * @param  string $password
-     * @param  string $hash
+     * @param string $password
+     * @param string $hash
      * @return bool
      */
-    public function verify($password, $hash)
+    public function verify(#[SensitiveParameter] string $password, string $hash): bool
     {
         return password_verify($password, $hash);
     }

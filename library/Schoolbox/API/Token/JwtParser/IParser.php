@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Schoolbox\User;
+use SensitiveParameter;
 
 /**
  * Interface for JWT parsers.
@@ -117,7 +118,7 @@ interface IParser
      * @throws Exception\Unparseable if the JWT is malformed and cannot be
      *                               parsed.
      */
-    public function accepts(string $jwt): bool;
+    public function accepts(#[SensitiveParameter] string $jwt): bool;
 
     /**
      * Determine the user identified by the JWT.
@@ -132,5 +133,5 @@ interface IParser
      *                                   it identifies.
      * @throws Exception\InvalidIdentity if the JWT is accepted, but does not identify a valid user.
      */
-    public function determineUser(string $jwt): User;
+    public function determineUser(#[SensitiveParameter] string $jwt): User;
 }

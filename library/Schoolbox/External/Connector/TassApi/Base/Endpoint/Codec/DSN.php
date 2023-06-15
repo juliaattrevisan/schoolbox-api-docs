@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use DomainException;
 use Schoolbox\External\Importer\Endpoint\IDSN;
+use SensitiveParameter;
 
 use function count;
 
@@ -101,7 +102,7 @@ class DSN implements IDSN
      * @return array
      * @throws DomainException
      */
-    public function decode(string $dsn): array
+    public function decode(#[SensitiveParameter] string $dsn): array
     {
         $bits = explode(self::OPTION_SEPARATOR, $dsn);
         $modules = $bits[0];
@@ -186,7 +187,7 @@ class DSN implements IDSN
      * @param array $parts
      * @return string
      */
-    public function encode(array $parts): string
+    public function encode(#[SensitiveParameter] array $parts): string
     {
         $struct = [];
 

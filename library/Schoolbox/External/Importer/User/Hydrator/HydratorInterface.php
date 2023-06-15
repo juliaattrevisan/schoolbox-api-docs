@@ -9,6 +9,7 @@
 namespace Schoolbox\External\Importer\User\Hydrator;
 
 use Schoolbox\User as UserModel;
+use SensitiveParameter;
 
 /**
  * Specialized hydrator interface for the importer.
@@ -20,9 +21,10 @@ interface HydratorInterface
     /**
      * Updates $user based on fields in $row.
      *
-     * @param  array     $row  The row from the CSV file
+     * @param array      $row  The row from the CSV file: sensitive as it may
+     *                         contain a password
      * @param  UserModel $user The user object to update
      * @return UserModel An updated user object
      */
-    public function hydrate($row, UserModel $user);
+    public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel;
 }

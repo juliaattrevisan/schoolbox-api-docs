@@ -14,6 +14,7 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use PDOStatement;
+use SensitiveParameter;
 
 /**
  * Implementation of *Alaress\Database\Connector\IConnector* for when
@@ -27,8 +28,13 @@ class NullConnector implements IConnector
     /**
      * @inheritDoc
      */
-    public function connect($hostname, $database, $username, $password, $options = [])
-    {
+    public function connect(
+        string $hostname,
+        string $database,
+        string $username,
+        #[SensitiveParameter] string $password,
+        array $options = [],
+    ): bool {
         return false;
     }
 

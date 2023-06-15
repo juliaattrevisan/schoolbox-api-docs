@@ -22,7 +22,7 @@ class DAV_Auth_Basic extends Sabre\DAV\Auth\Backend\AbstractBasic
      *
      * @return bool
      */
-    protected function validateUserPass($username, $password)
+    protected function validateUserPass(#[SensitiveParameter] $username, $password): bool
     {
         $auth = new Authenticator();
         try {

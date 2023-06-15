@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot;
 
+use SensitiveParameter;
+
 /**
  * Class ValidEventPhotosAvailable
  *
@@ -19,14 +21,13 @@ namespace Schoolbox\Geosnapshot;
  */
 class ValidEventPhotosAvailable extends ValidGeosnapshotAvailable
 {
-
     /**
      * @param string|null $apiKey
      * @param bool        $featureFlag
      * @param string|null $eventName
      * @return bool
      */
-    public function isSatisfiedBy(?string $apiKey, bool $featureFlag, ?string $eventName): bool
+    public function isSatisfiedBy(#[SensitiveParameter] ?string $apiKey, bool $featureFlag, ?string $eventName): bool
     {
 
         /* Invalid API key; exit early
