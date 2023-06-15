@@ -1116,7 +1116,7 @@ abstract class Kernel
                         new TwigFunction(
                             'getGuid',
                             function () {
-                                mt_srand((double)microtime() * 10000);
+                                mt_srand((int)microtime() * 10000);
                                 return strtoupper(md5(uniqid((string)rand(), true)));
                             }
                         )
