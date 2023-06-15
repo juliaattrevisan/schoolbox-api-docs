@@ -34,5 +34,5 @@ WHERE name = 'email_signature';
 
 ### admin full name formatter
 UPDATE config
-SET description = "Insert a default format for how user names will be displayed. Can contain: {title}, {firstname}, {preferredname} (falls back to first name if empty), {lastname} {subjectivepronoun} {subjectivepronounproper} {objectivepronoun} {objectivepronounproper} {possessivepronoun} {possessivepronounproper}."
+SET description = "Insert a default format for how user names will be displayed. Can contain: {title}, {firstname}, {preferredname} (falls back to first name if empty), {lastname} {pronoun}."
 WHERE name = 'name_format';
