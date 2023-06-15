@@ -53,11 +53,14 @@ class UsermediaController extends AbstractController
     /**
      * checks to see if the mimetype is able to be recorded.
      * (voice, video, screencapture)
-     * @param string|null   $mimeFilter
-     * @returns bool
+     * @param string|null $mimeFilter
+     * @return bool
      */
-    protected function isRecordable($mimeFilter)
+    protected function isRecordable(?string $mimeFilter): bool
     {
+        if (null === $mimeFilter) {
+            return true;
+        }
         $recordable = false;
         $csv = str_getcsv($mimeFilter);
         foreach ($csv as $mime) {
