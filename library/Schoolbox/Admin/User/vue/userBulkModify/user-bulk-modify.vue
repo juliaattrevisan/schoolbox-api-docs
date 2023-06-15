@@ -246,6 +246,7 @@ export default {
                 const response = await fetch(this.srcUserList, {
                     method: "POST",
                     body: JSON.stringify(this.getRowsBody()),
+                    headers: {'content-type': 'application/json'},
                 });
                 this.rows = await response.json();
             } catch (error) {
