@@ -431,11 +431,11 @@ class Controller extends Base\Base
      *
      * @param string|null $name
      */
-    public function newCourse(string $name = null)
+    public function newCourse(?string $name): void
     {
         $this->courseTpl('course', [
             'courseSpec'        => null,
-            'courseName'        => urldecode($name),
+            'courseName'        => urldecode($name ?? ''),
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);

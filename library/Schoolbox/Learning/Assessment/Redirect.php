@@ -42,7 +42,7 @@ class Redirect
      */
     public static function decode($encoded)
     {
-        return base64_decode(urldecode($encoded));
+        return base64_decode(urldecode($encoded ?? ''));
     }
 
 
