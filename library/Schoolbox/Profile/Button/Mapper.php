@@ -113,12 +113,12 @@ class Mapper extends BaseMapper
             $viewerLastName = empty($viewer->getLastName()) ? '' : $viewer->getLastName();
             $vieweeFirstName = empty($viewee->getFirstName()) ? '' : $viewee->getFirstName();
             $viewerFirstName = empty($viewer->getFirstName()) ? '' : $viewer->getFirstName();
-            $subjectivePronoun = $viewee->getPronoun()->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT;
-            $subjectivePronounProper = ucfirst($viewee->getPronoun()->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT);
-            $objectivePronoun = $viewee->getPronoun()->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT;
-            $objectivePronounProper = ucfirst($viewee->getPronoun()->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT);
-            $possessivePronoun = $viewee->getPronoun()->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT;
-            $possessivePronounProper = ucfirst($viewee->getPronoun()->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT);
+            $subjectivePronoun = $viewee->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT;
+            $subjectivePronounProper = ucfirst($viewee->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT);
+            $objectivePronoun = $viewee->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT;
+            $objectivePronounProper = ucfirst($viewee->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT);
+            $possessivePronoun = $viewee->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT;
+            $possessivePronounProper = ucfirst($viewee->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT);
 
             $array_replace = [
                 \urlencode((string)$viewee->getId()),

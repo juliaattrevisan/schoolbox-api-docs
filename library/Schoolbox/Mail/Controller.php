@@ -521,12 +521,12 @@ class Controller extends Base
                         '[fullname]'      => $this->getUser()->getFullName(),
                         '[email]'         => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
                         '[position]'      => $this->getUser()->getPositionTitle(),
-                        '[subjectivepronoun]'       => $this->getUser()->getPronoun()->getSubjective() ?: Model::SUBJECTIVE_DEFAULT,
-                        '[subjectivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getSubjective() ?: Model::SUBJECTIVE_DEFAULT),
-                        '[objectivepronoun]'        => $this->getUser()->getPronoun()->getObjective() ?: Model::OBJECTIVE_DEFAULT,
-                        '[objectivepronounproper]'  => ucfirst($this->getUser()->getPronoun()->getObjective() ?: Model::OBJECTIVE_DEFAULT),
-                        '[possessivepronoun]'       => $this->getUser()->getPronoun()->getPossessive() ?: Model::POSSESSIVE_DEFAULT,
-                        '[possessivepronounproper]' => ucfirst($this->getUser()->getPronoun()->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
+                        '[subjectivepronoun]'       => $this->getUser()->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT,
+                        '[subjectivepronounproper]' => ucfirst($this->getUser()->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT),
+                        '[objectivepronoun]'        => $this->getUser()->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT,
+                        '[objectivepronounproper]'  => ucfirst($this->getUser()->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT),
+                        '[possessivepronoun]'       => $this->getUser()->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT,
+                        '[possessivepronounproper]' => ucfirst($this->getUser()->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
                     ]
                 );
         }

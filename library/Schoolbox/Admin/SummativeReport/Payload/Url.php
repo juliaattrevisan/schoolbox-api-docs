@@ -175,12 +175,12 @@ class Url
                             //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
                             '[preferredname]' => \Scrub::filename($student->getGivenName() ?: 'unknown'),
                             '[title]'         => \Scrub::filename($student->getTitle() ?: 'unknown'),
-                            '[subjectivepronoun]'       => \Scrub::filename($student->getPronoun()->getSubjective() ?: Model::SUBJECTIVE_DEFAULT),
-                            '[subjectivepronounproper]' => \Scrub::filename(ucfirst($student->getPronoun()->getSubjective() ?: Model::SUBJECTIVE_DEFAULT)),
-                            '[objectivepronoun]'        => \Scrub::filename($student->getPronoun()->getObjective() ?: Model::OBJECTIVE_DEFAULT),
-                            '[objectivepronounproper]'  => \Scrub::filename(ucfirst($student->getPronoun()->getObjective() ?: Model::OBJECTIVE_DEFAULT)),
-                            '[possessivepronoun]'       => \Scrub::filename($student->getPronoun()->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
-                            '[possessivepronounproper]' => \Scrub::filename(ucfirst($student->getPronoun()->getPossessive() ?: Model::POSSESSIVE_DEFAULT)),
+                            '[subjectivepronoun]'       => \Scrub::filename($student->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT),
+                            '[subjectivepronounproper]' => \Scrub::filename(ucfirst($student->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT)),
+                            '[objectivepronoun]'        => \Scrub::filename($student->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT),
+                            '[objectivepronounproper]'  => \Scrub::filename(ucfirst($student->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT)),
+                            '[possessivepronoun]'       => \Scrub::filename($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
+                            '[possessivepronounproper]' => \Scrub::filename(ucfirst($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT)),
                         ]
                     );
                     //grab the filename excluding the folder paths
