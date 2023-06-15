@@ -666,6 +666,7 @@ class Module
         $controller
             ->setRequest($container->get('webFactory')->newRequest())
             ->setResponse($container->get('webFactory')->newResponse())
+            ->setPsr7Request($container->get('request'))
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
             ->setRouteGenerator($container->get('router.generator'))

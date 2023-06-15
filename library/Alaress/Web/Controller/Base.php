@@ -25,6 +25,7 @@ use Crell\ApiProblem\ApiProblem;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
@@ -34,14 +35,36 @@ use Schoolbox\Url\Uri;
 abstract class Base
 {
     /**
-     * @var Request
+     * Request object from Aura.Web package.
+     *
+     * @deprecated This will be replaced with a PSR-7 compliant request object
+     *             in `$this->psr7Request`.
      */
-    protected $request;
+    protected Request $request;
 
     /**
-     * @var Response
+     * A PSR-7 compliant request object, which represents the current incoming
+     * request.
      */
-    protected $response;
+    protected ServerRequestInterface $psr7Request;
+
+    /**
+     * Response object from Aura.Web package.
+     *
+     * @deprecated This will be replaced with a PSR-7 compliant response object
+     *             in `$this->psr7Response`.
+     *             If that object is not set, the output mechanism will fall
+     *             back to this object.
+     */
+    protected Response $response;
+
+    /**
+     * A PSR-7 compliant response object.
+     *
+     * If this is set: a response will be output from this object instead of
+     * from `$this->response`.
+     */
+    protected ?ResponseInterface $psr7Response = null;
 
     /**
      * @deprecated you should be injecting your dependencies from the constructor!
@@ -103,21 +126,43 @@ abstract class Base
     private $allowBackToTheFuture = true;
 
     /**
+     * @deprecated use `$this->psr7Request` instead
+     *
      * @param  Request $request
      * @return $this
      */
-    public function setRequest($request)
+    public function setRequest(Request $request): self
     {
         $this->request = $request;
         return $this;
     }
 
     /**
+     * @deprecated use `$this->psr7Request` instead
+     *
      * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
+    }
+
+    /**
+     * @return ServerRequestInterface
+     */
+    public function getPsr7Request(): ServerRequestInterface
+    {
+        return $this->psr7Request;
+    }
+
+    /**
+     * @param ServerRequestInterface $psr7Request
+     * @return $this
+     */
+    public function setPsr7Request(ServerRequestInterface $psr7Request): self
+    {
+        $this->psr7Request = $psr7Request;
+        return $this;
     }
 
     /**
@@ -139,21 +184,41 @@ abstract class Base
     }
 
     /**
+     * @deprecated use `$this->psr7Response` instead
+     *
      * @param  Response $response
      * @return $this
      */
-    public function setResponse($response)
+    public function setResponse(Response $response): self
     {
         $this->response = $response;
         return $this;
     }
 
     /**
+     * @deprecated use `$this->psr7Response` instead
+     *
      * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
+    }
+
+    /**
+     * @return ResponseInterface|null
+     */
+    public function getPsr7Response(): ?ResponseInterface
+    {
+        return $this->psr7Response;
+    }
+
+    /**
+     * @param ResponseInterface|null $psr7Response
+     */
+    public function setPsr7Response(?ResponseInterface $psr7Response): void
+    {
+        $this->psr7Response = $psr7Response;
     }
 
     /**
