@@ -271,11 +271,8 @@ class Controller extends Base\Base
          * will stop us from inserting a tuple that already exists
          */
         try {
-            $unit = $this->unitSpecificationMapper->findOneByColumn('folder_id', $unitFolder->getId(), [
-                'deleted' => true
-            ]);
+            $unit = $this->unitSpecificationMapper->findOneByColumn('folder_id', $unitFolder->getId());
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-
             /** @var UnitSpecification $deletedUnit */
             $deletedUnit = $e->getDeletedObject();
 
