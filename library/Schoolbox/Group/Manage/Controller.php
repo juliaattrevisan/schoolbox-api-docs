@@ -141,7 +141,7 @@ class Controller extends Base
      */
     public function removeMembers(Folder $folder)
     {
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
         $userIds     = array_map('intval', $requestBody['members']);
 
         $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
@@ -216,7 +216,7 @@ class Controller extends Base
      */
     public function addMembers(Folder $folder)
     {
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
         $users       = $this->getUsersFromRequest($requestBody);
 
         // Find users already in the group
@@ -279,7 +279,7 @@ class Controller extends Base
     public function updateSettings(Folder $folder)
     {
         // access, isNotificationsEnabled, isForceFollow
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
 
         /** @var Group $group */
         $group = (new ArrayToModel\Group())($requestBody, $folder->getGroup());

@@ -138,7 +138,7 @@ class Controller extends Base
      */
     public function apiUserPost()
     {
-        $data = json_decode(json_encode($this->request->content->get()), true);
+        $data = $this->psr7Request->getParsedBody();
         if (null === $data) {
             throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
@@ -202,7 +202,7 @@ class Controller extends Base
      */
     public function apiUserPut(User $user)
     {
-        $data = json_decode(json_encode($this->request->content->get()), true);
+        $data = $this->psr7Request->getParsedBody();
         if (null === $data) {
             throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
@@ -237,7 +237,7 @@ class Controller extends Base
      */
     public function apiUserPatch(User $user)
     {
-        $data = json_decode(json_encode($this->request->content->get()), true);
+        $data = $this->psr7Request->getParsedBody();
 
         if (null === $data) {
             throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");

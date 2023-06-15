@@ -250,7 +250,7 @@ class Controller extends Base
     {
         // requestBody is a stdclass from JSON, I'd rather work with arrays:
         // encode then decode
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
 
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
@@ -332,7 +332,7 @@ class Controller extends Base
      */
     public function putEvidence(Model $evidence): void
     {
-        $requestBody       = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody       = $this->psr7Request->getParsedBody();
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());

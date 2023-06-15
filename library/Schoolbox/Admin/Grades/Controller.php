@@ -126,9 +126,7 @@ class Controller extends Base
      */
     public function postSaveGrades(): void
     {
-        // Ignore the return type: this is an array of stdclass objects
-        /** @var iterable&\stdClass[] $payload */
-        $payload          = $this->request->content->get();
+        $payload          = $this->psr7Request->getParsedBody();
         $gradeLevelGroups = $this->gradeLevelGroupMapper->createCollection();
 
         foreach ($payload as $gradeLevelGroupPayload) {

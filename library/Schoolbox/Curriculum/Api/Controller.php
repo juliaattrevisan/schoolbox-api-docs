@@ -217,7 +217,7 @@ class Controller extends Base
      */
     private function persistNode(?Node\Model $previous): Node\Model
     {
-        $data          = json_decode(json_encode($this->request->content->get()), true);
+        $data          = $this->psr7Request->getParsedBody();
         $translator    = new ArrayToModel();
         $persistedNode = $translator($data, $previous);
         $this->nodeMapper->save($persistedNode);

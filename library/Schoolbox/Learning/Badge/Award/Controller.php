@@ -508,7 +508,7 @@ class Controller extends Base
      */
     private function createAwards(Model $badge, string $awardStatus): void
     {
-        $data    = json_decode($this->request->content->getRaw(), true);
+        $data    = $this->psr7Request->getParsedBody();
         $userIds = array_column($data['users'] ?? [], 'id');
         if (empty($userIds)) {
             $this->sendJsonError("No users provided to set $awardStatus", 400);

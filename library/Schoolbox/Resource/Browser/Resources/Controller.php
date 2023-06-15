@@ -274,7 +274,7 @@ class Controller extends AbstractController
      */
     public function patchFileInfo(Resource\File\Model $file)
     {
-        $data = json_decode(json_encode($this->request->content->get()), true);
+        $data = $this->psr7Request->getParsedBody();
         if (isset($data['hidden'])) {
             $file->setHidden($data['hidden']);
         } else {

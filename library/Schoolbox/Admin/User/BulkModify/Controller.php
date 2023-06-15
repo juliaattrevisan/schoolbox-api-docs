@@ -130,7 +130,7 @@ class Controller extends Base
      */
     public function getUserList()
     {
-        $selected = json_decode($this->request->content->get(), true);
+        $selected = $this->psr7Request->getParsedBody();
         /* If there were any search results, display control options
          */
         $userList = $this->userBulkMapper->bulkModifySearch(

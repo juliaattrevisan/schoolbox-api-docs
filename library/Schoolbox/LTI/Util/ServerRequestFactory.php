@@ -16,6 +16,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Factory for building PSR-7 server request objects out of Aura web requests.
+ *
+ * @deprecated `\Alaress\Web\Controller\Base::$psr7Request` now exists
  */
 class ServerRequestFactory
 {
