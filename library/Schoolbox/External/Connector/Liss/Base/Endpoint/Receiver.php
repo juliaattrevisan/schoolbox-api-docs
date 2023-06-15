@@ -215,7 +215,7 @@ class Receiver
         if ($this->storageLogging) {
             $this->log()->debug('Logging LISS payload to local storage');
 
-            (new PayloadCache($this->storageMapper))->cache($this->superuser, $message);
+            (new PayloadCache($this->storageMapper))->cache('dailydata', $this->superuser, $message);
         }
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php
@@ -247,6 +247,7 @@ class Receiver
      * @param Request $message
      * @return Response
      * @throws Exception
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
@@ -256,6 +257,15 @@ class Receiver
          */
         if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        /* Cache locally whatever liss sent to us
+         * This allows you to replay locally
+         */
+        if ($this->storageLogging) {
+            $this->log()->debug('Logging LISS payload to local storage');
+
+            (new PayloadCache($this->storageMapper))->cache('classmemberships', $this->superuser, $message);
         }
 
         $composites = new TimetableCalendar\ClassMemberships(
