@@ -181,8 +181,13 @@ function getAllColourPickers() {
  * @param { FormData }
  */
 export function appendColours(formData) {
-    for (const [key, value] of Object.entries(COLOURS.pickers)) {
-        //loop through the key/value pairs for each value and append to FormData
+    //loop through the key/value pairs for each value and append to FormData
+    for (let [key, value] of Object.entries(COLOURS.pickers)) {
+        if (value === "") {
+            // If the value is none, then fall back to the original colour.
+            // This might happen if the user has different colours for each column, and then tries to go back to editing all columns
+            value = COLOURS.original[key];
+        }
         formData.append(`colors[${key}]`, value);
     }
 }
