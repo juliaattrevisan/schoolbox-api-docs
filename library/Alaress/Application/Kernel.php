@@ -637,7 +637,17 @@ abstract class Kernel
                     // This will be a ServerRequestInterface,
                     // but of a discovered rather than defined type.
                     // That should be fine: they all obey the same interface.
-                    return (new Psr17Factory())->createServerRequestFromGlobals();
+                    $request = (new Psr17Factory())->createServerRequestFromGlobals();
+
+                    // If the request is JSON:
+                    // set the parsed body appropriately
+                    if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
+                        $request->getBody()->rewind();
+                        $content = $request->getBody()->getContents();
+                        $request->getBody()->rewind();
+                        $request = $request->withParsedBody(json_decode($content, true));
+                    }
+                    return $request;
                 }
             ),
         );
