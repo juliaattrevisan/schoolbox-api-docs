@@ -64,12 +64,12 @@ class Student
                 '[fullname]'                => $student->getFullName(),
                 '[year]'                    => $student->getYear() ? $student->getYear()->getName() : '',
                 '[house]'                   => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : '',
-                '[subjectivepronoun]'       => $student->getPronoun()->getSubjective(),
-                '[subjectivepronounproper]' => ucfirst($student->getPronoun()->getSubjective()),
-                '[objectivepronoun]'        => $student->getPronoun()->getObjective(),
-                '[objectivepronounproper]'  => ucfirst($student->getPronoun()->getObjective()),
-                '[possessivepronoun]'       => $student->getPronoun()->getPossessive(),
-                '[possessivepronounproper]' => ucfirst($student->getPronoun()->getPossessive()),
+                '[subjectivepronoun]'       => $student->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT,
+                '[subjectivepronounproper]' => ucfirst($student->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT),
+                '[objectivepronoun]'        => $student->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT,
+                '[objectivepronounproper]'  => ucfirst($student->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT),
+                '[possessivepronoun]'       => $student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT,
+                '[possessivepronounproper]' => ucfirst($student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT),
             ]
         );
     }
