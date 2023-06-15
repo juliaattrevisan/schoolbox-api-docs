@@ -417,7 +417,7 @@ class Mapper extends BaseMapper
     {
         $collection = $mapper->createCollection();
 
-        $ids = trim($ids);
+        $ids = trim((string)$ids);
 
         if (!empty($ids)) {
             $array = explode(",", $ids);

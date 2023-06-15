@@ -101,7 +101,7 @@ class Controller extends Base
 
         // Create datetime is unique to this method, so it can be a function.
         $createDatetime = function ($date, $time) {
-            if ($dateObject = DateTime::createFromFormat('Y-m-d', $date)) {
+            if ($date && $dateObject = DateTime::createFromFormat('Y-m-d', $date)) {
                 if ($time && ($timeObject = DateTime::createFromFormat('H:i', $time))) {
                     $dateObject->setTime($timeObject->format('H'), $timeObject->format('i'));
                 } else {

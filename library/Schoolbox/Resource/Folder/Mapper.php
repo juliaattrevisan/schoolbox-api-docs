@@ -881,12 +881,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $builder->notNull('ug.cid');
         }
 
-        $subBuilder = $this->getPredicateBuilder();
-        $subBuilder
-            ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")
-            ->like('cc.code', "%{$this->database->getQuoter()->escapeForLike($keyword)}%");
+        // if keyword is not provided or empty, return everything
+        if ($keyword && strlen($keyword) > 0) {
+            $subBuilder = $this->getPredicateBuilder();
+            $subBuilder
+                ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")
+                ->like('cc.code', "%{$this->database->getQuoter()->escapeForLike($keyword)}%");
 
-        $builder->any($subBuilder);
+            $builder->any($subBuilder);
+        }
 
         /* If a list of folder ids was provided to restrict the set of results, use it
          */
