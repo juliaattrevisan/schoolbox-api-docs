@@ -63,7 +63,7 @@ class Component_Config_Filter extends Component_Config_Abstract
         for ($i = 0; $i < count($filterFields); $i++) {
             $j                         = $configValue % 2;
             $filter[$filterFields[$i]] = $j;
-            $configValue               = (int)$configValue / 2;
+            $configValue               = ($configValue - $j) / 2;
         }
         return $filter;
     }
