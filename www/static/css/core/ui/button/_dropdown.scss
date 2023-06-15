@@ -296,6 +296,7 @@ $f-dropdown-icon-align: 0.25rem;
     box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
     overflow-y: auto;
     overflow-x: hidden;
+    margin-bottom: 0;
 
     &.drop-top {
         max-height: none;
@@ -334,18 +335,29 @@ $f-dropdown-icon-align: 0.25rem;
         padding-right: 0.8125rem;
     }
     @media #{$small-only} {
-        //ensure the menu lines up with the button on mobile
-        max-width: 70%;
-        left: auto !important;
-        right: 0px;
-        width: 70% !important;
+        /*
+            Switched to using vw so that dropdown widths are based on screen space
+            rather than %; if this was embedded within specific parent elements % was
+            calculated on the encapsulating element, which had problems (tables, etc).
+
+            Combining the below properties makes the logic operate like minmax on grids.
+            - Attempt to make yourself 70vw wide.
+            - However, don't ever grow larger than the maximum space you'd take on a
+            single line.
+            - ...and don't ever reduce below what is needed (without jank word breaks).
+
+            It may seem weird to include the width: 70vw AND max-width: max-content but
+            without this, the element will sit at max-content and never reduce in size
+            when screen size is reduced. 70vw kicks in as soon as max-content is no
+            longer sustainable and allows normal wrapping rules to kick in.
+        */
+        min-width: min-content;
+        max-width: max-content;
+        width: 70vw;
     }
 }
 
 #tab-control {
-    @media #{$small-only} {
-        width: 99% !important;
-    }
     @media screen and (min-width: 767px) {
         max-width: rem-calc(688);
         width: auto;

@@ -235,18 +235,8 @@
 
             this.clear_idx();
 
-            if (this.small()) {
-                var p = this.dirs.bottom.call(dropdown, target, settings);
-
-                dropdown.attr("style", "").removeClass("drop-left drop-right drop-top").css({
-                    position: "absolute",
-                    top: p.top,
-                });
-
-                dropdown.css(Foundation.rtl ? "right" : "left", left_offset);
-            }
             // detect if dropdown is in an overflow container
-            else if (parentOverflow !== "visible") {
+            if (parentOverflow !== "visible") {
                 var offset = target[0].offsetTop + target[0].offsetHeight;
 
                 dropdown.attr("style", "").css({
@@ -277,7 +267,8 @@
                  * the height of the target element must also be included in the calculation as the dropdown will be rendered below the target.
                  * also make sure that when we grab the outerheight, we include any margins
                  */
-                var targetRelativeHeight = Math.ceil(target.offset().top) + target.height() + dropdown.outerHeight(true);
+                var targetRelativeHeight =
+                    Math.ceil(target.offset().top) + target.height() + dropdown.outerHeight(true);
 
                 /**
                  * the relative position and height of the dropdown exceeds the document height
@@ -304,8 +295,30 @@
                     o = o_p.offset(),
                     p = t.offset();
 
-                p.top -= o.top;
-                p.left -= o.left;
+                // Cap out our left displacement so things don't get funky on small screen sizes
+
+                // Grab the width of our trigger element and dropdown
+                const triggerElementWidth = t[0].getBoundingClientRect().width;
+                const dropdownElementWidth = this[0].getBoundingClientRect().width;
+
+                /*
+                    If the width of our trigger element + dropdown exceeds the screen width (we need to include the trigger
+                    width here as the below calculations factor that in to determining position) then apply different calculations
+                    to determine how much left to apply to the dropdown (because the standard model was breaking
+
+                    We also don't need to Math.round here because Vanilla uses ints in these functions so we're never getting floats
+                */
+                if (triggerElementWidth + dropdownElementWidth >= window.innerWidth) {
+                    // The left value should now be our width subtracted from window width because we're in this interim state where
+                    // the standard method calculates left wrong but we're also not wide enough to cover the entire screen yet
+                    const leftVal = window.innerWidth - dropdownElementWidth;
+                    // Cap it so we never have a left that is negative - a negative left just means jam the dropdown to the left of the window
+                    p.left = leftVal >= 0 ? leftVal : 0;
+                } else {
+                    p.left = Math.round(p.left - o.left);
+                }
+
+                p.top = Math.floor(p.top - o.top);
 
                 //set some flags on the p object to pass along
                 p.missRight = false;
