@@ -8,7 +8,6 @@
  */
 class Component_Config_Filter extends Component_Config_Abstract
 {
-
     /**
      * Converts value from an array into a bitmask which represents the selected
      * fields.
