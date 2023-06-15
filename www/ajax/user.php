@@ -33,9 +33,9 @@ $externalUser = new \Schoolbox\External\User();
 $result = $suggestions = $data = $return = [];
 
 $excludeID = isset($_GET['excludeID']) ? intval($_GET['excludeID']) : null;
-$keyword = $_GET['query'] ?? null;
-$groupID = $_GET['groupID'] ?? null;
-$roleTypeID = $_GET['roleTypeID'] ?? null;
+$keyword = $_GET['query'] ?? '';
+$groupID = $_GET['groupID'] ?? '';
+$roleTypeID = $_GET['roleTypeID'] ?? '';
 // The showCampus parameter does nothing now default campuses are gone.
 // It may be restored later, but don't count on it.
 //$showCampus = !empty($_GET['showCampus']);
@@ -49,7 +49,7 @@ if (!empty($residentialHouseID)) {
 
 $filterParents = false;
 
-if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (strlen($groupID) || strlen($roleTypeID))) {
+if (strlen($keyword) > 1 && strlen($keyword) < 64 && (strlen($groupID) || strlen($roleTypeID))) {
     if (strlen($roleTypeID)) {
         // Search in a list of role types.
 
