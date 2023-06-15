@@ -20,9 +20,9 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     public const OBJECTIVE_DEFAULT = 'them';
     public const POSSESSIVE_DEFAULT = 'their';
 
-    protected ?string $subjective = self::SUBJECTIVE_DEFAULT;
-    protected ?string $objective = self::OBJECTIVE_DEFAULT;
-    protected ?string $possessive = self::POSSESSIVE_DEFAULT;
+    protected ?string $subjective;
+    protected ?string $objective;
+    protected ?string $possessive;
 
     /**
      * @param ?string $subjective
