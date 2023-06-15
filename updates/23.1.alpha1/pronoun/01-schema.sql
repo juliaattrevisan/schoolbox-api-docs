@@ -31,3 +31,8 @@ VALUES ('he', 'him', 'his', 2, now(), now()),
 UPDATE config
 SET description = "Email signatures will only be applied to users that have an email address that matches the School Email Domain.  Available tokens are: [title] [firstname] [surname] [fullname] [email] [position] [subjectivepronoun] [subjectivepronounproper] [objectivepronoun] [objectivepronounproper] [possessivepronoun] [possessivepronounproper]."
 WHERE name = 'email_signature';
+
+### admin full name formatter
+UPDATE config
+SET description = "Insert a default format for how user names will be displayed. Can contain: {title}, {firstname}, {preferredname} (falls back to first name if empty), {lastname} [subjectivepronoun] {subjectivepronounproper} {objectivepronoun} {objectivepronounproper} {possessivepronoun} {possessivepronounproper}."
+WHERE name = 'name_format';

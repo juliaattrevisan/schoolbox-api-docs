@@ -46,6 +46,12 @@ class Formatter
             'firstname'     => $user->getFirstname(),
             'preferredname' => $user->getPreferredName(),
             'lastname'      => $user->getLastname(),
+            'subjectivepronoun'       => $user->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT,
+            'subjectivepronounproper' => ucfirst($user->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT),
+            'objectivepronoun'        => $user->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT,
+            'objectivepronounproper'  => ucfirst($user->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT),
+            'possessivepronoun'       => $user->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT,
+            'possessivepronounproper' => ucfirst($user->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT),
         ]);
     }
 
