@@ -1,5 +1,4 @@
 const path = require("path");
-
 module.exports = {
     addons: [
         "@storybook/addon-a11y",
@@ -9,13 +8,13 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-storysource",
     ],
-    core: {
-        builder: "webpack5",
-    },
     features: {
         postcss: false,
     },
-    framework: "@storybook/vue3",
+    framework: {
+        name: "@storybook/vue3-webpack5",
+        options: {},
+    },
     staticDirs: ["../stories/assets"],
     stories: [
         "../stories/**/*.stories.mdx",
@@ -33,7 +32,6 @@ module.exports = {
             use: ["style-loader", "css-loader", "sass-loader"],
             include: path.resolve(__dirname, "../"),
         });
-
         config.resolve.alias["@js"] = path.resolve(__dirname, "../www/static/js");
         config.resolve.alias["@schoolboxVue"] = path.resolve(__dirname, "../vue");
         config.resolve.alias["@schoolboxCurriculum"] = path.resolve(
@@ -45,5 +43,8 @@ module.exports = {
 
         // Return the altered config
         return config;
+    },
+    docs: {
+        autodocs: true,
     },
 };
