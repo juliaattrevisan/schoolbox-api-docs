@@ -113,8 +113,9 @@ class Mapper extends AbstractUnitMapper
                 {$this->getJoinColumnString('course.folder.homepages', 'cfh')},
                 {$this->getJoinColumnString('specification', 'cus')},
                 {$this->getJoinColumnString('specification.folder', 'cus_f')},
-                {$this->getJoinColumnString('specification.course', 'cs')},
-                {$this->getJoinColumnString('specification.course.folder', 'cs_f')}
+                {$this->getJoinColumnString('specification.folder.parent', 'cus_fp')},
+                {$this->getJoinColumnString('specification.folder.parent.course_specification', 'cs')},
+                {$this->getJoinColumnString('specification.folder.parent.course_specification.folder', 'cs_f')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('course', '', 'c', true)}
             INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf', true)}
@@ -122,8 +123,9 @@ class Mapper extends AbstractUnitMapper
             LEFT  JOIN {$this->getJoinSql('course.folder.homepages', 'cf', 'cfh')}
             INNER JOIN {$this->getJoinSql('specification', '', 'cus', true)}
             INNER JOIN {$this->getJoinSql('specification.folder', 'cus', 'cus_f', true)}
-            INNER JOIN {$this->getJoinSql('specification.course', 'cus', 'cs', true)}
-            INNER JOIN {$this->getJoinSql('specification.course.folder', 'cs', 'cs_f', true)}
+            INNER JOIN {$this->getJoinSql('specification.folder.parent', 'cus_f', 'cus_fp', true)}
+            INNER JOIN {$this->getJoinSql('specification.folder.parent.course_specification', 'cus_fp', 'cs', true)}
+            INNER JOIN {$this->getJoinSql('specification.folder.parent.course_specification.folder', 'cs', 'cs_f', true)}
         ";
     }
 
@@ -161,11 +163,14 @@ class Mapper extends AbstractUnitMapper
             $specification = $this->hydrateJoin($row, 'specification', 'cus');
             /** @var Folder $specFolder */
             $specFolder = $this->hydrateJoin($row, 'specification.folder', 'cus_f');
+            /** @var Folder $specFolderParent */
+            $specFolderParent = $this->hydrateJoin($row, 'specification.folder.parent', 'cus_fp');
             /** @var CourseSpecificationModel $specCourse */
-            $specCourse = $this->hydrateJoin($row, 'specification.course', 'cs');
+            $specCourse = $this->hydrateJoin($row, 'specification.folder.parent.course_specification', 'cs');
             /** @var Folder $specCourseFolder */
-            $specCourseFolder = $this->hydrateJoin($row, 'specification.course.folder', 'cs_f');
+            $specCourseFolder = $this->hydrateJoin($row, 'specification.folder.parent.course_specification.folder', 'cs_f');
 
+            $specFolder->setParent($specFolderParent);
             $specCourse->setFolder($specCourseFolder);
             $specification->setFolder($specFolder);
             $specification->setCourse($specCourse);
