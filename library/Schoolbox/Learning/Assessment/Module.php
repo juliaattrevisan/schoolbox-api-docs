@@ -903,6 +903,9 @@ class Module extends BaseModule
                 AssessmentType::TYPE_LTI_ASSESSMENT,
                 AssessmentType::TYPE_PROJECT
             ]),
+            /* The status pages of specifications of quizzes need to be viewable because specifications of quizzes are
+             * previewable while under development.
+             */
             new Rule\Any(
                 new IsImplementation(),
                 new ValidAssessmentType([AssessmentType::TYPE_PROJECT]),

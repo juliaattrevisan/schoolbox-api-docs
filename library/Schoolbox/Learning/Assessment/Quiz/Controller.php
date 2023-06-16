@@ -263,6 +263,7 @@ class Controller extends Assessment\Controller
                 $assessment->isImplementation() || (
                     // Quizzes that are not yet implemented still need to be attemptable (to allow previewing), but only by those with instructor access.
                     // @see also the similar access level check in www/assess/init.php.
+                    // @see also the permission rule in Learning/Assessment/Module->buildAuthRuleCanViewStatus().
                     $assessment->isSpecification() && $this->getAccess()->isInstructor($student, $assessment->getContext()->getFolder())
                 )
             ) &&
