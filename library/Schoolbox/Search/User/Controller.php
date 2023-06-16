@@ -598,7 +598,7 @@ class Controller extends BaseController
                     'hideContacts'             => $hideContacts,
                     'showClasses'              => $showClasses,
                     'now'                      => Alaress_Date_Format::now(),
-                    'boarderType'              => $this->externalUser->determineBoarderType($externalUser['StudentBoarder'] ? (string)$externalUser['StudentBoarder'] : null),
+                    'boarderType'              => $this->externalUser->determineBoarderType(isset($externalUser['StudentBoarder']) ? (string)$externalUser['StudentBoarder'] : null),
                     'contacts'                 => $contacts,
                     'subjects'                 => $subjects,
                     'customButtons'            => $customButtons,
