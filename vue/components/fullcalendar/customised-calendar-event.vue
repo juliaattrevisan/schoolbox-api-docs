@@ -98,7 +98,6 @@ export default {
          * Ensure the text colour is readable on the background, which uses the user assigned folder colour
          */
         updateTextColor() {
-            window.sbProps.testEl = this.$el;
             if (!this.isEventInListComponent) {
                 //don't do for list view, only within month/week views
                 const readableTextColor = tinycolor
