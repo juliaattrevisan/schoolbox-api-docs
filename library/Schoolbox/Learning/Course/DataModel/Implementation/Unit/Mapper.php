@@ -19,6 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\HomepageConfig;
 
@@ -110,15 +111,19 @@ class Mapper extends AbstractUnitMapper
                 {$this->getJoinColumnString('course.folder', 'cf')},
                 {$this->getJoinColumnString('course.folder.codes', 'cfc')},
                 {$this->getJoinColumnString('course.folder.homepages', 'cfh')},
-                {$this->getJoinColumnString('specification', 's')},
-                {$this->getJoinColumnString('specification.folder', 'sf')}
+                {$this->getJoinColumnString('specification', 'cus')},
+                {$this->getJoinColumnString('specification.folder', 'cus_f')},
+                {$this->getJoinColumnString('specification.course', 'cs')},
+                {$this->getJoinColumnString('specification.course.folder', 'cs_f')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('course', '', 'c', true)}
             INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf', true)}
             LEFT  JOIN {$this->getJoinSql('course.folder.codes', 'cf', 'cfc')}
             LEFT  JOIN {$this->getJoinSql('course.folder.homepages', 'cf', 'cfh')}
-            INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
-            INNER JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
+            INNER JOIN {$this->getJoinSql('specification', '', 'cus', true)}
+            INNER JOIN {$this->getJoinSql('specification.folder', 'cus', 'cus_f', true)}
+            INNER JOIN {$this->getJoinSql('specification.course', 'cus', 'cs', true)}
+            INNER JOIN {$this->getJoinSql('specification.course.folder', 'cs', 'cs_f', true)}
         ";
     }
 
@@ -153,10 +158,17 @@ class Mapper extends AbstractUnitMapper
             $model->setCourse($course);
 
             /** @var UnitSpecificationModel $specification */
-            $specification = $this->hydrateJoin($row, 'specification', 's');
+            $specification = $this->hydrateJoin($row, 'specification', 'cus');
             /** @var Folder $specFolder */
-            $specFolder = $this->hydrateJoin($row, 'specification.folder', 'sf');
+            $specFolder = $this->hydrateJoin($row, 'specification.folder', 'cus_f');
+            /** @var CourseSpecificationModel $specCourse */
+            $specCourse = $this->hydrateJoin($row, 'specification.course', 'cs');
+            /** @var Folder $specCourseFolder */
+            $specCourseFolder = $this->hydrateJoin($row, 'specification.course.folder', 'cs_f');
+
+            $specCourse->setFolder($specCourseFolder);
             $specification->setFolder($specFolder);
+            $specification->setCourse($specCourse);
             $model->setSpecification($specification);
             $specification->getCourse()->getUnits()[$specification->getId()] = $specification;
             $specification->getUnitImplementations()[$model->getId()] = $model;
