@@ -130,7 +130,7 @@ class Mapper extends AbstractUnitMapper
     /**
      * @inheritdoc
      */
-    public function hydrateSelect(PDOStatement $statement)
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $modelList = $this->createCollection();
         foreach ($statement as $row) {
@@ -170,6 +170,7 @@ class Mapper extends AbstractUnitMapper
             $specification->setFolder($specFolder);
             $specification->setCourse($specCourse);
             $model->setSpecification($specification);
+
             $specification->getCourse()->getUnits()[$specification->getId()] = $specification;
             $specification->getUnitImplementations()[$model->getId()] = $model;
 
