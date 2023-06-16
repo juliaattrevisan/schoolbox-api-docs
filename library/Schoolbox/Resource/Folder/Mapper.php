@@ -882,7 +882,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // if keyword is not provided or empty, return everything
-        if ($keyword && strlen($keyword) > 0) {
+        if (null !== $keyword && '' !== $keyword) {
             $subBuilder = $this->getPredicateBuilder();
             $subBuilder
                 ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")
