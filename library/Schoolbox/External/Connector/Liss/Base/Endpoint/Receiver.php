@@ -256,7 +256,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
