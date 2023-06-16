@@ -4,7 +4,7 @@
  *
  */
 
-import { EXISTING_COMPONENT_SELECTOR } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 
 /**
@@ -13,8 +13,9 @@ import UpdateMasonryEvents from "../updateMasonryEvents";
 export function initToggleLockComponents() {
     const componentLockSwitch = document.querySelector("#component-lock-switch input");
     componentLockSwitch.addEventListener("change", () => {
+        console.log("change", masonryConfig)
         document
-            .querySelectorAll(EXISTING_COMPONENT_SELECTOR)
+            .querySelectorAll(masonryConfig.settings.existingComponentSelector)
             .forEach((component) => updateComponentDisplay(component));
     });
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
@@ -23,6 +24,9 @@ export function initToggleLockComponents() {
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
         updateComponentDisplay(event.detail.component)
     );
+
+    // Set the initial state of the toggle, in case the page is loaded with the toggle already checked
+    updateComponentDisplay(document);
 }
 
 /**

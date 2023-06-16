@@ -3,7 +3,7 @@
  *
  */
 
-import { UPDATE_URL } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { getFormData } from "./editColumns";
 
@@ -23,7 +23,7 @@ async function onEditColumnsSave() {
     const $toast = $('[data-relation="saveLayout"]');
     try {
         $toast.toastActivate({ text: "Saving..." });
-        await fetch(UPDATE_URL, {
+        await fetch(masonryConfig.settings.updateUrl, {
             method: "POST",
             body: getFormData(),
         });

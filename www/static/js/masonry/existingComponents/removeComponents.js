@@ -5,7 +5,8 @@
 
 import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
+import { getComponentID } from "../masonryFunctions";
 import { close as closeSettingsPanel } from "./updateComponentsSettings";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 
@@ -22,7 +23,7 @@ const PANEL_SELECTOR = '[data-component-panel="delete"]';
  * Toggle the remove palette and manage the confirm/deny actions
  */
 export function initRemoveComponents() {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
+    document.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((component) => init(component)); //existing components
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component)); //newly added components
 }
@@ -132,7 +133,7 @@ async function removeComponent(component, confirmDeleteButton) {
         document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
         confirmDeleteButton.classList.add("disabled");
         confirmDeleteButton.innerText = "Removing...";
-        await fetch(UPDATE_URL, {
+        await fetch(masonryConfig.settings.updateUrl, {
             method: "POST",
             body: getFormData(component),
         });

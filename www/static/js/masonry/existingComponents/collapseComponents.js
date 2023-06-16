@@ -4,7 +4,7 @@
  */
 
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
-import { EXISTING_COMPONENT_SELECTOR } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 
 const ANIMATE_CLOSED_POSITION = 180;
@@ -19,7 +19,7 @@ const BUTTON_SELECTOR = '[data-collapser="true"]';
  * Set up all components and listen for newly added ones
  */
 export function initCollapseComponents() {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
+    document.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((component) => init(component));
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
 }

@@ -3,7 +3,7 @@
  *
  */
 
-import { UPDATE_URL } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { getFormData } from "./editColumns";
 import { undoWidthChanges } from "./editColumnsWidths";
@@ -27,7 +27,7 @@ async function onEditColumnsUndoChanges() {
         $toast.toastActivate({ text: "Saving..." });
         undoWidthChanges();
         undoColourChanges();
-        await fetch(UPDATE_URL, {
+        await fetch(masonryConfig.settings.updateUrl, {
             method: "POST",
             body: getFormData(),
         });

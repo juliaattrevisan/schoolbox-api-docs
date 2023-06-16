@@ -3,7 +3,7 @@
  *
  */
 
-import { UPDATE_URL } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
 import { getLoadedHTML } from "@js/util/domUtils";
 
 /**
@@ -11,7 +11,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
  */
 export async function getNewComponent(component) {
     try {
-        const response = await fetch(UPDATE_URL, {
+        const response = await fetch(masonryConfig.settings.updateUrl, {
             method: "POST",
             body: getFormData(component),
         });

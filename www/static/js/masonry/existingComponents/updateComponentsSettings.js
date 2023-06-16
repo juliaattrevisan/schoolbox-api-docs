@@ -6,7 +6,7 @@
 import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
 import { getLoadedHTML } from "@js/util/domUtils";
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
 import { close as closeRemovePanel } from "./removeComponents";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { updateRemovedComponent } from "./removeComponents";
@@ -26,7 +26,7 @@ const QUERY_STRING_ATTRIBUTE = "data-query-string"; //to store the current setti
  * new component is added or udpated
  */
 export function initUpdateComponentsSettings() {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
+    document.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((component) => init(component));
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
 }
@@ -146,7 +146,7 @@ async function saveComponentSettings(component, form) {
         document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
         submitFormButton.disabled = true;
         submitFormButton.value = "Updating...";
-        const response = await fetch(UPDATE_URL + "?" + getSaveComponentSettingsParams(form));
+        const response = await fetch(masonryConfig.settings.updateUrl + "?" + getSaveComponentSettingsParams(form));
         const responseData = await response.text();
         await updateComponent(component, responseData);
     } catch (error) {

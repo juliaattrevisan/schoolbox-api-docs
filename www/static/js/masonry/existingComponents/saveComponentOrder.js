@@ -4,7 +4,8 @@
  *
  */
 
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../masonry";
+import { masonryConfig } from "../masonryConfig";
+import { getComponentID } from "../masonryFunctions";
 import { updateRemovedComponent } from "./removeComponents";
 
 /**
@@ -14,7 +15,7 @@ import { updateRemovedComponent } from "./removeComponents";
  */
 export async function saveComponentOrder(component) {
     try {
-        const response = await fetch(UPDATE_URL, {
+        const response = await fetch(masonryConfig.settings.updateUrl, {
             method: "POST",
             body: getFormData(component),
         });
@@ -57,7 +58,7 @@ function getFormData(component) {
  */
 function getContainerComponentIDs(componentContainer) {
     let containerComponentIDList = []; //add all ids into an array
-    componentContainer.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((sortable) => {
+    componentContainer.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((sortable) => {
         if (sortable.id) {
             //the <div class="masonry-placeholder" /> exists in each parent container, so we don't want that
             containerComponentIDList.push(getComponentID(sortable));
