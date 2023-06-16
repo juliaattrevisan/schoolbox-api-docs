@@ -96,6 +96,20 @@ module.exports = {
             // Global property storage
             "./www/static/js/global/sbProps.js",
         ],
+        masonry: {
+            import: [
+                // homepage editing
+                "./www/static/js/masonry/jquery.masonry.js",
+                "./www/static/js/masonry/jquery.masonry.colourPicker.js",
+            ],
+            dependOn: "main", // ensures jQuery is loaded prior
+        },
+        masonry2: {
+            import: [
+                "./www/static/js/masonry/masonry.js",
+            ],
+            dependOn: "main", // ensures jQuery is loaded prior
+        },
         mage: {
             import: ["./www/static/js/form/jquery.mage.js"],
             dependOn: "main", // ensures jQuery is loaded prior
