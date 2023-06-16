@@ -7,20 +7,16 @@ import { initNewComponents } from "./newComponents/newComponents";
 import { initUpdatePlaceHolders } from "./updatePlaceHolders";
 
 document.addEventListener("MASONRY__CREATE", (e) => {
-    // setMasonryConfig(e.detail.config);
+    setMasonryConfig(e.detail);
 
-    setMasonryConfig({
-        settings: {
-            allowEditing: true, // Whether the user has full edit control, or is read-only
-            existingComponentSelector: "[data-component]",
-            updateUrl: "/homepage/configForm.php",
-        },
-    }); // TEMP
+    console.log("MASONRY CONFIG", masonryConfig, masonryConfig.postToMyLinks)
 
-    initPostToMyLinks();
+    if (masonryConfig.postToMyLinks) { initPostToMyLinks(); }
+
     initExistingComponents();
+
     if (masonryConfig.settings.allowEditing) {
-        initToggleLockComponents();
+        if (masonryConfig.toggleLockComponents) { initToggleLockComponents(); }
         initEditColumns();
         initNewComponents();
         initUpdatePlaceHolders();

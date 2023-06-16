@@ -11,7 +11,7 @@ import UpdateMasonryEvents from "../updateMasonryEvents";
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
 export function initToggleLockComponents() {
-    const componentLockSwitch = document.querySelector("#component-lock-switch input");
+    const componentLockSwitch = document.querySelector(masonryConfig.toggleLockComponents.selector);
     componentLockSwitch.addEventListener("change", () => {
         console.log("change", masonryConfig)
         document

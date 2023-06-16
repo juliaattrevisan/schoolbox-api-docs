@@ -32,7 +32,7 @@ function initOnComponentAddedListener() {
 function initOnComponentRemovedListener() {
     document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, (event) => {
         const targetId = event.detail.component.dataset.componentDefinitionId;
-        const counter = document.querySelector(`[data-component-palette] [data-component-definition-id=${targetId}]`);
+        const counter = document.querySelector(`[data-component-palette] [data-component-definition-id="${targetId}"]`);
         const paletteElement = counter.parentElement.parentElement;
 
         const newComponentCount = updateComponentCount(paletteElement, false);

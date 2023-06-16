@@ -3,14 +3,17 @@
  *
  */
 
+import { masonryConfig } from "./masonryConfig";
+
 /**
  * Listen for the button press and then save the link to DB and display it on the page
  */
 export function initPostToMyLinks() {
-    if (!document.getElementById("postToMyLinks")) {
-        return;
-    }
-    document.getElementById("postToMyLinks").addEventListener("click", (event) => {
+    const postToMyLinksBtn = document.querySelector(masonryConfig.postToMyLinks.selector)
+    // The button will not exist for a user that has already added this page to their links.
+    if (!postToMyLinksBtn) { return; }
+
+    postToMyLinksBtn.addEventListener("click", (event) => {
         event.preventDefault();
         postLink();
     });
@@ -21,7 +24,7 @@ export function initPostToMyLinks() {
  */
 async function postLink() {
     try {
-        await fetch("/cms/myLinksForm.php", {
+        await fetch(masonryConfig.postToMyLinks.updateUrl, {
             method: "POST",
             body: getFormData(),
         });
@@ -38,10 +41,10 @@ async function postLink() {
  * @returns { FormData }
  */
 function getFormData() {
+    console.log(masonryConfig.postToMyLinks.url)
     const formData = new FormData();
-    // TODO: HOMEPAGE
-    formData.append("url", document.getElementById("homepageURL").value);
-    formData.append("description", document.getElementById("heading").value);
+    formData.append("url", masonryConfig.postToMyLinks.url);
+    formData.append("description", masonryConfig.postToMyLinks.heading);
     return formData;
 }
 
@@ -50,13 +53,16 @@ function getFormData() {
  */
 function displayLinkOnPage() {
     const link = document.createElement("a");
-    // TODO: HOMEPAGE
-    link.setAttribute("href", document.getElementById("homepageURL").value);
-    link.innerText = document.getElementById("heading").value;
+    link.setAttribute("href", masonryConfig.postToMyLinks.url);
+    link.innerText = masonryConfig.postToMyLinks.heading;
 
     const linkListItem = document.createElement("li");
     linkListItem.appendChild(link);
 
     const myLinksList = document.getElementById("side-menu-mylinks").querySelector("ul");
     myLinksList.appendChild(linkListItem);
+
+    // Remove the postToMyLinks button
+    const postToMyLinksBtn = document.querySelector(masonryConfig.postToMyLinks.selector)
+    postToMyLinksBtn.parentNode.removeChild(postToMyLinksBtn);
 }

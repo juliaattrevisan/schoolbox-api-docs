@@ -11,7 +11,10 @@ import UpdateEPortfolioEvents from "../updateEPortfolioEvents";
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
 export function initToggleLockComponents() {
-    const componentLockSwitch = document.getElementById("component-lock-switch").querySelector("input");
+    const componentLockSwitch = document.querySelector("#component-lock-switch input");
+    if (!componentLockSwitch) {
+        return; // No lock switch found, so the page doesn't need it
+    }
     componentLockSwitch.addEventListener("change", () => {
         document
             .querySelectorAll(EXISTING_COMPONENT_SELECTOR)

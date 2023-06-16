@@ -50,7 +50,29 @@
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"></script>
 <!-- END modify_layout -->
 <script type="text/javascript" src="{CDN_PREFIX}/js/resource/jquery.fileDrop.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/updateEPortfolio.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry2.js?v={SITE_VERSION}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Initialise the masonry layout
+        document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
+            detail: {
+                settings: {
+                    allowEditing: true, // Whether the user has full edit control, or is read-only
+                    existingComponentSelector: "[data-component]",
+                    updateUrl: "/eportfolio/configForm.php",
+                    // The backend for EPortfolios differs slightly to Homepages, so we need to
+                    // pass in a different set of data for each type of page.
+                    formData: {
+                        pageType: "page_id",
+                        pageValue: "{PAGE_ID}",
+                        newComponentAddAttribute: "data-component-definition-id",
+                        newComponentFromAttribute: "data-component-id",
+                    }
+                },
+            }
+        }));
+    });
+</script>
 <!-- END custom_head -->
 
 <div class="row actions-small-5">
@@ -306,61 +328,10 @@
     <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column column-right" data-position="right" data-components-container>{component_position_right}</div>
 </div>
 
-<input type="hidden" id="pageID" value="{PAGE_ID}" />
-
 <div id="resource-browser" class="hide"></div>
 
 <script>
     $(function() {
-
-    //     var url = '/eportfolio/configForm.php';
-
-    //     var eportfolio = $('#component-layout');
-    //     eportfolio.masonry({
-    //         context: {
-    //             page_id: '{PAGE_ID}'
-    //         },
-    //         component: {
-    //             url: url,
-    //             calcSequenceData: function (columns) {
-    //                 var masonry = this,
-    //                     data  = { type: 'components' },
-    //                     order = ['left','right','top','bottom'];
-
-    //                 $.each(columns, function (position, column) {
-    //                     var key = 'column' + (order.indexOf(position) + 1);
-
-    //                     data[key] = column.children(masonry.options.component.selector).map(function () {
-    //                         /*
-    //                          * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
-    //                          * and always appear in the same positions. So we do a check to see if
-    //                          * an id is set. If it isn't, and we don't do the check, the script breaks
-    //                          * and components cannot be relocated successfully
-    //                          */
-    //                         if (this.id) {
-    //                             return this.id.substr(9);
-    //                         }
-    //                     }).toArray().join(',');
-    //                 });
-
-    //                 return data;
-    //             }
-    //         },
-    //         colourPicker: {
-    //             selector: '#eportfolio-page-controls-tab-2',
-    //             colours: colours,
-    //             restoreBtnSelector: '[data-role="reset-to-default"]',
-    //             cancelBtnSelector: '[data-role="undo"]',
-    //             saveBtnSelector: '[data-role="save"]',
-    //             saveLabelSelector: '[data-relation="saveLayout"]',
-    //             url: url
-    //         },
-    //         slider: {
-    //             selector: '[data-interaction="column-width"]',
-    //             url: url
-    //         }
-    //     });
-
 		$('#addIndividualPermission').selectizeSelector({
 			multiple: true,
 			value: {USER_LIST},
