@@ -516,9 +516,9 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
-    public function getPublishDate(): Alaress_Date_Format
+    public function getPublishDate(): ?Alaress_Date_Format
     {
         if ($this->plan->getIsDynamic()) {
             return $this->plan->getAssessable()->getPublishAt();
@@ -533,7 +533,7 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getOpenDate(): ?Alaress_Date_Format
     {
@@ -550,7 +550,7 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getDueDate(): ?Alaress_Date_Format
     {
@@ -567,9 +567,9 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
-    public function getCloseDate(): Alaress_Date_Format
+    public function getCloseDate(): ?Alaress_Date_Format
     {
         if ($this->plan->getIsDynamic()) {
             return $this->plan->getAssessable()->getCloseAt();
