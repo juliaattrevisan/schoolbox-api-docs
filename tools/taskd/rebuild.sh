@@ -106,6 +106,7 @@ function main(){
   stop_container;
 
   # if managing locally, build image and run container.
+  echo $build_locally;
   if [[ $build_locally == "1" ]]; then
     build_image
     start_container "$env_file";

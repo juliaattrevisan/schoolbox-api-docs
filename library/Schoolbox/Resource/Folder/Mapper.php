@@ -864,15 +864,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Search by name
      *
-     * @param string|null $keyword
+     * @param string $keyword
      * @param bool   $userGroupsOnly
      * @param array  $folderIds
-     * @return Collection|Model[]
-     * @throws Alaress\Database\Predicate\InvalidColumnException
-     * @throws DefinitionException if join $name isn't on this mapper
-     * @throws \UnderflowException
+     * @return GenericCollection
      */
-    public function searchByName($keyword, $userGroupsOnly = false, array $folderIds = [])
+    public function searchByName(string $keyword, bool $userGroupsOnly = false, array $folderIds = []): GenericCollection
     {
         $builder = $this->getPredicateBuilder();
 
@@ -882,7 +879,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // if keyword is not provided or empty, return everything
-        if (null !== $keyword && '' !== $keyword) {
+        if ('' !== $keyword) {
             $subBuilder = $this->getPredicateBuilder();
             $subBuilder
                 ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")

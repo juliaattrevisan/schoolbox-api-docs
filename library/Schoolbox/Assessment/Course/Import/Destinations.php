@@ -13,6 +13,7 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
@@ -39,12 +40,9 @@ class Destinations
      * Find destinations into which a course can be imported
      *
      * @param string $keyword
-     * @return Collection|Model[]
-     * @throws DefinitionException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
+     * @return GenericCollection
      */
-    public function findImportable($keyword)
+    public function findImportable(string $keyword): GenericCollection
     {
         return $this->folderMapper->searchByName($keyword, false, $this->findGroupsAndClassesScalar());
     }
