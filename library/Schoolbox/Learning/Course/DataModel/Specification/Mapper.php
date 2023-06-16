@@ -187,13 +187,13 @@ class Mapper extends AbstractCourseMapper
     /**
      * List the courses. Convenience method for findByColumn('name', LIKE($name));
      *
-     * @param string|null $searchParam
-     * @param array       $options
+     * @param string $searchParam
+     * @param array  $options
      * @return GenericCollection
      */
-    public function findAllByName(?string $searchParam, array $options = []): GenericCollection
+    public function findAllByName(string $searchParam, array $options = []): GenericCollection
     {
-        if (null === $searchParam || strlen($searchParam) === 0) {
+        if (strlen($searchParam) === 0) {
             return $this->findAll($options);
         }
         $pb = $this->getPredicateBuilder();
