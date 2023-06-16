@@ -426,16 +426,14 @@ class Controller extends Base\Base
     /**
      * Form to create a new course
      *
-     * @api   GET /course/new{/:name}
+     * @api   GET /course/new
      * @since 160
-     *
-     * @param string|null $name
      */
-    public function newCourse(?string $name): void
+    public function newCourse(): void
     {
         $this->courseTpl('course', [
             'courseSpec'        => null,
-            'courseName'        => urldecode($name ?? ''),
+            'courseName'        => '',
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
