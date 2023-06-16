@@ -864,7 +864,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Search by name
      *
-     * @param string $keyword
+     * @param string|null $keyword
      * @param bool   $userGroupsOnly
      * @param array  $folderIds
      * @return Collection|Model[]
