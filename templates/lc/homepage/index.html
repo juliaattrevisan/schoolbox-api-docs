@@ -53,27 +53,38 @@
 
 <!-- BEGIN modify_layout -->
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/colourPicker.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/updateHomepage.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/course/jquery.course-selector.js?v={SITE_VERSION}"></script>
 
-<script type="text/javascript">
-    $(function() {
-
-        /* Attach Course Selector Modal listeners
-         */
-        $.fn.courseSelectorModal({
-            courseSelector: {
-                query: {
-                    hasClose:      true,
-                    hasAdd:        false,
-                    hasTot:        false,
-                    linkToUnits:   false,
-                    folder:        {ID},
-                    encodedReturnUrl: "{ENCODED_RETURN_URL}"
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry2.js?v={SITE_VERSION}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Initialise the masonry layout
+        document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
+            detail: {
+                settings: {
+                    allowEditing: true, // Whether the user has full edit control, or is read-only
+                    existingComponentSelector: "[data-component]",
+                    updateUrl: "/homepage/configForm.php",
+                    // The backend for EPortfolios differs slightly to Homepages, so we need to
+                    // pass in a different set of data for each type of page.
+                    formData: {
+                        pageType: "cid",
+                        pageValue: "{ID}",
+                        newComponentAddAttribute: "data-component-definition-id",
+                    }
+                },
+                postToMyLinks: {
+                    selector: "#postToMyLinks",
+                    url: "{HOMEPAGE_URL}",
+                    heading: "{HEADING}",
+                    updateUrl: "/cms/myLinksForm.php",
+                },
+                toggleLockComponents: {
+                    selector: "#component-lock-switch input"
                 }
             }
-        });
-
+        }));
     });
 </script>
 <!-- END modify_layout -->
