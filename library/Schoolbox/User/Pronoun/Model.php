@@ -115,6 +115,6 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
         }
 
         // both terms exist display the concat of them
-        return sprintf("%s / %s", $this->subjective, $this->objective);
+        return sprintf("(%s / %s)", $this->subjective, $this->objective);
     }
 }
