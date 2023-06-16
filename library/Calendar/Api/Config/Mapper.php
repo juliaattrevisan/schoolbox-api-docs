@@ -13,7 +13,6 @@
 
 use Calendar\Api\ModuleChecker;
 use Schoolbox\Collection;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;

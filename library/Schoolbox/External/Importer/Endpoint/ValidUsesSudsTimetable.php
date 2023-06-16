@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
-use External\IConnector;
-
 /**
  * Decide if the current SUDS connector uses the SUDS Timetable
  * (If it doesn't, then we presume usage of the cyclic grid)
@@ -44,16 +42,42 @@ class ValidUsesSudsTimetable
      * $dataSource corresponds to schooldata_import_data_source in config
      * (You could convert Factory::NAME to a more comprehensive hash lookup)
      *
-     * @param string|null $externalDb
-     * @param string|null $dataSource
+     * @param string $lissUsername
+     * @param string $lissPassword
+     * @param string $dataSource
      * @return bool
      */
-    public function isSatisfiedBy(?string $externalDb, ?string $dataSource): bool
+    public function isSatisfiedBy(string $lissUsername, string $lissPassword, string $dataSource): bool
     {
-        /* You also have to be on the Schoolbox connector, not some other live connector
-         * This can occur when you trade SUDS for a Live connector or vice versa,
-         * predominantly in testing
+        $username = trim($lissUsername);
+        $password = trim($lissPassword);
+
+        /* If your liss credentials are meaningful, use Schedule Timetable
+         * SUDS liss now populates Schedule Timetable
          */
-        return IConnector::EXTERNAL_TYPE_SCHOOLBOX === $externalDb && \in_array($dataSource, self::SUDS_TIMETABLE, true);
+        if ('' !== $username && '' !== $password) {
+            return true;
+        }
+
+        /* Remember if we've chosen a SUDS Connector that supports Schedule Timetable
+         * (Only some SUDS Connectors populate Schedule Timetable)
+         */
+        $isScheduleTimetable = \in_array($dataSource, self::SUDS_TIMETABLE, true);
+
+        /* No liss credentials provided;
+         * Might be using Cyclic, might be using Schedule; dig deeper,
+         * because the sis might fully populate the timetable by itself without liss
+         */
+        if ('' === $username && '' === $password) {
+            return $isScheduleTimetable;
+        }
+
+        /* Only one of the liss configuration pieces provided;
+         * there's no way this could have worked, but is an oddball scenario
+         * where schools haven't finished configuring properly
+         *
+         * This, and every other case: use the cyclic grid
+         */
+        return false;
     }
 }

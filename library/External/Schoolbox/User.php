@@ -259,7 +259,7 @@ class External_Schoolbox_User implements External_UserInterface
          *
          * All you classical grid users can skip this step
          */
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('external_type'), (string)$config->get('schooldata_import_data_source'))) {
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('external_liss_username'), (string)$config->get('external_liss_password'), (string)$config->get('schooldata_import_data_source'))) {
             $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
             $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
 
