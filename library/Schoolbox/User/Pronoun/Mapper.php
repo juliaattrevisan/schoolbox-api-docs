@@ -48,11 +48,10 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Ensure we return the correct sequence
-     * @param $options
-     * @return \Schoolbox\Collection|\Schoolbox\GenericCollection
+     * @return string[]
      */
-    public function findAll($options = [])
+    protected function getDefaultOrderByParams(): array
     {
-        return parent::findAll($options)->sortBy('sequence', 'asc');
+        return ['sequence' => 'ASC'];
     }
 }
