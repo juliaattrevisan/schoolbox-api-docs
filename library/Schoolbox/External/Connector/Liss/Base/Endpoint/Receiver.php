@@ -154,6 +154,10 @@ class Receiver
                 'function' => [$this, 'publishDailyData'],
             ],
 
+            'liss.publishClassMemberships' => [
+                'function' => [$this, 'publishClassMemberships'],
+            ],
+
             /* All these ones fulfil a cyclic timetable afaict
              * We don't need them
              *
@@ -164,9 +168,6 @@ class Receiver
             ],
             'liss.publishClasses' => [
                 'function' => [$this, 'publishClasses'],
-            ],
-            'liss.publishClassMemberships' => [
-                'function' => [$this, 'publishClassMemberships'],
             ],
             'liss.publishBellTimes' => [
                 'function' => [$this, 'publishBellTimes'],
@@ -237,6 +238,37 @@ class Receiver
         $this->transact($this->importLogMapper->getDatabase(), $composites);
 
         return $this->generateResponse('publishDailyData finished.');
+    }
+
+
+    /**
+     * Publish students to the Schoolbox
+     *
+     * @param Request $message
+     * @return Response
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function publishClassMemberships(Request $message): Response
+    {
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        $composites = new TimetableCalendar\ClassMemberships(
+            $this->log(),
+            true,
+            \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
+            \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
+            $message
+        );
+
+        $composites->import();
+
+        return $this->generateResponse('publishClassMemberships finished.');
     }
 
 
@@ -358,24 +390,6 @@ class Receiver
         }
 
         return $this->generateResponse('getRooms finished but unused.');
-    }
-
-
-    /**
-     * Publish students to the Schoolbox
-     *
-     * @param Request $message
-     * @return Response
-     */
-    public function publishClassMemberships(Request $message): Response
-    {
-        /* Requires schoolbox connector
-         */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
-            return $this->generateResponse(self::AUTHENTICATION_FAILED);
-        }
-
-        return $this->generateResponse('publishClassMemberships finished but unused.');
     }
 
 
