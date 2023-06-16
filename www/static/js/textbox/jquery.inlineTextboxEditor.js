@@ -1,5 +1,4 @@
 (function ($) {
-    console.info("jquery.inlineTextboxEditor.js");
     /**
      * Inline textbox editor constructor.
      *

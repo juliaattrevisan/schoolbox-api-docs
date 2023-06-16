@@ -40,7 +40,7 @@ function addDefaultConfig(config: EditorConfig) {
         config.toolbar = EditorToolbar.DEFAULT;
     }
     if (config.maxCharCount === undefined) {
-        config.maxCharCount = 65_000;
+        config.maxCharCount = window.sbProps.MAX_BYTES_MYSQL_TEXT;
     }
 }
 

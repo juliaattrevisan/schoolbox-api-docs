@@ -32,6 +32,7 @@ export default {
 
     data() {
         return {
+            isOverStorageLimit: false,
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
             newComment: "",
@@ -73,7 +74,7 @@ export default {
          * @returns {Boolean}
          */
         isPostCommentDisabled() {
-            if (this.newComment.trim() === "" || this.isProcessing) {
+            if (this.newComment.trim() === "" || this.isProcessing || this.isOverStorageLimit) {
                 return true;
             } else {
                 return false;
@@ -95,11 +96,15 @@ export default {
         async init() {
             try {
                 this.isCKEditorLoading = true; // to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+
                 const editorScript = `${this.cdnPrefix}/js/bundle/editor.js?v=${this.siteVersion}`;
+
                 if (!isScriptAdded(editorScript)) {
                     await injectScript(editorScript);
                 }
+
                 this.$refs.comment.addEventListener(EditorEvent.EDITOR__CREATED, this.onEditorCreated);
+
                 document.dispatchEvent(
                     new CustomEvent(EditorEvent.EDITOR__CREATE, {
                         detail: {
@@ -125,6 +130,24 @@ export default {
             this.editor.model.document.on("change:data", () => {
                 this.newComment = this.editor.getData();
             });
+
+            const sourceElement = event.detail.sourceElement;
+            const commentId = sourceElement.getAttribute("id");
+            const submitButton = document.querySelector("button.submit[id=submit-for-" + commentId + "]");
+            const submitButtonTextOrig = submitButton.innerHTML;
+
+            // Arrow function syntax ensures 'this' can be used inside event handler.
+            sourceElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
+                this.isOverStorageLimit = true;
+                submitButton.innerHTML = submitButtonTextOrig + " (disabled because maximum character count exceeded)";
+            });
+
+            // Arrow function syntax ensures 'this' can be used inside event handler.
+            sourceElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
+                this.isOverStorageLimit = false;
+                submitButton.setAttribute("value", submitButtonTextOrig);
+            });
+
             this.editor.editing.view.focus();
             this.isCKEditorLoading = false;
             this.isCKEditorLoaded = true;
@@ -150,7 +173,14 @@ export default {
         </button>
         <div :style="getStyles">
             <textarea :id="`comment-${uniqueId}`" ref="comment"></textarea>
-            <button class="button submit" @click="postComment" :disabled="isPostCommentDisabled">Post comment</button>
+            <button
+                :id="`submit-for-comment-${uniqueId}`"
+                class="button submit"
+                @click="postComment"
+                :disabled="isPostCommentDisabled"
+            >
+                Post comment
+            </button>
         </div>
     </div>
 </template>

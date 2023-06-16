@@ -109,12 +109,6 @@
                 }
             }));
 
-            /* Add event listener for ckeditor char count
-             */
-            let el = document.querySelector('[id=' + bodyId + ']');
-
-            applyCharCountListener(el, '#save-button');
-
             /* Postincrement in preparation for another new row
              */
             fieldCount++;
@@ -167,38 +161,21 @@
         /* Mandate at least one field existing at all times
          */
         refreshDeletes();
+
+        /* Spawn multiple ckeditors for fields which already existed
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: [
+                    {% if lessonPlanTemplate is not null %}
+                    {% for field in lessonPlanTemplate.fields %}
+                    '#field-body-{{ field.id }}',
+                    {% endfor %}
+                    {% endif %}
+                ]
+            }
+        }));
     });
-
-
-    /**
-     * Applies a maximum char count detection to disable the Save button,
-     * otherwise it tries to save more than is allowed; save the user from
-     * this error screen
-     *
-     * @param el
-     * @param saveButton string  A save button's id string, e.g. '#save-button'
-     */
-    function applyCharCountListener(el, saveButton) {
-        el.addEventListener(
-            "EDITOR__MAX_CHAR_COUNT_EXCEEDED",
-            function () {
-                const input = document.querySelector(saveButton);
-                input.disabled = true;
-                input.setAttribute('value', 'Save (disabled because maximum character count exceeded)');
-            }
-        );
-        el.addEventListener(
-            "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
-            function () {
-                // Only enable save button if no max. character count has been exceeded on any ckeditor field.
-                if (document.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
-                    const input = document.querySelector(saveButton);
-                    input.disabled = false;
-                    input.setAttribute('value', 'Save');
-                }
-            }
-        );
-    }
 </script>
 
 <div class="admin-container row">
@@ -328,23 +305,3 @@
         </div>
     </section>
 </div>
-
-<script>
-    document.querySelectorAll('[id^=field-body-]').forEach((el) => {
-        applyCharCountListener(el, '#save-button');
-    });
-
-    /* Spawn multiple ckeditors for fields which already existed
-     */
-    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-        detail: {
-            targetElements: [
-                {% if lessonPlanTemplate is not null %}
-                {% for field in lessonPlanTemplate.fields %}
-                '#field-body-{{ field.id }}',
-                {% endfor %}
-                {% endif %}
-            ]
-        }
-    }));
-</script>

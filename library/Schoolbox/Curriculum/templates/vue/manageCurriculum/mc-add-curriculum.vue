@@ -3,6 +3,7 @@
  * to show further info in a modal on a code that's been selected
  */
 
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useStore } from "./store/manageCurriculumStore";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
 import { useDescriptionEditor } from "./composable/useDescriptionEditor";
@@ -12,33 +13,52 @@ const addCurriculumStore = useAddCurriculumStore();
 
 /**
  * Store a reference to the ckeditor used for the description
- *
- * @returns { String }
  */
-const ckeditorInstance = window.Vue.computed(() => `new-curriculum`);
+const ckeditorIdAttr = `new-curriculum`;
+
+const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+
+/**
+ * To update the button text as the component state changes.
+ *
+ * @returns { string }
+ */
+const addButtonText = window.Vue.computed(() => {
+    if (addCurriculumStore.isProcessing) {
+        return "Adding...";
+    }
+
+    return "Add" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
+});
+
+/**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { boolean }
+ */
+const isAddDisabled = window.Vue.computed(() => {
+    return (
+        isMaxCharCountExceeded.value ||
+        addCurriculumStore.curriculum.name?.trim().length === 0 ||
+        addCurriculumStore.isProcessing
+    );
+});
 
 /**
  * Use a customised ckeditor for the description field
  */
-const descriptionField = useDescriptionEditor(
+const descriptionFieldValue = useDescriptionEditor(
     addCurriculumStore.curriculum?.description as string,
-    ckeditorInstance.value
+    ckeditorIdAttr,
+    isMaxCharCountExceeded
 );
 
 /**
- * And watch for changes on this field so we can update the description in the store
+ * And watch for changes on this field, so we can update the description in the store
  */
-window.Vue.watch(descriptionField, (newValue: string) => {
+window.Vue.watch(descriptionFieldValue, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;
 });
-
-/**
- * To instantly notify the user that the subsection is being added
- * by updating the button text
- *
- * @returns { String }
- */
-const addButtonText = window.Vue.computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
 
 /**
  * submit save
@@ -69,69 +89,61 @@ addCurriculumStore.$onAction(({ name, after, onError }) => {
 function onCancelSelected() {
     addCurriculumStore.cancel();
 }
-
-/**
- * Only enable the button once the conditions are met
- *
- * @returns { Boolean }
- */
-const isAddDisabled = window.Vue.computed(() => {
-    if (typeof addCurriculumStore.curriculum.name === "string") {
-        return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
-    }
-    return false;
-});
 </script>
 
 <template>
     <div class="row">
         <div class="small-12 island">
-            <section>
-                <fieldset class="content">
-                    <legend>Add new Curriculum</legend>
-                    <div class="small-12 columns">
-                        <label for="name" class="required">Name</label>
-                        <input
-                            type="text"
-                            id="name"
-                            v-model="addCurriculumStore.curriculum.name"
-                            maxlength="2048"
-                            required
-                        />
-                    </div>
-                    <div class="small-12 columns">
-                        <label for="code">Code</label>
-                        <input type="text" id="code" v-model="addCurriculumStore.curriculum.code" maxlength="64" />
-                    </div>
-                    <div class="small-12 columns">
-                        <label for="description">Description</label>
-                        <textarea :id="ckeditorInstance" rows="6"></textarea>
-                    </div>
-                    <div class="small-12 columns">
-                        <ul class="flex-list">
-                            <li>
-                                <button
-                                    class="button icon-close"
-                                    :disabled="addCurriculumStore.isProcessing"
-                                    @click.prevent="onCancelSelected"
-                                >
-                                    Cancel
-                                </button>
-                            </li>
-                            <li>
-                                <button
-                                    class="button icon-add submit"
-                                    data-test-add-curriculum
-                                    :disabled="isAddDisabled"
-                                    @click.prevent="onAddSubsectionSelected"
-                                >
-                                    {{ addButtonText }}
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </fieldset>
-            </section>
+            <form>
+                <section>
+                    <fieldset class="content">
+                        <legend>Add new Curriculum</legend>
+                        <div class="small-12 columns">
+                            <label for="name" class="required">Name</label>
+                            <input
+                                id="name"
+                                maxlength="2048"
+                                required
+                                type="text"
+                                v-model="addCurriculumStore.curriculum.name"
+                            />
+                        </div>
+                        <div class="small-12 columns">
+                            <label for="code">Code</label>
+                            <input type="text" id="code" v-model="addCurriculumStore.curriculum.code" maxlength="64" />
+                        </div>
+                        <div class="small-12 columns">
+                            <label for="description">Description</label>
+                            <textarea :id="ckeditorIdAttr" rows="6"></textarea>
+                        </div>
+                        <div class="small-12 columns">
+                            <ul class="flex-list">
+                                <li>
+                                    <button
+                                        :disabled="addCurriculumStore.isProcessing"
+                                        @click.prevent="onCancelSelected"
+                                        class="button icon-close"
+                                    >
+                                        Cancel
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        :data-submit-button-for="ckeditorIdAttr"
+                                        :disabled="isAddDisabled"
+                                        @click.prevent="onAddSubsectionSelected"
+                                        class="button icon-add submit"
+                                        data-test-add-curriculum
+                                        ref="addButton"
+                                    >
+                                        {{ addButtonText }}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </fieldset>
+                </section>
+            </form>
         </div>
     </div>
 </template>

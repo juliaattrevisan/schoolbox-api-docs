@@ -3,10 +3,11 @@
  * to be able to update a nodes name, code and description
  */
 
-import { useStore } from "../store/manageCurriculumStore";
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
-import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
+import { useStore } from "../store/manageCurriculumStore";
+import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";
 
 const props = defineProps({
     /**
@@ -34,27 +35,51 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { string }
  */
-const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
+
+const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+
+/**
+ * To update the button text as the component state changes.
+ *
+ * @returns { string }
+ */
+const updateButtonText = window.Vue.computed(() => {
+    if (updateNodeStore.isProcessing) {
+        return "Updating...";
+    }
+
+    return "Update" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
+});
+
+/**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { boolean }
+ */
+const isUpdateDisabled = window.Vue.computed(() => {
+    return (
+        isMaxCharCountExceeded.value ||
+        updateNodeStore.activeNodeCopy.name.trim().length === 0 ||
+        updateNodeStore.isProcessing
+    );
+});
 
 /**
  * Use a customised ckeditor for the description field
  */
-const descriptionField = useDescriptionEditor(updateNodeStore.activeNodeCopy.description, ckeditorInstance.value);
+const descriptionField = useDescriptionEditor(
+    updateNodeStore.activeNodeCopy?.description as string,
+    ckeditorIdAttr.value,
+    isMaxCharCountExceeded
+);
 
 /**
- * And watch for changes on this field so we can update the description in the store
+ * And watch for changes on this field, so we can update the description in the store
  */
 window.Vue.watch(descriptionField, (newValue) => {
     updateNodeStore.activeNodeCopy.description = newValue;
 });
-
-/**
- * To instantly notify the user that the node is being updated
- * by updating the button text
- *
- * @returns { string }
- */
-const updateButtonText = window.Vue.computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
 
 /**
  * submit save
@@ -85,65 +110,60 @@ updateNodeStore.$onAction(({ name, after, onError }) => {
 function onCancelSelected() {
     updateNodeStore.cancel();
 }
-
-/**
- * Only enable the button once the conditions are met
- *
- * @returns { boolean }
- */
-const isUpdateDisabled = window.Vue.computed(() => {
-    return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
-});
 </script>
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
-        <section>
-            <fieldset class="content">
-                <legend class="title">Update</legend>
-                <div class="small-12 columns">
-                    <label for="name" class="required">Name</label>
-                    <input
-                        id="name"
-                        v-model="updateNodeStore.activeNodeCopy.name"
-                        type="text"
-                        maxlength="2048"
-                        required
-                    />
-                </div>
-                <div class="small-12 columns">
-                    <label for="code">Code</label>
-                    <input id="code" v-model="updateNodeStore.activeNodeCopy.code" type="text" maxlength="64" />
-                </div>
-                <div class="small-12 columns">
-                    <label for="description">Description</label>
-                    <textarea :id="ckeditorInstance" rows="6"></textarea>
-                </div>
-                <div class="small-12 columns">
-                    <ul class="flex-list">
-                        <li>
-                            <button
-                                class="button icon-close"
-                                :disabled="updateNodeStore.isProcessing"
-                                @click.prevent="onCancelSelected"
-                            >
-                                Cancel
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                class="button icon-modify submit"
-                                :disabled="isUpdateDisabled"
-                                data-test-update-node
-                                @click.prevent="onUpdateSelected"
-                            >
-                                {{ updateButtonText }}
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </fieldset>
-        </section>
+        <form>
+            <section>
+                <fieldset class="content">
+                    <legend class="title">Update</legend>
+                    <div class="small-12 columns">
+                        <label for="name" class="required">Name</label>
+                        <input
+                            id="name"
+                            maxlength="2048"
+                            required
+                            type="text"
+                            v-model="updateNodeStore.activeNodeCopy.name"
+                        />
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="code">Code</label>
+                        <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64" />
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="description">Description</label>
+                        <textarea :id="ckeditorIdAttr" rows="6"></textarea>
+                    </div>
+                    <div class="small-12 columns">
+                        <ul class="flex-list">
+                            <li>
+                                <button
+                                    :disabled="updateNodeStore.isProcessing"
+                                    @click.prevent="onCancelSelected"
+                                    class="button icon-close"
+                                >
+                                    Cancel
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    :data-submit-button-for="ckeditorIdAttr"
+                                    :disabled="isUpdateDisabled"
+                                    @click.prevent="onUpdateSelected"
+                                    class="button icon-modify submit"
+                                    data-test-update-node
+                                    ref="updateButton"
+                                >
+                                    {{ updateButtonText }}
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
     </div>
 </template>
 

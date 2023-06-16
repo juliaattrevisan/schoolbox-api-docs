@@ -3,6 +3,7 @@
  * to show further info in a modal on a code that's been selected
  */
 
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useAddSubsectionStore } from "./store/mcAddSubsectionStore";
@@ -25,36 +26,60 @@ const addSubsectionStore = useAddSubsectionStore();
 /**
  * to gradually and more marginLeft to indicate node level depth
  *
- * @returns { Number }
+ * @returns { number }
  */
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
  *
- * @returns { String }
+ * @returns { string }
  */
-const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
+
+const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+
+/**
+ * To update the button text as the component state changes.
+ *
+ * @returns { string }
+ */
+const addButtonText = window.Vue.computed(() => {
+    if (addSubsectionStore.isProcessing) {
+        return "Adding...";
+    }
+
+    return "Add" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
+});
+
+/**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { boolean }
+ */
+const isAddDisabled = window.Vue.computed(() => {
+    return (
+        isMaxCharCountExceeded.value ||
+        addSubsectionStore.subsection.name?.trim().length === 0 ||
+        addSubsectionStore.isProcessing
+    );
+});
 
 /**
  * Use a customised ckeditor for the description field
  */
-const descriptionField = useDescriptionEditor(addSubsectionStore.subsection.description, ckeditorInstance.value);
+const descriptionField = useDescriptionEditor(
+    addSubsectionStore.subsection?.description as string,
+    ckeditorIdAttr.value,
+    isMaxCharCountExceeded
+);
 
 /**
- * And watch for changes on this field so we can update the description in the store
+ * And watch for changes on this field, so we can update the description in the store
  */
 window.Vue.watch(descriptionField, (newValue) => {
     addSubsectionStore.subsection.description = newValue;
 });
-
-/**
- * To instantly notify the user that the subsection is being added
- * by updating the button text
- *
- * @returns { String }
- */
-const addButtonText = window.Vue.computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
 
 /**
  * submit save
@@ -85,65 +110,60 @@ addSubsectionStore.$onAction(({ name, after, onError }) => {
 function onCancelSelected() {
     addSubsectionStore.cancel();
 }
-
-/**
- * Only enable the button once the conditions are met
- *
- * @returns { Boolean }
- */
-const isAddDisabled = window.Vue.computed(() => {
-    return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
-});
 </script>
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
-        <section>
-            <fieldset class="content">
-                <legend class="title">Add subsection</legend>
-                <div class="small-12 columns">
-                    <label for="name" class="required">Name</label>
-                    <input
-                        type="text"
-                        id="name"
-                        v-model="addSubsectionStore.subsection.name"
-                        maxlength="2048"
-                        required
-                    />
-                </div>
-                <div class="small-12 columns">
-                    <label for="code">Code</label>
-                    <input type="text" id="code" v-model="addSubsectionStore.subsection.code" maxlength="64" />
-                </div>
-                <div class="small-12 columns">
-                    <label for="description">Description</label>
-                    <textarea :id="ckeditorInstance" rows="6"></textarea>
-                </div>
-                <div class="small-12 columns">
-                    <ul class="flex-list">
-                        <li>
-                            <button
-                                class="button icon-close"
-                                :disabled="addSubsectionStore.isProcessing"
-                                @click.prevent="onCancelSelected"
-                            >
-                                Cancel
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                class="button icon-add submit"
-                                data-test-add-subsection
-                                :disabled="isAddDisabled"
-                                @click.prevent="onAddSubsectionSelected"
-                            >
-                                {{ addButtonText }}
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </fieldset>
-        </section>
+        <form>
+            <section>
+                <fieldset class="content">
+                    <legend class="title">Add subsection</legend>
+                    <div class="small-12 columns">
+                        <label for="name" class="required">Name</label>
+                        <input
+                            id="name"
+                            maxlength="2048"
+                            required
+                            type="text"
+                            v-model="addSubsectionStore.subsection.name"
+                        />
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="code">Code</label>
+                        <input type="text" id="code" v-model="addSubsectionStore.subsection.code" maxlength="64" />
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="description">Description</label>
+                        <textarea :id="ckeditorIdAttr" rows="6"></textarea>
+                    </div>
+                    <div class="small-12 columns">
+                        <ul class="flex-list">
+                            <li>
+                                <button
+                                    :disabled="addSubsectionStore.isProcessing"
+                                    @click.prevent="onCancelSelected"
+                                    class="button icon-close"
+                                >
+                                    Cancel
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    :data-submit-button-for="ckeditorIdAttr"
+                                    :disabled="isAddDisabled"
+                                    @click.prevent="onAddSubsectionSelected"
+                                    class="button icon-add submit"
+                                    data-test-add-subsection
+                                    ref="addButton"
+                                >
+                                    {{ addButtonText }}
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
     </div>
 </template>
 

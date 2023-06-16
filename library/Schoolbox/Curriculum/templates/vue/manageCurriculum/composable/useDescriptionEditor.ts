@@ -1,29 +1,37 @@
 /**
- * Loads and display the ckeditor, and once loaded prefil the initialValue if it's available
+ * Loads and display the ckeditor, and once loaded prefill the initialValue if it's available
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  *
  * We currently use this for the description in add curriculum, add subsection and update an existing node
  * It's linked specifically to description as we are removing embed media buttons which is currently specific just to these description fields
  */
 
+import { EditorEvent } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
 /**
  * Initialise the composable
  *
  * @param { string } $initialValue - the initial string value to input into the ckeditor
- * @param { string } $ckeditorInstance - the selector to target the CKEditor
+ * @param { string } ckeditorSelector - the selector to target the CKEditor
+ * @param { Ref<boolean> } isMaxCharCountExceeded - Vue reference to boolean
+ *  - true if the CKEditor field content storage limit was found to have been exceeded at last check
  * @returns { string } - the initial value
  */
-export function useDescriptionEditor($initialValue: string, $ckeditorInstance: string) {
+export function useDescriptionEditor(
+    $initialValue: string,
+    ckeditorSelector: string,
+    isMaxCharCountExceeded: Ref<boolean>
+) {
     const initialValue = window.Vue.ref($initialValue);
-    const ckeditorInstance = $ckeditorInstance;
 
     /**
      * When a new editor is created
+     *
+     * @param { object } event - Javascript event object
      */
-    function onEditorCreated(event) {
-        const editor = event.detail.editor;
+    function onEditorCreated(event: object) {
+        const editor = event.detail.editor as object;
 
         if (initialValue.value !== null) {
             editor.setData(initialValue.value); // set the initial data
@@ -31,6 +39,18 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
 
         editor.model.document.on("change:data", () => {
             initialValue.value = editor.getData() as string;
+        });
+
+        const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
+
+        // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
+        ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
+            isMaxCharCountExceeded.value = true;
+        });
+
+        // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
+        ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
+            isMaxCharCountExceeded.value = false;
         });
     }
 
@@ -43,12 +63,17 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
             if (!isScriptAdded(ckeditorScript)) {
                 await injectScript(ckeditorScript);
             }
-            document.getElementById(ckeditorInstance).addEventListener("EDITOR__CREATED", onEditorCreated);
+
+            const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
+
+            ckeditorElem.addEventListener(EditorEvent.EDITOR__CREATED, onEditorCreated);
+
             document.dispatchEvent(
-                new CustomEvent("EDITOR__CREATE", {
+                new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: {
-                        targetElements: [`#${ckeditorInstance}`],
+                        targetElements: [`#${ckeditorSelector}`],
                         toolbar: "simple",
+                        addMaxCharCountDefaultEventListeners: false,
                     },
                 })
             );
