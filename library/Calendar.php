@@ -532,6 +532,16 @@ class Calendar extends DeprecatedModel
 
         $allEvents = $this->db->query($query)->fetchAll();
 
+        /**
+         * grab the list of authors
+         */
+        $authorIDs = [];
+        foreach ($allEvents as $event) {
+            $authorIDs[$event['uid']] = $event['uid'];
+        }
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+        $authors =  $userMapper->findByColumn('id', $authorIDs);
+
         /* Standardised output
          */
         $stack = new GenericCollection(EventInterface::class);
@@ -540,10 +550,10 @@ class Calendar extends DeprecatedModel
             foreach ($allEvents as $currentEvent) {
                 $event = new Event();
 
+                /** @var User|null $eventAuthor **/
+                $eventAuthor = $authors->getBy('id', $currentEvent['uid']);
                 $event->setAuthorName(
-                    (new User\Formatter\Factory())->buildFromNothing()->formatArray(
-                        ['title' => ''] + $currentEvent
-                    )
+                    (new User\Formatter\Factory())->buildFromNothing()->formatObject($eventAuthor)
                 );
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
