@@ -238,8 +238,10 @@ class Controller extends AbstractController
 
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput(['status' => 200]));
-        } else {
+        } elseif (isset($get['returnUrl'])) {
             $this->getResponse()->redirect->to(Redirect::decode($get['returnUrl']));
+        } else {
+            $this->getResponse()->redirect->to($this->getSession()->getHistory());
         }
     }
 

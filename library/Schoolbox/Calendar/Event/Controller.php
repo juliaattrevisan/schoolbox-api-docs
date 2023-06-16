@@ -791,7 +791,6 @@ class Controller extends Base
      */
     public function postDelete(Event $event): void
     {
-
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() !== null) {
@@ -810,7 +809,9 @@ class Controller extends Base
 
         /* Redirect
          */
-        $redirect = Redirect::decode($this->request->query->get('returnUrl'));
+        $redirect = $this->request->query->get('returnUrl')
+            ? Redirect::decode($this->request->query->get('returnUrl'))
+            : $this->getSession()->getHistory();
 
         /* Calculate redirect for async javascript
          */

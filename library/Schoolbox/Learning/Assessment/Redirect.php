@@ -36,12 +36,12 @@ class Redirect
     /**
      * Decode an encoded redirect url
      *
-     * @param string|null $encoded
+     * @param string $encoded
      * @return string
      */
-    public static function decode($encoded)
+    public static function decode(string $encoded): string
     {
-        return base64_decode(urldecode($encoded ?? ''));
+        return base64_decode(urldecode($encoded));
     }
 
 

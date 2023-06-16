@@ -401,8 +401,8 @@ class Controller extends Base
          */
         $returnUrl = null;
 
-        if (strlen($this->getRequest()->post['returnUrl'])) {
-            $returnUrl = Redirect::decode($this->getRequest()->post['returnUrl']);
+        if ($this->request->post->get('returnUrl')) {
+            $returnUrl = Redirect::decode($this->request->post->get('returnUrl'));
         }
 
         if ($this->getRequest()->isXhr()) {
