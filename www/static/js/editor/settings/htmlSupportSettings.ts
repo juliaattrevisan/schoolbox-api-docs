@@ -49,7 +49,7 @@ export function getHTMLSupportSettings() {
                         float: true,
                     },
                 },
-                // "iframe(full-width)[id,src,allowfullscreen,width,height,allow,frameBorder,webkitallowfullscreen,mozallowfullscreen]{width,height,margin,margin-top,margin-bottom,margin-left,margin-right,display,float,border};"
+                // "iframe(full-width)[id,src,allowfullscreen,width,height,allow,frameBorder,webkitallowfullscreen,mozallowfullscreen]{width,height,margin,margin-top,margin-bottom,margin-left,margin-right,display,float,border,position,top,bottom,left,right};"
                 {
                     name: "iframe",
                     classes: ["full-width"],
@@ -75,6 +75,11 @@ export function getHTMLSupportSettings() {
                         display: true,
                         float: true,
                         border: true,
+                        position: true,
+                        top: true,
+                        bottom: true,
+                        left: true,
+                        right: true,
                     },
                 },
                 // "Allow class and style on all div, p, a, h2, h3, h4, and span elements"
