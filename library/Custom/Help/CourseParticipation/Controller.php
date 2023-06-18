@@ -458,8 +458,9 @@ class Controller extends Base
     private function isValidAuth(Request $request, string $schoolCode): bool
     {
         // 1. Check we have all the pieces we need
-        if (null !== $this->psr7Request->getHeaderLine('Authentication')) {
-            $authDigest = $this->psr7Request->getHeaderLine('Authentication');
+        $authHeader = $this->psr7Request->getHeaderLine('Authentication');
+        if ($authHeader !== '') {
+            $authDigest = $authHeader;
         } elseif (null !== $request->query->get('digest')) {
             // to support previous way of authentication
             $authDigest = $request->query->get('digest');
