@@ -23,6 +23,7 @@ use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Aura\Di\Container;
 use Aura\Router\Route;
+use Aura\Router\Router;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use ReflectionMethod;
@@ -129,7 +130,9 @@ class Kernel extends WebKernelAbstract
             header("Access-Control-Allow-Methods: *");
             exit;
         }
-        $route = $this->di->get('router')->match($path, $server);
+        /** @var Router $router */
+        $router = $this->di->get('router');
+        $route  = $router->match($path, $server);
 
         try {
             if ($route instanceof Route) {
