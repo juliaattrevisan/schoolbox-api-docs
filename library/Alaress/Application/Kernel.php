@@ -641,6 +641,7 @@ abstract class Kernel
 
                     // If the request is JSON:
                     // set the parsed body appropriately
+                    // TODO move to spec pattern?
                     if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
                         $request->getBody()->rewind();
                         $content = $request->getBody()->getContents();
