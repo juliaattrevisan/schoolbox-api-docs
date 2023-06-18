@@ -155,7 +155,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
+        $result = (new ToolOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->psr7Request);
 
         // Each content item should be a link, which may be launched as a resource link launch request.
         $contentItems  = $result->getPayload()->getDeepLinkingContentItems();

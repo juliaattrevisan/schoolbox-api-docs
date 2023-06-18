@@ -25,7 +25,6 @@ use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
-use Schoolbox\LTI\Util\ServerRequestFactory;
 
 /**
  * LTI Platform controller for line items.
@@ -123,9 +122,7 @@ class Controller extends BaseController
             new AccessTokenRepository($this->accessTokenCache),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
-        $request = $resourceServerValidator->validateAuthenticatedRequest(
-            (new ServerRequestFactory())->build($this->request)
-        );
+        $request = $resourceServerValidator->validateAuthenticatedRequest($this->psr7Request);
 
         // Line item repository: consists only of a single assessment
         $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator);

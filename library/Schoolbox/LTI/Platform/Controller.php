@@ -33,7 +33,6 @@ use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
-use Schoolbox\LTI\Util\ServerRequestFactory;
 
 /**
  * Controller for LTI platform stuff.
@@ -143,7 +142,7 @@ class Controller extends Base
         // Build the access token response
         $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
         $response  = $generator->generate(
-            (new ServerRequestFactory())->build($this->request),
+            $this->psr7Request,
             (new ResponseFactory())->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
@@ -194,7 +193,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->request);
+        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->psr7Request);
         if ($result->hasError()) {
             throw new LtiException($result->getError());
         }
