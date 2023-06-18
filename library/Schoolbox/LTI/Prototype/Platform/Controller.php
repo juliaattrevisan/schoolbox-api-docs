@@ -127,7 +127,7 @@ class Controller extends Base
             $message = (new OidcAuthenticationRequestFactory(
                 $this->buildRegistrationRepository(),
                 new UserAuthenticator($this->userMapper)
-            ))->build($this->request);
+            ))->build($this->psr7Request);
             $this->response->content->set(
                 $this->buildHtmlOutput(
                     '@ltiPrototypePlatform/oidcAuthenticationRequest.twig',

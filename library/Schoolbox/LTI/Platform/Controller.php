@@ -94,7 +94,7 @@ class Controller extends Base
         $message = (new OidcAuthenticationRequestFactory(
             $this->registrations,
             $this->userAuthenticator,
-        ))->build($this->request);
+        ))->build($this->psr7Request);
 
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
