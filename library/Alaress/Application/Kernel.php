@@ -29,11 +29,11 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
 use Alaress\Web\Router\PathMatcher;
-use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
 use Aura\Router\Router;
+use Aura\Router\RouterContainer;
 use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
@@ -556,12 +556,7 @@ abstract class Kernel
         // Web router
         $di->set(
             'router',
-            $di->lazy(
-                function () {
-                    $factory = new RouterFactory();
-                    return $factory->newInstance();
-                }
-            )
+            $di->lazyNew(RouterContainer::class)
         );
 
         $this->installSessionService($di);

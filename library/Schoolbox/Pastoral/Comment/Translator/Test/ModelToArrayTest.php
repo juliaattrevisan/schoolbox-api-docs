@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\MockAdapter;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
+use Aura\Router\RouterContainer;
 use DateTimeInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -212,9 +213,8 @@ class ModelToArrayTest extends TestCase
     private function createTranslator(bool $allowDelete): ModelToArray
     {
         // Test router setup
-        $factory    = new RouterFactory();
-        $testRouter = $factory->newInstance();
-        $testRouter->getRoutes()->add(
+        $testRouter = new RouterContainer();
+        $testRouter->getMap()->route(
             'pastoral.postCommentDelete',
             '/record/{recordId}/comment/{commentId}/delete',
         );

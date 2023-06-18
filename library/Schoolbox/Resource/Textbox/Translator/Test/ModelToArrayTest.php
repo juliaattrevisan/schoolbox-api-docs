@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Textbox\Translator\Test;
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\MockAdapter;
 use Alaress\Web\Router\RouterFactory;
+use Aura\Router\RouterContainer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -148,10 +149,9 @@ class ModelToArrayTest extends TestCase
      */
     private function createTranslator(bool $allowUpdate, bool $allowDelete): ModelToArray
     {
-        $factory    = new RouterFactory();
-        $testRouter = $factory->newInstance();
-        $testRouter->getRoutes()->add('textbox.updateTextbox', '/textbox/update/{id}');
-        $testRouter->getRoutes()->add('textbox.deleteTextbox', '/textbox/update/{id}');
+        $testRouter = new RouterContainer();
+        $testRouter->getMap()->route('textbox.updateTextbox', '/textbox/update/{id}');
+        $testRouter->getMap()->route('textbox.deleteTextbox', '/textbox/update/{id}');
 
         /** @var Authorizer|MockObject $testAuthorizer */
         $testAuthorizer = $this->createMock(Authorizer::class);
