@@ -1,6 +1,6 @@
 <?php
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
@@ -26,8 +26,8 @@ if ($ajax) {
 $page = $kernel->get('sitePage');
 $page->initSession();
 $page->setAjax($ajax);
-/** @var Router $router */
-$router = $page->getDi()->get('router');
+/** @var Generator $routeGenerator */
+$routeGenerator = $page->getDi()->get('router.generator');
 
 $groupHandler = new Group();
 
@@ -205,7 +205,7 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
                     'formatted' => $file->getModifiedAt()->getShort(),
                 ],
                 'editUrl'               => '/cms/file/' . $affectedIds[0],
-                'visibilityUrl' => $router->generate('resourceBrowser.patchFileInfo', ['fileId' => $affectedIds[0]]),
+                'visibilityUrl' => $routeGenerator->generate('resourceBrowser.patchFileInfo', ['fileId' => $affectedIds[0]]),
             ]));
         } else {
             $page->backToTheFuture(2);
