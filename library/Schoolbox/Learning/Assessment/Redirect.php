@@ -15,7 +15,6 @@ namespace Schoolbox\Learning\Assessment;
  */
 class Redirect
 {
-
     /**
      * @const string GET parameter
      */
@@ -40,7 +39,7 @@ class Redirect
      * @param string $encoded
      * @return string
      */
-    public static function decode($encoded)
+    public static function decode(string $encoded): string
     {
         return base64_decode(urldecode($encoded));
     }

@@ -167,12 +167,15 @@ class Controller extends Assessment\Controller
         }
 
         $twigData = [
-            'breadcrumbs'        => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
-            'baseContext'        => $assessment->getBaseContext(),
-            'assessment'         => $assessment,
-            'assessmentStats'    => $assessmentStats,
-            'participantStats'   => $participantStats,
-            'returnUrl'          => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
+            'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
+            'baseContext'      => $assessment->getBaseContext(),
+            'assessment'       => $assessment,
+            'assessmentStats'  => $assessmentStats,
+            'participantStats' => $participantStats,
+            'returnUrl'        =>
+                $this->getRequest()->query->get(Redirect::RETURN_URL)
+                    ? Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
+                    : $this->getSession()->getHistory(),
         ];
 
         $this->getResponse()->content->set(

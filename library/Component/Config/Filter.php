@@ -8,7 +8,6 @@
  */
 class Component_Config_Filter extends Component_Config_Abstract
 {
-
     /**
      * Converts value from an array into a bitmask which represents the selected
      * fields.
@@ -60,10 +59,9 @@ class Component_Config_Filter extends Component_Config_Abstract
     public static function getFilter(int $configValue, array $filterFields): array
     {
         $filter = [];
-        for ($i = 0; $i < count($filterFields); $i++) {
-            $j                         = $configValue % 2;
-            $filter[$filterFields[$i]] = $j;
-            $configValue               = (int)$configValue / 2;
+
+        foreach ($filterFields as $pos => $fieldName) {
+            $filter[$fieldName] = ($configValue & pow(2, $pos)) > 0 ? 1 : 0;
         }
         return $filter;
     }

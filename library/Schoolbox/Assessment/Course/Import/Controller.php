@@ -235,7 +235,7 @@ class Controller extends Base\Base
      */
     public function searchClasses()
     {
-        $query          = $this->getRequest()->query->get('query');
+        $query          = (string)$this->getRequest()->query->get('query');
         $folders        = (new Destinations($this->folderMapper))->findImportable($query);
 
         /* Swap keys for selectize compatibility -_-

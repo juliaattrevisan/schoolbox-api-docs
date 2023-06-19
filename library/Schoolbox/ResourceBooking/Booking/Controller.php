@@ -101,7 +101,7 @@ class Controller extends Base
 
         // Create datetime is unique to this method, so it can be a function.
         $createDatetime = function ($date, $time) {
-            if ($dateObject = DateTime::createFromFormat('Y-m-d', $date)) {
+            if ($date && $dateObject = DateTime::createFromFormat('Y-m-d', $date)) {
                 if ($time && ($timeObject = DateTime::createFromFormat('H:i', $time))) {
                     $dateObject->setTime($timeObject->format('H'), $timeObject->format('i'));
                 } else {
@@ -401,8 +401,8 @@ class Controller extends Base
          */
         $returnUrl = null;
 
-        if (strlen($this->getRequest()->post['returnUrl'])) {
-            $returnUrl = Redirect::decode($this->getRequest()->post['returnUrl']);
+        if ($this->request->post->get('returnUrl')) {
+            $returnUrl = Redirect::decode($this->request->post->get('returnUrl'));
         }
 
         if ($this->getRequest()->isXhr()) {

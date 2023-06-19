@@ -43,7 +43,8 @@ class UsermediaController extends AbstractController
     public function __construct($multi, $mimeFilter = null, $useFolder = true, $defaultFolderId = 0)
     {
         //$mimeFilter = 'image/*';
-        if ($this->isRecordable($mimeFilter)) {
+        // when $mimeFilter is null, it's recordable
+        if (!$mimeFilter || $this->isRecordable($mimeFilter)) {
             parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
         } else {
             throw new OutOfRangeException("mimeType is not recordable.");
@@ -53,10 +54,10 @@ class UsermediaController extends AbstractController
     /**
      * checks to see if the mimetype is able to be recorded.
      * (voice, video, screencapture)
-     * @param string|null   $mimeFilter
-     * @returns bool
+     * @param string $mimeFilter
+     * @return bool
      */
-    protected function isRecordable($mimeFilter)
+    protected function isRecordable(string $mimeFilter): bool
     {
         $recordable = false;
         $csv = str_getcsv($mimeFilter);

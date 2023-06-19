@@ -200,9 +200,9 @@
 
                     {# Cound the number of results we display so we don't blow the modal up too much #}
 
-                    var countFound = 0;
+                    let countFound = 0;
                     {% if limitRoles %}
-                    let roles = [ '{{ limitRoles.propertyValues('id') | join("','") | raw }}'];
+                    let roles = [{{ limitRoles.propertyValues('id') | join(',') | raw }}];
                     {% else %}
                     let roles = [];
                     {% endif %}
@@ -217,7 +217,7 @@
                     let moderatorIds = [];
                     {% endif %}
 
-                    for (var i = 0; i < results.length; i++) {
+                    for (let i = 0; i < results.length; i++) {
 
                         {# Cache the user so we don't have to search for them again this page load cycle #}
 

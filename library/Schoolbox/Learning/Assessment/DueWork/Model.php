@@ -309,12 +309,12 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function assertAcceptSubmission(?Participant $participant)
     {
         if ($this->isSpecification()) {
-            throw new DomainException(null, ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
+            throw new DomainException('', ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
         }
         $this->assertOpen($participant);
 
         if ($this->isAcceptNone()) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
+            throw new DomainException('', ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
         }
 
         // Allow accept single submission if:
@@ -333,7 +333,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
                 return;
             }
 
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+            throw new DomainException('', ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
     }
 
@@ -350,7 +350,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function assertAcceptAcknowledgement(?Participant $participant)
     {
         if ($this->isSpecification()) {
-            throw new DomainException(null, ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
+            throw new DomainException('', ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
         }
         $this->assertOpen($participant);
 
@@ -374,11 +374,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
         }
 
         if ($openDate->gt(Alaress_Date_Format::now())) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
+            throw new DomainException('', ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
         }
 
         if (Alaress_Date_Format::now()->gt($closeDate)) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
+            throw new DomainException('', ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
     }
 
@@ -390,7 +390,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         foreach ($responses as $response) {
             if ($response->isSubmitted()) {
-                throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+                throw new DomainException('', ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
             }
         }
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractCourseMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -188,9 +189,9 @@ class Mapper extends AbstractCourseMapper
      *
      * @param string $searchParam
      * @param array  $options
-     * @return Collection|Model[]
+     * @return GenericCollection
      */
-    public function findAllByName($searchParam, $options = [])
+    public function findAllByName(string $searchParam, array $options = []): GenericCollection
     {
         if (strlen($searchParam) === 0) {
             return $this->findAll($options);

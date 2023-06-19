@@ -170,7 +170,7 @@ class Controller extends Base
             $stmt = $this->db->executeQuery($sql);
             /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $valueLabels[$codec->encodeValue($row['id'])] = $strategy->formatName($row['name']);
+                $valueLabels[$codec->encodeValue((string)$row['id'])] = $strategy->formatName($row['name']);
             }
         }
         return $valueLabels;

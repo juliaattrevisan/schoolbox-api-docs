@@ -68,7 +68,7 @@ class Controller extends Base
         // Get the list of items
         $query    = [];
         $catId    = $this->getRequest()->query->get('category');
-        $search   = trim($this->getRequest()->query->get('search'));
+        $search   = trim($this->getRequest()->query->get('search') ?? '');
         $page     = max(intval($this->getRequest()->query->get('page')), 1);
         $category = $this->mapper->getJoinMapper('category')->createModel();
         $category->setName('All');
@@ -192,9 +192,8 @@ class Controller extends Base
      */
     public function read(Model $item): void
     {
-
         // Show a given view and date
-        $calendarDate = DateTime::createFromFormat('d-m-Y', $this->request->query->get('date'));
+        $calendarDate = $this->request->query->get('date') ? DateTime::createFromFormat('d-m-Y', $this->request->query->get('date')) : null;
         if (!($calendarDate instanceof DateTime)) {
             $calendarDate = new DateTime('now');
         }

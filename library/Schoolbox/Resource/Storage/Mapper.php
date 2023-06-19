@@ -149,6 +149,7 @@ class Mapper extends BaseMapper implements IReceiver
             $videoQ->setStorage($storage);
             $videoQ->setStatus(QueueMapper::STATUS_PENDING);
             $videoQ->setUser($this->getSessionUser());
+            $videoQ->setMessage('');
 
             $mapper->save($videoQ);
         }

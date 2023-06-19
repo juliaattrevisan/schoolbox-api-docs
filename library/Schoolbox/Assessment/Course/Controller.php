@@ -429,14 +429,14 @@ class Controller extends Base\Base
      * @api   GET /course/new{/:name}
      * @since 160
      *
-     * @param string|null $name
+     * @param string|null $name  Provided when creating from empty course search result
      */
-    public function newCourse(string $name = null)
+    public function newCourse(?string $name): void
     {
         $this->courseTpl('course', [
-            'courseSpec'        => null,
-            'courseName'        => urldecode($name),
-            'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+            'courseSpec'         => null,
+            'courseName'         => $name ? urldecode($name) : null,
+            'curriculumEnabled'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
     }
@@ -1047,7 +1047,12 @@ class Controller extends Base\Base
     protected function getCourseData(string $searchParam = null): array
     {
         // Use the new mapper to get the list of courses
-        $allCourses = $this->courseSpecificationMapper->findAllByName($searchParam, ['order' => ['f.name' => 'asc']]);
+        $findOptions = ['order' => ['f.name' => 'asc']];
+        if (null === $searchParam) {
+            $allCourses = $this->courseSpecificationMapper->findAll($findOptions);
+        } else {
+            $allCourses = $this->courseSpecificationMapper->findAllByName($searchParam, $findOptions);
+        }
 
         $data = [];
 

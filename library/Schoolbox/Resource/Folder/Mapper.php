@@ -867,12 +867,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param string $keyword
      * @param bool   $userGroupsOnly
      * @param array  $folderIds
-     * @return Collection|Model[]
-     * @throws Alaress\Database\Predicate\InvalidColumnException
-     * @throws DefinitionException if join $name isn't on this mapper
-     * @throws \UnderflowException
+     * @return GenericCollection
      */
-    public function searchByName($keyword, $userGroupsOnly = false, array $folderIds = [])
+    public function searchByName(string $keyword, bool $userGroupsOnly = false, array $folderIds = []): GenericCollection
     {
         $builder = $this->getPredicateBuilder();
 
@@ -881,12 +878,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $builder->notNull('ug.cid');
         }
 
-        $subBuilder = $this->getPredicateBuilder();
-        $subBuilder
-            ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")
-            ->like('cc.code', "%{$this->database->getQuoter()->escapeForLike($keyword)}%");
+        // if keyword is not provided or empty, return everything
+        if ('' !== $keyword) {
+            $subBuilder = $this->getPredicateBuilder();
+            $subBuilder
+                ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")
+                ->like('cc.code', "%{$this->database->getQuoter()->escapeForLike($keyword)}%");
 
-        $builder->any($subBuilder);
+            $builder->any($subBuilder);
+        }
 
         /* If a list of folder ids was provided to restrict the set of results, use it
          */

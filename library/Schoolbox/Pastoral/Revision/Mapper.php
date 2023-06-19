@@ -185,14 +185,14 @@ class Mapper extends BaseMapper
 
         // If the private body looks empty, make it really empty
 
-        if (empty(trim(strip_tags($model->getBodyPrivate())))) {
-            $model->setBodyPrivate("");
+        if (!$model->getBodyPrivate() || empty(trim(strip_tags($model->getBodyPrivate())))) {
+            $model->setBodyPrivate('');
         }
 
         // If the public body looks empty, make it really empty
 
-        if (empty(trim(strip_tags($model->getBodyPublic())))) {
-            $model->setBodyPublic("");
+        if (!$model->getBodyPublic() || empty(trim(strip_tags($model->getBodyPublic())))) {
+            $model->setBodyPublic('');
         }
 
         // Return hydrated model
