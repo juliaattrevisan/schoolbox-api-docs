@@ -111,10 +111,15 @@ class Module extends BaseModule
                         new IsSuperuser(),
                         new Callback(
                             static function (array $params = [], User $viewer = null) {
+                                /* $viewee might end up being null if $params[user] is null
+                                 * which can happen when you try to access a nonexistent user
+                                 */
                                 /** @var User $viewee */
-                                $viewee = $params['user'];
+                                $viewee = $params['user'] ?? null;
+
                                 if (
-                                    $viewer->getRole()->isStaff()
+                                    $viewee
+                                    && $viewer->getRole()->isStaff()
                                     && (!$viewee->getRole()->isStudent() || $viewer->getRole()->getViewStudentCalendar())
                                 ) {
                                     return;
