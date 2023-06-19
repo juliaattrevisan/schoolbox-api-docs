@@ -77,7 +77,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             if ($this->getContext()->getInherit()) {
                 $this->setVar("manage_page_block", "");
             } else {
-                $this->setVar('MANAGE_GROUP_LINK', $this->getRouter()->generate('group.getModify', $params));
+                $this->setVar('MANAGE_GROUP_LINK', $this->getRouteGenerator()->generate('group.getModify', $params));
                 $this->parse("manage_page_block", "manage_page");
             }
         } else {
@@ -99,7 +99,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             ]);
             $this->setVar('VIEW_FILES_LINK_NAME', 'View Files');
         }
-        $this->setVar('VIEW_FILES_LINK', $this->getRouter()->generate('resourceBrowser.showFolderFiles', ['sourceFolderID' => $this->getContext()->getId()]));
+        $this->setVar('VIEW_FILES_LINK', $this->getRouteGenerator()->generate('resourceBrowser.showFolderFiles', ['sourceFolderID' => $this->getContext()->getId()]));
 
         // User subscription to groups.
         $this->setBlock($templateHandle, 'subscribed', 'subscribed_block');

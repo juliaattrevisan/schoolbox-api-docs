@@ -102,7 +102,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     'folder'   => $this->getContext(),
                 ];
                 if ($this->getAuthorizer()->isPathAuthorizedForUser('group.getModify', $params, $this->getUser())) {
-                    $this->setVar('MANAGE_GROUP_LINK', $this->getRouter()->generate('group.getModify', $params));
+                    $this->setVar('MANAGE_GROUP_LINK', $this->getRouteGenerator()->generate('group.getModify', $params));
                     if (!$this->getSource()->getFolder()->isGroup()) {
                         $block = 'empty_not_group_members';
                     } else {

@@ -191,7 +191,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $route  = 'tigsParticipationReport.getReport';
                 $params = ['userId' => $userChild->getId(), 'user' => $userChild,];
                 if ($this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
-                    $this->setVar('HREF_CONTINUOUS_REPORT', $this->getRouter()->generate($route, $params));
+                    $this->setVar('HREF_CONTINUOUS_REPORT', $this->getRouteGenerator()->generate($route, $params));
                     $this->parse('continuous_report_block', 'continuous_report');
                 } else {
                     $this->setVar('continuous_report_block');
