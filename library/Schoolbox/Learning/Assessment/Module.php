@@ -50,6 +50,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsSafeExamBrowserRequired;
 use Schoolbox\Learning\Authorizer\Rule\IsSimilarityCheckEnabled;
+use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -902,9 +903,16 @@ class Module extends BaseModule
                 AssessmentType::TYPE_LTI_ASSESSMENT,
                 AssessmentType::TYPE_PROJECT
             ]),
+            /* The status pages of specifications of quizzes need to be viewable because specifications of quizzes are
+             * previewable while under development.
+             */
             new Rule\Any(
                 new IsImplementation(),
-                new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
+                new ValidAssessmentType([AssessmentType::TYPE_PROJECT]),
+                new Rule\All(
+                    new IsSpecification(),
+                    new ValidAssessmentType([AssessmentType::TYPE_QUIZ])
+                )
             )
         );
     }

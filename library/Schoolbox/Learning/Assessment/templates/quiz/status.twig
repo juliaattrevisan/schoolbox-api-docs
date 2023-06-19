@@ -105,7 +105,7 @@
                     Attempted
                 {% endif %}
 
-                {% if latestResponse.submittedOnTime %}
+                {% if participant.getDueDate and latestResponse.submittedOnTime %}
                     on time
                 {% else %}
                     late

@@ -207,7 +207,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-
         /* Redirect to some kind of third party who spawned this assessment
          */
         $externalRedirectUrl = null;
@@ -259,8 +258,17 @@ class Controller extends Assessment\Controller
         $actionValidator = new ActionValidator($now, $this->getAccess());
 
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $canAttempt = $assessment->isImplementation() && $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId()
-            && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
+        $canAttempt = (
+            $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId() && (
+                $assessment->isImplementation() || (
+                    // Quizzes that are not yet implemented still need to be attemptable (to allow previewing), but only by those with instructor access.
+                    // @see also the similar access level check in www/assess/init.php.
+                    // @see also the permission rule in Learning/Assessment/Module->buildAuthRuleCanViewStatus().
+                    $assessment->isSpecification() && $this->getAccess()->isInstructor($student, $assessment->getContext()->getFolder())
+                )
+            ) &&
+            $actionValidator->canAttemptQuiz($this->getUser(), $assessment)
+        );
 
         /**
          * record view
