@@ -150,6 +150,7 @@ import { throttle } from "lodash";
              *  so dropdowns would appear misaligned by the width of the scrollbar. ResizeObserver doesn't
              *  have that problem as it triggers a resize whenever the dimensions of document.body change.
              */
+
             const resizeCallback = throttle((entries) => {
                 self.resize.call(self);
             }, 50);
