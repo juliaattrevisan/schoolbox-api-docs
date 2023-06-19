@@ -42,8 +42,10 @@ class Fetcher
      * before serving the file rather than access oldschool controllers directly and bypassing
      * any auth checks
      *
-     * @param string          $basename
-     * @param Model           $resource
+     * @param string $basename
+     * @param Model  $resource
+     * @param bool   $useCache if true, allow the response from S3 presigned to
+     *                         be cached.
      * @return void
      * @throws UnreachableException
      * @throws FilesystemException
@@ -52,10 +54,11 @@ class Fetcher
     public function fetch(
         string $basename,
         \Schoolbox\Resource\Storage\Model $resource,
+        bool $useCache,
     ): void {
         $disposition = !$resource->getMimetype()->getInline() ? PreSignedUrlService::DISPOSITION_ATTACHMENT : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
-        $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
+        $cacheControl = $useCache ? ['private', 'must-revalidate'] : ['no-store'];
         $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
 
         if (
