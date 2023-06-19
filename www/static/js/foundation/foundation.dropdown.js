@@ -1,3 +1,5 @@
+import { throttle } from "lodash";
+
 (function ($, window, document, undefined) {
     "use strict";
 
@@ -138,14 +140,22 @@
                     self.settings.closed.call(this);
                 });
 
-            S(window)
-                .off(".dropdown")
-                .on(
-                    "resize.fndtn.dropdown",
-                    self.throttle(function () {
-                        self.resize.call(self);
-                    }, 50)
-                );
+            /**
+             *  Why is the resize logic now sitting within a ResizeObserver? When the old resize callback
+             *  logic was being run there was an interim point where dropdowns would make their positioning
+             *  calculations (based on window) but other JS logic (such as visibility logic) hadn't finished
+             *  running yet - as a result, the logic here would calculate window width including a vertical
+             *  scrollbar which possibly vanished once the other JS logic had run. However, the window resize
+             *  event listener wasn't firing when that happened because the window itself hadn't changed size
+             *  so dropdowns would appear misaligned by the width of the scrollbar. ResizeObserver doesn't
+             *  have that problem as it triggers a resize whenever the dimensions of document.body change.
+             */
+
+            const resizeCallback = throttle((entries) => {
+                self.resize.call(self);
+            }, 50);
+            const bodyResizeObserver = new ResizeObserver(resizeCallback);
+            bodyResizeObserver.observe(document.body);
 
             this.resize();
         },
