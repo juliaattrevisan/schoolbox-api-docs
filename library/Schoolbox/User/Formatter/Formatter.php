@@ -41,15 +41,12 @@ class Formatter
      */
     public function formatObject(User $user): string
     {
-        // use the specified format or create a default of (they / them)
-        $pronoun = $user->getPronoun()?->__toString() ?: sprintf("%s / %s", User\Pronoun\Model::SUBJECTIVE_DEFAULT, User\Pronoun\Model::OBJECTIVE_DEFAULT);
-
         return $this->formatArray([
             'title'         => $user->getTitle(),
             'firstname'     => $user->getFirstname(),
             'preferredname' => $user->getPreferredName(),
             'lastname'      => $user->getLastname(),
-            'pronoun'       => sprintf("(%s)", $pronoun),
+            'pronoun'       => $user->getPronoun()?->__toString(),
         ]);
     }
 
