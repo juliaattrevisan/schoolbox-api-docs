@@ -56,7 +56,16 @@
  */
 .ck.ck-editor__editable_inline {
     min-height: 100px;
-    padding: 3.5rem 0.5rem;
+    padding: 0.5rem;
+}
+
+/**
+ * to allow enough space for the media/table baloon UI's
+ * so they don't overlap the toolbar
+ */
+.ck.ck-content > figure:first-child,
+.ck.ck-content > p:first-child span.image-inline.ck-widget_selected {
+    margin-top: 3rem !important;
 }
 
 /**
