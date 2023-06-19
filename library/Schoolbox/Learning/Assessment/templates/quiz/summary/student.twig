@@ -10,6 +10,7 @@
         <h1>{{ assessment.title }}</h1>
         {% include '@learningAssessment/quiz/meta.twig' with {
             assessment: assessment,
+            canAttempt: canAttempt,
             student: student,
             icon: 'icon-quiz',
             lastViews: lastViews

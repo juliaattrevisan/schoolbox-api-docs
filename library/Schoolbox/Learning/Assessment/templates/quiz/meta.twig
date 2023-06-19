@@ -1,5 +1,6 @@
 {##
  # assessment   an IAssesssable instance
+ # canAttempt   whether the logged-in user can attempt the quiz (boolean)
  # student      the student currently being viewed
  # icon         a css class representing the assessable
  #}
@@ -9,7 +10,7 @@
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
     <li class="icon-time-value" title="Allowed Time">Allowed time:
         <time>
-            {% if assessment.isSpecification %}
+            {% if not canAttempt %}
                 You cannot attempt course assessments
             {% elseif assessment.durationUnlimited %}
                 Unlimited
