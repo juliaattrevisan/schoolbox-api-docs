@@ -114,7 +114,7 @@ class Module extends BaseModule
                                 /* $viewee might end up being null if $params[user] is null
                                  * which can happen when you try to access a nonexistent user
                                  */
-                                /** @var User $viewee */
+                                /** @var null|User $viewee */
                                 $viewee = $params['user'] ?? null;
 
                                 if (
