@@ -57,7 +57,7 @@ function getLimitWarningElement(config: EditorConfig) {
 }
 
 /**
- * To display the warning when the character limit has been reached
+ * To display the warning when the character limit has been reached.
  *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor has replaced
  * @param { Editor } editor - the CKEditor instance
@@ -147,8 +147,6 @@ function updateWordCount(
 
         if (submitButtons.length > 0) {
             addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
-        } else {
-            console.error("No submit buttons found for CKEditor field, so could not add default event listeners.");
         }
     }
 
