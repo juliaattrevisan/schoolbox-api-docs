@@ -553,11 +553,18 @@ abstract class Kernel
             )
         );
 
-        // Web router
-        $di->set(
-            'router',
-            $di->lazyNew(RouterContainer::class)
-        );
+        // Web router, and convenience references for its matcher and generator
+        $di->set('router', $di->lazyNew(RouterContainer::class));
+        $di->set('router.matcher', $di->lazy(function () use ($di) {
+            /** @var RouterContainer $router */
+            $router = $di->get('router');
+            return $router->getMatcher();
+        }));
+        $di->set('router.generator', $di->lazy(function () use ($di) {
+            /** @var RouterContainer $router */
+            $router = $di->get('router');
+            return $router->getGenerator();
+        }));
 
         $this->installSessionService($di);
 
