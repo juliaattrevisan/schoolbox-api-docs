@@ -46,17 +46,20 @@ class Fetcher
      * @param Model  $resource
      * @param bool   $useCache if true, allow the response from S3 presigned to
      *                         be cached.
+     * @param bool   $forceDownload  set to true if you want to force download directly, rather than
+     *                               display inline in your browser
      * @return void
-     * @throws UnreachableException
      * @throws FilesystemException
      * @throws UnableToReadFile
+     * @throws UnreachableException
      */
     public function fetch(
         string $basename,
         \Schoolbox\Resource\Storage\Model $resource,
         bool $useCache,
+        bool $forceDownload
     ): void {
-        $disposition = !$resource->getMimetype()->getInline() ? PreSignedUrlService::DISPOSITION_ATTACHMENT : PreSignedUrlService::DISPOSITION_INLINE;
+        $disposition = (!$resource->getMimetype()->getInline() || $forceDownload) ? PreSignedUrlService::DISPOSITION_ATTACHMENT : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $cacheControl = $useCache ? ['private', 'must-revalidate'] : ['no-store'];
         $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
