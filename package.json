@@ -55,7 +55,7 @@
         "dropzone": "~6.0.0-beta.2",
         "filesize": "~10.0.7",
         "flatpickr": "~4.6.13",
-        "gsap": "~npm:@gsap/business@3.11.5",
+        "gsap": "npm:@gsap/business@~3.11.5",
         "highcharts": "~9.3.3",
         "highcharts-vue": "~1.4.0",
         "intro.js": "~2.9.3",
