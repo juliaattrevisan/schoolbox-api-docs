@@ -315,7 +315,7 @@
                     // Cap it so we never have a left that is negative - a negative left just means jam the dropdown to the left of the window
                     p.left = leftVal >= 0 ? leftVal : 0;
                 } else {
-                    p.left = Math.round(p.left - o.left);
+                    p.left = Math.ceil(p.left - o.left);
                 }
 
                 p.top = Math.floor(p.top - o.top);
