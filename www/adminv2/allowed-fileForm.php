@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\Extension;
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\MimetypeMapper;
@@ -13,7 +14,7 @@ $page = $kernel->get('sitePage');
 $page->initSession();
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $tableIndex = 'fileTypeID';
@@ -28,8 +29,7 @@ if (is_numeric($_GET['delete'] ?? null)) {
     try {
         $mimeMapper->delete($mimeMapper->findById($id));
     } catch (Schoolbox\Mapper\Exception $e) {
-        // invalid ID
-        error(8);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
     }
 
     $page->backToTheFuture(1);
@@ -40,7 +40,7 @@ if (is_numeric($_GET['delete'] ?? null)) {
  */
 foreach (['description', 'mime', 'extension', 'inline'] as $current) {
     if (!strlen(trim($_POST[$current]))) {
-        error(2);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 }
 
@@ -75,12 +75,20 @@ try {
         /* You can't update an existing record into one where the mimetype already exists
          */
         if ((int)$_POST['fileTypeId'] !== $mime->getFileTypeID()) {
-            error(105, 'The mime type you have chosen for this file type is already in use.');
+            throw ErrorMapper::getInstance()->generateException(
+                ErrorMapper::ERROR_FORM_SUBMIT,
+                null,
+                'The mime type you have chosen for this file type is already in use.'
+            );
         }
     } else {
         /* You can't create a new record if the mime type is already in use
          */
-        error(105, 'The mime type you have chosen for this file type is already in use.');
+        throw ErrorMapper::getInstance()->generateException(
+            ErrorMapper::ERROR_FORM_SUBMIT,
+            null,
+            'The mime type you have chosen for this file type is already in use.'
+        );
     }
 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
     /** @var \Schoolbox\File\Mimetype $mime */
