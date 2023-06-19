@@ -801,7 +801,7 @@ class Controller extends Base
         if (!empty($encodedReturnUrl)) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
-            $returnUrl = $this->getRouter()->generate('pastoral.getStudent', ['studentId' => $studentId,]);
+            $returnUrl = $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,]);
         }
         $this->getResponse()->redirect->afterPost($returnUrl);
     }
@@ -843,7 +843,7 @@ class Controller extends Base
         // Go back to students pastoral record
 
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('pastoral.getStudent', ['studentId' => $studentId,])
+            $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,])
         );
     }
 
@@ -1166,7 +1166,7 @@ class Controller extends Base
         }
 
         $this->getResponse()->redirect->afterPost(
-            $this->getrouter()->generate('pastoral.getStudent', ['studentId' => $studentId,])
+            $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,])
         );
     }
 

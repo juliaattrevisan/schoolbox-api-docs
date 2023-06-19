@@ -59,7 +59,7 @@ class Controller extends Base
         $userPassword = $this->getUser()->getPassword() ?? '';
         if ($userPassword === '') {
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+                $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } else {
             $this->getResponse()->content->set(
@@ -115,7 +115,7 @@ class Controller extends Base
         }
 
         $this->getResponse()->redirect->to(
-            $this->getRouter()->generate('passwordChange.getChangePassword')
+            $this->routeGenerator->generate('passwordChange.getChangePassword')
         );
     }
 }

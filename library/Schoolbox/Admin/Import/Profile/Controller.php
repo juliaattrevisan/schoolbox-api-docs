@@ -107,7 +107,7 @@ class Controller extends Base
     public function getIndex()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
-            'pageCurrent' => $this->router->generate('adminImportProfile.getIndex'),
+            'pageCurrent' => $this->routeGenerator->generate('adminImportProfile.getIndex'),
             'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachzone' => [

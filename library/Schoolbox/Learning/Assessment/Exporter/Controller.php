@@ -282,7 +282,7 @@ class Controller extends BaseController
         } else {
             /** @var UnitSpecification\Model $unitSpec */
             $unitSpec  = $assessment->getBaseContext();
-            $returnUrl = $this->getRouter()->generate(
+            $returnUrl = $this->routeGenerator->generate(
                 'course.modifyCourse',
                 ['id' => $unitSpec->getCourse()->getId(),]
             ) . "#{$unitSpec->getId()}";

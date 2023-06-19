@@ -70,8 +70,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/index.twig',
             'data'     => [
-                'pageCurrent' => $this->router->generate('adminMenuTop.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuTop.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
                 'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => BaseMapper::SORT_ORDER_ASC]])
             ],
             'title' => 'Admin - Top Menu'
@@ -112,9 +112,9 @@ class Controller extends Base
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => $this->router->generate('adminMenuTop.getIndex'),
+                'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuTop.getIndex')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
                     [['Modify', null]]
                 ),
                 'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, ['cache' => false]),
@@ -140,9 +140,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
-                'pageCurrent' => $this->router->generate('adminMenuTop.getIndex'),
+                'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuTop.getIndex')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
                     [['Create', null]]
                 ),
                 'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),

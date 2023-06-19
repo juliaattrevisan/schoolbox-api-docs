@@ -214,7 +214,7 @@ class Controller extends Base
         try {
             $layout = $this->findLayoutForComponent($component);
             $this->response->redirect->found(
-                $this->getRouter()->generate(
+                $this->routeGenerator->generate(
                     'tile.add',
                     ['layoutId' => $layout->getId()]
                 ) . $this->buildReturnUrl()
@@ -222,7 +222,7 @@ class Controller extends Base
         } catch (MapperException $e) {
             $layout = $this->buildLayoutForComponent($component);
             $this->response->redirect->found(
-                $this->getRouter()->generate(
+                $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $layout->getId()]
                 ) . $this->buildReturnUrl()
@@ -251,7 +251,7 @@ class Controller extends Base
 
         $this->mapper->save($item);
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $layout->getId()]
             ) . $this->buildReturnUrl()
@@ -292,7 +292,7 @@ class Controller extends Base
 
         $this->mapper->save($item);
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $item->getTileLayout()->getId()]
             ) . $this->buildReturnUrl()
@@ -320,7 +320,7 @@ class Controller extends Base
             );
         } else {
             $this->getResponse()->redirect->afterPost(
-                $this->getRouter()->generate(
+                $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $item->getTileLayout()->getId()]
                 ) . $this->buildReturnUrl()

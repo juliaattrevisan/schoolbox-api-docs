@@ -212,7 +212,7 @@ class Controller extends Base
         // Send them back to the item detail page
 
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'eportfolioBlog.getItem',
                 ['pageId' => $page->getPageId(), 'id' => $blog->getId(),]
             )
@@ -281,7 +281,7 @@ class Controller extends Base
         } else {
             // If no return URL supplied, redirect to the Blog on which the comment was added.
             $blogPage = $blog->getPage();
-            $returnUrl = $this->getRouter()->generate(
+            $returnUrl = $this->routeGenerator->generate(
                 'eportfolioBlog.getItem',
                 ['pageId' => $blogPage->getPageId(), 'id' => $blog->getId()]
             );

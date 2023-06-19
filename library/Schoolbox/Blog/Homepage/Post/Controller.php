@@ -300,7 +300,7 @@ class Controller extends Base
             $returnUrl = Redirect::decode($returnUrlEncoded);
         } else {
             // If no return URL supplied, redirect to the Blog on which the comment was added.
-            $returnUrl = $this->getRouter()->generate('blog.getItem', ['id' => $blog->getId()]);
+            $returnUrl = $this->routeGenerator->generate('blog.getItem', ['id' => $blog->getId()]);
         }
 
         $this->getResponse()->redirect->afterPost($returnUrl);

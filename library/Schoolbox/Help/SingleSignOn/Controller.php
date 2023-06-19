@@ -95,7 +95,7 @@ class Controller extends Base
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $url = (new Uri($this->getConfigLoader()->get('schoolbox_help_url')))
-            ->withPath($this->router->generate('helpSso.receiveTokenFromInstance'))
+            ->withPath($this->routeGenerator->generate('helpSso.receiveTokenFromInstance'))
             ->appendQueryParameters(
                 [
                     self::QUERY_STRING_JWT  => $jwt,
@@ -197,7 +197,7 @@ class Controller extends Base
      */
     private function redirectToLogin(string $page): void
     {
-        $loginUrl = (new Uri($this->router->generate('login.getLogin')))
+        $loginUrl = (new Uri($this->routeGenerator->generate('login.getLogin')))
             ->appendQueryParameters(['page' => $page]);
         $this->response->redirect->seeOther($loginUrl);
     }

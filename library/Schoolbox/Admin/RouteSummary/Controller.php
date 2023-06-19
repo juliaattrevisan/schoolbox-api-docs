@@ -65,7 +65,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminRouteSummary/index.twig',
                 [
-                    'pageCurrent'    => $this->router->generate('adminRouteSummary.getRouteList'),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminRouteSummary.getRouteList'),
                     'allBreadcrumbs' => [
                         ['Administration', '/adminv2/home'],
                         ['Route Summary', '/adminv2/routes'],

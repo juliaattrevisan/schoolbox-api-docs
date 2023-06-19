@@ -89,7 +89,7 @@ class Controller extends Base
         switch ($report) {
             case NavigationSelector::SCHOOLGRADES_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getSchoolGrades', [
+                    $this->routeGenerator->generate('achievementreport.getSchoolGrades', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -99,7 +99,7 @@ class Controller extends Base
 
             case NavigationSelector::IB_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getIb', [
+                    $this->routeGenerator->generate('achievementreport.getIb', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -109,7 +109,7 @@ class Controller extends Base
 
             case NavigationSelector::NCEA_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getNcea', [
+                    $this->routeGenerator->generate('achievementreport.getNcea', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -119,7 +119,7 @@ class Controller extends Base
 
             case NavigationSelector::COMMENTS_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getComments', [
+                    $this->routeGenerator->generate('achievementreport.getComments', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -129,7 +129,7 @@ class Controller extends Base
 
             case NavigationSelector::STANDARDISEDTEST_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getStandardisedTests', [
+                    $this->routeGenerator->generate('achievementreport.getStandardisedTests', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -139,7 +139,7 @@ class Controller extends Base
 
             case NavigationSelector::COCURRICULAR_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getCoCurricular', [
+                    $this->routeGenerator->generate('achievementreport.getCoCurricular', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -149,7 +149,7 @@ class Controller extends Base
 
             case NavigationSelector::MYP_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getMyp', [
+                    $this->routeGenerator->generate('achievementreport.getMyp', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year'           => $year,
                     ])
@@ -190,7 +190,7 @@ class Controller extends Base
          */
 
         $this->getResponse()->redirect->to(
-            $this->getRouter()->generate('achievementreport.getStandardisedTestsPAT', [
+            $this->routeGenerator->generate('achievementreport.getStandardisedTestsPAT', [
                 'externalUserId' => $externalUser['StudentID'],
                 'year' => $year
             ])
@@ -605,7 +605,7 @@ class Controller extends Base
          */
         if (null === $year && \count($allYears)) {
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate('achievementreport.getIb', [
+                $this->routeGenerator->generate('achievementreport.getIb', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]
                 ])
@@ -786,7 +786,7 @@ class Controller extends Base
          */
         if (null === $year && \count($allYears)) {
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate('achievementreport.getComments', [
+                $this->routeGenerator->generate('achievementreport.getComments', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]
                 ])

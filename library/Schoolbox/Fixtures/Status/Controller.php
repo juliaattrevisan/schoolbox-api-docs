@@ -92,10 +92,10 @@ class Controller extends AbstractController
         if ($this->getRequest()->isXhr()) {
             $status = [
                 'id' => $entity->getId(),
-                'update' => $this->getRouter()->generate('sportsfixturesStatus.updateEntity', [
+                'update' => $this->routeGenerator->generate('sportsfixturesStatus.updateEntity', [
                     'entityId' => $entity->getId()
                 ]),
-                'delete' => $this->getRouter()->generate('sportsfixturesStatus.deleteEntity', [
+                'delete' => $this->routeGenerator->generate('sportsfixturesStatus.deleteEntity', [
                     'entityId' => $entity->getId()
                 ])
             ];

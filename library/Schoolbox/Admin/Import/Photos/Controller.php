@@ -148,7 +148,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportPhotos.getIndex'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminImportPhotos.getIndex'));
     }
 
 
@@ -189,8 +189,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPhotos/index.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminImportPhotos.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportPhotos.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminImportPhotos.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPhotos.getIndex')),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                 'attachzone' => $this->getAttachZone(),
                 'users' => $users,

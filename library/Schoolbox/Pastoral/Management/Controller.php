@@ -119,7 +119,7 @@ class Controller extends Base
         $this->pastoralGroupMapper->delete($group);
 
         $this->getResponse()->redirect->afterPost(
-            $this->router->generate('pastoralManagement.getGroups')
+            $this->routeGenerator->generate('pastoralManagement.getGroups')
         );
     }
 
@@ -211,7 +211,7 @@ class Controller extends Base
         }
 
         $this->getResponse()->redirect->afterPost(
-            $this->router->generate('pastoralManagement.getGroups')
+            $this->routeGenerator->generate('pastoralManagement.getGroups')
         );
     }
 }

@@ -155,7 +155,7 @@ class Controller extends Base
 
             $urlBase = (new Factory($this->getConfigLoader()))
                 ->buildFullyQualified()
-                ->withPath($this->router->generate('api.initSessionFromQueryString'));
+                ->withPath($this->routeGenerator->generate('api.initSessionFromQueryString'));
         }
 
         $students = [];

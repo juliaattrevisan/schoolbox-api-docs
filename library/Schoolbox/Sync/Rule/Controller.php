@@ -41,7 +41,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRule/add.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('upsRule.add'),
+                'pageCurrent' => $this->routeGenerator->generate('upsRule.add'),
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $params['rulesetId'],
 
@@ -106,7 +106,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRule/add.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('upsRule.add'),
+                'pageCurrent' => $this->routeGenerator->generate('upsRule.add'),
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $rulesetId,
                 'rule' => $rule

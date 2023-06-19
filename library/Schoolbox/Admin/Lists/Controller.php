@@ -1357,13 +1357,13 @@ class Controller extends Base
                         'hasDBid'       => $currentTable['showId'] ?? false,
                         'canDelete'     => $currentTable['delete'] ?? false,
                         'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
-                        'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
+                        'deleteRoute'   => $this->routeGenerator->generate('adminLists.postDelete'),
                         'deleteWarning' => $currentTable['deleteWarning'] ?? '',
                         'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
                         'isSortable'    => $currentTable['sortable'] ?? false,
                         'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
                         'rows'          => $this->reformatForJson($records, true),
-                        'saveRoute'     => $this->router->generate('adminLists.postSave'),
+                        'saveRoute'     => $this->routeGenerator->generate('adminLists.postSave'),
                         'title'         => $currentTable['title'],
                     ]
                 )
@@ -1374,8 +1374,8 @@ class Controller extends Base
                 [
                     'template' => '@adminLists/index.twig',
                     'data'     => [
-                        'pageCurrent'    => $this->router->generate('adminLists.getIndex') . "/{$table}",
-                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLists.getIndex') . "/{$table}"),
+                        'pageCurrent'    => $this->routeGenerator->generate('adminLists.getIndex') . "/{$table}",
+                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLists.getIndex') . "/{$table}"),
                         'tables'         => $tables,
                         'table'          => $table,
                         'records'        => $records,

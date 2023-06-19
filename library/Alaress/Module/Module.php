@@ -632,6 +632,7 @@ class Module
             ->setResponse($container->get('webFactory')->newResponse())
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
+            ->setRouteGenerator($container->get('router.generator'))
             ->setAuthorizer($container->get('authorizer'))
             ->setDi($container)
             ->setExceptionGenerator($container->get('mapperFactory')->get(ErrorMapper::class))

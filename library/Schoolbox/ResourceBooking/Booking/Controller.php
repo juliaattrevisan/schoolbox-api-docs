@@ -949,8 +949,8 @@ class Controller extends Base
         // The callback URL might point to the edit page for this booking.
         // Until I implement redirects in route preloads, I'll have to check for
         // that case here.
-        if ($callbackUrl === $this->router->generate('resourceBooking.edit', ['id' => $item->getId()])) {
-            $callbackUrl = $this->router->generate(
+        if ($callbackUrl === $this->routeGenerator->generate('resourceBooking.edit', ['id' => $item->getId()])) {
+            $callbackUrl = $this->routeGenerator->generate(
                 'resourceItem.read',
                 ['id' => $item->getResource()->getId()]
             );

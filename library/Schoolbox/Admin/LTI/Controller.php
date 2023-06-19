@@ -60,8 +60,8 @@ class Controller extends ConfigController
             [
                 'template' => '@adminLti/modify.twig',
                 'data'     => [
-                    'pageCurrent'    => $this->router->generate('adminLti.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
                 ],
             ]
         );
@@ -75,7 +75,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->router->generate('adminLti.postConfig'),
+            $this->routeGenerator->generate('adminLti.postConfig'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
@@ -84,8 +84,8 @@ class Controller extends ConfigController
             [
                 'template' => '@adminLti/index.twig',
                 'data'     => [
-                    'pageCurrent'           => $this->router->generate('adminLti.getIndex'),
-                    'allBreadcrumbs'        => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
+                    'pageCurrent'           => $this->routeGenerator->generate('adminLti.getIndex'),
+                    'allBreadcrumbs'        => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
                     'providers'             => $this->providerMapper->findAll(),
                     'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
                     'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
@@ -93,9 +93,9 @@ class Controller extends ConfigController
                     'providerTargetWindow'  => Provider::TARGET_WINDOW,
                     'configContext'         => $configContext,
                     'issuer'                => (string)$baseUrl,
-                    'oidcAuthenticationUrl' => (string)(clone $baseUrl)->withPath($this->router->generate('ltiPlatform.getOidcAuthenticationRequest')),
-                    'oauthAccessTokenUrl'   => (string)(clone $baseUrl)->withPath($this->router->generate('ltiPlatform.getOauthAccessTokenRequest')),
-                    'jsonWebKeySetUrl'      => (string)(clone $baseUrl)->withPath($this->router->generate('ltiPlatform.getJsonWebKeySet')),
+                    'oidcAuthenticationUrl' => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getOidcAuthenticationRequest')),
+                    'oauthAccessTokenUrl'   => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getOauthAccessTokenRequest')),
+                    'jsonWebKeySetUrl'      => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getJsonWebKeySet')),
                 ],
             ]
         );
@@ -114,8 +114,8 @@ class Controller extends ConfigController
             [
                 'template' => '@adminLti/modify.twig',
                 'data'     => [
-                    'pageCurrent'    => $this->router->generate('adminLti.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
                     'provider'       => $provider,
                 ],
             ]
@@ -132,7 +132,7 @@ class Controller extends ConfigController
     public function postDelete(Provider $provider): void
     {
         $this->providerMapper->delete($provider);
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLti.getIndex'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**
@@ -229,7 +229,7 @@ class Controller extends ConfigController
 
         $this->providerMapper->save($provider);
 
-        $this->response->redirect->afterPost($this->router->generate('adminLti.getIndex'));
+        $this->response->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**
@@ -241,7 +241,7 @@ class Controller extends ConfigController
     public function postConfig(): void
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
-        $this->response->redirect->afterPost($this->router->generate('adminLti.getIndex'));
+        $this->response->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**

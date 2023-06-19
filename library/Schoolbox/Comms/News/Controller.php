@@ -228,7 +228,7 @@ class Controller extends Base
         $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
 
         $this->response->redirect->to(
-            $this->router->generate('commsNews.getCreate') . '?' . $params
+            $this->routeGenerator->generate('commsNews.getCreate') . '?' . $params
         );
     }
 
@@ -391,13 +391,13 @@ class Controller extends Base
          */
         if ($this->getRequest()->isXhr()) {
             // Send the update page route, JS will update the window state to this
-            $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
+            $url = $this->routeGenerator->generate('commsNews.getUpdate', $routeParams);
             if (isset($data[Querystring::RETURN_URL])) {
                 $url .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
             }
 
             // Send all the possible routes, JS will determine which ones to show where
-            $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
+            $updateRoute = $this->routeGenerator->generate('commsNews.postUpdate', $routeParams);
             $submitRoute = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', $routeParams);
             $approveRoute = false;
             if ($article->canBeApproved()) {
@@ -421,7 +421,7 @@ class Controller extends Base
             if ($article->isPublished() && isset($data[Querystring::RETURN_URL])) {
                 $nextStep = Querystring::decode($data[Querystring::RETURN_URL]);
             } else {
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+                $nextStep = $this->routeGenerator->generate('commsNews.getDetail', $routeParams);
                 if (isset($data[Querystring::RETURN_URL])) {
                     $nextStep .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
                 }
@@ -470,7 +470,7 @@ class Controller extends Base
             if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
                 $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
             } else {
-                $nextStep = $this->getRouter()->generate('commsNews.getIndex');
+                $nextStep = $this->routeGenerator->generate('commsNews.getIndex');
             }
 
             if ($this->getRequest()->isXhr()) {
@@ -937,7 +937,7 @@ class Controller extends Base
          * Compact Mode is hardcoded to be disabled from this context
          * HidePaginator is always false in this context
          */
-        $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
+        $urlPrefix = $this->routeGenerator->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
         $this->assertValidTopic($params->getSlug());
 
@@ -964,7 +964,7 @@ class Controller extends Base
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
             'page' => RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()),
-            'pageWithoutParams' => $this->getRouter()->generate('commsNews.getArchive'),
+            'pageWithoutParams' => $this->routeGenerator->generate('commsNews.getArchive'),
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
@@ -1096,9 +1096,9 @@ class Controller extends Base
         /* The requested data set to load, given the params provided
          */
         if ($year) {
-            $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
+            $urlPrefix = $this->routeGenerator->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
         } else {
-            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+            $urlPrefix = $this->routeGenerator->generate('commsNews.getIndex');
         }
 
         $this->assertValidTopic($params->getSlug());
@@ -1403,7 +1403,7 @@ class Controller extends Base
 
         if ($generateAjaxRoutes) {
             foreach ($entityTypes as $type => $entityType) {
-                $entityTypes[$type]['ajaxRoute'] = $this->router->generate('commsNewsAudienceBrowser.getList', ['entityType' => $type]);
+                $entityTypes[$type]['ajaxRoute'] = $this->routeGenerator->generate('commsNewsAudienceBrowser.getList', ['entityType' => $type]);
             }
         }
         return $entityTypes;
@@ -1589,7 +1589,7 @@ class Controller extends Base
                 'commsNews.getAuthoredArticles'
             ];
             foreach ($ajaxRoutes as $ajaxRoute) {
-                $route = $this->getRouter()->generate($ajaxRoute);
+                $route = $this->routeGenerator->generate($ajaxRoute);
                 if ($route) {
                     $asyncUrls[] = $route;
                 }
@@ -1606,7 +1606,7 @@ class Controller extends Base
                 'commsNews.getIndex',
             ];
             foreach ($commsRoutes as $commsRoute) {
-                $route = $this->getRouter()->generate($commsRoute);
+                $route = $this->routeGenerator->generate($commsRoute);
                 if ($route) {
                     $commsListUrls[] = $route;
                 }

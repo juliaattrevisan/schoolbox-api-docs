@@ -742,7 +742,7 @@ class Controller extends Base\Base
             'componentNames'   => $componentNames,
             'folderAncestry'   => $folderAncestry,
             'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => Redirect::encode($this->getRouter()->generate('courseImport.getManagement', ['folderId' => $folder->getId()])),
+            'encodedReturnUrl' => Redirect::encode($this->routeGenerator->generate('courseImport.getManagement', ['folderId' => $folder->getId()])),
         ]);
     }
 

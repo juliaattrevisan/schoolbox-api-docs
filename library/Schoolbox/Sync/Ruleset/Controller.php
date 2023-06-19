@@ -90,8 +90,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/intro.twig',
             'data' => [
-                'pageCurrent'    => $this->router->generate('upsRuleset.intro'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
+                'pageCurrent'    => $this->routeGenerator->generate('upsRuleset.intro'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'allNavigation'  => $allNavigation->getAllNodes(),
                 'logs'           => $this->findLogs(3),
                 'upsCronTime'    => $this->getConfigLoader()->get('ups_cron_run_time'),
@@ -134,8 +134,8 @@ class Controller extends Base
             $twigData['logExtensionExists'] = false;
         }
 
-        $twigData['pageCurrent'] = $this->router->generate('upsRuleset.intro');
-        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
+        $twigData['pageCurrent'] = $this->routeGenerator->generate('upsRuleset.intro');
+        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
 
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
@@ -191,8 +191,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/log/list.twig',
             'data'     => [
-                'pageCurrent' => $this->router->generate('upsRuleset.intro'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
+                'pageCurrent' => $this->routeGenerator->generate('upsRuleset.intro'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'logs'           => $this->findLogs()
             ]
         ]);
@@ -283,8 +283,8 @@ class Controller extends Base
                     'id' => $logId,
                     'filterBlacklist' => ['rulestring'],
                     'log' => $log,
-                    'pageCurrent' => $this->router->generate('upsRuleset.intro'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
+                    'pageCurrent' => $this->routeGenerator->generate('upsRuleset.intro'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                     'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
                 ];
 
@@ -476,7 +476,7 @@ class Controller extends Base
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
         $this->getResponse()->redirect->to(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]
             )
@@ -505,7 +505,7 @@ class Controller extends Base
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasPerformUpdate', true);
         $this->getResponse()->redirect->to(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]
             )

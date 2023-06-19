@@ -32,6 +32,7 @@ use Alaress\Web\Router\PathMatcher;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
+use Aura\Router\Generator;
 use Aura\Router\Router;
 use Aura\Router\RouterContainer;
 use Aura\Web\WebFactory;
@@ -1890,8 +1891,8 @@ abstract class Kernel
             $di->lazy(function () use ($di) {
                 /** @var IConfigLoader $config */
                 $config = $di->get('config');
-                /** @var Router $router */
-                $router = $di->get('router');
+                /** @var Generator $generator */
+                $generator = $di->get('router.generator');
                 /** @var KeyChainRepositoryInterface $keyChains */
                 $keyChains = $di->get('lti.keyChains');
                 /** @var ToolModel[] $ltiTools */
@@ -1899,9 +1900,9 @@ abstract class Kernel
                 $registrationRepositoryFactory = new RegistrationRepositoryFactory(
                     $config,
                     $keyChains,
-                    $router->generate('ltiPlatform.getOidcAuthenticationRequest'),
-                    $router->generate('ltiPlatform.getOauthAccessTokenRequest'),
-                    $router->generate('ltiPlatform.getJsonWebKeySet'),
+                    $generator->generate('ltiPlatform.getOidcAuthenticationRequest'),
+                    $generator->generate('ltiPlatform.getOauthAccessTokenRequest'),
+                    $generator->generate('ltiPlatform.getJsonWebKeySet'),
                 );
                 return $registrationRepositoryFactory->build($ltiTools);
             })

@@ -67,7 +67,7 @@ class Controller extends Base
     {
         $this->response->redirect->to(
             $this->addQueryStringParamsToPath(
-                $this->router->generate(
+                $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',
                     ['userIds' => $this->request->query->get('userIds')]
                 ),

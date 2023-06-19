@@ -51,8 +51,8 @@ class Controller extends Base
             [
                 'template' => '@emailDKIM/index.twig',
                 'data'     => [
-                    'pageCurrent'    => $this->router->generate('emailDKIM.getDomainListPage'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('emailDKIM.getDomainListPage')),
+                    'pageCurrent'    => $this->routeGenerator->generate('emailDKIM.getDomainListPage'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('emailDKIM.getDomainListPage')),
                 ],
             ]
         );
@@ -73,11 +73,11 @@ class Controller extends Base
             $data[] = [
                 'id'           => $dkim->getId(),
                 'domain'       => $dkim->getDomain(),
-                'dkimUrl'      => $this->router->generate('emailDKIM.getDKIMJson', [
+                'dkimUrl'      => $this->routeGenerator->generate('emailDKIM.getDKIMJson', [
                     'emailDKIM'   => $dkim,
                     'emailDKIMId' => $dkim->getId(),
                 ]),
-                'deleteUrl'    => $this->router->generate('emailDKIM.deleteDKIM', [
+                'deleteUrl'    => $this->routeGenerator->generate('emailDKIM.deleteDKIM', [
                     'emailDKIM'   => $dkim,
                     'emailDKIMId' => $dkim->getId(),
                 ]),

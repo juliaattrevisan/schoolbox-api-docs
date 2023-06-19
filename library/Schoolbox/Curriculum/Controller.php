@@ -132,15 +132,15 @@ class Controller extends Base
             'parent' => $node->getParent() !== null ? (int)$node->getParent()->getId() : '#',
             'text'   => $name,
             'a_attr' => array(
-                'href' => $this->getRouter()->generate(
+                'href' => $this->routeGenerator->generate(
                     'curriculum.read',
                     array('id' => $nodeId, 'format' => '')
                 ),
-                'data-saveuri' => $this->getRouter()->generate(
+                'data-saveuri' => $this->routeGenerator->generate(
                     'curriculum.update:post',
                     array('id' => $nodeId)
                 ),
-                'data-deleteuri' => $this->getRouter()->generate(
+                'data-deleteuri' => $this->routeGenerator->generate(
                     'curriculum.delete:post',
                     array('id' => $nodeId)
                 ),

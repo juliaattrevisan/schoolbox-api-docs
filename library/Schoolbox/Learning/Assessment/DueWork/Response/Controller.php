@@ -231,7 +231,7 @@ class Controller extends Base
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
+                ->add([ $assessment->getTitle(), $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
                 ->add(['Inline Grader', '']),
             'response' => $response,
             'isMostRecentResponse' => $isMostRecentResponse,
@@ -501,7 +501,7 @@ class Controller extends Base
                 'response' => $response,
                 'participant' => $participant,
                 'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                    ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
+                    ->add([$assessment->getTitle(), $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
                     ->add(['Similarity Check', '']),
             ];
 

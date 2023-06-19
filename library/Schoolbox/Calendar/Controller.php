@@ -123,7 +123,7 @@ class Controller extends Base
     public function redirect(?string $selectedDate, User $user): void
     {
         if ($this->getRouter()->getMatchedRoute()->params['userId']) {
-            $route = $this->getRouter()->generate(
+            $route = $this->routeGenerator->generate(
                 'calendar.getCalendar',
                 [
                     'selectedDate' => $selectedDate,
@@ -131,7 +131,7 @@ class Controller extends Base
                 ]
             );
         } else {
-            $route = $this->getRouter()->generate(
+            $route = $this->routeGenerator->generate(
                 'calendar.getOwnCalendar'
             );
         }

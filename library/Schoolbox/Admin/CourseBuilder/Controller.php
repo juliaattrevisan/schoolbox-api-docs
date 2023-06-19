@@ -112,8 +112,8 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
-                    'pageCurrent' => $this->router->generate('adminCourseBuilder.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminCourseBuilder.getIndex')),
+                    'pageCurrent' => $this->routeGenerator->generate('adminCourseBuilder.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminCourseBuilder.getIndex')),
                     'tab' => $tab != '' ? $tab : 'course',
                     'roles' => $this->roleMapper->findAll(),
                     'permissions' => $permissions,

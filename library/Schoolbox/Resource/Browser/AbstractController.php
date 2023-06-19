@@ -222,7 +222,7 @@ abstract class AbstractController extends BaseController
             $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate("{$this->namespace}.browse", array())
+                $this->routeGenerator->generate("{$this->namespace}.browse", array())
             );
             return;
         }

@@ -79,7 +79,7 @@ class Controller extends Base
             throw new NotFound();
         }
         $this->response->redirect->to(
-            $this->router->generate(
+            $this->routeGenerator->generate(
                 'intellischool.getClassCodeAnalytics',
                 ['folderId' => $folder->getId(), 'classCode' => $firstClassCode->getCode()],
             )

@@ -354,10 +354,10 @@ class Controller extends Base
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
-                'pageCurrent' => $this->router->generate('adminUser.getInsert'),
+                'pageCurrent' => $this->routeGenerator->generate('adminUser.getInsert'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                    $this->router->generate('adminUser.getInsert'),
-                    $this->router->generate('adminUser.getModify', ['userId' => $user->getId()]),
+                    $this->routeGenerator->generate('adminUser.getInsert'),
+                    $this->routeGenerator->generate('adminUser.getModify', ['userId' => $user->getId()]),
                     'Modify User'
                 ),
                 'method' => 'Update',
@@ -402,10 +402,10 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminUser/stale.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminUser.getStaleReport'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUser.getStaleReport')),
-                'listEndpoint' => $this->router->generate('adminUser.getStaleUsers'),
-                'deleteEndpoint' => $this->router->generate('adminUser.postDeleteList'),
+                'pageCurrent' => $this->routeGenerator->generate('adminUser.getStaleReport'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getStaleReport')),
+                'listEndpoint' => $this->routeGenerator->generate('adminUser.getStaleUsers'),
+                'deleteEndpoint' => $this->routeGenerator->generate('adminUser.postDeleteList'),
             ]]);
     }
 
@@ -468,8 +468,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminUser.getInsert'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUser.getInsert')),
+                'pageCurrent' => $this->routeGenerator->generate('adminUser.getInsert'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getInsert')),
                 'method'    => 'Create',
                 'user' => $user,
                 'yearLevels' => $this->yearLevelMapper->findAll(),

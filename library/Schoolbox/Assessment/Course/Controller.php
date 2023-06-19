@@ -512,8 +512,8 @@ class Controller extends Base\Base
             // respond to XHR with JSON
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'id'              => $courseSpec->getId(),
-                'urlModifyCourse' => $this->getRouter()->generate('course.updateCourse', ['id' => $courseSpec->getId()]),
-                'urlNewUnit'      => $this->getRouter()->generate('course.newUnit', ['id' => $courseSpec->getId()]),
+                'urlModifyCourse' => $this->routeGenerator->generate('course.updateCourse', ['id' => $courseSpec->getId()]),
+                'urlNewUnit'      => $this->routeGenerator->generate('course.newUnit', ['id' => $courseSpec->getId()]),
             ]));
         } else {
             // respond to synchronous POST with redirect
@@ -963,7 +963,7 @@ class Controller extends Base\Base
                 'hasTot'           => true,
                 'linkToUnits'      => true,
                 'hasBreadcrumb'    => true,
-                'encodedReturnUrl' => Redirect::encode($this->getRouter()->generate('course.courseList')),
+                'encodedReturnUrl' => Redirect::encode($this->routeGenerator->generate('course.courseList')),
             ];
         }
 

@@ -2,7 +2,7 @@
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Web\Output;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -932,10 +932,10 @@ class SitePage
      */
     public function routeLookup($name, $params = [])
     {
-        /** @var Router $router */
         try {
-            $router = $this->getDi()->get('router');
-            return $router->generate($name, $params);
+            /** @var Generator $generator */
+            $generator = $this->getDi()->get('router.generator');
+            return $generator->generate($name, $params);
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             return '';
         } catch (\Aura\Router\Exception\RouteNotFound $e) {

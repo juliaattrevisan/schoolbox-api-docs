@@ -156,7 +156,7 @@ class Controller extends BaseController
             ],
         ];
 
-        $formAction = $this->getRouter()->generate(
+        $formAction = $this->routeGenerator->generate(
             'folder.postCreateFolder',
             ['parent' => $parent, 'parentId' => $parent->getId()]
         );
@@ -199,7 +199,7 @@ class Controller extends BaseController
             ],
         ];
 
-        $formAction = $this->getRouter()->generate(
+        $formAction = $this->routeGenerator->generate(
             'folder.postUpdateFolder',
             ['folder' => $folder, 'id' => $folder->getId()]
         );
@@ -829,7 +829,7 @@ class Controller extends BaseController
 
                 $this->userAccessMapper->save($uA);
 
-                return $this->router->generate('group.getModify', ['folderId' => $model->getId(), 'folder' => $model]) . '?new=1';
+                return $this->routeGenerator->generate('group.getModify', ['folderId' => $model->getId(), 'folder' => $model]) . '?new=1';
             } else {
                 throw new UnexpectedValueException("I find your lack of access disturbing.");
             }

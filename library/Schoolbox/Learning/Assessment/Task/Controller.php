@@ -303,7 +303,7 @@ class Controller extends Assessment\Controller
             } else {
                 // redirect after saving to Task Summary for particular Student
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate(
+                    $this->routeGenerator->generate(
                         'learningAssessment.getSummary',
                         [
                             'assessmentId' => $assessment->getId(),

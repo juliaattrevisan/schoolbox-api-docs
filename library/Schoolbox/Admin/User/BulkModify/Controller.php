@@ -109,9 +109,9 @@ class Controller extends Base
             [
                 'template' => '@adminUserBulkModify/bulkModify.twig',
                 'data'     => [
-                    'pageCurrent'    => $this->router->generate('adminUserBulkModify.getModify'),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminUserBulkModify.getModify'),
                     'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                        $this->router->generate('adminUserBulkModify.getModify'),
+                        $this->routeGenerator->generate('adminUserBulkModify.getModify'),
                         'Bulk Modify'
                     ),
                     'campuses'       => $campuses,

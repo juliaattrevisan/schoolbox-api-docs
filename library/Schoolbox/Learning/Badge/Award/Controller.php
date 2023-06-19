@@ -120,7 +120,7 @@ class Controller extends Base
     {
         $this->response->redirect->to(
             $this->addQueryStringParamsToPath(
-                $this->router->generate(
+                $this->routeGenerator->generate(
                     'learningBadgeAward.getAwardAsAchievementForm',
                     ['userIds' => $this->request->query->get('userIds')]
                 ),
@@ -160,7 +160,7 @@ class Controller extends Base
     {
         $this->response->redirect->to(
             $this->addQueryStringParamsToPath(
-                $this->router->generate(
+                $this->routeGenerator->generate(
                     'learningBadgeAward.getSetAsGoalForm',
                     ['userIds' => $this->request->query->get('userIds')]
                 ),
@@ -302,7 +302,7 @@ class Controller extends Base
         }
 
         $returnUrl = $this->request->query->get(Redirect::RETURN_URL) ??
-            Redirect::encode($this->router->generate('learningBadge.getBadgeListPage'));
+            Redirect::encode($this->routeGenerator->generate('learningBadge.getBadgeListPage'));
         $cancelUrl       = Redirect::decode($returnUrl);
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
         $userTranslator  = new User\Translator\Author\ModelToArray();
@@ -365,13 +365,13 @@ class Controller extends Base
     {
         $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
-        $returnUrl       = $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+        $returnUrl       = $this->routeGenerator->generate('learningBadgeAward.getAwardWithEvidence', [
             'awardId' => $award->getId(),
             'award'   => $award,
         ]);
         $cancelUrl       = $this->request->query->get(Redirect::RETURN_URL)
             ? Redirect::decode($this->request->query->get(Redirect::RETURN_URL))
-            : $this->router->generate('searchUser.getProfile', [
+            : $this->routeGenerator->generate('searchUser.getProfile', [
                 'userId' => $award->getRecipient()->getId(),
                 'user'   => $award->getRecipient(),
             ]);
@@ -785,14 +785,14 @@ class Controller extends Base
             $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
         } elseif ($this->getAuthorizer()->isPathAuthorizedForUser('learningBadgeAward.getAwardWithEvidence', ['awardId' => $award->getId()])) {
             $returnUrl = Redirect::encode(
-                $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+                $this->routeGenerator->generate('learningBadgeAward.getAwardWithEvidence', [
                     'award'   => $award,
                     'awardId' => $award->getId(),
                 ])
             );
         } else {
             $returnUrl = Redirect::encode(
-                $this->router->generate('searchUser.getProfile', [
+                $this->routeGenerator->generate('searchUser.getProfile', [
                     'user'   => $award->getRecipient(),
                     'userId' => $award->getRecipient()->getId(),
                 ])
@@ -842,7 +842,7 @@ class Controller extends Base
          * else redirect to back to where you came from
          * this redirect is created in the vue form component.
          */
-        $redirectUrl = $this->router->generate('searchUser.getProfile', [
+        $redirectUrl = $this->routeGenerator->generate('searchUser.getProfile', [
             'userId' => $award->getRecipient()->getId(),
             'user'   => $award->getRecipient(),
         ]);
@@ -889,7 +889,7 @@ class Controller extends Base
         $this->mapper->save($award);
 
         $translator      = $this->buildBadgeAwardModelToArrayTranslator();
-        $data['viewUrl'] = $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+        $data['viewUrl'] = $this->routeGenerator->generate('learningBadgeAward.getAwardWithEvidence', [
             'award'   => $achievement,
             'awardId' => $achievement->getId(),
         ]);

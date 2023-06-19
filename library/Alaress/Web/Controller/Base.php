@@ -13,6 +13,7 @@ namespace Alaress\Web\Controller;
 use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
+use Aura\Router\Generator;
 use Aura\Session\SegmentInterface;
 use Aura\Web\Exception\InvalidStatusCode;
 use Aura\Web\Request;
@@ -51,6 +52,11 @@ abstract class Base
      * @var Router
      */
     protected $router;
+
+    /**
+     * Direct reference to the controller's route generator.
+     */
+    protected Generator $routeGenerator;
 
     /**
      * @var Session
@@ -182,6 +188,24 @@ abstract class Base
     public function getRouter()
     {
         return $this->router;
+    }
+
+    /**
+     * @return Generator
+     */
+    public function getRouteGenerator(): Generator
+    {
+        return $this->routeGenerator;
+    }
+
+    /**
+     * @param Generator $routeGenerator
+     * @return $this
+     */
+    public function setRouteGenerator(Generator $routeGenerator): self
+    {
+        $this->routeGenerator = $routeGenerator;
+        return $this;
     }
 
     /**
@@ -322,7 +346,7 @@ abstract class Base
             $user = $this->getUser();
         }
         if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $user)) {
-            return $this->getRouter()->generate($name, $params);
+            return $this->routeGenerator->generate($name, $params);
         }
         return false;
     }

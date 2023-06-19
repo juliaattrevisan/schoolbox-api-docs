@@ -122,7 +122,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * If you're a student, you'll end up at a dead end if you've been excluded
          * from participating in the assessment but try to get there anyway
          */
-        $defaultUrl = $this->getRouter()->generate('learningAssessment.getSummary', [
+        $defaultUrl = $this->routeGenerator->generate('learningAssessment.getSummary', [
             'assessmentId' => $assessment->getId(),
             'studentId' => $this->getUser()->getId()
         ]);
@@ -165,7 +165,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getSummaryViaSeb(IAssessable $assessment, User $student): void
     {
-        $defaultUrl = $this->getRouter()->generate(
+        $defaultUrl = $this->routeGenerator->generate(
             'learningAssessment.getSummary',
             [
                 'assessmentId' => $assessment->getId(),
@@ -744,7 +744,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
             return $returnUrl;
         } elseif ($assessment->getContext() instanceof Project) {
-            return $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getContext()->getId()]);
+            return $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getContext()->getId()]);
         }
 
         return $defaultReturnUrl;

@@ -376,13 +376,13 @@ class ListController extends Web\Controller\Base
                 $returnUrl = '/homepage/' . $context->getId();
             } elseif ($context instanceof Project) {
                 // Project status page
-                $returnUrl = $this->getRouter()->generate(
+                $returnUrl = $this->routeGenerator->generate(
                     'learningAssessment.getStatus',
                     ['assessmentId' => $context->getId()]
                 );
             } elseif ($context instanceof UnitSpecification) {
                 // Course modify page for this unit
-                $returnUrl = $this->getRouter()->generate(
+                $returnUrl = $this->routeGenerator->generate(
                     'course.modifyCourse',
                     ['id' => $context->getCourse()->getId()]
                 );
@@ -587,7 +587,7 @@ class ListController extends Web\Controller\Base
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
         $data['context']     = $context;
         $data['breadcrumbs'] = [
-            ['Learning', $this->router->generate('learning.getClasses')],
+            ['Learning', $this->routeGenerator->generate('learning.getClasses')],
             [$context->getFolder()->getTitle(), "/homepage/{$context->getFolder()->getId()}"],
         ];
         // This needs to be here for creating a quiz in a project or from Course Builder component
@@ -605,7 +605,7 @@ class ListController extends Web\Controller\Base
         if ($context instanceof Project) {
             $data['breadcrumbs'][] = [
                 $context->getTitle(),
-                $this->router->generate(
+                $this->routeGenerator->generate(
                     'learningAssessment.getStatus',
                     [
                         'assessment'   => $context,

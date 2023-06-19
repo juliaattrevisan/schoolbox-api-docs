@@ -70,8 +70,8 @@ class Controller extends Base
         });
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
-            'pageCurrent'        => $this->router->generate('restore.getIndex'),
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('restore.getIndex')),
+            'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
             'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
             'assessmentTypes'    => [

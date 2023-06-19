@@ -53,8 +53,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLessonPlanTemplate/list.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminLessonPlanTemplate.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
                 'lessonPlanTemplates' => $this->templateMapper->findAll()->sortNaturally('title')
             ]
         ]);
@@ -72,9 +72,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLessonPlanTemplate/create.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminLessonPlanTemplate.getList'),
+                'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
                     [['Create', null]]
                 ),
                 'lessonPlanTemplate' => null,
@@ -143,7 +143,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLessonPlanTemplate.getList'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 
@@ -159,9 +159,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLessonPlanTemplate/create.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminLessonPlanTemplate.getList'),
+                'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
                     [['Modify', null]]
                 ),
                 'lessonPlanTemplate' => $lessonPlanTemplate,
@@ -257,7 +257,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLessonPlanTemplate.getList'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 
