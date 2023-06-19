@@ -62,7 +62,9 @@ try {
                         Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
                         FilesystemProxy::getPathFromHash($resource->getHash()),
                         $cacheControl,
-                        $disposition
+                        $disposition,
+                        null,
+                        $basename,
                     );
                 } catch (InvalidPresignedUrlDurationExecption $e) {
                     throw new UnreachableException($e);
