@@ -102,7 +102,20 @@ class Cleanup implements IStrategy
                         FROM sis_event_roletype
                         INNER JOIN sis_event ON sis_event.id = sis_event_roletype.event_id AND sis_event.updated_at = '0000-00-00 00:00:00'
                         WHERE sis_event.source = :source
-                        AND sis_event.classification = :classification     
+                        AND sis_event.classification = :classification
+                    ",
+                    'params' => [
+                        'classification' => Model::CLASSIFICATION_EVENT,
+                        'source' => $this->source
+                    ]
+                ],
+                [
+                    'query' => "
+                        DELETE sis_event_user
+                        FROM sis_event_user
+                        INNER JOIN sis_event ON sis_event.id = sis_event_user.event_id AND sis_event.updated_at = '0000-00-00 00:00:00'
+                        WHERE sis_event.source = :source
+                        AND sis_event.classification = :classification
                     ",
                     'params' => [
                         'classification' => Model::CLASSIFICATION_EVENT,
@@ -113,7 +126,7 @@ class Cleanup implements IStrategy
                     'query' => "
                         DELETE FROM sis_event
                         WHERE updated_at = '0000-00-00 00:00:00'
-                        AND sis_event.source = :source 
+                        AND sis_event.source = :source
                         AND sis_event.classification = :classification
                     ",
                     'params' => [
