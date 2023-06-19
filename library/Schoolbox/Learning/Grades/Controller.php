@@ -572,8 +572,7 @@ class Controller extends Base
         }
 
         // year levels all agree on the setting, use year level setting
-        $getProp = "get" . $propertyName;
-        return $folder->getYearLevels()->first()->$getProp();
+        return $propertyValues[0];
     }
 
     /**
