@@ -33,13 +33,19 @@ class PayloadCache
      * $superuser allows the storage mapper to bypass the normal
      * file restrictions such as size, mimetype, etc.
      *
-     * @param User    $superuser
+     * Use $name (an arbitrary string) to help identify filenames
+     *
+     * @param string $name
+     * @param User $superuser
      * @param Request $message
      * @return Model
      * @throws \JsonException
      */
-    public function cache(\Schoolbox\User $superuser, Request $message): \Schoolbox\Resource\Storage\Model
-    {
+    public function cache(
+        string $name,
+        \Schoolbox\User $superuser,
+        Request $message
+    ): \Schoolbox\Resource\Storage\Model {
         $payload = json_encode($message, JSON_THROW_ON_ERROR);
 
         /* Not a parser or reformatter
@@ -54,8 +60,9 @@ class PayloadCache
         $expiryAt = \Alaress_Date_Format::now()->addWeeks(1);
 
         $filename = sprintf(
-            'suds_liss_%s.log',
-            $now->getDatabase()
+            'suds_liss_%s_%s.log',
+            $name,
+            $now->getUsingFormat('Ymd_His')
         );
 
         return $this->storageMapper->acceptStream($filename, $payload, false, $expiryAt, $superuser);
