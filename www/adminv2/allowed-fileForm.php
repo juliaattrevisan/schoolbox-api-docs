@@ -22,7 +22,7 @@ $mimeMapper = MimetypeMapper::getInstance();
 
 /* Delete or create/update
   */
-if (is_numeric($_GET['delete'])) {
+if (is_numeric($_GET['delete'] ?? null)) {
     $id = Scrub::text($_GET['delete']);
 
     try {
