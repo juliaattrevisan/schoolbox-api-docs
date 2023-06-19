@@ -13,9 +13,9 @@ use Alaress\Web\Controller\Base;
 use DomainException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use Schoolbox\Learning\Assessment\DueWork\Fetcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -43,10 +43,7 @@ use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
-use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
@@ -628,47 +625,10 @@ class Controller extends Base
          */
         $resource = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($file->getStorage()->getHash());
 
-        $basename = $file->getBasename();
-        $disposition = !$resource->getMimetype()->getInline() ? PreSignedUrlService::DISPOSITION_ATTACHMENT : PreSignedUrlService::DISPOSITION_INLINE;
-        $contentType = ($resource->getMime()) ?: 'application/octet-stream';
-        $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
-        $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
-
-        $config = $this->getConfigLoader();
-
-        if (
-            !$bypassPresignedUrls
-            && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
-            && $config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)
-        ) {
-            $preSignedUrlService = new PreSignedUrlService($config);
-
-            try {
-                $preSignedUrlDataObject = $preSignedUrlService->generate(
-                    $resource,
-                    \Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
-                    FilesystemProxy::getPathFromHash($resource->getHash()),
-                    $cacheControl,
-                    $disposition,
-                    null,
-                    $basename
-                );
-            } catch (InvalidPresignedUrlDurationExecption $e) {
-                throw new UnreachableException($e);
-            }
-
-            $preSignedUrlService->download($preSignedUrlDataObject);
-        }
-
-        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-
-        //send headers
-        header("Content-Type: $contentType");
-        header("Cache-control: private");
-        header("Content-Ranges: none");
-        header("Content-Disposition: $disposition; filename=\"$basename\"");
-        header("Content-Length: " . $filesystemProxy->fileSize($resource));
-        fpassthru($filesystemProxy->readStream($resource));
+        /* TODO Arguably this should be in a storage controller in a storage route
+         */
+        (new Fetcher($this->getConfigLoader(), $this->getDi()->get('filesystem.storageProxy')))
+            ->fetch($file->getBasename(), $resource, (bool)$this->request->query->get('cache'));
     }
 
 

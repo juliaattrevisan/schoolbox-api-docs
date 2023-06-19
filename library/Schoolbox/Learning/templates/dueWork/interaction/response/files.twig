@@ -15,7 +15,6 @@
         ) %}
         {% set downloadHref = previewHref ~ '?save=true' %}
     {% else %}
-        {% set previewHref = '/storage/fetch.php?hash=' ~ currentFile.hash %}
         {% set downloadHref = routeLookupIfAuthorized('learningDueWorkResponse.getResponseFileDownload', {
             assessment: assessment,
             assessmentId: assessment.id,
@@ -26,6 +25,7 @@
             file: currentFile,
             fileId: currentFile.id,
         }) %}
+        {% set previewHref = downloadHref %}
     {% endif %}
     <div class="list-item">
         <div class="card attachment small-12">
@@ -33,17 +33,16 @@
                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                 <p>{{ currentFile.filename }}</p>
             </a>
-                {% include '@learning/dueWork/similarity/status.twig' with {
-                    turnitinApiEnabled: turnitinApiEnabled,
-                    assessment: assessment,
-                    participant: participant,
-                    response: response,
-                    currentFile: currentFile
-                } only %}
+            {% include '@learning/dueWork/similarity/status.twig' with {
+                turnitinApiEnabled: turnitinApiEnabled,
+                assessment: assessment,
+                participant: participant,
+                response: response,
+                currentFile: currentFile
+            } only %}
         </div>
     </div>
     <nav>
         <a href="{{ downloadHref }}" class='icon-download' title="Download"></a>
     </nav>
 </li>
-
