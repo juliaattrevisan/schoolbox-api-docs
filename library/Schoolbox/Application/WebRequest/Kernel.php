@@ -23,9 +23,10 @@ use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Aura\Di\Container;
 use Aura\Router\Route;
-use Aura\Router\Router;
+use Aura\Router\RouterContainer;
 use Aura\Web\Request;
 use Aura\Web\Response;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -35,7 +36,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 
@@ -100,6 +100,10 @@ class Kernel extends WebKernelAbstract
      */
     public function run()
     {
+        // First get the request object
+        /** @var ServerRequestInterface $request */
+        $request = $this->di->get('request');
+
         // Run router with requested path (trim trailing /)
         $path  = RequestUriParser::parseUrlPath($_SERVER);
 
@@ -130,9 +134,9 @@ class Kernel extends WebKernelAbstract
             header("Access-Control-Allow-Methods: *");
             exit;
         }
-        /** @var Router $router */
+        /** @var RouterContainer $router */
         $router = $this->di->get('router');
-        $route  = $router->match($path, $server);
+        $route  = $router->getMatcher()->match($request);
 
         try {
             if ($route instanceof Route) {
