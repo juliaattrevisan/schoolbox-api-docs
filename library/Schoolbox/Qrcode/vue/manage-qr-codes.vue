@@ -273,10 +273,7 @@ export default {
             <h3 class="selected-count">
                 <em>{{ selectedStudentsStatus }}</em>
             </h3>
-            <button
-                @click.prevent="onToggleStudentSelection"
-                class="button-toggle-selection"
-            >
+            <button @click.prevent="onToggleStudentSelection" class="button-toggle-selection">
                 {{ toggleStudentSelectionStatus }}
             </button>
             <div class="options-list">
@@ -359,7 +356,7 @@ export default {
     align-items: flex-end; //so the selects and buttons line up at the bottom
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem; //@todo consider safari 14
+    gap: 1rem;
     select,
     button {
         margin-bottom: 0;
