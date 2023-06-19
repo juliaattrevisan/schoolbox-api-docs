@@ -1,7 +1,7 @@
 ### LMS settings now display correct tooltips as year levels can now affect these options.
 
 UPDATE config
-    set description = "If toggled to 'ON', the box plot graph can be displayed on a student's grades page. The year level of the class page and the user's profile setup may also affect the visibility."
+    set description = "If toggled to 'ON', the box plot graph can be displayed on a student's grades page. The year level of the class page and the user's profile setup may also affect the visibility. The graph is always visible to staff."
 where name = 'display_grade_graph';
 
 UPDATE config
