@@ -79,6 +79,10 @@ class Reporter extends App
         $actualData = $selectActualDataQuery->fetchAll();
         $logger->info(sprintf('Fetched actual data: %d rows', count($actualData)));
 
+        // Sort consistently
+        usort($expectedData, [$this, 'sortCallback']);
+        usort($actualData, [$this, 'sortCallback']);
+
         $keyedExpectedData = $this->groupDataByKey($expectedData);
         $keyedActualData   = $this->groupDataByKey($actualData);
 
@@ -259,14 +263,18 @@ HELP;
      */
     private function reportOnDifferences(array $keyedActualData, array $keyedExpectedData): array
     {
-        $logger       = $this->getLogger();
+        $logger        = $this->getLogger();
         $differentRows = [];
         $differ        = new Differ('expected', 'actual');
-        foreach ($keyedActualData as $assessmentId => $actualAssessmentData) {
+        $assessmentIds = array_unique(
+            array_merge(
+                array_keys($keyedActualData),
+                array_keys($keyedExpectedData),
+            )
+        );
+        foreach ($assessmentIds as $assessmentId) {
+            $actualAssessmentData   = $keyedActualData[$assessmentId] ?? null;
             $expectedAssessmentData = $keyedExpectedData[$assessmentId] ?? null;
-            if (!isset($expectedAssessmentData)) {
-                continue;
-            }
             if ($expectedAssessmentData !== $actualAssessmentData) {
                 $differentRows[] = $assessmentId;
                 $logger->debug(
@@ -292,5 +300,38 @@ HELP;
             $logger->notice('No assessments different in actual and expected.');
         }
         return $differentRows;
+    }
+
+    /**
+     * Sort callback for results from DB.
+     *
+     * A little easier (and possibly quicker, believe it or not due to temporary
+     * table creation) than sorting in the DB.
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    private function sortCallback(array $a, array $b): int
+    {
+        $columns = [
+            'assessment_id',
+            'folder_id',
+            'project_assessment_id',
+            'course_implementation_id',
+            'course_unit_implementation_id',
+            'course_specification_id',
+            'course_unit_specification_id',
+        ];
+
+        // Return the first of these which isn't equal
+        foreach ($columns as $column) {
+            $aValue = $a[$column];
+            $bValue = $b[$column];
+            if ($aValue !== $bValue) {
+                return $a <=> $b;
+            }
+        }
+        return 0;
     }
 }
