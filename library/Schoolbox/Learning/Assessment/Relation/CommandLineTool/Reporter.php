@@ -84,49 +84,20 @@ class Reporter extends App
         $this->reportOnDuplicates($expectedData, 'expected');
         $this->reportOnDuplicates($actualData, 'actual');
 
-        // Report on data expected but not actual
-        $expectedRowsNotInActual = array_udiff(
+        // Report on data expected but not actual, and vice versa
+        $expectedRowsNotInActual = $this->reportOnMissingData(
             $expectedData,
+            'expected',
             $actualData,
-            fn ($a, $b) => $a === $b ? 0 : 1,
+            'actual',
         );
-        if (count($expectedRowsNotInActual)) {
-            $logger->warning(
-                sprintf(
-                    '%d expected rows not found in actual for assessments: %s',
-                    count($expectedRowsNotInActual),
-                    implode(
-                        ',',
-                        array_unique(array_column($expectedRowsNotInActual, 'assessment_id')),
-                    ),
-                )
-            );
-            $hasDataIssue = true;
-        } else {
-            $logger->notice('No expected rows not found in actual assessments.');
-        }
-
-        // Report on actual but unexpected data
-        $actualRowsNotInExpected = array_udiff(
+        $actualRowsNotInExpected = $this->reportOnMissingData(
             $actualData,
+            'actual',
             $expectedData,
-            fn ($a, $b) => $a === $b ? 0 : 1,
+            'expected',
         );
-        if (count($actualRowsNotInExpected)) {
-            $logger->warning(
-                sprintf(
-                    '%d actual assessments not found in expected for assessments: %s',
-                    count($actualRowsNotInExpected),
-                    implode(
-                        ',',
-                        array_unique(array_column($actualRowsNotInExpected, 'assessment_id')),
-                    ),
-                )
-            );
-            $hasDataIssue = true;
-        } else {
-            $logger->notice('No actual assessments not found in expected assessments.');
-        }
+        $hasDataIssue = count($expectedRowsNotInActual) > 0 || count($actualRowsNotInExpected) > 0;
 
         // Report on differences
         $differentRows = [];
@@ -246,4 +217,47 @@ HELP;
         );
     }
 
+    /**
+     * Report on whatever data might be missing.
+     *
+     * @param array  $baseData
+     * @param string $baseDataType
+     * @param array  $comparisonData
+     * @param string $comparisonDataType
+     * @return array list of rows missing from `$baseData` in `$comparisonData`,
+     *               if any.
+     */
+    private function reportOnMissingData(
+        array $baseData,
+        string $baseDataType,
+        array $comparisonData,
+        string $comparisonDataType,
+    ): array {
+        $logger                      = $this->getLogger();
+        $baseDataNotInComparisonData = array_udiff(
+            $baseData,
+            $comparisonData,
+            fn($a, $b) => $a === $b ? 0 : 1,
+        );
+        if (count($baseDataNotInComparisonData)) {
+            $logger->warning(
+                sprintf(
+                    '%d %s rows not found in %s for assessments: %s',
+                    count($baseDataNotInComparisonData),
+                    $baseDataType,
+                    $comparisonDataType,
+                    implode(
+                        ',',
+                        array_unique(array_column($baseDataNotInComparisonData, 'assessment_id')),
+                    ),
+                )
+            );
+            return [];
+        } else {
+            $logger->notice(
+                sprintf('No %s rows not found in %s assessments.', $baseDataType, $comparisonDataType)
+            );
+            return [];
+        }
+    }
 }
