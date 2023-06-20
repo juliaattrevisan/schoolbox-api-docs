@@ -171,7 +171,7 @@ class ModelToArrayTest extends TestCase
             function (FolderModel $folder) {
                 return ['id' => $folder->getId()];
             },
-            $testRouter,
+            $testRouter->getGenerator(),
             $testAuthorizer,
             new User(),
             new MockAdapter()

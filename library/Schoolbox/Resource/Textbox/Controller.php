@@ -184,7 +184,7 @@ class Controller extends Base
         $translateFolder  = new Folder\Translator\ModelToArray\LinkOnly(0);
         $translateTextbox = new Translator\ModelToArray(
             $translateFolder,
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             new ScrubAdapter()

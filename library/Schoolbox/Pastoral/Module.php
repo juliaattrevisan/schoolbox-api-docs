@@ -245,7 +245,7 @@ class Module extends BaseModule
     {
         $commentTranslator =             new Comment\Translator\ModelToArray(
             new User\Translator\Author\ModelToArray(),
-            $this->injector->get('router'),
+            $this->injector->get('router.generator'),
             $this->injector->get('authorizer'),
             $this->injector->get('user'),
             new ScrubAdapter(),

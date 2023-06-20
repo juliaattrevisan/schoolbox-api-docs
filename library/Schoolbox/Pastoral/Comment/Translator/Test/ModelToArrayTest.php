@@ -235,7 +235,7 @@ class ModelToArrayTest extends TestCase
             static function (User $user) {
                 return ['id' => $user->getId()];
             },
-            $testRouter,
+            $testRouter->getGenerator(),
             $testAuthorizer,
             new User(),
             new MockAdapter(),
