@@ -11,7 +11,7 @@
 namespace Calendar\Event\Type\Day\Renderer;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Calendar\Event\Type\Day;
 use Calendar\Event\Type\RendererBase;
 use Schoolbox\User;
@@ -33,14 +33,14 @@ abstract class Base extends RendererBase
      * Constructor
      *
      * @param Authorizer $authorizer
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Day\Event  $event
      * @param User       $user
      * @param User       $viewer
      */
-    public function __construct(Authorizer $authorizer, Router $router, Day\Event $event, User $user, User $viewer)
+    public function __construct(Authorizer $authorizer, Generator $routeGenerator, Day\Event $event, User $user, User $viewer)
     {
-        parent::__construct($authorizer, $router, $user, $viewer);
+        parent::__construct($authorizer, $routeGenerator, $user, $viewer);
 
         // TODO would rather not create this like this, but it's better than every renderer depending on it
         $this->calHandler = new \Calendar();

@@ -701,7 +701,7 @@ class Controller extends Base
                 foreach ($roomEvents as $event) {
                     $renderer = new \Calendar\Event\Type\SudsTimetable\Renderer\Javascript(
                         $this->getAuthorizer(),
-                        $this->getRouter(),
+                        $this->routeGenerator,
                         $event,
                         $this->getUser(),
                         $this->getUser()
@@ -722,7 +722,7 @@ class Controller extends Base
                 foreach ($roomEvents as $event) {
                     $renderer = new Javascript(
                         $this->getAuthorizer(),
-                        $this->getRouter(),
+                        $this->routeGenerator,
                         $event,
                         $this->getUser(),
                         $this->getUser()
