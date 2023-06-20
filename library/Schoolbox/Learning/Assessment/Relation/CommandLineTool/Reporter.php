@@ -81,37 +81,8 @@ class Reporter extends App
         $logger->info(sprintf('Fetched actual data: %d rows', count($actualData)));
 
         // Report on duplicates (both expected and actual)
-        $expectedDuplicates = array_filter(
-            array_count_values(array_column($expectedData, 'assessment_id')),
-            fn ($v) => $v > 1,
-        );
-        if (count($expectedDuplicates)) {
-            $logger->warning(
-                sprintf(
-                    '%d expected rows contain duplicates: %s',
-                    count($expectedDuplicates),
-                    implode(',', array_keys($expectedDuplicates)),
-                )
-            );
-        } else {
-            $logger->notice('No expected rows contain duplicates.');
-        }
-
-        $actualDuplicates = array_filter(
-            array_count_values(array_column($actualData, 'assessment_id')),
-            fn ($v) => $v > 1,
-        );
-        if (count($actualDuplicates)) {
-            $logger->warning(
-                sprintf(
-                    '%d actual rows contain duplicates: %s',
-                    count($actualDuplicates),
-                    implode(',', array_keys($actualDuplicates)),
-                )
-            );
-        } else {
-            $logger->notice('No actual rows contain duplicates.');
-        }
+        $this->reportOnDuplicates($expectedData, 'expected');
+        $this->reportOnDuplicates($actualData, 'actual');
 
         // Report on data expected but not actual
         $expectedRowsNotInActual = array_udiff(
@@ -235,4 +206,44 @@ OPTIONS
 
 HELP;
     }
+
+    /**
+     * Report on duplicates in data.
+     *
+     * @param array  $data
+     * @param string $type
+     * @return void Duplicates in data aren't yet considered a problem
+     */
+    private function reportOnDuplicates(array $data, string $type): void
+    {
+        $logger     = $this->getLogger();
+        $duplicates = $this->findDuplicateAssessments($data);
+        if (count($duplicates)) {
+            $logger->warning(
+                sprintf(
+                    '%d %s rows contain duplicates: %s',
+                    count($duplicates),
+                    $type,
+                    implode(',', array_keys($duplicates)),
+                )
+            );
+        } else {
+            $logger->notice(sprintf('No %s rows contain duplicates.', $type));
+        }
+    }
+
+    /**
+     * Finds duplicate assessment IDs in data.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function findDuplicateAssessments(array $data): array
+    {
+        return array_filter(
+            array_count_values(array_column($data, 'assessment_id')),
+            fn($v) => $v > 1,
+        );
+    }
+
 }
