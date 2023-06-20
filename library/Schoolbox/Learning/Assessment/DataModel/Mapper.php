@@ -1518,26 +1518,6 @@ class Mapper extends BaseMapper
      */
     protected function updateAssessmentRelationView(Model $assessment): bool
     {
-        $updateQuery = $this->database->prepare('
-            REPLACE INTO mv_assessment_relation (
-                assessment_id,
-                folder_id,
-                project_assessment_id,
-                course_implementation_id,
-                course_unit_implementation_id,
-                course_specification_id,
-                course_unit_specification_id
-            ) VALUES (
-                :assessmentId,
-                :folderId,
-                :projectAssessmentId,
-                :courseImplementationId,
-                :courseUnitImplementationId,
-                :courseSpecificationId,
-                :courseUnitSpecificationId
-            )
-        ');
-
         // Impl and spec come from project context if there is one:
         // otherwise, directly from assessment
         $contextProject = $assessment->getContextProject();
@@ -1560,15 +1540,52 @@ class Mapper extends BaseMapper
             $folder = $assessment->getAssessmentContext()->getFolder();
         }
         $params = [
-            'assessmentId'               => $assessment->getId(),
-            'folderId'                   => $folder->getId(),
-            'projectAssessmentId'        => $contextProject?->getId(),
-            'courseImplementationId'     => $unitImplementation?->getCourse()?->getId(),
-            'courseUnitImplementationId' => $unitImplementation?->getId(),
-            'courseSpecificationId'      => $unitSpecification?->getCourse()?->getId(),
-            'courseUnitSpecificationId'  => $unitSpecification?->getId(),
+            'assessment_id'                 => $assessment->getId(),
+            'folder_id'                     => $folder->getId(),
+            'project_assessment_id'         => $contextProject?->getId(),
+            'course_implementation_id'      => $unitImplementation?->getCourse()?->getId(),
+            'course_unit_implementation_id' => $unitImplementation?->getId(),
+            'course_specification_id'       => $unitSpecification?->getCourse()?->getId(),
+            'course_unit_specification_id'  => $unitSpecification?->getId(),
         ];
-        $updateQuery->execute($params);
+
+        // Create a predicate builder for deleting the existing
+        // `mv_assessment_relation`.
+        // Cannot rely upon `REPLACE` with unique key across all columns,
+        // because null in SQL is considered an unknown value
+        // (e.g. null is not equal to null).
+        $pb = new Builder($this->getDatabase()->getQuoter(), 'mv_assessment_relation');
+        foreach ($params as $param => $value) {
+            $pb = ($value === null)
+                ? $pb->isNull($param)
+                : $pb->equals($param, $value);
+        }
+        $deleteQuery = $this->database->prepare(
+            "DELETE FROM mv_assessment_relation WHERE {$pb->getWhereIntersect()}"
+        );
+        $deleteQuery->execute($pb->getParams());
+
+        // Insert the new `mv_assessment_relation` row
+        $insertQuery = $this->database->prepare('
+            INSERT INTO mv_assessment_relation (
+                assessment_id,
+                folder_id,
+                project_assessment_id,
+                course_implementation_id,
+                course_unit_implementation_id,
+                course_specification_id,
+                course_unit_specification_id
+            ) VALUES (
+                :assessment_id,
+                :folder_id,
+                :project_assessment_id,
+                :course_implementation_id,
+                :course_unit_implementation_id,
+                :course_specification_id,
+                :course_unit_specification_id
+            )
+        ');
+        $insertQuery->execute($params);
         return true;
     }
 
