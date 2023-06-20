@@ -17,6 +17,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Aura\Router\Router;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
@@ -94,7 +95,7 @@ class Report
 
     private $authorizer;
 
-    private $router;
+    private Generator $routeGenerator;
 
     /** @var User */
     private $viewer;
@@ -103,18 +104,18 @@ class Report
     /**
      * @param IConfigLoader          $config
      * @param External_UserInterface $externalUser
-     * @param External_ClassInterface $externalClass
-     * @param CourseImpl\Mapper      $courseImplMapper
-     * @param Assessment\MapperProxy $assessmentMapperProxy
+     * @param External_ClassInterface    $externalClass
+     * @param CourseImpl\Mapper          $courseImplMapper
+     * @param Assessment\MapperProxy     $assessmentMapperProxy
      * @param RubricDataModel\DataSource $rubricMapper
-     * @param UserMapper             $userMapper
-     * @param Assessment\Mapper      $assessmentMapper
-     * @param Textbox\Mapper         $textboxMapper
-     * @param Visibility             $visibility
-     * @param IConnector             $database
-     * @param Authorizer             $authorizer
-     * @param Router                 $router
-     * @param User                   $viewer
+     * @param UserMapper                 $userMapper
+     * @param Assessment\Mapper          $assessmentMapper
+     * @param Textbox\Mapper             $textboxMapper
+     * @param Visibility                 $visibility
+     * @param IConnector                 $database
+     * @param Authorizer                 $authorizer
+     * @param Generator                  $routeGenerator
+     * @param User                       $viewer
      */
     public function __construct(
         IConfigLoader $config,
@@ -129,7 +130,7 @@ class Report
         Visibility $visibility,
         IConnector $database,
         Authorizer $authorizer,
-        Router $router,
+        Generator $routeGenerator,
         User $viewer
     ) {
         $this->config                = $config;
@@ -144,7 +145,7 @@ class Report
         $this->visibility            = $visibility;
         $this->database              = $database;
         $this->authorizer            = $authorizer;
-        $this->router                = $router;
+        $this->routeGenerator        = $routeGenerator;
         $this->viewer                = $viewer;
     }
 
@@ -285,7 +286,7 @@ class Report
     private function getRouteIfAuthorized($name, array $params, User $user)
     {
         if ($this->authorizer->isPathAuthorizedForUser($name, $params, $user)) {
-            return $this->router->generate($name, $params);
+            return $this->routeGenerator->generate($name, $params);
         }
         return false;
     }
@@ -982,7 +983,7 @@ class Report
             $this->viewer,
             $this->rubricMapper,
             $this->authorizer,
-            $this->router,
+            $this->routeGenerator,
             $roleTypeOverride,
         );
 

@@ -45,17 +45,17 @@ class LearningProfile extends BaseComponent
     /**
      * Constructor
      *
-     * @param StudentAttributes $attributes
-     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
-     * @param User              $student
-     * @param Folder\Model      $folder
+     * @param StudentAttributes                                       $attributes
+     * @param GenericCollection|UnitSpec\Model[]                      $unitSpecs
+     * @param User                                                    $student
+     * @param Folder\Model                                            $folder
      * @param array<array{workTypeId: int, term: int, semester: int}> $searches
-     * @param Visibility        $visibility
-     * @param User              $viewer
-     * @param RubricDataSource  $rubricMapper
-     * @param Authorizer        $authorizer
-     * @param Router\Router     $router
-     * @param string|null       $roleTypeOverride
+     * @param Visibility                                              $visibility
+     * @param User                                                    $viewer
+     * @param RubricDataSource                                        $rubricMapper
+     * @param Authorizer                                              $authorizer
+     * @param Router\Generator                                        $routeGenerator
+     * @param string|null                                             $roleTypeOverride
      */
     public function __construct(
         StudentAttributes $attributes,
@@ -67,7 +67,7 @@ class LearningProfile extends BaseComponent
         private User $viewer,
         private RubricDataSource $rubricMapper,
         private Authorizer $authorizer,
-        private Router\Router $router,
+        private Router\Generator $routeGenerator,
         private ?string $roleTypeOverride
     ) {
         parent::__construct($attributes, $viewer, $roleTypeOverride);
@@ -273,7 +273,7 @@ class LearningProfile extends BaseComponent
         ];
 
         if ($this->authorizer->isPathAuthorizedForUser($path, $routeParams, $this->getViewer())) {
-            return $this->router->generate($path, $routeParams);
+            return $this->routeGenerator->generate($path, $routeParams);
         }
         return null;
     }

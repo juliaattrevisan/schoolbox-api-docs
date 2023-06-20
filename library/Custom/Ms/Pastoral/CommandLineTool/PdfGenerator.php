@@ -12,6 +12,7 @@ namespace Custom\Ms\Pastoral\CommandLineTool;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
+use Aura\Router\Generator;
 use Aura\Router\Router;
 use Custom\Ms\Pastoral\StudentInvolvement\Report\Factory;
 use Custom\Ms\Pastoral\StudentInvolvement\Gateway;
@@ -195,8 +196,8 @@ EXAMPLES:
 
 
         // Build the URL generator
-        /** @var Router $router */
-        $router = $this->getDi()->get('router');
+        /** @var Generator $routeGenerator */
+        $routeGenerator = $this->getDi()->get('router.generator');
         /** @var IConnector $externalDb */
         $externalDb   = $this->getDi()->get('databaseExternal');
         $userMapper   = UserMapper::getInstance();
@@ -206,7 +207,7 @@ EXAMPLES:
         $rubricDataSource     = RubricDataSource::getInstance();
         $userAccessMapper     = UserAccessMapper::getInstance();
         $urlGenerator         = new UrlGenerator(
-            $router,
+            $routeGenerator,
             new Factory(
                 new Gateway($externalDb),
                 $userMapper,
