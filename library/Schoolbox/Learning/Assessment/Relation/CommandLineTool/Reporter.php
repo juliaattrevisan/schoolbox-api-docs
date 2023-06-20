@@ -85,16 +85,18 @@ class Reporter extends App
         $this->reportOnDuplicates($actualData, 'actual');
 
         // Report on data expected but not actual, and vice versa
+        $keyedExpectedData       = $this->groupDataByKey($expectedData);
+        $keyedActualData         = $this->groupDataByKey($actualData);
         $expectedRowsNotInActual = $this->reportOnMissingData(
-            $expectedData,
+            $keyedExpectedData,
             'expected',
-            $actualData,
+            $keyedActualData,
             'actual',
         );
         $actualRowsNotInExpected = $this->reportOnMissingData(
-            $actualData,
+            $keyedActualData,
             'actual',
-            $expectedData,
+            $keyedExpectedData,
             'expected',
         );
         $hasDataIssue = count($expectedRowsNotInActual) > 0 || count($actualRowsNotInExpected) > 0;
@@ -220,24 +222,25 @@ HELP;
     /**
      * Report on whatever data might be missing.
      *
-     * @param array  $baseData
+     * @param array  $keyedBaseData
      * @param string $baseDataType
-     * @param array  $comparisonData
+     * @param array  $keyedComparisonData
      * @param string $comparisonDataType
      * @return array list of rows missing from `$baseData` in `$comparisonData`,
      *               if any.
      */
     private function reportOnMissingData(
-        array $baseData,
+        array $keyedBaseData,
         string $baseDataType,
-        array $comparisonData,
+        array $keyedComparisonData,
         string $comparisonDataType,
     ): array {
         $logger                      = $this->getLogger();
-        $baseDataNotInComparisonData = array_udiff(
-            $baseData,
-            $comparisonData,
-            fn($a, $b) => $a === $b ? 0 : 1,
+        $baseDataNotInComparisonData = array_keys(
+            array_diff_key(
+                $keyedBaseData,
+                $keyedComparisonData,
+            )
         );
         if (count($baseDataNotInComparisonData)) {
             $logger->warning(
@@ -246,18 +249,31 @@ HELP;
                     count($baseDataNotInComparisonData),
                     $baseDataType,
                     $comparisonDataType,
-                    implode(
-                        ',',
-                        array_unique(array_column($baseDataNotInComparisonData, 'assessment_id')),
-                    ),
+                    implode(',', $baseDataNotInComparisonData),
                 )
             );
-            return [];
         } else {
             $logger->notice(
                 sprintf('No %s rows not found in %s assessments.', $baseDataType, $comparisonDataType)
             );
-            return [];
         }
+        return $baseDataNotInComparisonData;
+    }
+
+    /**
+     * Group data by its assessment ID.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function groupDataByKey(array $data): array
+    {
+        $returnData = [];
+        foreach ($data as $row) {
+            $assessmentId = $row['assessment_id'];
+            $returnData[$assessmentId] ??= [];
+            $returnData[$assessmentId][] = $row;
+        }
+        return $returnData;
     }
 }
