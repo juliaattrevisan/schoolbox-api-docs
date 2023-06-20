@@ -496,7 +496,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         $bakery = new BreadcrumbFactory(
-            $this->getRouter(),
+            $this->getRouteGenerator(),
             $this->getAuthorizer(),
             $this->getMapperFactory()->get(Access::class),
         );

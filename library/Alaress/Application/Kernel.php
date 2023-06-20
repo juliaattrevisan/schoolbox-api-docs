@@ -1531,7 +1531,7 @@ abstract class Kernel
                     'submissionBoxMapper'      => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBoxMapper::class),
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
                     'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
-                    'router'                   => $di->lazyGet('router'),
+                    'routeGenerator'           => $di->lazyGet('router.generator'),
                     'replicator'               => $di->lazyNew(
                         Replicator::class,
                         [

@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Aura\Router\Generator;
 use Aura\Router\RouteCollection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -540,6 +541,16 @@ class Module
     protected function getRouter()
     {
         return $this->injector->get('router');
+    }
+
+    /**
+     * Typehinted convenience method for obtaining route generator reference.
+     *
+     * @return Generator
+     */
+    protected function getRouteGenerator(): Generator
+    {
+        return $this->injector->get('router.generator');
     }
 
     /**

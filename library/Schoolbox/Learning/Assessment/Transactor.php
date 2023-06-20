@@ -9,13 +9,12 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -104,9 +103,9 @@ class Transactor
     protected $quizMapper;
 
     /**
-     * @var Router
+     * @var Generator
      */
-    protected $router;
+    protected $routeGenerator;
 
     /**
      * @var Replicator
@@ -126,7 +125,7 @@ class Transactor
      * @param SubmissionBoxMapper                   $submissionBoxMapper
      * @param SingleFile\Mapper                     $submissionFileMapper
      * @param QuizMapper                            $quizMapper
-     * @param Router                                $router
+     * @param Generator                             $routeGenerator
      * @param Replicator                            $replicator
      */
     public function __construct(
@@ -139,7 +138,7 @@ class Transactor
         SubmissionBoxMapper $submissionBoxMapper,
         SingleFile\Mapper $submissionFileMapper,
         QuizMapper $quizMapper,
-        Router $router,
+        Generator $routeGenerator,
         Replicator $replicator
     ) {
         $this->folderMapper = $folderMapper;
@@ -151,7 +150,7 @@ class Transactor
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->submissionFileMapper = $submissionFileMapper;
         $this->quizMapper = $quizMapper;
-        $this->router = $router;
+        $this->routeGenerator = $routeGenerator;
         $this->replicator = $replicator;
     }
 
@@ -207,7 +206,7 @@ class Transactor
              */
             $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
-            $returnUrl = $this->router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->assessment->getId()]);
+            $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->assessment->getId()]);
         }
 
         // If relocated, remove original assessment
@@ -357,7 +356,7 @@ class Transactor
 
         $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
-        return $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
+        return $this->routeGenerator->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
     }
 
 

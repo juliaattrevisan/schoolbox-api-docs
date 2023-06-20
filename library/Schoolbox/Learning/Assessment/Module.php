@@ -442,7 +442,7 @@ class Module extends BaseModule
         $participantDataSource = $this->injector->get('participantDataSource');
 
         $bakery = new Breadcrumb\Factory(
-            $this->getRouter(),
+            $this->getRouteGenerator(),
             $this->getAuthorizer(),
             $this->getAccess(),
         );
