@@ -75,7 +75,7 @@ class Controller extends Base
             return;
         }
 
-        $selector = new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year);
+        $selector = new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year);
         $selector->determineDefaultReport();
 
         $report = $selector->getDefaultReport();
@@ -258,7 +258,7 @@ class Controller extends Base
             'template' => '@standardisedTest/PAT/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -266,7 +266,7 @@ class Controller extends Base
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_PAT_KEY
                 ],
 
@@ -323,7 +323,7 @@ class Controller extends Base
             'template' => '@standardisedTest/STAR/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -331,7 +331,7 @@ class Controller extends Base
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_STAR_KEY
                 ],
 
@@ -372,7 +372,7 @@ class Controller extends Base
             'template' => '@standardisedTest/Reading/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -380,7 +380,7 @@ class Controller extends Base
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_READING_KEY
                 ],
 
@@ -416,7 +416,7 @@ class Controller extends Base
             'template' => '@standardisedTest/Writing/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -424,7 +424,7 @@ class Controller extends Base
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_WRITING_KEY
                 ],
 
@@ -460,7 +460,7 @@ class Controller extends Base
             'template' => '@standardisedTest/Mathematics/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -468,7 +468,7 @@ class Controller extends Base
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_MATHEMATICS_KEY
                 ],
 
@@ -513,7 +513,7 @@ class Controller extends Base
             'template' => '@standardisedTest/LiteracyNumeracy/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -521,7 +521,7 @@ class Controller extends Base
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_LITERACYNUMERACY_KEY
                 ],
 
@@ -553,7 +553,7 @@ class Controller extends Base
             'template' => '@schoolGrades/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::SCHOOLGRADES_KEY
                 ],
                 'footer' => [
@@ -616,7 +616,7 @@ class Controller extends Base
             'template' => '@ib/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::IB_KEY
                 ],
 
@@ -661,7 +661,7 @@ class Controller extends Base
             'template' => '@ncea/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::NCEA_KEY
                 ],
                 'footer' => [
@@ -797,7 +797,7 @@ class Controller extends Base
             'template' => '@comments/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::COMMENTS_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -832,7 +832,7 @@ class Controller extends Base
             'template' => '@coCurricular/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::COCURRICULAR_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -881,7 +881,7 @@ class Controller extends Base
             'template' => '@myp/index.twig',
             'data'     => [
                 'navigation'   => [
-                    'all'      => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all'      => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::MYP_KEY,
                 ],
                 'externalUser' => $externalUser,

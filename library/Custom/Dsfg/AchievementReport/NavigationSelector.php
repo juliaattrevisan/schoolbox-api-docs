@@ -10,7 +10,7 @@ namespace Custom\Dsfg\AchievementReport;
 
 use Alaress\Database\Connector\IConnector;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\User;
 
 /**
@@ -60,9 +60,9 @@ class NavigationSelector
 
 
     /**
-     * @var Router
+     * @var Generator
      */
-    private $router;
+    private $routeGenerator;
 
 
     /**
@@ -84,17 +84,17 @@ class NavigationSelector
     /**
      * NavigationSelector constructor.
      *
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param User       $user
      * @param array      $externalUser
      * @param IConnector $db
      * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function __construct(Router $router, User $user, array $externalUser, IConnector $db, ?int $year)
+    public function __construct(Generator $routeGenerator, User $user, array $externalUser, IConnector $db, ?int $year)
     {
-        $this->router = $router;
-        $this->user = $user;
+        $this->routeGenerator = $routeGenerator;
+        $this->user           = $user;
         $this->externalUser = $externalUser;
         $this->db = $db;
         $this->year = $year;
@@ -165,7 +165,7 @@ class NavigationSelector
 
         if ($this->hasMYP()) {
             $availableNavigation[self::MYP_KEY] = [
-                'url' => $this->router->generate('achievementreport.getMyp', [
+                'url' => $this->routeGenerator->generate('achievementreport.getMyp', [
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'MYP',
@@ -176,7 +176,7 @@ class NavigationSelector
          */
         if ($this->hasNcea()) {
             $availableNavigation[self::NCEA_KEY] = [
-                'url' => $this->router->generate('achievementreport.getNcea', [
+                'url' => $this->routeGenerator->generate('achievementreport.getNcea', [
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'NCEA'
@@ -187,7 +187,7 @@ class NavigationSelector
          */
         if ($this->hasIb()) {
             $availableNavigation[self::IB_KEY] = [
-                'url' => $this->router->generate('achievementreport.getIb', [
+                'url' => $this->routeGenerator->generate('achievementreport.getIb', [
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'IB'
@@ -198,7 +198,7 @@ class NavigationSelector
          */
         if ($this->hasSchoolGrades()) {
             $availableNavigation[self::SCHOOLGRADES_KEY] = [
-                'url' => $this->router->generate('achievementreport.getSchoolGrades', [
+                'url' => $this->routeGenerator->generate('achievementreport.getSchoolGrades', [
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'School Grades'
@@ -208,7 +208,7 @@ class NavigationSelector
         /* Conditionally add Standardised Test option
          */
         $availableNavigation[self::STANDARDISEDTEST_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTests', [
+            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTests', [
                 'externalUserId' => $this->externalUser['StudentID'],
             ]),
             'label' => 'Standardised Tests'
@@ -218,7 +218,7 @@ class NavigationSelector
          */
         if ($this->hasComments()) {
             $availableNavigation[self::COMMENTS_KEY] = [
-                'url' => $this->router->generate('achievementreport.getComments', [
+                'url' => $this->routeGenerator->generate('achievementreport.getComments', [
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'Comments'
@@ -237,7 +237,7 @@ class NavigationSelector
          */
         if ($this->hasCoCurricular()) {
             $availableNavigation[self::COCURRICULAR_KEY] = [
-                'url' => $this->router->generate('achievementreport.getCoCurricular', [
+                'url' => $this->routeGenerator->generate('achievementreport.getCoCurricular', [
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'Co-Curricular'
