@@ -218,12 +218,12 @@ class Controller extends Base
         */
         $carousel = $blindMode ?
             (new StudentCarousel\Blind(
-                $this->getRouter(),
+                $this->getRouteGenerator(),
                 $participant->getUser(),
                 $assessment
             )) :
             (new StudentCarousel\Standard(
-                $this->getRouter(),
+                $this->getRouteGenerator(),
                 $participant->getUser(),
                 $assessment
             ));

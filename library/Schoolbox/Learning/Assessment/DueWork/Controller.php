@@ -257,7 +257,7 @@ class Controller extends Assessment\Controller
             /* Find the first valid Blind Review url
              */
             'blindReviewUrl'    => (new StudentCarousel\Blind(
-                $this->getRouter(),
+                $this->getRouteGenerator(),
                 null,
                 $assessment
             ))->getFirstUrl(),

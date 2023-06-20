@@ -155,7 +155,7 @@ class ListController extends Web\Controller\Base
         $sebPayload = new SebPayload(
             $this->getConfigLoader(),
             $this->getRequest()->server->get('HTTP_HOST'),
-            $this->router
+            $this->routeGenerator
         );
 
         $contents = $sebPayload->generate($assessment, $this->getUser());
@@ -210,7 +210,7 @@ class ListController extends Web\Controller\Base
             (new SebPayload(
                 $this->getConfigLoader(),
                 $this->request->server->get('HTTP_HOST'),
-                $this->router
+                $this->routeGenerator
             ))->generateConfigKey($assessment, $this->getUser()),
             $this->session->get(Payload::SEB_KEY)
         );
