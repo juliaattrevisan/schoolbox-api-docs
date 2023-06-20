@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Students;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress_Date_Format;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use External_ClassInterface;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception;
@@ -45,8 +45,8 @@ class StudentLists
     /** Viewer */
     private User $viewer;
 
-    /** @var Router */
-    private $router;
+    /** @var Generator */
+    private $routeGenerator;
 
     /** @var bool */
     private $pastoralIsEnabled;
@@ -75,7 +75,7 @@ class StudentLists
      * @param User                    $viewer
      * @param LogMapper               $logMapper
      * @param Authorizer              $authorizer
-     * @param Router                  $router
+     * @param Generator               $routeGenerator
      * @param bool                    $pastoralIsEnabled
      * @param bool                    $lmsIsEnabled
      * @param bool                    $mailIsEnabled
@@ -89,7 +89,7 @@ class StudentLists
         User $viewer,
         LogMapper $logMapper,
         Authorizer $authorizer,
-        Router $router,
+        Generator $routeGenerator,
         bool $pastoralIsEnabled,
         bool $lmsIsEnabled,
         bool $mailIsEnabled,
@@ -101,7 +101,7 @@ class StudentLists
         $this->logMapper         = $logMapper;
         $this->folder            = $folder;
         $this->viewer            = $viewer;
-        $this->router            = $router;
+        $this->routeGenerator    = $routeGenerator;
         $this->pastoralIsEnabled = $pastoralIsEnabled && $viewer->isStaffWithPastoralAccess();
         $this->lmsIsEnabled      = $lmsIsEnabled;
         $this->mailIsEnabled     = $mailIsEnabled;
@@ -189,7 +189,7 @@ class StudentLists
             if ($canViewUpcomingAssessments) {
                 $studentSisRecord['routes']['dueWork'] = [
                     'label' => $this->rosettaStone->translate('dueWork', false, true),
-                    'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
+                    'href'  => $this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
                     'class' => 'icon-due-work',
                     'title' => '',
                 ];
@@ -200,7 +200,7 @@ class StudentLists
             if ($canViewGrades) {
                 $studentSisRecord['routes']['grades'] = [
                     'label' => $this->rosettaStone->translate('grades', true, true),
-                    'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
+                    'href'  => $this->routeGenerator->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
                     'class' => 'icon-approve',
                     'title' => '',
                 ];
@@ -221,7 +221,7 @@ class StudentLists
         if ($this->pastoralIsEnabled) {
             $studentSisRecord['routes']['pastoral'] = [
                 'label' => $this->rosettaStone->translate('pastoralCare', false, true),
-                'href'  => $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
+                'href'  => $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
                 'class' => 'icon-pastoral',
                 'title' => '',
             ];
@@ -237,7 +237,7 @@ class StudentLists
         if ($canAccessCalendar) {
             $studentSisRecord['routes']['calendar'] = [
                 'label' => $this->rosettaStone->translate('calendar', false, true),
-                'href'  => $this->router->generate('calendar.getCalendar', $routeParams),
+                'href'  => $this->routeGenerator->generate('calendar.getCalendar', $routeParams),
                 'class' => 'icon-calendar',
                 'title' => '',
             ];

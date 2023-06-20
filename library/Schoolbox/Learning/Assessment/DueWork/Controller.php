@@ -1699,7 +1699,7 @@ class Controller extends Assessment\Controller
      */
     public function getSimilarityReportPayload(IAssessable $assessment): void
     {
-        $payload = (new Turnitin\SimilarityReportPayload($this->turnitinFileMapper, $this->getUserMapper(), $this->router))
+        $payload = (new Turnitin\SimilarityReportPayload($this->turnitinFileMapper, $this->getUserMapper(), $this->routeGenerator))
             ->generate($assessment);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));

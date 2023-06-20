@@ -351,7 +351,7 @@ class Controller extends Base
             $this->getUser(),
             $this->logMapper,
             $this->getAuthorizer(),
-            $this->getRouter(),
+            $this->routeGenerator,
             $this->getConfigLoader()->get('pastoral_enabled'),
             $this->getConfigLoader()->get('lms_enabled'),
             $this->getConfigLoader()->get('mail_enable'),

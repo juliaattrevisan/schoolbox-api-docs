@@ -290,7 +290,7 @@ class Controller extends BaseController
             new LaunchFactory(
                 $this->registrations,
                 $this->access,
-                $this->router,
+                $this->routeGenerator,
                 $this->instance,
                 $this->getConfigLoader(),
                 $this->userCodec,

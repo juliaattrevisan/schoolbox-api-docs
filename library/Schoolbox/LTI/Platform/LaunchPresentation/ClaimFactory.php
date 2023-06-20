@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform\LaunchPresentation;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Learning\Assessment\Lti\Model;
@@ -24,14 +24,14 @@ class ClaimFactory
     /**
      * Constructor
      *
-     * @param Access       $access   Used to determine whether a user has instructor access to an assessment's folder.
-     * @param UriInterface $baseUrl  Base URL for this instance.
-     * @param Router       $router   Used to build a path to a return URL.
+     * @param Access       $access         Used to determine whether a user has instructor access to an assessment's folder.
+     * @param UriInterface $baseUrl        Base URL for this instance.
+     * @param Generator    $routeGenerator Used to build a path to a return URL.
      */
     public function __construct(
         private Access $access,
         private UriInterface $baseUrl,
-        private Router $router,
+        private Generator $routeGenerator,
     ) {
     }
 
@@ -51,14 +51,14 @@ class ClaimFactory
     public function buildForAssessmentAndUser(Model $assessment, User $user, ?int $height): LaunchPresentationClaim
     {
         $returnUrl = $this->access->isInstructor($user, $assessment->getBaseContext()->getFolder())
-            ? $this->router->generate(
+            ? $this->routeGenerator->generate(
                 'learningAssessment.getLaunchAssessmentAsInstructorReturn',
                 [
                     'assessmentId' => $assessment->getId(),
                     'target'       => $assessment->getLtiTool()->getTarget(),
                 ]
             )
-            : $this->router->generate(
+            : $this->routeGenerator->generate(
                 'learningAssessment.getLaunchAssessmentAsStudentReturn',
                 [
                     'assessmentId' => $assessment->getId(),

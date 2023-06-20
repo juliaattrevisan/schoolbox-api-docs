@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\UserMapper;
 
@@ -41,9 +41,9 @@ class SimilarityReportPayload
     private UserMapper $userMapper;
 
     /**
-     * @var Router
+     * @var Generator
      */
-    protected Router $router;
+    protected Generator $routeGenerator;
 
 
     /**
@@ -51,13 +51,13 @@ class SimilarityReportPayload
      *
      * @param File\Mapper $turnitinFileMapper
      * @param UserMapper  $userMapper
-     * @param Router      $router
+     * @param Generator   $routeGenerator
      */
-    public function __construct(File\Mapper $turnitinFileMapper, UserMapper $userMapper, Router $router)
+    public function __construct(File\Mapper $turnitinFileMapper, UserMapper $userMapper, Generator $routeGenerator)
     {
         $this->turnitinFileMapper = $turnitinFileMapper;
         $this->userMapper = $userMapper;
-        $this->router = $router;
+        $this->routeGenerator = $routeGenerator;
     }
 
 
@@ -92,14 +92,14 @@ class SimilarityReportPayload
         /* Find the routes for each file's Inline Grader and Turnitin Reports
          */
         foreach ($payload as $userId => &$data) {
-            $data['submission']['_links']['inline_grader'] = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+            $data['submission']['_links']['inline_grader'] = $this->routeGenerator->generate('learningDueWorkResponse.getParticularResponse', [
                 'assessmentId' => $assessment->getId(),
                 'assessment' => $assessment,
                 'studentId' => $userId
             ]);
 
             foreach ($data['files'] as &$file) {
-                $file['_links']['turnitin_report'] = $this->router->generate('learningDueWorkResponse.getTurnitinReport', [
+                $file['_links']['turnitin_report'] = $this->routeGenerator->generate('learningDueWorkResponse.getTurnitinReport', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'responseId' => $data['submission']['id'],

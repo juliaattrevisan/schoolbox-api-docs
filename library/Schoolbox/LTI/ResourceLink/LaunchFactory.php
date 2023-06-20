@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\ResourceLink;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
@@ -54,7 +54,7 @@ class LaunchFactory
     /**
      * Router: used to build links to other content.
      */
-    private Router $router;
+    private Generator $routeGenerator;
 
     /**
      * Schoolbox instance data: used to build the platform instance claim.
@@ -77,7 +77,7 @@ class LaunchFactory
      *
      * @param RegistrationRepositoryInterface $registrations
      * @param Access                          $access
-     * @param Router                          $router
+     * @param Generator                       $routeGenerator
      * @param Instance                        $instance
      * @param IConfigLoader                   $config
      * @param UserCodec                       $userCodec
@@ -85,17 +85,17 @@ class LaunchFactory
     public function __construct(
         RegistrationRepositoryInterface $registrations,
         Access $access,
-        Router $router,
+        Generator $routeGenerator,
         Instance $instance,
         IConfigLoader $config,
         UserCodec $userCodec
     ) {
-        $this->access        = $access;
-        $this->router        = $router;
-        $this->registrations = $registrations;
-        $this->instance      = $instance;
-        $this->userCodec     = $userCodec;
-        $this->config        = $config;
+        $this->access         = $access;
+        $this->routeGenerator = $routeGenerator;
+        $this->registrations  = $registrations;
+        $this->instance       = $instance;
+        $this->userCodec      = $userCodec;
+        $this->config         = $config;
     }
 
     /**
@@ -181,7 +181,7 @@ class LaunchFactory
 
         // LaunchPresentationClaim:
         // talk about how the resource link will be presented
-        $launchPresentationClaim = (new LaunchPresentationClaimFactory($this->access, $baseUrl, $this->router))
+        $launchPresentationClaim = (new LaunchPresentationClaimFactory($this->access, $baseUrl, $this->routeGenerator))
             ->buildForAssessmentAndUser($assessment, $actingUser, $height);
         $additionalClaims[]      = $launchPresentationClaim;
 
@@ -220,7 +220,7 @@ class LaunchFactory
             null,
             (string)(clone $baseUrl)
                 ->withPath(
-                    $this->router->generate(
+                    $this->routeGenerator->generate(
                         'ltiPlatformLineItem.getLineItemForAssessment',
                         ['assessmentId' => $assessment->getId()]
                     )
@@ -232,7 +232,7 @@ class LaunchFactory
         $additionalClaims[] = new NrpsClaim(
             (string)(clone $baseUrl)
                 ->withPath(
-                    $this->router->generate(
+                    $this->routeGenerator->generate(
                         'ltiPlatformContext.getMembershipsForFolder',
                         ['folderId' => $assessment->getBaseContext()->getFolder()->getId()]
                     )
