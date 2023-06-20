@@ -186,6 +186,6 @@ class Controller extends Base
                     ->sortBy('lowerBound', 'asc')
             );
         }
-        return $gradeLevelGroups->map(new Translator\GradeGroup($this->router, $this->authorizer, $this->getUser()));
+        return $gradeLevelGroups->map(new Translator\GradeGroup($this->routeGenerator, $this->authorizer, $this->getUser()));
     }
 }
