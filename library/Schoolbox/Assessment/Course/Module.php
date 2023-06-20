@@ -125,6 +125,7 @@ class Module extends BaseModule
         $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourseSpec);
         $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourseSpec);
         $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnitSpec);
+        $this->register('GET', '/unitspecs/{id}/import', 'importUnitSpecification', null, $preloadUnitSpec);
         $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnitSpec);
         $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnitImpl);
     }

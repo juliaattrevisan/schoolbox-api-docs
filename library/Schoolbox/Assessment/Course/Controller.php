@@ -1229,6 +1229,36 @@ class Controller extends Base\Base
 
 
     /**
+     * Import a unit specification.
+     *
+     * Does not delete the folder the UnitSpec is linked to.
+     * (Essentially we are converting a Unit back to a Folder)
+     *
+     * @api   POST /course/unitspecs/{id}/import
+     * @since 230
+     *
+     * @param UnitSpecification $unitSpec The unit spec to import
+     * @throws Base\Exception
+     * @throws MapperException
+     */
+    public function importUnitSpecification(UnitSpecification $unitSpec)
+    {
+        // Does this Course exist ?
+        if (!$unitSpec->getId()) {
+            $this->sendError('Unit not found');
+            return;
+        }
+
+        if ($unitSpec->isDeleted()) {
+            $this->getResponse()->status->set(410);
+        }
+
+        echo "TODO: Implement this function.";
+        die;
+    }
+
+
+    /**
      * Delete a unit specification.
      *
      * Does not delete the folder the UnitSpec is linked to.
