@@ -73,6 +73,12 @@ class Module extends BaseModule
         $this->register('GET', $route, 'getExportForm', $canExport, $preloadAssessment);
         $this->register('GET', '/assessment/csv', 'getCSV', $isSuperuser);
         $this->register('POST', $route, 'postExport', $canExport, $preloadAssessment);
+
+        // register the routes
+        $routeForUnit = '/unit/{unitSpecId:\d+}';
+        $this->register('GET', $routeForUnit, 'getExportFormForUnit', $canExport, $preloadAssessment);
+        $this->register('GET', '/unit/csv', 'getCSVForUnit', $isSuperuser);
+        $this->register('POST', $routeForUnit, 'postExportForUnit', $canExport, $preloadAssessment);
     }
 
 
