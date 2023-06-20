@@ -179,7 +179,7 @@ if (strlen($keyword) > 1 && strlen($keyword) < 64 && (strlen($groupID) || strlen
                     'last_name' => $user['lastname'],
                     'full_name' => $fullName,
                     'role' => $user['gname'],
-                    'role_id' => $user['gid'],
+                    'role_id' => (int)$user['gid'],
                     'roleType' => $user['gtype'],
                     'external_id' => $user['synergy_id'],
                 ];
