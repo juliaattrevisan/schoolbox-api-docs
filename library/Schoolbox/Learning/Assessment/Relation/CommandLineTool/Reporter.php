@@ -59,9 +59,8 @@ class Reporter extends App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        $db           = $this->getDatabaseInternal();
-        $logger       = $this->getLogger();
-        $hasDataIssue = false;
+        $db     = $this->getDatabaseInternal();
+        $logger = $this->getLogger();
 
         // Collect expected rows
         $logger->notice('Fetching expected mv_assessment_relation data...');
@@ -80,13 +79,14 @@ class Reporter extends App
         $actualData = $selectActualDataQuery->fetchAll();
         $logger->info(sprintf('Fetched actual data: %d rows', count($actualData)));
 
+        $keyedExpectedData = $this->groupDataByKey($expectedData);
+        $keyedActualData   = $this->groupDataByKey($actualData);
+
         // Report on duplicates (both expected and actual)
-        $this->reportOnDuplicates($expectedData, 'expected');
-        $this->reportOnDuplicates($actualData, 'actual');
+        $this->reportOnDuplicates($keyedExpectedData, 'expected');
+        $this->reportOnDuplicates($keyedActualData, 'actual');
 
         // Report on data expected but not actual, and vice versa
-        $keyedExpectedData       = $this->groupDataByKey($expectedData);
-        $keyedActualData         = $this->groupDataByKey($actualData);
         $expectedRowsNotInActual = $this->reportOnMissingData(
             $keyedExpectedData,
             'expected',
@@ -157,14 +157,14 @@ HELP;
     /**
      * Report on duplicates in data.
      *
-     * @param array  $data
+     * @param array  $keyedData
      * @param string $type
      * @return void Duplicates in data aren't yet considered a problem
      */
-    private function reportOnDuplicates(array $data, string $type): void
+    private function reportOnDuplicates(array $keyedData, string $type): void
     {
         $logger     = $this->getLogger();
-        $duplicates = $this->findDuplicateAssessments($data);
+        $duplicates = $this->findDuplicateAssessments($keyedData);
         if (count($duplicates)) {
             $logger->warning(
                 sprintf(
@@ -182,15 +182,12 @@ HELP;
     /**
      * Finds duplicate assessment IDs in data.
      *
-     * @param array $data
+     * @param array $keyedData
      * @return array
      */
-    private function findDuplicateAssessments(array $data): array
+    private function findDuplicateAssessments(array $keyedData): array
     {
-        return array_filter(
-            array_count_values(array_column($data, 'assessment_id')),
-            fn($v) => $v > 1,
-        );
+        return array_filter($keyedData, fn($v) => count($v) > 1);
     }
 
     /**
