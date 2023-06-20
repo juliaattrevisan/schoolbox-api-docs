@@ -600,7 +600,7 @@ class Controller extends ConfigController
         /* Generate a (warnings, reportConfigs) stack
          */
         $reportConfigs = (new Payload\Url(
-            $this->router,
+            $this->routeGenerator,
             $urlBase,
             $this->termMapper,
             $this->roleMapper,
@@ -714,7 +714,7 @@ class Controller extends ConfigController
          * Use it to find the start/end date span
          */
         $range = (new Payload\Url(
-            $this->router,
+            $this->routeGenerator,
             $urlBase,
             $this->termMapper,
             $this->roleMapper,
@@ -969,7 +969,7 @@ class Controller extends ConfigController
         /* Generate a (warnings, reportConfigs) stack
          */
         $reportConfigs = (new Payload\Url(
-            $this->router,
+            $this->routeGenerator,
             $urlBase,
             $this->termMapper,
             $this->roleMapper,

@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Json\Decorator\PropertyDecorator;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
@@ -28,7 +28,7 @@ class Factory
     /**
      * The router used to build links to evidence.
      */
-    private Router $router;
+    private Generator $routeGenerator;
 
 
     /**
@@ -63,20 +63,20 @@ class Factory
     /**
      * Constructor
      *
-     * @param Router          $router
+     * @param Generator       $routeGenerator
      * @param Authorizer      $authorizer
      * @param User            $user
      * @param CommentMapper   $commentMapper
      * @param PrefixGenerator $prefixGenerator
      */
     public function __construct(
-        Router $router,
+        Generator $routeGenerator,
         Authorizer $authorizer,
         User $user,
         CommentMapper $commentMapper,
         PrefixGenerator $prefixGenerator
     ) {
-        $this->router          = $router;
+        $this->routeGenerator  = $routeGenerator;
         $this->authorizer      = $authorizer;
         $this->user            = $user;
         $this->commentMapper   = $commentMapper;
@@ -100,12 +100,12 @@ class Factory
         );
 
         $linkTranslator = new Links(
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->user,
         );
 
-        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->user);
+        $linkDecorator     = new LinkDecorator($this->routeGenerator, $this->authorizer, $this->user);
         $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
         $commentTranslator = new Comments(
             $this->commentMapper,

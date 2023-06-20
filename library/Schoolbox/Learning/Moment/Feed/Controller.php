@@ -102,20 +102,20 @@ class Controller extends Base
         $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
         $translator      = new ModelToArray(
             (new EvidenceTranslatorFactory(
-                $this->router,
+                $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser(),
                 $this->commentMapper,
                 $prefixGenerator
             ))->buildWithComments(self::FEED_COMMENTS_PER_ITEM),
             (new BadgeAwardTranslatorFactory(
-                $this->router,
+                $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser(),
                 $prefixGenerator,
             ))->build(),
             (new DueWorkFeedbackTranslatorFactory(
-                $this->router,
+                $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser(),
             ))->build()

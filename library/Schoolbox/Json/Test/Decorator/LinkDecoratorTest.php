@@ -85,7 +85,7 @@ class LinkDecoratorTest extends TestCase
             ]
         ];
 
-        $dec = new LinkDecorator($this->router, $this->auth, null);
+        $dec = new LinkDecorator($this->routeGenerator, $this->auth, null);
 
         $actual = $dec->decorate([], $this->linkable);
 

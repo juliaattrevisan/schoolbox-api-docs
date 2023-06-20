@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Translator;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\API\Translator\AbstractLinks;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge;
@@ -35,18 +35,18 @@ class Links extends AbstractLinks
     /**
      * Constructor
      *
-     * @param Router          $router
+     * @param Generator       $routeGenerator
      * @param Authorizer      $authorizer
      * @param User            $currentUser
      * @param PrefixGenerator $prefixGenerator
      */
     public function __construct(
-        Router $router,
+        Generator $routeGenerator,
         Authorizer $authorizer,
         User $currentUser,
         PrefixGenerator $prefixGenerator
     ) {
-        parent::__construct($router, $authorizer, $currentUser);
+        parent::__construct($routeGenerator, $authorizer, $currentUser);
         $this->prefixGenerator = $prefixGenerator;
     }
 

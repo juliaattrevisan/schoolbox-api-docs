@@ -574,7 +574,7 @@ class Controller extends Base
                 'article'         => $article->jsonSerialize(
                     new PropertyDecorator(
                         $map,
-                        new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                        new LinkDecorator($this->routeGenerator, $this->authorizer, $this->getUser()),
                         new FileDecorator(new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())))
                     )
                 ),
@@ -859,7 +859,7 @@ class Controller extends Base
         $articles = $articles->jsonSerialize(
             new PropertyDecorator(
                 $map,
-                new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                new LinkDecorator($this->routeGenerator, $this->authorizer, $this->getUser()),
                 new BlurbDecorator(
                     $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                     $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
@@ -1209,7 +1209,7 @@ class Controller extends Base
         $articles = $articles->jsonSerialize(
             new PropertyDecorator(
                 $map,
-                new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                new LinkDecorator($this->routeGenerator, $this->authorizer, $this->getUser()),
                 new BlurbDecorator(
                     $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                     $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),

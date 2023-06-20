@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Translator;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\User;
 
 /**
@@ -22,12 +22,12 @@ abstract class AbstractLinks
     /**
      * Constructor
      *
-     * @param Router     $router
+     * @param Generator  $router
      * @param Authorizer $authorizer
      * @param User       $currentUser
      */
     public function __construct(
-        protected Router $router,
+        protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser
     ) {

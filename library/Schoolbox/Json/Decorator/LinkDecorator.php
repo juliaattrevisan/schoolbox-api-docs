@@ -11,7 +11,7 @@ namespace Schoolbox\Json\Decorator;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Json\Api\Link;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\User;
 
@@ -27,13 +27,13 @@ class LinkDecorator extends \Alaress\Json\Decorator\LinkDecorator
 
 
     /**
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $auth
      * @param null|User  $user
      */
-    public function __construct(Router $router, Authorizer $auth, ?User $user)
+    public function __construct(Generator $routeGenerator, Authorizer $auth, ?User $user)
     {
-        parent::__construct($router, $auth);
+        parent::__construct($routeGenerator, $auth);
         $this->user = $user;
     }
 
@@ -48,7 +48,7 @@ class LinkDecorator extends \Alaress\Json\Decorator\LinkDecorator
     {
         if ($link instanceof AuraLink) {
             // don't like instanceof checks, but sometimes it's all you can do
-            $link->configure($this->router, $this->auth, $this->user);
+            $link->configure($this->routeGenerator, $this->auth, $this->user);
         }
 
         return parent::parseLink($link);

@@ -12,7 +12,7 @@ namespace Schoolbox\Json\Api;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Json\Api\Link;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\User;
 
 class AuraLink implements Link
@@ -23,8 +23,8 @@ class AuraLink implements Link
     /** @var array */
     private $args;
 
-    /** @var Router */
-    private $router;
+    /** @var Generator */
+    private $routeGenerator;
 
     /** @var Authorizer */
     private $auth;
@@ -56,15 +56,15 @@ class AuraLink implements Link
     /**
      * Post-construction configuration
      *
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $authorizer
      * @param User|null  $user
      */
-    public function configure(Router $router, Authorizer $authorizer, ?User $user)
+    public function configure(Generator $routeGenerator, Authorizer $authorizer, ?User $user)
     {
-        $this->router = $router;
-        $this->auth   = $authorizer;
-        $this->user   = $user;
+        $this->routeGenerator = $routeGenerator;
+        $this->auth           = $authorizer;
+        $this->user           = $user;
     }
 
 
@@ -76,7 +76,7 @@ class AuraLink implements Link
      */
     public function getHref(): string
     {
-        return $this->router->generate($this->name, $this->args);
+        return $this->routeGenerator->generate($this->name, $this->args);
     }
 
 

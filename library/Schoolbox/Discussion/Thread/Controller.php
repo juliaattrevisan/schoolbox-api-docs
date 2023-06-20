@@ -262,7 +262,7 @@ class Controller extends BaseController
     private function retrieveLinkDecorator(): LinkDecorator
     {
         if (!$this->linkDecorator) {
-            $this->linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+            $this->linkDecorator = new LinkDecorator($this->routeGenerator, $this->authorizer, $this->getUser());
         }
         return $this->linkDecorator;
     }
