@@ -951,8 +951,7 @@ abstract class Kernel
             'templateEngine:routeLookup',
             $di->lazyNew(
                 TwigMethod\RouteLookup::class,
-                [],
-                ['setRouter' => $di->lazyGet('router')],
+                ['routeGenerator' => $di->lazyGet('router.generator')],
             )
         );
         $di->set(

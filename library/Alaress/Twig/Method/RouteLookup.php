@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Twig function for outputting a route.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -11,15 +8,21 @@
 namespace Alaress\Twig\Method;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 
+/**
+ * Twig function for outputting a route.
+ */
 class RouteLookup
 {
-
     /**
-     * @var Router
+     * Constructor
+     *
+     * @param Generator $routeGenerator
      */
-    protected $router;
+    public function __construct(private Generator $routeGenerator)
+    {
+    }
 
     /**
      * Performs a reverse lookup on the route given its name, and creates a URL.
@@ -36,27 +39,9 @@ class RouteLookup
         }
 
         try {
-            return $this->getRouter()->generate($name, $data);
+            return $this->routeGenerator->generate($name, $data);
         } catch (RouteNotFound $e) {
             return false;
         }
-    }
-
-    /**
-     * @param  Router $router
-     * @return $this
-     */
-    public function setRouter($router)
-    {
-        $this->router = $router;
-        return $this;
-    }
-
-    /**
-     * @return Router
-     */
-    public function getRouter()
-    {
-        return $this->router;
     }
 }
