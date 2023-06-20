@@ -205,9 +205,8 @@ class Calendar_Api_Factory
         $composite = new Calendar_Api_Composite();
         if (
             (new ValidUsesSudsTimetable())->isSatisfiedBy(
-                (string)$this->configLoader->get('external_liss_username'),
-                (string)$this->configLoader->get('external_liss_password'),
-                (string)$this->configLoader->get('schooldata_import_data_source')
+                (string)$this->configLoader->get('external_type'),
+                (string)$this->configLoader->get('schooldata_import_data_source'),
             )
         ) {
             $composite->add(

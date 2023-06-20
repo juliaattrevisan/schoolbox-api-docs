@@ -17,7 +17,6 @@ use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use SensitiveParameter;
@@ -85,6 +84,7 @@ class Receiver
      * Constructor.
      *
      * @param int                                      $externalEnable    Whether the external db was enabled
+     * @param string                                   $externalType      Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
      * @param string                                   $username          LISS username, as per config
      * @param string                                   $password          LISS password, as per config
      * @param string                                   $exclusionList     A csv list of event types that we should skip
@@ -97,6 +97,7 @@ class Receiver
      */
     public function __construct(
         private int $externalEnable,
+        private string $externalType,
         private string $username,
         #[SensitiveParameter] private string $password,
         private string $exclusionList,
@@ -155,10 +156,6 @@ class Receiver
                 'function' => [$this, 'publishDailyData'],
             ],
 
-            'liss.publishClassMemberships' => [
-                'function' => [$this, 'publishClassMemberships'],
-            ],
-
             /* All these ones fulfil a cyclic timetable afaict
              * We don't need them
              *
@@ -169,6 +166,9 @@ class Receiver
             ],
             'liss.publishClasses' => [
                 'function' => [$this, 'publishClasses'],
+            ],
+            'liss.publishClassMemberships' => [
+                'function' => [$this, 'publishClassMemberships'],
             ],
             'liss.publishBellTimes' => [
                 'function' => [$this, 'publishBellTimes'],
@@ -206,7 +206,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -239,56 +239,6 @@ class Receiver
         $this->transact($this->importLogMapper->getDatabase(), $composites);
 
         return $this->generateResponse('publishDailyData finished.');
-    }
-
-
-    /**
-     * Publish students to the Schoolbox
-     *
-     * @param Request $message
-     * @return Response
-     * @throws Exception
-     * @throws \JsonException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     */
-    public function publishClassMemberships(Request $message): Response
-    {
-        /* Requires schoolbox connector
-         */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
-            return $this->generateResponse(self::AUTHENTICATION_FAILED);
-        }
-
-        /* Cache locally whatever liss sent to us
-         * This allows you to replay locally
-         */
-        if ($this->storageLogging) {
-            $this->log()->debug('Logging LISS payload to local storage');
-
-            (new PayloadCache($this->storageMapper))->cache('classmemberships', $this->superuser, $message);
-        }
-
-        /* This is the equivalent of a combined Scheduler.php and Factory.php
-         * since the liss receiver immediately processes upon receiving data
-         *
-         * Since we are receiving a push from schools,
-         * we are always in Perform mode
-         */
-        $composites = (new GenericCollection(IStrategy::class))
-            ->add(new TimetableCalendar\ClassMemberships(
-                $this->log(),
-                true,
-                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
-                $message
-            ));
-
-        /* Shank a database instance
-         */
-        $this->transact($this->importLogMapper->getDatabase(), $composites);
-
-        return $this->generateResponse('publishClassMemberships finished.');
     }
 
 
@@ -405,11 +355,29 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
         return $this->generateResponse('getRooms finished but unused.');
+    }
+
+
+    /**
+     * Publish students to the Schoolbox
+     *
+     * @param Request $message
+     * @return Response
+     */
+    public function publishClassMemberships(Request $message): Response
+    {
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        return $this->generateResponse('publishClassMemberships finished but unused.');
     }
 
 
@@ -423,7 +391,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -441,7 +409,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -459,7 +427,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -477,7 +445,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -495,7 +463,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -513,7 +481,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -531,7 +499,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
