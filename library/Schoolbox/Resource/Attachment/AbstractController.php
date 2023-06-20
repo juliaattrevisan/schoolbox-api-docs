@@ -35,7 +35,7 @@ abstract class AbstractController implements ControllerInterface
     /**
      * The template which this controller uses.
      */
-    private string $template;
+    protected string $template = '';
 
     /**
      * @param bool   $multi
