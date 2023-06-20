@@ -70,39 +70,47 @@ class Reporter extends App
             . Reloader::SELECT_ASSESSMENT_RELATION_SQL,
         );
         $selectExpectedDataQuery->execute();
-        $expectedData = $selectExpectedDataQuery->fetchRowArray('assessment_id');
+        $expectedData = $selectExpectedDataQuery->fetchAll();
         $logger->info(sprintf('Fetched expected data: %d rows', count($expectedData)));
 
         // Collect actual rows
         $logger->info('Fetching actual mv_assessment_relation data...');
         $selectActualDataQuery = $db->prepareQuery('SELECT * FROM mv_assessment_relation');
         $selectActualDataQuery->execute();
-        $actualData = $selectActualDataQuery->fetchRowArray('assessment_id');
+        $actualData = $selectActualDataQuery->fetchAll();
         $logger->info(sprintf('Fetched actual data: %d rows', count($actualData)));
 
+        // Report on duplicates (both expected and actual)
+
         // Report on data expected but not actual
-        $expectedRowsNotInActual = array_diff_key($expectedData, $actualData);
+        $expectedRowsNotInActual = array_diff($expectedData, $actualData);
         if (count($expectedRowsNotInActual)) {
             $logger->warning(
                 sprintf(
-                    '%d expected assessments not found in actual: %s',
+                    '%d expected rows not found in actual for assessments: %s',
                     count($expectedRowsNotInActual),
-                    implode(',', array_keys($expectedRowsNotInActual)),
+                    implode(
+                        ',',
+                        array_unique(array_column($expectedRowsNotInActual, 'assessment_id')),
+                    ),
                 )
             );
             $hasDataIssue = true;
         } else {
-            $logger->notice('No expected assessments not found in actual assessments.');
+            $logger->notice('No expected rows not found in actual assessments.');
         }
 
         // Report on actual but unexpected data
-        $actualRowsNotInExpected = array_diff_key($actualData, $expectedData);
+        $actualRowsNotInExpected = array_diff($actualData, $expectedData);
         if (count($actualRowsNotInExpected)) {
             $logger->warning(
                 sprintf(
-                    '%d actual assessments not found in expected: %s',
+                    '%d actual assessments not found in expected for assessments: %s',
                     count($actualRowsNotInExpected),
-                    implode(',', array_keys($actualRowsNotInExpected)),
+                    implode(
+                        ',',
+                        array_unique(array_column($actualRowsNotInExpected, 'assessment_id')),
+                    ),
                 )
             );
             $hasDataIssue = true;
