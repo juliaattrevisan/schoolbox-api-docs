@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Navigation;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 
 /**
  * Interface INavigation
@@ -20,22 +20,21 @@ use Aura\Router\Router;
  */
 interface INavigation
 {
-
     /**
      * Builds breadcrumbs for this page.
      *
-     * @param Router $router
+     * @param Generator $router
      * @return mixed
      */
-    public function buildBreadcrumbs(Router $router);
+    public function buildBreadcrumbs(Generator $routeGenerator);
 
 
     /**
      * Builds navigation for this page.
      *
-     * @param Router $router
-     * @param string $currentPage
+     * @param Generator $router
+     * @param string    $currentPage
      * @return mixed
      */
-    public function buildNavigation(Router $router, string $currentPage = '');
+    public function buildNavigation(Generator $routeGenerator, string $currentPage = '');
 }

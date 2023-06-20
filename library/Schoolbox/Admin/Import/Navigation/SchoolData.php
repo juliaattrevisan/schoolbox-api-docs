@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Navigation;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 
@@ -22,19 +22,18 @@ use Schoolbox\Sync\Navigator\Node;
  */
 class SchoolData implements INavigation
 {
-
     /**
      * Builds breadcrumbs for the Direct Import page.
      *
-     * @param Router $router
+     * @param Generator $routeGenerator
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function buildBreadcrumbs(Router $router): array
+    public function buildBreadcrumbs(Generator $routeGenerator): array
     {
         return [
             ['Administration', '/adminv2/home'],
-            ['School Data Import', $router->generate('adminImportIndex.getSchoolDataIndex')],
+            ['School Data Import', $routeGenerator->generate('adminImportIndex.getSchoolDataIndex')],
         ];
     }
 
@@ -42,33 +41,33 @@ class SchoolData implements INavigation
     /**
      * Builds navigation for this page.
      *
-     * @param Router $router
-     * @param string $currentPage
+     * @param Generator $routeGenerator
+     * @param string    $currentPage
      * @return Navigator
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \ReflectionException
      */
-    public function buildNavigation(Router $router, string $currentPage = ''): Navigator
+    public function buildNavigation(Generator $routeGenerator, string $currentPage = ''): Navigator
     {
         $args = [
             new Node(
                 'User Profiles',
-                $router->generate('adminImportProfile.getIndex'),
+                $routeGenerator->generate('adminImportProfile.getIndex'),
                 $currentPage === 'adminImportProfile'
             ),
             new Node(
                 'Timetable Structure',
-                $router->generate('adminImportTimetableStructure.getUpload'),
+                $routeGenerator->generate('adminImportTimetableStructure.getUpload'),
                 $currentPage === 'adminImportTimetableStructure'
             ),
             new Node(
                 'Timetable',
-                $router->generate('adminImportTimetable.getUpload'),
+                $routeGenerator->generate('adminImportTimetable.getUpload'),
                 $currentPage === 'adminImportTimetable'
             ),
             new Node(
                 'Timetable Enrolment',
-                $router->generate('adminImportTimetableEnrolment.getUpload'),
+                $routeGenerator->generate('adminImportTimetableEnrolment.getUpload'),
                 $currentPage === 'adminImportTimetableEnrolment'
             ),
         ];

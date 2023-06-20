@@ -108,8 +108,8 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminImportProfile.getIndex'),
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
-            'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
+            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
+            'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
             'attachzone' => [
                 Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
                 Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
