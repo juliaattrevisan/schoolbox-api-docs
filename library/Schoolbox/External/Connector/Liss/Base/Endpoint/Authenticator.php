@@ -27,7 +27,7 @@ class Authenticator
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
-    private const EXTERNAL_DB_MESSAGE = 'External Database must be activated; exiting';
+    private const WRONG_CONNECTOR_MESSAGE = 'External Database must be activated and the selected connector must be schoolbox; exiting';
 
 
     /**
@@ -36,6 +36,15 @@ class Authenticator
      * @var int
      */
     private int $externalEnable;
+
+
+    /**
+     * Whether the external db is the "schoolbox" connector
+     * or something else (it only works with "schoolbox" connector)
+     *
+     * @var string
+     */
+    private string $externalType;
 
 
     /**
@@ -73,6 +82,7 @@ class Authenticator
      * Constructor.
      *
      * @param int             $externalEnable
+     * @param string          $externalType
      * @param string          $username
      * @param string          $password
      * @param LoggerInterface $log
@@ -80,12 +90,14 @@ class Authenticator
      */
     public function __construct(
         int $externalEnable,
+        string $externalType,
         string $username,
         #[SensitiveParameter] string $password,
         LoggerInterface $log,
         Value $dataObject
     ) {
         $this->externalEnable = $externalEnable;
+        $this->externalType = $externalType;
         $this->username = $username;
         $this->password = $password;
         $this->dataObject = $dataObject;
@@ -99,12 +111,13 @@ class Authenticator
      */
     public function isAuthenticated(): bool
     {
-        /* Must be using external database
+        /* Must be using external database and schoolbox connector
          */
         $externalEnable = (bool)$this->externalEnable;
+        $externalType = IConnector::EXTERNAL_TYPE_SCHOOLBOX === $this->externalType;
 
-        if (!$externalEnable) {
-            $this->log->info(self::EXTERNAL_DB_MESSAGE);
+        if (!($externalEnable && $externalType)) {
+            $this->log->info(self::WRONG_CONNECTOR_MESSAGE);
 
             return false;
         }

@@ -64,8 +64,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
          */
         if (
             (new ValidUsesSudsTimetable())->isSatisfiedBy(
-                (string)$this->getConfigLoader()->get('external_liss_username'),
-                (string)$this->getConfigLoader()->get('external_liss_password'),
+                (string)$this->getConfigLoader()->get('external_type'),
                 (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
             )
         ) {

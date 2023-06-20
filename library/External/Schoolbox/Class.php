@@ -163,7 +163,7 @@ class External_Schoolbox_Class implements External_ClassInterface
          */
         $config = \Schoolbox\Config\Loader::getInstance();
 
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('external_liss_username'), (string)$config->get('external_liss_password'), (string)$config->get('schooldata_import_data_source'))) {
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('external_type'), (string)$config->get('schooldata_import_data_source'))) {
             $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
             $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
 
