@@ -164,7 +164,7 @@ async function removeComponent(component, confirmDeleteButton) {
  */
 function getFormData(component) {
     const formData = new FormData();
-    formData.append(masonryConfig.settings.formData.pageType, masonryConfig.settings.formData.pageValue)
+    formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
     formData.append("delete", getComponentID(component));
     formData.append("component", component.querySelector("[data-defn-id]").value);
     return formData;

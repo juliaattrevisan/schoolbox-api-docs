@@ -63,14 +63,16 @@
         document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
             detail: {
                 settings: {
-                    allowEditing: true, // Whether the user has full edit control, or is read-only
+                    allowEditing: document.getElementById("component-lock-switch") ? true : false, // Whether the user has full edit control, or is read-only
                     existingComponentSelector: "[data-component]",
                     updateUrl: "/homepage/configForm.php",
                     // The backend for EPortfolios differs slightly to Homepages, so we need to
                     // pass in a different set of data for each type of page.
                     formData: {
-                        pageType: "cid",
-                        pageValue: "{ID}",
+                        pageInfo: {
+                            type: "cid",
+                            id: "{ID}",
+                        },
                         newComponentAddAttribute: "data-component-definition-id",
                     }
                 },
@@ -82,6 +84,13 @@
                 },
                 toggleLockComponents: {
                     selector: "#component-lock-switch input"
+                },
+                editColumns: {
+                    columnWidthSelector: '[data-interaction="column-width"]',
+                    leftContainerSelector: '[data-position="left"]',
+                    rightContainerSelector: '[data-position="right"]',
+                    colourPickersSelector: "[data-colorpicker]",
+                    colours: colours,
                 }
             }
         }));

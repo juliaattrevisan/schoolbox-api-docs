@@ -42,7 +42,7 @@ function getFormData(component) {
     formData.append("column3", getContainerComponentIDs(document.querySelector('[data-position="top"]'))); //top panel... I know right?!
     formData.append("movedComponentId", getComponentID(component));
     formData.append("type", "components");
-    formData.append(masonryConfig.settings.formData.pageType, masonryConfig.settings.formData.pageValue)
+    formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
     return formData;
 }
 

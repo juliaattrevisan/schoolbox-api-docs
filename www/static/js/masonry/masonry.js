@@ -17,7 +17,7 @@ document.addEventListener("MASONRY__CREATE", (e) => {
 
     if (masonryConfig.settings.allowEditing) {
         if (masonryConfig.toggleLockComponents) { initToggleLockComponents(); }
-        initEditColumns();
+        if (masonryConfig.editColumns) { initEditColumns() };
         initNewComponents();
         initUpdatePlaceHolders();
     }

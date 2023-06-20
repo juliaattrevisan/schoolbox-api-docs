@@ -60,15 +60,22 @@
                     allowEditing: true, // Whether the user has full edit control, or is read-only
                     existingComponentSelector: "[data-component]",
                     updateUrl: "/eportfolio/configForm.php",
-                    // The backend for EPortfolios differs slightly to Homepages, so we need to
-                    // pass in a different set of data for each type of page.
                     formData: {
-                        pageType: "page_id",
-                        pageValue: "{PAGE_ID}",
+                        pageInfo: {
+                            type: "page_id",
+                            id: "{PAGE_ID}",
+                        },
                         newComponentAddAttribute: "data-component-definition-id",
                         newComponentFromAttribute: "data-component-id",
                     }
                 },
+                editColumns: {
+                    columnWidthSelector: '[data-interaction="column-width"]',
+                    leftContainerSelector: '[data-position="left"]',
+                    rightContainerSelector: '[data-position="right"]',
+                    colourPickersSelector: "[data-colorpicker]",
+                    colours: colours,
+                }
             }
         }));
     });

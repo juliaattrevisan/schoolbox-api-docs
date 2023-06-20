@@ -30,7 +30,7 @@ export function initEditColumns() {
  */
 export function getFormData() {
     const formData = new FormData();
-    formData.append(masonryConfig.settings.formData.pageType, masonryConfig.settings.formData.pageValue)
+    formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
     appendWidth(formData);
     appendColours(formData);
     return formData;
