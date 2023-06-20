@@ -99,43 +99,17 @@ class Reporter extends App
             $keyedExpectedData,
             'expected',
         );
-        $hasDataIssue = count($expectedRowsNotInActual) > 0 || count($actualRowsNotInExpected) > 0;
 
-        // Report on differences
-        $differentRows = [];
-        $differ        = new Differ('expected', 'actual');
-        foreach ($actualData as $assessmentId => $actualAssessmentData) {
-            $expectedAssessmentData = $expectedData[$assessmentId] ?? null;
-            if (!isset($expectedAssessmentData)) {
-                continue;
-            }
-            if ($expectedAssessmentData !== $actualAssessmentData) {
-                $differentRows[] = $assessmentId;
-                $logger->debug(
-                    sprintf(
-                        "Assessment %d does not match:\nexpected: %s\nactual: %s\ndiff: %s",
-                        $assessmentId,
-                        json_encode($expectedAssessmentData),
-                        json_encode($actualAssessmentData),
-                        json_encode($differ->diff($expectedAssessmentData, $actualAssessmentData))
-                    )
-                );
-            }
-        }
-        if (count($differentRows)) {
-            $logger->warning(
-                sprintf(
-                    '%d assessments different in actual and expected: %s',
-                    count($differentRows),
-                    implode(',', $differentRows),
-                )
-            );
-            $hasDataIssue = true;
-        } else {
-            $logger->notice('No assessments different in actual and expected.');
-        }
+        // Report on differences between rows
+        $differentRows = $this->reportOnDifferences($keyedActualData, $keyedExpectedData);
 
         // Raise error code if there was any data difference
+        $hasDataIssue =
+            count($expectedRowsNotInActual) > 0
+            || count($actualRowsNotInExpected) > 0
+            || count($differentRows) > 0
+        ;
+
         exit($hasDataIssue ? CliKernelAbstract::EXIT_STATUS_APP_ERROR : CliKernelAbstract::EXIT_STATUS_OK);
     }
 
@@ -275,5 +249,51 @@ HELP;
             $returnData[$assessmentId][] = $row;
         }
         return $returnData;
+    }
+
+    /**
+     * Report on data for assessments existing in both `$keyedActualData` and
+     * `$keyedExpectedData`, but different.
+     *
+     * @param array $keyedActualData
+     * @param array $keyedExpectedData
+     * @return array list of assessment IDs in both `$keyedActualData` and
+     *               `$keyedExpectedData`, but with different values.
+     */
+    private function reportOnDifferences(array $keyedActualData, array $keyedExpectedData): array
+    {
+        $logger       = $this->getLogger();
+        $differentRows = [];
+        $differ        = new Differ('expected', 'actual');
+        foreach ($keyedActualData as $assessmentId => $actualAssessmentData) {
+            $expectedAssessmentData = $keyedExpectedData[$assessmentId] ?? null;
+            if (!isset($expectedAssessmentData)) {
+                continue;
+            }
+            if ($expectedAssessmentData !== $actualAssessmentData) {
+                $differentRows[] = $assessmentId;
+                $logger->debug(
+                    sprintf(
+                        "Assessment %d does not match:\nexpected: %s\nactual: %s\ndiff: %s",
+                        $assessmentId,
+                        json_encode($expectedAssessmentData),
+                        json_encode($actualAssessmentData),
+                        json_encode($differ->diff($expectedAssessmentData, $actualAssessmentData))
+                    )
+                );
+            }
+        }
+        if (count($differentRows)) {
+            $logger->warning(
+                sprintf(
+                    '%d assessments different in actual and expected: %s',
+                    count($differentRows),
+                    implode(',', $differentRows),
+                )
+            );
+        } else {
+            $logger->notice('No assessments different in actual and expected.');
+        }
+        return $differentRows;
     }
 }
