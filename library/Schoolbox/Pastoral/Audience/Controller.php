@@ -194,7 +194,7 @@ class Controller extends Base
         $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
         $flyout = (new Flyout(
             $this->getConfigLoader(),
-            new FlyoutNodes($this->router, $this->pastoralTypeMapper)
+            new FlyoutNodes($this->routeGenerator, $this->pastoralTypeMapper)
         ))->prefixBreadcrumbs([
             [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
             ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],

@@ -11,7 +11,7 @@ namespace Schoolbox\Pastoral\Count;
 
 use Alaress\Color\Color;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Audience\ColorHelper;
@@ -65,9 +65,9 @@ class Helper
     private $pastoralSubTypesWhitelist;
 
     /**
-     * @var Router
+     * @var Generator
      */
-    private Router $router;
+    private Generator $routeGenerator;
 
     /**
      * @var TermMapper
@@ -77,18 +77,18 @@ class Helper
     /**
      * helper to bundle similar counts related to pastoral events of students
      *
-     * @param Router                $router
+     * @param Generator             $routeGenerator
      * @param PastoralTypeMapper    $pastoralTypeMapper
      * @param PastoralSubTypeMapper $pastoralSubTypeMapper
      * @param PastoralDataSource    $pastoralDataSource
      * @param TermMapper            $termMapper
      */
-    public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource, TermMapper $termMapper)
+    public function __construct(Generator $routeGenerator, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource, TermMapper $termMapper)
     {
         $this->pastoralTypeMapper    = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper = $pastoralSubTypeMapper;
         $this->pastoralDataSource    = $pastoralDataSource;
-        $this->router                = $router;
+        $this->routeGenerator        = $routeGenerator;
         $this->colorHelper           = new ColorHelper();
         $this->termMapper            = $termMapper;
     }
@@ -306,7 +306,7 @@ class Helper
             /** @noinspection PhpUnhandledExceptionInspection */
             $destinationUrl = sprintf(
                 "%s?type=%s&subtype=%s",
-                $this->router->generate('pastoral.getStudent', ['studentId' => $student->getId()]),
+                $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $student->getId()]),
                 $studentCount->getOffset('typeId'),
                 $studentCount->getOffset('subtypeId')
             );
