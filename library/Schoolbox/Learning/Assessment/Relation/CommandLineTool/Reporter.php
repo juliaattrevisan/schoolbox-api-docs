@@ -81,9 +81,44 @@ class Reporter extends App
         $logger->info(sprintf('Fetched actual data: %d rows', count($actualData)));
 
         // Report on duplicates (both expected and actual)
+        $expectedDuplicates = array_filter(
+            array_count_values(array_column($expectedData, 'assessment_id')),
+            fn ($v) => $v > 1,
+        );
+        if (count($expectedDuplicates)) {
+            $logger->warning(
+                sprintf(
+                    '%d expected rows contain duplicates: %s',
+                    count($expectedDuplicates),
+                    implode(',', array_keys($expectedDuplicates)),
+                )
+            );
+        } else {
+            $logger->notice('No expected rows contain duplicates.');
+        }
+
+        $actualDuplicates = array_filter(
+            array_count_values(array_column($actualData, 'assessment_id')),
+            fn ($v) => $v > 1,
+        );
+        if (count($actualDuplicates)) {
+            $logger->warning(
+                sprintf(
+                    '%d actual rows contain duplicates: %s',
+                    count($actualDuplicates),
+                    implode(',', array_keys($actualDuplicates)),
+                )
+            );
+        } else {
+            $logger->notice('No actual rows contain duplicates.');
+        }
 
         // Report on data expected but not actual
-        $expectedRowsNotInActual = array_diff($expectedData, $actualData);
+        $expectedRowsNotInActual = array_udiff(
+            $expectedData,
+            $actualData,
+            fn ($a, $b) => $a === $b ? 0 : 1,
+        );
         if (count($expectedRowsNotInActual)) {
             $logger->warning(
                 sprintf(
@@ -101,7 +136,11 @@ class Reporter extends App
         }
 
         // Report on actual but unexpected data
-        $actualRowsNotInExpected = array_diff($actualData, $expectedData);
+        $actualRowsNotInExpected = array_udiff(
+            $actualData,
+            $expectedData,
+            fn ($a, $b) => $a === $b ? 0 : 1,
+        );
         if (count($actualRowsNotInExpected)) {
             $logger->warning(
                 sprintf(
