@@ -24,6 +24,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -160,6 +161,70 @@ class Controller extends BaseController
 
         $template = '@learningAssessmentExporter/export.twig';
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+    }
+
+
+    /**
+     * Get the form for exporting a single unitSpec.
+     *
+     * GET vars:
+     * * returnUrl: a URL to return to once done
+     *
+     * @api   GET /learning/export/unit/:unitSpecId
+     * @since 230
+     *
+     * @param UnitSpecificationModel $unitSpec UnitSpec
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function getExportFormForUnit(UnitSpecificationModel $unitSpec): void
+    {
+echo "In Exporter/Controller->getExportForm().  Success!\n";
+die;
+//        $unitSpecImpls = $this->buildImplementationsForSpecification($unitSpec);
+//
+//        $notImported = $unitSpecImpls->filter(function (IAssessable $unitSpecImpl) {
+//            return null === $unitSpecImpl->getId();
+//        })->sortByCallback(static function (IAssessable $a, IAssessable $b) {
+//            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+//        });
+//
+//        $imported    = $unitSpecImpls->filter(function (IAssessable $unitSpecImpl) {
+//            return $unitSpecImpl->getId();
+//        })->sortByCallback(static function (IAssessable $a, IAssessable $b) {
+//            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+//        });
+//
+//        // Find interactions with imported unitSpecs
+//        $unitSpecIds  = $imported->getPropertyValues('id');
+//        $responseCounts = $this->unitSpecDataSource->findResponseCountsForAssessments($unitSpecIds);
+//        $feedbackCounts = $this->unitSpecDataSource->findFeedbackCountsForAssessments($unitSpecIds);
+//
+//        $breadcrumbs = [
+//            ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
+//            [$unitSpec->getBaseContext()->getTitle(), '/homepage/' . $unitSpec->getBaseContext()->getFolder()->getId()],
+//        ];
+//        if ($unitSpec->getContext() instanceof Project) {
+//            $breadcrumbs[] = [$unitSpec->getContext()->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['unitSpecId' => $unitSpec->getContext()->getId()])];
+//        }
+//        $breadcrumbs[] = [$unitSpec->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['unitSpecId' => $unitSpec->getId()])];
+//        $breadcrumbs[] = ['Export', '#'];
+//
+//        $data = [
+//            'unitSpec'         => $unitSpec,
+//            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+//            'returnUrlName'    => Redirect::RETURN_URL,
+//            'unImported'       => $notImported,
+//            'imported'         => $imported,
+//            'folderWritePerms' => $this->buildFolderWritePermissions($unitSpecImpls),
+//            'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+//            'breadcrumbs'      => $breadcrumbs,
+//            'responseCounts'   => $responseCounts,
+//            'feedbackCounts'   => $feedbackCounts,
+//        ];
+//
+//        $template = '@learningAssessmentExporter/export.twig';
+//        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
 

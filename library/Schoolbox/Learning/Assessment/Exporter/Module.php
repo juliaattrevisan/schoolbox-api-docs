@@ -56,6 +56,9 @@ class Module extends BaseModule
         $preloadAssessment = function ($params) {
             return $this->preloadAssessment($params);
         };
+        $preloadUnitSpec = function ($params) {
+            return $this->preloadUnitSpec($params);
+        };
 
         // rules in use
         $isStaff = $this->getAuthRule('isStaffOrSuper');
@@ -68,6 +71,11 @@ class Module extends BaseModule
             new IsSpecification()
         );
 
+        $canExportForUnit = new Rule\All(
+            new Rule\IsLoggedIn(),
+            $isStaff
+        );
+
         // register the routes
         $route = '/assessment/{assessmentId:\d+}';
         $this->register('GET', $route, 'getExportForm', $canExport, $preloadAssessment);
@@ -76,9 +84,9 @@ class Module extends BaseModule
 
         // register the routes
         $routeForUnit = '/unit/{unitSpecId:\d+}';
-        $this->register('GET', $routeForUnit, 'getExportFormForUnit', $canExport, $preloadAssessment);
+        $this->register('GET', $routeForUnit, 'getExportFormForUnit', $canExportForUnit, $preloadUnitSpec);
         $this->register('GET', '/unit/csv', 'getCSVForUnit', $isSuperuser);
-        $this->register('POST', $routeForUnit, 'postExportForUnit', $canExport, $preloadAssessment);
+        $this->register('POST', $routeForUnit, 'postExportForUnit', $canExportForUnit, $preloadUnitSpec);
     }
 
 
@@ -111,6 +119,32 @@ class Module extends BaseModule
             'assessment' => $assessment
         ];
     }
+
+
+    /**
+     * Convert route params into a unitSpec object
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws ApplicationException
+     * @throws \Exception
+     */
+    protected function preloadUnitSpec(array $params): array
+    {
+        try {
+            $unitSpec = $this->getUnitSpecificationMapper()->findById($params['unitSpecId']);
+        } catch (MapperException\Deleted $e) {
+            $unitSpec = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        return [
+            'unitSpec' => $unitSpec
+        ];
+    }
+
 
     /**
      * @inheritdoc
