@@ -958,11 +958,9 @@ abstract class Kernel
             'templateEngine:isRouteAuthorized',
             $di->lazyNew(
                 TwigMethod\IsRouteAuthorized::class,
-                [],
                 [
-                    'setRouter'     => $di->lazyGet('router'),
-                    'setAuthorizer' => $di->lazyGet('authorizer'),
-                    'setSession'    => $di->lazyGet('session'),
+                    'authorizer' => $di->lazyGet('authorizer'),
+                    'session'    => $di->lazyGet('session'),
                 ],
             )
         );
