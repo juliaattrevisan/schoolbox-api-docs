@@ -12,11 +12,9 @@ namespace Custom\Tigs\Summative\ParticipationReport;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
+use Aura\Router\Generator;
 use External_ClassInterface;
 use Schoolbox\UserMapper;
-
-use function array_column;
-
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Report;
 use DomainException;
@@ -37,6 +35,8 @@ use UnderflowException;
 use UnexpectedValueException;
 use Aura\Router;
 use Schoolbox\Resource\Textbox;
+
+use function array_column;
 
 /**
  * Responsible for rendering the 'Academic Transcript' component on the Participation report page
@@ -83,25 +83,25 @@ class AcademicTranscript
     /** @var Authorizer */
     private $authorizer;
 
-    /** @var Router\Router */
-    private $router;
+    /** @var Generator */
+    private $routeGenerator;
 
 
     /**
-     * @param IConfigLoader          $config
-     * @param Folder\Mapper          $folderMapper
-     * @param External_UserInterface $externalUser
-     * @param External_ClassInterface $externalClass
-     * @param CourseImpl\Mapper      $courseImplMapper
-     * @param Assessment\MapperProxy $assessmentMapperProxy
+     * @param IConfigLoader              $config
+     * @param Folder\Mapper              $folderMapper
+     * @param External_UserInterface     $externalUser
+     * @param External_ClassInterface    $externalClass
+     * @param CourseImpl\Mapper          $courseImplMapper
+     * @param Assessment\MapperProxy     $assessmentMapperProxy
      * @param RubricDataModel\DataSource $rubricMapper
-     * @param UserMapper              $userMapper
-     * @param Assessment\Mapper       $assessmentMapper
-     * @param Textbox\Mapper         $textBoxMapper
-     * @param Access                 $access
-     * @param IConnector             $database
-     * @param Authorizer             $authorizer
-     * @param Router\Router          $router
+     * @param UserMapper                 $userMapper
+     * @param Assessment\Mapper          $assessmentMapper
+     * @param Textbox\Mapper             $textBoxMapper
+     * @param Access                     $access
+     * @param IConnector                 $database
+     * @param Authorizer                 $authorizer
+     * @param Generator                  $routeGenerator
      */
     public function __construct(
         IConfigLoader $config,
@@ -117,7 +117,7 @@ class AcademicTranscript
         Access $access,
         IConnector $database,
         Authorizer $authorizer,
-        Router\Router $router
+        Generator $routeGenerator
     ) {
         $this->config                = $config;
         $this->folderMapper          = $folderMapper;
@@ -132,7 +132,7 @@ class AcademicTranscript
         $this->access                = $access;
         $this->database              = $database;
         $this->authorizer            = $authorizer;
-        $this->router                = $router;
+        $this->routeGenerator        = $routeGenerator;
     }
 
 
@@ -174,7 +174,7 @@ class AcademicTranscript
                 new Visibility($this->access),
                 $this->database,
                 $this->authorizer,
-                $this->router,
+                $this->routeGenerator,
                 $viewer
             );
 
