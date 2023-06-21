@@ -118,7 +118,7 @@ function onColourChange(element, colour) {
 function updateColour(colourId, colour) {
     masonryConfig.editColumns.colours.pickers[colourId] = colour; //update the object for possible future save / reset / undo
     const colourProperty = `--${colourId.replace(/_/g, "-")}`;
-    document.getElementById("component-layout").style.setProperty(colourProperty, colour);
+    document.getElementById(masonryConfig.settings.layoutSelector).style.setProperty(colourProperty, colour);
 }
 
 /**

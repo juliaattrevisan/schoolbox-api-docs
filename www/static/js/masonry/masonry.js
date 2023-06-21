@@ -5,11 +5,10 @@ import { initToggleLockComponents } from "./existingComponents/toggleLockCompone
 import { initEditColumns } from "./editColumns/editColumns";
 import { initNewComponents } from "./newComponents/newComponents";
 import { initUpdatePlaceHolders } from "./updatePlaceHolders";
+import { merge } from "lodash";
 
 document.addEventListener("MASONRY__CREATE", (e) => {
     setMasonryConfig(e.detail);
-
-    console.log("MASONRY CONFIG", masonryConfig, masonryConfig.postToMyLinks)
 
     if (masonryConfig.postToMyLinks) { initPostToMyLinks(); }
 
@@ -21,4 +20,8 @@ document.addEventListener("MASONRY__CREATE", (e) => {
         initNewComponents();
         initUpdatePlaceHolders();
     }
+});
+
+document.addEventListener("MASONRY__UPDATE__CONFIG", (e) => {
+    setMasonryConfig(merge(masonryConfig, e.detail));
 });

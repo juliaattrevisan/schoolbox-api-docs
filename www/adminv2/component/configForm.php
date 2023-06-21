@@ -66,15 +66,12 @@ if (($_POST['type'] ?? '') == 'components') {
     // Was any one component requested?
     // If so render it only so it can be re-rendered
     if ($_POST['movedComponentId'] ?? false) {
-        $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
-        if (is_object($instance) === false) {
-            exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
+        $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+        if (is_object($instance)) {
+            $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
+        } else {
+            $page->outputJson(['hasComponentBeenDeleted' => true], false, 200);
         }
-        $factoryFactory   = new Component_FactoryFactory();
-        $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
-        $renderer         = new Component_Renderer();
-        $renderer->renderAdminComponent($page, $componentFactory->buildComponent($instance));
-        $page->outputPage(true);
     }
 } elseif (is_numeric($_POST['delete'] ?? false)) {
     // AJAX request to delete component from homepage
@@ -189,5 +186,5 @@ if (($_POST['type'] ?? '') == 'components') {
     } else {
         $page->outputJson('error: component does not exist', false, 409);
     }
-//    SitePage::localRedir("/homepage/" . $_GET['cid']);
+    //    SitePage::localRedir("/homepage/" . $_GET['cid']);
 }

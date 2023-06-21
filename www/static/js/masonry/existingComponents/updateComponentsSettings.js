@@ -50,6 +50,8 @@ function init(component) {
  */
 function initToggleButtons(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    if (!toggleButton) return;
+
     toggleButton.addEventListener("click", (event) => {
         event.preventDefault();
         isOpen(component) ? close(component) : open(component);
@@ -72,6 +74,7 @@ function initToggleButtons(component) {
  */
 export function isOpen(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    if (!toggleButton) return;
     return toggleButton.getAttribute(STATE_ATTRIBUTE) === "opened";
 }
 
@@ -82,6 +85,7 @@ export function isOpen(component) {
  */
 function open(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    if (!toggleButton) return;
     toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
     toggleButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
     animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
@@ -112,6 +116,7 @@ function getQueryString(component) {
  */
 export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    if (!toggleButton) return;
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
     animateRotation(toggleButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
@@ -124,8 +129,9 @@ export async function close(component) {
  * @param { Element }
  */
 function initForm(component) {
-    const panelForm = component.querySelector(PANEL_SELECTOR).querySelector("form");
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    if (!toggleButton) return;
+    const panelForm = component.querySelector(PANEL_SELECTOR).querySelector("form");
     panelForm.addEventListener("submit", (event) => {
         event.preventDefault();
         toggleButton.getAttribute(QUERY_STRING_ATTRIBUTE) === getQueryString(component)
@@ -146,7 +152,12 @@ async function saveComponentSettings(component, form) {
         document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
         submitFormButton.disabled = true;
         submitFormButton.value = "Updating...";
-        const response = await fetch(masonryConfig.settings.updateUrl + "?" + getSaveComponentSettingsParams(form));
+        // Set X-Requested-With header to allow for AJAX specific processing in the backend controller
+        const response = await fetch(masonryConfig.settings.updateUrl + "?" + getSaveComponentSettingsParams(form), {
+            headers: {
+                'X-Requested-With' : 'XMLHttpRequest'
+            }
+        });
         const responseData = await response.text();
         await updateComponent(component, responseData);
     } catch (error) {
@@ -167,13 +178,30 @@ async function saveComponentSettings(component, form) {
  */
 function getSaveComponentSettingsParams(form) {
     const formData = Object.fromEntries(new FormData(form));
-    const queryString = Object.keys(formData)
-        .map((key) => key + "=" + encodeURIComponent(formData[key]))
-        .join("&"); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
-    const params = new URLSearchParams(queryString);
-    return params;
-}
+    const queryParams = [];
 
+    // Add existing parameters to the query params
+    for (const key in formData) {
+        queryParams.push(key + "=" + encodeURIComponent(formData[key]));
+    }
+
+    // Replace cid parameter if it is empty or not set and masonryConfig.pageInfo.type === "cid"
+    if (
+        masonryConfig.settings.formData.pageInfo.type === "cid"
+        && (!queryParams.some(param => param.startsWith('cid=')) || queryParams.some(param => param === 'cid='))
+    ) {
+        queryParams.push('cid=' + encodeURIComponent(masonryConfig.settings.formData.pageInfo.id));
+    }
+
+    // Add context parameter if it is set in masonryConfig
+    const context = masonryConfig.settings.formData.pageInfo.context;
+    if (context) {
+        queryParams.push('context=' + encodeURIComponent(context));
+    }
+
+    const queryString = queryParams.join('&');
+    return new URLSearchParams(queryString);
+}
 /**
  * Now we have the returned response from the settings save, replace the old component with the new component
  *

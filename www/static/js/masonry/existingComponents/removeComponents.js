@@ -165,6 +165,9 @@ async function removeComponent(component, confirmDeleteButton) {
 function getFormData(component) {
     const formData = new FormData();
     formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+    if (masonryConfig.settings.formData.pageInfo.context) {
+        formData.append("context", masonryConfig.settings.formData.pageInfo.context)
+    }
     formData.append("delete", getComponentID(component));
     formData.append("component", component.querySelector("[data-defn-id]").value);
     return formData;
@@ -185,7 +188,9 @@ export function updateRemovedComponent(component) {
     errorElement.innerHTML = `<b>Warning:</b> This component has been removed from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
 
     const insideComponentElement = component.querySelector("[data-collapsable] > div > section");
-    insideComponentElement.replaceChildren(errorElement);
+    if (insideComponentElement) {
+        insideComponentElement.replaceChildren(errorElement);
+    }
 
     gsap.from(errorElement, { opacity: 0, duration: ANIMATE_SPEED });
 }

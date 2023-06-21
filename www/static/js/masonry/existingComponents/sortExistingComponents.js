@@ -184,9 +184,12 @@ function onDragStart(draggableInstance) {
  */
 function getReferenceElement() {
     const referenceElement = __activeComponent.cloneNode(true);
-    referenceElement.querySelector("[data-collapsable]").remove(); //just use the top bar as reference, so remove all component controls that can be expanded
-    referenceElement.querySelector('[data-component-panel="settings"]').remove();
-    referenceElement.querySelector('[data-component-panel="delete"]').remove();
+
+    const collapsableContent = referenceElement.querySelector("[data-collapsable]");
+    if (collapsableContent) { collapsableContent.remove(); } //just use the top bar as reference, so remove all component controls that can be expanded
+
+    referenceElement.querySelector('[data-component-panel="settings"]')?.remove();
+    referenceElement.querySelector('[data-component-panel="delete"]')?.remove();
     referenceElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed
     insertElementBefore(__activeComponent, referenceElement);
     return referenceElement;
@@ -287,15 +290,21 @@ async function collapseActiveComponentContent() {
     __isChangingSize = true;
     if (isSettingsPanelOpen(__activeComponent)) {
         const activeComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]'); //just assume it may be open
-        slideUp(activeComponentSettingsPanel, ANIMATE_SPEED);
+        if (activeComponentSettingsPanel) {
+            slideUp(activeComponentSettingsPanel, ANIMATE_SPEED);
+        }
     }
     if (isRemovePanelOpen(__activeComponent)) {
         const activeComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]'); //just assume it may be open
-        slideUp(activeComponentDeletePanel, ANIMATE_SPEED);
+        if (activeComponentDeletePanel) {
+            slideUp(activeComponentDeletePanel, ANIMATE_SPEED);
+        }
     }
     if (isComponentOpen(__activeComponent)) {
         const activeComponentContent = __activeComponent.querySelector("[data-collapsable]");
-        await slideUp(activeComponentContent, ANIMATE_SPEED);
+        if (activeComponentContent) {
+            await slideUp(activeComponentContent, ANIMATE_SPEED);
+        }
     }
     __isChangingSize = false;
 }
@@ -480,7 +489,9 @@ async function expandActiveComponent() {
     }
     if (isComponentOpen(__activeComponent)) {
         const activeComponentContent = __activeComponent.querySelector("[data-collapsable]");
-        await slideDown(activeComponentContent, ANIMATE_SPEED);
+        if (activeComponentContent) {
+            await slideDown(activeComponentContent, ANIMATE_SPEED);
+        }
     }
     onActiveComponentExpanded();
 }

@@ -41,7 +41,6 @@ async function postLink() {
  * @returns { FormData }
  */
 function getFormData() {
-    console.log(masonryConfig.postToMyLinks.url)
     const formData = new FormData();
     formData.append("url", masonryConfig.postToMyLinks.url);
     formData.append("description", masonryConfig.postToMyLinks.heading);

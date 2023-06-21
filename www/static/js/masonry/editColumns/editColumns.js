@@ -31,6 +31,9 @@ export function initEditColumns() {
 export function getFormData() {
     const formData = new FormData();
     formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+    if (masonryConfig.settings.formData.pageInfo.context) {
+        formData.append("context", masonryConfig.settings.formData.pageInfo.context)
+    }
     appendWidth(formData);
     appendColours(formData);
     return formData;

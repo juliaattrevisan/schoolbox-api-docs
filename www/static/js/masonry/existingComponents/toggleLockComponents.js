@@ -13,7 +13,6 @@ import UpdateMasonryEvents from "../updateMasonryEvents";
 export function initToggleLockComponents() {
     const componentLockSwitch = document.querySelector(masonryConfig.toggleLockComponents.selector);
     componentLockSwitch.addEventListener("change", () => {
-        console.log("change", masonryConfig)
         document
             .querySelectorAll(masonryConfig.settings.existingComponentSelector)
             .forEach((component) => updateComponentDisplay(component));

@@ -1,67 +1,123 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry2.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
-    $(function() {
-        
-        var url = '/adminv2/component/configForm.php';
-        $('[data-homepage-layout]').masonry({
-            // Only create action goes through masonry
-            context: function(masonry) {
-                return {
-                    context: 'dashboard',
-                    cid: $(masonry.options.templateSelector.selector).val()
-                }
-            },
-            component: {
-                url: url,
-                calcSequenceData: function (columns) {
-                    var masonry = this,
-                            data    = { type: 'components', cid: $(masonry.options.templateSelector.selector).val() },
-                            order   = ['left','right','top','bottom'];
+    // $(function() {
 
-                    $.each(columns, function (position, column) {
-                        var key = 'column' + (order.indexOf(position) + 1);
+    //     var url = '/adminv2/component/configForm.php';
+    //     $('[data-homepage-layout]').masonry({
+    //         // Only create action goes through masonry
+    //         context: function(masonry) {
+    //             return {
+    //                 context: 'dashboard',
+    //                 cid: $(masonry.options.templateSelector.selector).val()
+    //             }
+    //         },
+    //         component: {
+    //             url: url,
+    //             calcSequenceData: function (columns) {
+    //                 var masonry = this,
+    //                         data    = { type: 'components', cid: $(masonry.options.templateSelector.selector).val() },
+    //                         order   = ['left','right','top','bottom'];
 
-                        data[key] = column.find(masonry.options.component.selector).map(function () {
-                            /*
-                             * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
-                             * and always appear in the same positions. So we do a check to see if
-                             * an id is set. If it isn't, and we don't do the check, the script breaks
-                             * and components cannot be relocated successfully
-                             */
-                            if (this.id) {
-                                return this.id.substr(9);
-                            }
-                        }).toArray().join(',');
-                    });
+    //                 $.each(columns, function (position, column) {
+    //                     var key = 'column' + (order.indexOf(position) + 1);
 
-                    return data;
-                }
-            },
-            column: {
-                leftColumnWidth: 6,
-                selector: '[data-position]',
-                position: {
-                    top: '[data-position=top]',
-                    left: '[data-position=left]',
-                    right: '[data-position=right]'
-                },
-                placeholderTpl: '<p class="masonry-placeholder alert-box" />'
-            },
-            palette: {
-                url: url,
-                selector: '[data-definition-palette]',
-                containerSelector: '[data-component-list]',
-                handleSelector: '[data-component-palette]',
-                refreshItem: function () {
-                    this.find('[data-relation="count"]').text(this.data('count'));
-                }
-            },
-            templateSelector: {
-                selector: '[data-template-select]',
-                url: '/adminv2/component/get/dashboard'
+    //                     data[key] = column.find(masonry.options.component.selector).map(function () {
+    //                         /*
+    //                          * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+    //                          * and always appear in the same positions. So we do a check to see if
+    //                          * an id is set. If it isn't, and we don't do the check, the script breaks
+    //                          * and components cannot be relocated successfully
+    //                          */
+    //                         if (this.id) {
+    //                             return this.id.substr(9);
+    //                         }
+    //                     }).toArray().join(',');
+    //                 });
+
+    //                 return data;
+    //             }
+    //         },
+    //         column: {
+    //             leftColumnWidth: 6,
+    //             selector: '[data-position]',
+    //             position: {
+    //                 top: '[data-position=top]',
+    //                 left: '[data-position=left]',
+    //                 right: '[data-position=right]'
+    //             },
+    //             placeholderTpl: '<p class="masonry-placeholder alert-box" />'
+    //         },
+    //         palette: {
+    //             url: url,
+    //             selector: '[data-definition-palette]',
+    //             containerSelector: '[data-component-list]',
+    //             handleSelector: '[data-component-palette]',
+    //             refreshItem: function () {
+    //                 this.find('[data-relation="count"]').text(this.data('count'));
+    //             }
+    //         },
+    //         templateSelector: {
+    //             selector: '[data-template-select]',
+    //             url: '/adminv2/component/get/dashboard'
+    //         }
+    //     });
+    // });
+
+    TEMPLATE_SELECT_URL = "/adminv2/component/get/dashboard"
+
+    async function loadLayout(layoutId) {
+        const response = await fetch(TEMPLATE_SELECT_URL + "/" + layoutId, {
+            headers: {
+                'X-Requested-With' : 'XMLHttpRequest'
             }
         });
+        const responseData = await response.text();
+
+        document.getElementById("layoutContainer").innerHTML = responseData;
+    }
+
+    // Set the selected layout in the template selector if a URL hash is present
+    function setSelectedLayout() {
+        if (window.location.hash) {
+            const templateHash = window.location.hash.substr(1);
+            if (document.getElementById("templateSelector").querySelector(`option[value="${templateHash}"]`)) {
+                document.getElementById("templateSelector").value = templateHash;
+            }
+        }
+        return document.getElementById("templateSelector").value;
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        // When the template selector changes, reload the page to get the new layout
+        document.getElementById("templateSelector").addEventListener("change", () => {
+            window.location.replace("#" + document.getElementById("templateSelector").value);
+            window.location.reload();
+        });
+
+        const layoutId = setSelectedLayout(); // Ensure the correct layout is selected
+        await loadLayout(layoutId);
+
+        // Initialise the masonry layout
+        document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
+            detail: {
+                settings: {
+                    allowEditing: true, // Whether the user has full edit control, or is read-only
+                    existingComponentSelector: "[data-component]",
+                    layoutSelector: "#component-layout",
+                    updateUrl: "/adminv2/component/configForm.php",
+                    formData: {
+                        pageInfo: {
+                            type: "cid",
+                            id: layoutId,
+                            context: "dashboard",
+                        },
+                        newComponentAddAttribute: "data-component-definition-id",
+                    },
+                    alwaysShowPlaceHolderComponents: true,
+                }
+            }
+        }));
     });
 </script>
 <!-- END custom_head -->
@@ -76,13 +132,16 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <form id="template-action" class="no-margin" action="/adminv2/homepage/homepageForm.php" method="POST">
+                    <form id="template-action" class="no-margin">
                         <input type="hidden" name="action" value="delete" />
                         <select id="templateSelector" class="no-margin" data-template-select name="template">
                             <!-- BEGIN group -->
                             <option value="{group.id}">{group.name}</option>
                             <!-- END group -->
                         </select>
+                        <script>
+                            setSelectedLayout(); // Running this here prevents the template selector briefly showing the wrong value
+                        </script>
                     </form>
                 </div>
                 <div data-definition-palette>
@@ -93,7 +152,7 @@
                                  data-count="{COMPONENT_COUNT}"
                                  data-multi="{COMPONENT_MULTIPLE_STATE}"
                                  data-component-palette>
-                                <a href="#" rel="{COMPONENT_ID}" title="{COMPONENT_DESCRIPTION}">
+                                <a href="#" data-component-definition-id="{COMPONENT_ID}" title="{COMPONENT_DESCRIPTION}">
                                     <span class="size-32 icon-masonry icon-masonry-{COMPONENT_CLASS}"></span>
                                     <p>{COMPONENT_NAME}</p>
                                     <p class="meta">(<span data-relation="count">{COMPONENT_COUNT}</span>)</p>
@@ -105,6 +164,6 @@
                 </div>
             </section>
         </div>
-        <!-- BEGIN layout --><!-- END layout -->
+        <div id="layoutContainer"></div>
     </div>
 </div>

@@ -43,6 +43,9 @@ function getFormData(component) {
     formData.append("movedComponentId", getComponentID(component));
     formData.append("type", "components");
     formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+    if (masonryConfig.settings.formData.pageInfo.context) {
+        formData.append("context", masonryConfig.settings.formData.pageInfo.context)
+    }
     return formData;
 }
 
@@ -56,7 +59,7 @@ function getFormData(component) {
 function getContainerComponentIDs(componentContainer) {
     let containerComponentIDList = []; //add all ids into an array
     componentContainer.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((sortable) => {
-        if (sortable.id) {
+        if (sortable.id && !sortable.dataset.placeHolderComponent) {
             //the <div class="masonry-placeholder" /> exists in each parent container, so we don't want that
             containerComponentIDList.push(getComponentID(sortable));
         }

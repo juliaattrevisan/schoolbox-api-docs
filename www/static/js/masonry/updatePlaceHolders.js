@@ -6,6 +6,7 @@
 
 import UpdateMasonryEvents from "./updateMasonryEvents";
 import { isOpen as isNewComponentTabsOpen } from "./newComponents/newComponentsTabs";
+import { masonryConfig } from "./masonryConfig";
 
 const COMPONENT_CONTAINERS_SELECTOR = "[data-components-container]"; //the top/left/right parent containers
 
@@ -16,6 +17,7 @@ let __placeHolderComponentsList = []; //to contain the place holder instances
  */
 export function initUpdatePlaceHolders() {
     initPlaceHolderComponents();
+    if (isNewComponentTabsOpen()) addPlaceHolderComponents();
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, onComponentUpdate);
     document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, onComponentUpdate);
     document.addEventListener(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_START, addPlaceHolderComponents);
@@ -63,7 +65,13 @@ function addPlaceHolderComponents() {
     document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
         if (canAddPlaceHolderComponent(parentContainer)) {
             const placeHolderComponent = __placeHolderComponentsList[index];
-            parentContainer.append(placeHolderComponent);
+
+            if (parentContainer.firstChild !== null) {
+                // if we already have components, insert the placeholder before the first component
+                parentContainer.insertBefore(placeHolderComponent, parentContainer.firstChild);
+            } else {
+                parentContainer.append(placeHolderComponent);
+            }
         }
     });
 }
@@ -76,6 +84,7 @@ function addPlaceHolderComponents() {
  * @returns { Boolean }
  */
 function canAddPlaceHolderComponent(parentContainer) {
+    if (masonryConfig.settings.alwaysShowPlaceHolderComponents) return true;
     return parentContainer.children.length === 0;
 }
 

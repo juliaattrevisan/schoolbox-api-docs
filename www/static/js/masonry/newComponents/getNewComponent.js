@@ -50,6 +50,9 @@ async function replaceExistingComponent(component, newComponentHTML) {
 function getFormData(component) {
     const formData = new FormData();
     formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+    if (masonryConfig.settings.formData.pageInfo.context) {
+        formData.append("context", masonryConfig.settings.formData.pageInfo.context)
+    }
 
     //this is to retrieve the new component id to know which type of component to create
     formData.append("add", component.querySelector("a").getAttribute(masonryConfig.settings.formData.newComponentAddAttribute));

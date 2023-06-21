@@ -49,6 +49,9 @@ function init(component) {
  */
 export function isOpen(component) {
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
+    if (!collapsePanel) {
+        return false;
+    }
     return collapsePanel.getAttribute("data-collapse-state") === "uncollapsed";
 }
 
@@ -91,5 +94,8 @@ export async function close(component) {
  */
 export function isCollapseComponentSelected(component) {
     const collapseCheckbox = component.querySelector(`#${component.id}-collapse`);
+    if (!collapseCheckbox) {
+        return false;
+    }
     return collapseCheckbox.getAttribute("checked") === "checked" ? true : false;
 }
