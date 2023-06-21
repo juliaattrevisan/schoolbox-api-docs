@@ -72,6 +72,7 @@ Admin,Review submission states,https://vagrant.dev.schoolbox.cloud/adminv2/lists
 Admin,Review components,https://vagrant.dev.schoolbox.cloud/adminv2/lists/component-definition
 Admin,Review timetable colours,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour
 Admin,Lists User Titles,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title
+Admin,Lists User Pronouns,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-pronoun
 Admin,Review pastoral types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type
 Admin,Review pastoral subtypes,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category
 Admin,Review pastoral sis docs,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification
