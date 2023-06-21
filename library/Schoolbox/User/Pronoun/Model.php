@@ -26,10 +26,12 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 
     /**
      * @param ?string $subjective
+     * @return $this
      */
-    public function setSubjective(?string $subjective): void
+    public function setSubjective(?string $subjective): self
     {
         $this->subjective = $subjective;
+        return $this;
     }
 
     /**
@@ -42,10 +44,12 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 
     /**
      * @param string $objective
+     * @return $this
      */
-    public function setObjective(?string $objective): void
+    public function setObjective(?string $objective): self
     {
         $this->objective = $objective;
+        return $this;
     }
 
     /**
@@ -58,11 +62,13 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 
     /**
      * @param string $possessive
+     * @return $this
      */
 
-    public function setPossessive(?string $possessive): void
+    public function setPossessive(?string $possessive): self
     {
         $this->possessive = $possessive;
+        return $this;
     }
 
     /**
