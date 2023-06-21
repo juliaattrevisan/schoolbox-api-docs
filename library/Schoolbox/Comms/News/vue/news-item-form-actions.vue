@@ -58,7 +58,14 @@ export default {
          * @returns {Boolean}
          */
         isDisabled() {
-            if (this.articleId === 0) {
+            let previewButton = document.getElementById('news-preview');
+            let submitButton = document.getElementById('news-submit');
+
+            if (
+                this.articleId === 0 ||
+                previewButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') ||
+                submitButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
+            ) {
                 return true;
             } else {
                 return false;

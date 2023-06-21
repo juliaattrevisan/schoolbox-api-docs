@@ -233,14 +233,6 @@
                     }
                 });
                 document.dispatchEvent(event);
-
-                // Enable the submit buttons unless they have the 'data-ckeditorMaxCharCountExceededAtLastCheck'
-                // attribute, which will have been added if the content storage limit was exceeded at the last check.
-                for (let submitButton of $submitButtons) {
-                    if (!submitButton.hasAttribute('data-ckeditorMaxCharCountExceededAtLastCheck')) {
-                        submitButton.disabled = false;
-                    }
-                }
             }
         });
         {% endif %}
