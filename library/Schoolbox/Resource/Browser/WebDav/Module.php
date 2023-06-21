@@ -9,9 +9,10 @@
 
 namespace Schoolbox\Resource\Browser\WebDav;
 
+use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use PortfolioWebDAV;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\UserMapper;
@@ -19,6 +20,33 @@ use Schoolbox\UserMapper;
 class Module extends AbstractModule
 {
     protected $basename = 'webDavBrowser';
+
+    /**
+     * Define standard routes for WebDAV browser
+     *
+     * @return void
+     */
+    protected function registerRoutes(): void
+    {
+        // Standard rules
+        $permission = new Rule\IsLoggedIn();
+        $this->register('GET', '/picker/{sourceSlug}', 'picker', $permission);
+        $this->register('GET', '/file/{fileId:\d+}/ajax', 'getFileInfo', $permission);
+        $this->register('GET', '{/folderId:\d+}', 'browse', $permission);
+        $this->register('GET', '/{folderId:\d+}/children', 'listResources', $permission);
+        $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $permission);
+        $this->register('GET', '/{folderId:\d+}/info', 'showFolderInfo', $permission);
+        $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $permission);
+        $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $permission);
+
+        // I believe showMultiFileInfo is never used anywhere
+        $this->register(
+            'GET',
+            '/file/{fileIds:\d+}/info',
+            'showMultiFileInfo',
+            new Rule\Callback(fn () => throw new InvalidPath()),
+        );
+    }
 
     /**
      * @inheritdoc
