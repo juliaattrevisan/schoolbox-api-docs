@@ -312,7 +312,7 @@ class Module
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Router $router   The router to add the route to
+     * @param Map    $routeMap The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -321,9 +321,9 @@ class Module
      *
      * @return Route
      */
-    protected function addRoute(Router $router, $alias, $basePath, $path)
+    protected function addRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $router->getRoutes()->add($this->basename . '.' . $alias, $basePath . $path);
+        return $routeMap->route($this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**
@@ -332,7 +332,7 @@ class Module
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Router $router   The router to add the route to
+     * @param Map    $routeMap The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -341,9 +341,9 @@ class Module
      *
      * @return Route
      */
-    protected function addGetRoute(Router $router, $alias, $basePath, $path)
+    protected function addGetRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $router->getRoutes()->addGet($this->basename . '.' . $alias, $basePath . $path);
+        return $routeMap->get($this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**
@@ -352,7 +352,7 @@ class Module
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Router $router   The router to add the route to
+     * @param Map    $routeMap The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -361,9 +361,9 @@ class Module
      *
      * @return Route
      */
-    protected function addPostRoute(Router $router, $alias, $basePath, $path)
+    protected function addPostRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $router->getRoutes()->addPost($this->basename . '.' . $alias, $basePath . $path);
+        return $routeMap->post($this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**

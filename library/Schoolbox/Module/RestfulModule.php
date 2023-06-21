@@ -118,11 +118,11 @@ abstract class RestfulModule extends AlaressModule
         ];
 
         foreach ($routes['GET'] as $path => $controllerMethod) {
-            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+|\*', 'entityId' => '\d+' ]);
+            $this->addGetRoute($routeMap, $controllerMethod, $basePath, $path)->setTokens(['contextId' => '\d+|\*', 'entityId' => '\d+' ]);
         }
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($routeMap, $controllerMethod, $basePath, $path)->setTokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 

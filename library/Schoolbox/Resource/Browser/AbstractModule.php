@@ -24,15 +24,15 @@ abstract class AbstractModule extends BaseModule
      */
     public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'picker', $basePath, '/picker/{sourceSlug}');
-        $this->addGetRoute($router, 'getFileInfo', $basePath, '/file/{fileId}/ajax')->addTokens([ 'fileId' => '\d+' ]);
-        $this->addGetRoute($router, 'browse', $basePath, '{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'listResources', $basePath, '/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'listNodes', $basePath, '/{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'showFolderInfo', $basePath, '/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'showFileInfo', $basePath, '/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
-        $this->addGetRoute($router, 'showMultiFileInfo', $basePath, '/file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
-        $this->addPostRoute($router, 'postFiles', $basePath, '/{folderId}/files')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($routeMap, 'picker', $basePath, '/picker/{sourceSlug}');
+        $this->addGetRoute($routeMap, 'getFileInfo', $basePath, '/file/{fileId}/ajax')->addTokens(['fileId' => '\d+' ]);
+        $this->addGetRoute($routeMap, 'browse', $basePath, '{/folderId}')->addTokens(['folderId' => '\d+' ]);
+        $this->addGetRoute($routeMap, 'listResources', $basePath, '/{folderId}/children')->addTokens(['folderId' => '\d+' ]);
+        $this->addGetRoute($routeMap, 'listNodes', $basePath, '/{folderId}/nodes')->addTokens(['folderId' => '\d+' ]);
+        $this->addGetRoute($routeMap, 'showFolderInfo', $basePath, '/{folderId}/info')->addTokens(['folderId' => '\d+' ]);
+        $this->addGetRoute($routeMap, 'showFileInfo', $basePath, '/file/{fileId}/info')->addTokens(['fileId' => '\d+' ]);
+        $this->addGetRoute($routeMap, 'showMultiFileInfo', $basePath, '/file/{fileIds}/info')->addTokens(['fileIds' => '(\d+,)+(\d+)' ]);
+        $this->addPostRoute($routeMap, 'postFiles', $basePath, '/{folderId}/files')->addTokens(['folderId' => '\d+' ]);
     }
 
 
