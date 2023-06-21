@@ -342,7 +342,7 @@ class SitePage
                 $rememberer = $this->di->get('session.rememberer');
                 $username   = $rememberer->retrieveUsername();
 
-                if (strlen($username) === 0 || !$sessionHandler->create($username)) {
+                if ($username === null || strlen($username) === 0 || !$sessionHandler->create($username)) {
                     $sessionHandler->destroy();
                     $this->goLoginPage();
                 } else {
@@ -528,7 +528,7 @@ class SitePage
         if (($file ?? '') === '') {
             $file = '/';
         }
-        header('Location: ' . $file, null, $responseCode);
+        header('Location: ' . $file, true, $responseCode ?? 0);
         header('Content-Type:');
         self::disableXssProtectionAfterForm();
         if ($keepProcessing) {

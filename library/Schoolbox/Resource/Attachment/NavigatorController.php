@@ -20,12 +20,6 @@ use SitePage;
  */
 abstract class NavigatorController extends AbstractController
 {
-
-    /**
-     * @var string
-     */
-    protected $template;
-
     /**
      * @param bool               $multi
      * @param string|bool|null   $mimeFilter

@@ -226,7 +226,7 @@ class Generator implements GeneratorInterface
         $roleType = $user->getRole()->getType();
 
         // parental bindings TODO can this be more lightweight
-        if ($roleType === Role::PARENT && strlen(trim($user->getExternalId())) > 0) {
+        if ($roleType === Role::PARENT && strlen(trim($user->getExternalId() ?? '')) > 0) {
             $childrenArray = $this->getExternalUserHandler()->getEnrolledStudents($user->getExternalId());
 
             if (is_array($childrenArray)) {
