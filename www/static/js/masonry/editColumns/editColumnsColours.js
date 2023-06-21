@@ -180,6 +180,11 @@ function getAllColourPickers() {
  */
 export function appendColours(formData) {
     for (const [key, value] of Object.entries(masonryConfig.editColumns.colours.pickers)) {
+        if (value === "") {
+            // If the value is none, then fall back to the original colour
+            // This might happen if the user has different colours for each column
+            value = COLOURS.original[key];
+        }
         //loop through the key/value pairs for each value and append to FormData
         formData.append(`colors[${key}]`, value);
     }
