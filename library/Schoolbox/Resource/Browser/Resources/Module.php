@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
@@ -112,23 +113,44 @@ class Module extends AbstractModule
                 )
             );
 
+        // Generic routes
+        $this->register('GET', '/picker/{sourceSlug}', 'picker', new Rule\IsLoggedIn());
+        $this->register('GET', '/file/{fileId:\d+}/ajax', 'getFileInfo', $hasReadAccess, $preloadFile);
+        $this->register('GET', '{/folderId:\d+}', 'browse', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/{folderId:\d+}/children', 'listResources', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/{folderId:\d+}/info', 'showFolderInfo', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
+        $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $hasFolderReadAccess, $preloadFolder);
+
+        // I believe showMultiFileInfo is never used anywhere:
+        // at any rate, there's no support for verifying permissions for
+        // multiple files.
+        $this->register(
+            'GET',
+            '/file/{fileIds:\d+}/info',
+            'showMultiFileInfo',
+            new Rule\Callback(fn () => throw new InvalidPath()),
+        );
+
+        // Specific routes
         $this->register('GET', '/folder/{componentID:\d+}/files/{sourceFolderID:\d+}', 'showFiles', $hasFolderReadAccess, $preloadFolder);
         $this->register('GET', '/folder/files/{sourceFolderID:\d+}', 'showFolderFiles', $hasFolderReadAccess, $preloadFolder);
         $this->register('PATCH', '/file/{fileId:\d+}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
-        $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
+//        $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
         $this->register('GET', '/link/{linkId:\d+}/info', 'showLinkInfo', $hasReadAccess, $preloadLink);
     }
 
-    /**
-     * Add a link route as well
-     *
-     * @param Map $routeMap
-     * @param string $basePath
-     */
-    public function initRoutes(Map $routeMap, $basePath)
-    {
-        parent::initRoutes($routeMap, $basePath);
-    }
+//    /**
+//     * Add a link route as well
+//     *
+//     * @param Map $routeMap
+//     * @param string $basePath
+//     */
+//    public function initRoutes(Map $routeMap, $basePath)
+//    {
+//        parent::initRoutes($routeMap, $basePath);
+//    }
 
     /**
      * @inheritdoc
