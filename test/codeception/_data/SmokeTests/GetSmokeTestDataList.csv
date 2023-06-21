@@ -290,6 +290,10 @@ Admin,"Review timetable colours",Superuser,https://vagrant.dev.schoolbox.cloud/a
 Admin,"Review timetable colours",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,401
 Admin,"Review timetable colours",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,401
 Admin,"Review timetable colours",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,401
+Admin,"Lists User Pronouns",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-pronoun,200
+Admin,"Lists User Pronouns",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-pronoun,401
+Admin,"Lists User Pronouns",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-pronoun,401
+Admin,"Lists User Pronouns",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-pronoun,401
 Admin,"Lists User Titles",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title,200
 Admin,"Lists User Titles",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title,401
 Admin,"Lists User Titles",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title,401
