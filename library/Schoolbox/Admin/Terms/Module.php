@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -30,14 +31,14 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'getIndex', $basePath, "");
-        $this->addPostRoute($router, 'postCreateTerm', $basePath, "");
-        $this->addPostRoute($router, 'postUpdateTerm', $basePath, "/{id}/update");
-        $this->addPostRoute($router, 'postDeleteTerm', $basePath, "/{id}/delete");
-        $this->addPostRoute($router, 'postArchiveTerm', $basePath, "/{id}/archive");
-        $this->addPostRoute($router, 'postRestoreTerm', $basePath, "/{id}/restore");
+        $this->addGetRoute($routeMap, 'getIndex', $basePath, "");
+        $this->addPostRoute($routeMap, 'postCreateTerm', $basePath, "");
+        $this->addPostRoute($routeMap, 'postUpdateTerm', $basePath, "/{id}/update");
+        $this->addPostRoute($routeMap, 'postDeleteTerm', $basePath, "/{id}/delete");
+        $this->addPostRoute($routeMap, 'postArchiveTerm', $basePath, "/{id}/archive");
+        $this->addPostRoute($routeMap, 'postRestoreTerm', $basePath, "/{id}/restore");
     }
 
     /**

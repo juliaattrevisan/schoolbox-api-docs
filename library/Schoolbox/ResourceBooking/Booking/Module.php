@@ -14,6 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
@@ -32,23 +33,23 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $this->addGetRoute($router, 'book', $basePath, '/bookItem/{id}');
-        $this->addGetRoute($router, 'edit', $basePath, '/{id}/edit');
-        $this->addPostRoute($router, 'createBooking', $basePath, '/bookItem/{id}')
+        $this->addGetRoute($routeMap, 'book', $basePath, '/bookItem/{id}');
+        $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit');
+        $this->addPostRoute($routeMap, 'createBooking', $basePath, '/bookItem/{id}')
             ->addValues(array('action' => 'createBooking'));
-        $this->addPostRoute($router, 'update:post', $basePath, '/{id}/update')
+        $this->addPostRoute($routeMap, 'update:post', $basePath, '/{id}/update')
             ->addValues(array('action' => 'update'));
-        $this->addRoute($router, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
+        $this->addRoute($routeMap, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
-        $this->addRoute($router, 'approve', $basePath, '/{id}/approve');
-        $this->addRoute($router, 'reject', $basePath, '/{id}/reject');
-        $this->addRoute($router, 'setPending', $basePath, '/{id}/setPending');
-        $this->addRoute($router, 'cancel', $basePath, '/{id}/cancel');
+        $this->addRoute($routeMap, 'approve', $basePath, '/{id}/approve');
+        $this->addRoute($routeMap, 'reject', $basePath, '/{id}/reject');
+        $this->addRoute($routeMap, 'setPending', $basePath, '/{id}/setPending');
+        $this->addRoute($routeMap, 'cancel', $basePath, '/{id}/cancel');
     }
 
     /**

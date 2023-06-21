@@ -12,16 +12,17 @@ namespace Schoolbox\Resource\Browser;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 
 abstract class AbstractModule extends BaseModule
 {
     /**
-     * @param Router $router
+     * @param \Aura\Router\Map $router
      * @param string $basePath
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
         $this->addGetRoute($router, 'picker', $basePath, '/picker/{sourceSlug}');
         $this->addGetRoute($router, 'getFileInfo', $basePath, '/file/{fileId}/ajax')->addTokens([ 'fileId' => '\d+' ]);

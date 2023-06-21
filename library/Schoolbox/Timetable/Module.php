@@ -14,6 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use External_Timetable;
@@ -94,10 +95,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
         $this
-            ->addRoute($router, 'dateForTimetableDay', $basePath, '/dateForTimetableDay')
+            ->addRoute($routeMap, 'dateForTimetableDay', $basePath, '/dateForTimetableDay')
             ->addValues(array('format' => '.json'))
         ;
     }

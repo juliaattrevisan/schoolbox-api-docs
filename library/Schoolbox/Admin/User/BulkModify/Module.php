@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use HouseMapper;
 use Schoolbox\CampusMapper;
@@ -32,12 +33,12 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'getModify', $basePath, "/modify");
-        $this->addPostRoute($router, 'getUserList', $basePath, "/modify/list");
-        $this->addPostRoute($router, 'postModify', $basePath, "/modifyForm");
-        $this->addPostRoute($router, 'deleteUsers', $basePath, "/modifyForm/delete");
+        $this->addGetRoute($routeMap, 'getModify', $basePath, "/modify");
+        $this->addPostRoute($routeMap, 'getUserList', $basePath, "/modify/list");
+        $this->addPostRoute($routeMap, 'postModify', $basePath, "/modifyForm");
+        $this->addPostRoute($routeMap, 'deleteUsers', $basePath, "/modifyForm/delete");
     }
 
 

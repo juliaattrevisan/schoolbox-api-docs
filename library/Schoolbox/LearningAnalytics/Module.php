@@ -14,6 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
@@ -52,7 +53,7 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
         $get = [
             // For a Course - aggregating all Classes which have imported Course
@@ -69,7 +70,7 @@ class Module extends BaseModule
         ];
 
         foreach ($get as $method => $route) {
-            $this->addGetRoute($router, $method, $basePath, $route);
+            $this->addGetRoute($routeMap, $method, $basePath, $route);
         }
     }
 

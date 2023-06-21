@@ -8,6 +8,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -30,7 +31,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath): void
+    public function initRoutes(Map $routeMap, $basePath): void
     {
         $routes = [
             'GET' => [
@@ -46,11 +47,11 @@ class Module extends BaseModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($routeMap, $alias, $basePath, $path);
         }
 
         foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
+            $this->addPostRoute($routeMap, $alias, $basePath, $path);
         }
     }
 

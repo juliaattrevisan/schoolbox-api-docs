@@ -15,6 +15,7 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Aura\Router\Generator;
+use Aura\Router\Map;
 use Aura\Router\RouteCollection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -187,7 +188,7 @@ class Module
             unset($this->routeIndex);
 
             // manual route init
-            $this->initRoutes($this->getRouter(), $basePath);
+            $this->initRoutes($this->getRouteMap(), $basePath);
         }
     }
 
@@ -298,10 +299,10 @@ class Module
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
+     * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
     }
 
@@ -544,7 +545,19 @@ class Module
     }
 
     /**
-     * Typehinted convenience method for obtaining route generator reference.
+     * Typehinted convenience method for obtaining route map reference,
+     * as used for adding routes into.
+     *
+     * @return Map
+     */
+    protected function getRouteMap(): Map
+    {
+        return $this->injector->get('router.map');
+    }
+
+    /**
+     * Typehinted convenience method for obtaining route generator reference,
+     * as used for converting route aliases into paths.
      *
      * @return Generator
      */

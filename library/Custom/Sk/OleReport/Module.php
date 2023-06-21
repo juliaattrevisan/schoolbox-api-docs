@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
@@ -32,10 +33,10 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'reportList', $basePath, '/{studentId}');
-        $this->addGetRoute($router, 'sendReport', $basePath, '/{studentId}/{reportId}/sendReport');
+        $this->addGetRoute($routeMap, 'reportList', $basePath, '/{studentId}');
+        $this->addGetRoute($routeMap, 'sendReport', $basePath, '/{studentId}/{reportId}/sendReport');
     }
 
     /**

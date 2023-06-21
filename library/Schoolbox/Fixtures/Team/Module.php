@@ -11,6 +11,7 @@ namespace Schoolbox\Fixtures\Team;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
@@ -43,16 +44,16 @@ class Module extends RestfulModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
+     * @param Map $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        parent::initRoutes($router, $basePath);
+        parent::initRoutes($routeMap, $basePath);
         $collection = $this->getCollectionName();
-        $this->addPostRoute($router, "postAddPlayers", $basePath, "/$collection/{entityId}/addPlayers");
-        $this->addPostRoute($router, "postRemovePlayers", $basePath, "/$collection/{entityId}/removePlayers");
-        $this->addPostRoute($router, "postReorderPlayers", $basePath, "/$collection/{entityId}/reorderPlayers");
+        $this->addPostRoute($routeMap, "postAddPlayers", $basePath, "/$collection/{entityId}/addPlayers");
+        $this->addPostRoute($routeMap, "postRemovePlayers", $basePath, "/$collection/{entityId}/removePlayers");
+        $this->addPostRoute($routeMap, "postReorderPlayers", $basePath, "/$collection/{entityId}/reorderPlayers");
     }
 
     /**

@@ -17,6 +17,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Component_ConfigMapper;
 use Component_Instance;
@@ -38,20 +39,20 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'layout', $basePath, '/layout/{layoutId}');
-        $this->addPostRoute($router, 'layoutForm', $basePath, '/layout/{layoutId}');
+        $this->addGetRoute($routeMap, 'layout', $basePath, '/layout/{layoutId}');
+        $this->addPostRoute($routeMap, 'layoutForm', $basePath, '/layout/{layoutId}');
 
         // Attach standard REST routes...
-        $this->attachResourceRoutes($router, $basePath);
+        $this->attachResourceRoutes($routeMap, $basePath);
 
         // but have separate add tile paths...
-        $this->addGetRoute($router, 'add', $basePath, '/add/{layoutId}');
-        $this->addPostRoute($router, 'create', $basePath, '/add/{layoutId}');
+        $this->addGetRoute($routeMap, 'add', $basePath, '/add/{layoutId}');
+        $this->addPostRoute($routeMap, 'create', $basePath, '/add/{layoutId}');
 
         // also have separate paths for adding a tile to a component (will create a new layout)
-        $this->addGetRoute($router, 'addToComponent', $basePath, '/add/component/{componentId}');
+        $this->addGetRoute($routeMap, 'addToComponent', $basePath, '/add/component/{componentId}');
     }
 
     /**

@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -40,13 +41,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'displayCreateRequestForm', $basePath, '');
-        $this->addPostRoute($router, 'createRequest', $basePath, '/createRequest');
-        $this->addGetRoute($router, 'displayResetForm', $basePath, '/{token}')->addTokens(['token' => '[0-9a-f]+']);
-        $this->addPostRoute($router, 'reset', $basePath, '/reset/{token}')->addTokens(['token' => '[0-9a-f]+']);
-        $this->addGetRoute($router, 'displaySuccessMessage', $basePath, '/success');
+        $this->addGetRoute($routeMap, 'displayCreateRequestForm', $basePath, '');
+        $this->addPostRoute($routeMap, 'createRequest', $basePath, '/createRequest');
+        $this->addGetRoute($routeMap, 'displayResetForm', $basePath, '/{token}')->addTokens(['token' => '[0-9a-f]+']);
+        $this->addPostRoute($routeMap, 'reset', $basePath, '/reset/{token}')->addTokens(['token' => '[0-9a-f]+']);
+        $this->addGetRoute($routeMap, 'displaySuccessMessage', $basePath, '/success');
     }
 
     /**

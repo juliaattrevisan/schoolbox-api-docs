@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use HouseMapper;
 use HouseResidentialMapper;
@@ -43,33 +44,33 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'getInsert', $basePath, "/create");
-        $this->addGetRoute($router, 'getModify', $basePath, "/{userId}/modify")->setTokens(['userId' => '\d+']);
-        $this->addGetRoute($router, 'getStaleReport', $basePath, "/stale");
-        $this->addGetRoute($router, 'getStaleUsers', $basePath, "/stale/list");
+        $this->addGetRoute($routeMap, 'getInsert', $basePath, "/create");
+        $this->addGetRoute($routeMap, 'getModify', $basePath, "/{userId}/modify")->setTokens(['userId' => '\d+']);
+        $this->addGetRoute($routeMap, 'getStaleReport', $basePath, "/stale");
+        $this->addGetRoute($routeMap, 'getStaleUsers', $basePath, "/stale/list");
 
 
         // CRUD Actions
 
-        $this->addPostRoute($router, 'postDetails', $basePath, "{/userId}");
-        $this->addPostRoute($router, 'postInsertGroup', $basePath, "/{userId}/group");
-        $this->addPostRoute($router, 'postInsertPermission', $basePath, "/{userId}/permission");
-        $this->addPostRoute($router, 'postInsertLinked', $basePath, "/{userId}/linked");
+        $this->addPostRoute($routeMap, 'postDetails', $basePath, "{/userId}");
+        $this->addPostRoute($routeMap, 'postInsertGroup', $basePath, "/{userId}/group");
+        $this->addPostRoute($routeMap, 'postInsertPermission', $basePath, "/{userId}/permission");
+        $this->addPostRoute($routeMap, 'postInsertLinked', $basePath, "/{userId}/linked");
 
-        $this->addPostRoute($router, 'postUpdateGroup', $basePath, "/{userId}/group/{folderId}");
-        $this->addPostRoute($router, 'postUpdateService', $basePath, "/{userId}/permission/{service}/{sid}");
+        $this->addPostRoute($routeMap, 'postUpdateGroup', $basePath, "/{userId}/group/{folderId}");
+        $this->addPostRoute($routeMap, 'postUpdateService', $basePath, "/{userId}/permission/{service}/{sid}");
 
-        $this->addPostRoute($router, 'postDeleteList', $basePath, "/list/delete");
-        $this->addPostRoute($router, 'postDeleteUser', $basePath, "/{userId}/delete");
-        $this->addPostRoute($router, 'postDeletePermission', $basePath, "/{userId}/permission/{service}/{sid}/delete");
-        $this->addPostRoute($router, 'postDeleteGroup', $basePath, "/{userId}/group/{folderId}/delete");
-        $this->addPostRoute($router, 'postDeleteLinked', $basePath, "/{userId}/linked/{linkedId}/delete");
+        $this->addPostRoute($routeMap, 'postDeleteList', $basePath, "/list/delete");
+        $this->addPostRoute($routeMap, 'postDeleteUser', $basePath, "/{userId}/delete");
+        $this->addPostRoute($routeMap, 'postDeletePermission', $basePath, "/{userId}/permission/{service}/{sid}/delete");
+        $this->addPostRoute($routeMap, 'postDeleteGroup', $basePath, "/{userId}/group/{folderId}/delete");
+        $this->addPostRoute($routeMap, 'postDeleteLinked', $basePath, "/{userId}/linked/{linkedId}/delete");
 
         // Other stuff
 
-        $this->addPostRoute($router, 'postAlert', $basePath, "/{userId}/alert");
+        $this->addPostRoute($routeMap, 'postAlert', $basePath, "/{userId}/alert");
     }
 
     /**

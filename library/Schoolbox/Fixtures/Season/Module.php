@@ -11,6 +11,7 @@ namespace Schoolbox\Fixtures\Season;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
@@ -43,12 +44,12 @@ class Module extends RestfulModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
+     * @param Map $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        parent::initRoutes($router, $basePath);
+        parent::initRoutes($routeMap, $basePath);
 
         $collection = $this->getCollectionName();
 
@@ -61,7 +62,7 @@ class Module extends RestfulModule
         ];
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($router, $controllerMethod, $basePath, $path)->addTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($routeMap, $controllerMethod, $basePath, $path)->addTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 

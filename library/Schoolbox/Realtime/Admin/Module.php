@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
@@ -38,15 +39,15 @@ class Module extends BaseModule
 
 
     /**
-     * @param Router $router
+     * @param Map $routeMap
      * @param string $basePath
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'customConfig', $basePath, "/configure/custom");
-        $this->addGetRoute($router, 'configure', $basePath, "/configure{/roletype}");
-        $this->addGetRoute($router, 'testPush', $basePath, '/puush{/userId}');
-        $this->addPostRoute($router, 'saveConfig', $basePath, "/configure{/roletype}");
+        $this->addGetRoute($routeMap, 'customConfig', $basePath, "/configure/custom");
+        $this->addGetRoute($routeMap, 'configure', $basePath, "/configure{/roletype}");
+        $this->addGetRoute($routeMap, 'testPush', $basePath, '/puush{/userId}');
+        $this->addPostRoute($routeMap, 'saveConfig', $basePath, "/configure{/roletype}");
     }
 
 

@@ -11,6 +11,7 @@ namespace Schoolbox\Module;
 
 use Alaress\Module\Registry;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Mapper;
@@ -90,10 +91,10 @@ abstract class RestfulModule extends AlaressModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
+     * @param \Aura\Router\Map $router
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
         $collection = $this->getCollectionName();
 

@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
@@ -28,10 +29,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->attachResourceRoutes($router, $basePath);
-        $this->addGetRoute($router, 'calendar', $basePath, '/{id}/calendar');
+        $this->attachResourceRoutes($routeMap, $basePath);
+        $this->addGetRoute($routeMap, 'calendar', $basePath, '/{id}/calendar');
     }
 
     /**

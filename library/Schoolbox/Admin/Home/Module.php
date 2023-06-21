@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Log\Mapper as LogMapper;
@@ -27,13 +28,13 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'getIndex', $basePath, "");
-        $this->addGetRoute($router, 'getSslRenewalHelp', $basePath, "/ssl-renewal-help");
-        $this->addGetRoute($router, 'getHealthcheck', $basePath, "/healthcheck");
-        $this->addGetRoute($router, 'getDisasterRecovery', $basePath, "/disaster-recovery");
-        $this->addGetRoute($router, 'dismissUpgradeReminder', $basePath, "/dismiss-upgrade-reminder");
+        $this->addGetRoute($routeMap, 'getIndex', $basePath, "");
+        $this->addGetRoute($routeMap, 'getSslRenewalHelp', $basePath, "/ssl-renewal-help");
+        $this->addGetRoute($routeMap, 'getHealthcheck', $basePath, "/healthcheck");
+        $this->addGetRoute($routeMap, 'getDisasterRecovery', $basePath, "/disaster-recovery");
+        $this->addGetRoute($routeMap, 'dismissUpgradeReminder', $basePath, "/dismiss-upgrade-reminder");
     }
 
     /**

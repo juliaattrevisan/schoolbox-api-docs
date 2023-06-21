@@ -561,6 +561,11 @@ abstract class Kernel
             $router = $di->get('router');
             return $router->getMatcher();
         }));
+        $di->set('router.map', $di->lazy(function () use ($di) {
+            /** @var RouterContainer $router */
+            $router = $di->get('router');
+            return $router->getMap();
+        }));
         $di->set('router.generator', $di->lazy(function () use ($di) {
             /** @var RouterContainer $router */
             $router = $di->get('router');

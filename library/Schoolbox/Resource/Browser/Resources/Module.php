@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser\Resources;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
@@ -121,12 +122,12 @@ class Module extends AbstractModule
     /**
      * Add a link route as well
      *
-     * @param Router $router
+     * @param Map $routeMap
      * @param string $basePath
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        parent::initRoutes($router, $basePath);
+        parent::initRoutes($routeMap, $basePath);
     }
 
     /**

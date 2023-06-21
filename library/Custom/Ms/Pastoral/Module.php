@@ -16,6 +16,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Map;
 use Aura\Router\Router;
 use House;
 use HouseMapper;
@@ -33,15 +34,15 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
-        $this->addGetRoute($router, 'currentReport', $basePath, '/{id}')
+        $this->addGetRoute($routeMap, 'currentReport', $basePath, '/{id}')
              ->addTokens(['id' => '\\d+']);
-        $this->addGetRoute($router, 'index', $basePath, '/{id}/{year}')
+        $this->addGetRoute($routeMap, 'index', $basePath, '/{id}/{year}')
              ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
-        $this->addGetRoute($router, 'subject', $basePath, '/{id}/{year}/{subjectCode}')
+        $this->addGetRoute($routeMap, 'subject', $basePath, '/{id}/{year}/{subjectCode}')
              ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
-        $this->addGetRoute($router, 'printableReport', $basePath, '/{id}/print/{year}')
+        $this->addGetRoute($routeMap, 'printableReport', $basePath, '/{id}/print/{year}')
              ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
     }
 
