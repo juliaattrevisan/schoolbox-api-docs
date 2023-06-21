@@ -10,9 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Module\Cache;
 
 use Alaress\Module\Registry;
-use Aura\Router\RouteCollection;
-use Aura\Router\RouteFactory;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Config\Modules\ModuleConfigInterface;
 use Predis\ClientInterface;
 use Psr\Container\ContainerExceptionInterface;
@@ -48,7 +46,7 @@ class Rebuilder
     /**
      * Route table: once built, modules add their routes here.
      */
-    private Router $router;
+    private Map $routeMap;
 
     /**
      * Redis client: the route table and module registrations are stored here.
@@ -67,22 +65,22 @@ class Rebuilder
      *
      * @param ContainerInterface   $di
      * @param IConfigLoader        $config
-     * @param Router               $router
+     * @param Map                  $routeMap
      * @param ClientInterface      $redis
      * @param LoggerInterface|null $logger
      */
     public function __construct(
         ContainerInterface $di,
         IConfigLoader $config,
-        Router $router,
+        Map $routeMap,
         ClientInterface $redis,
         ?LoggerInterface $logger
     ) {
-        $this->di     = $di;
-        $this->config = $config;
-        $this->router = $router;
-        $this->redis  = $redis;
-        $this->logger = $logger ?? new NullLogger();
+        $this->di       = $di;
+        $this->config   = $config;
+        $this->routeMap = $routeMap;
+        $this->redis    = $redis;
+        $this->logger   = $logger ?? new NullLogger();
     }
 
     /**
@@ -105,15 +103,13 @@ class Rebuilder
      */
     public function rebuild(string $siteSchoolCode): void
     {
-        // TODO re-implement rebuild
-        return;
         $this->logger->info(sprintf('Refreshing route and module cache for instance "%s"', INSTANCE_ID));
 
         // Before this runs: clear the route table and module registrations,
         // so that they may be built afresh.
         // Clear config too: it must be reloaded so that config changes are
         // recognised on module load.
-        $this->router->setRoutes(new RouteCollection(new RouteFactory()));
+        $this->routeMap->setRoutes([]);
         Registry::setRegistrations([]);
         $this->config->dropCache();
 
@@ -125,7 +121,7 @@ class Rebuilder
         $this->redis->setex(
             Cache::ROUTE_TABLE_CACHE_KEY_PREFIX . INSTANCE_ID,
             self::CACHE_EXPIRY,
-            serialize($this->router->getRoutes()),
+            serialize($this->routeMap->getRoutes()),
         );
         $this->redis->setex(
             Cache::MODULE_REGISTRATION_CACHE_KEY_PREFIX . INSTANCE_ID,

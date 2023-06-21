@@ -412,11 +412,11 @@ abstract class Kernel
             $di->lazyNew(
                 ModuleCache\Rebuilder::class,
                 [
-                    'di'     => $di,
-                    'config' => $di->lazyGet('config'),
-                    'router' => $di->lazyGet('router'),
-                    'redis'  => $di->lazyGet('redis.cache'),
-                    'logger' => null,
+                    'di'       => $di,
+                    'config'   => $di->lazyGet('config'),
+                    'routeMap' => $di->lazyGet('router.map'),
+                    'redis'    => $di->lazyGet('redis.cache'),
+                    'logger'   => null,
                 ]
             )
         );
