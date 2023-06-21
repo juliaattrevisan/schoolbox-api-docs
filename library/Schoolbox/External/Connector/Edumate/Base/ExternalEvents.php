@@ -21,31 +21,30 @@ class ExternalEvents extends Base implements IExternalEvents
             throw new InvalidArgumentException("External ID is not a Number");
         }
 
-        $query = '
-            SELECT
-                ID AS "id"
-                TITLE AS "title",
-                COMMENT AS "comment",
-                OWNER AS "owner",
-                ROOM AS "room",
-                TYPE AS "type",
-                START_DATE AS "start",
-                END_DATE AS "finish",
-                LOCATION AS "location"
-            FROM SCHOOLBOX_EVENT
-            WHERE
-                OWNER = :externalId
-                AND EVENT.START_DATE <= :startDate
-                AND EVENT.END_DATE >= :endDate
-        ';
+        $query = 'SELECT
+                    EVENT_ID AS "id",
+                    TITLE AS "title",
+                    COMMENT AS "comment",
+                    OWNER AS "owner",
+                    ROOM AS "room",
+                    TYPE AS "type",
+                    START_DATE AS "start",
+                    END_DATE AS "finish",
+                    LOCATION AS "location"
+                FROM SCHOOLBOX_EVENT
+                WHERE
+                    OWNER = :externalId
+                    AND START_DATE >= :startDate
+                    AND END_DATE <= :endDate';
 
         return $this->databaseExternal->getQueryIterator(
             $query,
             [
-                'externalId' => $user->getExternalId(),
-                'startDate'  => date('Y-m-d', $startDate),
-                'endDate'    => date('Y-m-d', $endDate),
+             'externalId' => $user->getExternalId(),
+             'startDate'  => date('Y-m-d', $startDate),
+             'endDate'    => date('Y-m-d', $endDate)
             ]
         );
+
     }
 }
