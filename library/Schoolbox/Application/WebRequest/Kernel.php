@@ -301,7 +301,7 @@ class Kernel extends WebKernelAbstract
         $preloaderException = null;
 
         // Augment route params with preloader params, if possible
-        $params = $route->params;
+        $params = $route->attributes;
         try {
             $params = $preloader->check($route->name, $params);
         } catch (\Exception $preloaderException) {
