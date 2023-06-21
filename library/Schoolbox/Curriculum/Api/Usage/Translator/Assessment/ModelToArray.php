@@ -11,7 +11,7 @@ namespace Schoolbox\Curriculum\Api\Usage\Translator\Assessment;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
@@ -29,13 +29,13 @@ class ModelToArray
     /**
      * Constructor
      *
-     * @param Router                                    $router
+     * @param Generator                                 $routeGenerator
      * @param Authorizer                                $authorizer
      * @param User                                      $currentUser
      * @param UnitSpecification\Translator\ModelToArray $unitTranslator
      */
     public function __construct(
-        protected Router $router,
+        protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
         private UnitSpecification\Translator\ModelToArray $unitTranslator,

@@ -11,7 +11,7 @@ namespace Schoolbox\Curriculum\Api\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Curriculum\Node\Model;
 use Schoolbox\User;
 
@@ -34,7 +34,7 @@ class ModelToArray
      * @param ?array<int, array<string, int>> $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
-        protected Router $router,
+        protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
         private int $ancestorCount,

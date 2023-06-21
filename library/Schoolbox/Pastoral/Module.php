@@ -277,7 +277,7 @@ class Module extends BaseModule
                 new User\Translator\Author\ModelToArray(),
                 $commentTranslator,
                 new Storage\Translator\ModelToArray(new PrefixGenerator($this->injector->get('config'))),
-                $this->injector->get('router'),
+                $this->getRouteGenerator(),
                 $this->injector->get('authorizer'),
                 $this->injector->get('user'),
                 new ScrubAdapter(),

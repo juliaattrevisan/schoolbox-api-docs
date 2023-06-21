@@ -11,9 +11,8 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Resource\Folder\Translator\IModelToArray as FolderTranslator;
 use Schoolbox\User;
 
@@ -25,7 +24,7 @@ class ModelToArray
     use GetRouteIfAuthorized;
 
     public function __construct(
-        protected Router $router,
+        protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
         private FolderTranslator $folderTranslator,

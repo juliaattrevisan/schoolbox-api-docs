@@ -11,7 +11,7 @@ namespace Schoolbox\Pastoral\ClassReport\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\Pastoral\RecordAction\Model as RecordAction;
 use Schoolbox\Pastoral\Tag\Model as Tag;
@@ -35,13 +35,13 @@ class ModelToArray
      * Constructor
      *
      * @param UserTranslator $userTranslator
-     * @param Router         $router
+     * @param Generator      $routeGenerator
      * @param Authorizer     $authorizer
      * @param User           $currentUser
      */
     public function __construct(
         private UserTranslator $userTranslator,
-        protected Router $router,
+        protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
     ) {

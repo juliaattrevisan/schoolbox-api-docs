@@ -66,20 +66,20 @@ class Controller extends Base
         // and the user doesn't reliably exist in the module.
         $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly(1);
         $courseTranslator = new CourseSpec\Translator\ModelToArray(
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             $folderTranslator,
         );
         $unitTranslator = new UnitSpec\Translator\ModelToArray(
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             $folderTranslator,
             $courseTranslator,
         );
         $assessmentTranslator = new Translator\Assessment\ModelToArray(
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             $unitTranslator,
@@ -89,7 +89,7 @@ class Controller extends Base
             new \Schoolbox\User\Translator\Author\ModelToArray(),
             new \Schoolbox\Resource\Storage\Translator\ModelToArray($prefixGenerator),
             new ScrubAdapter(),
-            new BadgeLinksTranslator($this->router, $this->authorizer, $this->getUser(), $prefixGenerator)
+            new BadgeLinksTranslator($this->routeGenerator, $this->authorizer, $this->getUser(), $prefixGenerator)
         );
 
         $hydrator = new Hydrator(
