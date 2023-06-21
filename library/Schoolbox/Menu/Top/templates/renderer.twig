@@ -1,34 +1,11 @@
-{%  if user.pronoun is null %}
-    {% set tokens = {
-        '[id]':         user.id,
-        '[externalId]': user.externalId,
-        '[username]':   user.username,
-        '[firstName]':  user.firstName,
-        '[lastName]':   user.lastName,
-        '[email]':      user.email,
-        '[subjectivepronoun]': 'they',
-        '[subjectivepronounproper]': 'They',
-        '[objectivepronoun]': 'them',
-        '[objectivepronounproper]': 'Them',
-        '[possessivepronoun]': 'theirs',
-        '[possessivepronounproper]': 'Theirs'
-    } %}
-{% else %}
-    {% set tokens = {
-        '[id]':         user.id,
-        '[externalId]': user.externalId,
-        '[username]':   user.username,
-        '[firstName]':  user.firstName,
-        '[lastName]':   user.lastName,
-        '[email]':      user.email,
-        '[subjectivepronoun]': user.pronoun.subjective,
-        '[subjectivepronounproper]': user.pronoun.subjective | capitalize,
-        '[objectivepronoun]': user.pronoun.objective,
-        '[objectivepronounproper]': user.pronoun.objective |capitalize,
-        '[possessivepronoun]': user.pronoun.possessive,
-        '[possessivepronounproper]': user.pronoun.possessive |capitalize
-    } %}
-{% endif %}
+{% set tokens = {
+    '[id]':         user.id,
+    '[externalId]': user.externalId,
+    '[username]':   user.username,
+    '[firstName]':  user.firstName,
+    '[lastName]':   user.lastName,
+    '[email]':      user.email,
+} %}
 
 {% for tab in tabs %}
     <li data-id="{{ tab.id }}"> {# data-id is used by JS to map between the top menu and side menu (overflow) version of these menu items #}

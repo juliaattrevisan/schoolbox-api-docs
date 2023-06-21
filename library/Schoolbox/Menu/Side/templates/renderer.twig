@@ -1,34 +1,11 @@
-{%  if user.pronoun is null %}
-    {% set tokens = {
-        '[id]':         user.id,
-        '[externalId]': user.externalId,
-        '[username]':   user.username,
-        '[firstName]':  user.firstName,
-        '[lastName]':   user.lastName,
-        '[email]':      user.email,
-        '[subjectivepronoun]': 'they',
-        '[subjectivepronounproper]': 'They',
-        '[objectivepronoun]': 'them',
-        '[objectivepronounproper]': 'Them',
-        '[possessivepronoun]': 'theirs',
-        '[possessivepronounproper]': 'Theirs'
-    } %}
-{% else %}
-    {% set tokens = {
-        '[id]':         user.id,
-        '[externalId]': user.externalId,
-        '[username]':   user.username,
-        '[firstName]':  user.firstName,
-        '[lastName]':   user.lastName,
-        '[email]':      user.email,
-        '[subjectivepronoun]': user.pronoun.subjective,
-        '[subjectivepronounproper]': user.pronoun.subjective | capitalize,
-        '[objectivepronoun]': user.pronoun.objective,
-        '[objectivepronounproper]': user.pronoun.objective |capitalize,
-        '[possessivepronoun]': user.pronoun.possessive,
-        '[possessivepronounproper]': user.pronoun.possessive |capitalize
-    } %}
-{% endif %}
+{% set tokens = {
+    '[id]':         user.id,
+    '[externalId]': user.externalId,
+    '[username]':   user.username,
+    '[firstName]':  user.firstName,
+    '[lastName]':   user.lastName,
+    '[email]':      user.email,
+} %}
 
 <nav id="nav">
     <ul class="off-canvas-list">
