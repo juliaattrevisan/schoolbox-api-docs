@@ -11,7 +11,6 @@ namespace Schoolbox\Pastoral\Comment\Translator\Test;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\MockAdapter;
-use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use Aura\Router\RouterContainer;
 use DateTimeInterface;

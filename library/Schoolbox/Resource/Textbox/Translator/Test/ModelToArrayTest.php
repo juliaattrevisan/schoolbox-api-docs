@@ -11,7 +11,6 @@ namespace Schoolbox\Resource\Textbox\Translator\Test;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\MockAdapter;
-use Alaress\Web\Router\RouterFactory;
 use Aura\Router\RouterContainer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
