@@ -105,6 +105,8 @@ class Rebuilder
      */
     public function rebuild(string $siteSchoolCode): void
     {
+        // TODO re-implement rebuild
+        return;
         $this->logger->info(sprintf('Refreshing route and module cache for instance "%s"', INSTANCE_ID));
 
         // Before this runs: clear the route table and module registrations,
