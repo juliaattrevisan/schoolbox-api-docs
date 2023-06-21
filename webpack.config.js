@@ -98,14 +98,6 @@ module.exports = {
         ],
         masonry: {
             import: [
-                // homepage editing
-                "./www/static/js/masonry/jquery.masonry.js",
-                "./www/static/js/masonry/jquery.masonry.colourPicker.js",
-            ],
-            dependOn: "main", // ensures jQuery is loaded prior
-        },
-        masonry2: {
-            import: [
                 "./www/static/js/masonry/masonry.js",
             ],
             dependOn: "main", // ensures jQuery is loaded prior
