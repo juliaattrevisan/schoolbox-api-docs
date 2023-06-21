@@ -23,8 +23,7 @@ alter table user
 INSERT INTO pronoun (subjective, objective, possessive, sequence, created_at, updated_at)
 VALUES ('he', 'him', 'his', 2, now(), now()),
        ('she', 'her', 'hers', 3, now(), now()),
-       ('they', 'them', 'theirs', 4, now(), now()),
-       ('ze', 'hir', 'hirs', 5, now(), now());
+       ('they', 'them', 'theirs', 4, now(), now());
 
 
 ### admin email signature tooltip
