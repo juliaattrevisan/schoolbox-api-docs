@@ -33,7 +33,7 @@ use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
 use Aura\Router\Generator;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Aura\Router\RouterContainer;
 use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
@@ -2103,9 +2103,9 @@ abstract class Kernel
             $routes = $moduleCache->fetchRouteTable();
         }
 
-        /** @var Router $router */
-        $router = $this->di->get('router');
-        $router->setRoutes($routes);
+        /** @var Map $routeMap */
+        $routeMap = $this->di->get('router.map');
+        $routeMap->setRoutes($routes);
     }
 
     /**
