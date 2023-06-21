@@ -23,11 +23,10 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -179,17 +178,21 @@ class Controller extends BaseController
      */
     public function getExportFormForUnit(UnitSpecificationModel $unitSpec): void
     {
-        $unitImpls = $unitSpec->getUnitImplementations();
+        $course = $unitSpec->getCourse();
+        echo "This unit spec belongs to course '" . $course->getTitle() . "', id: " . $course->getId() . "<br/>\n";
 
-        $notImported = $unitImpls->filter(function (UnitImplementionModel $unitImpl) {
-            return null === $unitImpl->getId();
-        })->sortByCallback(static function (UnitImplementationModel $a, UnitImplementationModel $b) {
+        // TODO: This function is not returning linked course implementations.  Fix the function by hydrating the model.
+        $courseImpls = $course->getCourseImplementations();
+
+        $notImported = $courseImpls->filter(function (CourseImplemention $courseImpl) {
+            return null === $courseImpl->getId();
+        })->sortByCallback(static function (CourseSpecification $a, CourseSpecification $b) {
             return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
         });
 
-        $imported = $unitImpls->filter(function (UnitImplementationModel $unitImpl) {
-            return $unitImpl->getId();
-        })->sortByCallback(static function (UnitImplementationModel $a, UnitImplementationModel $b) {
+        $imported = $courseImpls->filter(function (CourseSpecification $courseImpl) {
+            return $courseImpl->getId();
+        })->sortByCallback(static function (CourseSpecification $a, CourseSpecification $b) {
             return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
         });
 
@@ -210,14 +213,14 @@ class Controller extends BaseController
             'returnUrlName'    => Redirect::RETURN_URL,
             'unImported'       => $notImported,
             'imported'         => $imported,
-            'folderWritePerms' => $this->buildFolderWritePermissions($unitImpls),
+            'folderWritePerms' => $this->buildFolderWritePermissions($courseImpls),
             'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
             'breadcrumbs'      => $breadcrumbs,
             'responseCounts'   => $responseCounts,
             'feedbackCounts'   => $feedbackCounts,
         ];
 
-        $template = '@learningAssessmentExporter/export.twig';
+        $template = '@learningAssessmentExporter/export.twig'; // TODO: Create new Twig template.  Start from copy of @learningAssessmentExporter/export.twig.
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
