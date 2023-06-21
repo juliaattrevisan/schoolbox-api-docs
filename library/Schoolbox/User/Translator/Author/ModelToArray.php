@@ -41,6 +41,7 @@ class ModelToArray extends User\Translator\ModelToArray
             'title'         => $user->getTitle(),
             'firstName'     => $user->getFirstname(),
             'preferredName' => $user->getPreferredName(),
+            'pronoun'       => $user->getPronoun(),
             'lastName'      => $user->getLastname(),
             'fullName'      => $user->getFullName(),
             'isDeleted'     => $user->isDeleted(),

@@ -225,7 +225,7 @@ export default {
                                             title="View all pastoral records"
                                             class="name"
                                         >
-                                            {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
+                                            {{ studentData.student.lastName }}, {{ studentData.student.firstName }} {{ studentData.student.pronoun }}
                                         </a>
                                     </h4>
                                     <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
