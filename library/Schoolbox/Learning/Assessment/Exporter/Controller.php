@@ -179,52 +179,46 @@ class Controller extends BaseController
      */
     public function getExportFormForUnit(UnitSpecificationModel $unitSpec): void
     {
-echo "In Exporter/Controller->getExportForm().  Success!\n";
-die;
-//        $unitSpecImpls = $this->buildImplementationsForSpecification($unitSpec);
-//
-//        $notImported = $unitSpecImpls->filter(function (IAssessable $unitSpecImpl) {
-//            return null === $unitSpecImpl->getId();
-//        })->sortByCallback(static function (IAssessable $a, IAssessable $b) {
-//            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
-//        });
-//
-//        $imported    = $unitSpecImpls->filter(function (IAssessable $unitSpecImpl) {
-//            return $unitSpecImpl->getId();
-//        })->sortByCallback(static function (IAssessable $a, IAssessable $b) {
-//            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
-//        });
-//
-//        // Find interactions with imported unitSpecs
-//        $unitSpecIds  = $imported->getPropertyValues('id');
+        $unitImpls = $unitSpec->getUnitImplementations();
+
+        $notImported = $unitImpls->filter(function (UnitImplementionModel $unitImpl) {
+            return null === $unitImpl->getId();
+        })->sortByCallback(static function (UnitImplementationModel $a, UnitImplementationModel $b) {
+            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+        });
+
+        $imported = $unitImpls->filter(function (UnitImplementationModel $unitImpl) {
+            return $unitImpl->getId();
+        })->sortByCallback(static function (UnitImplementationModel $a, UnitImplementationModel $b) {
+            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+        });
+
+        // Find interactions with imported unitSpecs
+        $unitSpecIds = $imported->getPropertyValues('id');
 //        $responseCounts = $this->unitSpecDataSource->findResponseCountsForAssessments($unitSpecIds);
 //        $feedbackCounts = $this->unitSpecDataSource->findFeedbackCountsForAssessments($unitSpecIds);
-//
-//        $breadcrumbs = [
-//            ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
-//            [$unitSpec->getBaseContext()->getTitle(), '/homepage/' . $unitSpec->getBaseContext()->getFolder()->getId()],
-//        ];
-//        if ($unitSpec->getContext() instanceof Project) {
-//            $breadcrumbs[] = [$unitSpec->getContext()->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['unitSpecId' => $unitSpec->getContext()->getId()])];
-//        }
-//        $breadcrumbs[] = [$unitSpec->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['unitSpecId' => $unitSpec->getId()])];
-//        $breadcrumbs[] = ['Export', '#'];
-//
-//        $data = [
-//            'unitSpec'         => $unitSpec,
-//            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
-//            'returnUrlName'    => Redirect::RETURN_URL,
-//            'unImported'       => $notImported,
-//            'imported'         => $imported,
-//            'folderWritePerms' => $this->buildFolderWritePermissions($unitSpecImpls),
-//            'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
-//            'breadcrumbs'      => $breadcrumbs,
-//            'responseCounts'   => $responseCounts,
-//            'feedbackCounts'   => $feedbackCounts,
-//        ];
-//
-//        $template = '@learningAssessmentExporter/export.twig';
-//        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        $responseCounts = [];
+        $feedbackCounts = [];
+
+        $breadcrumbs = [];
+
+        $unitSpec->context = false; // Context property is required by the Twig template, which was designed for assessments, not units.
+
+        $data = [
+            'assessmentSpec'   => $unitSpec,
+            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'    => Redirect::RETURN_URL,
+            'unImported'       => $notImported,
+            'imported'         => $imported,
+            'folderWritePerms' => $this->buildFolderWritePermissions($unitImpls),
+            'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+            'breadcrumbs'      => $breadcrumbs,
+            'responseCounts'   => $responseCounts,
+            'feedbackCounts'   => $feedbackCounts,
+        ];
+
+        $template = '@learningAssessmentExporter/export.twig';
+        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
 
