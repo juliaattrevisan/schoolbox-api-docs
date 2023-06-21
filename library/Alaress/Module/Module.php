@@ -373,30 +373,31 @@ class Module
      * match against preloads or permissions for "update", "replace" and "delete"
      * respectively.
      *
-     * @param Router $router   The router to add the route to
+     * @param Map    $routeMap The router to add the route to
      * @param string $basePath The base path for this route
      */
-    protected function attachResourceRoutes(Router $router, $basePath)
+    protected function attachResourceRoutes(Map $routeMap, $basePath)
     {
-        $routes = $router->getRoutes();
-        $routes->attachResource($this->basename, $basePath);
+        // TODO reimplement REST routes
+//        $routes = $routeMap->getRoutes();
+//        $routes->attachResource($this->basename, $basePath);
 
         // Attach POST aliases for the PUT/PATCH/DELETE routes added by
         // `attachResource`.
-        $routes->attach(
+        $routeMap->attach(
             $this->basename,
             $basePath,
-            function (RouteCollection $subroute) {
-                $subroute->setTokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
-                $subroute
-                    ->addPost('update:post', '/{id}/update')
-                    ->addValues(['action' => 'update']);
-                $subroute
-                    ->addPost('replace:post', '/{id}/replace')
-                    ->addValues(['action' => 'replace']);
-                $subroute
-                    ->addPost('delete:post', '/{id}/delete')
-                    ->addValues(['action' => 'delete']);
+            function (Map $subMap) {
+                $subMap->tokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
+                $subMap
+                    ->post('update:post', '/{id}/update')
+                    ->attributes(['action' => 'update']);
+                $subMap
+                    ->post('replace:post', '/{id}/replace')
+                    ->attributes(['action' => 'replace']);
+                $subMap
+                    ->post('delete:post', '/{id}/delete')
+                    ->attributes(['action' => 'delete']);
             }
         );
     }
