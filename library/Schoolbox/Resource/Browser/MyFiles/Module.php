@@ -87,8 +87,11 @@ class Module extends AbstractModule
         $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/info', 'showFolderInfo', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasFileAccess, $preloadFile);
-        $this->register('GET', '/file/{fileIds:\d+}/info', 'showMultiFileInfo', $notSupported);
         $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $hasFolderAccess, $preloadFolder);
+
+        // I believe showMultiFileInfo is never used in any resource browser
+        // variant: I can find no reference to it
+        $this->register('GET', '/file/{fileIds:\d+}/info', 'showMultiFileInfo', $notSupported);
     }
 
     /**
