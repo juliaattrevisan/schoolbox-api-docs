@@ -48,13 +48,13 @@ class Module extends BaseModule
         $selectedDateRegex = '([0][1-9]|[12][0-9]|3[01])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}';
 
         $this->addGetRoute($routeMap, 'getOwnCalendar', $basePath, "{/selectedDate}");
-        $this->addGetRoute($routeMap, 'getCalendar', $basePath, "/{selectedDate}/{userId}")->addTokens([
+        $this->addGetRoute($routeMap, 'getCalendar', $basePath, "/{selectedDate}/{userId}")->tokens([
             'selectedDate' => $selectedDateRegex,
             'userId'       => '\d+',
         ]);
 
         // Redirect old paths
-        $this->addGetRoute($routeMap, 'redirect', $basePath, "/{format}{/selectedDate,userId}")->addTokens([
+        $this->addGetRoute($routeMap, 'redirect', $basePath, "/{format}{/selectedDate,userId}")->tokens([
             'format'       => 'week|month|full|week-list|month-list',
             'selectedDate' => $selectedDateRegex,
             'userId'       => '\d+',

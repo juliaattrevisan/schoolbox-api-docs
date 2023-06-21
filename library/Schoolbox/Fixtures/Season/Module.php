@@ -62,7 +62,7 @@ class Module extends RestfulModule
         ];
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($routeMap, $controllerMethod, $basePath, $path)->addTokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($routeMap, $controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 

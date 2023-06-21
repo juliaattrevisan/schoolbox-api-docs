@@ -37,13 +37,13 @@ class Module extends BaseModule
     public function initRoutes(Map $routeMap, $basePath)
     {
         $this->addGetRoute($routeMap, 'currentReport', $basePath, '/{id}')
-             ->addTokens(['id' => '\\d+']);
+             ->tokens(['id' => '\\d+']);
         $this->addGetRoute($routeMap, 'index', $basePath, '/{id}/{year}')
-             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
+             ->tokens(['id' => '\\d+', 'year' => '\\d+']);
         $this->addGetRoute($routeMap, 'subject', $basePath, '/{id}/{year}/{subjectCode}')
-             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
+             ->tokens(['id' => '\\d+', 'year' => '\\d+']);
         $this->addGetRoute($routeMap, 'printableReport', $basePath, '/{id}/print/{year}')
-             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
+             ->tokens(['id' => '\\d+', 'year' => '\\d+']);
     }
 
     /**

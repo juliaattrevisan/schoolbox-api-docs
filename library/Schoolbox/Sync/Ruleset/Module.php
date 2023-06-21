@@ -32,7 +32,7 @@ class Module extends BaseModule
     public function initRoutes(Map $routeMap, $basePath)
     {
         $this->addGetRoute($routeMap, 'logs', $basePath, "/logs");
-        $this->addGetRoute($routeMap, 'logFormat', $basePath, "/log/{logId}.{format}")->addTokens(['logId' => '\d+']);
+        $this->addGetRoute($routeMap, 'logFormat', $basePath, "/log/{logId}.{format}")->tokens(['logId' => '\d+']);
         $this->addGetRoute($routeMap, 'log', $basePath, "/log/{logId}");
         $this->addGetRoute($routeMap, 'intro', $basePath, "");
         $this->addGetRoute($routeMap, 'read', $basePath, "/{rulesetId}");

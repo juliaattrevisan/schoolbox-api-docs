@@ -47,7 +47,7 @@ class Module extends BaseModule
     public function initRoutes(Map $routeMap, $basePath)
     {
         $this->addGetRoute($routeMap, 'getInsert', $basePath, "/create");
-        $this->addGetRoute($routeMap, 'getModify', $basePath, "/{userId}/modify")->setTokens(['userId' => '\d+']);
+        $this->addGetRoute($routeMap, 'getModify', $basePath, "/{userId}/modify")->tokens(['userId' => '\d+']);
         $this->addGetRoute($routeMap, 'getStaleReport', $basePath, "/stale");
         $this->addGetRoute($routeMap, 'getStaleUsers', $basePath, "/stale/list");
 

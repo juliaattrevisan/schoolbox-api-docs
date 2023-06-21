@@ -179,9 +179,9 @@ class Module
 
             // preload registered routes
             foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
-                $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
-                     ->setMethod($method)
-                     ->setTokens($tokens);
+                $this->addRoute($this->getRouteMap(), $controllerMethod, $basePath, $path)
+                     ->allows($method)
+                     ->tokens($tokens);
             }
 
             // no need that no more
