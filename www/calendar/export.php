@@ -730,7 +730,7 @@ $renderer = new Renderer(
     $endTimestamp,
     $user,
     $kernel->get('authorizer'),
-    $kernel->get('router'),
+    $kernel->get('router.generator'),
     $viewer
 );
 

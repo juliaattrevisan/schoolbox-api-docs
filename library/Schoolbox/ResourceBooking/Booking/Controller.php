@@ -673,7 +673,7 @@ class Controller extends Base
             (int)$query['end'],
             $this->getUser(),
             $this->getAuthorizer(),
-            $this->getRouter(),
+            $this->routeGenerator,
             $this->getUser()
         );
 

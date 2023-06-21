@@ -47,7 +47,7 @@ $renderer             = new Renderer(
     (int)$_GET['end'],
     $user,
     $this->getDi()->get('authorizer'),
-    $this->getDi()->get('router'),
+    $this->getDi()->get('router.generator'),
     $viewer
 );
 

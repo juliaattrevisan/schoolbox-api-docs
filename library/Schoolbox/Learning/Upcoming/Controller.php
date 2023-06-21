@@ -380,7 +380,7 @@ class Controller extends Base
             $end,
             $student,
             $this->getAuthorizer(),
-            $this->getRouter(),
+            $this->routeGenerator,
             $this->getUser()
         );
 

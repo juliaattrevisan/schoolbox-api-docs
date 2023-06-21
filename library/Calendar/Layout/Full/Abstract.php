@@ -9,10 +9,9 @@
  */
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 abstract class Calendar_Layout_Full_Abstract
 {
@@ -63,9 +62,9 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Router, used for generating links in calendar events.
      *
-     * @var Router
+     * @var Generator
      */
-    protected Router $router;
+    protected Generator $routeGenerator;
 
 
     /**
@@ -80,7 +79,7 @@ abstract class Calendar_Layout_Full_Abstract
      * Constructor
      *
      * @param Authorizer                       $authorizer
-     * @param Router                           $router
+     * @param Generator                        $routeGenerator
      * @param User                             $user
      * @param User                             $viewer
      * @param Calendar_Api_EventType_Interface $api
@@ -89,7 +88,7 @@ abstract class Calendar_Layout_Full_Abstract
      */
     public function __construct(
         Authorizer $authorizer,
-        Router $router,
+        Generator $routeGenerator,
         User $user,
         User $viewer,
         Calendar_Api_EventType_Interface $api,
@@ -101,7 +100,7 @@ abstract class Calendar_Layout_Full_Abstract
         $this->user              = $user;
         $this->viewer            = $viewer;
         $this->authorizer        = $authorizer;
-        $this->router            = $router;
+        $this->routeGenerator    = $routeGenerator;
         $this->allowedEventTypes = $allowedEventTypes;
     }
 
