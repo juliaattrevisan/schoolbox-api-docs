@@ -80,6 +80,7 @@ class Module extends AbstractModule
         $notSupported    = new Rule\Callback(function (array $params, User $user): bool {
             throw new InvalidPath();
         });
+        $this->register('GET', '/picker/{sourceSlug}', 'picker', new Rule\IsLoggedIn());
         $this->register('GET', '/file/{fileId:\d+}/ajax', 'getFileInfo', $hasFileAccess, $preloadFile);
         $this->register('GET', '{/folderId:\d+}', 'browse', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/children', 'listResources', $hasFolderAccess, $preloadFolder);
