@@ -421,11 +421,6 @@ module.exports = {
                     // For feature tours
                     "./node_modules/intro.js/minified/intro.min.js",
                 ],
-                "masonry.js": [
-                    // homepage editing
-                    "./www/static/js/masonry/jquery.masonry.js",
-                    "./www/static/js/masonry/jquery.masonry.colourPicker.js",
-                ],
                 "dataTables.js": [
                     // DataTables
                     "./node_modules/datatables.net/js/jquery.dataTables.js",
