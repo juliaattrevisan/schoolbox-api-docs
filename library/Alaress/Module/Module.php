@@ -378,17 +378,24 @@ class Module
      */
     protected function attachResourceRoutes(Map $routeMap, $basePath)
     {
-        // TODO reimplement REST routes
-//        $routes = $routeMap->getRoutes();
-//        $routes->attachResource($this->basename, $basePath);
-
-        // Attach POST aliases for the PUT/PATCH/DELETE routes added by
-        // `attachResource`.
         $routeMap->attach(
             $this->basename,
             $basePath,
             function (Map $subMap) {
                 $subMap->tokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
+
+                // Attach routes from Aura Router 2.x `attachResource`
+                $subMap->get('browse', '{format}');
+                $subMap->get('read', '/{id}{format}');
+                $subMap->get('edit', '/{id}/edit{format}');
+                $subMap->get('add', '/add');
+                $subMap->delete('delete', '/{id}');
+                $subMap->post('create', '');
+                $subMap->post('update', '/{id}');
+                $subMap->post('replace', '/{id}');
+                $subMap->options('options', '');
+
+                // Attach POST aliases for PUT/PATCH/DELETE routes
                 $subMap
                     ->post('update:post', '/{id}/update')
                     ->attributes(['action' => 'update']);
