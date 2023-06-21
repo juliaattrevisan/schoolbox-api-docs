@@ -4,6 +4,7 @@ import { initExistingComponents } from "./existingComponents/existingComponents"
 import { initToggleLockComponents } from "./existingComponents/toggleLockComponents";
 import { initEditColumns } from "./editColumns/editColumns";
 import { initNewComponents } from "./newComponents/newComponents";
+import { updateAllComponentCounts } from "./newComponents/updateNewComponentButtons";
 import { initUpdatePlaceHolders } from "./updatePlaceHolders";
 import { merge } from "lodash";
 
@@ -19,6 +20,8 @@ document.addEventListener("MASONRY__CREATE", (e) => {
         if (masonryConfig.editColumns) { initEditColumns() };
         initNewComponents();
         initUpdatePlaceHolders();
+
+        if (masonryConfig.refreshPaletteCountsOnLoad) { updateAllComponentCounts(); }
     }
 });
 

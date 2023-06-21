@@ -76,3 +76,19 @@ function checkButtonStatus(paletteElement, componentCount) {
         paletteElement.style.opacity = 1;
     }
 }
+
+/**
+ * Updates all the component counts based on what can be found on the page
+ * Note: This will not work as intended if multiple components with the same definition ID are in the pallette, e.g. on eportfolios
+ */
+export function updateAllComponentCounts() {
+    document.querySelectorAll("[data-component-palette]").forEach((paletteElement) => {
+        const componentDefinitionId = paletteElement.querySelector("[data-component-definition-id]").dataset.componentDefinitionId;
+        const componentCount = document.querySelectorAll(`[data-component][data-component-definition-id="${componentDefinitionId}"]`).length;
+        const counterElement = paletteElement.querySelector('[data-relation="count"]');
+        if (counterElement) {
+            counterElement.textContent = componentCount;
+        }
+        checkButtonStatus(paletteElement, componentCount);
+    });
+}
