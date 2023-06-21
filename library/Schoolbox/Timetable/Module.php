@@ -99,8 +99,7 @@ class Module extends BaseModule
     {
         $this
             ->addRoute($routeMap, 'dateForTimetableDay', $basePath, '/dateForTimetableDay')
-            ->addValues(array('format' => '.json'))
-        ;
+            ->attributes(['format' => '.json']);
     }
 
 

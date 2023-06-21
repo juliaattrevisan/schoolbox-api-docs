@@ -40,9 +40,9 @@ class Module extends BaseModule
         $this->addGetRoute($routeMap, 'book', $basePath, '/bookItem/{id}');
         $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit');
         $this->addPostRoute($routeMap, 'createBooking', $basePath, '/bookItem/{id}')
-            ->addValues(array('action' => 'createBooking'));
+             ->attributes(['action' => 'createBooking']);
         $this->addPostRoute($routeMap, 'update:post', $basePath, '/{id}/update')
-            ->addValues(array('action' => 'update'));
+             ->attributes(['action' => 'update']);
         $this->addRoute($routeMap, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking

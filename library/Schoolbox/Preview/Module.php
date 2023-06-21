@@ -30,7 +30,7 @@ class Module extends BaseModule
         /* Render html fragment, or redirect
          */
         $this->addGetRoute($routeMap, 'preview', $basePath, '/{encodedUrl}')
-            ->addValues([
+            ->attributes([
                 'format' => '.json'
             ]);
     }
