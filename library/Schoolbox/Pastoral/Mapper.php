@@ -155,6 +155,7 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('student.year', 'sy')},
                         {$this->getJoinColumnString('student.schoolHouse', 'sh')},
                         {$this->getJoinColumnString('student.userCampus', 'sc')},
+                        {$this->getJoinColumnString('student.pronoun', 'p')},
                         {$this->getJoinColumnString('severity', 'sv')},
                         {$this->getJoinColumnString('owner', 'o')},
                         {$this->getJoinColumnString('type', 't')},
@@ -174,6 +175,7 @@ class Mapper extends BaseMapper
             LEFT  JOIN   {$this->getJoinSql('student.year', 's', 'sy')}
             LEFT  JOIN   {$this->getJoinSql('student.schoolHouse', 's', 'sh')}
             LEFT  JOIN   {$this->getJoinSql('student.userCampus', 's', 'sc')}
+            LEFT  JOIN   {$this->getJoinSql('student.pronoun', 's', 'p')}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv', true)}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
@@ -249,6 +251,9 @@ class Mapper extends BaseMapper
         /** @var CampusMapper $campusMapper */
         $campusMapper = $this->getJoinMapper('student.userCampus');
 
+        /** @var User\Pronoun\Mapper $pronounMapper */
+        $pronounMapper = $this->getJoinMapper('student.pronoun');
+
         $model = $this->hydrate($row);
 
         $model->setOwner($ownerMapper->hydrate($row, 'o'));
@@ -257,6 +262,8 @@ class Mapper extends BaseMapper
         //complete the hydration on the student object....
         (new \Schoolbox\External\User())->loadParents([$model->getStudent()]);
         (new \Schoolbox\External\User())->loadTeachers([$model->getStudent()]);
+
+        $model->getStudent()->setPronoun($pronounMapper->hydrate($row, 'p'));
 
         $studentYear = $this->hydrateJoin($row, 'student.year', 'sy');
         if ($studentYear) {

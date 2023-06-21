@@ -646,6 +646,7 @@ export default {
                                                 ? "‘" + student.preferred + "’"
                                                 : ""
                                         }}
+                                        {{ student.pronoun }}
                                     </a>
                                 </template>
                                 <template v-else>
@@ -655,6 +656,7 @@ export default {
                                             ? "‘" + student.preferred + "’"
                                             : ""
                                     }}
+                                    {{ student.pronoun }}
                                 </template>
 
                                 <span class="meta">({{ student.synergy_id }})</span>

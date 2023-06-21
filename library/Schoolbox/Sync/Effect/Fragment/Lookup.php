@@ -23,7 +23,6 @@ use Schoolbox\ValueLabelInterface;
  */
 class Lookup
 {
-
     /**
      * A list of mappers to use when retrieving lookup data
      *
@@ -39,6 +38,7 @@ class Lookup
         'userAccessRead' => '\Schoolbox\Resource\GroupMapper',
         'userAccessWrite' => '\Schoolbox\Resource\GroupMapper',
         'userAccessRemove' => '\Schoolbox\Resource\GroupMapper',
+        'pronoun' => '\Schoolbox\User\Pronoun\Mapper',
     ];
 
     /**
@@ -75,9 +75,24 @@ class Lookup
                      * in the ui
                      */
                     $allResults = $mapper->findFolders();
-                } elseif (in_array($userField, ['year', 'residentialHouse', 'schoolHouse'])) {
+                } elseif (in_array($userField, ['year', 'residentialHouse', 'schoolHouse', 'pronoun'])) {
                     $notSet = ($mapper->createModel())->setId(self::NOT_SET_ID);
-                    ($userField === 'year') ? $notSet->setName('Not Set') : $notSet->setHouse('Not Set');
+                    /**
+                     * switch the mapper we are using to build the empty object correctly
+                     */
+                    switch ($userField) {
+                        case 'year':
+                            /** @var \Schoolbox\YearLevel\Model $notSet **/
+                            $notSet->setName('Not Set');
+                            break;
+                        case 'pronoun':
+                            /** @var \Schoolbox\User\Pronoun\Model $notSet **/
+                            $notSet->setSubjective('Not Set');
+                            break;
+                        default:
+                            /** @var \House|\HouseResidential $notSet **/
+                            $notSet->setHouse('Not Set');
+                    }
                     /** @var GenericCollection $allResults */
                     $allResults = $mapper->createCollection()->add($notSet);
                     $allResults = $allResults->merge($mapper->findAll());

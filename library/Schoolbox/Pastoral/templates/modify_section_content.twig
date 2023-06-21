@@ -5,18 +5,14 @@
 <section class="content tabs-content">
     <div class="content active" id="panel-general">
         <p class="meta">
-            You may use the following tokens that will be substituted with the
-            students details on creation:
-            [firstname], [preferredname], [surname], [fullname], [year], [house]
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
         </p>
         <textarea id="body_public" name="body_public">{{ record.bodyPublic }}</textarea>
         {% include 'sub/attachzone.twig' with {attachzone: attachzonePublic} %}
     </div>
     <div class="content" id="panel-confidential">
         <p class="meta">
-            You may use the following tokens that will be substituted with the
-            students details on creation:
-            [firstname], [preferredname], [surname], [fullname], [year], [house]
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
         </p>
         <textarea id="body_private" name="body_private">{{ record.bodyPrivate }}</textarea>
         {% include 'sub/attachzone.twig' with {attachzone: attachzonePrivate} %}

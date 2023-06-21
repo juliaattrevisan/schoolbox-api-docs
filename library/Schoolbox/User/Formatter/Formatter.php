@@ -46,6 +46,7 @@ class Formatter
             'firstname'     => $user->getFirstname(),
             'preferredname' => $user->getPreferredName(),
             'lastname'      => $user->getLastname(),
+            'pronoun'       => $user->getPronoun()?->__toString(),
         ]);
     }
 

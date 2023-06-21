@@ -20,6 +20,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\YearLevel\Model as YearLevel;
+use Schoolbox\User\Pronoun\Model as Pronoun;
 
 /**
  * Test for the author variant of the user model to array translator.
@@ -52,6 +53,7 @@ class ModelToArrayTest extends TestCase
             'title'         => null,
             'firstName'     => null,
             'preferredName' => null,
+            'pronoun'       => null,
             'lastName'      => null,
             'fullName'      => 'Unknown User',
             'isDeleted'     => false,
@@ -88,6 +90,11 @@ class ModelToArrayTest extends TestCase
             ->setFirstname('John')
             ->setPreferredName('Jack')
             ->setLastname('Doe')
+            ->setPronoun((new Pronoun())
+                             ->setId(1)
+                             ->setSubjective('he')
+                             ->setObjective('him')
+                             ->setPossessive('his'))
             ->setLocalEmail(false)
             ->setAltEmail('mrjohndoe@mail.com')
             ->setPositionTitle('Tester')
@@ -113,6 +120,7 @@ class ModelToArrayTest extends TestCase
                 'title'         => 'Mr',
                 'firstName'     => 'John',
                 'preferredName' => 'Jack',
+                'pronoun'       => '(he / him)',
                 'lastName'      => 'Doe',
                 'fullName'      => 'Mr John Doe',
                 'isDeleted'     => false,

@@ -124,6 +124,7 @@ class UserMapper extends Mapper
         $this->joins('portrait_hash', Storage\Mapper::class, 'hash', null, null, 'portrait', 'portrait');
         $this->joins('house', HouseMapper::class, 'id', null, null, 'schoolHouse', 'schoolHouse');
         $this->joins('residential_house_id', HouseResidentialMapper::class, 'id', null, null, 'residentialHouse', 'residentialHouse');
+        $this->joins('pronoun', Schoolbox\User\Pronoun\Mapper::class, 'id', null, null, 'pronoun', 'pronoun');
         $this->joins('group_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->joins('year_id', YearLevel\Mapper::class, 'id', null, null, 'year', 'year');
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
@@ -357,7 +358,8 @@ class UserMapper extends Mapper
                 {$this->getJoinColumnString('role', 'lur')},
                 {$this->getJoinColumnString('year', 'lyl')},
                 {$this->getJoinColumnString('portrait', 'portrait')},
-                {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')}
+                {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')},
+                {$this->getJoinColumnString('pronoun', 'p')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
             JOIN {$this->getJoinSql('role', '', 'g', true)}
@@ -368,6 +370,7 @@ class UserMapper extends Mapper
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
             LEFT JOIN {$this->getJoinSql('portrait', '', 'portrait')}
             LEFT JOIN {$this->getJoinSql('portrait.allowedFileExtension', 'portrait', 'afe', true)}
+            LEFT JOIN {$this->getJoinSql('pronoun', '', 'p')}
         ";
     }
 
@@ -402,12 +405,23 @@ class UserMapper extends Mapper
                 /** @var House $schoolHouse **/
                 $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
 
+                /** @var User\Pronoun\Model|null $pronoun **/
+                $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
+
+                // if empty pronoun, create blank default entry
+//                if (null === $pronoun) {
+//                    /** @var Schoolbox\User\Pronoun\Mapper $pronounMapper */
+//                    $pronounMapper = $this->getJoinMapper('pronoun');
+//                    $pronoun = $pronounMapper->createModel();
+//                }
+
                 $users[$userId] = $this->hydrate($row)
                                        ->setSuperuser($row['superuser'] == 1)
                                        ->setRole($role)
                                        ->setYear($year)
                                        ->setSchoolHouse($schoolHouse)
                                        ->setLinkedUser($this->createCollection())
+                                       ->setPronoun($pronoun)
                                        ->setCampusCollection($campusMapper->createCollection());
             }
 

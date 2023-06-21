@@ -97,6 +97,12 @@ class Mapper extends BaseMapper
                 '[firstName]',
                 '[lastName]',
                 '[email]',
+                '[subjectivepronoun]',
+                '[subjectivepronounproper]',
+                '[objectivepronoun]',
+                '[objectivepronounproper]',
+                '[possessivepronoun]',
+                '[possessivepronounproper]',
             ];
 
             $vieweeEmail = empty($viewee->getEmail()) ? '' : $viewee->getEmail();
@@ -107,6 +113,12 @@ class Mapper extends BaseMapper
             $viewerLastName = empty($viewer->getLastName()) ? '' : $viewer->getLastName();
             $vieweeFirstName = empty($viewee->getFirstName()) ? '' : $viewee->getFirstName();
             $viewerFirstName = empty($viewer->getFirstName()) ? '' : $viewer->getFirstName();
+            $subjectivePronoun = $viewee->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT;
+            $subjectivePronounProper = ucfirst($viewee->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT);
+            $objectivePronoun = $viewee->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT;
+            $objectivePronounProper = ucfirst($viewee->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT);
+            $possessivePronoun = $viewee->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT;
+            $possessivePronounProper = ucfirst($viewee->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT);
 
             $array_replace = [
                 \urlencode((string)$viewee->getId()),
@@ -120,7 +132,13 @@ class Mapper extends BaseMapper
                 \urlencode($viewer->getUsername()),
                 \urlencode($viewerFirstName),
                 \urlencode($viewerLastName),
-                \urlencode($viewerEmail)
+                \urlencode($viewerEmail),
+                \urlencode($subjectivePronoun),
+                \urlencode($subjectivePronounProper),
+                \urlencode($objectivePronoun),
+                \urlencode($objectivePronounProper),
+                \urlencode($possessivePronoun),
+                \urlencode($possessivePronounProper),
             ];
 
             $processedButton = clone $button;

@@ -24,6 +24,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
+use Schoolbox\User\Pronoun;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
@@ -130,6 +131,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(HouseMapper::class),
             $this->getMapperFactory()->get(TokenMapper::class),
             $this->getMapperFactory()->get(YearLevel\Mapper::class),
+            $this->getMapperFactory()->get(Pronoun\Mapper::class),
         );
     }
 

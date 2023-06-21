@@ -88,6 +88,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('recipient', 'recipient')},
                 {$this->getJoinColumnString('recipient.year', 'recipientYear')},
                 {$this->getJoinColumnString('recipient.schoolHouse', 'recipientSchoolHouse')},
+                {$this->getJoinColumnString('recipient.pronoun', 'recipientPronoun')},
                 {$this->getJoinColumnString('creator', 'creator')}
         ";
     }
@@ -107,6 +108,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('recipient', '', 'recipient', true)}
             LEFT JOIN {$this->getJoinSql('recipient.year', 'recipient', 'recipientYear', true)}
             LEFT JOIN {$this->getJoinSql('recipient.schoolHouse', 'recipient', 'recipientSchoolHouse', true)}
+            LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'recipient', 'recipientPronoun')}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
         ";
     }
@@ -155,6 +157,16 @@ class Mapper extends BaseMapper
                 if ($recipientSchoolHouse) {
                     $recipient->setSchoolHouse($recipientSchoolHouse);
                 }
+
+                /** @var User\Pronoun\Model|null $recipientPronoun */
+                $recipientPronoun = $this->hydrateJoin($row, 'recipient.pronoun', 'recipientPronoun');
+//                // if empty pronoun, create blank default entry
+//                if (null === $recipientPronoun) {
+//                    /** @var User\Pronoun\Mapper $pronounMapper */
+//                    $pronounMapper = $this->getJoinMapper('recipient.pronoun');
+//                    $recipientPronoun = $pronounMapper->createModel();
+//                }
+                $recipient->setPronoun($recipientPronoun);
             }
             $model->setRecipient($recipient);
 

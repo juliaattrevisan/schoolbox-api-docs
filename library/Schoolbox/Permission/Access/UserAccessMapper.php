@@ -396,6 +396,8 @@ class UserAccessMapper extends Mapper
         $userMapper     = $this->getJoinMapper('user');
         /** @var RoleMapper $roleMapper */
         $roleMapper     = $this->getJoinMapper('user.role');
+        /** @var User\Pronoun\Mapper $pronounMapper */
+        $pronounMapper  = $this->getJoinMapper('user.pronoun');
         $userCollection = $userMapper->createCollection();
 
         // Performance testing appears to indicate there is no material difference between:
@@ -460,10 +462,12 @@ class UserAccessMapper extends Mapper
         $query = "
             SELECT
                 {$userMapper->getColumnString('u')},
-                {$roleMapper->getColumnString('g')}
+                {$roleMapper->getColumnString('g')},
+                {$pronounMapper->getColumnString('p')}
             FROM
                 {$userMapper->getTable()} u
                 INNER JOIN {$userMapper->getJoinSql('role','u', 'g', true)}
+                LEFT JOIN {$userMapper->getJoinSql('pronoun','u', 'p')}
                 {$userAccessJoinType} JOIN {$this->table} ua ON ua.uid = u.id
             WHERE {$whereClause}
             ORDER BY ua.type DESC, u.lastname, u.chosen_name
@@ -477,7 +481,9 @@ class UserAccessMapper extends Mapper
             // add the user represented by this row to the collection
             $userId = $r['u.id'];
             if (!$userCollection->keyExists($userId)) {
-                $userCollection[$r['u.id']] = $userMapper->hydrate($r, 'u')->setRole($roleMapper->hydrate($r, 'g'));
+                $userCollection[$r['u.id']] = $userMapper->hydrate($r, 'u')
+                                                         ->setRole($roleMapper->hydrate($r, 'g'))
+                                                         ->setPronoun($pronounMapper->hydrate($r, 'p'));
             }
         }
         return $userCollection;

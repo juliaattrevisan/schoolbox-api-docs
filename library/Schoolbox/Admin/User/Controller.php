@@ -118,6 +118,8 @@ class Controller extends Base
      */
     private User\Token\Mapper $tokenMapper;
 
+    private User\Pronoun\Mapper $pronounMapper;
+
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
      * There are currently three options: campus, residentialHouse, none
@@ -256,7 +258,8 @@ class Controller extends Base
         HouseResidentialMapper $houseResidentialMapper,
         HouseMapper $houseMapper,
         User\Token\Mapper $tokenMapper,
-        YearLevel\Mapper $yearLevelMapper
+        YearLevel\Mapper $yearLevelMapper,
+        User\Pronoun\Mapper $pronounMapper
     ) {
         $this->cmsLogMapper = $cmsLogMapper;
         $this->userLogMapper = $userLogMapper;
@@ -271,6 +274,7 @@ class Controller extends Base
         $this->houseMapper = $houseMapper;
         $this->tokenMapper = $tokenMapper;
         $this->yearLevelMapper = $yearLevelMapper;
+        $this->pronounMapper = $pronounMapper;
     }
 
 
@@ -364,6 +368,7 @@ class Controller extends Base
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
                 'titles' => $this->userTitleMapper->findAll(),
+                'pronouns' => $this->pronounMapper->findAll(),
                 'fileYear' => $fileYear,
                 'fileSemester' => $fileSemester,
                 'allGroups' => $this->folderMapper->searchByName('', true)->sortBy('name', 'asc'),
@@ -470,6 +475,7 @@ class Controller extends Base
                 'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
+                'pronouns' => $this->pronounMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
@@ -735,6 +741,16 @@ class Controller extends Base
                 $campus->setId($campusId);
                 $user->getCampusCollection()->add($campus);
             }
+        }
+
+        /* Pronoun Logic
+         *
+         */
+        $user->setPronoun(null);
+        if ($post['pronoun']) {
+            $pronoun = new User\Pronoun\Model();
+            $pronoun->setId($post['pronoun']);
+            $user->setPronoun($pronoun);
         }
 
 
