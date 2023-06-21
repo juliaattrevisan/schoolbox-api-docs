@@ -28,7 +28,7 @@ VALUES ('he', 'him', 'his', 2, now(), now()),
 
 ### admin email signature tooltip
 UPDATE config
-SET description = "Email signatures will only be applied to users that have an email address that matches the School Email Domain.  Available tokens are: [title] [firstname] [surname] [fullname] [email] [position] [subjectivepronoun] [subjectivepronounproper] [objectivepronoun] [objectivepronounproper] [possessivepronoun] [possessivepronounproper]."
+SET description = "Email signatures will only be applied to users that have an email address that matches the School Email Domain.  Available tokens are: [title] [firstname] [surname] [fullname] [email] [position]. Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation."
 WHERE name = 'email_signature';
 
 ### admin full name formatter
