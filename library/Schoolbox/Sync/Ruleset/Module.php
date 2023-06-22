@@ -28,17 +28,17 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'logs', $basePath, "/logs");
-        $this->addGetRoute($routeMap, 'logFormat', $basePath, "/log/{logId}.{format}")->tokens(['logId' => '\d+']);
-        $this->addGetRoute($routeMap, 'log', $basePath, "/log/{logId}");
-        $this->addGetRoute($routeMap, 'intro', $basePath, "");
-        $this->addGetRoute($routeMap, 'read', $basePath, "/{rulesetId}");
-        $this->addPostRoute($routeMap, 'updateRuleset', $basePath, "/ruleset/update");
-        $this->addPostRoute($routeMap, 'updateRule', $basePath, "/ruleset/rule/update");
-        $this->addGetRoute($routeMap, 'dryRun', $basePath, "/{rulesetId}/dry-run");
-        $this->addGetRoute($routeMap, 'performUpdate', $basePath, "/{rulesetId}/perform-update");
+        $this->addGetRoute('logs', $basePath, "/logs");
+        $this->addGetRoute('logFormat', $basePath, "/log/{logId}.{format}")->tokens(['logId' => '\d+']);
+        $this->addGetRoute('log', $basePath, "/log/{logId}");
+        $this->addGetRoute('intro', $basePath, "");
+        $this->addGetRoute('read', $basePath, "/{rulesetId}");
+        $this->addPostRoute('updateRuleset', $basePath, "/ruleset/update");
+        $this->addPostRoute('updateRule', $basePath, "/ruleset/rule/update");
+        $this->addGetRoute('dryRun', $basePath, "/{rulesetId}/dry-run");
+        $this->addGetRoute('performUpdate', $basePath, "/{rulesetId}/perform-update");
     }
 
     /**

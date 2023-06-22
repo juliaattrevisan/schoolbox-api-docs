@@ -28,10 +28,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         $this->attachResourceRoutes($routeMap, $basePath);
-        $this->addGetRoute($routeMap, 'calendar', $basePath, '/{id}/calendar');
+        $this->addGetRoute('calendar', $basePath, '/{id}/calendar');
     }
 
     /**

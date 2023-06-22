@@ -33,15 +33,15 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'currentReport', $basePath, '/{id}')
+        $this->addGetRoute('currentReport', $basePath, '/{id}')
              ->tokens(['id' => '\\d+']);
-        $this->addGetRoute($routeMap, 'index', $basePath, '/{id}/{year}')
+        $this->addGetRoute('index', $basePath, '/{id}/{year}')
              ->tokens(['id' => '\\d+', 'year' => '\\d+']);
-        $this->addGetRoute($routeMap, 'subject', $basePath, '/{id}/{year}/{subjectCode}')
+        $this->addGetRoute('subject', $basePath, '/{id}/{year}/{subjectCode}')
              ->tokens(['id' => '\\d+', 'year' => '\\d+']);
-        $this->addGetRoute($routeMap, 'printableReport', $basePath, '/{id}/print/{year}')
+        $this->addGetRoute('printableReport', $basePath, '/{id}/print/{year}')
              ->tokens(['id' => '\\d+', 'year' => '\\d+']);
     }
 

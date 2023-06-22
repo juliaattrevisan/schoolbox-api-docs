@@ -27,21 +27,21 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addPostRoute($routeMap, 'add', $basePath, "/add/{ruleId}");
+        $this->addPostRoute('add', $basePath, "/add/{ruleId}");
 
         /* Special case
          * Has no inputs or anything so we can lighten the backend load
          */
-        $this->addPostRoute($routeMap, 'addSkip', $basePath, "/add/{ruleId}/skip");
+        $this->addPostRoute('addSkip', $basePath, "/add/{ruleId}/skip");
 
-        $this->addPostRoute($routeMap, 'delete', $basePath, "/delete");
-        $this->addGetRoute($routeMap, 'change', $basePath, "/change");
+        $this->addPostRoute('delete', $basePath, "/delete");
+        $this->addGetRoute('change', $basePath, "/change");
 
         /* Spawn a new Mapped Key/Value fragment
          */
-        $this->addGetRoute($routeMap, 'newMappedRow', $basePath, "/newMappedRow");
+        $this->addGetRoute('newMappedRow', $basePath, "/newMappedRow");
     }
 
     /**

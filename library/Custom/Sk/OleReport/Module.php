@@ -32,10 +32,10 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'reportList', $basePath, '/{studentId}');
-        $this->addGetRoute($routeMap, 'sendReport', $basePath, '/{studentId}/{reportId}/sendReport');
+        $this->addGetRoute('reportList', $basePath, '/{studentId}');
+        $this->addGetRoute('sendReport', $basePath, '/{studentId}/{reportId}/sendReport');
     }
 
     /**

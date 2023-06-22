@@ -93,7 +93,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         $this
             ->addRoute($routeMap, 'dateForTimetableDay', $basePath, '/dateForTimetableDay')

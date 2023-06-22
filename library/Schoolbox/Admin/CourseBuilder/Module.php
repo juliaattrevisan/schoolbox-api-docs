@@ -29,10 +29,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'getIndex', $basePath, "{/tab}");
-        $this->addPostRoute($routeMap, 'postSave', $basePath, "/save");
+        $this->addGetRoute('getIndex', $basePath, "{/tab}");
+        $this->addPostRoute('postSave', $basePath, "/save");
     }
 
     /**

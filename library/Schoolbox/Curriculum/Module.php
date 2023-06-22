@@ -28,11 +28,11 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         $this->attachResourceRoutes($routeMap, $basePath);
-        $this->addGetRoute($routeMap, 'search', $basePath, '/search');
-        $this->addGetRoute($routeMap, 'getTree', $basePath, '/tree');
+        $this->addGetRoute('search', $basePath, '/search');
+        $this->addGetRoute('getTree', $basePath, '/tree');
 
         /* You can view the Curriculum Tree with this route
          * $this->addGetRoute($router, 'browse', $basePath, '/browse');

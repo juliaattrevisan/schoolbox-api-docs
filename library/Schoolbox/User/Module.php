@@ -53,10 +53,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'impersonate', $basePath, '/switch/{userId}');
-        $this->addGetRoute($routeMap, 'recoverSession', $basePath, '/recoverSession');
+        $this->addGetRoute('impersonate', $basePath, '/switch/{userId}');
+        $this->addGetRoute('recoverSession', $basePath, '/recoverSession');
     }
 
     /**

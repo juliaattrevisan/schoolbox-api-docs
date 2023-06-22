@@ -25,7 +25,7 @@ class Module extends \Alaress\Module\Module
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         $this->addRoute($routeMap, 'parentLounge', $basePath, '/parentlounge');
         $this->addRoute($routeMap, 'tassWeb', $basePath, '/tassweb');

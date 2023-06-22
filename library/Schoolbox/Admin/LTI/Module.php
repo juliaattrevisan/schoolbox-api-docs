@@ -29,13 +29,13 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'getIndex', $basePath, "");
-        $this->addGetRoute($routeMap, 'getModify', $basePath, "/modify/{providerId}");
-        $this->addPostRoute($routeMap, 'postModify', $basePath, "/modify");
-        $this->addPostRoute($routeMap, 'postDelete', $basePath, "/delete/{providerId}");
-        $this->addPostRoute($routeMap, 'postConfig', $basePath, '/postConfig');
+        $this->addGetRoute('getIndex', $basePath, "");
+        $this->addGetRoute('getModify', $basePath, "/modify/{providerId}");
+        $this->addPostRoute('postModify', $basePath, "/modify");
+        $this->addPostRoute('postDelete', $basePath, "/delete/{providerId}");
+        $this->addPostRoute('postConfig', $basePath, '/postConfig');
     }
 
     /**

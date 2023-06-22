@@ -27,13 +27,13 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'getIndex', $basePath, "");
-        $this->addGetRoute($routeMap, 'getSslRenewalHelp', $basePath, "/ssl-renewal-help");
-        $this->addGetRoute($routeMap, 'getHealthcheck', $basePath, "/healthcheck");
-        $this->addGetRoute($routeMap, 'getDisasterRecovery', $basePath, "/disaster-recovery");
-        $this->addGetRoute($routeMap, 'dismissUpgradeReminder', $basePath, "/dismiss-upgrade-reminder");
+        $this->addGetRoute('getIndex', $basePath, "");
+        $this->addGetRoute('getSslRenewalHelp', $basePath, "/ssl-renewal-help");
+        $this->addGetRoute('getHealthcheck', $basePath, "/healthcheck");
+        $this->addGetRoute('getDisasterRecovery', $basePath, "/disaster-recovery");
+        $this->addGetRoute('dismissUpgradeReminder', $basePath, "/dismiss-upgrade-reminder");
     }
 
     /**

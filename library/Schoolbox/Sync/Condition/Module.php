@@ -27,10 +27,10 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addPostRoute($routeMap, 'add', $basePath, "/add/{ruleId}/{conditionType}");
-        $this->addPostRoute($routeMap, 'delete', $basePath, "/delete");
+        $this->addPostRoute('add', $basePath, "/add/{ruleId}/{conditionType}");
+        $this->addPostRoute('delete', $basePath, "/delete");
     }
 
     /**

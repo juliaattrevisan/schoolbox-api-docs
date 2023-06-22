@@ -40,13 +40,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'displayCreateRequestForm', $basePath, '');
-        $this->addPostRoute($routeMap, 'createRequest', $basePath, '/createRequest');
-        $this->addGetRoute($routeMap, 'displayResetForm', $basePath, '/{token}')->tokens(['token' => '[0-9a-f]+']);
-        $this->addPostRoute($routeMap, 'reset', $basePath, '/reset/{token}')->tokens(['token' => '[0-9a-f]+']);
-        $this->addGetRoute($routeMap, 'displaySuccessMessage', $basePath, '/success');
+        $this->addGetRoute('displayCreateRequestForm', $basePath, '');
+        $this->addPostRoute('createRequest', $basePath, '/createRequest');
+        $this->addGetRoute('displayResetForm', $basePath, '/{token}')->tokens(['token' => '[0-9a-f]+']);
+        $this->addPostRoute('reset', $basePath, '/reset/{token}')->tokens(['token' => '[0-9a-f]+']);
+        $this->addGetRoute('displaySuccessMessage', $basePath, '/success');
     }
 
     /**

@@ -302,7 +302,7 @@ class Module
      * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
     }
 
@@ -336,7 +336,6 @@ class Module
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Map    $routeMap The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -345,7 +344,7 @@ class Module
      *
      * @return Route
      */
-    protected function addGetRoute(Map $routeMap, $alias, $basePath, $path)
+    protected function addGetRoute(string $alias, string $basePath, string $path)
     {
         return $this->addRoute($this->getRouter()->getMap(), $alias, $basePath, $path)
                     ->allows(self::METHOD_GET);
@@ -357,7 +356,6 @@ class Module
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Map    $routeMap The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -366,7 +364,7 @@ class Module
      *
      * @return Route
      */
-    protected function addPostRoute(Map $routeMap, $alias, $basePath, $path)
+    protected function addPostRoute(string $alias, string $basePath, string $path)
     {
         return $this->addRoute($this->getRouter()->getMap(), $alias, $basePath, $path)
                     ->allows(self::METHOD_POST);
@@ -388,36 +386,36 @@ class Module
         $formatToken = ['format' => '(\.[^/]+)?'];
 
         // Attach routes from Aura Router 2.x `attachResource`
-        $this->addGetRoute($routeMap, 'browse', $basePath, '{format}')
+        $this->addGetRoute('browse', $basePath, '{format}')
              ->tokens($formatToken);
-        $this->addGetRoute($routeMap, 'read', $basePath, '/{id}{format}')
+        $this->addGetRoute('read', $basePath, '/{id}{format}')
              ->tokens($idToken)
              ->tokens($formatToken);
-        $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit{format}')
+        $this->addGetRoute('edit', $basePath, '/{id}/edit{format}')
              ->tokens($idToken)
              ->tokens($formatToken);
-        $this->addGetRoute($routeMap, 'add', $basePath, '/add');
+        $this->addGetRoute('add', $basePath, '/add');
         $this->addRoute($routeMap, 'delete', $basePath, '/{id}')
              ->tokens($idToken)
              ->allows(self::METHOD_DELETE);
-        $this->addPostRoute($routeMap, 'create', $basePath, '');
+        $this->addPostRoute('create', $basePath, '');
         $this->addRoute($routeMap, 'update', $basePath, '/{id}')
              ->tokens($idToken)
              ->allows(self::METHOD_PATCH);
-        $this->addPostRoute($routeMap, 'replace', $basePath, '/{id}')
+        $this->addPostRoute('replace', $basePath, '/{id}')
              ->tokens($idToken)
              ->allows(self::METHOD_PUT);
 
         $this->addRoute($routeMap, 'options', $basePath, '')->allows(self::METHOD_OPTIONS);
 
         // Attach POST aliases for PUT/PATCH/DELETE routes
-        $this->addPostRoute($routeMap, 'update:post', $basePath, '/{id}/update')
+        $this->addPostRoute('update:post', $basePath, '/{id}/update')
              ->tokens($idToken)
              ->attributes(['action' => 'update']);
-        $this->addPostRoute($routeMap, 'replace:post', $basePath, '/{id}/replace')
+        $this->addPostRoute('replace:post', $basePath, '/{id}/replace')
              ->tokens($idToken)
              ->attributes(['action' => 'replace']);
-        $this->addPostRoute($routeMap, 'delete:post', $basePath, '/{id}/delete')
+        $this->addPostRoute('delete:post', $basePath, '/{id}/delete')
              ->tokens($idToken)
              ->attributes(['action' => 'delete']);
     }

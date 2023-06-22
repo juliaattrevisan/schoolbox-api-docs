@@ -30,7 +30,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         $this->attachResourceRoutes($routeMap, $basePath);
         $this->addRoute($routeMap, 'search', $basePath, '/search');

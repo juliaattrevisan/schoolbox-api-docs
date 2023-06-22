@@ -87,10 +87,10 @@ class Module extends RestfulModule
     /**
      * {@inheritdoc}
      *
-     * @param Map $routeMap
+     * @param Map    $routeMap
      * @param string $basePath
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         parent::initRoutes($routeMap, $basePath);
 
@@ -112,11 +112,11 @@ class Module extends RestfulModule
         ];
 
         foreach ($routes['GET'] as $path => $controllerMethod) {
-            $this->addGetRoute($routeMap, $controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addGetRoute($controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($routeMap, $controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 

@@ -67,7 +67,7 @@ class Module extends RestfulModule
      * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         parent::initRoutes($routeMap, $basePath);
 
@@ -88,11 +88,11 @@ class Module extends RestfulModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($routeMap, $alias, $basePath, $path);
+            $this->addGetRoute($alias, $basePath, $path);
         }
 
         foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($routeMap, $alias, $basePath, $path);
+            $this->addPostRoute($alias, $basePath, $path);
         }
     }
 

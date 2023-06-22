@@ -30,14 +30,14 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'getIndex', $basePath, "");
-        $this->addPostRoute($routeMap, 'postCreateTerm', $basePath, "");
-        $this->addPostRoute($routeMap, 'postUpdateTerm', $basePath, "/{id}/update");
-        $this->addPostRoute($routeMap, 'postDeleteTerm', $basePath, "/{id}/delete");
-        $this->addPostRoute($routeMap, 'postArchiveTerm', $basePath, "/{id}/archive");
-        $this->addPostRoute($routeMap, 'postRestoreTerm', $basePath, "/{id}/restore");
+        $this->addGetRoute('getIndex', $basePath, "");
+        $this->addPostRoute('postCreateTerm', $basePath, "");
+        $this->addPostRoute('postUpdateTerm', $basePath, "/{id}/update");
+        $this->addPostRoute('postDeleteTerm', $basePath, "/{id}/delete");
+        $this->addPostRoute('postArchiveTerm', $basePath, "/{id}/archive");
+        $this->addPostRoute('postRestoreTerm', $basePath, "/{id}/restore");
     }
 
     /**

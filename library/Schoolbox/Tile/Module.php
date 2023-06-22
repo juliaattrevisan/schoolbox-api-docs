@@ -38,20 +38,20 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'layout', $basePath, '/layout/{layoutId}');
-        $this->addPostRoute($routeMap, 'layoutForm', $basePath, '/layout/{layoutId}');
+        $this->addGetRoute('layout', $basePath, '/layout/{layoutId}');
+        $this->addPostRoute('layoutForm', $basePath, '/layout/{layoutId}');
 
         // Attach standard REST routes...
         $this->attachResourceRoutes($routeMap, $basePath);
 
         // but have separate add tile paths...
-        $this->addGetRoute($routeMap, 'add', $basePath, '/add/{layoutId}');
-        $this->addPostRoute($routeMap, 'create', $basePath, '/add/{layoutId}');
+        $this->addGetRoute('add', $basePath, '/add/{layoutId}');
+        $this->addPostRoute('create', $basePath, '/add/{layoutId}');
 
         // also have separate paths for adding a tile to a component (will create a new layout)
-        $this->addGetRoute($routeMap, 'addToComponent', $basePath, '/add/component/{componentId}');
+        $this->addGetRoute('addToComponent', $basePath, '/add/component/{componentId}');
     }
 
     /**

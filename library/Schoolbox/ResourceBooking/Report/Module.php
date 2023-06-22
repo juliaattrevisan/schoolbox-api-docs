@@ -29,12 +29,12 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $this->addGetRoute($routeMap, 'index', $basePath, '');
-        $this->addGetRoute($routeMap, 'download', $basePath, '/download');
+        $this->addGetRoute('index', $basePath, '');
+        $this->addGetRoute('download', $basePath, '/download');
     }
 
     /**

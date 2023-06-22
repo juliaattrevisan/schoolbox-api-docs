@@ -43,10 +43,10 @@ class Module extends RestfulModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Map $routeMap
+     * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         parent::initRoutes($routeMap, $basePath);
 
@@ -61,7 +61,7 @@ class Module extends RestfulModule
         ];
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($routeMap, $controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 

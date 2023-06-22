@@ -52,7 +52,7 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         $get = [
             // For a Course - aggregating all Classes which have imported Course
@@ -69,7 +69,7 @@ class Module extends BaseModule
         ];
 
         foreach ($get as $method => $route) {
-            $this->addGetRoute($routeMap, $method, $basePath, $route);
+            $this->addGetRoute($method, $basePath, $route);
         }
     }
 

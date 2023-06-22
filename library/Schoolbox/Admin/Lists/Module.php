@@ -24,12 +24,12 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'getIndex', $basePath, "{/table}");
-        $this->addGetRoute($routeMap, 'getData', $basePath, "/data{/table}");
-        $this->addPostRoute($routeMap, 'postSave', $basePath, "/save");
-        $this->addPostRoute($routeMap, 'postDelete', $basePath, "/delete");
+        $this->addGetRoute('getIndex', $basePath, "{/table}");
+        $this->addGetRoute('getData', $basePath, "/data{/table}");
+        $this->addPostRoute('postSave', $basePath, "/save");
+        $this->addPostRoute('postDelete', $basePath, "/delete");
     }
 
     /**

@@ -32,12 +32,12 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'getModify', $basePath, "/modify");
-        $this->addPostRoute($routeMap, 'getUserList', $basePath, "/modify/list");
-        $this->addPostRoute($routeMap, 'postModify', $basePath, "/modifyForm");
-        $this->addPostRoute($routeMap, 'deleteUsers', $basePath, "/modifyForm/delete");
+        $this->addGetRoute('getModify', $basePath, "/modify");
+        $this->addPostRoute('getUserList', $basePath, "/modify/list");
+        $this->addPostRoute('postModify', $basePath, "/modifyForm");
+        $this->addPostRoute('deleteUsers', $basePath, "/modifyForm/delete");
     }
 
 

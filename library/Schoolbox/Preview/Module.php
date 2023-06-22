@@ -23,12 +23,12 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
 
         /* Render html fragment, or redirect
          */
-        $this->addGetRoute($routeMap, 'preview', $basePath, '/{encodedUrl}')
+        $this->addGetRoute('preview', $basePath, '/{encodedUrl}')
             ->attributes([
                 'format' => '.json'
             ]);

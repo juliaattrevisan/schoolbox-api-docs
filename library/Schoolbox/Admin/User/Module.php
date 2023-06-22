@@ -43,33 +43,33 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'getInsert', $basePath, "/create");
-        $this->addGetRoute($routeMap, 'getModify', $basePath, "/{userId}/modify")->tokens(['userId' => '\d+']);
-        $this->addGetRoute($routeMap, 'getStaleReport', $basePath, "/stale");
-        $this->addGetRoute($routeMap, 'getStaleUsers', $basePath, "/stale/list");
+        $this->addGetRoute('getInsert', $basePath, "/create");
+        $this->addGetRoute('getModify', $basePath, "/{userId}/modify")->tokens(['userId' => '\d+']);
+        $this->addGetRoute('getStaleReport', $basePath, "/stale");
+        $this->addGetRoute('getStaleUsers', $basePath, "/stale/list");
 
 
         // CRUD Actions
 
-        $this->addPostRoute($routeMap, 'postDetails', $basePath, "{/userId}");
-        $this->addPostRoute($routeMap, 'postInsertGroup', $basePath, "/{userId}/group");
-        $this->addPostRoute($routeMap, 'postInsertPermission', $basePath, "/{userId}/permission");
-        $this->addPostRoute($routeMap, 'postInsertLinked', $basePath, "/{userId}/linked");
+        $this->addPostRoute('postDetails', $basePath, "{/userId}");
+        $this->addPostRoute('postInsertGroup', $basePath, "/{userId}/group");
+        $this->addPostRoute('postInsertPermission', $basePath, "/{userId}/permission");
+        $this->addPostRoute('postInsertLinked', $basePath, "/{userId}/linked");
 
-        $this->addPostRoute($routeMap, 'postUpdateGroup', $basePath, "/{userId}/group/{folderId}");
-        $this->addPostRoute($routeMap, 'postUpdateService', $basePath, "/{userId}/permission/{service}/{sid}");
+        $this->addPostRoute('postUpdateGroup', $basePath, "/{userId}/group/{folderId}");
+        $this->addPostRoute('postUpdateService', $basePath, "/{userId}/permission/{service}/{sid}");
 
-        $this->addPostRoute($routeMap, 'postDeleteList', $basePath, "/list/delete");
-        $this->addPostRoute($routeMap, 'postDeleteUser', $basePath, "/{userId}/delete");
-        $this->addPostRoute($routeMap, 'postDeletePermission', $basePath, "/{userId}/permission/{service}/{sid}/delete");
-        $this->addPostRoute($routeMap, 'postDeleteGroup', $basePath, "/{userId}/group/{folderId}/delete");
-        $this->addPostRoute($routeMap, 'postDeleteLinked', $basePath, "/{userId}/linked/{linkedId}/delete");
+        $this->addPostRoute('postDeleteList', $basePath, "/list/delete");
+        $this->addPostRoute('postDeleteUser', $basePath, "/{userId}/delete");
+        $this->addPostRoute('postDeletePermission', $basePath, "/{userId}/permission/{service}/{sid}/delete");
+        $this->addPostRoute('postDeleteGroup', $basePath, "/{userId}/group/{folderId}/delete");
+        $this->addPostRoute('postDeleteLinked', $basePath, "/{userId}/linked/{linkedId}/delete");
 
         // Other stuff
 
-        $this->addPostRoute($routeMap, 'postAlert', $basePath, "/{userId}/alert");
+        $this->addPostRoute('postAlert', $basePath, "/{userId}/alert");
     }
 
     /**

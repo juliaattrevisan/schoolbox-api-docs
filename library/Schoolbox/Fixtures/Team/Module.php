@@ -43,16 +43,16 @@ class Module extends RestfulModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Map $routeMap
+     * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         parent::initRoutes($routeMap, $basePath);
         $collection = $this->getCollectionName();
-        $this->addPostRoute($routeMap, "postAddPlayers", $basePath, "/$collection/{entityId}/addPlayers");
-        $this->addPostRoute($routeMap, "postRemovePlayers", $basePath, "/$collection/{entityId}/removePlayers");
-        $this->addPostRoute($routeMap, "postReorderPlayers", $basePath, "/$collection/{entityId}/reorderPlayers");
+        $this->addPostRoute("postAddPlayers", $basePath, "/$collection/{entityId}/addPlayers");
+        $this->addPostRoute("postRemovePlayers", $basePath, "/$collection/{entityId}/removePlayers");
+        $this->addPostRoute("postReorderPlayers", $basePath, "/$collection/{entityId}/reorderPlayers");
     }
 
     /**

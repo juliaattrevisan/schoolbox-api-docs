@@ -27,15 +27,15 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addGetRoute($routeMap, 'add', $basePath, "/add/{rulesetId}");
-        $this->addPostRoute($routeMap, 'create', $basePath, "/create");
+        $this->addGetRoute('add', $basePath, "/add/{rulesetId}");
+        $this->addPostRoute('create', $basePath, "/create");
 
-        $this->addGetRoute($routeMap, 'edit', $basePath, "/edit/{ruleId}");
-        $this->addPostRoute($routeMap, 'update', $basePath, "/update");
+        $this->addGetRoute('edit', $basePath, "/edit/{ruleId}");
+        $this->addPostRoute('update', $basePath, "/update");
 
-        $this->addPostRoute($routeMap, 'delete', $basePath, "/delete");
+        $this->addPostRoute('delete', $basePath, "/delete");
     }
 
     /**

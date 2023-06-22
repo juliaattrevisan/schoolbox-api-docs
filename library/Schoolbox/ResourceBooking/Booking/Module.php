@@ -32,15 +32,15 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(Map $routeMap, string $basePath)
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $this->addGetRoute($routeMap, 'book', $basePath, '/bookItem/{id}');
-        $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit');
-        $this->addPostRoute($routeMap, 'createBooking', $basePath, '/bookItem/{id}')
+        $this->addGetRoute('book', $basePath, '/bookItem/{id}');
+        $this->addGetRoute('edit', $basePath, '/{id}/edit');
+        $this->addPostRoute('createBooking', $basePath, '/bookItem/{id}')
              ->attributes(['action' => 'createBooking']);
-        $this->addPostRoute($routeMap, 'update:post', $basePath, '/{id}/update')
+        $this->addPostRoute('update:post', $basePath, '/{id}/update')
              ->attributes(['action' => 'update']);
         $this->addRoute($routeMap, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
 
