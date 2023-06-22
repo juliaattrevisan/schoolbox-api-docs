@@ -132,6 +132,9 @@
                             // !! Note that this means we are skipping autosave for all fields, not just the one
                             //    whose max char count was exceeded.  If we want to skip only the field whose
                             //    max char count wsa exceeded, server-side changes will be required.
+                            // !! Note also that the current behaviour of skipping autosave for all fields if any are
+                            //    overfilled is the same matches the behaviour for manual save.  This is because if any
+                            //    field is overfilled, the submit button for the form is normally disabled.
                             doSave = false;
                             break;
                         }
