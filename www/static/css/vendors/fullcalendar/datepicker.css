@@ -505,10 +505,6 @@ a.fc-more {
   text-decoration: none;
 }
 
-a.fc-more:hover {
-  text-decoration: underline;
-}
-
 .fc-limited {
   /* rows and cells that are hidden because of a "more" link */
   display: none;
@@ -1083,7 +1079,7 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 
 .fc-list-table td {
   border-width: 1px 0 0;
-  /*Need to use !important as npm rebuilding @fullcalendar 
+  /*Need to use !important as npm rebuilding @fullcalendar
   keeps injecting padding: 8px 14px into fc's main.css */
   padding: 10px 12px !important;
 }
