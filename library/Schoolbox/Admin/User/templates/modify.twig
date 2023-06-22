@@ -1072,6 +1072,7 @@
         });
 
         // Generate token
+        {% if user.id %}
         $('#generate-token-button').on('click', function () {
             $.post('{{ routeLookup('userToken.getTokenForUser', {userId: user.id, user: user}) }}',
                     {jwtIdToUse: 'new'})
@@ -1092,6 +1093,7 @@
                         tokenDelete();
                     })
         });
+        {% endif %}
 
         // Copy user token to clipboard
         $.fn.clipboardSelector({
