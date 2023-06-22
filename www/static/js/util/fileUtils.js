@@ -99,7 +99,7 @@ export const blobToDataURL = async (blob) => {
  *
  * @return Formatted string.
  */
-export const humanFileSize = (bytes, dp = 2, si=true) => {
+export const humanFileSize = (bytes, dp = 2, si=false) => {
     const thresh = si ? 1000 : 1024;
 
     // Return input if it is not numeric
@@ -112,9 +112,10 @@ export const humanFileSize = (bytes, dp = 2, si=true) => {
     let selectedUnit = "B";
 
     if (Math.abs(bytes) >= thresh) {
-        const units = si
-            ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-            : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        // Although usually when using factors of 1024 we would show "KiB", "MiB", etc.,
+        // SchoolBox uses "kB", "MB", etc. for consistency with the rest of the site,
+        // hence, we always use SI unit prefixes regardless of the value of si.
+        const units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
         let u = -1;
         const r = 10**dp;
 
