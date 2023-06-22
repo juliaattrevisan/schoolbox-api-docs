@@ -67,6 +67,7 @@ class MockConnector implements IConnector
     public function resetStatement(): void
     {
         $this->mockStatement = $this->testCase->getMockBuilder(PDOStatement::class)->getMock();
+        $this->mockStatement->queryString = '';
     }
 
     /**
