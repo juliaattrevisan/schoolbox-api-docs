@@ -33,7 +33,7 @@ class Module extends BaseModule
     public function initRoutes(Map $routeMap, string $basePath)
     {
         $this->attachResourceRoutes($routeMap, $basePath);
-        $this->addRoute($routeMap, 'search', $basePath, '/search');
+        $this->addRoute('search', $basePath, '/search');
     }
 
     /**

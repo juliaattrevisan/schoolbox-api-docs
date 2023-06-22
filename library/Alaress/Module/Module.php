@@ -179,7 +179,7 @@ class Module
 
             // preload registered routes, only if they don't already exist
             foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
-                $this->addRoute($this->getRouter()->getMap(), $controllerMethod, $basePath, $path)
+                $this->addRoute($controllerMethod, $basePath, $path)
                      ->allows($method)
                      ->tokens($tokens);
             }
@@ -312,7 +312,6 @@ class Module
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Map    $routeMap The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -321,10 +320,9 @@ class Module
      *
      * @return Route
      */
-    protected function addRoute(Map $routeMap, $alias, $basePath, $path)
+    protected function addRoute(string $alias, string $basePath, string $path)
     {
         return $this->addOrOverwriteExistingRoute(
-            $this->getRouter()->getMap(),
             $this->basename . '.' . $alias,
             $basePath . $path,
         );
@@ -346,7 +344,7 @@ class Module
      */
     protected function addGetRoute(string $alias, string $basePath, string $path)
     {
-        return $this->addRoute($this->getRouter()->getMap(), $alias, $basePath, $path)
+        return $this->addRoute($alias, $basePath, $path)
                     ->allows(self::METHOD_GET);
     }
 
@@ -366,7 +364,7 @@ class Module
      */
     protected function addPostRoute(string $alias, string $basePath, string $path)
     {
-        return $this->addRoute($this->getRouter()->getMap(), $alias, $basePath, $path)
+        return $this->addRoute($alias, $basePath, $path)
                     ->allows(self::METHOD_POST);
     }
 
@@ -395,18 +393,18 @@ class Module
              ->tokens($idToken)
              ->tokens($formatToken);
         $this->addGetRoute('add', $basePath, '/add');
-        $this->addRoute($routeMap, 'delete', $basePath, '/{id}')
+        $this->addRoute('delete', $basePath, '/{id}')
              ->tokens($idToken)
              ->allows(self::METHOD_DELETE);
         $this->addPostRoute('create', $basePath, '');
-        $this->addRoute($routeMap, 'update', $basePath, '/{id}')
+        $this->addRoute('update', $basePath, '/{id}')
              ->tokens($idToken)
              ->allows(self::METHOD_PATCH);
         $this->addPostRoute('replace', $basePath, '/{id}')
              ->tokens($idToken)
              ->allows(self::METHOD_PUT);
 
-        $this->addRoute($routeMap, 'options', $basePath, '')->allows(self::METHOD_OPTIONS);
+        $this->addRoute('options', $basePath, '')->allows(self::METHOD_OPTIONS);
 
         // Attach POST aliases for PUT/PATCH/DELETE routes
         $this->addPostRoute('update:post', $basePath, '/{id}/update')
@@ -424,14 +422,14 @@ class Module
      * Add a route for `$name` and `$path`: if a route with name `$name` already
      * exists, override it.
      *
-     * @param Map    $routeMap
      * @param string $name
      * @param string $path
      * @return Route
      * @noinspection PhpDocMissingThrowsInspection
      */
-    private function addOrOverwriteExistingRoute(Map $routeMap, $name, $path): Route
+    private function addOrOverwriteExistingRoute(string $name, string $path): Route
     {
+        $routeMap       = $this->getRouter()->getMap();
         $existingRoutes = $routeMap->getRoutes();
         if (isset($existingRoutes[$name])) {
             unset($existingRoutes[$name]);

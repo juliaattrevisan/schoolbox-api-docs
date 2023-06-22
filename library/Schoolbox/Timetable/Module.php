@@ -96,7 +96,7 @@ class Module extends BaseModule
     public function initRoutes(Map $routeMap, string $basePath)
     {
         $this
-            ->addRoute($routeMap, 'dateForTimetableDay', $basePath, '/dateForTimetableDay')
+            ->addRoute('dateForTimetableDay', $basePath, '/dateForTimetableDay')
             ->attributes(['format' => '.json']);
     }
 

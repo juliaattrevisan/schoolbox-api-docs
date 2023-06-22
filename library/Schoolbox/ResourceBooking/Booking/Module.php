@@ -42,13 +42,13 @@ class Module extends BaseModule
              ->attributes(['action' => 'createBooking']);
         $this->addPostRoute('update:post', $basePath, '/{id}/update')
              ->attributes(['action' => 'update']);
-        $this->addRoute($routeMap, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
+        $this->addRoute('bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
-        $this->addRoute($routeMap, 'approve', $basePath, '/{id}/approve');
-        $this->addRoute($routeMap, 'reject', $basePath, '/{id}/reject');
-        $this->addRoute($routeMap, 'setPending', $basePath, '/{id}/setPending');
-        $this->addRoute($routeMap, 'cancel', $basePath, '/{id}/cancel');
+        $this->addRoute('approve', $basePath, '/{id}/approve');
+        $this->addRoute('reject', $basePath, '/{id}/reject');
+        $this->addRoute('setPending', $basePath, '/{id}/setPending');
+        $this->addRoute('cancel', $basePath, '/{id}/cancel');
     }
 
     /**

@@ -27,12 +27,12 @@ class Module extends \Alaress\Module\Module
      */
     public function initRoutes(Map $routeMap, string $basePath)
     {
-        $this->addRoute($routeMap, 'parentLounge', $basePath, '/parentlounge');
-        $this->addRoute($routeMap, 'tassWeb', $basePath, '/tassweb');
-        $this->addRoute($routeMap, 'teacherKiosk', $basePath, '/teacherkiosk');
-        $this->addRoute($routeMap, 'studentProfile', $basePath, '/studentProfile/{studentId}');
-        $this->addRoute($routeMap, 'webBook', $basePath, '/webbook');
-        $this->addRoute($routeMap, 'studentCafe', $basePath, '/studentcafe');
+        $this->addRoute('parentLounge', $basePath, '/parentlounge');
+        $this->addRoute('tassWeb', $basePath, '/tassweb');
+        $this->addRoute('teacherKiosk', $basePath, '/teacherkiosk');
+        $this->addRoute('studentProfile', $basePath, '/studentProfile/{studentId}');
+        $this->addRoute('webBook', $basePath, '/webbook');
+        $this->addRoute('studentCafe', $basePath, '/studentcafe');
     }
 
     /**
