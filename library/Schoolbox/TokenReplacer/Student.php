@@ -17,12 +17,12 @@ use Schoolbox\User;
  * Supports the following tokens:
  * * "[firstname]": the student's first name
  * * "[preferredname]": the student's preferred name, falling back to first name, if empty
- * * "[subjectivepronoun]": the student's subjective pronoun.
- * * "[subjectivepronounproper]": the student's subjective pronoun, in first Char capitalised.
- * * "[objectivepronoun]": the student's objective pronoun.
- * * "[objectivepronounproper]": the student's objective pronoun, in first Char capitalised.
- * * "[possessivepronoun]": the student's possessive pronoun.
- * * "[possessivepronounproper]": the student's possessive pronoun, in first Char capitalised.
+ * * "[they]": the student's subjective pronoun.
+ * * "[They]": the student's subjective pronoun, in first Char capitalised.
+ * * "[them]": the student's objective pronoun.
+ * * "[Them]": the student's objective pronoun, in first Char capitalised.
+ * * "[theirs]": the student's possessive pronoun.
+ * * "[Theirs]": the student's possessive pronoun, in first Char capitalised.
  * * "[surname]":   the student's surname
  * * "[fullname]":  the student's full name
  * * "[year]":      the student's year level, or an empty string if not defined
@@ -64,12 +64,12 @@ class Student
                 '[fullname]'                => $student->getFullName(),
                 '[year]'                    => $student->getYear() ? $student->getYear()->getName() : '',
                 '[house]'                   => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : '',
-                '[subjectivepronoun]'       => $student->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT,
-                '[subjectivepronounproper]' => ucfirst($student->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT),
-                '[objectivepronoun]'        => $student->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT,
-                '[objectivepronounproper]'  => ucfirst($student->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT),
-                '[possessivepronoun]'       => $student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT,
-                '[possessivepronounproper]' => ucfirst($student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT),
+                '[they]'                    => $student->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT,
+                '[They]'                    => ucfirst($student->getPronoun()?->getSubjective() ?: User\Pronoun\Model::SUBJECTIVE_DEFAULT),
+                '[them]'                    => $student->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT,
+                '[Them]'                    => ucfirst($student->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT),
+                '[theirs]'                  => $student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT,
+                '[Theirs]'                  => ucfirst($student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT),
             ]
         );
     }

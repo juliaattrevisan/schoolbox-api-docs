@@ -97,12 +97,12 @@ class Mapper extends BaseMapper
                 '[firstName]',
                 '[lastName]',
                 '[email]',
-                '[subjectivepronoun]',
-                '[subjectivepronounproper]',
-                '[objectivepronoun]',
-                '[objectivepronounproper]',
-                '[possessivepronoun]',
-                '[possessivepronounproper]',
+                '[they]',
+                '[They]',
+                '[them]',
+                '[Them]',
+                '[theirs]',
+                '[Theirs]',
             ];
 
             $vieweeEmail = empty($viewee->getEmail()) ? '' : $viewee->getEmail();
