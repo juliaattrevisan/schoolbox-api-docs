@@ -18,7 +18,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Component_ConfigMapper;
 use Component_Instance;
 use Component_InstanceMapper;

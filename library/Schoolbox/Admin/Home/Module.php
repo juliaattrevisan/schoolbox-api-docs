@@ -15,7 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Log\Mapper as LogMapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;

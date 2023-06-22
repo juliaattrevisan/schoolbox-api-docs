@@ -13,7 +13,6 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
 use Aura\Router\Generator;
-use Aura\Router\Router;
 use Custom\Ms\Pastoral\StudentInvolvement\Report\Factory;
 use Custom\Ms\Pastoral\StudentInvolvement\Gateway;
 use InvalidArgumentException;

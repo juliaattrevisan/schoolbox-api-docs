@@ -13,12 +13,9 @@ use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
-use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -140,17 +137,6 @@ class Module extends AbstractModule
 //        $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
         $this->register('GET', '/link/{linkId:\d+}/info', 'showLinkInfo', $hasReadAccess, $preloadLink);
     }
-
-//    /**
-//     * Add a link route as well
-//     *
-//     * @param Map $routeMap
-//     * @param string $basePath
-//     */
-//    public function initRoutes(Map $routeMap, $basePath)
-//    {
-//        parent::initRoutes($routeMap, $basePath);
-//    }
 
     /**
      * @inheritdoc

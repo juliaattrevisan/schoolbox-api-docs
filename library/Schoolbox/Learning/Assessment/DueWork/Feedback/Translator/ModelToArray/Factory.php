@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Aura\Router\Generator;
-use Aura\Router\Router;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray;
 use Schoolbox\Learning\Assessment\Translator\AssessmentForFeed;

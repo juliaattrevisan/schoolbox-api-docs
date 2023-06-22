@@ -17,7 +17,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Eportfolio\Page as EportfolioPageModel;
 use Eportfolio\PageMapper as EportfolioPageMapper;
 use Eportfolio_Authenticator;

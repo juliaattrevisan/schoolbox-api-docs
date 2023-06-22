@@ -16,7 +16,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;

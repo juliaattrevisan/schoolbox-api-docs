@@ -13,7 +13,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;

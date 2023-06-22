@@ -16,7 +16,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Permission\Access\UserAccess;

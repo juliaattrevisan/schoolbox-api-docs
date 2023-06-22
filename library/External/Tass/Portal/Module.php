@@ -15,7 +15,6 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
 

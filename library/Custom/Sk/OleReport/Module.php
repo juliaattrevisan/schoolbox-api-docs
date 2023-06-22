@@ -14,7 +14,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;

@@ -12,7 +12,6 @@ namespace Schoolbox\Module;
 use Alaress\Module\Registry;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;

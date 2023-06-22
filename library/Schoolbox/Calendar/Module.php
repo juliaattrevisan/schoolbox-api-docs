@@ -24,7 +24,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Folder\Mapper;

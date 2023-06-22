@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 
 /**

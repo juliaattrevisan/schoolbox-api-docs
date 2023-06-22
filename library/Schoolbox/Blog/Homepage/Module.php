@@ -17,7 +17,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Schoolbox\Blog\Homepage\Comment\Mapper as BlogCommentMapper;
 use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
 use Schoolbox\Blog\Homepage\Post\Controller as BlogController;

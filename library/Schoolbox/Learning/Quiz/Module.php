@@ -12,7 +12,6 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;

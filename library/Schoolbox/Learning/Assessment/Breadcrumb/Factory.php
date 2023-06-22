@@ -16,7 +16,6 @@ namespace Schoolbox\Learning\Assessment\Breadcrumb;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
-use Aura\Router\Router;
 use Exception;
 use Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;

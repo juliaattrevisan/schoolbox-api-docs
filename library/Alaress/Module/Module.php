@@ -18,10 +18,10 @@ use Aura\Router\Exception\RouteAlreadyExists;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouteCollection;
+use Aura\Router\RouterContainer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Aura\Router\Route;
-use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use LogicException;
@@ -590,9 +590,9 @@ class Module
     /**
      * Typehinted convenience method for obtaining router reference
      *
-     * @return Router
+     * @return RouterContainer
      */
-    protected function getRouter()
+    protected function getRouter(): RouterContainer
     {
         return $this->injector->get('router');
     }

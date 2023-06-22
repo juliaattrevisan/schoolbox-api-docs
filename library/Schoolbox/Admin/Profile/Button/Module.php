@@ -9,7 +9,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;

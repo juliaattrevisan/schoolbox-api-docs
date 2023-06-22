@@ -12,7 +12,6 @@ use Alaress\Web\Router\PathMatcher;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use External_UserInterface;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Module\RestfulModule;

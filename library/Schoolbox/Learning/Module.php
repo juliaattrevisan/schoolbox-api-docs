@@ -20,7 +20,6 @@ use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;

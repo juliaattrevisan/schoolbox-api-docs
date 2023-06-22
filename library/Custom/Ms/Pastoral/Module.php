@@ -17,7 +17,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use House;
 use HouseMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;

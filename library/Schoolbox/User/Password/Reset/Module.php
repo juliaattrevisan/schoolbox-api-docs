@@ -16,7 +16,6 @@ use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Map;
-use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User\Password\MailService;

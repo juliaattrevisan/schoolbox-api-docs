@@ -877,7 +877,7 @@ namespace Schoolbox\Kingdom;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Twig\Error\LoaderError;
 
@@ -892,10 +892,10 @@ class Module extends BaseModule
      * The alias of each route added needs to match a public method in the
      * controller built by buildController().
      *
-     * @param Router $router
+     * @param Map $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Map $routeMap, $basePath)
     {
         $routes = [
             'GET' => [
@@ -905,11 +905,11 @@ class Module extends BaseModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($routeMap, $alias, $basePath, $path);
         }
 
         foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
+            $this->addPostRoute($routeMap, $alias, $basePath, $path);
         }
     }
 
