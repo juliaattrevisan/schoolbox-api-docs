@@ -830,14 +830,14 @@ class ImportFactory
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['sa.id']}");
         }
 
-        $assessmentSpec->setId($row['sa.id']);
+        $assessmentSpec->setId((int)$row['sa.id']);
         $assessmentSpec->setTitle($row['sa.title']);
-        $assessmentSpec->setSequence($row['sa.sequence']);
+        $assessmentSpec->setSequence((int)$row['sa.sequence']);
 
         $workType   = new WorkType();
         $workTypeId = $row['sa.work_type_id'];
         if (!is_null($workTypeId)) {
-            $workType->setId($workTypeId);
+            $workType->setId((int)$workTypeId);
             $workType->setName($row['lwt.name']);
         }
         $assessmentSpec->setWorkType($workType);
@@ -892,14 +892,14 @@ class ImportFactory
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['ia.id']}");
         }
 
-        $assessmentImpl->setId($row['ia.id']);
+        $assessmentImpl->setId((int)$row['ia.id']);
         $assessmentImpl->setTitle($row['ia.title']);
-        $assessmentImpl->setSequence($row['ia.sequence']);
+        $assessmentImpl->setSequence((int)$row['ia.sequence']);
 
         $workType   = new WorkType();
         $workTypeId = $row['ia.work_type_id'];
         if (!is_null($workTypeId)) {
-            $workType->setId($workTypeId);
+            $workType->setId((int)$workTypeId);
             $workType->setName($row['lwt.name']);
         }
         $assessmentImpl->setWorkType($workType);

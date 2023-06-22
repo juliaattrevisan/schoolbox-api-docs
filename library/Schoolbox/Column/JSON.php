@@ -12,15 +12,17 @@ namespace Schoolbox\Column;
 
 class JSON implements IColumnType
 {
-
     /**
-     * @param string            $value
+     * @param string|null       $value
      * @param \Schoolbox\Mapper $mapper
      *
      * @return mixed
      */
     public function hydrate($value, $mapper = null)
     {
+        if (null === $value) {
+            return null;
+        }
         return json_decode($value, true);
     }
 

@@ -197,11 +197,11 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
                     // If a component exists but hasn't had its name/purpose customised use the defaults
 
-                    if (!strlen($componentName)) {
+                    if (!strlen($componentName ?? '')) {
                         $componentName = $component->getDefinition()->getName();
                     }
 
-                    if (!strlen($componentDescription)) {
+                    if (!strlen($componentDescription ?? '')) {
                         $componentDescription = $component->getDefinition()->getDescription();
                     }
                 } else {
