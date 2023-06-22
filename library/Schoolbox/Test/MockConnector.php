@@ -53,11 +53,11 @@ class MockConnector implements IConnector
     /**
      * Builds the mock connection, using the test case to build mock statement.
      *
-     * @param TestCase $test_case
+     * @param TestCase $testCase
      */
-    public function __construct(TestCase $test_case)
+    public function __construct(TestCase $testCase)
     {
-        $this->testCase = $test_case;
+        $this->testCase = $testCase;
         $this->resetStatement();
     }
 
@@ -67,6 +67,15 @@ class MockConnector implements IConnector
     public function resetStatement(): void
     {
         $this->mockStatement = $this->testCase->getMockBuilder(PDOStatement::class)->getMock();
+
+        // Under 8.0 the query string is a read-only parameter, and _cannot_ be
+        // initialized: however, the place which reads it assumes it's null.
+        // Under 8.2 it doesn't seem to be read-only, but it can and _must_ be
+        // initialized before it is read.
+        // TODO remove when 8.2 is the only version for which CI jobs run
+        if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
+            $this->mockStatement->queryString = '';
+        }
     }
 
     /**
