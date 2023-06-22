@@ -53,11 +53,11 @@ class MockConnector implements IConnector
     /**
      * Builds the mock connection, using the test case to build mock statement.
      *
-     * @param TestCase $test_case
+     * @param TestCase $testCase
      */
-    public function __construct(TestCase $test_case)
+    public function __construct(TestCase $testCase)
     {
-        $this->testCase = $test_case;
+        $this->testCase = $testCase;
         $this->resetStatement();
     }
 
