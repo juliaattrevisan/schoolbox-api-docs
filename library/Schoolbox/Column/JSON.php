@@ -12,9 +12,8 @@ namespace Schoolbox\Column;
 
 class JSON implements IColumnType
 {
-
     /**
-     * @param string            $value
+     * @param string|null       $value
      * @param \Schoolbox\Mapper $mapper
      *
      * @return mixed
