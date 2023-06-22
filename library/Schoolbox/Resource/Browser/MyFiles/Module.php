@@ -82,6 +82,7 @@ class Module extends AbstractModule
         });
         $this->register('GET', '/picker/{sourceSlug}', 'picker', new Rule\IsLoggedIn());
         $this->register('GET', '/file/{fileId:\d+}/ajax', 'getFileInfo', $hasFileAccess, $preloadFile);
+        $this->register('GET', '', 'browseRoot', new Rule\IsLoggedIn());
         $this->register('GET', '{/folderId:\d+}', 'browse', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/children', 'listResources', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $hasFolderAccess, $preloadFolder);

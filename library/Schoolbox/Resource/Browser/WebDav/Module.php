@@ -32,6 +32,7 @@ class Module extends AbstractModule
         $permission = new Rule\IsLoggedIn();
         $this->register('GET', '/picker/{sourceSlug}', 'picker', $permission);
         $this->register('GET', '/file/{fileId:\d+}/ajax', 'getFileInfo', $permission);
+        $this->register('GET', '', 'browseRoot', $permission);
         $this->register('GET', '{/folderId:\d+}', 'browse', $permission);
         $this->register('GET', '/{folderId:\d+}/children', 'listResources', $permission);
         $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $permission);
