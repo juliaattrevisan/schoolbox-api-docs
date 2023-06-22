@@ -1,6 +1,6 @@
 <script>
 import { Chart } from "highcharts-vue";
-import { filesize } from "filesize";
+import { humanFileSize } from "@js/util/fileUtils";
 
 export default {
     /**
@@ -143,7 +143,7 @@ export default {
                             crop: false,
                             enabled: true,
                             formatter: function () {
-                                return '<span style="color: #777777">' + filesize(this.y) + "</span>";
+                                return '<span style="color: #777777">' + humanFileSize(this.y) + "</span>";
                             },
                             inside: false,
                             overflow: "none",

@@ -1,5 +1,5 @@
 <script>
-import { filesize } from "filesize";
+import { humanFileSize } from "@js/util/fileUtils";
 
 export default {
     /**
@@ -97,7 +97,7 @@ export default {
          * @returns {string}
          */
         filesize: function (size) {
-            return filesize(size);
+            return humanFileSize(size);
         },
     },
 };
@@ -123,7 +123,7 @@ export default {
         </template>
         <template v-else>
             <h2>Total Usage</h2>
-            {{ filesize(this.allData.size) }}
+            {{ humanFileSize(this.allData.size) }}
         </template>
     </div>
 </template>

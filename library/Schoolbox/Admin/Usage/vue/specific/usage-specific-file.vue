@@ -1,5 +1,5 @@
 <script>
-import { filesize } from "filesize";
+import { humanFileSize } from "@js/util/fileUtils";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast";
 import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
@@ -164,7 +164,7 @@ export default {
          * @returns { String } - 204.5 MB
          */
         getHumanReadableFilesize(value) {
-            return filesize(value);
+            return humanFileSize(value);
         },
 
         /**

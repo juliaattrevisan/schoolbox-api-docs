@@ -1,5 +1,5 @@
 <script>
-import { filesize } from "filesize";
+import { humanFileSize } from "@js/util/fileUtils";
 import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 
 export default {
@@ -161,7 +161,7 @@ export default {
          * @returns { String } - 204.5 MB
          */
         getHumanReadableFilesize(value) {
-            return filesize(value);
+            return humanFileSize(value);
         },
     },
 };
