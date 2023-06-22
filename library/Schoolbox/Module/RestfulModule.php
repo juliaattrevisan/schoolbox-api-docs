@@ -89,7 +89,7 @@ abstract class RestfulModule extends AlaressModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param \Aura\Router\Map $router
+     * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
     public function initRoutes(Map $routeMap, $basePath)

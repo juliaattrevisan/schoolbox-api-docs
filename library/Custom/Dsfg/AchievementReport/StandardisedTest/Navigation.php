@@ -74,7 +74,7 @@ class Navigation
     /**
      * NavigationSelector constructor.
      *
-     * @param Generator  $router
+     * @param Generator  $routeGenerator
      * @param User       $user
      * @param array      $externalUser
      * @param IConnector $db

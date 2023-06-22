@@ -628,9 +628,9 @@ class Controller extends Base
 
     /**
      * @param int $vieweeId
-     * @return false|string|null
+     * @return string|null
      */
-    private function getYearUrl(int $vieweeId)
+    private function getYearUrl(int $vieweeId): ?string
     {
         try {
             return $this->routeGenerator->generate('learningGrades.getGradesYear', ['userId' => $vieweeId]);

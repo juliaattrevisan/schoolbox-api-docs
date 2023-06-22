@@ -1976,11 +1976,6 @@ parameters:
 			path: library/Schoolbox/Admin/Home/Controller.php
 
 		-
-			message: "#^Access to protected property Aura\\\\Router\\\\Route\\:\\:\\$method\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/RouteSummary/Controller.php
-
-		-
 			message: "#^Property Schoolbox\\\\Admin\\\\Service\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Service/Controller.php
@@ -6073,11 +6068,6 @@ parameters:
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 2
-			path: library/SitePage.php
-
-		-
-			message: "#^Variable \\$router in PHPDoc tag @var does not exist\\.$#"
-			count: 1
 			path: library/SitePage.php
 
 		-

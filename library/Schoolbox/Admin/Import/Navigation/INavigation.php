@@ -23,7 +23,7 @@ interface INavigation
     /**
      * Builds breadcrumbs for this page.
      *
-     * @param Generator $router
+     * @param Generator $routeGenerator
      * @return mixed
      */
     public function buildBreadcrumbs(Generator $routeGenerator);
@@ -32,7 +32,7 @@ interface INavigation
     /**
      * Builds navigation for this page.
      *
-     * @param Generator $router
+     * @param Generator $routeGenerator
      * @param string    $currentPage
      * @return mixed
      */

@@ -22,7 +22,7 @@ abstract class AbstractLinks
     /**
      * Constructor
      *
-     * @param Generator  $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $authorizer
      * @param User       $currentUser
      */
@@ -45,7 +45,7 @@ abstract class AbstractLinks
     {
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $this->currentUser)) {
             /** @noinspection PhpUnhandledExceptionInspection */
-            return $this->router->generate($route, $params);
+            return $this->routeGenerator->generate($route, $params);
         }
         return null;
     }
