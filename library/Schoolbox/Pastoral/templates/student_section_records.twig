@@ -92,7 +92,12 @@
                                     {# Delete record #}
 
                                     {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
-                                        <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                        <a data-delete
+                                           id="{{ record.id }}"
+                                           class="icon-delete no-text"
+                                           href="{{ routeLookup('pastoral.postRecordDelete', {recordId: record.id}) }}"
+                                           title="Delete"
+                                        ></a>
                                     {% endif %}
                                 </nav>
                             {% endif %}
@@ -115,9 +120,9 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this record?',
                     confirmLabel: 'Delete',
-                    confirmEvent: function () {
+                    confirmEvent: function (element) {
                         $('#deletePastoralId').val();
-                        $('#deletePastoralForm').attr('action', '{{ routeLookup('pastoral.postRecordDelete', {recordId: '_recordId'}) }}'.replace(/_recordId/g, e.target.id));
+                        $('#deletePastoralForm').attr('action', element.attr('href'));
                         $('#deletePastoralForm').submit();
                     }
                 });
