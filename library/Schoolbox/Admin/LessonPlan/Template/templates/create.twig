@@ -154,6 +154,23 @@
                     /* Mandate at least one field existing at all times
                      */
                     refreshDeletes();
+
+                    const $saveButton = $('#save-button');
+
+                    if (
+                        // If submit button is disabled, and there are no overfilled ckeditor fields...
+                        $saveButton.prop('disabled') &&
+                        $('[data-maxCharCountExceededAtLastCheck=1]').length === 0
+                    ) {
+                        // Re-enable submit button and remove storage limit suffix.
+                        // (This step is needed when there is one overfilled field (that has caused the submit button to
+                        //  be disabled), and that field is deleted by the user.
+                        $saveButton.prop('disabled', false);
+                        $saveButton.attr(
+                            'value',
+                            $saveButton.attr('value').replace(' (disabled because content storage limit exceeded)', '')
+                        );
+                    }
                 }
             });
         });
