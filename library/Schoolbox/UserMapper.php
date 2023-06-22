@@ -408,13 +408,6 @@ class UserMapper extends Mapper
                 /** @var User\Pronoun\Model|null $pronoun **/
                 $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
 
-                // if empty pronoun, create blank default entry
-//                if (null === $pronoun) {
-//                    /** @var Schoolbox\User\Pronoun\Mapper $pronounMapper */
-//                    $pronounMapper = $this->getJoinMapper('pronoun');
-//                    $pronoun = $pronounMapper->createModel();
-//                }
-
                 $users[$userId] = $this->hydrate($row)
                                        ->setSuperuser($row['superuser'] == 1)
                                        ->setRole($role)

@@ -160,12 +160,6 @@ class Mapper extends BaseMapper
 
                 /** @var User\Pronoun\Model|null $recipientPronoun */
                 $recipientPronoun = $this->hydrateJoin($row, 'recipient.pronoun', 'recipientPronoun');
-//                // if empty pronoun, create blank default entry
-//                if (null === $recipientPronoun) {
-//                    /** @var User\Pronoun\Mapper $pronounMapper */
-//                    $pronounMapper = $this->getJoinMapper('recipient.pronoun');
-//                    $recipientPronoun = $pronounMapper->createModel();
-//                }
                 $recipient->setPronoun($recipientPronoun);
             }
             $model->setRecipient($recipient);
