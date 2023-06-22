@@ -340,16 +340,16 @@
 
 <script>
     $(function() {
-		$('#addIndividualPermission').selectizeSelector({
-			multiple: true,
-			value: {USER_LIST},
-			ajax: {
-				url:      '/eportfolio/search.php',
-				type:     'GET',
-				data:     {groupID: '{STUDENT_GROUP_IDS}'},
-				dataType: 'json'
-			}
-		});
+        $('#addIndividualPermission').selectizeSelector({
+            multiple: true,
+            value: {USER_LIST},
+            ajax: {
+                url:      '/eportfolio/search.php',
+                type:     'GET',
+                data:     {groupID: '{STUDENT_GROUP_IDS}'},
+                dataType: 'json'
+            }
+        });
 
         $('[data-interaction="delete"]').click(function(e){
             e.preventDefault();
