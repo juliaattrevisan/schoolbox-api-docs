@@ -89,7 +89,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('recipient.year', 'recipientYear')},
                 {$this->getJoinColumnString('recipient.schoolHouse', 'recipientSchoolHouse')},
                 {$this->getJoinColumnString('recipient.pronoun', 'recipientPronoun')},
-                {$this->getJoinColumnString('creator', 'creator')}
+                {$this->getJoinColumnString('creator', 'creator')},
+                {$this->getJoinColumnString('creator.pronoun', 'creatorPronoun')}
         ";
     }
 
@@ -110,6 +111,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('recipient.schoolHouse', 'recipient', 'recipientSchoolHouse', true)}
             LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'recipient', 'recipientPronoun')}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
+            LEFT JOIN {$this->getJoinSql('creator.pronoun', 'creator', 'creatorPronoun')}
         ";
     }
 
@@ -166,6 +168,9 @@ class Mapper extends BaseMapper
 
             /** @var User|null $creator */
             $creator = $this->hydrateJoin($row, 'creator', 'creator');
+            /** @var User\Pronoun\Model|null $creatorPronoun */
+            $creatorPronoun = $this->hydrateJoin($row, 'creator.pronoun', 'creatorPronoun');
+            $creator->setPronoun($creatorPronoun);
             $model->setCreator($creator);
 
             // Set the list of tags as an empty collection:
