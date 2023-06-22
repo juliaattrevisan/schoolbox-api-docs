@@ -502,7 +502,8 @@ class Calendar extends DeprecatedModel
                 folder.id AS categoryId,
                 folder.name AS categoryName,
                 event.completed,
-                author_id
+                author_id,
+                if (user.pronoun, concat('(', pronoun.objective, ' / ', pronoun.subjective, ')'), '') as 'pronoun'
             FROM event
             LEFT JOIN user             ON event.author_id = user.id
             LEFT JOIN luEventType      ON type = eventTypeID
@@ -513,6 +514,7 @@ class Calendar extends DeprecatedModel
             LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = %d
             LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = %d
             LEFT JOIN event_attendance ON event.id = event_attendance.event_id
+            LEFT JOIN pronoun ON user.pronoun = pronoun.id
             WHERE
                 event.deleted_at is NULL
                 AND resource_booking.id IS NULL
