@@ -40,14 +40,6 @@
                 // CKEditors to listen for changes on
                 textareas: [],
 
-                // Submit buttons to check for the 'data-ckEditorMaxCharCountExceededAtLastCheck' attribute.
-                // If the 'data-ckEditorMaxCharCountExceededAtLastCheck' attribute is present on any submit button, this
-                // means the maximum character count has been exceeded in one or more of the ckeditor textareas that will
-                // be submitted by that submit button (see wordCountSettings.ts).  The content cannot be saved in this
-                // situation, because it will not fit into the relevant database field. Therefore, if any of these submit
-                // buttons has the attribute autosave will be skipped.
-                submitButtons: [],
-
                 // Attachzones to listen for changes on
                 attachzones: [],
 
@@ -123,9 +115,26 @@
              * Alternatively I could've returned the vars in this function and reassigned them above.
              */
             function checkForChanges() {
-                for (let submitButton of config.submitButtons) {
-                    if (submitButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')) {
-                        return; // Skip check because the content storage limit has been exceeded.
+                let doSave = true;
+
+                for (let textareaId of config.textareas) {
+                    const textarea = document.getElementById(textareaId);
+                    const container = textarea.parentNode;
+                    const wordCountDivs = container.querySelectorAll('*.ck-word-count');
+
+                    if (wordCountDivs.length === 1) {
+                        // If the 'data-maxCharCountExceededAtLastCheck=1' attribute is present on any submit button, the
+                        // maximum character count has been exceeded in the matching ckeditor textarea element.
+                        // The content of the textarea cannot be saved in this situation, because it will not fit into
+                        // the relevant database field.
+                        if (wordCountDivs[0].getAttribute('data-maxCharCountExceededAtLastCheck') === '1') {
+                            // Abandon check because the content storage limit has been exceeded.
+                            // !! Note that this means we are skipping autosave for all fields, not just the one
+                            //    whose max char count was exceeded.  If we want to skip only the field whose
+                            //    max char count wsa exceeded, server-side changes will be required.
+                            doSave = false;
+                            break;
+                        }
                     }
                 }
 
@@ -140,7 +149,16 @@
 
                 // Set a timeout for the draft to save
                 draftTimeout = setTimeout(function () {
-                    save(deferred);
+                    if (doSave) {
+                        save(deferred);
+                    } else {
+                        config.toaster.toastActivate({text: "Saving...",});
+                        config.toaster.toastTimeout({
+                            text: "Save skipped because storage limit exceeded",
+                            css: "alert",
+                        });
+                        deferred.resolve(); // Resolve the deferred for stallSubmit.
+                    }
                 }, config.interval * 1000);
 
                 // install the deferred as stalling form submit

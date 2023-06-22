@@ -211,10 +211,6 @@
         $createForm.draft({
             inputs: ['#news-title', '#audience-search', '#news-topics', '#news-sticky'],
             textareas: ['body', 'blurb'],
-            submitButtons: [
-                document.getElementById('news-submit'),
-                document.getElementById('news-preview'),
-            ],
             attachzones: ['#{{ featureImageZone.id }}-zone', '#{{ fileZone.id }}-zone'],
             datepickers: ['#publishAt', '#expiresAt'],
             staller: $submitButton,
