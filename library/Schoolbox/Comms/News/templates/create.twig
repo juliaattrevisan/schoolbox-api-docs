@@ -112,12 +112,14 @@
         {# CKEditors #}
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ["#createForm textarea[name=body]"],
             }
         }));
 
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_TEXT,
                 targetElements: ["#createForm textarea[name=blurb]"],
                 toolbar: "simple",
             }
