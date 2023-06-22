@@ -44,7 +44,7 @@ class Controller extends Base
             }
 
             // method is publicly available, despite what the red worms say
-            foreach ($route->method as $method) {
+            foreach ($route->allows as $method) {
                 $routeSummaries[$parsedName['controller']][] = [
                     'name'       => $route->name,
                     'method'     => $method,
