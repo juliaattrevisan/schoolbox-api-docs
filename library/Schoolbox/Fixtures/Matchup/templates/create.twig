@@ -202,7 +202,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% if match %}
+        {% if match and match.id %}
             {% set formUrl = routeLookup('sportsfixturesMatch.updateEntity', {entityId: match.id}) %}
         {% else %}
             {% set formUrl = routeLookup('sportsfixturesMatch.createEntity') %}
