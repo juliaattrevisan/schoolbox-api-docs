@@ -138,6 +138,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('author', 'a')},
+                {$this->getJoinColumnString('author.pronoun', 'pronoun')},
                 {$this->getJoinColumnString('comms_news_article_topic', 'topics')},
                 {$this->getJoinColumnString('moderator', 'm')},
                 {$this->getJoinColumnString('rejector', 'r')},
@@ -161,6 +162,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('comms_news_article_topic', null, 'topics')}
             INNER JOIN {$this->getJoinSql('author', null, 'a', true)}
+            LEFT JOIN {$this->getJoinSql('author.pronoun', 'a', 'pronoun')}
             LEFT JOIN {$this->getJoinSql('moderator', null, 'm', true)}
             LEFT JOIN {$this->getJoinSql('rejector', null, 'r', true)}
             LEFT JOIN {$this->getJoinSql('featureImage', null, 'fi')}
@@ -217,7 +219,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
                 // Hydrate 1:1 and 1:0..1 joins
                 $article->setTopics($topicMapper->createCollection());
-                $article->setAuthor($authorMapper->hydrate($row, 'a'));
+                $author = $authorMapper->hydrate($row, 'a');
+                $author->setPronoun($this->hydrateJoin($row, 'author.pronoun', 'pronoun'));
+                $article->setAuthor($author);
                 $article->setAcceptedBy($moderatorMapper->hydrate($row, 'm'));
                 $article->setRejectedBy($rejectorMapper->hydrate($row, 'r'));
 

@@ -71,33 +71,45 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('recipient', 'r')},
                 {$this->getJoinColumnString('recipient.role', 'rr')},
+                {$this->getJoinColumnString('recipient.pronoun', 'rp')},
                 {$this->getJoinColumnString('awardedBy', 'a')},
                 {$this->getJoinColumnString('awardedBy.role', 'ar')},
+                {$this->getJoinColumnString('awardedBy.pronoun', 'ap')},
                 {$this->getJoinColumnString('reasonedBy', 'rb')},
                 {$this->getJoinColumnString('reasonedBy.role', 'rbr')},
+                {$this->getJoinColumnString('reasonedBy.pronoun', 'rbp')},
                 {$this->getJoinColumnString('award', 'aw')},
                 {$this->getJoinColumnString('award.badge', 'awb')},
                 {$this->getJoinColumnString('award.recipient', 'awr')},
                 {$this->getJoinColumnString('award.recipient.role', 'awrr')},
+                {$this->getJoinColumnString('award.recipient.pronoun', 'awrp')},
                 {$this->getJoinColumnString('award.awardedBy', 'awa')},
                 {$this->getJoinColumnString('award.awardedBy.role', 'awar')},
+                {$this->getJoinColumnString('award.awardedBy.pronoun', 'awap')},
                 {$this->getJoinColumnString('award.reasonedBy', 'awrb')},
-                {$this->getJoinColumnString('award.reasonedBy.role', 'awrbr')}
+                {$this->getJoinColumnString('award.reasonedBy.role', 'awrbr')},
+                {$this->getJoinColumnString('award.reasonedBy.pronoun', 'awrbp')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('recipient', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr')}
+            LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'r', 'rp')}
             INNER JOIN {$this->getJoinSql('awardedBy', '', 'a', true)}
             INNER JOIN {$this->getJoinSql('awardedBy.role', 'a', 'ar')}
+            LEFT JOIN {$this->getJoinSql('awardedBy.pronoun', 'a', 'ap')}
             LEFT  JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
             LEFT  JOIN {$this->getJoinSql('reasonedBy.role', 'a', 'rbr')}
+            LEFT  JOIN {$this->getJoinSql('reasonedBy.pronoun', 'a', 'rbp')}
             LEFT  JOIN {$this->getJoinSql('award', '', 'aw')}
             LEFT  JOIN {$this->getJoinSql('award.badge', 'aw', 'awb')}
             LEFT  JOIN {$this->getJoinSql('award.recipient', 'aw', 'awr', true)}
             LEFT  JOIN {$this->getJoinSql('award.recipient.role', 'awr', 'awrr')}
+            LEFT  JOIN {$this->getJoinSql('award.recipient.pronoun', 'awr', 'awrp')}
             LEFT  JOIN {$this->getJoinSql('award.awardedBy', 'aw', 'awa', true)}
             LEFT  JOIN {$this->getJoinSql('award.awardedBy.role', 'awa', 'awar')}
+            LEFT  JOIN {$this->getJoinSql('award.awardedBy.pronoun', 'awa', 'awap')}
             LEFT  JOIN {$this->getJoinSql('award.reasonedBy', 'aw', 'awrb', true)}
             LEFT  JOIN {$this->getJoinSql('award.reasonedBy.role', 'awrb', 'awrbr')}
+            LEFT  JOIN {$this->getJoinSql('award.reasonedBy.pronoun', 'awrb', 'awrbp')}
         ";
     }
 
@@ -155,7 +167,8 @@ class Mapper extends \Schoolbox\Mapper
                 if ($role instanceof Role) {
                     $recipient->setRole($role);
                 }
-
+                $recipientPronoun = $this->hydrateJoin($row, 'recipient.pronoun', 'rp');
+                $recipient->setPronoun($recipientPronoun);
                 $award->setRecipient($recipient);
             }
 
@@ -170,6 +183,9 @@ class Mapper extends \Schoolbox\Mapper
                     $awardedBy->setRole($role);
                 }
 
+                $awardedByPronoun = $this->hydrateJoin($row, 'awardedBy.pronoun', 'ap');
+                $awardedBy->setPronoun($awardedByPronoun);
+
                 $award->setAwardedBy($awardedBy);
             }
 
@@ -183,6 +199,9 @@ class Mapper extends \Schoolbox\Mapper
                 if ($role instanceof Role) {
                     $reasonedBy->setRole($role);
                 }
+
+                $reasonedByPronoun = $this->hydrateJoin($row, 'reasonedBy.pronoun', 'rbp');
+                $reasonedBy->setPronoun($reasonedByPronoun);
 
                 $award->setReasonedBy($reasonedBy);
             }
@@ -200,6 +219,8 @@ class Mapper extends \Schoolbox\Mapper
                         if ($parentAwardedByRole instanceof Role) {
                             $parentAwardedBy->setRole($parentAwardedByRole);
                         }
+                        $parentAwardedByPronoun = $this->hydrateJoin($row, 'award.awardedBy.pronoun', 'awap');
+                        $parentAwardedBy->setPronoun($parentAwardedByPronoun);
                         $parentAward->setAwardedBy($parentAwardedBy);
                     }
 
@@ -209,6 +230,8 @@ class Mapper extends \Schoolbox\Mapper
                         if ($parentReasonedByRole instanceof Role) {
                             $parentReasonedBy->setRole($parentReasonedByRole);
                         }
+                        $parentReasonedByPronoun = $this->hydrateJoin($row, 'award.reasonedBy.pronoun', 'awrbp');
+                        $parentReasonedBy->setPronoun($parentReasonedByPronoun);
                         $parentAward->setReasonedBy($parentReasonedBy);
                     }
 
@@ -220,6 +243,8 @@ class Mapper extends \Schoolbox\Mapper
                         if ($parentRecipientRole instanceof Role) {
                             $parentRecipient->setRole($parentRecipientRole);
                         }
+                        $parentRecipientPronoun = $this->hydrateJoin($row, 'award.recipient.pronoun', 'awrp');
+                        $parentRecipient->setPronoun($parentRecipientPronoun);
                         $parentAward->setRecipient($parentRecipient);
                     }
 

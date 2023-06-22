@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Comment;
 
-use function count;
-
 use PDO;
 use PDOStatement;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
+use function count;
 
 /**
  * Mapper for comments in discussion threads.
@@ -64,7 +64,8 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('thread', 't')},
-                {$this->getJoinColumnString('author', 'a')}
+                {$this->getJoinColumnString('author', 'a')},
+                {$this->getJoinColumnString('author.pronoun', 'pronoun')}
         ";
     }
 
@@ -81,6 +82,7 @@ class Mapper extends BaseMapper
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('thread', '', 't', true)}
             INNER JOIN {$this->getJoinSql('author', '', 'a', true)}
+            LEFT JOIN {$this->getJoinSql('author.pronoun', 'a', 'pronoun')}
         ";
     }
 
@@ -108,6 +110,7 @@ class Mapper extends BaseMapper
             /** @var User|null $author */
             $author = $this->hydrateJoin($row, 'author', 'a');
             if ($author) {
+                $author->setPronoun($this->hydrateJoin($row, 'author.pronoun', 'pronoun'));
                 $model->setAuthor($author);
             }
 
@@ -168,9 +171,9 @@ class Mapper extends BaseMapper
         $query = "
             SELECT
             {$selectColumns}
-            FROM {$this->getTable()} 
+            FROM {$this->getTable()}
             {$join}
-            WHERE {$where} 
+            WHERE {$where}
             GROUP BY {$this->table}.discussion_thread_id
         ";
 

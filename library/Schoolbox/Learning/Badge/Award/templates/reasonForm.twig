@@ -16,9 +16,7 @@
                         <p class="meta">Provide evidence or narrative on how the
                             {{ isGoal ? 'goal is progressing.' : 'achievement was earned.' }}
                             {% if USER.role.staff %}
-                                You may use the following tokens that will be substituted with the
-                                students details on creation:
-                                [firstname], [preferredname], [surname], [fullname], [year], [house]
+                                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
                             {% endif %}
                         </p>
                         <textarea id="reason" name="reason">{{ reason }}</textarea>
