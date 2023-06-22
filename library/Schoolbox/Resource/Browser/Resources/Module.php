@@ -131,10 +131,9 @@ class Module extends AbstractModule
         );
 
         // Specific routes
-        $this->register('GET', '/folder/{componentID:\d+}/files/{sourceFolderID:\d+}', 'showFiles', $hasFolderReadAccess, $preloadFolder);
-        $this->register('GET', '/folder/files/{sourceFolderID:\d+}', 'showFolderFiles', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/folder/{componentID:\d+}/files/{folderId:\d+}', 'showFiles', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/folder/files/{folderId:\d+}', 'showFolderFiles', $hasFolderReadAccess, $preloadFolder);
         $this->register('PATCH', '/file/{fileId:\d+}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
-//        $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
         $this->register('GET', '/link/{linkId:\d+}/info', 'showLinkInfo', $hasReadAccess, $preloadLink);
     }
 
@@ -205,10 +204,16 @@ class Module extends AbstractModule
         if (($params['sourceFolder'] ?? null) instanceof Resource\Folder\Model) {
             return $params;
         }
-        try {
-            $folder = $this->getMapperFactory()->get(Resource\Folder\Mapper::class)->findById($params['sourceFolderID']);
-        } catch (MapperException $e) {
-            throw new NotFound();
+
+        // Load folder only if folderId is set
+        // (the folder is an optional param in the route)
+        $folder = null;
+        if (isset($params['folderId'])) {
+            try {
+                $folder = $this->getMapperFactory()->get(Resource\Folder\Mapper::class)->findById($params['folderId']);
+            } catch (MapperException $e) {
+                throw new NotFound();
+            }
         }
 
         return [
