@@ -673,16 +673,17 @@ class UserMapper extends Mapper
      */
     public function findByAccess($service, $accessLevel, $serviceIdentifier = null, $order = [], $limit = null)
     {
+
         $query = "
-            SELECT DISTINCT {$this->getColumnString('u')}, {$this->getJoinColumnString('role', 'r')}
+        SELECT DISTINCT {$this->getColumnString('u')}, {$this->getJoinColumnString('role', 'r')}, {$this->getJoinColumnString('pronoun', 'pronoun')}
             FROM {$this->getTable()} u
             INNER JOIN {$this->getJoinSql('userAccess', 'u', 'ua')}
+            LEFT JOIN {$this->getJoinSql('pronoun', 'u', 'pronoun')}
             INNER JOIN {$this->getJoinSql('role', 'u', 'r')}
             WHERE ua.service=:service
             AND ua.type >=:accessLevel
             AND u.deleted_at is null
         ";
-
         $params = array(
             'service' => $service,
             'accessLevel' => $accessLevel,
@@ -716,6 +717,7 @@ class UserMapper extends Mapper
             $role = $this->hydrateJoin($row, 'role', 'r');
 
             $user->setRole($role);
+            $user->setPronoun($this->hydrateJoin($row, 'pronoun', 'pronoun'));
             $users->add($user);
         }
 
