@@ -124,6 +124,13 @@ class Controller extends Base
     {
         $matchedRoute = $this->router->getMatcher()->getMatchedRoute();
         if ($matchedRoute && $matchedRoute->attributes['userId']) {
+            // If the selected date is provided: the route preloader has
+            // converted it to YYYY-MM-DD.
+            // Convert it back to DD-MM-YYYY.
+            if (isset($selectedDate)) {
+                $dateObject   = new Alaress_Date_Format($selectedDate, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $selectedDate = $dateObject->getURLDate();
+            }
             $route = $this->routeGenerator->generate(
                 'calendar.getCalendar',
                 [
