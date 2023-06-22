@@ -382,12 +382,14 @@ class Controller extends Base
         $navigableTerms = TermMapper::getInstance()->findAll();
         $termsWithResults = $this->getNavigableTerms($courseSpecification, $classFolder);
 
-        $data = [
+        $matchedRoute = $this->router->getMatcher()->getMatchedRoute();
+        $currentRoute = $matchedRoute ? $matchedRoute->name : '';
+        $data  = [
             'courseSpec'          => $courseSpecification,
             'classFolder'         => $classFolder,
             'submissionType'      => $submissionType,
             'submissionTypes'     => $this->workTypeMapper->findAll(),
-            'currentRoute'        => $this->getRouter()->getMatchedRoute()->name,
+            'currentRoute'        => $currentRoute,
             'route'               => $routeType,
             'classFolders'        => $courseImplementationFolders,
             'term'                => $term,

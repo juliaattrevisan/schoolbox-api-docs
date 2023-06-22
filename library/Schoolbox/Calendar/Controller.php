@@ -122,7 +122,8 @@ class Controller extends Base
      */
     public function redirect(?string $selectedDate, User $user): void
     {
-        if ($this->getRouter()->getMatchedRoute()->params['userId']) {
+        $matchedRoute = $this->router->getMatcher()->getMatchedRoute();
+        if ($matchedRoute && $matchedRoute->attributes['userId']) {
             $route = $this->routeGenerator->generate(
                 'calendar.getCalendar',
                 [

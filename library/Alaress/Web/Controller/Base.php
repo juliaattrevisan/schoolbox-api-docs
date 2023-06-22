@@ -14,11 +14,11 @@ use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
 use Aura\Router\Generator;
+use Aura\Router\RouterContainer;
 use Aura\Session\SegmentInterface;
 use Aura\Web\Exception\InvalidStatusCode;
 use Aura\Web\Request;
 use Aura\Web\Response;
-use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
 use Crell\ApiProblem\ApiProblem;
@@ -49,9 +49,15 @@ abstract class Base
     protected ContainerInterface $di;
 
     /**
-     * @var Router
+     * Direct reference to the router object.
+     *
+     * Usually not required, as controllers usually only want to generate routes
+     * (see `$this->routeGenerator`). However, some controllers may do atypical
+     * things with the router itself, e.g.:
+     * * finding the last matched route
+     * * getting a list of all registered routes
      */
-    protected $router;
+    protected RouterContainer $router;
 
     /**
      * Direct reference to the controller's route generator.
@@ -173,17 +179,17 @@ abstract class Base
     }
 
     /**
-     * @param  Router $router
+     * @param  RouterContainer $router
      * @return $this
      */
-    public function setRouter($router)
+    public function setRouter(RouterContainer $router)
     {
         $this->router = $router;
         return $this;
     }
 
     /**
-     * @return Router
+     * @return RouterContainer
      */
     public function getRouter()
     {

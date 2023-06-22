@@ -23,8 +23,7 @@ class Controller extends Base
     public function getRouteList()
     {
         $routeSummaries = [];
-        foreach ($this->getRouter()->getRoutes() as $route) {
-            /** @var Route $route */
+        foreach ($this->router->getMap()->getRoutes() as $route) {
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             try {
                 $module = Registry::buildModuleFromRegistration($this->di, $parsedName['controller']);
