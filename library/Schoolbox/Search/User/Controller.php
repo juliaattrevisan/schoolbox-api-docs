@@ -582,7 +582,7 @@ class Controller extends BaseController
         $pastoralCounts = 0;
         if ($showPastoral) {
             $pastoralCountHelper = new PastoralCountHelper(
-                $this->router,
+                $this->routeGenerator,
                 $this->pastoralTypeMapper,
                 $this->pastoralSubTypeMapper,
                 $this->pastoralDataSource,

@@ -221,8 +221,8 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
-            'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
+            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
+            'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
             'attachment' => $this->getRequest()->post['attachment'] ?? null,
             'errors' => $errors,
             'logs' => $logs,

@@ -103,7 +103,7 @@ class Controller extends Base
                 'data' => [
                     'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
                     'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
-                    'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportFolder')->getAllNodes(),
+                    'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportFolder')->getAllNodes(),
                     'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
                     'roles' => $this->roleMapper->findAll(),
                     'attachzone' => $this->getAttachZone(),

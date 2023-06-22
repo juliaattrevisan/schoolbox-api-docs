@@ -908,7 +908,7 @@ class Controller extends Base
     private function buildBadgeAwardModelToArrayTranslator(): Translator\ModelToArray
     {
         $factory = new Translator\ModelToArray\Factory(
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             new PrefixGenerator($this->getConfigLoader()),
@@ -930,10 +930,10 @@ class Controller extends Base
                 new User\Translator\Author\ModelToArray(),
                 new Storage\Translator\ModelToArray($prefixGenerator),
                 new ScrubAdapter(),
-                new BadgeTranslator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
+                new BadgeTranslator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
             ),
             new BadgeTranslator\ModelToArray\Links(
-                $this->router,
+                $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser()
             )

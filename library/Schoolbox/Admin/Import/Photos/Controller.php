@@ -191,7 +191,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportPhotos.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPhotos.getIndex')),
-                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
+                'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPhotos')->getAllNodes(),
                 'attachzone' => $this->getAttachZone(),
                 'users' => $users,
                 'surname' => $surname

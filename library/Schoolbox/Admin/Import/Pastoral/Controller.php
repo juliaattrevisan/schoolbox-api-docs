@@ -74,7 +74,7 @@ class Controller extends Base
                 'data'     => [
                     'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
                     'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
-                    'allNavigation'   => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                    'allNavigation'   => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                     'externalEnabled' => $this->getConfigLoader()->get("external_pastoral"),
                 ],
             ]
@@ -91,7 +91,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
                 'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
-                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
                 'message'        => false,
             ],
@@ -110,7 +110,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
                 'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
-                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                 'log'            => $log,
                 'message'        => false,
             ],
@@ -143,7 +143,7 @@ class Controller extends Base
             'data'       => [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
                 'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
-                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
                 'message'        => true,
             ],

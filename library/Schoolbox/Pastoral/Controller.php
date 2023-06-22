@@ -187,7 +187,7 @@ class Controller extends Base
     public function getStudentsCount(Collection $students): void
     {
         $pastoralCountHelper = new PastoralCountHelper(
-            $this->router,
+            $this->routeGenerator,
             $this->pastoralTypeMapper,
             $this->pastoralSubTypeMapper,
             $this->pastoralDataSource,
@@ -250,7 +250,7 @@ class Controller extends Base
         $pageRecords = $this->pastoralDataSource->findRecords($user, $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
 
         $pastoralCountHelper = new PastoralCountHelper(
-            $this->router,
+            $this->routeGenerator,
             $this->pastoralTypeMapper,
             $this->pastoralSubTypeMapper,
             $this->pastoralDataSource,

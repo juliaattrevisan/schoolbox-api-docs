@@ -472,7 +472,7 @@ class Controller extends Base
     private function buildTranslatorWithComments(int $commentLimit): Composite
     {
         return (new Factory(
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             $this->commentMapper,

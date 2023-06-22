@@ -432,10 +432,10 @@ class Controller extends Base
                 new User\Translator\Author\ModelToArray(),
                 new Storage\Translator\ModelToArray($prefixGenerator),
                 new ScrubAdapter(),
-                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
+                new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
             ),
             new Translator\ModelToArray\Links(
-                $this->router,
+                $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser()
             )

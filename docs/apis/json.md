@@ -2,7 +2,7 @@
 
 The objective of this documentation is to explain how to use a few utilities within the codebase
 to easily turn Controller methods and Model structures into JSON representations for easy API
-consumption by 3rd parties. 
+consumption by 3rd parties.
 
 Our most notable partner who this affects is Digistorm, who&mdash;in a lot of cases&mdash;scrape
 our HTML output for the data they want, hoping we don't change it on them.
@@ -33,7 +33,7 @@ use Schoolbox\Json\Api\AuraLink;
 class MyModel implements Serializable, Linkable
 {
     use SerializableTrait;
-    
+
     public function getDefaultJsonMap(): array
     {
         return [
@@ -161,9 +161,11 @@ But what if you want to customise the output in this case? Let's say that we act
 coming through when we're in the context of `getList()`...
 
 ```php
+use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Alaress\Web\Request\IsJson;
+use Schoolbox\Json\Decorator\LinkDecorator;
 
 class MyController extends Base
 {
@@ -177,8 +179,8 @@ class MyController extends Base
         // manually do the check for JSON and pre-compile the JSON output
         if ((new IsJson())->isSatisfiedBy($this->request)) {
             $data['models'] = $models->jsonSerialize(
-                new \Alaress\Json\Decorator\PropertyDecorator([ 'propertyA' ]),
-                new LinkDecorator($this->router, $this->authorizer)
+                new PropertyDecorator([ 'propertyA' ]),
+                new LinkDecorator($this->routeGenerator, $this->authorizer, $this->getUser())
             );
         } else {
             $data['models'] = $models;
