@@ -12,12 +12,12 @@ const DEFAULT_TOKENS = [
     "[fullname]",
     "[house]",
     "[year]",
-    "[subjectivepronoun]",
-    "[subjectivepronounproper]",
-    "[objectivepronoun]",
-    "[objectivepronounproper]",
-    "[possessivepronoun]",
-    "[possessivepronounproper]",
+    "[they]",
+    "[They]",
+    "[them]",
+    "[Them]",
+    "[theirs]",
+    "[Theirs]",
 ];
 
 /**
