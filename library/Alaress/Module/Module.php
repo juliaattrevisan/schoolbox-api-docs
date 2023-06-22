@@ -17,7 +17,6 @@ use Alaress\Web\Request\IsXhr;
 use Aura\Router\Exception\RouteAlreadyExists;
 use Aura\Router\Generator;
 use Aura\Router\Map;
-use Aura\Router\RouteCollection;
 use Aura\Router\RouterContainer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
