@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Aura\Router\Exception\RouteAlreadyExists;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouteCollection;
@@ -43,6 +44,7 @@ class Module
     public const METHOD_PUT    = 'PUT';
     public const METHOD_PATCH  = 'PATCH';
     public const METHOD_DELETE = 'DELETE';
+    public const METHOD_OPTIONS = 'OPTIONS';
 
 
     /** @var RouteParser */
@@ -177,7 +179,7 @@ class Module
             // perform any route registration available
             $this->registerRoutes();
 
-            // preload registered routes
+            // preload registered routes, only if they don't already exist
             foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
                 $this->addRoute($this->getRouteMap(), $controllerMethod, $basePath, $path)
                      ->allows($method)
@@ -323,11 +325,11 @@ class Module
      */
     protected function addRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $routeMap->route($this->basename . '.' . $alias, $basePath . $path);
+        return $this->addOrFetchExistingRoute($routeMap, $this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**
-     * Helper for calling $router->addGet() for this component's basename.
+     * Helper for calling $router->get() for this component's basename.
      *
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
@@ -343,11 +345,11 @@ class Module
      */
     protected function addGetRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $routeMap->get($this->basename . '.' . $alias, $basePath . $path);
+        return $this->addRoute($routeMap, $alias, $basePath, $path)->allows(self::METHOD_GET);
     }
 
     /**
-     * Helper for calling $router->addGet() for this component's basename.
+     * Helper for calling $router->post() for this component's basename.
      *
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
@@ -363,7 +365,7 @@ class Module
      */
     protected function addPostRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $routeMap->post($this->basename . '.' . $alias, $basePath . $path);
+        return $this->addRoute($routeMap, $alias, $basePath, $path)->allows(self::METHOD_POST);
     }
 
     /**
@@ -378,35 +380,81 @@ class Module
      */
     protected function attachResourceRoutes(Map $routeMap, $basePath)
     {
-        $routeMap->attach(
-            $this->basename,
-            $basePath,
-            function (Map $subMap) {
-                $subMap->tokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
+        $tokens = ['id' => '\d+', 'format' => '(\.[^/]+)?',];
 
-                // Attach routes from Aura Router 2.x `attachResource`
-                $subMap->get('browse', '{format}');
-                $subMap->get('read', '/{id}{format}');
-                $subMap->get('edit', '/{id}/edit{format}');
-                $subMap->get('add', '/add');
-                $subMap->delete('delete', '/{id}');
-                $subMap->post('create', '');
-                $subMap->post('update', '/{id}');
-                $subMap->post('replace', '/{id}');
-                $subMap->options('options', '');
+        // Attach routes from Aura Router 2.x `attachResource`
+        $this->addGetRoute($routeMap, 'browse', $basePath, '{format}')->tokens($tokens);
 
-                // Attach POST aliases for PUT/PATCH/DELETE routes
-                $subMap
-                    ->post('update:post', '/{id}/update')
-                    ->attributes(['action' => 'update']);
-                $subMap
-                    ->post('replace:post', '/{id}/replace')
-                    ->attributes(['action' => 'replace']);
-                $subMap
-                    ->post('delete:post', '/{id}/delete')
-                    ->attributes(['action' => 'delete']);
-            }
-        );
+        $this->addGetRoute($routeMap, 'read', $basePath, '/{id}{format}')->tokens($tokens);
+        $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit{format}')->tokens($tokens);
+        $this->addGetRoute($routeMap, 'add', $basePath, '/add')->tokens($tokens);
+
+        $this->addRoute($routeMap, 'delete', $basePath, '/{id}')
+             ->tokens($tokens)
+             ->allows(self::METHOD_DELETE);
+
+        // Should these really be POST routes? Look closer
+        $this->addPostRoute($routeMap, 'create', $basePath, '')->tokens($tokens);
+        $this->addPostRoute($routeMap, 'update', $basePath, '/{id}')->tokens($tokens);
+        $this->addPostRoute($routeMap, 'replace', $basePath, '/{id}')->tokens($tokens);
+
+        $this->addRoute($routeMap, 'options', $basePath, '')->allows(self::METHOD_OPTIONS)->tokens($tokens);
+
+        // Attach POST aliases for PUT/PATCH/DELETE routes
+        $this->addPostRoute($routeMap, 'update:post', $basePath, '/{id}/update')
+             ->tokens($tokens)
+             ->attributes(['action' => 'update']);
+        $this->addPostRoute($routeMap, 'replace:post', $basePath, '/{id}/replace')
+             ->tokens($tokens)
+             ->attributes(['action' => 'replace']);
+        $this->addPostRoute($routeMap, 'delete:post', $basePath, '/{id}/delete')
+             ->tokens($tokens)
+             ->attributes(['action' => 'delete']);
+
+//        $routeMap->attach(
+//            $this->basename,
+//            $basePath,
+//            function (Map $subMap) {
+//                $subMap->tokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
+//
+//                // Attach routes from Aura Router 2.x `attachResource`
+//                $this->addOrFetchExistingRoute($subMap, 'browse', '{format}')->allows(self::METHOD_GET);
+//                $this->addOrFetchExistingRoute($subMap, 'read', '/{id}{format}')->allows(self::METHOD_GET);
+//                $this->addOrFetchExistingRoute($subMap, 'edit', '/{id}/edit{format}')->allows(self::METHOD_GET);
+//                $this->addOrFetchExistingRoute($subMap, 'add', '/add')->allows(self::METHOD_GET);
+//                $this->addOrFetchExistingRoute($subMap, 'delete', '/{id}')->allows(self::METHOD_DELETE);
+//                $this->addOrFetchExistingRoute($subMap, 'create', '')->allows(self::METHOD_POST);
+//                $this->addOrFetchExistingRoute($subMap, 'update', '/{id}')->allows(self::METHOD_POST);
+//                $this->addOrFetchExistingRoute($subMap, 'replace', '/{id}')->allows(self::METHOD_POST);
+//                $this->addOrFetchExistingRoute($subMap, 'options', '')->allows(self::METHOD_OPTIONS);
+//
+//                // Attach POST aliases for PUT/PATCH/DELETE routes
+//                $this->addOrFetchExistingRoute($subMap, 'update:post', '/{id}/update')
+//                     ->attributes(['action' => 'update']);
+//                $this->addOrFetchExistingRoute($subMap, 'replace:post', '/{id}/replace')
+//                     ->attributes(['action' => 'replace']);
+//                $this->addOrFetchExistingRoute($subMap, 'delete:post', '/{id}/delete')
+//                     ->attributes(['action' => 'delete']);
+//            }
+//        );
+    }
+
+    /**
+     * Add a route for `$name` and `$path`: if a route with name `$name` already
+     * exists, fetch it.
+     *
+     * @param Map    $routeMap
+     * @param string $name
+     * @param string $path
+     * @return Route
+     */
+    private function addOrFetchExistingRoute(Map $routeMap, $name, $path): Route
+    {
+        try {
+            return $routeMap->route($name, $path);
+        } catch (RouteAlreadyExists) {
+            return $routeMap->getRoute($name);
+        }
     }
 
     /**
