@@ -44,7 +44,7 @@ class Module extends BaseModule
         $this->addPostRoute('layoutForm', $basePath, '/layout/{layoutId}');
 
         // Attach standard REST routes...
-        $this->attachResourceRoutes($routeMap, $basePath);
+        $this->attachResourceRoutes($basePath);
 
         // but have separate add tile paths...
         $this->addGetRoute('add', $basePath, '/add/{layoutId}');

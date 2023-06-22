@@ -375,10 +375,9 @@ class Module
      * match against preloads or permissions for "update", "replace" and "delete"
      * respectively.
      *
-     * @param Map    $routeMap The router to add the route to
      * @param string $basePath The base path for this route
      */
-    protected function attachResourceRoutes(Map $routeMap, $basePath)
+    protected function attachResourceRoutes(string $basePath)
     {
         $idToken     = ['id' => '\d+'];
         $formatToken = ['format' => '(\.[^/]+)?'];
