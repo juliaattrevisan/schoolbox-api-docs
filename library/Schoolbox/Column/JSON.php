@@ -21,6 +21,9 @@ class JSON implements IColumnType
      */
     public function hydrate($value, $mapper = null)
     {
+        if (null === $value) {
+            return null;
+        }
         return json_decode($value, true);
     }
 

@@ -27,7 +27,7 @@ trait External_Synergetic_ClearInvalidValuesTrait
             if (is_array($value)) {
                 return $this->clearInvalidValues($value);
             } else {
-                return trim(str_replace($placeholder, '', $value));
+                return trim(str_replace($placeholder, '', $value ?? ''));
             }
         }, $array);
     }
