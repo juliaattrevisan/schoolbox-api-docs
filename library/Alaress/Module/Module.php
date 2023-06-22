@@ -442,14 +442,13 @@ class Module
      * @param string $name
      * @param string $path
      * @return Route
+     * @noinspection PhpDocMissingThrowsInspection
      */
     private function addOrFetchExistingRoute(Map $routeMap, $name, $path): Route
     {
-        try {
-            return $routeMap->route($name, $path);
-        } catch (RouteAlreadyExists) {
-            return $routeMap->getRoute($name);
-        }
+        $existingRoute = $routeMap->getRoutes()[$name] ?? null;
+        /** @noinspection PhpUnhandledExceptionInspection - route existence has been checked already */
+        return $existingRoute ?? $routeMap->route($name, $path);
     }
 
     /**
