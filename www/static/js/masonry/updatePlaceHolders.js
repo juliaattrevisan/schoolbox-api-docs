@@ -84,7 +84,6 @@ function addPlaceHolderComponents() {
  * @returns { Boolean }
  */
 function canAddPlaceHolderComponent(parentContainer) {
-    if (masonryConfig.settings.alwaysShowPlaceHolderComponents) return true;
     return parentContainer.children.length === 0;
 }
 
