@@ -92,10 +92,10 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('recipient', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr')}
-            INNER JOIN {$this->getJoinSql('recipient.pronoun', 'r', 'rp')}
+            LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'r', 'rp')}
             INNER JOIN {$this->getJoinSql('awardedBy', '', 'a', true)}
             INNER JOIN {$this->getJoinSql('awardedBy.role', 'a', 'ar')}
-            INNER JOIN {$this->getJoinSql('awardedBy.pronoun', 'a', 'ap')}
+            LEFT JOIN {$this->getJoinSql('awardedBy.pronoun', 'a', 'ap')}
             LEFT  JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
             LEFT  JOIN {$this->getJoinSql('reasonedBy.role', 'a', 'rbr')}
             LEFT  JOIN {$this->getJoinSql('reasonedBy.pronoun', 'a', 'rbp')}

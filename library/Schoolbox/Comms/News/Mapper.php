@@ -162,7 +162,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('comms_news_article_topic', null, 'topics')}
             INNER JOIN {$this->getJoinSql('author', null, 'a', true)}
-            INNER JOIN {$this->getJoinSql('author.pronoun', 'a', 'pronoun')}
+            LEFT JOIN {$this->getJoinSql('author.pronoun', 'a', 'pronoun')}
             LEFT JOIN {$this->getJoinSql('moderator', null, 'm', true)}
             LEFT JOIN {$this->getJoinSql('rejector', null, 'r', true)}
             LEFT JOIN {$this->getJoinSql('featureImage', null, 'fi')}
