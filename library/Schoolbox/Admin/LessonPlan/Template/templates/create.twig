@@ -168,6 +168,7 @@
                         $saveButton.prop('disabled', false);
                         $saveButton.attr(
                             'value',
+                            // TODO: Use function getButtonTextDisabledDueToStorageLimitSuffix() from wordCountSettings.ts here?
                             $saveButton.attr('value').replace(' (disabled because content storage limit exceeded)', '')
                         );
                     }
