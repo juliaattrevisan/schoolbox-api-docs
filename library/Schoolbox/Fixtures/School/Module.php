@@ -30,10 +30,9 @@ class Module extends BaseModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
 
         $routes = [

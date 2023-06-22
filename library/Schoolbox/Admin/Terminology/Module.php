@@ -31,7 +31,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $routes = [
             'GET' => [

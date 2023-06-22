@@ -64,12 +64,11 @@ class Module extends RestfulModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
-        parent::initRoutes($routeMap, $basePath);
+        parent::initRoutes($basePath);
 
         $routes = [
             'GET' => [

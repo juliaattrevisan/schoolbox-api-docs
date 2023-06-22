@@ -14,8 +14,6 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
-use Aura\Router\Exception\RouteAlreadyExists;
-use Aura\Router\Map;
 use Aura\Router\RouterContainer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -188,7 +186,7 @@ class Module
             unset($this->routeIndex);
 
             // manual route init
-            $this->initRoutes($this->getRouter()->getMap(), $basePath);
+            $this->initRoutes($basePath);
         }
     }
 
@@ -299,10 +297,9 @@ class Module
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Map    $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
     }
 

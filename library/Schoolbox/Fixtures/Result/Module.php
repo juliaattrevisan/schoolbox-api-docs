@@ -87,12 +87,11 @@ class Module extends RestfulModule
     /**
      * {@inheritdoc}
      *
-     * @param Map    $routeMap
      * @param string $basePath
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
-        parent::initRoutes($routeMap, $basePath);
+        parent::initRoutes($basePath);
 
         $collection = $this->getCollectionName();
 

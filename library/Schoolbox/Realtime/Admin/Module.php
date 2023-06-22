@@ -38,10 +38,9 @@ class Module extends BaseModule
 
 
     /**
-     * @param Map    $routeMap
      * @param string $basePath
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $this->addGetRoute('customConfig', $basePath, "/configure/custom");
         $this->addGetRoute('configure', $basePath, "/configure{/roletype}");

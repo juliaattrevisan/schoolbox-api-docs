@@ -22,10 +22,9 @@ class Module extends BaseModule
     protected $basename = 'messages';
 
     /**
-     * @param Map    $routeMap
      * @param string $basePath
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $this->addGetRoute('configure', $basePath, '');
         $this->addPostRoute('saveConfig', $basePath, '');

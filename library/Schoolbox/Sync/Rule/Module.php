@@ -27,7 +27,7 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $this->addGetRoute('add', $basePath, "/add/{rulesetId}");
         $this->addPostRoute('create', $basePath, "/create");

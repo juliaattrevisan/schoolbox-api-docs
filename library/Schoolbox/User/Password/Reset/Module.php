@@ -40,7 +40,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $this->addGetRoute('displayCreateRequestForm', $basePath, '');
         $this->addPostRoute('createRequest', $basePath, '/createRequest');

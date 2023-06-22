@@ -38,7 +38,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $this->addGetRoute('layout', $basePath, '/layout/{layoutId}');
         $this->addPostRoute('layoutForm', $basePath, '/layout/{layoutId}');

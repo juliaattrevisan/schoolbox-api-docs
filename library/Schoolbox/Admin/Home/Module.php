@@ -27,7 +27,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $this->addGetRoute('getIndex', $basePath, "");
         $this->addGetRoute('getSslRenewalHelp', $basePath, "/ssl-renewal-help");

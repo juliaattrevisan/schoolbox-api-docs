@@ -892,10 +892,9 @@ class Module extends BaseModule
      * The alias of each route added needs to match a public method in the
      * controller built by buildController().
      *
-     * @param Map $routeMap
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Map $routeMap, $basePath)
+    public function initRoutes(string $basePath)
     {
         $routes = [
             'GET' => [

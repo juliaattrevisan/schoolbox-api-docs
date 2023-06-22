@@ -43,7 +43,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Map $routeMap, string $basePath)
+    public function initRoutes(string $basePath)
     {
         $this->addGetRoute('getInsert', $basePath, "/create");
         $this->addGetRoute('getModify', $basePath, "/{userId}/modify")->tokens(['userId' => '\d+']);
