@@ -40,6 +40,14 @@
                 // CKEditors to listen for changes on
                 textareas: [],
 
+                // Submit buttons to check for the 'data-ckEditorMaxCharCountExceededAtLastCheck' attribute.
+                // If the 'data-ckEditorMaxCharCountExceededAtLastCheck' attribute is present on any submit button, this
+                // means the maximum character count has been exceeded in one or more of the ckeditor textareas that will
+                // be submitted by that submit button (see wordCountSettings.ts).  The content cannot be saved in this
+                // situation, because it will not fit into the relevant database field. Therefore, if any of these submit
+                // buttons has the attribute autosave will be skipped.
+                submitButtons: [],
+
                 // Attachzones to listen for changes on
                 attachzones: [],
 
@@ -115,6 +123,12 @@
              * Alternatively I could've returned the vars in this function and reassigned them above.
              */
             function checkForChanges() {
+                for (let submitButton of config.submitButtons) {
+                    if (submitButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')) {
+                        return; // Skip check because the content storage limit has been exceeded.
+                    }
+                }
+
                 // kill any other timeout pending, and resolve the deferred
                 clearTimeout(draftTimeout);
                 if (deferred !== undefined) {
