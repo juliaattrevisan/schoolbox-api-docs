@@ -390,14 +390,13 @@ class Module
         $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit{format}')
              ->tokens($formatToken);
         $this->addGetRoute($routeMap, 'add', $basePath, '/add');
-
         $this->addRoute($routeMap, 'delete', $basePath, '/{id}')
              ->allows(self::METHOD_DELETE);
-
-        // Should these really be POST routes? Look closer
         $this->addPostRoute($routeMap, 'create', $basePath, '');
-        $this->addPostRoute($routeMap, 'update', $basePath, '/{id}');
-        $this->addPostRoute($routeMap, 'replace', $basePath, '/{id}');
+        $this->addRoute($routeMap, 'update', $basePath, '/{id}')
+             ->allows(self::METHOD_PATCH);
+        $this->addPostRoute($routeMap, 'replace', $basePath, '/{id}')
+             ->allows(self::METHOD_PUT);
 
         $this->addRoute($routeMap, 'options', $basePath, '')->allows(self::METHOD_OPTIONS);
 
