@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Comment;
 
-use function count;
-
 use PDO;
 use PDOStatement;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
+use function count;
 
 /**
  * Mapper for comments in discussion threads.
