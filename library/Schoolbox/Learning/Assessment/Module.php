@@ -442,7 +442,7 @@ class Module extends BaseModule
         $participantDataSource = $this->injector->get('participantDataSource');
 
         $bakery = new Breadcrumb\Factory(
-            $this->getRouteGenerator(),
+            $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
             $this->getAccess(),
         );
@@ -471,7 +471,7 @@ class Module extends BaseModule
                     $this->injector->get('taskd.downloadPagesMessageFactory'),
                     (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified(),
                     $this->injector->get('l10n'),
-                    $this->getRouteGenerator(),
+                    $this->getRouter()->getGenerator(),
                     new User\Translator\Author\ModelToArray(),
                     (new Turnitin\Helper($this->getConfig()))->isConfigured(),
                 );

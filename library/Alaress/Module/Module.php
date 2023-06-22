@@ -180,7 +180,7 @@ class Module
 
             // preload registered routes, only if they don't already exist
             foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
-                $this->addRoute($this->getRouteMap(), $controllerMethod, $basePath, $path)
+                $this->addRoute($this->getRouter()->getMap(), $controllerMethod, $basePath, $path)
                      ->allows($method)
                      ->tokens($tokens);
             }
@@ -189,7 +189,7 @@ class Module
             unset($this->routeIndex);
 
             // manual route init
-            $this->initRoutes($this->getRouteMap(), $basePath);
+            $this->initRoutes($this->getRouter()->getMap(), $basePath);
         }
     }
 
@@ -594,28 +594,6 @@ class Module
     protected function getRouter(): RouterContainer
     {
         return $this->injector->get('router');
-    }
-
-    /**
-     * Typehinted convenience method for obtaining route map reference,
-     * as used for adding routes into.
-     *
-     * @return Map
-     */
-    protected function getRouteMap(): Map
-    {
-        return $this->injector->get('router.map');
-    }
-
-    /**
-     * Typehinted convenience method for obtaining route generator reference,
-     * as used for converting route aliases into paths.
-     *
-     * @return Generator
-     */
-    protected function getRouteGenerator(): Generator
-    {
-        return $this->injector->get('router.generator');
     }
 
     /**

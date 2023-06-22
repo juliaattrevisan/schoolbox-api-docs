@@ -112,7 +112,7 @@ class Module extends BaseModule
         $currentUser        = $this->injector->get('user');
         $pastoralTranslator = new PastoralTranslator(
             $userTranslator,
-            $this->getRouteGenerator(),
+            $this->getRouter()->getGenerator(),
             $authorizer,
             $currentUser,
         );
