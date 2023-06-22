@@ -44,9 +44,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                 preferred_name,
                 lastname,
                 synergy_id AS user_ext_id,
+                if (user.pronoun, concat('(', pronoun.objective, ' / ', pronoun.subjective, ')'), '') as 'pronoun',
                 c.*
             FROM {$this->_table} c
             LEFT JOIN user ON c.user_id = user.id
+            LEFT JOIN pronoun ON user.pronoun = pronoun.id
             WHERE `category_id` = $category_id
         ";
 
