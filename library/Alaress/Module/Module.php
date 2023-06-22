@@ -380,35 +380,42 @@ class Module
      */
     protected function attachResourceRoutes(Map $routeMap, $basePath)
     {
-        $tokens = ['id' => '\d+', 'format' => '(\.[^/]+)?',];
+        $idToken     = ['id' => '\d+'];
+        $formatToken = ['format' => '(\.[^/]+)?'];
 
         // Attach routes from Aura Router 2.x `attachResource`
-        $this->addGetRoute($routeMap, 'browse', $basePath, '{format}')->tokens($tokens);
-
-        $this->addGetRoute($routeMap, 'read', $basePath, '/{id}{format}')->tokens($tokens);
-        $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit{format}')->tokens($tokens);
-        $this->addGetRoute($routeMap, 'add', $basePath, '/add')->tokens($tokens);
+        $this->addGetRoute($routeMap, 'browse', $basePath, '{format}')
+             ->tokens($formatToken);
+        $this->addGetRoute($routeMap, 'read', $basePath, '/{id}{format}')
+             ->tokens($idToken)
+             ->tokens($formatToken);
+        $this->addGetRoute($routeMap, 'edit', $basePath, '/{id}/edit{format}')
+             ->tokens($idToken)
+             ->tokens($formatToken);
+        $this->addGetRoute($routeMap, 'add', $basePath, '/add');
 
         $this->addRoute($routeMap, 'delete', $basePath, '/{id}')
-             ->tokens($tokens)
+             ->tokens($idToken)
              ->allows(self::METHOD_DELETE);
 
         // Should these really be POST routes? Look closer
-        $this->addPostRoute($routeMap, 'create', $basePath, '')->tokens($tokens);
-        $this->addPostRoute($routeMap, 'update', $basePath, '/{id}')->tokens($tokens);
-        $this->addPostRoute($routeMap, 'replace', $basePath, '/{id}')->tokens($tokens);
+        $this->addPostRoute($routeMap, 'create', $basePath, '');
+        $this->addPostRoute($routeMap, 'update', $basePath, '/{id}')
+             ->tokens($idToken);
+        $this->addPostRoute($routeMap, 'replace', $basePath, '/{id}')
+             ->tokens($idToken);
 
-        $this->addRoute($routeMap, 'options', $basePath, '')->allows(self::METHOD_OPTIONS)->tokens($tokens);
+        $this->addRoute($routeMap, 'options', $basePath, '')->allows(self::METHOD_OPTIONS);
 
         // Attach POST aliases for PUT/PATCH/DELETE routes
         $this->addPostRoute($routeMap, 'update:post', $basePath, '/{id}/update')
-             ->tokens($tokens)
+             ->tokens($idToken)
              ->attributes(['action' => 'update']);
         $this->addPostRoute($routeMap, 'replace:post', $basePath, '/{id}/replace')
-             ->tokens($tokens)
+             ->tokens($idToken)
              ->attributes(['action' => 'replace']);
         $this->addPostRoute($routeMap, 'delete:post', $basePath, '/{id}/delete')
-             ->tokens($tokens)
+             ->tokens($idToken)
              ->attributes(['action' => 'delete']);
 
 //        $routeMap->attach(
