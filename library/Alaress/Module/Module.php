@@ -323,7 +323,7 @@ class Module
      */
     protected function addRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $this->addOrFetchExistingRoute($routeMap, $this->basename . '.' . $alias, $basePath . $path);
+        return $this->addOrOverwriteExistingRoute($routeMap, $this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**
@@ -405,38 +405,11 @@ class Module
              ->attributes(['action' => 'replace']);
         $this->addPostRoute($routeMap, 'delete:post', $basePath, '/{id}/delete')
              ->attributes(['action' => 'delete']);
-
-//        $routeMap->attach(
-//            $this->basename,
-//            $basePath,
-//            function (Map $subMap) {
-//                $subMap->tokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
-//
-//                // Attach routes from Aura Router 2.x `attachResource`
-//                $this->addOrFetchExistingRoute($subMap, 'browse', '{format}')->allows(self::METHOD_GET);
-//                $this->addOrFetchExistingRoute($subMap, 'read', '/{id}{format}')->allows(self::METHOD_GET);
-//                $this->addOrFetchExistingRoute($subMap, 'edit', '/{id}/edit{format}')->allows(self::METHOD_GET);
-//                $this->addOrFetchExistingRoute($subMap, 'add', '/add')->allows(self::METHOD_GET);
-//                $this->addOrFetchExistingRoute($subMap, 'delete', '/{id}')->allows(self::METHOD_DELETE);
-//                $this->addOrFetchExistingRoute($subMap, 'create', '')->allows(self::METHOD_POST);
-//                $this->addOrFetchExistingRoute($subMap, 'update', '/{id}')->allows(self::METHOD_POST);
-//                $this->addOrFetchExistingRoute($subMap, 'replace', '/{id}')->allows(self::METHOD_POST);
-//                $this->addOrFetchExistingRoute($subMap, 'options', '')->allows(self::METHOD_OPTIONS);
-//
-//                // Attach POST aliases for PUT/PATCH/DELETE routes
-//                $this->addOrFetchExistingRoute($subMap, 'update:post', '/{id}/update')
-//                     ->attributes(['action' => 'update']);
-//                $this->addOrFetchExistingRoute($subMap, 'replace:post', '/{id}/replace')
-//                     ->attributes(['action' => 'replace']);
-//                $this->addOrFetchExistingRoute($subMap, 'delete:post', '/{id}/delete')
-//                     ->attributes(['action' => 'delete']);
-//            }
-//        );
     }
 
     /**
      * Add a route for `$name` and `$path`: if a route with name `$name` already
-     * exists, fetch it.
+     * exists, override it.
      *
      * @param Map    $routeMap
      * @param string $name
@@ -444,11 +417,15 @@ class Module
      * @return Route
      * @noinspection PhpDocMissingThrowsInspection
      */
-    private function addOrFetchExistingRoute(Map $routeMap, $name, $path): Route
+    private function addOrOverwriteExistingRoute(Map $routeMap, $name, $path): Route
     {
-        $existingRoute = $routeMap->getRoutes()[$name] ?? null;
+        $existingRoutes = $routeMap->getRoutes();
+        if (isset($existingRoutes[$name])) {
+            unset($existingRoutes[$name]);
+            $routeMap->setRoutes($existingRoutes);
+        }
         /** @noinspection PhpUnhandledExceptionInspection - route existence has been checked already */
-        return $existingRoute ?? $routeMap->route($name, $path);
+        return $routeMap->route($name, $path);
     }
 
     /**
