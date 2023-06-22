@@ -23,7 +23,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
-
     /**
      * @var Term\Mapper
      */

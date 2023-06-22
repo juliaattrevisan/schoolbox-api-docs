@@ -40,7 +40,6 @@ use Schoolbox\User;
  */
 class Payload
 {
-
     /**
      * Browser Exam Key and Config Key are hashed with SHA256
      */

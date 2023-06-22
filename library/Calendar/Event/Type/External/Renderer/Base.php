@@ -19,7 +19,6 @@ use Schoolbox\User;
 
 abstract class Base extends RendererBase
 {
-
     /** @var External\Event */
     protected $event;
 

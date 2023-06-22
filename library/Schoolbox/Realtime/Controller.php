@@ -25,7 +25,6 @@ use Schoolbox\RoleMapper;
 
 class Controller extends BaseController
 {
-
     /** @var RoleMapper */
     protected $roleMapper;
 

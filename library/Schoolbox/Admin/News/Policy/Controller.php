@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Controller extends ConfigController
 {
-
     /** @var UserAccessMapper */
     private $userAccessMapper;
 

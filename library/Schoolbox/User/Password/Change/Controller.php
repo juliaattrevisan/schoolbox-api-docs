@@ -17,7 +17,6 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-
     /**
      * @var UserMapper
      */

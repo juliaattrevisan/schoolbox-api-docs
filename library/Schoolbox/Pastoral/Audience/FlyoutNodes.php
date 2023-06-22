@@ -22,7 +22,6 @@ use Schoolbox\Submenu\IFlyoutNodes;
  */
 class FlyoutNodes implements IFlyoutNodes
 {
-
     /**
      * @var Generator
      */

@@ -25,7 +25,6 @@ use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
-
     protected $basename = 'timetable';
 
 

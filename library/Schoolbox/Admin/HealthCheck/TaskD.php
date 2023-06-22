@@ -23,7 +23,7 @@ class TaskD
     private Jwt $tokenBuilder;
     private IConfigLoader $config;
     private Generator $routeGenerator;
-    private Uri           $urlBase;
+    private Uri $urlBase;
     private MessageFactory $messageFactory;
     private Producer $producer;
 

@@ -28,7 +28,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 abstract class RestfulModule extends AlaressModule
 {
-
     /** @var string */
     protected $collection;
 

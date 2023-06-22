@@ -15,7 +15,6 @@ use Schoolbox\L10n\Mapper as L10nMapper;
 
 class Controller extends Base
 {
-
     /**
      * @var L10nMapper
      */

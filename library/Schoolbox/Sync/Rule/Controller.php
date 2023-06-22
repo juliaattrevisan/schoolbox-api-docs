@@ -20,7 +20,6 @@ use Schoolbox\Sync\Navigator\Node;
  */
 class Controller extends Base
 {
-
     /**
      * Form
      *

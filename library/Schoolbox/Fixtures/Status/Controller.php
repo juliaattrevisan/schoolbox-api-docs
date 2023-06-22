@@ -18,7 +18,6 @@ use Schoolbox\Fixtures\Status\Mapper as StatusMapper;
 
 class Controller extends AbstractController
 {
-
     /**
      * @var ErrorMapper
      */

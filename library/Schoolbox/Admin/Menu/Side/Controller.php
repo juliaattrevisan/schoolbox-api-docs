@@ -31,7 +31,6 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends Base
 {
-
     /** @var MenuSideMapper $menuSideMapper */
     private $menuSideMapper;
 

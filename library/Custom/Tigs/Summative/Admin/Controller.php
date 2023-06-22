@@ -19,7 +19,6 @@ use Alaress\Database\Predicate;
 
 class Controller extends ConfigController
 {
-
     /** @var Quoter */
     private $quoter;
 

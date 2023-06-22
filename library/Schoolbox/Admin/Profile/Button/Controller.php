@@ -21,7 +21,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
-
     /** @var ErrorMapper $errorMapper */
     private $errorMapper;
 

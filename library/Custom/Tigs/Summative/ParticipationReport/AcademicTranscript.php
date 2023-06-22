@@ -43,7 +43,6 @@ use function array_column;
  */
 class AcademicTranscript
 {
-
     /** @var IConfigLoader */
     private $config;
 

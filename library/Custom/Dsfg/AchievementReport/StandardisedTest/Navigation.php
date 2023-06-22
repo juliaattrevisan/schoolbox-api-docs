@@ -16,7 +16,6 @@ use Schoolbox\User;
 
 class Navigation
 {
-
     /**
      * Consts for each of the Standardised Test pieces
      */

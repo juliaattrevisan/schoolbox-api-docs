@@ -19,7 +19,6 @@ use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 
 class Controller extends AbstractController
 {
-
     /**
      * @var SportMapper
      */

@@ -12,7 +12,6 @@ use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */

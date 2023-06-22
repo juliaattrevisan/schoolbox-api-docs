@@ -26,7 +26,6 @@ use Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
  */
 class Controller extends AbstractController
 {
-
     /**
      * @var SportMapper
      */

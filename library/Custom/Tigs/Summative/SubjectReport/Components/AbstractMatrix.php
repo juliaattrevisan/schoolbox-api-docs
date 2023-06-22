@@ -34,7 +34,6 @@ use function sprintf;
  */
 class AbstractMatrix extends BaseComponent
 {
-
     /** @var GenericCollection|UnitSpec\Model[] */
     protected $unitSpecs;
 
