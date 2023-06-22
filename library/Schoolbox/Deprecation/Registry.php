@@ -27,6 +27,7 @@ class Registry
      */
     public const PATH_WHITELIST = [
         SITE_root . '/library/',
+        SITE_root . '/vendor/Aura/Router',
     ];
 
     /**
