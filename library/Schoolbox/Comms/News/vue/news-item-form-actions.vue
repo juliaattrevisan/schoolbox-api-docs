@@ -3,7 +3,6 @@
  * The buttons at the bottom of the create news page
  * There can be 1 or 2 depending on the status of the news
  * They are also only active when the news is drafted
- *
  */
 
 export default {
@@ -53,23 +52,20 @@ export default {
         },
 
         /**
-         * to disable buttons when the news isn't ready to be submitted
-         *
-         * @returns {Boolean}
+         * To disable buttons when the news isn't ready to be submitted
+         * @returns {boolean} True if the preview button should be disabled, false otherwise.
          */
         isDisabled() {
-            let previewButton = document.getElementById('news-preview');
-            let submitButton = document.getElementById('news-submit');
+            const previewButton = document.getElementById('news-preview');
+            const submitButton = document.getElementById('news-submit');
 
-            if (
+            return (
                 this.articleId === 0 ||
-                previewButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') ||
-                submitButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
-            ) {
-                return true;
-            } else {
-                return false;
-            }
+                submitButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') || (
+                    previewButton !== null &&
+                    previewButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
+                )
+            );
         },
     },
 
