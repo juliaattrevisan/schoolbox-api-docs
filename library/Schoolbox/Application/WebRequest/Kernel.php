@@ -105,23 +105,25 @@ class Kernel extends WebKernelAbstract
         $request = $this->di->get('request');
 
         // Run router with requested path (trim trailing /)
-        $path  = RequestUriParser::parseUrlPath($_SERVER);
-
-        // take a copy
-        $server = $_SERVER;
+        $server  = $request->getServerParams();
+        $path    = RequestUriParser::parseUrlPath($server);
+        $request = $request->withUri($request->getUri()->withPath($path));
 
         // check for a method override and act accordingly
         if (!empty($server['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
             $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);
         }
 
+        /** @var Matcher $matcher */
+        $matcher = $this->di->get('router.matcher');
         if ('OPTIONS' === $server['REQUEST_METHOD']) {
             /**
              * if system is requesting OPTIONS lets give them what the endpoint actually accepts, not just all.
              */
             $methods = ['OPTIONS'];
             foreach (["GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"] as $testMethod) {
-                if (false !== $this->di->get('router')->match($path, ['REQUEST_METHOD' => $testMethod])) {
+                $testRequest = $request->withMethod($testMethod);
+                if ($matcher->match($testRequest)) {
                     $methods[] = $testMethod;
                 }
             }
@@ -134,9 +136,7 @@ class Kernel extends WebKernelAbstract
             header("Access-Control-Allow-Methods: *");
             exit;
         }
-        /** @var Matcher $matcher */
-        $matcher = $this->di->get('router.matcher');
-        $route   = $matcher->match($request);
+        $route = $matcher->match($request);
 
         try {
             if ($route instanceof Route) {
