@@ -323,7 +323,11 @@ class Module
      */
     protected function addRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $this->addOrOverwriteExistingRoute($routeMap, $this->basename . '.' . $alias, $basePath . $path);
+        return $this->addOrOverwriteExistingRoute(
+            $this->getRouter()->getMap(),
+            $this->basename . '.' . $alias,
+            $basePath . $path,
+        );
     }
 
     /**
@@ -343,7 +347,8 @@ class Module
      */
     protected function addGetRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $this->addRoute($routeMap, $alias, $basePath, $path)->allows(self::METHOD_GET);
+        return $this->addRoute($this->getRouter()->getMap(), $alias, $basePath, $path)
+                    ->allows(self::METHOD_GET);
     }
 
     /**
@@ -363,7 +368,8 @@ class Module
      */
     protected function addPostRoute(Map $routeMap, $alias, $basePath, $path)
     {
-        return $this->addRoute($routeMap, $alias, $basePath, $path)->allows(self::METHOD_POST);
+        return $this->addRoute($this->getRouter()->getMap(), $alias, $basePath, $path)
+                    ->allows(self::METHOD_POST);
     }
 
     /**
