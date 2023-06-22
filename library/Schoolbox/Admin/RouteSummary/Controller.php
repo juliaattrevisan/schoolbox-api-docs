@@ -43,8 +43,7 @@ class Controller extends Base
                 continue;
             }
 
-            // method is publicly available, despite what the red worms say
-            foreach ($route->allows as $method) {
+            foreach (array_unique($route->allows) as $method) {
                 $routeSummaries[$parsedName['controller']][] = [
                     'name'       => $route->name,
                     'method'     => $method,
