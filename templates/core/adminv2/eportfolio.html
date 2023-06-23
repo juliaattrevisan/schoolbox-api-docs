@@ -5,7 +5,14 @@
 <script type="text/javascript">
     TEMPLATE_SELECT_URL = "/adminv2/component/get/eportfolio"
 
+    // Load the selected layout and insert it into the page
     async function loadLayout(layoutId) {
+        if (!layoutId) {
+            // We need a layout ID to load the layout, if there is none, we won't continue so that the user only sees the template selector
+            return false;
+        }
+
+        // Include the X-Requested-With header so the server can detect this is an AJAX request
         const response = await fetch(TEMPLATE_SELECT_URL + "/" + layoutId, {
             headers: {
                 'X-Requested-With' : 'XMLHttpRequest'

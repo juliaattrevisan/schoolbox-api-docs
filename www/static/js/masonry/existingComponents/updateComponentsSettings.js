@@ -193,7 +193,7 @@ function getSaveComponentSettingsParams(form) {
         queryParams.push('cid=' + encodeURIComponent(masonryConfig.settings.formData.pageInfo.id));
     }
 
-    // Add context parameter if it is set in masonryConfig
+    // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
     const context = masonryConfig.settings.formData.pageInfo.context;
     if (context) {
         queryParams.push('context=' + encodeURIComponent(context));

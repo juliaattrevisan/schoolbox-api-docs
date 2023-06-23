@@ -31,6 +31,8 @@ export function initEditColumns() {
 export function getFormData() {
     const formData = new FormData();
     formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+
+    // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
     if (masonryConfig.settings.formData.pageInfo.context) {
         formData.append("context", masonryConfig.settings.formData.pageInfo.context)
     }
