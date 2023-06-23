@@ -414,6 +414,18 @@ abbr {
         content: "";
     }
 
+    /*
+     * To prevent telephone numbers and email addresses from being printed twice in staff reports due to rule above.
+     *  - parents.html
+     *  - staff.html
+     *  - staffDepartment.html
+     */
+    a[href^="mailto:"]:after,
+    a[href^="tel:"]:after
+     {
+        content: none !important;
+    }
+
     pre,
     blockquote {
         border: 1px solid $aluminum;
