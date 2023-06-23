@@ -155,6 +155,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var array
+     */
+    private array $campuses;
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -202,6 +208,10 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
+        /* Grab a list of campuses
+         */
+        $this->campuses = (new Lookup\Campus($this->api))->generate();
+
         /* Import students' profile data
          * Import their specific parents' profile data
          */
@@ -247,10 +257,6 @@ class Profile implements IStrategy
         /* Collapse this var's contents; we won't use it again
          */
         $academicPeriodIds = implode(',', $academicPeriodIds);
-
-        /* Grab a list of campuses
-         */
-        $campuses = (new Lookup\Campus($this->api))->generate();
 
         /* Sentral gives you paginated data, at most, 200 per page
          *
