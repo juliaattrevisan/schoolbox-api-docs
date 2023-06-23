@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
+use External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Campus;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -247,6 +248,10 @@ class Profile implements IStrategy
          */
         $academicPeriodIds = implode(',', $academicPeriodIds);
 
+        /* Grab a list of campuses
+         */
+        $campuses = (new Lookup\Campus($this->api))->generate();
+
         /* Sentral gives you paginated data, at most, 200 per page
          *
          * Process multiple pages until there are none remaining, or if something is really stuffed,
@@ -268,7 +273,12 @@ class Profile implements IStrategy
 
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
-                $campusName = '';
+
+                /* Dig out a campus name, using null as default if broken data
+                 */
+                $campusId = (int)$student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'];
+                $campusName = $campuses[$campusId] ?? null;
+
                 $comments = '';
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
                 $email = (string)$student['relationships']['person']['data']['attributes']['email'];
@@ -372,10 +382,6 @@ class Profile implements IStrategy
                 /* Fish out medical alerts
                  */
                 $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $student));
-
-                /* Fish out campus name
-                 */
-                $campusName = $this->findCampusName();
 
                 /* Emergency Contacts
                  */
@@ -584,21 +590,6 @@ class Profile implements IStrategy
         }
 
         return $ids;
-    }
-
-
-    /**
-     * Find campus name
-     *
-     * Assign campuses if they exist in the mapping
-     * Otherwise quietly disregard bad data
-     *
-     * @phpstan-ignore-next-line: this will eventually return a string
-     * @return string|null
-     */
-    private function findCampusName(): ?string
-    {
-        return null;
     }
 
 
