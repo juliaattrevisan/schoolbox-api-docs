@@ -124,7 +124,7 @@
                                         <div>
                                             <label for="pronoun">Pronoun</label>
                                             <select id="pronoun" name="pronoun">
-                                                <option value="" {% if user.pronoun is null %}selected{% endif %}></option>
+                                                <option value="" {% if user.pronoun is null %}selected{% endif %}>Not Set</option>
                                                 {% for pronoun in pronouns %}
                                                     {% if pronoun %}
                                                         <option value="{{ pronoun.id }}" {% if user.pronoun and (user.pronoun.id == pronoun.id) %}selected{% endif %}>{{ pronoun }}</option>
