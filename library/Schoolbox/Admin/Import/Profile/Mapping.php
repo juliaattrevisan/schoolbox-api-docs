@@ -44,6 +44,7 @@ class Mapping
         'Firstname' => 'firstname',
         'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
+        'Pronoun' => 'pronoun',
         'Email' => 'email',
 
         'Mobile' => 'mobile',
@@ -63,6 +64,7 @@ class Mapping
         'Firstname' => 'firstname',
         'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
+        'Pronoun' => 'pronoun',
         'Email' => 'email',
 
         'Date of Birth' => 'date_of_birth',
@@ -118,6 +120,7 @@ class Mapping
         'Firstname' => 'firstname',
         'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
+        'Pronoun' => 'pronoun',
         'Email' => 'email',
 
         'Campus' => 'campus_name',

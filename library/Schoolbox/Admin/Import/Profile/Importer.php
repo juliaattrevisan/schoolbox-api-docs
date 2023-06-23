@@ -315,7 +315,8 @@ class Importer
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
                 ->setFirstnamePreferred($row['Preferred Firstname'])
-                ->setLastname($row['Surname']);
+                ->setLastname($row['Surname'])
+                ->setPronoun($row['Pronoun'] ?? null);
 
             /* Date of birth - strtotime doesn't understand empty cells and returns false
              * ADF can't make a new timestamp from a bool

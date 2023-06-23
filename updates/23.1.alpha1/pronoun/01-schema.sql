@@ -20,6 +20,10 @@ alter table user
     add constraint fk_user_pronoun_id
         foreign key IF NOT EXISTS (pronoun) references pronoun (id);
 
+alter table sis_user_profile
+    add column IF NOT EXISTS pronoun varchar(255) null after lastname;
+
+
 
 ### now for the initial data
 INSERT INTO pronoun (subjective, objective, possessive, sequence, created_at, updated_at)

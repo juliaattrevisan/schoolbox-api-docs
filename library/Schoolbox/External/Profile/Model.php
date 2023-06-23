@@ -55,6 +55,10 @@ class Model
      */
     private ?Storage\Model $portrait = null;
 
+    /**
+     * @var string|null
+     */
+    private ?string $pronoun = null;
 
     /**
      * @return string $externalId
@@ -172,6 +176,24 @@ class Model
     public function setPortrait(?Storage\Model $portrait): self
     {
         $this->portrait = $portrait;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPronoun(): ?string
+    {
+        return $this->pronoun;
+    }
+
+    /**
+     * @param string|null $pronoun
+     * @return self
+     */
+    public function setPronoun(?string $pronoun): self
+    {
+        $this->pronoun = $pronoun;
         return $this;
     }
 }
