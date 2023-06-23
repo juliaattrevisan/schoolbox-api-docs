@@ -104,7 +104,7 @@ trait StackableTrait
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->consolidatedItem instanceof User\Base;
     }
@@ -114,7 +114,7 @@ trait StackableTrait
      *
      * @return User\Base|null
      */
-    public function current()
+    public function current(): ?User\Base
     {
         return $this->consolidatedItem;
     }
@@ -122,7 +122,7 @@ trait StackableTrait
     /**
      * Move forward to next element
      */
-    public function next()
+    public function next(): void
     {
         // Intentionally does not directly call $innerIterator->next() as each execution
         // of buildStack() indirectly generates 1 or more calls to $innerIterator->next()
@@ -135,7 +135,7 @@ trait StackableTrait
      *
      * @return int|null
      */
-    public function key()
+    public function key(): ?int
     {
         return $this->rowNum;
     }
@@ -143,7 +143,7 @@ trait StackableTrait
     /**
      * Resets the pointer to 0 and loads first item ready for retrieval.
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->getInnerIterator()->rewind();
 
