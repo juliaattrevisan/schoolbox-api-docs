@@ -52,7 +52,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function execute(array $input_parameters = null)
      */
-    public function execute($input_params = null)
+    public function execute($input_params = null): bool
     {
         if (is_array($input_params) && count($input_params) > 0) {
             // Use the supplied parameters rather than the ones previously bound
@@ -110,7 +110,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function fetch($fetch_style = null, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0)
+    public function fetch($fetch_style = null, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0): mixed
     {
         if (!$this->statement) {
             return false;
@@ -123,15 +123,12 @@ class PDOStatement extends BasePDOStatement
         switch ($fetch_style) {
             case BasePDO::FETCH_ASSOC:
                 return db2_fetch_assoc($this->statement);
-                break;
 
             case BasePDO::FETCH_BOTH:
                 return db2_fetch_both($this->statement);
-                break;
 
             case BasePDO::FETCH_OBJ:
                 return db2_fetch_object($this->statement);
-                break;
         }
 
         throw new Exception("Requested fetch type not supported by DB2 wrapper.");
@@ -140,7 +137,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null)
+    public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null): bool
     {
         if ($data_type & PDO::PARAM_INPUT_OUTPUT) {
             $parameterType = DB2_PARAM_INOUT;
@@ -159,7 +156,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR)
+    public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR): bool
     {
         $this->bindings[$parameter] = [
             'type' => DB2_PARAM_IN,
@@ -171,7 +168,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function rowCount()
+    public function rowCount(): int
     {
         return db2_num_rows($this->statement);
     }
@@ -179,7 +176,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function fetchColumn($column_number = 0)
+    public function fetchColumn($column_number = 0): mixed
     {
         $row = db2_fetch_both($this->statement);
 
@@ -202,7 +199,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function fetchAll($fetch_style = null, $fetch_argument = null, array $ctor_args = array())
      */
-    public function fetchAll($how = null, $class_name = null, ...$args)
+    public function fetchAll($how = null, $class_name = null, ...$args): array
     {
         $result = [];
 
@@ -216,7 +213,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function errorCode()
+    public function errorCode(): ?string
     {
         return db2_stmt_error($this->statement);
     }
@@ -224,15 +221,16 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function errorInfo()
+    public function errorInfo(): array
     {
-        return db2_stmt_errormsg($this->statement);
+        // Don't know the driver error code: just return 0
+        return [$this->errorCode() ?? '', 0, db2_stmt_errormsg($this->statement)];
     }
 
     /**
      * @inheritdoc
      */
-    public function setAttribute($attribute, $value)
+    public function setAttribute($attribute, $value): bool
     {
         return db2_set_option($this->statement, [$attribute => $value], 0);
     }
@@ -240,7 +238,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function getAttribute($attribute)
+    public function getAttribute($attribute): mixed
     {
         return db2_get_option($this->statement, $attribute);
     }
@@ -248,7 +246,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function columnCount()
+    public function columnCount(): int
     {
         return db2_num_fields($this->statement);
     }
@@ -256,7 +254,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function setFetchMode($mode, $className = null, ...$params)
+    public function setFetchMode($mode, $className = null, ...$params): bool
     {
         $this->fetchStyleDefault = $mode;
         return true;
@@ -265,7 +263,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function nextRowset()
+    public function nextRowset(): bool
     {
         if (false !== db2_next_result($this->statement)) {
             return true;
@@ -276,7 +274,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function closeCursor()
+    public function closeCursor(): bool
     {
         return db2_free_stmt($this->statement);
     }
@@ -291,7 +289,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function fetchObject($class_name = "stdClass", array $ctor_args = array())
      */
-    public function fetchObject($class_name = null, $ctor_args = null)
+    public function fetchObject($class_name = null, $ctor_args = null): object|false
     {
         throw new Exception("Object fetching not supported by DB2 wrapper.");
     }
@@ -299,7 +297,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function getColumnMeta($column)
+    public function getColumnMeta($column): false|array
     {
         throw new Exception("Metadata fetching not supported by DB2 wrapper.");
     }
@@ -307,7 +305,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function bindColumn($column, &$param, $type = null, $maxlen = null, $driverdata = null)
+    public function bindColumn($column, &$param, $type = null, $maxlen = null, $driverdata = null): bool
     {
         throw new Exception("Column binding not supported by DB2 wrapper.");
     }
@@ -315,7 +313,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function debugDumpParams()
+    public function debugDumpParams(): ?bool
     {
         throw new Exception("Debugging dump not supported by DB2 wrapper.");
     }
