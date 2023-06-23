@@ -23,7 +23,7 @@ abstract class Base extends FilterIterator
      * @return State The current element value.
      * @throws UnexpectedValueException if it wasn't a State
      */
-    public function current()
+    public function current(): State
     {
         $state = parent::current();
         if (!$state instanceof State) {

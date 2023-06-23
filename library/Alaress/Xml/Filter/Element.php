@@ -27,7 +27,7 @@ class Element extends Base
      *
      * @return bool true if the current element is acceptable, otherwise false.
      */
-    public function accept()
+    public function accept(): bool
     {
         $state  = $this->current();
         $reader = $state->getReader();

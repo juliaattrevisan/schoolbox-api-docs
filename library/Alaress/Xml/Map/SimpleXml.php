@@ -17,7 +17,7 @@ class SimpleXml extends Base
     /**
      * @return SimpleXMLElement
      */
-    public function current()
+    public function current(): mixed
     {
         $state = parent::current();
         return new SimpleXMLElement($state->getReader()->readOuterXml());

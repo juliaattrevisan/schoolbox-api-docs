@@ -50,7 +50,7 @@ class ReaderIterator implements \Iterator
      *
      * @return void
      */
-    public function next()
+    public function next(): void
     {
         $this->elementCount++;
 
@@ -69,7 +69,7 @@ class ReaderIterator implements \Iterator
      *
      * @return State Current state of $this->reader
      */
-    public function current()
+    public function current(): mixed
     {
         // Push this node name on the stack for navigation
         if ($this->reader->nodeType === XMLReader::ELEMENT) {
@@ -83,7 +83,7 @@ class ReaderIterator implements \Iterator
      *
      * @return int
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->elementCount;
     }
@@ -93,7 +93,7 @@ class ReaderIterator implements \Iterator
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->reader->read();
     }
@@ -103,7 +103,7 @@ class ReaderIterator implements \Iterator
      *
      * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
     }
 }

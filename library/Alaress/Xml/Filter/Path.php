@@ -42,7 +42,7 @@ class Path extends Base
      *
      * @return bool true if the current element is acceptable, otherwise false.
      */
-    public function accept()
+    public function accept(): bool
     {
         $state = $this->current();
         foreach ($this->paths as $thisPath) {
