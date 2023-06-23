@@ -19,7 +19,6 @@ use Schoolbox\Collection;
 
 abstract class Base
 {
-
     /* Personal
      */
 
