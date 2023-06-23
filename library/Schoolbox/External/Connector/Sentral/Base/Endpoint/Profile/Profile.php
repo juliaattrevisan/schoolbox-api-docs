@@ -345,7 +345,8 @@ class Profile implements IStrategy
                     ->setTitle($title)
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
+                    ->setLastname($lastname)
+                    ->setPronoun(null);
 
                 /* Then save it
                  */
@@ -1074,7 +1075,8 @@ class Profile implements IStrategy
                 ->setTitle($title)
                 ->setFirstname($firstname)
                 ->setFirstnamePreferred($firstnamePreferred)
-                ->setLastname($lastname);
+                ->setLastname($lastname)
+                ->setPronoun(null);
 
             /* Then save it
              */
@@ -1286,7 +1288,8 @@ class Profile implements IStrategy
                     ->setTitle($title)
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
+                    ->setLastname($lastname)
+                    ->setPronoun(null);
 
                 /* Then save it
                  */

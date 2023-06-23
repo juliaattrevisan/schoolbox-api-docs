@@ -72,6 +72,7 @@ class User extends Base implements IUser
                         `user`.`title` AS `title`,
                         `user`.`firstname` AS `givenName`,
                         `user`.`lastname` AS `lastName`,
+                        if (`user`.`pronoun`, concat('(', `pronoun`.`subjective`, ' / ', `pronoun`.`objective`, ')'), '') as `pronoun`,
                         `user`.`year` AS `year`,
                         `user`.`alt_email` AS `email`,
                         `user`.`username` AS `username`,
@@ -125,6 +126,7 @@ class User extends Base implements IUser
 
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
+            LEFT JOIN   `pronoun` ON `user`.`pronoun` = `pronoun`.`id`
             WHERE       `user`.`synergy_id` IN ({$externalIdBindings['sql']})
             GROUP BY    `user`.`synergy_id`
         ", array_merge($externalIdBindings['bindings'], [
@@ -230,6 +232,7 @@ class User extends Base implements IUser
                         `user`.`title` as `title`,
                         `user`.`firstname` as `firstName`,
                         `user`.`lastname` as `lastName`,
+                        if (`user`.`pronoun`, concat('(', `pronoun`.`subjective`, ' / ', `pronoun`.`objective`, ')'), '') as `pronoun`,
                         `user`.`year` as `year`,
                         `user`.`alt_email` as `email`,
                         `user`.`username` as `username`,
@@ -280,6 +283,7 @@ class User extends Base implements IUser
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             JOIN        `user_profile` ON `user_id` = `user`.`id`
+            LEFT JOIN   `pronoun` ON `user`.`pronoun` = `pronoun`.`id`
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
             {$whereSql}
             GROUP BY    `user`.`synergy_id`
@@ -312,6 +316,8 @@ class User extends Base implements IUser
                         `user`.`title` AS `title`,
                         `user`.`firstname` AS `firstName`,
                         `user`.`lastname` AS `lastName`,
+                        if (`user`.`pronoun`, concat('(', `pronoun`.`subjective`, ' / ', `pronoun`.`objective`, ')'), '') as `pronoun`,
+                        `user`.`pronoun` AS `pronoun`,
                         `user`.`year` AS `year`,
                         `user`.`alt_email` AS `email`,
                         `user`.`username` AS `username`,
@@ -362,6 +368,7 @@ class User extends Base implements IUser
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
+            LEFT JOIN   `pronoun` ON `user`.`pronoun` = `pronoun`.`id`
             WHERE       `user`.`synergy_id` IN ({$externalIdBindings['sql']})
             GROUP BY    `user`.`synergy_id`
 
@@ -401,6 +408,7 @@ class User extends Base implements IUser
                         `user`.`title` AS `title`,
                         `user`.`firstname` AS `firstName`,
                         `user`.`lastname` AS `lastName`,
+                        if (`user`.`pronoun`, concat("(", `pronoun`.`subjective`, " / ", `pronoun`.`objective`, ")"), "") as `pronoun`,
                         `user`.`year` AS `year`,
                         `user`.`alt_email` AS `email`,
                         `user`.`username` AS `username`,
@@ -451,6 +459,7 @@ class User extends Base implements IUser
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
+            LEFT JOIN   `pronoun` ON `user`.`pronoun` = `pronoun`.`id`
             WHERE       `user`.`id` IN (
                 SELECT    `user_id`
                 FROM      `user_relation`
@@ -493,6 +502,7 @@ class User extends Base implements IUser
                         `user`.`title` AS `title`,
                         `user`.`firstname` AS `firstName`,
                         `user`.`lastname` AS `lastName`,
+                        if (`user`.`pronoun`, concat('(', `pronoun`.`subjective`, ' / ', `pronoun`.`objective`, ')'), '') as `pronoun`,
                         `user`.`year` AS `year`,
                         `user`.`alt_email` AS `email`,
                         `user`.`username` AS `username`,
@@ -523,6 +533,7 @@ class User extends Base implements IUser
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
+            LEFT JOIN   `pronoun` ON `user`.`pronoun` = `pronoun`.`id`
             WHERE       `user`.`synergy_id` IN ({$externalIdBindings['sql']})
             GROUP BY    `user`.`synergy_id`
 
@@ -711,6 +722,7 @@ class User extends Base implements IUser
         $student->setGivenName($studentRow['firstName']);
         $student->setPreferredName($studentRow['firstName']);
         $student->setLastname($studentRow['lastName']);
+        $student->setPronoun($studentRow['pronoun']);
         $student->setEmail($studentRow['email']);
         $student->setYear($studentRow['year']);
 
@@ -813,6 +825,7 @@ class User extends Base implements IUser
         $staff->setGivenName($staffRow['firstName']);
         $staff->setPreferredName($staffRow['firstName']);
         $staff->setLastname($staffRow['lastName']);
+        $staff->setPronoun($staffRow['pronoun']);
         $staff->setEmail($staffRow['email']);
         $staff->setWorkEmail($staffRow['email']);
         $staff->setYear($staffRow['year']);
@@ -890,6 +903,7 @@ class User extends Base implements IUser
         $guardian->setGivenName($guardianRow['givenName']);
         $guardian->setPreferredName($guardianRow['givenName']);
         $guardian->setLastname($guardianRow['lastName']);
+        $guardian->setPronoun($guardianRow['pronoun']);
         $guardian->setEmail($guardianRow['email']);
         $guardian->setPubliclyVisible($guardianRow['visible']);
         $guardian->setTitle($guardianRow['positionTitle']);

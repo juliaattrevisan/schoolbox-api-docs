@@ -553,7 +553,8 @@ class Importer
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
                 ->setFirstnamePreferred($row['Preferred Firstname'])
-                ->setLastname($row['Surname']);
+                ->setLastname($row['Surname'])
+                ->setPronoun($row['Pronoun'] ?? null);
 
             $staffProfile
                 ->setUsername($row['Username'])
@@ -665,7 +666,8 @@ class Importer
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
                 ->setFirstnamePreferred($row['Preferred Firstname'])
-                ->setLastname($row['Surname']);
+                ->setLastname($row['Surname'])
+                ->setPronoun($row['Pronoun'] ?? null);
 
             $parentProfile
                 ->setMobile($row['Mobile'])
