@@ -155,7 +155,8 @@ class PDO extends BasePDO
             return false;
         }
 
-        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement, $mode);
+        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement);
+        $this->lastStatement->setFetchMode($mode);
 
         if (db2_execute($resource)) {
             return $this->lastStatement;

@@ -166,26 +166,6 @@ parameters:
 			path: library/Alaress/Database/Transactor/Test/TransactorTest.php
 
 		-
-			message: "#^Class Alaress\\\\Database\\\\Wrapper\\\\Db2\\\\PDOStatement constructor invoked with 4 parameters, 2\\-3 required\\.$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDO.php
-
-		-
-			message: "#^Method Alaress\\\\Database\\\\Wrapper\\\\Db2\\\\PDO\\:\\:errorInfo\\(\\) should return array but returns string\\.$#"
-			count: 2
-			path: library/Alaress/Database/Wrapper/Db2/PDO.php
-
-		-
-			message: "#^Method Alaress\\\\Database\\\\Wrapper\\\\Db2\\\\PDOStatement\\:\\:errorInfo\\(\\) should return array but returns string\\.$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 3
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
 			message: "#^Property Alaress\\\\Date\\\\DilatedClock\\:\\:\\$offset \\(int\\) does not accept float\\.$#"
 			count: 1
 			path: library/Alaress/Date/DilatedClock.php
