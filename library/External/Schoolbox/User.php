@@ -78,6 +78,7 @@ class External_Schoolbox_User implements External_UserInterface
             "SELECT   external_id AS StudentID,
                           firstname AS StudentGiven1,
                           lastname AS StudentSurname,
+                          pronoun as StudentPronoun,
                           gender AS StudentGender,
                           UNIX_TIMESTAMP(date_of_birth) AS StudentBirthDate,
                           tutor_teacher_name AS StudentTutorName,
@@ -503,6 +504,7 @@ class External_Schoolbox_User implements External_UserInterface
             "SELECT   title AS Title,
                          firstname AS Preferred,
                          lastname AS Surname,
+                         pronoun as Pronoun,
                          email AS Email,
                          '' AS OccupEmail,
                          '' AS DefaultEmailCode,
@@ -538,6 +540,7 @@ class External_Schoolbox_User implements External_UserInterface
     {
         $staff = $this->internalDatabase->executeQuery(
             "SELECT    external_id AS SchoolStaffCode,
+                      pronoun as Pronoun,
                       building AS StaffBuilding,
                       room AS StaffRoom,
                       phone AS StaffExtension,

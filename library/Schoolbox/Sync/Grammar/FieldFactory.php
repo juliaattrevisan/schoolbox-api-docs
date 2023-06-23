@@ -33,6 +33,7 @@ class FieldFactory
             'preferredName' => 'Preferred Name',
             'givenName'     => 'Given Name',
             'lastname'      => 'Last Name',
+            'pronoun'       => 'Pronoun',
 
             'email[].address'     => 'Default Email Address(es)',
             'workEmail[].address' => 'Work Email Address(es)',
