@@ -15,7 +15,7 @@ class External_AscTimetables_Translator_Timetable_Map extends IteratorIterator
     /**
      * @return array
      */
-    public function current()
+    public function current(): array
     {
         /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();
