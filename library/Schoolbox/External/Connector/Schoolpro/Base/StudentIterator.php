@@ -28,7 +28,7 @@ class StudentIterator extends IteratorIterator
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->currentItem instanceof User\Student;
     }
@@ -39,7 +39,7 @@ class StudentIterator extends IteratorIterator
      *
      * @return User\Student|null
      */
-    public function current()
+    public function current(): ?User\Student
     {
         return $this->currentItem;
     }
@@ -48,7 +48,7 @@ class StudentIterator extends IteratorIterator
     /**
      * @inheritdoc
      */
-    public function next()
+    public function next(): void
     {
         $this->getInnerIterator()->next();
         $this->loadCurrent();
@@ -58,7 +58,7 @@ class StudentIterator extends IteratorIterator
     /**
      * @inheritdoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         parent::rewind();
         $this->loadCurrent();

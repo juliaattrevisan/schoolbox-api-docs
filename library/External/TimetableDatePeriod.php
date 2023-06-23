@@ -100,7 +100,7 @@ class External_TimetableDatePeriod implements Iterator
      * @link http://php.net/manual/en/iterator.current.php
      * @return DateTime
      */
-    public function current()
+    public function current(): Datetime
     {
         return $this->current;
     }
@@ -111,7 +111,7 @@ class External_TimetableDatePeriod implements Iterator
      * @link http://php.net/manual/en/iterator.next.php
      * @return void
      */
-    public function next()
+    public function next(): void
     {
         $this->index++;
         try {
@@ -139,7 +139,7 @@ class External_TimetableDatePeriod implements Iterator
      * @link http://php.net/manual/en/iterator.key.php
      * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->index;
     }
@@ -150,7 +150,7 @@ class External_TimetableDatePeriod implements Iterator
      * @link http://php.net/manual/en/iterator.valid.php
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         if (!$this->isValid) {
             return false;
@@ -167,7 +167,7 @@ class External_TimetableDatePeriod implements Iterator
      * @link http://php.net/manual/en/iterator.rewind.php
      * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->isValid = true;
         $this->index   = 0;

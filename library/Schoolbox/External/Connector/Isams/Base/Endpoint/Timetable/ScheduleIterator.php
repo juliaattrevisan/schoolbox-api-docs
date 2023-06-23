@@ -78,11 +78,11 @@ class ScheduleIterator implements Iterator
      * Compile this into an array of convenient pieces
      *
      * @link  https://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @return array
      * @throws RuntimeException
      * @since 5.0.0
      */
-    public function current()
+    public function current(): array
     {
         $schedule = $this->schedules[$this->position];
 
@@ -344,10 +344,10 @@ class ScheduleIterator implements Iterator
     /**
      * Return the key of the current element
      * @link  https://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * @return int
      * @since 5.0.0
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
