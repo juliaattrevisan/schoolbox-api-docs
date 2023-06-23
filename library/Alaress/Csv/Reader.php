@@ -12,7 +12,6 @@ namespace Alaress\Csv;
 
 class Reader implements \Iterator
 {
-
     /**
      * The column list for this reader. Each row returned will be mapped to its
      * corresponding position in this list.

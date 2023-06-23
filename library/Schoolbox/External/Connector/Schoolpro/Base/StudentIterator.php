@@ -18,7 +18,6 @@ use Schoolbox\External\Normalise\User;
 
 class StudentIterator extends IteratorIterator
 {
-
     /**
      * @var User\Student|null
      */
