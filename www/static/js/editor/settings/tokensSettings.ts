@@ -30,6 +30,7 @@ export function getTokensSettings(config: EditorConfig) {
     if (config.hasTokens) {
         return {
             mention: {
+                dropdownLimit: 15,
                 feeds: [
                     {
                         marker: "[",
