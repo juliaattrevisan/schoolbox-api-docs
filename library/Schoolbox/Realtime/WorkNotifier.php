@@ -14,6 +14,7 @@ use Alaress\Serializable\LegacySerializable;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
+use Serializable;
 
 abstract class WorkNotifier implements Serializable
 {
