@@ -374,7 +374,9 @@ WHERE
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('owner', 'owner')},
+                   {$this->getJoinColumnString('owner.pronoun', 'op')},
                    {$this->getJoinColumnString('lastPoster', 'lastPoster')},
+                   {$this->getJoinColumnString('lastPoster.pronoun', 'lpp')},
                    {$this->getJoinColumnString('post', 'post')}
         ";
     }
@@ -389,6 +391,8 @@ WHERE
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
             INNER JOIN {$this->getJoinSql('lastPoster', '', 'lastPoster', true)}
+            LEFT JOIN {$this->getJoinSql('owner.pronoun', 'owner', 'op')}
+            LEFT JOIN {$this->getJoinSql('lastPoster.pronoun', 'lastPoster', 'lpp')}
             LEFT JOIN {$this->getJoinSql('post', '', 'post', false)}
         ";
     }
@@ -405,10 +409,16 @@ WHERE
         $collection = $this->createCollection();
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($row, 'owner', 'owner');
+            $owner->setPronoun($this->hydrateJoin($row, 'owner.pronoun', 'op'));
+            /** @var User $lastPoster */
+            $lastPoster = $this->hydrateJoin($row, 'lastPoster', 'lastPoster');
+            $owner->setPronoun($this->hydrateJoin($row, 'lastPoster.pronoun', 'lpp'));
             $thread = $this->hydrate($row)
-                         ->setUser($this->hydrateJoin($row, 'owner', 'owner'))
+                         ->setUser($owner)
                          ->setLastPost($this->hydrateJoin($row, 'post', 'post'))
-                         ->setLastPostUser($this->hydrateJoin($row, 'lastPoster', 'lastPoster'));
+                         ->setLastPostUser($lastPoster);
             $collection[$thread->getId()] = $thread;
         }
 
