@@ -78,6 +78,17 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         //Show this many actions in nav bar if user has write access
         $this->setVar('COMPONENT_ACTION_COUNT', $this->hasWriteAccess() ? 2 : 1);
 
+        // This ensures the correct collapse data is provided to JS masonry such that
+        // when components are moved around, their behaviour is consistent with homepages.
+        // Otherwise, twig will fail to replace these vars when rendering component templates.
+        $this->setVar(
+            array(
+                'CONFIG_COLLAPSED_ICON'  => 'icon-up-arrow',
+                'CONFIG_COLLAPSED_CLASS' => '',
+                'CONFIG_COLLAPSED_STATE' => 'uncollapsed',
+            )
+        );
+
         $this->getSitePage()->setBlock($targetHandle, 'drag_handle', 'drag_handle_block');
 
         if ($this->hasContextWriteAccess()) {
