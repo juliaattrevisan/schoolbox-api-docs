@@ -74,9 +74,9 @@ function checkForModal(editor: Editor) {
 }
 
 /**
- * The last menu item in the toolbar is a panel that displays the items within horizontally.
- * This panel can be hidden off screen depending on screen size. So we should align it so the
- * right edge of the panel is aligned with the right edge of the button.
+ * Some items in the toolbar are panels that displays the items within horizontally.
+ * These panels can be hidden underneath the notifications menu when its open.
+ * So we should align them so the right edge of the panel is aligned with the right edge of the button.
  * 		         [ Button ]
  *		+-----------------+
  *		|      Panel      |
@@ -84,11 +84,15 @@ function checkForModal(editor: Editor) {
  *
  * @param { Editor } editor - the CKEditor instance
  */
-function updatePanelPosition(editor: Editor) {
+function updatePanelPositions(editor: Editor) {
+    const buttonTitles = ["Insert media", "Emoji", "Insert table", "Other"];
     const toolbarItems = editor.ui.view.toolbar.items._items;
-    const lastToolbarItem = toolbarItems[toolbarItems.length - 1];
-    // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#static-member-defaultPanelPositions
-    lastToolbarItem.panelPosition = "sw";
+    toolbarItems.forEach((item) => {
+        if (buttonTitles.includes(item.buttonView?.label)) {
+            // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#static-member-defaultPanelPositions
+            item.panelPosition = "sw";
+        }
+    });
 }
 
 /**
@@ -177,7 +181,7 @@ export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, c
     disableAutoMedia(editor, config);
     removeValidation();
     checkForModal(editor);
-    updatePanelPosition(editor);
+    updatePanelPositions(editor);
     await addIframelyEmbed(config, editor);
     await attachInspector(editor);
 }
