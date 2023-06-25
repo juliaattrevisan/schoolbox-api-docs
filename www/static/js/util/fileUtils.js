@@ -92,12 +92,11 @@ export const blobToDataURL = async (blob) => {
  * Format bytes as human-readable text.
  * Modified from https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/14919494
  *
- * @param bytes Number of bytes.
- * @param dp Number of decimal places to display.
- * @param si True to use metric (SI) units, aka powers of 1000.
- *           False to use binary (IEC), aka powers of 1024.
- *
- * @return Formatted string.
+ * @param { Number } bytes - Number of bytes.
+ * @param { Number } dp - Number of decimal places to display.
+ * @param { Boolean } si - True to use metric (SI) units, aka powers of 1000.
+ *                               False to use binary (IEC), aka powers of 1024.
+ * @returns { String } - Formatted string.
  */
 export const humanFileSize = (bytes, dp = 2, si=false) => {
     const thresh = si ? 1000 : 1024;
