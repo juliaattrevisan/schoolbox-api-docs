@@ -74,6 +74,24 @@ function checkForModal(editor: Editor) {
 }
 
 /**
+ * The last menu item in the toolbar is a panel that displays the items within horizontally.
+ * This panel can be hidden off screen depending on screen size. So we should align it so the
+ * right edge of the panel is aligned with the right edge of the button.
+ * 		         [ Button ]
+ *		+-----------------+
+ *		|      Panel      |
+ *		+-----------------+
+ *
+ * @param { Editor } editor - the CKEditor instance
+ */
+function updatePanelPosition(editor: Editor) {
+    const toolbarItems = editor.ui.view.toolbar.items._items;
+    const lastToolbarItem = toolbarItems[toolbarItems.length - 1];
+    // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#static-member-defaultPanelPositions
+    lastToolbarItem.panelPosition = "sw";
+}
+
+/**
  * Once the iFramely script has loaded, we can add in the event listener
  *
  * @param { Editor } editor - the CKEditor instance
@@ -159,6 +177,7 @@ export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, c
     disableAutoMedia(editor, config);
     removeValidation();
     checkForModal(editor);
+    updatePanelPosition(editor);
     await addIframelyEmbed(config, editor);
     await attachInspector(editor);
 }
