@@ -7,7 +7,7 @@
  * * Other files are rendered with an `<a>` tag, providing a link for download
  */
 
-import { filesize } from "filesize";
+import { humanFileSize } from "@js/util/fileUtils";
 import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
 
 export default {
@@ -64,7 +64,7 @@ export default {
             // rather than the SI standard (1KB = 1000B, 1KiB = 1024B):
             // Schoolbox's file size rendering uses the JEDEC standard for
             // better or worse.
-            return filesize(size);
+            return humanFileSize(size);
         },
     },
 };

@@ -10,7 +10,7 @@ import RecordAudioOnly from "@schoolboxVue/components/record/record-audio-only";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
 import recordMediaTypes from "@js/record-media/recordMediaTypes";
 import axios from "axios";
-import { filesize } from "filesize";
+import { humanFileSize } from "@js/util/fileUtils";
 import { hasDeviceCapture } from "@js/util/featureDetectionUtils";
 import { isOfFileType, convertFilenameExtension } from "@js/util/fileUtils";
 
@@ -229,7 +229,7 @@ export default {
          */
         checkErrorMessage(errorResponseData) {
             if (errorResponseData.hash?.includes("This file exceeds the file size restriction")) {
-                this.uploadErrorMessage = `Sorry, the recording of ${filesize(
+                this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(
                     this.recordedData.size
                 )} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
             }
