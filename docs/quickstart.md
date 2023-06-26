@@ -875,9 +875,7 @@ The Module lets us decide the format of urls where we can interact with our futu
 namespace Schoolbox\Kingdom;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Twig\Error\LoaderError;
 
