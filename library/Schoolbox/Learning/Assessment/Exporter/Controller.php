@@ -220,7 +220,7 @@ class Controller extends BaseController
             'feedbackCounts'   => $feedbackCounts,
         ];
 
-        $template = '@learningAssessmentExporter/export.twig'; // TODO: Create new Twig template.  Start from copy of @learningAssessmentExporter/export.twig.
+        $template = '@learningAssessmentExporter/exportUnit.twig';
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 

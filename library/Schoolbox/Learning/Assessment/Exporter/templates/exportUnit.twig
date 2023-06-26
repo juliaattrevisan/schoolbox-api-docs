@@ -1,0 +1,108 @@
+{#
+    'assessmentSpec'   IAssessable   - The assessment spec
+    'returnUrl'        string        - A URL to return to
+    'returnUrlName'    string        - query arg name
+    'unImported'       IAssessable[] - Assessments not yet imported
+    'imported'         IAssessable[] - Assessments already imported
+    'folderWritePerms' bool[]        - Does current user have WRITE+ perm to the class folder
+    'enableReimport'   bool          - Should already imported class assessments be re-importable?
+#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+
+{{ bread.crumbsArray(breadcrumbs) }}
+<script type="text/javascript">
+    $(function () {
+        var $importForm   = $('#importForm'),
+            $checkboxes   = $importForm.find('input[type=checkbox][data-unit-id]'),
+            $submitButton = $importForm.find('input[type=submit]');
+
+        // Enable submit button if any checkbox is checked.
+        $checkboxes.change(function () {
+            if ($checkboxes.filter(':checked:not(:disabled)').length) {
+                $submitButton.prop('disabled', false);
+            } else {
+                $submitButton.prop('disabled', true);
+            }
+        });
+        $importForm.alaressValidate();
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Export {{ assessmentSpec.title }}</h1>
+    </div>
+</div>
+<div class="row">
+    {% if unImported|length == 0 and imported|length == 0 %}
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-class-list"></i>
+                <p>There are no open classes that currently use this  {{ assessmentSpec.context is project ? 'project' : locale.unit }}.</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="small-12 island">
+
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
+
+            <form method="post"
+                  action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessmentSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
+                  id="importForm">
+                {% if unImported|length %}
+                    <section data-not-imported>
+                        <ul class="information-list card-selectable">
+                            <li>
+                                <div class="small-12 column">
+                                    <div class="selector">
+                                        <input id="checkAll"
+                                               type="checkbox"
+                                               data-select-all="[data-not-imported]"
+                                        />
+                                        <label for="checkAll" class="checkbox-label"></label>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="information-list card-selectable">
+                            {% for assessmentImpl in unImported %}
+                                {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                    assessmentSpec:         assessmentSpec,
+                                    assessmentImpl:         assessmentImpl,
+                                    folderWritePerms:       folderWritePerms,
+                                    enableReimport:         enableReimport,
+                                    submittedResponseCount: responseCounts[assessmentImpl.id].submitted ?? 0,
+                                    draftResponseCount:     responseCounts[assessmentImpl.id].draft ?? 0,
+                                    publishedFeedbackCount: feedbackCounts[assessmentImpl.id].published ?? 0,
+                                    draftFeedbackCount:     feedbackCounts[assessmentImpl.id].draft ?? 0,
+                                } only %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                {% if imported|length %}
+                    <section>
+                        <ul class="information-list card-selectable">
+                            {% for assessmentImpl in imported %}
+                                {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                    assessmentSpec:         assessmentSpec,
+                                    assessmentImpl:         assessmentImpl,
+                                    folderWritePerms:       folderWritePerms,
+                                    enableReimport:         enableReimport,
+                                    submittedResponseCount: responseCounts[assessmentImpl.id].submitted ?? 0,
+                                    draftResponseCount:     responseCounts[assessmentImpl.id].draft ?? 0,
+                                    publishedFeedbackCount: feedbackCounts[assessmentImpl.id].published ?? 0,
+                                    draftFeedbackCount:     feedbackCounts[assessmentImpl.id].draft ?? 0,
+                                } only %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+                <input type="submit" disabled value="Export to selected classes"/>
+            </form>
+        </div>
+    {% endif %}
+</div>
