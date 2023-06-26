@@ -92,11 +92,10 @@ export default {
 
         /**
          * Wrapper for this filesize library
-         *
-         * @param size
-         * @returns {string}
+         * @param {number} size - The size in bytes
+         * @returns {string} - The size in human readable format
          */
-        filesize: function (size) {
+        filesize(size) {
             return humanFileSize(size);
         },
     },
@@ -123,7 +122,7 @@ export default {
         </template>
         <template v-else>
             <h2>Total Usage</h2>
-            {{ humanFileSize(this.allData.size) }}
+            {{ filesize(allData.size) }}
         </template>
     </div>
 </template>
