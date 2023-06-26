@@ -399,6 +399,11 @@ $allow-sidebar-stash: $large-up;
         .content {
             padding: 0;
         }
+
+        // Make the profile menu match the side menu when displayed in mobile
+        .profile-options-mobile {
+            background-color: var(--accounts-menu-background);
+        }
     }
 
     .left-menu-dock {

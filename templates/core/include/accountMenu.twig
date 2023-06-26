@@ -11,9 +11,11 @@
     {% set mobileSuffix = '' %}
 {% endif %}
 
-<ul id="profile-options{{ mobileSuffix }}">
+<ul id="profile-options{{ mobileSuffix }}" class="profile-options{{ mobileSuffix }}">
     {% if not mobile %}
         <li class="separator">{{ user.current.fullName }}</li>
+    {% else %}
+        <li class="separator">Profile Options</li>
     {% endif %}
 
     <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>

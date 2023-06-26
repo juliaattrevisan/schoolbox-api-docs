@@ -186,6 +186,9 @@
                 {% if user.current.id %}
                     <nav class="row">
                         <ul class="off-canvas-list second-nav" id="overflow-nav">
+                            <li data-sidenav-separator>
+                                <h3>Navigation</h3>
+                            </li>
                             {% include '@menuTop/renderer.twig' with topMenu only %}
                         </ul>
                     </nav>
