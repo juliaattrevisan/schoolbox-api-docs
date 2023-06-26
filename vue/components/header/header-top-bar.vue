@@ -3,9 +3,6 @@
  * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
 
-import { ResizeObserver } from "vue3-resize";
-import "vue3-resize/dist/vue3-resize.css";
-import debounce from "lodash/debounce";
 import { topMenuData } from "./headerData";
 
 const emit = defineEmits(["openSideMenu", "toggleProfileMenu", "openNotificationsMenu"]);
@@ -27,15 +24,15 @@ window.Vue.onMounted(() => {
     primaryMenuItemsMaxXPos = primaryMenuItems.map(
         (menuItem) => menuItem.getBoundingClientRect().x + menuItem.getBoundingClientRect().width
     );
-
-    updateTopNavItems();
+    initResizeObserver();
 });
 
 /**
  * Any changes to the element size are tracked by ResizeObserver so can update dimensions
  */
-function onContainerResize() {
-    updateTopNavItems();
+function initResizeObserver() {
+    const resizeObserver = new ResizeObserver(() => updateTopNavItems());
+    resizeObserver.observe(topBar.value);
 }
 
 const menuData = window.Vue.ref(topMenuData);
@@ -58,7 +55,6 @@ function updateTopNavItems() {
 
 <template>
     <div class="top-bar" ref="topBar">
-        <resize-observer @notify="onContainerResize" />
         <nav class="primary" aria-label="Primary navigation" ref="primary">
             <ul>
                 <li>
