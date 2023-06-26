@@ -154,7 +154,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
-        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getUnixTimeStamp();
+        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getDatabase();
 
         $limit = (int)$limit;
         $offset = (int)$offset;
@@ -167,7 +167,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
                 {$this->getJoinColumnString('thread', 't')}
             FROM `{$this->getTable()}` p
               INNER JOIN {$this->getJoinSql('owner', 'p', 'o', true)}
-              LEFT JOIN {$this->getJoinSql('owner.pronoun', 'op', 'o')}
+              LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
               INNER JOIN {$this->getJoinSql('thread', 'p', 't', true)}
             WHERE p.deleted = 'false'
             AND t.categoryID = :cat
@@ -189,7 +189,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
             $post = $this->hydrate($r, 'p');
             /** @var User $owner */
             $owner = $this->hydrateJoin($r, 'owner', 'o');
-            $owner->setPronoun($this->hydrateJoin($r, 'pronoun', 'op'));
+            $owner->setPronoun($this->hydrateJoin($r, 'owner.pronoun', 'op'));
             $post->setOwner($owner);
             $post->setThread($this->hydrateJoin($r, 'thread', 't'));
 

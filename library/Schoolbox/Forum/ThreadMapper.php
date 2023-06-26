@@ -218,9 +218,11 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
         $stmt = $this->database->prepare("
             SELECT
                 {$this->getColumnString('t')},
-                {$this->getJoinColumnString('owner', 'o')}
+                {$this->getJoinColumnString('owner', 'o')},
+                {$this->getJoinColumnString('owner.pronoun', 'op')}
             FROM `{$this->getTable()}` t
             INNER JOIN {$this->getJoinSql('owner', 't', 'o', true)}
+            LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
             WHERE t.deleted = 'false'
             AND t.categoryID = :cat
             AND t.date < :time
@@ -239,7 +241,10 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var Thread $thread */
             $thread = $this->hydrate($r, 't');
-            $thread->setUser($this->hydrateJoin($r, 'owner', 'o'));
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($r, 'owner', 'o');
+            $owner->setPronoun($this->hydrateJoin($r, 'owner.pronoun', 'op'));
+            $thread->setUser($owner);
 
             $c->add($thread);
         }
