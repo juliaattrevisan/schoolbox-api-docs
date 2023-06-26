@@ -34,16 +34,19 @@ class AcceptanceTester extends Actor
     /**
      * Log out of Schoolbox
      */
-    public function logout()
+    public function logout(): void
     {
         $i = $this;
         $i->deleteSessionSnapshot('login:' . 'alaress');
         $i->amOnPage(self::$logoutURL);
+        $i->waitForText('Parents, forgotten your password?', 3);
     }
+
     /**
      * Login as Alaress
+     * @throws Exception
      */
-    public function loginAsAdmin()
+    public function loginAsAdmin(): void
     {
         $this->login('alaress', 'alaress');
     }
@@ -80,7 +83,7 @@ class AcceptanceTester extends Actor
      * Impersonate Coles (sales data)
      * @throws Exception
      */
-    public function impersonateTeacher()
+    public function impersonateTeacher(): void
     {
         $i = $this;
         $i->click('Alaress Admin');
@@ -95,7 +98,7 @@ class AcceptanceTester extends Actor
      * @param $fullname
      * @throws Exception
      */
-    public function impersonate($fullname)
+    public function impersonate($fullname): void
     {
         $i = $this;
         $i->logout();
@@ -115,7 +118,7 @@ class AcceptanceTester extends Actor
      * @param $fullname
      * @throws Exception
      */
-    public function impersonateAnyUser($fullname)
+    public function impersonateAnyUser($fullname): void
     {
         $i = $this;
        // $i->amOnPage('/user/recoverSession');
@@ -134,7 +137,7 @@ class AcceptanceTester extends Actor
      * @param $userId
      * @throws Exception
      */
-    public function impersonateViaModifyUserPage($fullname)
+    public function impersonateViaModifyUserPage($fullname): void
     {
         $i = $this;
         $i->logout();
@@ -154,7 +157,7 @@ class AcceptanceTester extends Actor
      * @param $fullname
      * @throws Exception
      */
-    public function searchBar($fullname)
+    public function searchBar($fullname): void
     {
         $i = $this;
         $i->click('label.icon-search.no-text');
@@ -169,7 +172,7 @@ class AcceptanceTester extends Actor
      * @param $content
      * @throws Exception
      */
-    public function fillCkEditorById($elementId, $content)
+    public function fillCkEditorById($elementId, $content): void
     {
         $this->executeJS(sprintf('window.sbProps.editors["%s"].setData("<p>%s</p>");', $elementId, $content));
     }
@@ -179,7 +182,7 @@ class AcceptanceTester extends Actor
      * @param $element_name
      * @param $content
      */
-    public function fillCkEditorByName($element_name, $content)
+    public function fillCkEditorByName($element_name, $content): void
     {
         $this->fillRteEditor(
             \Facebook\WebDriver\WebDriverBy::cssSelector(
@@ -194,7 +197,7 @@ class AcceptanceTester extends Actor
      * @param $id
      * @param $content
      */
-    public function fillTinyMceEditorById($id, $content)
+    public function fillTinyMceEditorById($id, $content): void
     {
         $this->fillTinyMceEditor('id', $id, $content);
     }
@@ -203,7 +206,7 @@ class AcceptanceTester extends Actor
      * @param $name
      * @param $content
      */
-    public function fillTinyMceEditorByName($name, $content)
+    public function fillTinyMceEditorByName($name, $content): void
     {
         $this->fillTinyMceEditor('name', $name, $content);
     }
@@ -213,7 +216,7 @@ class AcceptanceTester extends Actor
      * @param $value
      * @param $content
      */
-    private function fillTinyMceEditor($attribute, $value, $content)
+    private function fillTinyMceEditor($attribute, $value, $content): void
     {
         $this->fillRteEditor(
             \Facebook\WebDriver\WebDriverBy::xpath(
@@ -227,7 +230,7 @@ class AcceptanceTester extends Actor
      * @param $selector
      * @param $content
      */
-    private function fillRteEditor($selector, $content)
+    private function fillRteEditor($selector, $content): void
     {
         $this->executeInSelenium(
             function (\Facebook\WebDriver\Remote\RemoteWebDriver $webDriver) use ($selector, $content) {
@@ -248,14 +251,14 @@ class AcceptanceTester extends Actor
      * Get current url from WebDriver
      * @return mixed
      */
-    public function getCurrentUrl()
+    public function getCurrentUrl(): mixed
     {
         return $this->executeJS("return location.href");
     }
     /**
      * @throws Exception
      */
-    public function scrollAndClick($selector)
+    public function scrollAndClick($selector): void
     {
         $this->scrollTo($selector);
         $this->waitForElementVisible($selector, 5);

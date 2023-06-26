@@ -4,6 +4,7 @@ namespace Folder;
 
 use AcceptanceTester;
 use Exception;
+use Page\Common;
 use Page\Group\ManageGroup;
 use Page\Folder\CreateFolder;
 use Page\Resources\Resources;
@@ -50,6 +51,7 @@ class GroupPermissionCest
         $studentJunior = 'Eden Reed';
         $studentMiddle = 'Louisa Smith';
         $studentSenior = 'Tim Reed';
+        $groupMember = 'Eloise White';
 
         $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
@@ -65,25 +67,44 @@ class GroupPermissionCest
         $createFolder->setAccessPermission('groupNone6');
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
+        $folderId = $i->grabFirstFolderByTitle($folderName)->getId();
 
         $manageGroup->waitManageGroupTitleToBePresented();
         $manageGroup->setAccessPermission('type-3');
         $manageGroup->clickUpdateButton();
+        $i->amGoingTo('add  Eloise White  into the group');
+        $manageGroup->search('elwhite');
+        $manageGroup->selectUser(50);
+        $manageGroup->clickFromRadioButton('role');
+        $i->click('Add Members');
+        sleep(1);
 
         $i->amGoingTo('get logged in as a junior student to check the group is presented to them');
         $i->impersonate($studentJunior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->canSee('Group Free');
 
         $i->amGoingTo('get logged in as a middle student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentMiddle);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->cantSee('Group Free');
 
         $i->amGoingTo('get logged in as a senior student to check the group is presented to them');
         $i->impersonateViaModifyUserPage($studentSenior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->canSee('Group Free');
+
+        $i->amGoingTo('get logged in as Eloise White and check she is able to leave the group');
+        $i->impersonateViaModifyUserPage($groupMember);
+        $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
+        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->canSee('Leave Group');
+        $i->click('Leave Group');
+        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->canSee('Join Group');
     }
 
     /**
@@ -107,6 +128,7 @@ class GroupPermissionCest
         $studentJunior = 'Eden Reed';
         $studentMiddle = 'Louisa Smith';
         $studentSenior = 'Tim Reed';
+        $groupMember = 'Eloise White';
 
         $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
@@ -122,25 +144,46 @@ class GroupPermissionCest
         $createFolder->setAccessPermission('groupNone6');
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
+        $folderId = $i->grabFirstFolderByTitle($folderName)->getId();
 
         $manageGroup->waitManageGroupTitleToBePresented();
         $manageGroup->setAccessPermission('type-2');
         $manageGroup->clickUpdateButton();
+        $i->amGoingTo('add Jana Reed into the group');
+        $manageGroup->search('elwhite');
+        $manageGroup->selectUser(50);
+        $manageGroup->clickFromRadioButton('role');
+        $i->click('Add Members');
+        sleep(1);
 
         $i->amGoingTo('get logged in as a junior student to check the group is presented to them');
         $i->impersonate($studentJunior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->canSee('Group Moderated');
 
         $i->amGoingTo('get  logged in as a middle student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentMiddle);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->cantSee('Group Moderated');
 
         $i->amGoingTo('get  logged in as a senior student to check the group is presented to them');
         $i->impersonateViaModifyUserPage($studentSenior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->canSee('Group Moderated');
+
+        $i->amGoingTo('get logged in as Eloise White and check she is able to leave the group');
+        $i->impersonateViaModifyUserPage($groupMember);
+        $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
+        $i->click(Common::SELECTOR_JELLY_TOT);
+        sleep(1);
+        $i->canSee('Leave Group');
+        $i->click('Leave Group');
+        $i->click(Common::SELECTOR_JELLY_TOT);
+        sleep(1);
+        $i->cantSee('Cancel Application');
     }
 
     /**
@@ -164,6 +207,7 @@ class GroupPermissionCest
         $studentJunior = 'Eden Reed';
         $studentMiddle = 'Louisa Smith';
         $studentSenior = 'Tim Reed';
+        $groupMember = 'Jana Reed';
 
         $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
@@ -173,31 +217,47 @@ class GroupPermissionCest
         $i->amGoingTo('set write permission to senior student');
         $createFolder->setAccessPermission('groupWrite3');
         $createFolder->setAccessPermission('groupWrite4');
-        $i->amGoingTo('set read permission to jjunior student');
+        $i->amGoingTo('set read permission to junior student');
         $createFolder->setAccessPermission('groupRead5');
         $i->amGoingTo('set none permission to middle student');
         $createFolder->setAccessPermission('groupNone6');
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
+        $folderId = $i->grabFirstFolderByTitle($folderName)->getId();
 
         $manageGroup->waitManageGroupTitleToBePresented();
         $manageGroup->setAccessPermission('type-1');
         $manageGroup->clickUpdateButton();
+        $i->amGoingTo('add Jana Reed into the group');
+        $manageGroup->search('jreed');
+        $manageGroup->selectUser(25);
+        $manageGroup->clickFromRadioButton('role');
+        $i->click('Add Members');
+        sleep(1);
 
         $i->amGoingTo('get logged in as a junior student to check the group is NOT presented to them');
-        $i->impersonate($studentJunior);
+        $i->impersonateViaModifyUserPage($studentJunior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->cantSee('Group Restricted');
 
         $i->amGoingTo('get logged in as a middle student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentMiddle);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->cantSee('Group Restricted');
 
         $i->amGoingTo('get logged in as a senior student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentSenior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
+        sleep(1);
         $i->cantSee('Group Restricted');
+
+        $i->amGoingTo('get logged in as Jana Reed and check she is unable to leave the group');
+        $i->impersonateViaModifyUserPage($groupMember);
+        $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
+        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->cantSee('Leave Group');
     }
 
     /**
