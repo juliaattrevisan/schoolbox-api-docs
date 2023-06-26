@@ -82,10 +82,8 @@ export default {
         /**
          * Once the news item has been saved, can enable the preview/publish buttons
          * Event is dispatched from /library/Schoolbox/Comms/News/templates/create.twig
-         * @param setting
-         * @params {Event} with articleId and approveRoute
          */
-        initNewsSaveListener(setting) {
+        initNewsSaveListener() {
             document.addEventListener("create-news-form-actions__on-news-saved", (event) => {
                 this.articleId = event.detail.articleId;
                 this.approveRoute = event.detail.approveRoute;
