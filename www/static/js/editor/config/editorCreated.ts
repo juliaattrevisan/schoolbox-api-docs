@@ -74,9 +74,11 @@ function checkForModal(editor: Editor) {
 }
 
 /**
- * Some items in the toolbar are panels that displays the items within horizontally.
+ * Some items in the toolbar are panels that display the items within horizontally.
  * These panels can be hidden underneath the notifications menu when its open.
  * So we should align them so the right edge of the panel is aligned with the right edge of the button.
+ * Due to the current setup of the toolbar, we can keep this positioning regardless of whether the
+ * notifications panel is pinned or not.
  * 		         [ Button ]
  *		+-----------------+
  *		|      Panel      |
