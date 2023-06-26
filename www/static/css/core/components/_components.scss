@@ -76,23 +76,15 @@
      */
     .component {
         margin-bottom: rem-calc(($base-font-size));
-
-        /* Absorb from Skin Builder colour set
-         *
-         * wow nested identical css names - that's a really bad
-         * outcome. I shall rename .component.information-list
-         * into component-titlebar
-         */
-        .component-titlebar {
-            background-color: $content-ui-background;
-            margin-bottom: 0px;
-        }
     }
 }
 
 /* Component Title Bar
  */
 .component-titlebar {
+    background-color: $content-ui-background;
+    margin-bottom: 0px;
+
     .list-item {
         padding: 0.475rem 1rem;
     }
