@@ -1,17 +1,10 @@
 <script>
-import { ResizeObserver } from "vue3-resize";
-import "vue3-resize/dist/vue3-resize.css";
-
 /**
  * To display content that appears when requested from the bottom of the window.
  * Usually contains actions in response to selections on the page, for example choosing some users to edit.
  * Once +1 users is selected the drawer will slide in from the bottom of the window.
  */
 export default {
-    components: {
-        ResizeObserver, //to track any size changes to the parent container
-    },
-
     props: {
         /**
          * When true will slide in the drawer from the bottom of the window
@@ -43,24 +36,18 @@ export default {
 
     data() {
         return {
-            width: "", //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers width
-            left: "", //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers left position
-            position: "", //can be fixed/static when isAlwaysAnchored is set to false
+            width: "", // as the drawer is position: fixed, need to use ResizeObserver to track the parent containers width
+            left: "", // as the drawer is position: fixed, need to use ResizeObserver to track the parent containers left position
+            position: "", // can be fixed/static when isAlwaysAnchored is set to false
         };
     },
 
     mounted() {
-        this.updatePosition();
+        const resizeObserver = new ResizeObserver(() => this.updatePosition());
+        resizeObserver.observe(this.$el);
     },
 
     methods: {
-        /**
-         * Any changes to the element size are tracked by ResizeObserver so can update dimensions
-         */
-        onContainerResize() {
-            this.updatePosition();
-        },
-
         /**
          * To keep the width and left position of the bottom-drawer the same as the parent container
          * which will change depending on whether the side menu is opened/closed, browser resized etc
@@ -78,7 +65,6 @@ export default {
 
 <template>
     <div>
-        <resize-observer @notify="onContainerResize" />
         <transition name="slide">
             <div v-show="showDrawer" class="bottom-drawer-container">
                 <!-- @slot Default slot, put whatever HTML markup you like in here -->
