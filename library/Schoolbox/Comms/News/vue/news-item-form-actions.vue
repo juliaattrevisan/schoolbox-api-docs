@@ -54,14 +54,11 @@ export default {
          * @returns {boolean} True if the preview button should be disabled, false otherwise.
          */
         isDisabled() {
-            const previewButton = document.getElementById('news-preview');
-            const submitButton = document.getElementById('news-submit');
-
             return (
                 this.articleId === 0 ||
-                submitButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') || (
-                    previewButton !== null &&
-                    previewButton.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
+                this.$refs.newsSubmit.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') || (
+                    this.$refs.newsPreview !== null &&
+                    this.$refs.newsPreview.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
                 )
             );
         },
@@ -102,11 +99,11 @@ export default {
     <ul class="flex-list buttons">
         <template v-if="isAutoSavable">
             <li>
-                <button type="submit" id="news-preview" :disabled="isDisabled">Preview</button>
+                <button type="submit" id="news-preview" ref="newsPreview" :disabled="isDisabled">Preview</button>
             </li>
         </template>
         <li>
-            <button type="submit" class="submit" id="news-submit" :disabled="isDisabled">{{ submitText }}</button>
+            <button type="submit" class="submit" id="news-submit" ref="newsSubmit" :disabled="isDisabled">{{ submitText }}</button>
         </li>
     </ul>
 </template>
