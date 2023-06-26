@@ -24,7 +24,6 @@ use SocialStream_Post_Abstract;
  */
 class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Schoolbox\IHomepageCleanable
 {
-
     /**
      * Define column/property mapping
      *

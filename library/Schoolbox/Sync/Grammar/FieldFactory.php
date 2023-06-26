@@ -13,7 +13,6 @@ use Schoolbox\Role;
 
 class FieldFactory
 {
-
     /**
      * @param string $roleType
      * @return array

@@ -21,7 +21,6 @@ use Schoolbox\UserMapper;
  */
 class LogMapper extends Mapper
 {
-
     const ACTION_CREATE = 'create';
     const ACTION_READ   = 'access';
     const ACTION_UPDATE = 'modify';

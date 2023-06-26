@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class RevisionMapper extends Mapper implements FeedableMapperInterface
 {
-
     /**
      * @return void
      */
