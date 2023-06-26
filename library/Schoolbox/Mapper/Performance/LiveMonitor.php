@@ -15,7 +15,6 @@ use Schoolbox\Mapper;
 
 class LiveMonitor extends AbstractLogger implements IMonitor
 {
-
     /**
      * @param Mapper $mapper
      * @return void
