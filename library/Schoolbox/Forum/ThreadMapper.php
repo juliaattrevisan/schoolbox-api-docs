@@ -414,7 +414,7 @@ WHERE
             $owner->setPronoun($this->hydrateJoin($row, 'owner.pronoun', 'op'));
             /** @var User $lastPoster */
             $lastPoster = $this->hydrateJoin($row, 'lastPoster', 'lastPoster');
-            $owner->setPronoun($this->hydrateJoin($row, 'lastPoster.pronoun', 'lpp'));
+            $lastPoster->setPronoun($this->hydrateJoin($row, 'lastPoster.pronoun', 'lpp'));
             $thread = $this->hydrate($row)
                          ->setUser($owner)
                          ->setLastPost($this->hydrateJoin($row, 'post', 'post'))
