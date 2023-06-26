@@ -32,7 +32,7 @@
     <li><a class="icon-logout" href="/logout.php">Logout</a></li>
 </ul>
 {% if user.current.linkedUser is not empty or user.previous  %}
-    <ul id="switch-user{{ mobileSuffix }}">
+    <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
         <li class="separator">Switch User</li>
 
         {% set previousUser = user.previous | default(null) %}

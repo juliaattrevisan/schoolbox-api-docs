@@ -400,8 +400,9 @@ $allow-sidebar-stash: $large-up;
             padding: 0;
         }
 
-        // Make the profile menu match the side menu when displayed in mobile
-        .profile-options-mobile {
+        // Make the mobile menus match the side menu when displayed in mobile
+        .profile-options-mobile,
+        .switch-user-mobile {
             background-color: var(--accounts-menu-background);
         }
     }
