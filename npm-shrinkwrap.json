@@ -59,7 +59,7 @@
                 "dayjs": "~1.11.7",
                 "dropzone": "~6.0.0-beta.2",
                 "flatpickr": "~4.6.13",
-                "gsap": "npm:@gsap/business@~3.11.5",
+                "gsap": "npm:@gsap/business@^3.12.1",
                 "highcharts": "~9.3.3",
                 "highcharts-vue": "~1.4.0",
                 "intro.js": "~2.9.3",
@@ -15453,9 +15453,9 @@
         },
         "node_modules/gsap": {
             "name": "@gsap/business",
-            "version": "3.11.5",
-            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.11.5.tgz",
-            "integrity": "sha512-4eYfbB7c+s9N+ImkqU5ZoaNEkDm9SEZb6NfHYsvGr5hM4bIN/8wKObbpl+/pNRRPl0XopxRNz4E6hc4a0j76ZA==",
+            "version": "3.12.1",
+            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.1.tgz",
+            "integrity": "sha512-34k7zB81c2yAb4aOHUHo0qXmNMCXp6hMujVBdFn6asRI74ZH3vc1kx93SebksUZ8v/gZSJT4S3haWPB436nOjQ==",
             "license": "This package should only be used by individuals/companies with an active Business Green Club GreenSock membership. See https://greensock.com/club/. Licensing: https://greensock.com/licensing/"
         },
         "node_modules/gunzip-maybe": {
@@ -38750,9 +38750,9 @@
             "dev": true
         },
         "gsap": {
-            "version": "npm:@gsap/business@3.11.5",
-            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.11.5.tgz",
-            "integrity": "sha512-4eYfbB7c+s9N+ImkqU5ZoaNEkDm9SEZb6NfHYsvGr5hM4bIN/8wKObbpl+/pNRRPl0XopxRNz4E6hc4a0j76ZA=="
+            "version": "npm:@gsap/business@3.12.1",
+            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.1.tgz",
+            "integrity": "sha512-34k7zB81c2yAb4aOHUHo0qXmNMCXp6hMujVBdFn6asRI74ZH3vc1kx93SebksUZ8v/gZSJT4S3haWPB436nOjQ=="
         },
         "gunzip-maybe": {
             "version": "1.4.2",
