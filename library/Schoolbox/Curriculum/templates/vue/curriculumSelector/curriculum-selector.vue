@@ -3,8 +3,6 @@
  * To select Curriculum Nodes to assign to something like a Due Work
  */
 
-import { ResizeObserver } from "vue3-resize";
-import "vue3-resize/dist/vue3-resize.css";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
@@ -74,22 +72,24 @@ const curriculumSelectorEl = window.Vue.ref(null);
  */
 window.Vue.onMounted(() => {
     store.init(props);
-    checkContainerWidth();
+    initResizeObserver();
 });
-
-/**
- * so can respond to dimenion changes if required
- */
-async function checkContainerWidth() {
-    await window.Vue.nextTick();
-    store.updateContainerWidth(curriculumSelectorEl.value.offsetWidth);
-}
 
 /**
  * Any changes to the element size are tracked by ResizeObserver so can update dimensions
  */
-function onContainerResize() {
-    checkContainerWidth();
+function initResizeObserver() {
+    const resizeObserver = new ResizeObserver(() => checkContainerWidth());
+    resizeObserver.observe(curriculumSelectorEl.value);
+}
+
+/**
+ * to track the width of the container the curriculum selector is in,
+ * so we can update the design when appropriate
+ */
+async function checkContainerWidth() {
+    await window.Vue.nextTick();
+    store.updateContainerWidth(curriculumSelectorEl.value.offsetWidth);
 }
 
 /**
@@ -105,7 +105,6 @@ function onSelectedNodeModalClosed() {
         <cs-selected-nodes />
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
         <cs-search-results />
-        <resize-observer @notify="onContainerResize" />
     </div>
     <cs-modal v-if="store.hasLoadedOk" />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
