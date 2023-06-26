@@ -63,9 +63,10 @@ use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 class Controller extends ConfigController
 {
     /**
-     * Flash message text appears in this key
+     * Session key and url parameter which remembers the status
+     * of a particular taskd message we generated here
      */
-    public const SUMMATIVE_REPORT_FLASH_MESSAGE_KEY = 'SummativeReportFlashMessage';
+    public const SUMMATIVE_REPORT_STATUS_KEY = 'summativeReport_%s';
 
 
     /**
@@ -686,7 +687,7 @@ class Controller extends ConfigController
         /* Arbitrarily assign a guid to this report generation
          */
         $guid = strtoupper(md5(uniqid((string)mt_rand(), true)));
-        $reportKey = "summativeReport_{$guid}";
+        $reportKey = sprintf(self::SUMMATIVE_REPORT_STATUS_KEY, $guid);
 
         /* Remember the result payload associated with this report generation
          */
