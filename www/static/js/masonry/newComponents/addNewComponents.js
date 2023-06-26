@@ -16,6 +16,7 @@ gsap.registerPlugin(Draggable, Flip);
 const COMPONENT_CONTAINERS_SELECTOR = "[data-components-container]"; //the top/left/right parent containers and the tabs container
 const COMPONENT_SELECTOR = "[data-component-palette]"; //any component that will be dragged/added/sorted
 const SORTABLE_SELECTOR = "[data-component]"; //existing components that can be sorted
+const SORTABLE_SELECTOR_NOT_PALETTE = "[data-component]:not([data-component-palette])"; //existing components that can be sorted, but not inside the palette
 const ANIMATE_SPEED = 0.15; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
@@ -30,6 +31,7 @@ let __isFlipping = false; //prevent quick shifts / odd flickers while using FLIP
 let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position changes, have to move a minimum amount prior to another change
 let __newComponentClone; //to later insert back into the palette
 let __newComponentTabsContainer; //to reinsert the newComponentClone into the new component tabs to replace the one that was taken out
+let __isDragging = false; //to prevent some funky behaviour when a user has just stopped dragging
 
 /*****************************************************************
  *
@@ -216,6 +218,7 @@ function updateNewComponentVars(newComponent) {
  */
 function onDragStart(draggableInstance) {
     if (!__isProcessing) {
+        __isDragging = true;
         __isProcessing = true;
         updateNewComponentVars(draggableInstance.target); //use the parent container regardless of selection to ensure correct dimensions etc
         __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
@@ -315,10 +318,12 @@ function extractNewComponent() {
  * Moving it onto the page or back into the tabs based on the drag position
  */
 function onDrag() {
-    if (canCheckForChange() && isNewComponentOverPage()) {
+    const canCheck = canCheckForChange();
+    const componentIsOverPage = isNewComponentOverPage();
+    if (canCheck && componentIsOverPage) {
         //add the component to the page
         checkNewDraggedComponentOnPage();
-    } else if (canCheckForChange() && __hasNewComponent) {
+    } else if (canCheck && !componentIsOverPage && __hasNewComponent && __isDragging) {
         //if the new component has been added to page already, but it back into the tabs
         putDraggedComponentBackIntoTabs();
     }
@@ -361,7 +366,7 @@ function isNewComponentOverPage() {
  *  animate the position change.
  */
 function checkNewDraggedComponentOnPage() {
-    const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements
+    const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR_NOT_PALETTE)); //grab all sortable elements
     const closestElement = getClosestElement(__newComponent, sortablesToCheckList); //the element nearest to the dragged element
     if (closestElement.id !== __newComponent.id && isElementAboveOtherElement(__newComponent, closestElement)) {
         //no need to FLIP if the closest element is still the __newComponent
@@ -473,6 +478,7 @@ function animateFlip(state) {
  * Just snap back to where it now belongs
  */
 function onDragEnd() {
+    __isDragging = false;
     document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
     if (isNewComponentOverPage()) {
         //add the component to the page
@@ -484,7 +490,9 @@ function onDragEnd() {
     if (__hasNewComponent) {
         reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
     }
-    alignNewComponent();
+    if (__referenceElement) { // For some reason it is possible to have no reference element, so check for it just in case...
+        alignNewComponent();
+    }
 }
 
 /**
