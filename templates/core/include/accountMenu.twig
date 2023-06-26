@@ -11,9 +11,11 @@
     {% set mobileSuffix = '' %}
 {% endif %}
 
-<ul id="profile-options{{ mobileSuffix }}">
+<ul id="profile-options{{ mobileSuffix }}" class="profile-options{{ mobileSuffix }}">
     {% if not mobile %}
         <li class="separator">{{ user.current.fullName }}</li>
+    {% else %}
+        <li class="separator">Profile Options</li>
     {% endif %}
 
     <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
@@ -30,7 +32,7 @@
     <li><a class="icon-logout" href="/logout.php">Logout</a></li>
 </ul>
 {% if user.current.linkedUser is not empty or user.previous  %}
-    <ul id="switch-user{{ mobileSuffix }}">
+    <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
         <li class="separator">Switch User</li>
 
         {% set previousUser = user.previous | default(null) %}

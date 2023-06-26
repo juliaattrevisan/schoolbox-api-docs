@@ -157,6 +157,10 @@ $(function () {
         // ^ have to check that the notfications bar isn't docked as well, if it is- it's not part of the #top-menu width
         var extraWidth = profileWidth + searchWidth + notificationsWidth;
 
+        // A separator used to break up the menu items from the profile menu that appears above it in mobile.
+        const sideNavSeparator = document.querySelector("li[data-sidenav-separator]");
+        let secondNavHasItems = false;
+
         // Store the width left in top nav after subtracting
         var spaceLeft = $("#top-menu").width() - extraWidth;
 
@@ -179,8 +183,18 @@ $(function () {
                 spaceLeft -= topMenuItemWidth;
             } else {
                 toggleTopNavItem(false, $(this));
+                secondNavHasItems = true;
             }
         });
+
+        // If any items are visible in the sidebar and a separator exists, show it.
+        if (sideNavSeparator) {
+            if (secondNavHasItems) {
+                sideNavSeparator.style.display = "list-item";
+            } else {
+                sideNavSeparator.style.display = "none";
+            }
+        }
     }
 
     /**

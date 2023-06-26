@@ -399,6 +399,12 @@ $allow-sidebar-stash: $large-up;
         .content {
             padding: 0;
         }
+
+        // Make the mobile menus match the side menu when displayed in mobile
+        .profile-options-mobile,
+        .switch-user-mobile {
+            background-color: var(--accounts-menu-background);
+        }
     }
 
     .left-menu-dock {
@@ -580,7 +586,7 @@ $allow-sidebar-stash: $large-up;
     a {
         color: $accounts-menu-foreground;
         display: block;
-        padding: 0.625rem 0.8125rem;
+        padding: 0.5rem 1rem;
         font-size: 1rem;
         font-weight: 300;
         &:hover {
