@@ -561,7 +561,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
                          * Incorrect response, selected
                          * Unselected
                          */
-                        if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
+                        if (isset($currentAnswer->correct) && in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
                                 'OTHER_DESCRIPTION' => '',
                                 'CORRECT'           => $this->getCorrectClass(),
