@@ -20,6 +20,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\User;
 
 /**
  * Class ResourceVideoMapper
@@ -83,10 +84,12 @@ class ResourceVideoMapper extends Mapper
         $query = "
             SELECT    {$this->getJoinMapper('file')->getColumnString('f')},
                       {$this->getColumnString('vq')},
-                      {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
+                      {$fileMapper->getJoinMapper('owner')->getColumnString('u')},
+                      {$fileMapper->getJoinMapper('owner')->getJoinColumnString('pronoun', 'op')}
             FROM      `{$this->getTable()}` vq
             JOIN      {$this->getJoinSQL('file', 'vq', 'f')}
             LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u', true)}
+            LEFT JOIN {$fileMapper->getJoinMapper('owner')->getJoinSql('pronoun', 'u', 'op')}
             JOIN      storage s ON s.hash = f.hash
             JOIN      allowedFileExtension e ON s.ext = e.extension
             JOIN      allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
@@ -142,7 +145,10 @@ class ResourceVideoMapper extends Mapper
             $video->setFile($fileMapper->hydrate($row, 'f'));
 
             if ($row['u.id']) {
-                $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->hydrate($row, 'u'));
+                /** @var User $owner */
+                $owner = $fileMapper->getJoinMapper('owner')->hydrate($row, 'u');
+                $owner->setPronoun($fileMapper->getJoinMapper('owner')->hydrateJoin($row, 'pronoun', 'op'));
+                $video->getFile()->setOwner($owner);
             } else {
                 $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->getUnknownUser());
             }
