@@ -82,7 +82,7 @@
         "dragonmantank/cron-expression": "^3.0",
         "ext-simplexml": "*",
         "enshrined/svg-sanitize": "~0.15.0",
-        "symfony/yaml": "^6.3",
+        "symfony/yaml": "6.*",
         "maennchen/zipstream-php": "^2.1",
         "ext-mbstring": "*",
         "ext-intl": "*",
@@ -113,7 +113,7 @@
         "guzzlehttp/psr7": "^2.4"
     },
     "require-dev": {
-        "codeception/codeception": "^5.0",
+        "codeception/codeception": "5.*",
         "phpunit/phpunit": "^9.5.20",
         "phpstan/phpstan": "^1.2.0",
         "roave/security-advisories": "dev-latest",
