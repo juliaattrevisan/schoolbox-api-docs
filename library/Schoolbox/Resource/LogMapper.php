@@ -213,9 +213,11 @@ class LogMapper extends Mapper
             SELECT
                 {$this->getColumnString('log')},
                 {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('user.pronoun', 'op')},
                 $selectSql
             FROM `{$this->getTable()}` `log`
                 LEFT JOIN {$this->getJoinSql('user', 'log', 'u', true)}
+                LEFT JOIN {$this->getJoinSql('user.pronoun', 'u', 'op')}
                 $joinSql
             WHERE log.time <= :time
             ORDER BY log.time DESC
@@ -231,6 +233,7 @@ class LogMapper extends Mapper
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $user = $this->hydrateJoin($r, 'user', 'u');
+            $user->setPronoun($this->hydrateJoin($r, 'user.pronoun', 'op'));
 
             /* Special case for logs:
              * For the moment, we do not enforce referential integrity.
