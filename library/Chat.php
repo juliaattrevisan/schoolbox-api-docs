@@ -150,10 +150,12 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                 preferred_name,
                 lastname,
                 synergy_id AS user_ext_id,
+                if (`user`.`pronoun`, concat('(', `pronoun`.`subjective`, ' / ', `pronoun`.`objective`, ')'), '') as `pronoun`,
                 group_type,
                 chat_poll.*
             FROM chat_poll
             LEFT JOIN `user` ON chat_poll.user_id = user.id
+            LEFT JOIN `pronoun` ON `user`.`pronoun` = `pronoun`.`id`
             LEFT JOIN `groups` ON user.`group_id` = `groups`.`id`
             WHERE `category_id` = ?
             AND chat_poll.time >= ?
