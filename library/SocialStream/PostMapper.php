@@ -13,6 +13,7 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\User;
 use SocialStream\Post\Factory;
 use SocialStream_Post_Abstract;
 
@@ -462,9 +463,11 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
         $stmt = $this->database->prepare("
             SELECT
                 {$this->getColumnString('p')},
-                {$ownerMapper->getColumnString('u')}
+                {$ownerMapper->getColumnString('u')},
+                {$this->getJoinColumnString('user.pronoun', 'op')}
             FROM `{$this->getTable()}` p
             INNER JOIN {$this->getJoinSql('user', 'p', 'u', true)}
+            LEFT JOIN {$this->getJoinSql('user.pronoun', 'u', 'op')}
             WHERE
                 p.deleted_at IS NULL
                 AND p.created_at < :time
@@ -482,7 +485,10 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $post = $this->hydrate($r, 'p');
-            $post->setOwner($ownerMapper->hydrate($r, 'u'));
+            /** @var User $owner */
+            $owner = $ownerMapper->hydrate($r, 'u');
+            $owner->setPronoun($this->hydrateJoin($r, 'user.pronoun', 'op'));
+            $post->setOwner($owner);
             $c->add($post);
         }
         return $c;
