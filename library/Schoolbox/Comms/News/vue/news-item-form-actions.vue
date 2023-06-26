@@ -27,8 +27,7 @@ export default {
     computed: {
         /**
          * to change the text of the submit button depending on the news state
-         *
-         * @returns {String}
+         * @returns {string} Text on submit button.
          */
         submitText() {
             if (this.isSubmitted && !this.isRejected) {
@@ -44,8 +43,7 @@ export default {
          * Global moderation config is turned on
          * Global posting is turned on (no case where a user can post for moderation otherwise)
          * The draft save response has returned false for an approveRoute
-         *
-         * @returns {Boolean}
+         * @returns {boolean} True if requires moderation.
          */
         requiresModeration() {
             return this.globalModeration && this.globalPosting && !this.approveRoute;
@@ -87,9 +85,8 @@ export default {
         /**
          * Once the news item has been saved, can enable the preview/publish buttons
          * Event is dispatched from /library/Schoolbox/Comms/News/templates/create.twig
-         *
+         * @param setting
          * @params {Event} with articleId and approveRoute
-         *
          */
         initNewsSaveListener(setting) {
             document.addEventListener("create-news-form-actions__on-news-saved", (event) => {
