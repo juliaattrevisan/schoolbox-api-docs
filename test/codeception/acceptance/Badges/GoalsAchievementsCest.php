@@ -44,7 +44,6 @@ class GoalsAchievementsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      *
      * on learning/badge page create a Badge
      * set it as a goal to Jana Reed
@@ -83,7 +82,6 @@ class GoalsAchievementsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      *
      *
      * award an achievement to Jana Reed from the Badges page
@@ -118,7 +116,6 @@ class GoalsAchievementsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      * @depends setGoals
      * @depends awardAchievement
      *
@@ -167,7 +164,6 @@ class GoalsAchievementsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      * @depends setGoals
      * set a goal, add an evidence, view the evidence, edit it, check it is updated, award it and check the evidence is presented
      * withdraw the achievement, remove the evidence, award it again with evidence, check the evidence, update the evidence, check the evidence is presented properly

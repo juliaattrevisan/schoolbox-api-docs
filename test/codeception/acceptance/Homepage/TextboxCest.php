@@ -35,7 +35,6 @@ class TextboxCest
 
     /**
      * @param AcceptanceTester $i
-     * @beforeSuite
      */
 
     /**
@@ -85,7 +84,6 @@ class TextboxCest
      * @param Homepage\TextboxForm $textboxForm
      * @depends createHomepage
      *
-     * @beforeSuite
      * @depends createHomepage
      * @throws Exception
      */

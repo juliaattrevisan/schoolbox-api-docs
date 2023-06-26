@@ -23,7 +23,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function create2Assessments(AcceptanceTester $i)
@@ -106,7 +105,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function deleteAssessment(AcceptanceTester $i)
@@ -127,7 +125,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function viewClassWork(AcceptanceTester $i)
@@ -143,7 +140,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function submitWorkInPersonByStudent(AcceptanceTester $i)
@@ -164,7 +160,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function viewSubmission(AcceptanceTester $i)
@@ -187,7 +182,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function markSubmission(AcceptanceTester $i)
@@ -216,7 +210,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function viewMarkedSubmission(AcceptanceTester $i)
@@ -242,7 +235,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function submitWorkTypingSomethingByTeacher(AcceptanceTester $i)
@@ -263,7 +255,6 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @beforeSuite
      * @throws \Exception
      */
     public function submitWorkTypingSomethingByAdmin(AcceptanceTester $i)

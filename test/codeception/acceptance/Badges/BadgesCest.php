@@ -42,7 +42,6 @@ class BadgesCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      *
      * on learning/badge page click Create Badge button
      * Type a Name

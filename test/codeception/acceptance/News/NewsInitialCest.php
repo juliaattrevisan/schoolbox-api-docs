@@ -22,7 +22,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function createNews(AcceptanceTester $i)
     {
@@ -50,7 +49,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function unpublishNews(AcceptanceTester $i)
     {
@@ -69,7 +67,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function publishNews(AcceptanceTester $i)
     {
@@ -82,7 +79,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function audienceViewsNewsFeed(AcceptanceTester $i)
     {
@@ -95,7 +91,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function audienceViewsNewsItem(AcceptanceTester $i)
     {
@@ -109,7 +104,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function enableNewsComments(AcceptanceTester $i)
     {
@@ -124,7 +118,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function addTwoNewsComments(AcceptanceTester $i)
     {
@@ -148,7 +141,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function deleteNewsComments(AcceptanceTester $i)
     {
@@ -163,7 +155,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function disableNewsComments(AcceptanceTester $i)
     {
@@ -177,7 +168,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @beforeSuite
      */
     public function deleteNews(AcceptanceTester $i)
     {

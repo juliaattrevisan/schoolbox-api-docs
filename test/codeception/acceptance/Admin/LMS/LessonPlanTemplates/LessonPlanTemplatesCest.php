@@ -30,7 +30,6 @@ class LessonPlanTemplatesCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      *
      * on adminv2/lesson-plan/template page click Create button
      * Type a Title
@@ -61,7 +60,6 @@ class LessonPlanTemplatesCest
      * @param AcceptanceTester $i
      * @throws Exception
      * @depends createLessonPlanTemplate
-     * @beforeSuite
      *
      * on adminv2/lesson-plan/template page click the Modify button
      * Update the Title
@@ -126,7 +124,6 @@ class LessonPlanTemplatesCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      *
      * on adminv2/lesson-plan/template page
      * disable the lesson plan template
