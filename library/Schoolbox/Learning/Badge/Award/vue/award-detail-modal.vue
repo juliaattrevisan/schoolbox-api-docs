@@ -7,8 +7,6 @@ import toastMixin from "@schoolboxVue/components/toast-mixin";
 import userProfileMixin from "../../../vue/user-profile/mixin";
 import axios from "axios";
 import { animateBadgeImage } from "../js/animateBadgeImage";
-import { ResizeObserver } from "vue3-resize";
-import "vue3-resize/dist/vue3-resize.css";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
@@ -62,7 +60,6 @@ export default {
         BadgeImage,
         RelativeTime,
         SequentialRevealModal,
-        ResizeObserver, //to track any size changes to the parent container
         CodesList,
         NodeDetails,
     },
