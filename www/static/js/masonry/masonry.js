@@ -1,3 +1,11 @@
+/**
+ * This file is the entry point for masonry used on homepages, eportfolios, and the admin template pages.
+ *
+ * It handles adding, removing, and updating components, as well as sorting components, editing columns or other page settings, and various other things.
+ * Masonry can be initialised by dispatching a MASONRY__CREATE event on the document with settings in the detail.
+ * See masonryConfig.js for the settings that can be passed in.
+ */
+
 import { setMasonryConfig, masonryConfig } from "./masonryConfig";
 import { initPostToMyLinks } from "./postToMyLinks";
 import { initExistingComponents } from "./existingComponents/existingComponents";
