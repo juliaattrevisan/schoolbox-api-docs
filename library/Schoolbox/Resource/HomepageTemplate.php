@@ -16,6 +16,11 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class HomepageTemplate
 {
+    /**
+     * These are default column widths for homepage templates
+     */
+    public const DEFAULT_LEFT_COLUMN_WIDTH = 69.5;
+    public const DEFAULT_RIGHT_COLUMN_WIDTH = 29.5;
 
     public const HOMEPAGE_NONE          = -1;
     public const HOMEPAGE_KEEP_EXISTING = 0;
