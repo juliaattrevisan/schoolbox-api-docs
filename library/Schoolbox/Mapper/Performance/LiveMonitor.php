@@ -66,7 +66,7 @@ class LiveMonitor extends AbstractLogger implements IMonitor
      * @param array  $context
      * @return void
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         // noop
     }
