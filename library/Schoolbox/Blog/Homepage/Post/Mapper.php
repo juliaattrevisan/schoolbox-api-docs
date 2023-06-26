@@ -169,9 +169,11 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
 			SELECT
 				{$this->getColumnString('b')},
 				{$this->getJoinColumnString('owner', 'u')},
+                {$this->getJoinColumnString('owner.pronoun', 'op')},
 				{$this->getJoinColumnString('folder', 'c')}
 			FROM `{$this->getTable()}` AS `b`
 				INNER JOIN {$this->getJoinSql('owner', 'b', 'u', true)}
+			    LEFT JOIN {$this->getJoinSql('owner.pronoun', 'u', 'op')}
 				INNER JOIN {$this->getJoinSql('folder', 'b', 'c')}
 			WHERE `b`.`deleted_at` IS NULL
 				AND `b`.`folder_id` = :folder_id
@@ -193,6 +195,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var User $user */
             $user = $this->hydrateJoin($r, 'owner', 'u');
+            $user->setPronoun($this->hydrateJoin($r, 'owner.pronoun', 'op'));
 
             /** @var FolderModel $folder */
             $folder = $this->hydrateJoin($r, 'folder', 'c');

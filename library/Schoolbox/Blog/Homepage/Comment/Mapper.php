@@ -59,9 +59,11 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
 			SELECT
 				{$this->getColumnString('bc')},
 				{$this->getJoinColumnString('owner', 'u')},
+				{$this->getJoinColumnString('owner.pronoun', 'op')},
 				{$this->getJoinColumnString('blog', 'b')}
 			FROM `{$this->getTable()}` AS `bc`
 				INNER JOIN {$this->getJoinSql('owner', 'bc', 'u', true)}
+			    LEFT JOIN {$this->getJoinSql('owner.pronoun', 'u', 'op')}
 				INNER JOIN {$this->getJoinSql('blog', 'bc', 'b')}
 			WHERE `bc`.`deleted_at` IS NULL
 				AND `b`.`folder_id` = :folder_id
@@ -83,6 +85,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var User $owner */
             $owner = $this->hydrateJoin($r, 'owner', 'u');
+            $owner->setPronoun($this->hydrateJoin($r, 'owner.pronoun', 'op'));
 
             /** @var BlogModel $blog */
             $blog = $this->hydrateJoin($r, 'blog', 'b');
