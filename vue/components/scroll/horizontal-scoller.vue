@@ -4,8 +4,6 @@
  */
 
 import { gsap, Draggable, InertiaPlugin } from "gsap/all";
-import { ResizeObserver } from "vue3-resize";
-import "vue3-resize/dist/vue3-resize.css";
 
 gsap.registerPlugin(Draggable, InertiaPlugin);
 
@@ -63,7 +61,7 @@ export default {
         this.initElements();
         this.initDraggable();
         this.initScrollBar();
-        this.refresh();
+        this.initResizeObserver();
     },
 
     methods: {
@@ -98,6 +96,14 @@ export default {
          */
         initScrollBar() {
             gsap.set(this.scrollBar, { alpha: 0 }); // only show when sliding active
+        },
+
+        /**
+         * To respond to any size changes to the parent container
+         */
+        initResizeObserver() {
+            const resizeObserver = new ResizeObserver(() => this.refresh());
+            resizeObserver.observe(this.$refs.scrollerOuterContainer);
         },
 
         /**
@@ -208,13 +214,6 @@ export default {
             const constrainedXTarget = xTarget < this.minX ? this.minX : xTarget; // ensure doesn't move beyond the container bounds
             this.moveInnerContainer(constrainedXTarget);
         },
-
-        /**
-         * Any changes to the element size are tracked by ResizeObserver so can update dimensions
-         */
-        onContainerResize() {
-            this.refresh();
-        },
     },
 };
 </script>
@@ -231,8 +230,7 @@ export default {
                 &lt;
             </button>
         </div>
-        <div class="scroller__outer-container" data-scroller-outer-container>
-            <resize-observer @notify="onContainerResize" />
+        <div class="scroller__outer-container" data-scroller-outer-container ref="scrollerOuterContainer">
             <div class="scroller__inner-container" data-scroller-inner-container>
                 <slot></slot>
             </div>

@@ -81,7 +81,6 @@
                 "videojs-record": "~4.6.0",
                 "vue": "~3.3.4",
                 "vue-select": "~4.0.0-beta.6",
-                "vue3-resize": "~0.2.0",
                 "vuejs-paginate-next": "~1.0.2"
             },
             "devDependencies": {
@@ -26447,14 +26446,6 @@
                 "node": ">=4.0.0"
             }
         },
-        "node_modules/vue3-resize": {
-            "version": "0.2.0",
-            "resolved": "https://registry.npmjs.org/vue3-resize/-/vue3-resize-0.2.0.tgz",
-            "integrity": "sha512-vZkbEv4PjMEWFV0igAxCvdSIH9hrIJjXyJ9XPTxH0cS/L2/VW1dLVORMWJKU0VXHpHiYKwskB62ju7aBQMVpOQ==",
-            "peerDependencies": {
-                "vue": "^3.0.0"
-            }
-        },
         "node_modules/vuejs-paginate-next": {
             "version": "1.0.2",
             "resolved": "https://registry.npmjs.org/vuejs-paginate-next/-/vuejs-paginate-next-1.0.2.tgz",
@@ -46959,12 +46950,6 @@
                     }
                 }
             }
-        },
-        "vue3-resize": {
-            "version": "0.2.0",
-            "resolved": "https://registry.npmjs.org/vue3-resize/-/vue3-resize-0.2.0.tgz",
-            "integrity": "sha512-vZkbEv4PjMEWFV0igAxCvdSIH9hrIJjXyJ9XPTxH0cS/L2/VW1dLVORMWJKU0VXHpHiYKwskB62ju7aBQMVpOQ==",
-            "requires": {}
         },
         "vuejs-paginate-next": {
             "version": "1.0.2",
