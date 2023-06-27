@@ -87,7 +87,7 @@ class Notif implements NotifInterface
      * @param string $topic
      * @return self
      */
-    public function setTopic($topic): static
+    public function setTopic($topic): self
     {
         $this->topic = $topic;
         return $this;
