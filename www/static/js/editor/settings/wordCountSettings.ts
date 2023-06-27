@@ -77,6 +77,109 @@ function getContainingFormAndSubmitButtons(sourceElement: HTMLElement, config: E
 }
 
 /**
+ * Return the button text for buttons that are <input> or <button>.
+ * @param { Element } buttonElem - The button whose text we want returned.
+ * @returns { string|null } - The button text or null if no text could be read from the button.
+ */
+function getButtonText(buttonElem: Element) {
+    const buttonTagName = buttonElem.tagName.toLowerCase();
+    let buttonText = null;
+
+    switch (buttonTagName) {
+        case "input":
+            buttonText = buttonElem.getAttribute("value");
+            break;
+        case "button":
+            buttonText = buttonElem.innerHTML;
+            break;
+        default:
+            throw "Unsupported button tag name '" + buttonTagName + "'.";
+    }
+
+    return buttonText ?? "";
+}
+
+/**
+ * Change button text for buttons that are <input> or <button>.
+ * @param { HTMLElement } buttonElem - The button whose state is to change.
+ * @param { boolean } maxCharCountExceeded - Whether the max char count on the relevant CKEditor textarea has been exceeded.
+ * @param { string } newText - The new text for the button.
+ */
+function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolean, newText: string) {
+    const buttonTagName = buttonElem.tagName.toLowerCase();
+
+    switch (buttonTagName) {
+        case "input":
+            buttonElem.setAttribute("value", newText);
+            break;
+        case "button":
+            buttonElem.innerHTML = newText;
+            break;
+        default:
+            throw "Unsupported button tag name '" + buttonTagName + "'.";
+    }
+
+    (buttonElem as HTMLInputElement | HTMLButtonElement).disabled = maxCharCountExceeded;
+
+    if (maxCharCountExceeded) {
+        buttonElem.setAttribute("data-ckEditorMaxCharCountExceededAtLastCheck", "");
+    } else {
+        buttonElem.removeAttribute("data-ckEditorMaxCharCountExceededAtLastCheck");
+    }
+}
+
+/**
+ * Add event listeners for the EDITOR__MAX_CHAR_COUNT_EXCEEDED and EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events.
+ * When the max char count has been exceeded on the ckeditorSourceEl, disable the form's submit button(s).
+ * When the max char count is no longer exceeded on all ckeditor source elements in the form, re-enable the submit button(s).
+ *
+ * Some testing URLS (sales data):
+ *  - https://vagrant.dev.schoolbox.cloud/adminv2/summative-report/create (single submit <input>)
+ *  - https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
+ *  - https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
+ *  - https://vagrant.dev.schoolbox.cloud/curriculum (
+ *       Vue example using config.addMaxCharCountDefaultEventListeners: false
+ *       (The default event listeners directly manipulate the DOM, and in Vue land that should be avoided.
+ *        Specifically, directly manipulating the DOM can cause reactivity to break in tracked properties.
+ *        https://www.danvega.dev/blog/2019/04/18/tips-for-vue-developers-avoid-directly-manipulating-the-dom/)
+ *    )
+ *
+ *  This function is not intended to handle every possible configuration of CKEditor fields inside forms.  If this
+ *  function does not disable/enable the submit form button in a specific case, it may be best to handle that case
+ *  separately.  See for example the special case handling of the EDITOR__MAX_CHAR_COUNT_EXCEEDED and
+ *  EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events in vue/components/ckeditor/add-comment-input.vue./**
+ * @param { HTMLElement } ckeditorSourceEl - The textarea element to which the CKEditor has been attached.
+ * @param { HTMLFormElement } containingForm - The form the submit buttons submit.
+ * @param { Array<HTMLElement> } submitButtons - The submit buttons that submit the containingForm.
+ */
+function addListenersForDisablingSubmitButtons(
+    ckeditorSourceEl: HTMLElement,
+    containingForm: HTMLFormElement | null,
+    submitButtons: Array<HTMLElement>
+) {
+    for (const button of submitButtons) {
+        // Now we know we have a button, assign it to a const.
+        const submitButton: HTMLElement = button;
+        const buttonTextOriginal: string = getButtonText(submitButton);
+
+        ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, function () {
+            changeButtonState(submitButton, true, buttonTextOriginal + getButtonTextDisabledDueToStorageLimitSuffix());
+        });
+
+        ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, function () {
+            if (containingForm !== null) {
+                // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
+                if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
+                    changeButtonState(submitButton, false, buttonTextOriginal);
+                }
+            } else {
+                changeButtonState(submitButton, false, buttonTextOriginal);
+            }
+        });
+    }
+}
+
+/**
  * To display the warning when the character limit has been reached.
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor has replaced
  * @param { Editor } editor - the CKEditor instance
@@ -205,8 +308,8 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
                     let oneOrMoreEditorsAreOverfilled = false;
 
                     // Check each CKEditor to see whether the content storage limit has been exceeded.
-                    Object.values(window.sbProps.editors).forEach((editor) => {
-                        const container = editor.plugins.get("WordCount").wordCountContainer;
+                    Object.values(window.sbProps.editors).forEach((ed) => {
+                        const container = ed.plugins.get("WordCount").wordCountContainer;
                         if (container.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
                             oneOrMoreEditorsAreOverfilled = true;
                         }
@@ -225,108 +328,5 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
         );
 
         config.editorDeletedEventListenerAdded = true;
-    }
-}
-
-/**
- * Return the button text for buttons that are <input> or <button>.
- * @param { Element } buttonElem - The button whose text we want returned.
- * @returns { string|null } - The button text or null if no text could be read from the button.
- */
-function getButtonText(buttonElem: Element) {
-    const buttonTagName = buttonElem.tagName.toLowerCase();
-    let buttonText = null;
-
-    switch (buttonTagName) {
-        case "input":
-            buttonText = buttonElem.getAttribute("value");
-            break;
-        case "button":
-            buttonText = buttonElem.innerHTML;
-            break;
-        default:
-            throw "Unsupported button tag name '" + buttonTagName + "'.";
-    }
-
-    return buttonText ?? "";
-}
-
-/**
- * Add event listeners for the EDITOR__MAX_CHAR_COUNT_EXCEEDED and EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events.
- * When the max char count has been exceeded on the ckeditorSourceEl, disable the form's submit button(s).
- * When the max char count is no longer exceeded on all ckeditor source elements in the form, re-enable the submit button(s).
- *
- * Some testing URLS (sales data):
- *  - https://vagrant.dev.schoolbox.cloud/adminv2/summative-report/create (single submit <input>)
- *  - https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
- *  - https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
- *  - https://vagrant.dev.schoolbox.cloud/curriculum (
- *       Vue example using config.addMaxCharCountDefaultEventListeners: false
- *       (The default event listeners directly manipulate the DOM, and in Vue land that should be avoided.
- *        Specifically, directly manipulating the DOM can cause reactivity to break in tracked properties.
- *        https://www.danvega.dev/blog/2019/04/18/tips-for-vue-developers-avoid-directly-manipulating-the-dom/)
- *    )
- *
- *  This function is not intended to handle every possible configuration of CKEditor fields inside forms.  If this
- *  function does not disable/enable the submit form button in a specific case, it may be best to handle that case
- *  separately.  See for example the special case handling of the EDITOR__MAX_CHAR_COUNT_EXCEEDED and
- *  EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events in vue/components/ckeditor/add-comment-input.vue./**
- * @param { HTMLElement } ckeditorSourceEl - The textarea element to which the CKEditor has been attached.
- * @param { HTMLFormElement } containingForm - The form the submit buttons submit.
- * @param { Array<HTMLElement> } submitButtons - The submit buttons that submit the containingForm.
- */
-function addListenersForDisablingSubmitButtons(
-    ckeditorSourceEl: HTMLElement,
-    containingForm: HTMLFormElement | null,
-    submitButtons: Array<HTMLElement>
-) {
-    for (let button of submitButtons) {
-        // Now we know we have a button, assign it to a const.
-        const submitButton: HTMLElement = button;
-        const buttonTextOriginal: string = getButtonText(submitButton);
-
-        ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, function () {
-            changeButtonState(submitButton, true, buttonTextOriginal + getButtonTextDisabledDueToStorageLimitSuffix());
-        });
-
-        ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, function () {
-            if (containingForm !== null) {
-                // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
-                if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
-                    changeButtonState(submitButton, false, buttonTextOriginal);
-                }
-            } else {
-                changeButtonState(submitButton, false, buttonTextOriginal);
-            }
-        });
-    }
-}
-
-/**
- * Change button text for buttons that are <input> or <button>.
- * @param { HTMLElement } buttonElem - The button whose state is to change.
- * @param { boolean } maxCharCountExceeded - Whether the max char count on the relevant CKEditor textarea has been exceeded.
- * @param { string } newText - The new text for the button.
- */
-function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolean, newText: string) {
-    const buttonTagName = buttonElem.tagName.toLowerCase();
-
-    switch (buttonTagName) {
-        case "input":
-            buttonElem.setAttribute("value", newText);
-            break;
-        case "button":
-            buttonElem.innerHTML = newText;
-            break;
-        default:
-            throw "Unsupported button tag name '" + buttonTagName + "'.";
-    }
-
-    (buttonElem as HTMLInputElement | HTMLButtonElement).disabled = maxCharCountExceeded;
-
-    if (maxCharCountExceeded) {
-        buttonElem.setAttribute("data-ckEditorMaxCharCountExceededAtLastCheck", "");
-    } else {
-        buttonElem.removeAttribute("data-ckEditorMaxCharCountExceededAtLastCheck");
     }
 }
