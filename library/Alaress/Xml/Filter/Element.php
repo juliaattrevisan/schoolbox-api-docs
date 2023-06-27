@@ -27,12 +27,14 @@ class Element extends Base
      *
      * @return bool true if the current element is acceptable, otherwise false.
      */
-    public function accept()
+    public function accept(): bool
     {
         $state  = $this->current();
         $reader = $state->getReader();
         if (
+            /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
             $reader->nodeType === XMLReader::ELEMENT
+            /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
             || ($reader->nodeType === XMLReader::END_ELEMENT && $reader->isEmptyElement)
         ) {
             return true;

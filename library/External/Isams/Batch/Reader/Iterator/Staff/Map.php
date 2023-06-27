@@ -15,7 +15,7 @@ class External_Isams_Batch_Reader_Iterator_Staff_Map extends External_Isams_Batc
     /**
      * @return array
      */
-    public function current()
+    public function current(): array
     {
         $current = $this->getInnerIterator()->current();
         $result  = new SimpleXMLElement($current->getReader()->readOuterXml());

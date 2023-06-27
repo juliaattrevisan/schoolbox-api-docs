@@ -12,7 +12,6 @@ namespace Alaress\Csv;
 
 class Reader implements \Iterator
 {
-
     /**
      * The column list for this reader. Each row returned will be mapped to its
      * corresponding position in this list.
@@ -106,7 +105,7 @@ class Reader implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         $parsed_row  = [];
         $column_list = $this->getColumnList();
@@ -136,7 +135,7 @@ class Reader implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->current_key++;
         $this->current_row = $this->loadRow();
@@ -145,7 +144,7 @@ class Reader implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->current_key;
     }
@@ -153,7 +152,7 @@ class Reader implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->current_row !== false;
     }
@@ -161,7 +160,7 @@ class Reader implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->current_key = 0;
         $this->current_row = [];

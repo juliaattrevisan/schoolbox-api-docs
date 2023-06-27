@@ -18,7 +18,7 @@ class ResultIterator extends IteratorIterator
     /**
      * @inheritDoc
      */
-    public function current()
+    public function current(): mixed
     {
         return array_change_key_case($this->getInnerIterator()->current(), CASE_LOWER);
     }

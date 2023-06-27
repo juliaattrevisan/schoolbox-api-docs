@@ -16,7 +16,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
     /**
      * @return array
      */
-    public function current()
+    public function current(): array
     {
         /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();

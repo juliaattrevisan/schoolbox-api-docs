@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Csv\ValidCSV;
+use Iterator;
 
 /**
  * Class Reader
@@ -19,7 +20,7 @@ use Alaress\Csv\ValidCSV;
  *
  * @package Schoolbox\Admin\Import\Profile
  */
-class Reader implements \Iterator
+class Reader implements Iterator
 {
     /**
      * Field delimiter for the CSV file
@@ -244,10 +245,10 @@ class Reader implements \Iterator
      * Otherwise try to return an associative array of (expected column, value)
      *
      * @link  https://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @return array|bool Can return any type.
      * @since 5.0.0
      */
-    public function current()
+    public function current(): array|bool
     {
         /* If column headings don't matter, just return the current row without any transformations
          */
@@ -388,10 +389,10 @@ class Reader implements \Iterator
     /**
      * Return the key of the current element
      * @link  https://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * @return int scalar on success, or null on failure.
      * @since 5.0.0
      */
-    public function key()
+    public function key(): int
     {
         return $this->currentKey;
     }

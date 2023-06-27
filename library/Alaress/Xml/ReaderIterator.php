@@ -50,12 +50,14 @@ class ReaderIterator implements \Iterator
      *
      * @return void
      */
-    public function next()
+    public function next(): void
     {
         $this->elementCount++;
 
         // Pop this node name off the stack if I'm done with it
+        /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
         if ($this->reader->nodeType === XMLReader::ELEMENT) {
+            /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
             if ($this->reader->isEmptyElement) {
                 array_pop($this->elementStack);
             }
@@ -69,10 +71,12 @@ class ReaderIterator implements \Iterator
      *
      * @return State Current state of $this->reader
      */
-    public function current()
+    public function current(): mixed
     {
         // Push this node name on the stack for navigation
+        /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
         if ($this->reader->nodeType === XMLReader::ELEMENT) {
+            /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
             array_push($this->elementStack, $this->reader->name);
         }
         return new State($this->reader, $this->elementStack);
@@ -83,7 +87,7 @@ class ReaderIterator implements \Iterator
      *
      * @return int
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->elementCount;
     }
@@ -93,7 +97,7 @@ class ReaderIterator implements \Iterator
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->reader->read();
     }
@@ -103,7 +107,7 @@ class ReaderIterator implements \Iterator
      *
      * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
     }
 }

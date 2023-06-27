@@ -71,18 +71,18 @@ class PDO extends BasePDO
      *
      * Storm expects: public function execute($statement, $driver_options = [])
      *
-     * @return bool|PDOStatement
+     * @return false|PDOStatement
      */
-    public function prepare($statement, $options = null)
+    public function prepare($query, $options = null): false|PDOStatement
     {
-        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $statement);
+        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $query);
         return $this->lastStatement;
     }
 
     /**
      * @inheritdoc
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         return db2_autocommit($this->getConnectionWithCheck(), DB2_AUTOCOMMIT_OFF);
     }
@@ -90,7 +90,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function commit()
+    public function commit(): bool
     {
         return db2_commit($this->getConnectionWithCheck());
     }
@@ -98,7 +98,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function rollBack()
+    public function rollBack(): bool
     {
         return db2_rollback($this->getConnectionWithCheck());
     }
@@ -106,7 +106,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function inTransaction()
+    public function inTransaction(): bool
     {
         return db2_autocommit($this->getConnectionWithCheck()) == 0;
     }
@@ -114,7 +114,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function setAttribute($attribute, $value)
+    public function setAttribute($attribute, $value): bool
     {
         return db2_set_option($this->getConnectionWithCheck(), [$attribute => $value], 1);
     }
@@ -122,7 +122,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function exec($statement)
+    public function exec($statement): false|int
     {
         $resource = db2_prepare($this->getConnectionWithCheck(), $statement, ['cursor' => DB2_SCROLLABLE]);
 
@@ -145,9 +145,9 @@ class PDO extends BasePDO
 
     /**
      * @inheritdoc
-     * @return bool|PDOStatement
+     * @return false|PDOStatement
      */
-    public function query($statement, $mode = BasePDO::ATTR_DEFAULT_FETCH_MODE, ...$ctorargs)
+    public function query($statement, $mode = BasePDO::ATTR_DEFAULT_FETCH_MODE, ...$ctorargs): PDOStatement|false
     {
         $resource = db2_prepare($this->getConnectionWithCheck(), $statement, ['cursor' => DB2_SCROLLABLE]);
 
@@ -155,7 +155,8 @@ class PDO extends BasePDO
             return false;
         }
 
-        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement, $mode);
+        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement);
+        $this->lastStatement->setFetchMode($mode);
 
         if (db2_execute($resource)) {
             return $this->lastStatement;
@@ -167,7 +168,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function lastInsertId($name = null)
+    public function lastInsertId($name = null): false|string
     {
         if ($name != null) {
             throw new Exception("The sequence object name parameter is not supported by DB2 wrapper.");
@@ -179,7 +180,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function errorCode()
+    public function errorCode(): ?string
     {
         // Return the error code from the last statement executed if one had been executed via db2_prepare() or db2_exec()
 
@@ -195,23 +196,25 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function errorInfo()
+    public function errorInfo(): array
     {
         // Return the error code from the last statement executed if one had been executed via db2_prepare() or db2_exec()
+        $errorCode = $this->errorCode();
 
         if ($this->lastStatement != null) {
-            return db2_stmt_errormsg($this->lastStatement->getStatement());
+            $errorMessage = db2_stmt_errormsg($this->lastStatement->getStatement());
+        } else {
+            $errorMessage = db2_conn_errormsg($this->getConnectionWithCheck());
         }
 
-        // If there was no statement executed, return the last connection error
-
-        return db2_conn_errormsg($this->getConnectionWithCheck());
+        // Don't know the driver error code: just return 0
+        return [$errorCode ?? '', 0, $errorMessage];
     }
 
     /**
      * @inheritdoc
      */
-    public function getAttribute($attribute)
+    public function getAttribute($attribute): mixed
     {
         return db2_get_option($this->getConnectionWithCheck(), $attribute);
     }
@@ -219,7 +222,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function quote($string, $parameter_type = BasePDO::PARAM_STR)
+    public function quote($string, $parameter_type = BasePDO::PARAM_STR): false|string
     {
         return db2_escape_string($string);
     }

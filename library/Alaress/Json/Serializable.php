@@ -11,7 +11,6 @@ namespace Alaress\Json;
 
 use Alaress\Json\Decorator\IDecorator;
 use JsonSerializable;
-use ReturnTypeWillChange;
 
 /**
  * Interface that extends the core JsonSerializable interface so that decoration strategies can be specified
@@ -30,6 +29,5 @@ interface Serializable extends JsonSerializable
      * @param IDecorator ...$decorators
      * @return mixed
      */
-    #[ReturnTypeWillChange]
     public function jsonSerialize(IDecorator ...$decorators): mixed;
 }

@@ -22,7 +22,7 @@ abstract class Base extends IteratorIterator
      * @return State The current element value.
      * @throws UnexpectedValueException if it wasn't a State
      */
-    public function current()
+    public function current(): mixed
     {
         $state = parent::current();
         if (!$state instanceof State) {

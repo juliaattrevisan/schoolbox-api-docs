@@ -12,7 +12,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
     /**
      * @return array
      */
-    public function current()
+    public function current(): array
     {
         /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();
