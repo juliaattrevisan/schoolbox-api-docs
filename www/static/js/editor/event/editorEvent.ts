@@ -5,6 +5,7 @@ export enum EditorEvent {
     EDITOR__CREATE = "EDITOR__CREATE",
     EDITOR__CREATED = "EDITOR__CREATED",
     EDITOR__CHECK_DATA = "EDITOR__CHECK_DATA",
+    EDITOR__DELETED = "EDITOR__DELETED",
 
     /**
      * Fires following a change the textarea content when config.maxCharCount has been exceeded.

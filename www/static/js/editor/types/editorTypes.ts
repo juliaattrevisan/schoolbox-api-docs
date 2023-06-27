@@ -11,6 +11,7 @@ export enum EditorToolbar {
  * The config object for the editor
  */
 export interface EditorConfig {
+    editorDeletedEventListenerAdded: boolean; // True if the onEditorDeleted event listener has been added to window.document.
     targetElements: string[]; // the elements to target for the editor
     toolbar?: EditorToolbar.DEFAULT | EditorToolbar.COMMENT | EditorToolbar.SIMPLE; // the toolbar to use for the editor
     hasTokens?: boolean; // whether or not to enable the tokens plugin

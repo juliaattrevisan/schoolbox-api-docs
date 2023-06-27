@@ -148,30 +148,21 @@
 
             element.confirmDialog({
                 text: 'Are you sure you want to delete this field?',
-                confirmEvent: function() {
-                    $(element).parents('li').remove();
+                confirmEvent: function () {
+                    const lis = element.closest('li');
+                    const li = lis[0];
+                    const textarea = li.querySelector('textarea');
+                    const textareaId = textarea.getAttribute('id');
+
+                    // Delete editor instance from sbProps.editors, then dispatch an event in case there are listeners.
+                    delete window.sbProps.editors[textareaId];
+                    document.dispatchEvent(new CustomEvent("EDITOR__DELETED"));
+
+                    $(li).remove();
 
                     /* Mandate at least one field existing at all times
                      */
                     refreshDeletes();
-
-                    const $saveButton = $('#save-button');
-
-                    if (
-                        // If submit button is disabled, and there are no overfilled ckeditor fields...
-                        $saveButton.prop('disabled') &&
-                        $('[data-maxCharCountExceededAtLastCheck=1]').length === 0
-                    ) {
-                        // Re-enable submit button and remove storage limit suffix.
-                        // (This step is needed when there is one overfilled field (that has caused the submit button to
-                        //  be disabled), and that field is deleted by the user.
-                        $saveButton.prop('disabled', false);
-                        $saveButton.attr(
-                            'value',
-                            // TODO: Use function getButtonTextDisabledDueToStorageLimitSuffix() from wordCountSettings.ts here?
-                            $saveButton.attr('value').replace(' (disabled because content storage limit exceeded)', '')
-                        );
-                    }
                 }
             });
         });
