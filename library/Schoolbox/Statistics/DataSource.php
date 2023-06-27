@@ -195,10 +195,12 @@ class DataSource
         $query = "
             SELECT      {$this->folderLogMapper->getColumnString('hl')},
                         {$this->folderLogMapper->getJoinColumnString('user', 'u')},
+                        {$this->folderLogMapper->getJoinColumnString('user.pronoun', 'op')},
                         {$this->folderLogMapper->getJoinColumnString('user.role', 'ur')}
             FROM        `{$this->folderLogMapper->getTable()}` AS `hl`
             LEFT JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
             LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
+            LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.pronoun', 'u', 'op')}
             WHERE       hl.folder_id = :folderId AND
                         datetime BETWEEN :startDate AND :endDate
                         {$roleClause}
@@ -214,7 +216,10 @@ class DataSource
         foreach ($statement as $row) {
             /** @var \Schoolbox\Resource\Folder\Log\Model $record */
             $record = $this->folderLogMapper->hydrate($row, 'hl');
-            $record->setUser($this->folderLogMapper->hydrateJoin($row, 'user', 'u'));
+            /** @var \Schoolbox\User $user */
+            $user = $this->folderLogMapper->hydrateJoin($row, 'user', 'u');
+            $user->setPronoun($this->folderLogMapper->hydrateJoin($row, 'user.pronoun', 'op'));
+            $record->setUser($user);
             $user = $record->getUser();
             if (! is_null($user)) {
                 $record->getUser()->setRole($this->folderLogMapper->hydrateJoin($row, 'user.role', 'ur'));
