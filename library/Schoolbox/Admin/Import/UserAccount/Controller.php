@@ -261,14 +261,15 @@ class Controller extends Base
      * Parses lines out of the logger.
      *
      * @param CacheableLoggerInterface $logger
-     * @param bool                     $preview
+     * @param bool                     $preview whether the log is for preview mode
      * @return array
      * @throws \JsonException
      * @throws \League\Flysystem\FilesystemException
      */
     protected function parseLogLines(CacheableLoggerInterface $logger, bool $preview): array
     {
-        $expiryAt = $preview ? \Alaress_Date_Format::now()->addDays(1) : null;
+        // Set the storage expire date to be the next day for preview mode and 14 days later for persist mode
+        $expiryAt = \Alaress_Date_Format::now()->addDays($preview ? 1 : 14);
         $stream   = $this->filesystemProxy->readStream($logger->flushToStorage('UserAccountImport.log', $expiryAt));
         $logLines = [];
 

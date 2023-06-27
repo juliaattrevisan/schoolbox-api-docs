@@ -9,9 +9,7 @@ use RobRichards\XMLSecLibs\XMLSecurityDSig;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-$logger = Config::get('saml_debug')
-    ? new \Alaress\Lumberjack\Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'saml')
-    : new \Alaress\Lumberjack\Logger(null);
+$logger = new \Alaress\Lumberjack\Logger(STDOUT, STDOUT, Config::get('saml_debug') ? \Monolog\Logger::DEBUG : \Monolog\Logger::INFO, [], true, 'saml');
 
 $spBaseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
 
@@ -47,7 +45,7 @@ if (Config::get('saml_auth_context') !== 'unspecified') {
     $settingsInfo['security']['requestedAuthnContextComparison'] = Config::get('saml_auth_comparison');
 }
 
-$logger->info(json_encode($settingsInfo));
+$logger->debug(json_encode($settingsInfo));
 
 try {
     $url = new \Schoolbox\Url\Uri(Config::get('saml_idp_metadata_url'));
@@ -62,7 +60,7 @@ try {
             $settingsInfo = IdPMetadataParser::injectIntoSettings($settingsInfo, IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
         } catch (Exception $e) {
             $cache->invalidateCache();
-            $logger->info("Invalidating cache as we failed to get valid metadata from IDP");
+            $logger->warning("Invalidating cache as we failed to get valid metadata from IDP");
         }
     }
 } catch (Exception $e) {
@@ -106,7 +104,7 @@ function useSAMLKerberos(\Alaress\Lumberjack\Logger $logger)
 
     // If whitelist not in use, don't use kerberos at all
     if (trim(Config::get('saml_krb_whitelist')) == '') {
-        $logger->info("Kerberos whitelist not in use");
+        $logger->debug("Kerberos whitelist not in use");
         return false;
     }
 
@@ -114,7 +112,7 @@ function useSAMLKerberos(\Alaress\Lumberjack\Logger $logger)
 
 
     if (!IpUtils::checkIp(Session::getIP(), array_map('trim', explode(',', Config::get('saml_krb_whitelist'))))) {
-        $logger->info("IP not in kerberos whitelist");
+        $logger->debug("IP not in kerberos whitelist");
         return false;
     }
 
@@ -131,11 +129,11 @@ function useSAMLKerberos(\Alaress\Lumberjack\Logger $logger)
      *
      * Errs on the side of kerberos than non-kerberos
      */
-    $logger->info("IP in kerberos whitelist, attempting browser/platform check");
+    $logger->debug("IP in kerberos whitelist, attempting browser/platform check");
 
     $browser = new BrowserDetection();
 
-    $logger->info(json_encode($browser->getUserAgent()));
+    $logger->debug(json_encode($browser->getUserAgent()));
     if (!$browser->isMobile()) {
         if ($browser->getPlatform() == BrowserDetection::PLATFORM_WINDOWS || $browser->getPlatform() == BrowserDetection::PLATFORM_MACINTOSH) {
             switch ($browser->getName()) {

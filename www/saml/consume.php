@@ -19,21 +19,21 @@ $auth = new OneLogin\Saml2\Auth($settingsInfo);
 /* Handle Single Logout commands */
 if (isset($_GET['sls'])) {
     if (isset($_GET['SAMLRequest'])) {
-        $logger->info('SLS Request:' . base64_decode($_GET['SAMLRequest']));
+        $logger->debug('SLS Request:' . base64_decode($_GET['SAMLRequest']));
     }
     try {
-        $logger->info("Attempting SLS");
+        $logger->debug("Attempting SLS");
         $auth->processSLO(false, null, true);
     } catch (OneLogin\Saml2\Error $e) {
-        $logger->info("SLS Error: " . $e->getMessage());
+        $logger->error("SLS Error: " . $e->getMessage());
         error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
     }
 
     $errors = $auth->getErrors();
     if (!empty($errors)) {
         $errorReason = $auth->getLastErrorReason() ?? end($errors);
-        $logger->info("SLS Error(s): " . json_encode($errors));
-        $logger->info("SLS Error: " . $errorReason);
+        $logger->error("SLS Error(s): " . json_encode($errors));
+        $logger->error("SLS Error: " . $errorReason);
         error(ErrorMapper::ERROR_PROCESSING, $errorReason);
     }
 
@@ -50,7 +50,7 @@ if (isset($_GET['sls'])) {
         SitePage::localRedir("/login/");
     }
 } else if (isset($_POST['SAMLResponse'])) {
-    $logger->info(base64_decode($_POST['SAMLResponse']));
+    $logger->debug(base64_decode($_POST['SAMLResponse']));
 
     if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
         $requestID = $_SESSION['AuthNRequestID'];
@@ -82,12 +82,12 @@ if (isset($_GET['sls'])) {
         $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
         unset($_SESSION['AuthNRequestID']);
 
-        $logger->info("SAML auth successful");
+        $logger->debug("SAML auth successful");
         SitePage::localRedir($page);
     } else {
         $msg = 'Invalid SAML user.';
         $errorTracker[] = $msg;
-        $logger->info($msg);
+        $logger->warning($msg);
         error(ErrorMapper::ERROR_USER_NOT_FOUND);
     }
 } else {
