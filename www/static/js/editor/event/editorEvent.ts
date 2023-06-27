@@ -18,3 +18,13 @@ export enum EditorEvent {
      */
     EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED = "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
 }
+
+// Types for information objects sent with events. /////////////////////////////////////////////////////////////////////
+
+/**
+ * When an EDITOR__DELETED event is dispatched, include this info:
+ */
+export type EditorDeletedEventInfo = {
+    containingFormId: string,
+    submitButtons: Array<HTMLInputElement|HTMLButtonElement>
+};

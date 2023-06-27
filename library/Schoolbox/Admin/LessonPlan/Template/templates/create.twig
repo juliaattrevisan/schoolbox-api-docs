@@ -156,7 +156,13 @@
 
                     // Delete editor instance from sbProps.editors, then dispatch an event in case there are listeners.
                     delete window.sbProps.editors[textareaId];
-                    document.dispatchEvent(new CustomEvent("EDITOR__DELETED"));
+                    document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
+                        detail: {
+                            // See definition of type EditorDeletedEventInfo in editorEvents.ts.
+                            containingFormId:'lesson-plan-template-form',
+                            submitButtons: [document.getElementById('save-button')]
+                        }
+                    }));
 
                     $(li).remove();
 

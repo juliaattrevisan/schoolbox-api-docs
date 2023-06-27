@@ -5,13 +5,12 @@ export enum EditorToolbar {
     DEFAULT = "default",
     COMMENT = "comment",
     SIMPLE = "simple",
-}
+};
 
 /**
  * The config object for the editor
  */
 export interface EditorConfig {
-    editorDeletedEventListenerAdded: boolean; // True if the onEditorDeleted event listener has been added to window.document.
     targetElements: string[]; // the elements to target for the editor
     toolbar?: EditorToolbar.DEFAULT | EditorToolbar.COMMENT | EditorToolbar.SIMPLE; // the toolbar to use for the editor
     hasTokens?: boolean; // whether or not to enable the tokens plugin
@@ -20,8 +19,8 @@ export interface EditorConfig {
     addToToolbar?: string[]; // the list of extra plugins to add to the ckeditor outside of the scope of the EditorToolbar options
     removeFromToolbar?: string[]; // the list of plugins to remove from the ckeditor outside of the scope of the EditorToolbar options
     maxCharCount?: number; // The maximum number of bytes allowed in the editor.  For ASCII text, 1 byte = 1 character.  Unicode characters can be multi-byte.
-    maxCharCountSubmitButtons?: HTMLElement[]; // array of submit buttons to disable/enable when the storage limit is exceeded/no-longer-exceeded.
+    maxCharCountDocumentEventListenersAdded: boolean; // True if event listeners pertaining to maxCharCount have been added to the document.  Document event listeners must only be added once, even if there are multiple CKEditor instances on the page.
     addMaxCharCountDefaultEventListeners?: boolean; // Whether to add the default event listeners for dealing with events relating to max char count.
     showWordCount?: boolean; // whether or not to show the word count
     fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal
-}
+};
