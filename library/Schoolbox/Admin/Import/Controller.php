@@ -558,9 +558,7 @@ class Controller extends ConfigController
      */
     private function spawnLogger(): Logger
     {
-        $logFile = fopen($this->getConfigLoader()->get('logs_dir') . '/suds_live.log', 'a');
-
-        return new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
+        return new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'suds');
     }
 
 

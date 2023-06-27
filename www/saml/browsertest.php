@@ -15,7 +15,7 @@ echo "\nPlatform: " . $browser->getPlatform() ;
 echo "\nMobile: " . ($browser->isMobile() ? 'Yes' : 'No');
 
 echo "\nAttempt to use Kerberos/WIA with SAML for this browser? " . '' . "\n";
-var_dump(useSAMLKerberos());
+var_dump(useSAMLKerberos(new \Alaress\Lumberjack\Logger(null)));
 
 if (trim(Config::get('saml_krb_whitelist')) == '') {
     echo "\nIs this IP address (" . Session::getIP() . ") within the Kerberos/WIA whitelist?\n";

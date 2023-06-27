@@ -129,7 +129,7 @@ class Controller extends Base
             'template' => "@{$this->basename}/preview.twig",
             'data' => $this->getBaseData() + [
                 'log' => [
-                    'lines' => $this->parseLogLines($logger),
+                    'lines' => $this->parseLogLines($logger, true),
                 ],
                 'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
@@ -161,7 +161,7 @@ class Controller extends Base
             'template' => "@{$this->basename}/import.twig",
             'data' => $this->getBaseData() + [
                 'log' => [
-                    'lines' => $this->parseLogLines($logger)
+                    'lines' => $this->parseLogLines($logger, false)
                 ],
             ],
         ]);
@@ -261,12 +261,16 @@ class Controller extends Base
      * Parses lines out of the logger.
      *
      * @param CacheableLoggerInterface $logger
+     * @param bool                     $preview whether the log is for preview mode
      * @return array
-     * @throws \Schoolbox\File\Exception
+     * @throws \JsonException
+     * @throws \League\Flysystem\FilesystemException
      */
-    protected function parseLogLines($logger): array
+    protected function parseLogLines(CacheableLoggerInterface $logger, bool $preview): array
     {
-        $stream   = $this->filesystemProxy->readStream($logger->flushToStorage());
+        // Set the storage expire date to be the next day for preview mode and 14 days later for persist mode
+        $expiryAt = \Alaress_Date_Format::now()->addDays($preview ? 1 : 14);
+        $stream   = $this->filesystemProxy->readStream($logger->flushToStorage('UserAccountImport.log', $expiryAt));
         $logLines = [];
 
         while ($line = fgets($stream)) {

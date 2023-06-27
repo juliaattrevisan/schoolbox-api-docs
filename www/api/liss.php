@@ -25,7 +25,6 @@ $liss = new Receiver(
     $config->get('external_liss_default_event_type'),
     $config->get('external_liss_teacher_identifier'),
     (bool)$config->get('external_liss_storage_logging'),
-    $config->get('logs_dir'),
     $superuser,
     \Schoolbox\External\Connector\Log\Mapper::getInstance(),
     \Schoolbox\Resource\Storage\Mapper::getInstance()

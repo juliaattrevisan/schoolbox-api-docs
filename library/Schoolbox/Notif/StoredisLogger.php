@@ -87,11 +87,11 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
      * Take a snapshot of the logs in Redis and dump into Storage
      * Wipe the logs from Redis, beware.
      *
-     * @param string $basename
-     * @throws File\Exception
+     * @param string                    $basename
+     * @param \Alaress_Date_Format|null $expiryAt
      * @return Storage\Model
      */
-    public function flushToStorage($basename = '')
+    public function flushToStorage(string $basename = '', \Alaress_Date_Format|null $expiryAt = null): Storage\Model
     {
         if (!$basename) {
             // set the "file name" as {now}.log
@@ -115,7 +115,7 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
         fclose($fp);
 
         // save the tempfile to storage (will throw a File\Exception if it fails)
-        $storage = $this->receiver->accept($basename, $tempLocation, false);
+        $storage = $this->receiver->accept($basename, $tempLocation, false, $expiryAt);
 
         // all done - pass back the new object
         return $storage;

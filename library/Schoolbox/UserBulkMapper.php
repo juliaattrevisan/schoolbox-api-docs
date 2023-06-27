@@ -32,14 +32,14 @@ class UserBulkMapper extends UserMapper
      *
      * @var string
      */
-    private $outputMessage = '';
+    private string $outputMessage = '';
 
 
     /**
      * Bulk modify logger
      * @var Logger
      */
-    private $logger;
+    private Logger $logger;
 
 
     /**
@@ -47,8 +47,7 @@ class UserBulkMapper extends UserMapper
      */
     protected function postSetup()
     {
-        $file         = fopen($this->getConfigLoader()->get('logs_dir') . '/audit.log', 'a');
-        $this->logger = new Logger($file, null, 200, [], true);
+        $this->logger = new Logger();
     }
 
 

@@ -46,6 +46,7 @@ if (PHP_SAPI === 'cli') {
     }
 } else {
     // Web request
+    define('STDOUT', fopen('php://stdout', 'w'));
     $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
     $hostname = explode(':', $hostname)[0];
     foreach ($instances as $instanceIdKey => $instance) {

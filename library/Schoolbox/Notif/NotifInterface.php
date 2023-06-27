@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 
 interface NotifInterface extends LoggerInterface
 {
-
     /**
      * You will need to add to `\Schoolbox\Notif\Notif::SYSTEM_TOPICS` if you
      * want to log this topic to a log file.
@@ -22,7 +21,6 @@ interface NotifInterface extends LoggerInterface
     const TOPIC_NOTIFICATION = 'notif';   //     "           "   the notification system
     const TOPIC_DATABASE = 'db';          //     "           "   internal database events
     const TOPIC_APPLICATION = 'sb';       //     "           "   Schoolbox application events (ie. Mappers)
-    const TOPIC_SYNERGY = 'syn';          //     "           "   synergy database events
     const TOPIC_ADMIN = 'admin';          //     "           "   superuser events (includes assumption)
     const TOPIC_AUTH = 'login';           //     "           "   authentication events
     const TOPIC_CMS = 'cms';              //     "           "   cms events to be logged

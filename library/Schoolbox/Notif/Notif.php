@@ -35,7 +35,6 @@ class Notif implements NotifInterface
         self::TOPIC_NOTIFICATION,
         self::TOPIC_DATABASE,
         self::TOPIC_APPLICATION,
-        self::TOPIC_SYNERGY,
         self::TOPIC_ADMIN,
     ];
 

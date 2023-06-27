@@ -64,14 +64,20 @@ class Logger implements LoggerInterface
      * @param array    $fields
      * @param bool     $porcelain
      */
-    public function __construct($outStream = STDOUT, $errStream = null, $threshold = Monologger::INFO, $fields = array(), $porcelain = false)
-    {
-        $this->out = $outStream;
-        $this->err = $errStream;
+    public function __construct(
+        $outStream = STDOUT,
+        $errStream = null,
+        $threshold = Monologger::INFO,
+        $fields = [],
+        $porcelain = false,
+        ?string $module = null
+    ) {
+        $this->out       = $outStream;
+        $this->err       = $errStream;
         $this->porcelain = $porcelain;
 
 
-        $processors = array(new MicrotimeProcessor());
+        $processors = [new MicrotimeProcessor()];
 
         if (in_array(self::FIELD_MEM, $fields)) {
             $processors[] = new MemoryUsageProcessor(false);
@@ -87,7 +93,11 @@ class Logger implements LoggerInterface
             $processors[] = new ProcessIdProcessor();
         }
 
-        $this->log = new Monologger('cli', array(), $processors);
+        if ($module) {
+            $processors[] = new ModuleProcessor($module);
+        }
+
+        $this->log = new Monologger('cli', [], $processors);
         $this->setLevel($threshold);
     }
 
