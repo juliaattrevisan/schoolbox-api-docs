@@ -507,8 +507,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
      */
     public function reviewResponse($page, $attemptId, $question_id)
     {
-        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
-
+        $existing       = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $existingAnswer = null;
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);
         }
@@ -516,6 +516,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
+            /** @var stdClass[] $allAnswers */
             $allAnswers = unserialize($answerGroup['answer']);
 
             $other = new StdClass();
