@@ -101,9 +101,9 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/index.twig',
                 'data' => [
-                    'pageCurrent'    => $this->router->generate('adminImportFolder.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportFolder.getIndex')),
-                    'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportFolder')->getAllNodes(),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
+                    'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportFolder')->getAllNodes(),
                     'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
                     'roles' => $this->roleMapper->findAll(),
                     'attachzone' => $this->getAttachZone(),
@@ -156,8 +156,8 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/importResults.twig',
                 'data' => [
-                    'pageCurrent'    => $this->router->generate('adminImportFolder.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportFolder.getIndex')),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
                     'results'        => $allFolders,
                     'perform'        => $performMode,
                 ],

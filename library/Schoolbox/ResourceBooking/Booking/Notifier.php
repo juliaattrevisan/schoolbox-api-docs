@@ -19,7 +19,6 @@ namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-use Aura\Router\Router;
 use Monolog\Logger;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
@@ -33,21 +32,12 @@ use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier
 {
-
     /**
      * Namespace slug, as defined in msg_namespace table.
      *
      * @var string
      */
     protected $slug = NSMapper::NS_RESOURCE_BOOKING;
-
-    /**
-     * A router - injected for the purpose of generating URLs for resource
-     * booking related items.
-     *
-     * @var Router
-     */
-    protected $router;
 
 
     /**

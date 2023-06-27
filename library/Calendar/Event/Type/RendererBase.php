@@ -9,7 +9,7 @@
 namespace Calendar\Event\Type;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\User;
 
 abstract class RendererBase implements RendererInterface
@@ -37,25 +37,25 @@ abstract class RendererBase implements RendererInterface
 
 
     /**
-     * @var Router
+     * @var Generator
      */
-    private $router;
+    private $routeGenerator;
 
 
     /**
      * Constructor
      *
      * @param Authorizer $authorizer
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param User       $user
      * @param User       $viewer
      */
-    public function __construct(Authorizer $authorizer, Router $router, User $user, User $viewer)
+    public function __construct(Authorizer $authorizer, Generator $routeGenerator, User $user, User $viewer)
     {
-        $this->authorizer = $authorizer;
-        $this->router     = $router;
-        $this->user       = $user;
-        $this->viewer     = $viewer;
+        $this->authorizer     = $authorizer;
+        $this->routeGenerator = $routeGenerator;
+        $this->user           = $user;
+        $this->viewer         = $viewer;
     }
 
 
@@ -71,7 +71,7 @@ abstract class RendererBase implements RendererInterface
     {
         if ($this->authorizer->isPathAuthorizedForUser($name, $params, $this->viewer)) {
             try {
-                return $this->router->generate($name, $params);
+                return $this->routeGenerator->generate($name, $params);
             } catch (\Aura\Router\Exception\RouteNotFound $e) {
                 // the route does not exist, the module may not be enabled?
                 return false;

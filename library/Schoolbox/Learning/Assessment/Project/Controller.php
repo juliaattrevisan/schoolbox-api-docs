@@ -284,7 +284,7 @@ class Controller extends Assessment\Controller
          * Always go to the status screen when a project has been created,
          * but send the return url with it
          */
-        $redirect = $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
+        $redirect = $this->routeGenerator->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
 
         if ($postReturnUrl) {
             $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";

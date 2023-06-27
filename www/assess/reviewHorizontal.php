@@ -380,7 +380,7 @@ function getBreadcrumbsForQuiz($di, $assessId): array
 {
     $authorizer        = $di->get('authorizer');
     $assessment        = $di->get('assessmentDataSource')->findByQuizId($assessId, null);
-    $breadcrumbFactory = new BreadcrumbFactory($di->get('router'), $authorizer, Access::getInstance());
+    $breadcrumbFactory = new BreadcrumbFactory($di->get('router.generator'), $authorizer, Access::getInstance());
     $breadcrumbs       = $breadcrumbFactory->produceFromAssessment($assessment, $_SESSION['user']);
     $breadcrumbsArray  = [];
 

@@ -11,7 +11,7 @@ namespace Schoolbox\Fixtures\Result;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use External_UserInterface;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
@@ -87,12 +87,11 @@ class Module extends RestfulModule
     /**
      * {@inheritdoc}
      *
-     * @param Router $router
      * @param string $basePath
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        parent::initRoutes($router, $basePath);
+        parent::initRoutes($basePath);
 
         $collection = $this->getCollectionName();
 
@@ -112,11 +111,11 @@ class Module extends RestfulModule
         ];
 
         foreach ($routes['GET'] as $path => $controllerMethod) {
-            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addGetRoute($controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 

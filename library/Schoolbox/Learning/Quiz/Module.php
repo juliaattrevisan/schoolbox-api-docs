@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Quiz;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -64,12 +64,11 @@ class Module extends RestfulModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        parent::initRoutes($router, $basePath);
+        parent::initRoutes($basePath);
 
         $routes = [
             'GET' => [
@@ -88,11 +87,11 @@ class Module extends RestfulModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($alias, $basePath, $path);
         }
 
         foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
+            $this->addPostRoute($alias, $basePath, $path);
         }
     }
 

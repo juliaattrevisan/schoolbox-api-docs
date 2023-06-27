@@ -23,8 +23,7 @@ class Controller extends Base
     public function getRouteList()
     {
         $routeSummaries = [];
-        foreach ($this->getRouter()->getRoutes() as $route) {
-            /** @var Route $route */
+        foreach ($this->router->getMap()->getRoutes() as $route) {
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             try {
                 $module = Registry::buildModuleFromRegistration($this->di, $parsedName['controller']);
@@ -44,8 +43,7 @@ class Controller extends Base
                 continue;
             }
 
-            // method is publicly available, despite what the red worms say
-            foreach ($route->method as $method) {
+            foreach (array_unique($route->allows) as $method) {
                 $routeSummaries[$parsedName['controller']][] = [
                     'name'       => $route->name,
                     'method'     => $method,
@@ -65,7 +63,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminRouteSummary/index.twig',
                 [
-                    'pageCurrent'    => $this->router->generate('adminRouteSummary.getRouteList'),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminRouteSummary.getRouteList'),
                     'allBreadcrumbs' => [
                         ['Administration', '/adminv2/home'],
                         ['Route Summary', '/adminv2/routes'],

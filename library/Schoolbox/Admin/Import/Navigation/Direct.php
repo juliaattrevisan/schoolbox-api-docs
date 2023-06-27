@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Navigation;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
@@ -25,7 +25,6 @@ use Schoolbox\Sync\Navigator\Node;
  */
 class Direct implements INavigation
 {
-
     /**
      * @var IConfigLoader
      */
@@ -46,15 +45,15 @@ class Direct implements INavigation
     /**
      * {@inheritDoc}
      *
-     * @param Router $router
+     * @param Generator $routeGenerator
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function buildBreadcrumbs(Router $router): array
+    public function buildBreadcrumbs(Generator $routeGenerator): array
     {
         return [
             ['Administration', '/adminv2/home'],
-            ['Direct Import', $router->generate('adminImportIndex.getDirectIndex')],
+            ['Direct Import', $routeGenerator->generate('adminImportIndex.getDirectIndex')],
         ];
     }
 
@@ -62,28 +61,28 @@ class Direct implements INavigation
     /**
      * {@inheritDoc}
      *
-     * @param Router $router
-     * @param string $currentPage
+     * @param Generator $routeGenerator
+     * @param string    $currentPage
      * @return Navigator
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \ReflectionException
      */
-    public function buildNavigation(Router $router, string $currentPage = ''): Navigator
+    public function buildNavigation(Generator $routeGenerator, string $currentPage = ''): Navigator
     {
         $args = [
             new Node(
                 'User Accounts',
-                $router->generate('adminImportUserAccount.getUpload'),
+                $routeGenerator->generate('adminImportUserAccount.getUpload'),
                 $currentPage === 'adminImportUserAccount'
             ),
             new Node(
                 'User Photos',
-                $router->generate('adminImportPhotos.getIndex'),
+                $routeGenerator->generate('adminImportPhotos.getIndex'),
                 $currentPage === 'adminImportPhotos'
             ),
             new Node(
                 'Folders',
-                $router->generate('adminImportFolder.getIndex'),
+                $routeGenerator->generate('adminImportFolder.getIndex'),
                 $currentPage === 'adminImportFolder'
             ),
         ];
@@ -95,7 +94,7 @@ class Direct implements INavigation
 
             $args[] = new Node(
                 $rosettaStone->translate('pastoralCare', false, true) . ' Records',
-                $router->generate('adminImportPastoral.getIndex'),
+                $routeGenerator->generate('adminImportPastoral.getIndex'),
                 $currentPage === 'adminImportPastoral'
             );
         }

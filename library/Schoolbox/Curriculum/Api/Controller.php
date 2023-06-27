@@ -98,7 +98,7 @@ class Controller extends Base
         }
         $translatedResults = $resultsForAllKeywords->map(
             new ModelToArray(
-                $this->router,
+                $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser(),
                 $ancestorCount,
@@ -127,7 +127,7 @@ class Controller extends Base
             $this->buildJsonOutput(
                 $tree->map(
                     new ModelToArray(
-                        $this->router,
+                        $this->routeGenerator,
                         $this->authorizer,
                         $this->getUser(),
                         0,
@@ -238,7 +238,7 @@ class Controller extends Base
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
         $translator = new ModelToArray(
-            $this->router,
+            $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             $ancestorCount,

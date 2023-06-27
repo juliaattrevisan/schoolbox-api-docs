@@ -11,12 +11,11 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest;
 
 use Alaress\Database\Connector\IConnector;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\User;
 
 class Navigation
 {
-
     /**
      * Consts for each of the Standardised Test pieces
      */
@@ -59,9 +58,9 @@ class Navigation
 
 
     /**
-     * @var Router
+     * @var Generator
      */
-    private $router;
+    private $routeGenerator;
 
 
     /**
@@ -75,17 +74,17 @@ class Navigation
     /**
      * NavigationSelector constructor.
      *
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param User       $user
      * @param array      $externalUser
      * @param IConnector $db
      * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function __construct(Router $router, User $user, array $externalUser, IConnector $db, ?int $year)
+    public function __construct(Generator $routeGenerator, User $user, array $externalUser, IConnector $db, ?int $year)
     {
-        $this->router = $router;
-        $this->user = $user;
+        $this->routeGenerator = $routeGenerator;
+        $this->user           = $user;
         $this->externalUser = $externalUser;
         $this->db = $db;
         $this->year = $year;
@@ -112,7 +111,7 @@ class Navigation
          */
         if ((new PAT\ValidPAT($this->db))->isSatisifiedBy($this->user, $this->externalUser)) {
             $availableNavigation[self::STANDARDISEDTEST_PAT_KEY] = [
-                'url' => $this->router->generate('achievementreport.getStandardisedTestsPAT', [
+                'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsPAT', [
                     'externalUserId' => $this->externalUser['StudentID'],
                     'year' => $this->year
                 ]),
@@ -124,7 +123,7 @@ class Navigation
          */
         if ((new STAR\ValidSTAR())->isSatisifiedBy($this->user)) {
             $availableNavigation[self::STANDARDISEDTEST_STAR_KEY] = [
-                'url' => $this->router->generate('achievementreport.getStandardisedTestsSTAR', [
+                'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsSTAR', [
                     'externalUserId' => $this->externalUser['StudentID'],
                     'year' => $this->year
                 ]),
@@ -135,7 +134,7 @@ class Navigation
         /* Conditional Reading report
          */
         $availableNavigation[self::STANDARDISEDTEST_READING_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestsReading', [
+            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsReading', [
                 'externalUserId' => $this->externalUser['StudentID'],
                 'year' => $this->year
             ]),
@@ -145,7 +144,7 @@ class Navigation
         /* Conditional Writing report
          */
         $availableNavigation[self::STANDARDISEDTEST_WRITING_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestsWriting', [
+            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsWriting', [
                 'externalUserId' => $this->externalUser['StudentID'],
                 'year' => $this->year
             ]),
@@ -155,7 +154,7 @@ class Navigation
         /* Conditional Mathematics report
          */
         $availableNavigation[self::STANDARDISEDTEST_MATHEMATICS_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestsMathematics', [
+            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsMathematics', [
                 'externalUserId' => $this->externalUser['StudentID'],
                 'year' => $this->year
             ]),
@@ -166,7 +165,7 @@ class Navigation
          */
         if ((new ValidHasLiteracyNumeracy())->isSatisfiedBy($this->user->getYear())) {
             $availableNavigation[self::STANDARDISEDTEST_LITERACYNUMERACY_KEY] = [
-                'url'   => $this->router->generate('achievementreport.getStandardisedTestsLiteracyNumeracy', [
+                'url'   => $this->routeGenerator->generate('achievementreport.getStandardisedTestsLiteracyNumeracy', [
                     'externalUserId' => $this->externalUser['StudentID'],
                     'year'           => $this->year
                 ]),

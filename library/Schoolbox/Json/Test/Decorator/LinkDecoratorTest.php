@@ -12,7 +12,7 @@ namespace Schoolbox\Json\Test\Decorator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Json\Api\Link;
 use Alaress\Json\Linkable;
-use Aura\Router\Router;
+use Aura\Router\RouterContainer;
 use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Json\Decorator\LinkDecorator;
@@ -20,8 +20,8 @@ use PHPUnit\Framework\TestCase;
 
 class LinkDecoratorTest extends TestCase
 {
-    /** @var Router */
-    private $router;
+    /** @var RouterContainer */
+    private RouterContainer $routerContainer;
 
     /** @var Authorizer */
     private $auth;
@@ -34,15 +34,8 @@ class LinkDecoratorTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([ 'generate' ])
-            ->getMock();
-
-        $this->router
-            ->method('generate')
-            ->willReturn('/test/link')
-        ;
+        $this->routerContainer = new RouterContainer();
+        $this->routerContainer->getMap()->route('test.link', '/test/link');
 
         $this->auth = $this->getMockBuilder(Authorizer::class)
             ->disableOriginalConstructor()
@@ -85,7 +78,7 @@ class LinkDecoratorTest extends TestCase
             ]
         ];
 
-        $dec = new LinkDecorator($this->router, $this->auth, null);
+        $dec = new LinkDecorator($this->routerContainer->getGenerator(), $this->auth, null);
 
         $actual = $dec->decorate([], $this->linkable);
 

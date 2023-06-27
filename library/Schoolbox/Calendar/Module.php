@@ -23,7 +23,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Folder\Mapper;
@@ -41,24 +41,24 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
         // need this to navigate /event route
         $selectedDateRegex = '([0][1-9]|[12][0-9]|3[01])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}';
 
-        $this->addGetRoute($router, 'getOwnCalendar', $basePath, "{/selectedDate}");
-        $this->addGetRoute($router, 'getCalendar', $basePath, "/{selectedDate}/{userId}")->addTokens([
+        $this->addGetRoute('getOwnCalendar', $basePath, "{/selectedDate}");
+        $this->addGetRoute('getCalendar', $basePath, "/{selectedDate}/{userId}")->tokens([
             'selectedDate' => $selectedDateRegex,
             'userId'       => '\d+',
         ]);
 
         // Redirect old paths
-        $this->addGetRoute($router, 'redirect', $basePath, "/{format}{/selectedDate,userId}")->addTokens([
+        $this->addGetRoute('redirect', $basePath, "/{format}{/selectedDate,userId}")->tokens([
             'format'       => 'week|month|full|week-list|month-list',
             'selectedDate' => $selectedDateRegex,
             'userId'       => '\d+',
         ]);
-        $this->addPostRoute($router, 'changeState', $basePath, '/changeState');
+        $this->addPostRoute('changeState', $basePath, '/changeState');
     }
 
     /**

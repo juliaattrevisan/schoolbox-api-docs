@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Calendar_Api_Composite;
 use External_Timetable;
 use Schoolbox\Role;
@@ -29,12 +29,12 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $this->addGetRoute($router, 'index', $basePath, '');
-        $this->addGetRoute($router, 'download', $basePath, '/download');
+        $this->addGetRoute('index', $basePath, '');
+        $this->addGetRoute('download', $basePath, '/download');
     }
 
     /**

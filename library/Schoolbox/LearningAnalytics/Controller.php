@@ -68,7 +68,7 @@ class Controller extends Base
         $currentTerm = $this->termMapper->findForToday();
 
         $data = ['courseSpecId' => $courseSpecId, 'termCode' => $currentTerm->getCode()];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithTerm', $data));
+        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.courseWithTerm', $data));
     }
 
 
@@ -121,7 +121,7 @@ class Controller extends Base
             'submissionTypeId' => $submissionTypeId,
             'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.courseWithSubmissionTypeAndTerm', $data));
+        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.courseWithSubmissionTypeAndTerm', $data));
     }
 
 
@@ -178,7 +178,7 @@ class Controller extends Base
             'folderId'     => $folderId,
             'termCode'     => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithTerm', $data));
+        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.folderWithTerm', $data));
     }
 
 
@@ -236,7 +236,7 @@ class Controller extends Base
             'submissionTypeId' => $submissionTypeId,
             'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('learningAnalytics.folderWithSubmissionTypeAndTerm', $data));
+        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.folderWithSubmissionTypeAndTerm', $data));
     }
 
 
@@ -382,12 +382,14 @@ class Controller extends Base
         $navigableTerms = TermMapper::getInstance()->findAll();
         $termsWithResults = $this->getNavigableTerms($courseSpecification, $classFolder);
 
-        $data = [
+        $matchedRoute = $this->router->getMatcher()->getMatchedRoute();
+        $currentRoute = $matchedRoute ? $matchedRoute->name : '';
+        $data  = [
             'courseSpec'          => $courseSpecification,
             'classFolder'         => $classFolder,
             'submissionType'      => $submissionType,
             'submissionTypes'     => $this->workTypeMapper->findAll(),
-            'currentRoute'        => $this->getRouter()->getMatchedRoute()->name,
+            'currentRoute'        => $currentRoute,
             'route'               => $routeType,
             'classFolders'        => $courseImplementationFolders,
             'term'                => $term,

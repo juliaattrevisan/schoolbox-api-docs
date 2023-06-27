@@ -129,7 +129,7 @@ class Controller extends Base
         unset($queryArgs['page']);
 
         $page        = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
-        $route       = $this->getRouter()->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
+        $route       = $this->routeGenerator->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
         $this->getResponse()->content->set(
@@ -428,7 +428,7 @@ class Controller extends Base
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name'           => $row['assessment_name'],
-                'statusLink'     => $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
+                'statusLink'     => $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
                 'maxMark'        => $row['assessment_max_mark'],
                 'markType'       => $row['assessment_mark_type'],
                 'capabilityMarkTypeId'     => $row['capability_mark_type_id'],
@@ -765,7 +765,7 @@ class Controller extends Base
                     unset($studentMarks[$studentId]['assessments'][$assessmentId]);
                     continue;
                 }
-                $summaryLink = $this->getRouter()->generate(
+                $summaryLink = $this->routeGenerator->generate(
                     'learningAssessment.getSummary',
                     [
                         'studentId'    => $studentId,

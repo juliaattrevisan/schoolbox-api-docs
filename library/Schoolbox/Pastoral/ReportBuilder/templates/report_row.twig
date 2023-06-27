@@ -38,7 +38,11 @@
             <a class="icon-modify no-text"
                href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id, report: report}) }}"
                title="Modify Report"></a>
-            <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
+            <a class="icon-delete no-text"
+               data-delete="{{ report.id }}"
+               href="{{ routeLookup('pastoralReportBuilder.postReportDelete', {reportId: report.id, report: report}) }}"
+               title="Delete Report"
+            ></a>
         {% endif %}
     </nav>
 </li>

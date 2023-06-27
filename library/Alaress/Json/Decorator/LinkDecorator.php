@@ -12,7 +12,7 @@ namespace Alaress\Json\Decorator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Json\Api\Link;
 use Alaress\Json\Linkable;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 
 /**
  * Decorates a JSON payload with links. The input model MUST implement \Alaress\Json\Linkable, or no decoration will
@@ -22,21 +22,21 @@ use Aura\Router\Router;
  */
 class LinkDecorator implements IDecorator
 {
-    /** @var Router */
-    protected $router;
+    /** @var Generator */
+    protected $routeGenerator;
 
     /** @var Authorizer */
     protected $auth;
 
 
     /**
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $auth
      */
-    public function __construct(Router $router, Authorizer $auth)
+    public function __construct(Generator $routeGenerator, Authorizer $auth)
     {
-        $this->router = $router;
-        $this->auth   = $auth;
+        $this->routeGenerator = $routeGenerator;
+        $this->auth           = $auth;
     }
 
 

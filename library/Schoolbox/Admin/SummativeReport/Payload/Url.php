@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Role;
@@ -28,7 +28,7 @@ class Url
     public const FILENAME_MAX_LENGTH = 250;
 
 
-    private Router $router;
+    private Generator $routeGenerator;
     private UriInterface $baseUrl;
     private \Schoolbox\Assessment\Term\Mapper $termMapper;
     private \Schoolbox\RoleMapper $roleMapper;
@@ -41,16 +41,16 @@ class Url
     /**
      * Constructor.
      *
-     * @param Router                $router
-     * @param UriInterface          $baseUrl
-     * @param Mapper                $termMapper
-     * @param \Schoolbox\RoleMapper $roleMapper
-     * @param UserBulkMapper        $userBulkMapper
-     * @param \Schoolbox\UserMapper $userMapper
+     * @param Generator                $routeGenerator
+     * @param UriInterface             $baseUrl
+     * @param Mapper                   $termMapper
+     * @param \Schoolbox\RoleMapper    $roleMapper
+     * @param UserBulkMapper           $userBulkMapper
+     * @param \Schoolbox\UserMapper    $userMapper
      * @param \Schoolbox\External\User $externalUser
      */
     public function __construct(
-        Router $router,
+        Generator $routeGenerator,
         UriInterface $baseUrl,
         \Schoolbox\Assessment\Term\Mapper $termMapper,
         \Schoolbox\RoleMapper $roleMapper,
@@ -58,8 +58,8 @@ class Url
         \Schoolbox\UserMapper $userMapper,
         \Schoolbox\External\User $externalUser,
     ) {
-        $this->router = $router;
-        $this->baseUrl = $baseUrl;
+        $this->routeGenerator = $routeGenerator;
+        $this->baseUrl        = $baseUrl;
         $this->termMapper = $termMapper;
         $this->roleMapper = $roleMapper;
         $this->userBulkMapper = $userBulkMapper;
@@ -150,7 +150,7 @@ class Url
             /* See if we can make a url for this student's report
              */
             try {
-                $reportPath = $this->router->generate('adminSummativeReport.getStudentReport', [
+                $reportPath = $this->routeGenerator->generate('adminSummativeReport.getStudentReport', [
                     'reportId' => $report->getId(),
                     'report' => $report,
                     'studentId' => $student->getId(),

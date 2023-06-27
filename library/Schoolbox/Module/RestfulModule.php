@@ -11,7 +11,7 @@ namespace Schoolbox\Module;
 
 use Alaress\Module\Registry;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -28,7 +28,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 abstract class RestfulModule extends AlaressModule
 {
-
     /** @var string */
     protected $collection;
 
@@ -90,10 +89,9 @@ abstract class RestfulModule extends AlaressModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
         $collection = $this->getCollectionName();
 
@@ -117,11 +115,11 @@ abstract class RestfulModule extends AlaressModule
         ];
 
         foreach ($routes['GET'] as $path => $controllerMethod) {
-            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+|\*', 'entityId' => '\d+' ]);
+            $this->addGetRoute($controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+|\*', 'entityId' => '\d+' ]);
         }
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($controllerMethod, $basePath, $path)->tokens(['contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 

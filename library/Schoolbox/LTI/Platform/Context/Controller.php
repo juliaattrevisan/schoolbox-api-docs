@@ -210,7 +210,7 @@ class Controller extends BaseController
         $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->withScheme('https');
         $returnUrl = (clone $baseUrl)
             ->withPath(
-                $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
+                $this->routeGenerator->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
             )
             // If a context was passed in the query string:
             // add it to the return URL
@@ -290,7 +290,7 @@ class Controller extends BaseController
             new LaunchFactory(
                 $this->registrations,
                 $this->access,
-                $this->router,
+                $this->routeGenerator,
                 $this->instance,
                 $this->getConfigLoader(),
                 $this->userCodec,
@@ -343,7 +343,7 @@ class Controller extends BaseController
         $nrpsClaim = new NrpsClaim(
             (string)(clone $baseUrl)
                 ->withPath(
-                    $this->router->generate(
+                    $this->routeGenerator->generate(
                         'ltiPlatformContext.getMembershipsForFolder',
                         ['folderId' => $folder->getId()]
                     )

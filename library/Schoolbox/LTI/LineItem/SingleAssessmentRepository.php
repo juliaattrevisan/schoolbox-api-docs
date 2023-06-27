@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\LineItem;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use BadMethodCallException;
 use Schoolbox\Url\Uri;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItem;
@@ -31,18 +31,18 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
     /**
      * Router, used to generate the line item route for the assessment.
      */
-    private Router $router;
+    private Generator $routeGenerator;
 
     /**
      * Constructor
      *
      * @param LtiAssessment $ltiAssessment
-     * @param Router        $router
+     * @param Generator     $routeGenerator
      */
-    public function __construct(LtiAssessment $ltiAssessment, Router $router)
+    public function __construct(LtiAssessment $ltiAssessment, Generator $routeGenerator)
     {
-        $this->ltiAssessment = $ltiAssessment;
-        $this->router        = $router;
+        $this->ltiAssessment  = $ltiAssessment;
+        $this->routeGenerator = $routeGenerator;
     }
 
     /**
@@ -57,7 +57,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
         // Line item identifier: the line item request URI
         $url          = new Uri($lineItemIdentifier);
         $assessmentId = $this->ltiAssessment->getId();
-        $route        = $this->router->generate(
+        $route        = $this->routeGenerator->generate(
             'ltiPlatformLineItem.getLineItemForAssessment',
             ['assessmentId' => $assessmentId],
         );

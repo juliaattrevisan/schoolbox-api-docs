@@ -127,7 +127,7 @@ class Controller extends WebController\Base
             $getArgString = '?' . (new Codec($this->filterMapper, $this->filterSelectionMapper))->convertSelectionsToQueryString($selections);
         }
 
-        $route = $this->getRouter()->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
+        $route = $this->routeGenerator->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
 
         $this->getResponse()->redirect->to("{$route}{$getArgString}");
     }
@@ -155,7 +155,7 @@ class Controller extends WebController\Base
         unset($queryArgs['page']);
 
         $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
-        $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
+        $route       = $this->routeGenerator->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
         $this->getResponse()->content->set(

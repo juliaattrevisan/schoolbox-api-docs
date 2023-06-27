@@ -43,7 +43,7 @@ class Controller extends ConfigController
 
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate($typeLabel),
-            $this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel]),
+            $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]),
             [ModuleConfig::CONTEXT_TYPE_LABEL => $typeLabel],
         );
 
@@ -51,15 +51,15 @@ class Controller extends ConfigController
         foreach ($typeLabels as $label) {
             $settingsTabs[] = [
                 'label'    => $label,
-                'route'    => urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $label)])),
+                'route'    => urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $label)])),
                 'isActive' => $typeLabel === $label,
             ];
         }
 
         /* Settings are now recategorised by the feature to which they are relevant
          */
-        $pageCurrent = $this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
-        $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
+        $pageCurrent = $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
+        $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
 
         $this->getResponse()->content->set(
             $this->buildContent('@settings/settings.twig', [
@@ -220,7 +220,7 @@ class Controller extends ConfigController
             ]);
         }
 
-        $route = urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
+        $route = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
         $this->getResponse()->redirect->afterPost($route);
     }
 

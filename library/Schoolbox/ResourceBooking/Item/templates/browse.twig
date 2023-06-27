@@ -26,9 +26,11 @@
                 <a class="icon-report" href="{{  routeLookup('resourceBookingReport.index') }}" title="Booking Report">Booking Report</a>
             </li>
         {% endif %}
+        {% if categoryId %}
         <li>
             <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar">Availability Calendar</a>
         </li>
+        {% endif %}
         {% if isRouteAuthorized('resourceItem.add') %}
             <li class="separator">Admin Actions</li>
             <li>

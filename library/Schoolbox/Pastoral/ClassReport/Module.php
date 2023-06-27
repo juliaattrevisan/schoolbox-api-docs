@@ -108,12 +108,11 @@ class Module extends BaseModule
     {
         // Build translators here instead of in controller code
         $userTranslator     = new UserTranslator();
-        $router             = $this->getRouter();
         $authorizer         = $this->getAuthorizer();
         $currentUser        = $this->injector->get('user');
         $pastoralTranslator = new PastoralTranslator(
             $userTranslator,
-            $router,
+            $this->getRouter()->getGenerator(),
             $authorizer,
             $currentUser,
         );

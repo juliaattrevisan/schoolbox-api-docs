@@ -12,7 +12,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Permission\Access\UserAccess;
@@ -30,10 +30,9 @@ class Module extends BaseModule
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
 
         $routes = [
@@ -48,11 +47,11 @@ class Module extends BaseModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($alias, $basePath, $path);
         }
 
         foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
+            $this->addPostRoute($alias, $basePath, $path);
         }
     }
 

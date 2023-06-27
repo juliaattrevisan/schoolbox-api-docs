@@ -8,23 +8,23 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\User;
 
 /**
  * @var SitePage             $this
  * @var AssessmentDataSource $assessmentDataSource
- * @var Router               $router
+ * @var Generator            $routeGenerator
  * @var User                 $sessionUser
  */
 [$quizId]             = $this->arg;
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-$router               = $this->getDi()->get('router');
+$routeGenerator       = $this->getDi()->get('router.generator');
 $sessionUser          = $_SESSION['user'];
 $assessment           = $assessmentDataSource->findByQuizId($quizId, $sessionUser);
 $this::localRedir(
-    $router->generate(
+    $routeGenerator->generate(
         'learningAssessment.getSummary',
         [
             'assessmentId' => $assessment->getId(),

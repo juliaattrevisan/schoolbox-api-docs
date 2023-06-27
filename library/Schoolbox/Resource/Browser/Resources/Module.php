@@ -9,14 +9,13 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -111,22 +110,32 @@ class Module extends AbstractModule
                 )
             );
 
-        $this->register('GET', '/folder/{componentID:\d+}/files/{sourceFolderID:\d+}', 'showFiles', $hasFolderReadAccess, $preloadFolder);
-        $this->register('GET', '/folder/files/{sourceFolderID:\d+}', 'showFolderFiles', $hasFolderReadAccess, $preloadFolder);
-        $this->register('PATCH', '/file/{fileId:\d+}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
+        // Generic routes
+        $this->register('GET', '/picker/{sourceSlug}', 'picker', new Rule\IsLoggedIn());
+        $this->register('GET', '/file/{fileId:\d+}/ajax', 'getFileInfo', $hasReadAccess, $preloadFile);
+        $this->register('GET', '', 'browseRoot', new Rule\IsLoggedIn());
+        $this->register('GET', '{/folderId:\d+}', 'browse', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/{folderId:\d+}/children', 'listResources', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/{folderId:\d+}/info', 'showFolderInfo', $hasFolderReadAccess, $preloadFolder);
         $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
-        $this->register('GET', '/link/{linkId:\d+}/info', 'showLinkInfo', $hasReadAccess, $preloadLink);
-    }
+        $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $hasFolderReadAccess, $preloadFolder);
 
-    /**
-     * Add a link route as well
-     *
-     * @param Router $router
-     * @param string $basePath
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        parent::initRoutes($router, $basePath);
+        // I believe showMultiFileInfo is never used anywhere:
+        // at any rate, there's no support for verifying permissions for
+        // multiple files.
+        $this->register(
+            'GET',
+            '/file/{fileIds:\d+}/info',
+            'showMultiFileInfo',
+            new Rule\Callback(fn () => throw new InvalidPath()),
+        );
+
+        // Specific routes
+        $this->register('GET', '/folder/{componentID:\d+}/files/{folderId:\d+}', 'showFiles', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/folder/files/{folderId:\d+}', 'showFolderFiles', $hasFolderReadAccess, $preloadFolder);
+        $this->register('PATCH', '/file/{fileId:\d+}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
+        $this->register('GET', '/link/{linkId:\d+}/info', 'showLinkInfo', $hasReadAccess, $preloadLink);
     }
 
     /**
@@ -196,10 +205,16 @@ class Module extends AbstractModule
         if (($params['sourceFolder'] ?? null) instanceof Resource\Folder\Model) {
             return $params;
         }
-        try {
-            $folder = $this->getMapperFactory()->get(Resource\Folder\Mapper::class)->findById($params['sourceFolderID']);
-        } catch (MapperException $e) {
-            throw new NotFound();
+
+        // Load folder only if folderId is set
+        // (the folder is an optional param in the route)
+        $folder = null;
+        if (isset($params['folderId'])) {
+            try {
+                $folder = $this->getMapperFactory()->get(Resource\Folder\Mapper::class)->findById($params['folderId']);
+            } catch (MapperException $e) {
+                throw new NotFound();
+            }
         }
 
         return [

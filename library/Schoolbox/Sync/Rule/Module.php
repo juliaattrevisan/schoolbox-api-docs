@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -27,15 +27,15 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addGetRoute($router, 'add', $basePath, "/add/{rulesetId}");
-        $this->addPostRoute($router, 'create', $basePath, "/create");
+        $this->addGetRoute('add', $basePath, "/add/{rulesetId}");
+        $this->addPostRoute('create', $basePath, "/create");
 
-        $this->addGetRoute($router, 'edit', $basePath, "/edit/{ruleId}");
-        $this->addPostRoute($router, 'update', $basePath, "/update");
+        $this->addGetRoute('edit', $basePath, "/edit/{ruleId}");
+        $this->addPostRoute('update', $basePath, "/update");
 
-        $this->addPostRoute($router, 'delete', $basePath, "/delete");
+        $this->addPostRoute('delete', $basePath, "/delete");
     }
 
     /**

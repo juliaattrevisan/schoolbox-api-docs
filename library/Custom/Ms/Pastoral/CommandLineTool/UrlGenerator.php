@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Custom\Ms\Pastoral\CommandLineTool;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Custom\Ms\Pastoral\StudentInvolvement\Report\Factory;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\User;
@@ -20,9 +20,9 @@ use Schoolbox\User;
 class UrlGenerator
 {
     /**
-     * @var Router
+     * @var Generator
      */
-    private $router;
+    private $routeGenerator;
 
 
     /**
@@ -34,13 +34,13 @@ class UrlGenerator
     /**
      * Constructor
      *
-     * @param Router  $router
-     * @param Factory $factory
+     * @param Generator $routeGenerator
+     * @param Factory   $factory
      */
-    public function __construct(Router $router, Factory $factory)
+    public function __construct(Generator $routeGenerator, Factory $factory)
     {
-        $this->router  = $router;
-        $this->factory = $factory;
+        $this->routeGenerator = $routeGenerator;
+        $this->factory        = $factory;
     }
 
 
@@ -86,7 +86,7 @@ class UrlGenerator
                     'year'    => $year,
                 ];
                 $results[] = (string)$baseUrl
-                    ->withPath($this->router->generate('customMeridenPastoral.index', $params))
+                    ->withPath($this->routeGenerator->generate('customMeridenPastoral.index', $params))
                     ->withQuery(http_build_query($query));
                 break;
             }
@@ -105,7 +105,7 @@ class UrlGenerator
                     'subjectCode' => $subject->getSubjectCode(),
                 ];
                 $results[] = (string)$baseUrl
-                    ->withPath($this->router->generate('customMeridenPastoral.subject', $params))
+                    ->withPath($this->routeGenerator->generate('customMeridenPastoral.subject', $params))
                     ->withQuery(http_build_query($query));
             }
         }

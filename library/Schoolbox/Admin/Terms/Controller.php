@@ -23,7 +23,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
-
     /**
      * @var Term\Mapper
      */
@@ -84,8 +83,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
-                'pageCurrent'      => $this->router->generate('adminTerms.getIndex'),
-                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminTerms.getIndex')),
+                'pageCurrent'      => $this->routeGenerator->generate('adminTerms.getIndex'),
+                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerms.getIndex')),
                 'terms'            => $terms,
                 'yearLevelValues'  => $yearLevelValues,
                 'yearLevelOptions' => $yearLevelOptions,
@@ -231,7 +230,7 @@ class Controller extends Base
                 'data'     => ['term' => $term,]
             ]);
         } else {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('adminTerms.getIndex'));
+            $this->getResponse()->redirect->to($this->routeGenerator->generate('adminTerms.getIndex'));
         }
     }
 

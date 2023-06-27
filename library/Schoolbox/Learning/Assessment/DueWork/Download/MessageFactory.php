@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Download;
 
 use Alaress_Date_Format;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -19,7 +19,6 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Turnitin\File\Api;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
@@ -48,7 +47,7 @@ class MessageFactory
      * @param BaseMessageFactory $baseMessageFactory Required to actually build messages.
      * @param Uri                $urlBase            Required to build URIs which point back to this instance.
      * @param RosettaStone       $rosettaStone       Required to translate the term "due work" for this instance.
-     * @param Router             $router             Required to build routes to download various due work parts.
+     * @param Generator          $routeGenerator     Required to build routes to download various due work parts.
      * @param UserTranslator     $userTranslator     Required to translate the viewer to an array representation for
      *                                               inclusion within the sent message.
      * @param bool               $turnitinEnabled    Is Turnitin enabled for this instance? If so, download TII reports.
@@ -57,7 +56,7 @@ class MessageFactory
         private BaseMessageFactory $baseMessageFactory,
         private Uri $urlBase,
         private RosettaStone $rosettaStone,
-        private Router $router,
+        private Generator $routeGenerator,
         private UserTranslator $userTranslator,
         private bool $turnitinEnabled,
     ) {
@@ -353,7 +352,7 @@ class MessageFactory
     private function generateParticipantSubmissionHistoryUrl(Participant $participant): string
     {
         /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
-        $submissionHistoryPath = $this->router->generate(
+        $submissionHistoryPath = $this->routeGenerator->generate(
             'learningAssessment.getSummary',
             [
                 'assessmentId' => $participant->getAssessable()->getId(),
@@ -376,7 +375,7 @@ class MessageFactory
     private function generateCallbackUrl(User $viewer): string
     {
         /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
-        $callbackPath = $this->router->generate(
+        $callbackPath = $this->routeGenerator->generate(
             'apiusernotify.apiUserNotify',
             ['userId' => $viewer->getId()]
         );

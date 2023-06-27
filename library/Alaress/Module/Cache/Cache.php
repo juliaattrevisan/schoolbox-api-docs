@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Alaress\Module\Cache;
 
-use Aura\Router\RouteCollection;
 use Predis\ClientInterface;
 use Throwable;
 use TypeError;
@@ -69,12 +68,11 @@ class Cache
     /**
      * Fetch route table from cache.
      *
-     * @return RouteCollection
+     * @return array
      * @throws FetchException if the route table isn't in cache.
-     * @throws TypeError      if somehow the route table once decoded is not a
-     *                        `RouteCollection`?
+     * @throws TypeError      if somehow the route table once decoded is not an array?
      */
-    public function fetchRouteTable(): RouteCollection
+    public function fetchRouteTable(): array
     {
         $routesSerialized = $this->redis->get(self::ROUTE_TABLE_CACHE_KEY_PREFIX . INSTANCE_ID);
         if (!isset($routesSerialized)) {

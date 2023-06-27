@@ -102,6 +102,10 @@ echo 'started mariadb'
 use_redis_persistent_instance_sql="UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"
 
+# May need to composer install here:
+# develop vendor build won't have Composer changes made in this PR
+composer install -o
+
 # Set data dirs in config table + run upgrade + schema repair scripts
 cd tools || exit 1
 ./module/refresh-cache.php

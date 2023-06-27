@@ -87,7 +87,7 @@ class Module extends BaseModule
         return new Controller(
             $this->injector->get('user.tokenBuilder'),
             $this->getConfig(),
-            $this->getRouter(),
+            $this->injector->get('router.generator'),
             $this->injector->get('taskd.messageFactory'),
             $this->injector->get('taskd.messageProducer')
         );

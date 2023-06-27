@@ -508,7 +508,7 @@ function renderTemplateForAnalyticsSection(SitePage $phpLibObj, Component_Homepa
         ];
         if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $sessionUser)) {
             $hasAnalytics = true;
-            $phpLibObj->setVar('CLASS_ANALYTICS_LINK', $manageClassController->getRouter()->generate($cohortProfileRoute, $params));
+            $phpLibObj->setVar('CLASS_ANALYTICS_LINK', $manageClassController->getRouteGenerator()->generate($cohortProfileRoute, $params));
             $phpLibObj->parse('class_analytics_link_block', 'class_analytics_link');
         }
     }
@@ -532,7 +532,7 @@ function renderTemplateForAnalyticsSection(SitePage $phpLibObj, Component_Homepa
             ];
             if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $sessionUser)) {
                 $hasAnalytics = true;
-                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK', $manageClassController->getRouter()->generate($schoolboxAnalytics, $params));
+                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK', $manageClassController->getRouteGenerator()->generate($schoolboxAnalytics, $params));
                 $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
                 $phpLibObj->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
             }

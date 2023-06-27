@@ -12,7 +12,6 @@ use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */
@@ -38,8 +37,8 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminPackage/index.twig',
                 [
-                    'pageCurrent' => $this->router->generate('adminPackage.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminPackage.getIndex')),
+                    'pageCurrent' => $this->routeGenerator->generate('adminPackage.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminPackage.getIndex')),
                     'packages'    => $this->packageMapper->findAvailablePackages(),
                 ]
             )

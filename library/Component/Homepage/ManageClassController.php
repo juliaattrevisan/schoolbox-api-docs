@@ -163,7 +163,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             && $this->getConfigLoader()->get('rubric_markbook_enable')
             && $authorizer->isPathAuthorizedForUser($route, $folderParams, $this->getUser())
         ) {
-            $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate($route, $folderParams));
+            $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouteGenerator()->generate($route, $folderParams));
             $this->parse('rubric_markbook_link_block', 'rubric_markbook_link');
             $hasClassActions = true;
         } else {
@@ -193,7 +193,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ) {
             $this->setVar(
                 'AWARD_LIST_LINK',
-                $this->getRouter()->generate(
+                $this->getRouteGenerator()->generate(
                     'learningBadgeAward.getListPage',
                     $folderParams
                 )
@@ -213,7 +213,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
             && $this->getConfigLoader()->get('assessment_calendar_enabled')
         ) {
-            $assessmentCalendarUrl = $this->getRouter()->generate('learningAssessmentCalendar.getReport');
+            $assessmentCalendarUrl = $this->getRouteGenerator()->generate('learningAssessmentCalendar.getReport');
             if ($isUnitPage) {
                 $assessmentCalendarUrl .= '?course=' . $this->getContext()->getUnitSpecification()->getCourse()->getId();
             } elseif ($isCoursePage) {
@@ -237,7 +237,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ) {
             $this->setVar(
                 'QRCODE_LINK',
-                $this->getRouter()->generate(
+                $this->getRouteGenerator()->generate(
                     'qrcode.getListPage',
                     $folderParams
                 )
@@ -271,7 +271,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             && UserAccess::ACCESS_READ === $this->getContentPermission()
             && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())
         ) {
-            $this->setVar('STUDENT_GRADE_LINK', $this->getRouter()->generate($route, $params));
+            $this->setVar('STUDENT_GRADE_LINK', $this->getRouteGenerator()->generate($route, $params));
             $this->parse('student_grades_block', 'student_grades');
             $hasClassActions = true;
         } else {
@@ -317,7 +317,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ) {
             $this->setVar(
                 'PASTORAL_CLASS_REPORT_LINK',
-                $this->getRouter()->generate('pastoralClassReportModule.getReport', $folderParams)
+                $this->getRouteGenerator()->generate('pastoralClassReportModule.getReport', $folderParams)
             );
             $this->parse('class_pastoral_report_link_block', 'class_pastoral_report_link');
             $hasClassActions = true;
@@ -363,7 +363,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return null;
         }
 
-        return $this->getRouter()->generate($route, $classArg);
+        return $this->getRouteGenerator()->generate($route, $classArg);
     }
 
     /**
@@ -398,7 +398,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         if ($route && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
-            return $this->getRouter()->generate($route, $params);
+            return $this->getRouteGenerator()->generate($route, $params);
         }
 
         return null;

@@ -15,7 +15,6 @@ use Schoolbox\L10n\Mapper as L10nMapper;
 
 class Controller extends Base
 {
-
     /**
      * @var L10nMapper
      */
@@ -37,8 +36,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminTerminology/index.twig',
             'data'     => [
-                'pageCurrent' => $this->router->generate('adminTerminology.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminTerminology.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminTerminology.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerminology.getIndex')),
                 'terms' => $this->l10nMapper->findAll()->sortNaturally('title'),
             ],
             'title' => 'Admin - Terminology'
@@ -67,6 +66,6 @@ class Controller extends Base
             // noop, I guess? skip unknown terminologies
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminTerminology.getIndex'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminTerminology.getIndex'));
     }
 }

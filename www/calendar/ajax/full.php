@@ -82,7 +82,7 @@ if (isset($_GET['componentInstanceId']) && (int)$_GET['componentInstanceId']) {
 
 $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $this->getDi()->get('authorizer'),
-    $this->getDi()->get('router'),
+    $this->getDi()->get('router.generator'),
     $user,
     $viewer,
     $api,

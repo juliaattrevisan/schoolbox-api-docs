@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Seb;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use CFPropertyList\CFData;
 use CFPropertyList\CFDate;
 use CFPropertyList\CFDictionary;
@@ -40,7 +40,6 @@ use Schoolbox\User;
  */
 class Payload
 {
-
     /**
      * Browser Exam Key and Config Key are hashed with SHA256
      */
@@ -73,9 +72,9 @@ class Payload
 
 
     /**
-     * @var Router
+     * @var Generator
      */
-    private Router $router;
+    private Generator $routeGenerator;
 
     /**
      * @var IConfigLoader
@@ -96,14 +95,14 @@ class Payload
      * Constructor.
      *
      * @param IConfigLoader $config
-     * @param string $host
-     * @param Router $router
+     * @param string        $host
+     * @param Generator     $routeGenerator
      */
-    public function __construct(IConfigLoader $config, string $host, Router $router)
+    public function __construct(IConfigLoader $config, string $host, Generator $routeGenerator)
     {
         $this->saltBasis = (string)$config->get('site_school_code');
         $this->host = $host;
-        $this->router = $router;
+        $this->routeGenerator = $routeGenerator;
         $this->config = $config;
     }
 
@@ -130,10 +129,10 @@ class Payload
          *  "Router $router" to "string $route" instead, and have the aura pages generate
          *  the $route and pass it instead of doing it internally
          */
-        $assessmentUrl = $domain . $this->router->generate('learningAssessment.getAssessment', [
+        $assessmentUrl = $domain . $this->routeGenerator->generate('learningAssessment.getAssessment', [
                 'assessmentId' => $assessment->getId()
             ]);
-        $startUrl = $domain . $this->router->generate('learningAssessment.getSummaryViaSeb', [
+        $startUrl = $domain . $this->routeGenerator->generate('learningAssessment.getSummaryViaSeb', [
             'assessmentId' => $assessment->getId(),
             'studentId' => $user->getId()
         ]);

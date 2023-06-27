@@ -80,19 +80,15 @@
         $('[data-delete]').click(function (e) {
             e.preventDefault();
 
-            var reportId = $(this).attr('data-delete');
             var li = $(this).closest('li');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this report?',
                 confirmLabel: 'Delete',
-                confirmEvent: function () {
-                    var route = '{{ routeLookup('pastoralReportBuilder.postReportDelete', {'reportId': '_reportId'}) }}';
-
-                    $.post(route.replace(/_reportId/g, reportId))
+                confirmEvent: function (element) {
+                    $.post(element.attr('href'))
                         .done(function () {
                             li.remove();
-
                             if ($('[data-delete]').length == 0) {
                                 $('.empty-state').removeClass('hide');
                             }

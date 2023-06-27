@@ -289,7 +289,7 @@ class Controller extends AbstractController
          * All match pages are on a per-team basis
          */
 
-        $this->getResponse()->redirect->to($this->getRouter()->generate('sportsfixtures.getLanding', []));
+        $this->getResponse()->redirect->to($this->routeGenerator->generate('sportsfixtures.getLanding', []));
     }
 
     /**
@@ -359,7 +359,7 @@ class Controller extends AbstractController
 
         $this->saveMatch($entity, $division, $name, $season, $startAt, $finishAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesMatch.getList', [
             'contextId' => $division->getId()
         ]));
     }

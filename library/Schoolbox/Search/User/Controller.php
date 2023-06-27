@@ -581,7 +581,13 @@ class Controller extends BaseController
 
         $pastoralCounts = 0;
         if ($showPastoral) {
-            $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
+            $pastoralCountHelper = new PastoralCountHelper(
+                $this->routeGenerator,
+                $this->pastoralTypeMapper,
+                $this->pastoralSubTypeMapper,
+                $this->pastoralDataSource,
+                $this->termMapper
+            );
             $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
         }
 

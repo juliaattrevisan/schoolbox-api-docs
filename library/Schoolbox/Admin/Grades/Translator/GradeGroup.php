@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Grades\Translator;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\User;
 
@@ -20,9 +20,9 @@ use Schoolbox\User;
 class GradeGroup
 {
     /**
-     * @var Router required for generating links
+     * @var Generator required for generating links
      */
-    private Router $router;
+    private Generator $routeGenerator;
 
     /**
      * @var User currently logged in user needed for authorizer
@@ -37,15 +37,15 @@ class GradeGroup
     /**
      * Constructor
      *
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $authorizer
      * @param User       $currentUser
      */
-    public function __construct(Router $router, Authorizer $authorizer, User $currentUser)
+    public function __construct(Generator $routeGenerator, Authorizer $authorizer, User $currentUser)
     {
-        $this->router      = $router;
-        $this->authorizer  = $authorizer;
-        $this->currentUser = $currentUser;
+        $this->routeGenerator = $routeGenerator;
+        $this->authorizer     = $authorizer;
+        $this->currentUser    = $currentUser;
     }
 
     public function __invoke(GradeLevel\Group\Model $gradeGroup): array
@@ -84,7 +84,7 @@ class GradeGroup
     {
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $this->currentUser)) {
             /** @noinspection PhpUnhandledExceptionInspection `$route` should never be missing */
-            return $this->router->generate($route, $params);
+            return $this->routeGenerator->generate($route, $params);
         }
 
         return null;

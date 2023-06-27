@@ -189,7 +189,7 @@ class Controller extends AbstractController
                 Alaress_Date_Format::newLocalShort($this->getRequest()->post['end'])
             );
 
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSeason.getList'));
+            $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSeason.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }
@@ -343,7 +343,7 @@ class Controller extends AbstractController
                 ]
             ]);
         } else {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('sportsfixturesSeason.getList'));
+            $this->getResponse()->redirect->to($this->routeGenerator->generate('sportsfixturesSeason.getList'));
         }
     }
 

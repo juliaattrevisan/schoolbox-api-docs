@@ -257,7 +257,7 @@ class Controller extends Assessment\Controller
             /* Find the first valid Blind Review url
              */
             'blindReviewUrl'    => (new StudentCarousel\Blind(
-                $this->getRouter(),
+                $this->routeGenerator,
                 null,
                 $assessment
             ))->getFirstUrl(),
@@ -466,7 +466,7 @@ class Controller extends Assessment\Controller
         $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
         $returnUrl        = isset($encodedReturnUrl)
             ? Redirect::decode($encodedReturnUrl)
-            : $this->router->generate(
+            : $this->routeGenerator->generate(
                 'learningAssessment.getStatus',
                 ['assessmentId' => $assessment->getId()],
             );
@@ -502,7 +502,7 @@ class Controller extends Assessment\Controller
                                    ->add(
                                        [
                                            $assessment->getTitle(),
-                                           $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
+                                           $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
                                        ]
                                    )
                                    ->add(['Rubric Report', '']),
@@ -978,7 +978,7 @@ class Controller extends Assessment\Controller
                 $attachments = $factory->build($rq->post->get('attachment'))->getAll();
             } catch (InvalidArgumentException) {
                 $errorMessage = 'One or more files were not able to be attached';
-                $redirect     = $this->getRouter()->generate(
+                $redirect     = $this->routeGenerator->generate(
                     'learningAssessment.getCreateResponseForm',
                     [
                         'assessmentId' => $assessment->getId(),
@@ -1014,7 +1014,7 @@ class Controller extends Assessment\Controller
             // should there be files attached? fail if we didn't get any
             if ($acceptsOnline && $notSubmittedInPerson && $response->getAllFiles()->count() === 0) {
                 $errorMessage = 'One or more files failed to attach to your submission; please try again.';
-                $redirect     = $this->getRouter()->generate(
+                $redirect     = $this->routeGenerator->generate(
                     'learningAssessment.getCreateResponseForm',
                     [
                         'assessmentId' => $assessment->getId(),
@@ -1234,7 +1234,7 @@ class Controller extends Assessment\Controller
         } else {
             // Redirect after saving to Due Work Summary for particular student.
             $rs->redirect->to(
-                $this->getRouter()->generate(
+                $this->routeGenerator->generate(
                     'learningAssessment.getSummary',
                     [
                         'assessmentId' => $assessment->getId(),
@@ -1684,7 +1684,7 @@ class Controller extends Assessment\Controller
                 ''
             ]),
             'assessment' => $assessment,
-            'payloadUrl' => $this->router->generate('learningAssessment.getSimilarityReportPayload', [
+            'payloadUrl' => $this->routeGenerator->generate('learningAssessment.getSimilarityReportPayload', [
                 'assessment' => $assessment,
                 'assessmentId' => $assessment->getId()
             ])
@@ -1699,7 +1699,7 @@ class Controller extends Assessment\Controller
      */
     public function getSimilarityReportPayload(IAssessable $assessment): void
     {
-        $payload = (new Turnitin\SimilarityReportPayload($this->turnitinFileMapper, $this->getUserMapper(), $this->router))
+        $payload = (new Turnitin\SimilarityReportPayload($this->turnitinFileMapper, $this->getUserMapper(), $this->routeGenerator))
             ->generate($assessment);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));

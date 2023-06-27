@@ -11,7 +11,7 @@
 namespace Calendar\Event\Collection;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Calendar\Event\SortStrategy;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\RendererInterface;
@@ -36,9 +36,9 @@ class Renderer
     private $authorizer;
 
     /**
-     * @var Router
+     * @var Generator
      */
-    private $router;
+    private $routeGenerator;
 
 
     /** @var User */
@@ -63,7 +63,7 @@ class Renderer
      * @param int                              $endTimestamp
      * @param User                             $user
      * @param Authorizer                       $authorizer
-     * @param Router                           $router
+     * @param Generator                        $routeGenerator
      * @param User                             $viewer
      * @param array|null                       $allowedEventTypes
      */
@@ -73,7 +73,7 @@ class Renderer
         int $endTimestamp,
         User $user,
         Authorizer $authorizer,
-        Router $router,
+        Generator $routeGenerator,
         User $viewer,
         ?array $allowedEventTypes = null
     ) {
@@ -82,7 +82,7 @@ class Renderer
         $this->endTimestamp   = $endTimestamp;
         $this->user           = $user;
         $this->authorizer     = $authorizer;
-        $this->router         = $router;
+        $this->routeGenerator = $routeGenerator;
         $this->viewer         = $viewer;
 
         $this->allEvents = new GenericCollection(EventInterface::class);
@@ -139,7 +139,7 @@ class Renderer
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
             $this->authorizer,
-            $this->router,
+            $this->routeGenerator,
             $event,
             $this->user,
             $this->viewer

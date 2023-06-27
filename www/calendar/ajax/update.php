@@ -112,7 +112,7 @@ if ($eventId = $calendarHandler->update($updatedEvent)) {
         // Only one event should ever be gotten here, so render that one only
         $renderer = new Javascript(
             $this->getDi()->get('authorizer'),
-            $this->getDi()->get('router'),
+            $this->getDi()->get('router.generator'),
             $calendarEvent,
             $_SESSION['user'],
             $_SESSION['user']

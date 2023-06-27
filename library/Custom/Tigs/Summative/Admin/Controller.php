@@ -19,7 +19,6 @@ use Alaress\Database\Predicate;
 
 class Controller extends ConfigController
 {
-
     /** @var Quoter */
     private $quoter;
 
@@ -57,7 +56,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->getRouter()->generate('tigsSummativeAdmin.postAdmin'),
+            $this->routeGenerator->generate('tigsSummativeAdmin.postAdmin'),
         );
 
         $data = ['configContext' => $configContext,];
@@ -80,7 +79,7 @@ class Controller extends ConfigController
     public function postAdmin(): void
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('tigsSummativeAdmin.getAdmin'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('tigsSummativeAdmin.getAdmin'));
     }
 
 

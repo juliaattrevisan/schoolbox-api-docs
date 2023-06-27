@@ -171,8 +171,8 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/index.twig',
                 [
-                    'pageCurrent'    => $this->router->generate('shaps.getAll'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
+                    'pageCurrent'    => $this->routeGenerator->generate('shaps.getAll'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('shaps.getAll')),
                     'campuses'       => $campuses,
                     'roles'          => $roles,
                     'courses'        => $courses,

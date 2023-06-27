@@ -13,7 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -22,13 +22,12 @@ class Module extends BaseModule
     protected $basename = 'messages';
 
     /**
-     * @param Router $router
      * @param string $basePath
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addGetRoute($router, 'configure', $basePath, '');
-        $this->addPostRoute($router, 'saveConfig', $basePath, '');
+        $this->addGetRoute('configure', $basePath, '');
+        $this->addPostRoute('saveConfig', $basePath, '');
     }
 
 

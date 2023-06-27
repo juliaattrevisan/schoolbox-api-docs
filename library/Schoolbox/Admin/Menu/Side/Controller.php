@@ -31,7 +31,6 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends Base
 {
-
     /** @var MenuSideMapper $menuSideMapper */
     private $menuSideMapper;
 
@@ -113,8 +112,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuSide/index.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
                 'tree' => $treeList,
                 'sections' => $sections,
                 'configTitle' => $this->getConfigLoader()->get('title'),
@@ -200,9 +199,9 @@ class Controller extends Base
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
+                'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
                     [['Modify', null]]
                 ),
                 'item' => $this->getMenuSideMapper()->findById($id),
@@ -227,9 +226,9 @@ class Controller extends Base
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
+                'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
                     [['Create', null]]
                 ),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),

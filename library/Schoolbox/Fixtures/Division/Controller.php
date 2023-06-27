@@ -223,7 +223,7 @@ class Controller extends AbstractController
             $return = base64_decode($this->request->post->get('returnUrl'));
 
             if (empty($return)) {
-                $return = $this->getRouter()->generate('sportsfixturesSport.getEntity', [
+                $return = $this->routeGenerator->generate('sportsfixturesSport.getEntity', [
                     'entityId' => $sport->getId()
                 ]);
             }
@@ -348,7 +348,7 @@ class Controller extends AbstractController
             ])
         );
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'sportsfixturesDivision.getLobby',
                 ['entityId' => $division->getId(),]
             )
@@ -451,7 +451,7 @@ class Controller extends AbstractController
         // Return to lobby
 
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'sportsfixturesDivision.getLobby',
                 ['entityId' => $entityId]
             )
@@ -500,7 +500,7 @@ class Controller extends AbstractController
         } else {
             // Redirect back to lobby
             $this->getResponse()->redirect->afterPost(
-                $this->getRouter()->generate(
+                $this->routeGenerator->generate(
                     'sportsfixturesDivision.getLobby',
                     ['entityId' => $division->getId(),]
                 )

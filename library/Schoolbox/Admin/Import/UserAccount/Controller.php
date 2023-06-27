@@ -97,9 +97,9 @@ class Controller extends Base
     protected function getBaseData(): array
     {
         return [
-            'pageCurrent' => $this->getRouter()->generate("{$this->basename}.getUpload"),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->getRouter()->generate("{$this->basename}.getUpload")),
-            'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
+            'pageCurrent' => $this->routeGenerator->generate("{$this->basename}.getUpload"),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate("{$this->basename}.getUpload")),
+            'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, $this->basename)->getAllNodes(),
             'basename' => $this->basename,
             'now' => \Alaress_Date_Format::now(),
         ];
@@ -118,7 +118,7 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->getResponse()->redirect->to($this->getRouter()->generate("{$this->basename}.getUpload"));
+            $this->getResponse()->redirect->to($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }
@@ -150,7 +150,7 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->getResponse()->redirect->to($this->getRouter()->generate("{$this->basename}.getUpload"));
+            $this->getResponse()->redirect->to($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }

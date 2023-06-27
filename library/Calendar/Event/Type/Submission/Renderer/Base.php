@@ -11,14 +11,13 @@
 namespace Calendar\Event\Type\Submission\Renderer;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\Submission;
 use Schoolbox\User;
 
 abstract class Base extends RendererBase
 {
-
     /** @var Submission\Event */
     protected $event;
 
@@ -27,14 +26,14 @@ abstract class Base extends RendererBase
      * Constructor
      *
      * @param Authorizer       $authorizer
-     * @param Router           $router
+     * @param Generator        $routeGenerator
      * @param Submission\Event $event
      * @param User             $user
      * @param User             $viewer
      */
-    public function __construct(Authorizer $authorizer, Router $router, Submission\Event $event, User $user, User $viewer)
+    public function __construct(Authorizer $authorizer, Generator $routeGenerator, Submission\Event $event, User $user, User $viewer)
     {
-        parent::__construct($authorizer, $router, $user, $viewer);
+        parent::__construct($authorizer, $routeGenerator, $user, $viewer);
         $this->event = $event;
     }
 

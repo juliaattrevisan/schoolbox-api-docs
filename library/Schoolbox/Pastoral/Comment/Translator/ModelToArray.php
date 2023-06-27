@@ -12,7 +12,7 @@ namespace Schoolbox\Pastoral\Comment\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Alaress\HTMLPurifier\IPurifier;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Pastoral\Comment\Model;
 use Schoolbox\User;
 
@@ -39,20 +39,20 @@ class ModelToArray
      * Constructor
      *
      * @param callable   $userTranslator
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $authorizer
      * @param User       $currentUser
      * @param IPurifier  $purifier
      */
     public function __construct(
         callable $userTranslator,
-        Router $router,
+        Generator $routeGenerator,
         Authorizer $authorizer,
         User $currentUser,
         IPurifier $purifier
     ) {
         $this->userTranslator = $userTranslator;
-        $this->router         = $router;
+        $this->routeGenerator = $routeGenerator;
         $this->authorizer     = $authorizer;
         $this->currentUser    = $currentUser;
         $this->purifier       = $purifier;

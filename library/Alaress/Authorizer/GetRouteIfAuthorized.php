@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Authorizer;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\User;
 
 /**
@@ -20,7 +20,7 @@ trait GetRouteIfAuthorized
     /**
      * The router object, as required to generate a link to content.
      */
-    protected Router $router;
+    protected Generator $routeGenerator;
 
 
     /**
@@ -48,7 +48,7 @@ trait GetRouteIfAuthorized
     {
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $this->currentUser)) {
             /** @noinspection PhpUnhandledExceptionInspection */
-            return $this->router->generate($route, $params);
+            return $this->routeGenerator->generate($route, $params);
         }
         return null;
     }

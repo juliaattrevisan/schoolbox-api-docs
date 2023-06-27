@@ -195,8 +195,8 @@ class Controller extends BaseController
         }
 
         $data = [
-            'pageCurrent'    => $this->router->generate('adminMessages.getApps'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMessages.getApps')),
+            'pageCurrent'    => $this->routeGenerator->generate('adminMessages.getApps'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.getApps')),
             'apps'           => $apps,
             'attachzones'    => $zones,
             'providers'      => [
@@ -422,8 +422,8 @@ class Controller extends BaseController
             'title'    => 'Global Message Configuration',
             'template' => '@adminMessages/configure.twig',
             'data'     => [
-                'pageCurrent' => $this->router->generate('adminMessages.configure'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMessages.configure')),
+                'pageCurrent' => $this->routeGenerator->generate('adminMessages.configure'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.configure')),
                 'filters' => $filters,
                 'roles'   => $roles,
                 'ns'      => $ns,
@@ -557,9 +557,9 @@ class Controller extends BaseController
             'template' => '@adminMessages/puush.twig',
             'data'     => [
                 'liveMessage'    => $liveMessage,
-                'pageCurrent'    => $this->router->generate('adminMessages.testPush'),
+                'pageCurrent'    => $this->routeGenerator->generate('adminMessages.testPush'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))
-                    ->generateBreadcrumbs($this->router->generate('adminMessages.testPush')),
+                    ->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.testPush')),
             ],
         ];
 

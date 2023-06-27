@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
@@ -39,7 +39,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
         $routes = [
             'GET' => [
@@ -54,7 +54,7 @@ class Module extends BaseModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($alias, $basePath, $path);
         }
     }
 

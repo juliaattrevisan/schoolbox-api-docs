@@ -15,7 +15,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -53,10 +53,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addGetRoute($router, 'impersonate', $basePath, '/switch/{userId}');
-        $this->addGetRoute($router, 'recoverSession', $basePath, '/recoverSession');
+        $this->addGetRoute('impersonate', $basePath, '/switch/{userId}');
+        $this->addGetRoute('recoverSession', $basePath, '/recoverSession');
     }
 
     /**

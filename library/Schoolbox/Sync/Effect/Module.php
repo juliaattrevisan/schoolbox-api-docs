@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -27,21 +27,21 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addPostRoute($router, 'add', $basePath, "/add/{ruleId}");
+        $this->addPostRoute('add', $basePath, "/add/{ruleId}");
 
         /* Special case
          * Has no inputs or anything so we can lighten the backend load
          */
-        $this->addPostRoute($router, 'addSkip', $basePath, "/add/{ruleId}/skip");
+        $this->addPostRoute('addSkip', $basePath, "/add/{ruleId}/skip");
 
-        $this->addPostRoute($router, 'delete', $basePath, "/delete");
-        $this->addGetRoute($router, 'change', $basePath, "/change");
+        $this->addPostRoute('delete', $basePath, "/delete");
+        $this->addGetRoute('change', $basePath, "/change");
 
         /* Spawn a new Mapped Key/Value fragment
          */
-        $this->addGetRoute($router, 'newMappedRow', $basePath, "/newMappedRow");
+        $this->addGetRoute('newMappedRow', $basePath, "/newMappedRow");
     }
 
     /**

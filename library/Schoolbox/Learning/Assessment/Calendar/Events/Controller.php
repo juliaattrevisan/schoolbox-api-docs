@@ -337,6 +337,6 @@ class Controller extends Base
      */
     private function buildRenderer(Calendar_Api_EventType_Interface $api, int $start, int $end, User $user): Renderer
     {
-        return new Renderer($api, $start, $end, $user, $this->getAuthorizer(), $this->getRouter(), $user);
+        return new Renderer($api, $start, $end, $user, $this->getAuthorizer(), $this->routeGenerator, $user);
     }
 }

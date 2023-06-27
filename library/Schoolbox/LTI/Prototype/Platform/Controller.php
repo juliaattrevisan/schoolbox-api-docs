@@ -101,7 +101,7 @@ class Controller extends Base
                 (string)(new Factory($this->getConfigLoader()))
                     ->buildFullyQualified()
                     ->withScheme('https')
-                    ->withPath($this->router->generate('ltiPrototypePlatform.getDeepLinkingResponse')),
+                    ->withPath($this->routeGenerator->generate('ltiPrototypePlatform.getDeepLinkingResponse')),
             );
 
         $this->response->content->set(

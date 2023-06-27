@@ -80,14 +80,19 @@ class Module extends AbstractModule
         $notSupported    = new Rule\Callback(function (array $params, User $user): bool {
             throw new InvalidPath();
         });
+        $this->register('GET', '/picker/{sourceSlug}', 'picker', new Rule\IsLoggedIn());
         $this->register('GET', '/file/{fileId:\d+}/ajax', 'getFileInfo', $hasFileAccess, $preloadFile);
+        $this->register('GET', '', 'browseRoot', new Rule\IsLoggedIn());
         $this->register('GET', '{/folderId:\d+}', 'browse', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/children', 'listResources', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/info', 'showFolderInfo', $hasFolderAccess, $preloadFolder);
         $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasFileAccess, $preloadFile);
-        $this->register('GET', '/file/{fileIds:\d+}/info', 'showMultiFileInfo', $notSupported);
         $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $hasFolderAccess, $preloadFolder);
+
+        // I believe showMultiFileInfo is never used in any resource browser
+        // variant: I can find no reference to it
+        $this->register('GET', '/file/{fileIds:\d+}/info', 'showMultiFileInfo', $notSupported);
     }
 
     /**

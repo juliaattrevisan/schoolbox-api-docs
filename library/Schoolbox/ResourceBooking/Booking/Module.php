@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Calendar;
@@ -32,23 +32,23 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $this->addGetRoute($router, 'book', $basePath, '/bookItem/{id}');
-        $this->addGetRoute($router, 'edit', $basePath, '/{id}/edit');
-        $this->addPostRoute($router, 'createBooking', $basePath, '/bookItem/{id}')
-            ->addValues(array('action' => 'createBooking'));
-        $this->addPostRoute($router, 'update:post', $basePath, '/{id}/update')
-            ->addValues(array('action' => 'update'));
-        $this->addRoute($router, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
+        $this->addGetRoute('book', $basePath, '/bookItem/{id}');
+        $this->addGetRoute('edit', $basePath, '/{id}/edit');
+        $this->addPostRoute('createBooking', $basePath, '/bookItem/{id}')
+             ->attributes(['action' => 'createBooking']);
+        $this->addPostRoute('update:post', $basePath, '/{id}/update')
+             ->attributes(['action' => 'update']);
+        $this->addRoute('bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
-        $this->addRoute($router, 'approve', $basePath, '/{id}/approve');
-        $this->addRoute($router, 'reject', $basePath, '/{id}/reject');
-        $this->addRoute($router, 'setPending', $basePath, '/{id}/setPending');
-        $this->addRoute($router, 'cancel', $basePath, '/{id}/cancel');
+        $this->addRoute('approve', $basePath, '/{id}/approve');
+        $this->addRoute('reject', $basePath, '/{id}/reject');
+        $this->addRoute('setPending', $basePath, '/{id}/setPending');
+        $this->addRoute('cancel', $basePath, '/{id}/cancel');
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -16,10 +16,10 @@ $token = isset($args[3]) && !empty($args[3]) ? $args[3] : '';
 /* Redirect to new module
  */
 $di = $kernel->getDependencyInjector();
-/** @var Router $router */
-$router = $di->get('router');
+/** @var Generator $routeGenerator */
+$routeGenerator = $di->get('router.generator');
 $url = $catID
-    ? $router->generate('commsNewsFeed.getFeedForFolder', ['key' => $token, 'folderId' => $catID])
-    : $router->generate('commsNewsFeed.getFeedForUser', ['key' => $token]);
+    ? $routeGenerator->generate('commsNewsFeed.getFeedForFolder', ['key' => $token, 'folderId' => $catID])
+    : $routeGenerator->generate('commsNewsFeed.getFeedForUser', ['key' => $token]);
 
 SitePage::localRedir($url, false, 308);

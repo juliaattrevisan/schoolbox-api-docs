@@ -15,7 +15,7 @@ namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Exception;
 use Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;
@@ -34,12 +34,12 @@ class Factory
     /**
      * Constructor
      *
-     * @param Router     $router     Used to generate route URLs
-     * @param Authorizer $authorizer Used to verify that route URLs are accessible
-     * @param Access     $access     Used to verify homepage access permissions
+     * @param Generator  $routeGenerator Used to generate route URLs
+     * @param Authorizer $authorizer     Used to verify that route URLs are accessible
+     * @param Access     $access         Used to verify homepage access permissions
      */
     public function __construct(
-        private Router $router,
+        private Generator $routeGenerator,
         private Authorizer $authorizer,
         private Access $access
     ) {
@@ -61,7 +61,7 @@ class Factory
     {
         $assessmentContext = $assessment->getContext();
         $breadcrumbs       = new Collection();
-        $breadcrumbs->add(['Learning', $this->router->generate('learning.getClasses')]);
+        $breadcrumbs->add(['Learning', $this->routeGenerator->generate('learning.getClasses')]);
 
         if ($assessmentContext instanceof UnitImplementation) {
             // Generate trail like 'Learning'->$unitImp->$unitSpec (eg. 'Learning'->'9ENGA'->'Romeo and Juliet').
@@ -106,8 +106,8 @@ class Factory
                         // In some circumstances the user will not be authorised to view the 'status' page.
                         // In that case, show the 'summary' page instead.
                         ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
-                        $this->router->generate('learningAssessment.getStatus', $routeParams) :
-                        $this->router->generate('learningAssessment.getSummary', $routeParams)
+                        $this->routeGenerator->generate('learningAssessment.getStatus', $routeParams) :
+                        $this->routeGenerator->generate('learningAssessment.getSummary', $routeParams)
                     )
                 ]
             );
@@ -138,7 +138,7 @@ class Factory
     public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null, \Schoolbox\User $user): Collection
     {
         $trail = new Collection();
-        $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
+        $trail->add(['Learning', $this->routeGenerator->generate('learning.getClasses')]);
 
         if ($context instanceof Folder) {
             $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
@@ -152,9 +152,9 @@ class Factory
              * has never actually been needed; this route was never visible in that usage
              */
             if ($assessment instanceof LessonPlan\Model) {
-                $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId(), 'studentId' => $user->getId()])]);
+                $trail->add([$context->getTitle(), $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId(), 'studentId' => $user->getId()])]);
             } else {
-                $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
+                $trail->add([$context->getTitle(), $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
             }
         }
 

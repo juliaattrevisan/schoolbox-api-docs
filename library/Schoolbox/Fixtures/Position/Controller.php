@@ -19,7 +19,6 @@ use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 
 class Controller extends AbstractController
 {
-
     /**
      * @var SportMapper
      */
@@ -130,7 +129,7 @@ class Controller extends AbstractController
 
         $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesPosition.getList', [
             'contextId' => $sportId
         ]));
     }

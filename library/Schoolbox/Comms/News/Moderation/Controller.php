@@ -173,7 +173,7 @@ class Controller extends Base
             // TODO. The client should be responsible for determining what to do after submission
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
             // TODO. THis should just return the outcome of the request, not a redirect.
-            $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+            $route = $this->routeGenerator->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
             if ($this->isXhrRequest()) {
                 $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
             } else {
@@ -244,7 +244,7 @@ class Controller extends Base
                 ) {
                     $route = $listRoute;
                 } else {
-                    $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+                    $route = $this->routeGenerator->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
                 }
             }
 
@@ -321,7 +321,7 @@ class Controller extends Base
                 if ($listRoute) {
                     $route = $listRoute;
                 } else {
-                    $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+                    $route = $this->routeGenerator->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
                 }
             }
             $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);

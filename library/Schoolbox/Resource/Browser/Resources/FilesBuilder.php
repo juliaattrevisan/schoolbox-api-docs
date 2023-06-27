@@ -10,7 +10,7 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -24,20 +24,20 @@ class FilesBuilder
 
     protected Component_InstanceMapper $componentInstanceMapper;
 
-    protected Router $router;
+    protected Generator $routeGenerator;
 
     /**
      * FilesBuilder constructor.
      *
      * @param FileMapper               $fileMapper
      * @param Component_InstanceMapper $componentInstanceMapper
-     * @param Router                   $router
+     * @param Generator                $routeGenerator
      */
-    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper, Router $router)
+    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper, Generator $routeGenerator)
     {
         $this->fileMapper              = $fileMapper;
         $this->componentInstanceMapper = $componentInstanceMapper;
-        $this->router                  = $router;
+        $this->routeGenerator          = $routeGenerator;
     }
 
     /**
@@ -80,11 +80,11 @@ class FilesBuilder
         //lets build the list folder array, so we don't have to worry about hydration. etc
         $files     = [];
         $returnUrl = $componentId ?
-            $this->router->generate('resourceBrowser.showFiles', [
+            $this->routeGenerator->generate('resourceBrowser.showFiles', [
                 'componentID'    => $componentId,
                 'sourceFolderID' => $folderId,
             ])
-            : $this->router->generate('resourceBrowser.showFolderFiles', ['sourceFolderID' => $folderId]);
+            : $this->routeGenerator->generate('resourceBrowser.showFolderFiles', ['sourceFolderID' => $folderId]);
 
         $encodedReturnUrl = Redirect::encode($returnUrl);
 
@@ -144,7 +144,7 @@ class FilesBuilder
                 'formatted' => $file->getModifiedAt()->getShort(),
             ],
             'editUrl'       => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "={$returnURL}",
-            'visibilityUrl' => $this->router->generate('resourceBrowser.patchFileInfo', ['fileId' => $file->getId()]),
+            'visibilityUrl' => $this->routeGenerator->generate('resourceBrowser.patchFileInfo', ['fileId' => $file->getId()]),
         ];
     }
 }

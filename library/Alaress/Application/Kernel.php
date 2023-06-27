@@ -29,11 +29,12 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
 use Alaress\Web\Router\PathMatcher;
-use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
-use Aura\Router\Router;
+use Aura\Router\Generator;
+use Aura\Router\Map;
+use Aura\Router\RouterContainer;
 use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
@@ -46,6 +47,7 @@ use External_User;
 use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
+use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -410,11 +412,11 @@ abstract class Kernel
             $di->lazyNew(
                 ModuleCache\Rebuilder::class,
                 [
-                    'di'     => $di,
-                    'config' => $di->lazyGet('config'),
-                    'router' => $di->lazyGet('router'),
-                    'redis'  => $di->lazyGet('redis.cache'),
-                    'logger' => null,
+                    'di'       => $di,
+                    'config'   => $di->lazyGet('config'),
+                    'routeMap' => $di->lazyGet('router.map'),
+                    'redis'    => $di->lazyGet('redis.cache'),
+                    'logger'   => null,
                 ]
             )
         );
@@ -552,16 +554,23 @@ abstract class Kernel
             )
         );
 
-        // Web router
-        $di->set(
-            'router',
-            $di->lazy(
-                function () {
-                    $factory = new RouterFactory();
-                    return $factory->newInstance();
-                }
-            )
-        );
+        // Web router, and convenience references for its matcher and generator
+        $di->set('router', $di->lazyNew(RouterContainer::class));
+        $di->set('router.matcher', $di->lazy(function () use ($di) {
+            /** @var RouterContainer $router */
+            $router = $di->get('router');
+            return $router->getMatcher();
+        }));
+        $di->set('router.map', $di->lazy(function () use ($di) {
+            /** @var RouterContainer $router */
+            $router = $di->get('router');
+            return $router->getMap();
+        }));
+        $di->set('router.generator', $di->lazy(function () use ($di) {
+            /** @var RouterContainer $router */
+            $router = $di->get('router');
+            return $router->getGenerator();
+        }));
 
         $this->installSessionService($di);
 
@@ -627,6 +636,30 @@ abstract class Kernel
 
         // Web request/response factory
         $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
+
+        // New PSR-7 compliant request object
+        $di->set(
+            'request',
+            $di->lazy(
+                function () {
+                    // This will be a ServerRequestInterface,
+                    // but of a discovered rather than defined type.
+                    // That should be fine: they all obey the same interface.
+                    $request = (new Psr17Factory())->createServerRequestFromGlobals();
+
+                    // If the request is JSON:
+                    // set the parsed body appropriately
+                    // TODO move to spec pattern?
+                    if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
+                        $request->getBody()->rewind();
+                        $content = $request->getBody()->getContents();
+                        $request->getBody()->rewind();
+                        $request = $request->withParsedBody(json_decode($content, true));
+                    }
+                    return $request;
+                }
+            ),
+        );
 
         // SitePage :D
         $di->set(
@@ -923,19 +956,16 @@ abstract class Kernel
             'templateEngine:routeLookup',
             $di->lazyNew(
                 TwigMethod\RouteLookup::class,
-                [],
-                ['setRouter' => $di->lazyGet('router')],
+                ['routeGenerator' => $di->lazyGet('router.generator')],
             )
         );
         $di->set(
             'templateEngine:isRouteAuthorized',
             $di->lazyNew(
                 TwigMethod\IsRouteAuthorized::class,
-                [],
                 [
-                    'setRouter'     => $di->lazyGet('router'),
-                    'setAuthorizer' => $di->lazyGet('authorizer'),
-                    'setSession'    => $di->lazyGet('session'),
+                    'authorizer' => $di->lazyGet('authorizer'),
+                    'session'    => $di->lazyGet('session'),
                 ],
             )
         );
@@ -1506,7 +1536,7 @@ abstract class Kernel
                     'submissionBoxMapper'      => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBoxMapper::class),
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
                     'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
-                    'router'                   => $di->lazyGet('router'),
+                    'routeGenerator'           => $di->lazyGet('router.generator'),
                     'replicator'               => $di->lazyNew(
                         Replicator::class,
                         [
@@ -1863,8 +1893,8 @@ abstract class Kernel
             $di->lazy(function () use ($di) {
                 /** @var IConfigLoader $config */
                 $config = $di->get('config');
-                /** @var Router $router */
-                $router = $di->get('router');
+                /** @var Generator $generator */
+                $generator = $di->get('router.generator');
                 /** @var KeyChainRepositoryInterface $keyChains */
                 $keyChains = $di->get('lti.keyChains');
                 /** @var ToolModel[] $ltiTools */
@@ -1872,9 +1902,9 @@ abstract class Kernel
                 $registrationRepositoryFactory = new RegistrationRepositoryFactory(
                     $config,
                     $keyChains,
-                    $router->generate('ltiPlatform.getOidcAuthenticationRequest'),
-                    $router->generate('ltiPlatform.getOauthAccessTokenRequest'),
-                    $router->generate('ltiPlatform.getJsonWebKeySet'),
+                    $generator->generate('ltiPlatform.getOidcAuthenticationRequest'),
+                    $generator->generate('ltiPlatform.getOauthAccessTokenRequest'),
+                    $generator->generate('ltiPlatform.getJsonWebKeySet'),
                 );
                 return $registrationRepositoryFactory->build($ltiTools);
             })
@@ -2073,9 +2103,9 @@ abstract class Kernel
             $routes = $moduleCache->fetchRouteTable();
         }
 
-        /** @var Router $router */
-        $router = $this->di->get('router');
-        $router->setRoutes($routes);
+        /** @var Map $routeMap */
+        $routeMap = $this->di->get('router.map');
+        $routeMap->setRoutes($routes);
     }
 
     /**

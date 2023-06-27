@@ -84,7 +84,7 @@ class Controller extends Base
         // This is now the final location, not the redirect
         // Ignore viewee: always use current user
         $page      = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
-        $route     = $this->getRouter()->generate(
+        $route     = $this->routeGenerator->generate(
             'learningMarkbook.postMarkbookForClass',
             [
                 'folder'   => $folder,
@@ -193,7 +193,7 @@ class Controller extends Base
      */
     private function buildMarkbookRedirect(FolderModel $folder, ?Term\Model $term): void
     {
-        $route = $this->getRouter()->generate(
+        $route = $this->routeGenerator->generate(
             'learningMarkbook.getMarkbookForClass',
             [
                 'folder'   => $folder,

@@ -36,7 +36,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
             $endSequence->getUnixTimeStamp(),
             $this->user,
             $this->authorizer,
-            $this->router,
+            $this->routeGenerator,
             $this->viewer,
             $this->allowedEventTypes
         );

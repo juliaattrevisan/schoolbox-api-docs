@@ -22,9 +22,11 @@ use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Aura\Di\Container;
+use Aura\Router\Matcher;
 use Aura\Router\Route;
 use Aura\Web\Request;
 use Aura\Web\Response;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -34,7 +36,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 
@@ -99,24 +100,30 @@ class Kernel extends WebKernelAbstract
      */
     public function run()
     {
-        // Run router with requested path (trim trailing /)
-        $path  = RequestUriParser::parseUrlPath($_SERVER);
+        // First get the request object
+        /** @var ServerRequestInterface $request */
+        $request = $this->di->get('request');
 
-        // take a copy
-        $server = $_SERVER;
+        // Run router with requested path (trim trailing /)
+        $server  = $request->getServerParams();
+        $path    = RequestUriParser::parseUrlPath($server);
+        $request = $request->withUri($request->getUri()->withPath($path));
 
         // check for a method override and act accordingly
         if (!empty($server['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
             $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);
         }
 
+        /** @var Matcher $matcher */
+        $matcher = $this->di->get('router.matcher');
         if ('OPTIONS' === $server['REQUEST_METHOD']) {
             /**
              * if system is requesting OPTIONS lets give them what the endpoint actually accepts, not just all.
              */
             $methods = ['OPTIONS'];
             foreach (["GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"] as $testMethod) {
-                if (false !== $this->di->get('router')->match($path, ['REQUEST_METHOD' => $testMethod])) {
+                $testRequest = $request->withMethod($testMethod);
+                if ($matcher->match($testRequest)) {
                     $methods[] = $testMethod;
                 }
             }
@@ -129,7 +136,7 @@ class Kernel extends WebKernelAbstract
             header("Access-Control-Allow-Methods: *");
             exit;
         }
-        $route = $this->di->get('router')->match($path, $server);
+        $route = $matcher->match($request);
 
         try {
             if ($route instanceof Route) {
@@ -294,7 +301,7 @@ class Kernel extends WebKernelAbstract
         $preloaderException = null;
 
         // Augment route params with preloader params, if possible
-        $params = $route->params;
+        $params = $route->attributes;
         try {
             $params = $preloader->check($route->name, $params);
         } catch (\Exception $preloaderException) {

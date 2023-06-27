@@ -16,7 +16,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use House;
 use HouseMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -33,16 +33,16 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addGetRoute($router, 'currentReport', $basePath, '/{id}')
-             ->addTokens(['id' => '\\d+']);
-        $this->addGetRoute($router, 'index', $basePath, '/{id}/{year}')
-             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
-        $this->addGetRoute($router, 'subject', $basePath, '/{id}/{year}/{subjectCode}')
-             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
-        $this->addGetRoute($router, 'printableReport', $basePath, '/{id}/print/{year}')
-             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
+        $this->addGetRoute('currentReport', $basePath, '/{id}')
+             ->tokens(['id' => '\\d+']);
+        $this->addGetRoute('index', $basePath, '/{id}/{year}')
+             ->tokens(['id' => '\\d+', 'year' => '\\d+']);
+        $this->addGetRoute('subject', $basePath, '/{id}/{year}/{subjectCode}')
+             ->tokens(['id' => '\\d+', 'year' => '\\d+']);
+        $this->addGetRoute('printableReport', $basePath, '/{id}/print/{year}')
+             ->tokens(['id' => '\\d+', 'year' => '\\d+']);
     }
 
     /**

@@ -15,7 +15,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -28,11 +28,11 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->attachResourceRoutes($router, $basePath);
-        $this->addGetRoute($router, 'search', $basePath, '/search');
-        $this->addGetRoute($router, 'getTree', $basePath, '/tree');
+        $this->attachResourceRoutes($basePath);
+        $this->addGetRoute('search', $basePath, '/search');
+        $this->addGetRoute('getTree', $basePath, '/tree');
 
         /* You can view the Curriculum Tree with this route
          * $this->addGetRoute($router, 'browse', $basePath, '/browse');

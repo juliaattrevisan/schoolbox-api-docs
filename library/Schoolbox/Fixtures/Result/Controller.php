@@ -203,7 +203,7 @@ class Controller extends AbstractController
              * Prompt to spawn one
              */
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate(
+                $this->routeGenerator->generate(
                     'sportsfixturesResult.getCreateForm',
                     [
                         'contextId' => $context->getId()
@@ -461,7 +461,7 @@ class Controller extends AbstractController
         $this->saveResult($matchup, $team, $status, $this->getRequest()->post['description'], $entity);
 
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'sportsfixturesResult.getResultForTeam',
                 [
                     'contextId' => $matchId,

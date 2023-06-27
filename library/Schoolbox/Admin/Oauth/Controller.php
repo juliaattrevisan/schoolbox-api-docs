@@ -29,12 +29,12 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->getRouter()->generate('adminOauth.postAdmin'),
+            $this->routeGenerator->generate('adminOauth.postAdmin'),
         );
 
         $data = [
-            'pageCurrent' => $this->router->generate('adminOauth.postAdmin'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminOauth.postAdmin')),
+            'pageCurrent' => $this->routeGenerator->generate('adminOauth.postAdmin'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminOauth.postAdmin')),
             'configContext' => $configContext,
         ];
 
@@ -62,7 +62,7 @@ class Controller extends ConfigController
     public function postAdmin(): void
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminOauth.getAdmin'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminOauth.getAdmin'));
     }
 
 

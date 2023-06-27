@@ -12,7 +12,7 @@ namespace Schoolbox\Pastoral\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as CommentTranslator;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\Pastoral\RecordAction\Model as RecordAction;
@@ -34,7 +34,7 @@ class ModelToArray
      * @param UserTranslator    $userTranslator
      * @param CommentTranslator $commentTranslator
      * @param StorageTranslator $storageTranslator
-     * @param Router            $router
+     * @param Generator         $routeGenerator
      * @param Authorizer        $authorizer
      * @param User              $currentUser
      * @param ScrubAdapter      $scrubAdapter
@@ -43,7 +43,7 @@ class ModelToArray
         private UserTranslator $userTranslator,
         private CommentTranslator $commentTranslator,
         private StorageTranslator $storageTranslator,
-        protected Router $router,
+        protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
         private ScrubAdapter $scrubAdapter,

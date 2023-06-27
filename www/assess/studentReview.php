@@ -13,6 +13,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Aura\Router\Generator;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -281,16 +282,16 @@ if (!is_numeric($nextSection['section_id'] ?? null) && !is_numeric($prevSection[
 if (isset($_GET["returnUrl"])) {
     $returnUrl = \Schoolbox\Learning\Assessment\Redirect::decode($_GET["returnUrl"]);
 } else {
-    /** @var \Aura\Router\Router $router */
-    $router = $this->getDi()->get('router');
+    /** @var Generator $routeGenerator */
+    $routeGenerator = $this->getDi()->get('router.generator');
     $params = [
         'assessmentId' => $assess['assessment_id'],
         'assessment'   => $assessment,
     ];
     if ($sessionUser->getRole()->isStaff()) {
-        $returnUrl = $router->generate('learningAssessment.getStatus', $params);
+        $returnUrl = $routeGenerator->generate('learningAssessment.getStatus', $params);
     } else {
-        $returnUrl = $router->generate('learningAssessment.getSummary', $params);
+        $returnUrl = $routeGenerator->generate('learningAssessment.getSummary', $params);
     }
 }
 

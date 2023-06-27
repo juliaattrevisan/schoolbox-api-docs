@@ -178,12 +178,12 @@ class Controller extends Base
          * are actually in...
          */
         if (null !== $subType) {
-            $url = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
+            $url = $this->routeGenerator->generate('pastoralAudience.getAudiencesSubTypeModify', [
                 'typeId' => $type->getId(),
                 'subtypeId' => $subType->getId(),
             ]);
         } else {
-            $url = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
+            $url = $this->routeGenerator->generate('pastoralAudience.getAudiencesTypeModify', [
                 'typeId' => $type->getId(),
             ]);
         }
@@ -194,10 +194,10 @@ class Controller extends Base
         $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
         $flyout = (new Flyout(
             $this->getConfigLoader(),
-            new FlyoutNodes($this->router, $this->pastoralTypeMapper)
+            new FlyoutNodes($this->routeGenerator, $this->pastoralTypeMapper)
         ))->prefixBreadcrumbs([
-            [$pastoralCareProper, $this->router->generate('pastoral.getIndex')],
-            ["Manage {$pastoralCareProper} Record Settings", $this->router->generate('pastoralAudience.getAudiences')],
+            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+            ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
         ]);
 
 

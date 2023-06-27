@@ -201,11 +201,25 @@ abstract class AbstractController extends BaseController
         $this->getResponse()->content->set($html);
     }
 
+    /**
+     * Alternate route for browsing the root node of a resource browser:
+     * required because the router can no longer easily differentiate
+     * permissions for the root node and one of its leaf folders.
+     *
+     * @api   GET /resources
+     * @since 23.1
+     *
+     * @return void
+     */
+    public function browseRoot(): void
+    {
+        $this->browse(null);
+    }
 
     /**
      * Displays 3-panel browser
      *
-     * @api   GET /resources(/:folderId)
+     * @api   GET /resources/:folderId
      * @since 150
      *
      * @param int $folderId
@@ -222,7 +236,7 @@ abstract class AbstractController extends BaseController
             $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate("{$this->namespace}.browse", array())
+                $this->routeGenerator->generate("{$this->namespace}.browse", array())
             );
             return;
         }

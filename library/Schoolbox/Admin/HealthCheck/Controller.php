@@ -3,7 +3,7 @@
 namespace Schoolbox\Admin\HealthCheck;
 
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\IConfigLoader;
@@ -31,14 +31,14 @@ class Controller extends Base
      *
      * @param Jwt            $tokenBuilder
      * @param IConfigLoader  $config
-     * @param Router         $router
+     * @param Generator      $routeGenerator
      * @param MessageFactory $messageFactory
      * @param Producer       $producer
      */
     public function __construct(
         Jwt $tokenBuilder,
         IConfigLoader $config,
-        Router $router,
+        Generator $routeGenerator,
         MessageFactory $messageFactory,
         Producer $producer
     ) {
@@ -47,7 +47,7 @@ class Controller extends Base
         $this->taskDHelper = new TaskD(
             $this->tokenBuilder,
             $config,
-            $router,
+            $routeGenerator,
             $messageFactory,
             $producer
         );
@@ -90,7 +90,7 @@ class Controller extends Base
                      */
                     //helper URL object
                     $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-                    $this->taskDHelper->addSource('assessment', 'assessment', $urlBase->withPath($this->getRouter()->generate('learning.getAssessmentAudit', ['folderId' => 0])));
+                    $this->taskDHelper->addSource('assessment', 'assessment', $urlBase->withPath($this->routeGenerator->generate('learning.getAssessmentAudit', ['folderId' => 0])));
                     break;
                 case 'uxui':
                     /**

@@ -89,7 +89,7 @@ class Controller extends Base
         }
 
         $this->getResponse()->redirect->to(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'learningGrades.getGrades',
                 [
                     'userId'   => $this->getUser()->getId(),
@@ -204,7 +204,7 @@ class Controller extends Base
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
         $page        = FilterPage\Model::PAGE_GRADES;
-        $route       = $this->getRouter()->generate('learningGrades.postReport', [
+        $route       = $this->routeGenerator->generate('learningGrades.postReport', [
             'userId'    => $viewee->getId(),
             'termCode'  => $term->getCode(),
             'subjectId' => $subject->getId(),
@@ -628,12 +628,12 @@ class Controller extends Base
 
     /**
      * @param int $vieweeId
-     * @return false|string|null
+     * @return string|null
      */
-    private function getYearUrl(int $vieweeId)
+    private function getYearUrl(int $vieweeId): ?string
     {
         try {
-            return $this->getRouter()->generate('learningGrades.getGradesYear', ['userId' => $vieweeId]);
+            return $this->routeGenerator->generate('learningGrades.getGradesYear', ['userId' => $vieweeId]);
         } catch (RouteNotFound $e) {
             return null;
         }

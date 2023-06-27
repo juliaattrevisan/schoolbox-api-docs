@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
 
@@ -25,14 +25,14 @@ class Module extends \Alaress\Module\Module
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addRoute($router, 'parentLounge', $basePath, '/parentlounge');
-        $this->addRoute($router, 'tassWeb', $basePath, '/tassweb');
-        $this->addRoute($router, 'teacherKiosk', $basePath, '/teacherkiosk');
-        $this->addRoute($router, 'studentProfile', $basePath, '/studentProfile/{studentId}');
-        $this->addRoute($router, 'webBook', $basePath, '/webbook');
-        $this->addRoute($router, 'studentCafe', $basePath, '/studentcafe');
+        $this->addRoute('parentLounge', $basePath, '/parentlounge');
+        $this->addRoute('tassWeb', $basePath, '/tassweb');
+        $this->addRoute('teacherKiosk', $basePath, '/teacherkiosk');
+        $this->addRoute('studentProfile', $basePath, '/studentProfile/{studentId}');
+        $this->addRoute('webBook', $basePath, '/webbook');
+        $this->addRoute('studentCafe', $basePath, '/studentcafe');
     }
 
     /**

@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Learning\InlineGrader\StudentCarousel;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
@@ -26,12 +26,10 @@ use Schoolbox\User;
  */
 class Standard
 {
-
-
     /**
-     * @var Router
+     * @var Generator
      */
-    private $router;
+    private $routeGenerator;
 
 
     /**
@@ -49,15 +47,15 @@ class Standard
     /**
      * Standard constructor.
      *
-     * @param Router      $router
-     * @param User        $student
-     * @param DueWork     $assessment
+     * @param Generator $routeGenerator
+     * @param User      $student
+     * @param DueWork   $assessment
      */
-    public function __construct(Router $router, User $student, DueWork $assessment)
+    public function __construct(Generator $routeGenerator, User $student, DueWork $assessment)
     {
-        $this->router     = $router;
-        $this->student    = $student;
-        $this->assessment = $assessment;
+        $this->routeGenerator = $routeGenerator;
+        $this->student        = $student;
+        $this->assessment     = $assessment;
     }
 
 
@@ -167,7 +165,7 @@ class Standard
      */
     private function getUrl(User $user): string
     {
-        $url = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+        $url = $this->routeGenerator->generate('learningDueWorkResponse.getParticularResponse', [
             'assessmentId' => $this->assessment->getId(),
             'studentId'    => $user->getId(),
             'assessment'   => $this->assessment

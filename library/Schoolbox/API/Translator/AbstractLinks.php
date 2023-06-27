@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Translator;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\User;
 
 /**
@@ -22,12 +22,12 @@ abstract class AbstractLinks
     /**
      * Constructor
      *
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $authorizer
      * @param User       $currentUser
      */
     public function __construct(
-        protected Router $router,
+        protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser
     ) {
@@ -45,7 +45,7 @@ abstract class AbstractLinks
     {
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $this->currentUser)) {
             /** @noinspection PhpUnhandledExceptionInspection */
-            return $this->router->generate($route, $params);
+            return $this->routeGenerator->generate($route, $params);
         }
         return null;
     }

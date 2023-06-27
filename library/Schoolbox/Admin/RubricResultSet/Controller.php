@@ -46,10 +46,10 @@ class Controller extends Base
             [
                 'template' => '@adminRubricResultSet/index.twig',
                 'data'     => [
-                    'pageCurrent'          => $this->router->generate('adminRubricResultSet.getList'),
+                    'pageCurrent'          => $this->routeGenerator->generate('adminRubricResultSet.getList'),
                     'rubricsByResultSetId' => $this->mapper->findSets(),
                     'allBreadcrumbs'       => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList'))
+                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
                     )
                 ]
             ]
@@ -104,11 +104,11 @@ class Controller extends Base
                 'data'     => [
                     'maxCharsPerLabel'    => self::MAX_CHARS_PER_LABEL,
                     'maxRowsPerResultSet' => self::MAX_ROWS_PER_RESULT_SET,
-                    'pageCurrent'         => $this->router->generate('adminRubricResultSet.getList'),
+                    'pageCurrent'         => $this->routeGenerator->generate('adminRubricResultSet.getList'),
                     'resultSetId'         => $resultSetId,
                     'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRows($resultSetId)),
                     'allBreadcrumbs'      => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList'))
+                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
                     )
                 ]
             ]
@@ -137,6 +137,6 @@ class Controller extends Base
 
         $this->mapper->saveSet($resultSetId, $indexedLabels); // If $resultSetId is null, a new set will be created.
 
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
+        $this->getResponse()->redirect->to($this->routeGenerator->generate('adminRubricResultSet.getList'));
     }
 }

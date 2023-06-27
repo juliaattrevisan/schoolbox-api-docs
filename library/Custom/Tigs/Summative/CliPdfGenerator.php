@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\GenericCollection;
 use Schoolbox\YearLevel;
 use Schoolbox\Url\Uri;
@@ -67,8 +67,8 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     /** @var Folder\Mapper */
     private $folderMapper;
 
-    /** @var Router */
-    private $router;
+    /** @var Generator */
+    private $routeGenerator;
 
     /**
      * Fully-qualified domain name
@@ -125,13 +125,13 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
 
         $di = $this->getDi();
         /** @var MapperFactory $mapperFactory */
-        $mapperFactory       = $this->getDi()->get('mapperFactory');
-        $this->userMapper    = $mapperFactory->get(UserMapper::class);
-        $this->folderMapper  = $mapperFactory->get(Folder\Mapper::class);
-        $this->externalUser  = $di->get('externalUser');
-        $this->fqdn          = \trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
-        $this->router        = $di->get('router');
-        $this->folderFetcher = new FolderFetcher($this->folderMapper, $this->externalUser);
+        $mapperFactory        = $this->getDi()->get('mapperFactory');
+        $this->userMapper     = $mapperFactory->get(UserMapper::class);
+        $this->folderMapper   = $mapperFactory->get(Folder\Mapper::class);
+        $this->externalUser   = $di->get('externalUser');
+        $this->fqdn           = \trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
+        $this->routeGenerator = $di->get('router.generator');
+        $this->folderFetcher  = new FolderFetcher($this->folderMapper, $this->externalUser);
 
         parent::run();
     }
@@ -404,7 +404,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     private function generateUrlsForStudent(User $student, array $externalStudent, ?string $excludedClassCodes): array
     {
         $data                   = ['userId' => $student->getId(), 'reportDate' => $this->reportDateOverride,];
-        $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data) . '?inline=1';
+        $participationReportUrl = 'https://' . $this->fqdn . $this->routeGenerator->generate('tigsParticipationReport.getReport', $data) . '?inline=1';
         if ($this->roleTypeOverride) {
             $participationReportUrl .= "&role-type={$this->roleTypeOverride}";
         }
@@ -426,7 +426,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
                 'folderId'   => $folder->getId(),
                 'reportDate' => $this->reportDateOverride,
             ];
-            $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data) . $queryArgs;
+            $subjectReportUrl = 'https://' . $this->fqdn . $this->routeGenerator->generate('tigsSubjectReport.getReport', $data) . $queryArgs;
             $this->getLogger()->debug("Adding url '$subjectReportUrl' to list");
             $urls[] = $subjectReportUrl;
         }

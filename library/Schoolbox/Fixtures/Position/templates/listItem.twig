@@ -9,6 +9,12 @@
 </div>
 {% if hideNav is not defined or not hideNav %}
 <nav>
-    <a href="{{ routeLookup('sportsfixturesPosition.deleteEntity', {entityId: position.id ?? null}) }}" class="icon-delete" title="Delete" data-delete="{{ position.id ?? '' }}"></a>
+    <a href="{{ (position.id ?? null)
+        ? routeLookup('sportsfixturesPosition.deleteEntity', { entityId: position.id })
+        : '#'
+        }}"
+       class="icon-delete"
+       title="Delete"
+       data-delete="{{ position.id ?? '' }}"></a>
 </nav>
 {% endif %}

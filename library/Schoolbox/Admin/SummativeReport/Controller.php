@@ -158,8 +158,8 @@ class Controller extends ConfigController
         $this->getResponse()->content->set([
             'template' => '@adminSummativeReport/list.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminSummativeReport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminSummativeReport.getList')),
+                'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'reports' => $reports
             ]
         ]);
@@ -189,8 +189,8 @@ class Controller extends ConfigController
         $this->getResponse()->content->set([
             'template' => '@adminSummativeReport/create.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminSummativeReport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminSummativeReport.getList')),
+                'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'report' => $report,
                 'options' => Model::DEFAULT_OPTIONS,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
@@ -249,9 +249,9 @@ class Controller extends ConfigController
         $this->getResponse()->content->set([
             'template' => '@adminSummativeReport/create.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminSummativeReport.getList'),
+                'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminSummativeReport.getList')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                     [['Modify', null]]
                 ),
                 'report' => $report,
@@ -330,7 +330,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminSummativeReport.getList'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -557,7 +557,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminSummativeReport.getList'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -574,7 +574,7 @@ class Controller extends ConfigController
     {
         $this->reportMapper->delete($report);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminSummativeReport.getList'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -600,7 +600,7 @@ class Controller extends ConfigController
         /* Generate a (warnings, reportConfigs) stack
          */
         $reportConfigs = (new Payload\Url(
-            $this->router,
+            $this->routeGenerator,
             $urlBase,
             $this->termMapper,
             $this->roleMapper,
@@ -651,7 +651,7 @@ class Controller extends ConfigController
                 ->setCallbackUrl(
                     (string)$urlBase
                         ->withPath(
-                            $this->getRouter()->generate(
+                            $this->routeGenerator->generate(
                                 'apiusernotify.apiUserNotify',
                                 ['userId' => $this->getUser()->getId()]
                             )
@@ -678,9 +678,9 @@ class Controller extends ConfigController
         $this->getResponse()->content->set([
             'template' => '@adminSummativeReport/result.twig',
             'data' => [
-                'pageCurrent'    => $this->router->generate('adminSummativeReport.getList'),
+                'pageCurrent'    => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                    $this->router->generate('adminSummativeReport.getList')
+                    $this->routeGenerator->generate('adminSummativeReport.getList')
                 ),
                 'reportCount'    => $numReports,
                 'warnings'       => $warnings,
@@ -714,7 +714,7 @@ class Controller extends ConfigController
          * Use it to find the start/end date span
          */
         $range = (new Payload\Url(
-            $this->router,
+            $this->routeGenerator,
             $urlBase,
             $this->termMapper,
             $this->roleMapper,
@@ -969,7 +969,7 @@ class Controller extends ConfigController
         /* Generate a (warnings, reportConfigs) stack
          */
         $reportConfigs = (new Payload\Url(
-            $this->router,
+            $this->routeGenerator,
             $urlBase,
             $this->termMapper,
             $this->roleMapper,

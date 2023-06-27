@@ -103,7 +103,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->router->generate('adminImportIndex.postSchoolDataOptions'),
+            $this->routeGenerator->generate('adminImportIndex.postSchoolDataOptions'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
@@ -156,13 +156,13 @@ class Controller extends ConfigController
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
-            'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
-            'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
+            'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
+            'allNavigation'  => (new SchoolData())->buildNavigation($this->routeGenerator)->getAllNodes(),
             'dataSource' => $dataSource,
             'configContext' => $configContext,
             'hasIndicator' => $hasIndicator,
-            'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
+            'statusIndicatorRoute' => $this->routeGenerator->generate('adminImportIndex.getStatusIndicator'),
             'importLogs' => $this->importLogMapper->findLogsWithDuration(),
             /* Decide if the Perform Live Sync is available based on the current
              * data source selected (you can't do it if you're using No Data Source
@@ -213,7 +213,7 @@ class Controller extends ConfigController
         $this->updateConfig($postData, $this->buildConfigPredicate());
         /* Go back to the place from whence you came
          */
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
     }
 
 
@@ -285,7 +285,7 @@ class Controller extends ConfigController
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
-            'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
+            'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
             'report' => \is_array($report) ? $report : [[
                 'message' => $message,
                 'reason' => '',
@@ -316,7 +316,7 @@ class Controller extends ConfigController
         }
 
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->getResponse()->redirect->to($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
 
         /* Spawn a logger out of darkness
          * Was there a particular way to do this?
@@ -454,7 +454,7 @@ class Controller extends ConfigController
 
             /* Go to the "Previous Imports" area of SUDS Control Panel
              */
-            $redirect = $this->router->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
+            $redirect = $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
 
             /* Arbitrarily inject and broadcast a notification,
              * bypassing all the usual Mr Matt mechanisms

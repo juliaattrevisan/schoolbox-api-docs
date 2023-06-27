@@ -41,8 +41,8 @@ class Controller extends Base
     public function getConsole()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminIntellischool/console.twig', [
-            'pageCurrent'      => $this->router->generate('adminIntellischool.getConsole'),
-            'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminIntellischool.getConsole')),
+            'pageCurrent'      => $this->routeGenerator->generate('adminIntellischool.getConsole'),
+            'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminIntellischool.getConsole')),
             'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
             'jwt'         => $this->jwtFactory->buildForAdminView($this->getUser()),
             'title' => 'Intellischool - Admin Console'

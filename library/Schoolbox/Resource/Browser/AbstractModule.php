@@ -9,41 +9,11 @@
 
 namespace Schoolbox\Resource\Browser;
 
-use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 
 abstract class AbstractModule extends BaseModule
 {
-    /**
-     * @param Router $router
-     * @param string $basePath
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $this->addGetRoute($router, 'picker', $basePath, '/picker/{sourceSlug}');
-        $this->addGetRoute($router, 'getFileInfo', $basePath, '/file/{fileId}/ajax')->addTokens([ 'fileId' => '\d+' ]);
-        $this->addGetRoute($router, 'browse', $basePath, '{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'listResources', $basePath, '/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'listNodes', $basePath, '/{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'showFolderInfo', $basePath, '/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'showFileInfo', $basePath, '/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
-        $this->addGetRoute($router, 'showMultiFileInfo', $basePath, '/file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
-        $this->addPostRoute($router, 'postFiles', $basePath, '/{folderId}/files')->addTokens([ 'folderId' => '\d+' ]);
-    }
-
-
-    /**
-     * @param Authorizer $authorizer
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $this->addRoutePermission($authorizer, '(?:.+)', new Rule\IsLoggedIn());
-    }
-
-
     /**
      * @param IChainLoader $templateLoader
      * @throws \Twig\Error\LoaderError

@@ -12,7 +12,7 @@ namespace Schoolbox\Resource\Textbox\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Alaress\HTMLPurifier\IPurifier;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Resource\Textbox\Model;
 use Schoolbox\User;
 
@@ -40,20 +40,20 @@ class ModelToArray
      * Constructor
      *
      * @param callable   $folderTranslator,
-     * @param Router     $router
+     * @param Generator  $routeGenerator
      * @param Authorizer $authorizer
      * @param User       $currentUser
      * @param IPurifier  $purifier
      */
     public function __construct(
         callable $folderTranslator,
-        Router $router,
+        Generator $routeGenerator,
         Authorizer $authorizer,
         User $currentUser,
         IPurifier $purifier
     ) {
         $this->folderTranslator = $folderTranslator;
-        $this->router           = $router;
+        $this->routeGenerator   = $routeGenerator;
         $this->authorizer       = $authorizer;
         $this->currentUser      = $currentUser;
         $this->purifier         = $purifier;

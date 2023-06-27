@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use External_Timetable;
 use Schoolbox\Application\Exception\NotFound;
@@ -25,7 +25,6 @@ use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
-
     protected $basename = 'timetable';
 
 
@@ -94,12 +93,11 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
         $this
-            ->addRoute($router, 'dateForTimetableDay', $basePath, '/dateForTimetableDay')
-            ->addValues(array('format' => '.json'))
-        ;
+            ->addRoute('dateForTimetableDay', $basePath, '/dateForTimetableDay')
+            ->attributes(['format' => '.json']);
     }
 
 

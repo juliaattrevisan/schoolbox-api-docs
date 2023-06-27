@@ -15,7 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
@@ -30,10 +30,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->attachResourceRoutes($router, $basePath);
-        $this->addRoute($router, 'search', $basePath, '/search');
+        $this->attachResourceRoutes($basePath);
+        $this->addRoute('search', $basePath, '/search');
     }
 
     /**

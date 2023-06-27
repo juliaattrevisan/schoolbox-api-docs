@@ -102,7 +102,7 @@ class Controller extends Base
     public function getUpcoming(): void
     {
         $this->getResponse()->redirect->to(
-            $this->getRouter()->generate(
+            $this->routeGenerator->generate(
                 'learningUpcoming.getUpcomingForStudent',
                 ['studentId' => $this->getUser()->getId(),]
             )
@@ -131,7 +131,7 @@ class Controller extends Base
         $date = Alaress_Date_Format::now();
 
         $page        = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
-        $route       = $this->getRouter()->generate("learningUpcoming.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
+        $route       = $this->routeGenerator->generate("learningUpcoming.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             $page,
@@ -380,7 +380,7 @@ class Controller extends Base
             $end,
             $student,
             $this->getAuthorizer(),
-            $this->getRouter(),
+            $this->routeGenerator,
             $this->getUser()
         );
 

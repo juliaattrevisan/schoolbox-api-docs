@@ -15,7 +15,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
@@ -39,10 +39,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addGetRoute($router, 'getIndex', $basePath, '');
-        $this->addPostRoute($router, 'postImportResults', $basePath, '');
+        $this->addGetRoute('getIndex', $basePath, '');
+        $this->addPostRoute('postImportResults', $basePath, '');
     }
 
     /**

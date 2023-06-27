@@ -12,6 +12,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Map;
 use InvalidArgumentException;
 use Twig\Error\LoaderError;
 use UnexpectedValueException;
@@ -19,7 +20,6 @@ use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -42,7 +42,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
         /** @var string[][] $routes */
         $routes = [
@@ -57,11 +57,11 @@ class Module extends BaseModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($alias, $basePath, $path);
         }
 
         foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
+            $this->addPostRoute($alias, $basePath, $path);
         }
     }
 

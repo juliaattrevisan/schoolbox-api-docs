@@ -72,7 +72,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             /* Routes
              */
-            'getArticlesRoute' => $this->getRouter()->generate('commsNews.getListForIndex')
+            'getArticlesRoute' => $this->getRouteGenerator()->generate('commsNews.getListForIndex')
         ]);
     }
 }

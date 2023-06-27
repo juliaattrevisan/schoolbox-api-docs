@@ -44,8 +44,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminVideo/index.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminVideo.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminVideo.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminVideo.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminVideo.getIndex')),
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],
@@ -84,7 +84,7 @@ class Controller extends Base
             if ($post['videoAction'] == 'resubmit') {
                 $video->setStatus(VideoQueueMapper::STATUS_PENDING);
                 $this->getVideoQueueMapper()->save($video);
-                $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminVideo.getIndex'));
+                $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminVideo.getIndex'));
             } else if ($post['videoAction'] == 'delete') {
                 $this->getVideoQueueMapper()->delete($video);
             }

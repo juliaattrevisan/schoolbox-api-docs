@@ -645,7 +645,7 @@ class Controller extends Base
         // Go back to the reports list
 
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('pastoralReportBuilder.getIndex')
+            $this->routeGenerator->generate('pastoralReportBuilder.getIndex')
         );
     }
 

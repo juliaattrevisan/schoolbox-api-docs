@@ -39,8 +39,8 @@ class Controller extends Base
     {
         $twigData = [
             'toursEnabled' => $this->getConfigLoader()->get('tours_enabled'),
-            'pageCurrent' => $this->router->generate('featureTours.render'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('featureTours.render')),
+            'pageCurrent' => $this->routeGenerator->generate('featureTours.render'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('featureTours.render')),
             'tours' => $this->tourMapper->findAll()
         ];
 

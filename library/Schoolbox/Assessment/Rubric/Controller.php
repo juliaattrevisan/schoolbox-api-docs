@@ -485,7 +485,7 @@ class Controller extends BaseController
         if (!$proposedGrid->isCompatibleWith($currentGrid)) {
             $response['compatible'] = false;
             $jsonDecorator = new PropertyDecorator();
-            $linkDecorator = new LinkDecorator($this->router, $this->authorizer);
+            $linkDecorator = new LinkDecorator($this->routeGenerator, $this->authorizer);
 
             // Determine who's actually affected?
             foreach ($currentAssessment->getAllParticipants() as $participant) {

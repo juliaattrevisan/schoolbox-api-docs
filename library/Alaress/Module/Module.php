@@ -14,11 +14,10 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
-use Aura\Router\RouteCollection;
+use Aura\Router\RouterContainer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Aura\Router\Route;
-use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use LogicException;
@@ -41,6 +40,7 @@ class Module
     public const METHOD_PUT    = 'PUT';
     public const METHOD_PATCH  = 'PATCH';
     public const METHOD_DELETE = 'DELETE';
+    public const METHOD_OPTIONS = 'OPTIONS';
 
 
     /** @var RouteParser */
@@ -175,18 +175,18 @@ class Module
             // perform any route registration available
             $this->registerRoutes();
 
-            // preload registered routes
+            // preload registered routes, only if they don't already exist
             foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
-                $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
-                     ->setMethod($method)
-                     ->setTokens($tokens);
+                $this->addRoute($controllerMethod, $basePath, $path)
+                     ->allows($method)
+                     ->tokens($tokens);
             }
 
             // no need that no more
             unset($this->routeIndex);
 
             // manual route init
-            $this->initRoutes($this->getRouter(), $basePath);
+            $this->initRoutes($basePath);
         }
     }
 
@@ -297,10 +297,9 @@ class Module
      * "user", there must be a controller in the DI container called
      * "controller:user"
      *
-     * @param Router $router
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
     }
 
@@ -310,7 +309,6 @@ class Module
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Router $router   The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -319,18 +317,20 @@ class Module
      *
      * @return Route
      */
-    protected function addRoute(Router $router, $alias, $basePath, $path)
+    protected function addRoute(string $alias, string $basePath, string $path)
     {
-        return $router->getRoutes()->add($this->basename . '.' . $alias, $basePath . $path);
+        return $this->addOrOverwriteExistingRoute(
+            $this->basename . '.' . $alias,
+            $basePath . $path,
+        );
     }
 
     /**
-     * Helper for calling $router->addGet() for this component's basename.
+     * Helper for calling $router->get() for this component's basename.
      *
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Router $router   The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -339,18 +339,18 @@ class Module
      *
      * @return Route
      */
-    protected function addGetRoute(Router $router, $alias, $basePath, $path)
+    protected function addGetRoute(string $alias, string $basePath, string $path)
     {
-        return $router->getRoutes()->addGet($this->basename . '.' . $alias, $basePath . $path);
+        return $this->addRoute($alias, $basePath, $path)
+                    ->allows(self::METHOD_GET);
     }
 
     /**
-     * Helper for calling $router->addGet() for this component's basename.
+     * Helper for calling $router->post() for this component's basename.
      *
      * Anything after the ':' character in $alias is ignored when matching
      * the requested path against preloads or permissions.
      *
-     * @param Router $router   The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
@@ -359,9 +359,10 @@ class Module
      *
      * @return Route
      */
-    protected function addPostRoute(Router $router, $alias, $basePath, $path)
+    protected function addPostRoute(string $alias, string $basePath, string $path)
     {
-        return $router->getRoutes()->addPost($this->basename . '.' . $alias, $basePath . $path);
+        return $this->addRoute($alias, $basePath, $path)
+                    ->allows(self::METHOD_POST);
     }
 
     /**
@@ -371,32 +372,67 @@ class Module
      * match against preloads or permissions for "update", "replace" and "delete"
      * respectively.
      *
-     * @param Router $router   The router to add the route to
      * @param string $basePath The base path for this route
      */
-    protected function attachResourceRoutes(Router $router, $basePath)
+    protected function attachResourceRoutes(string $basePath)
     {
-        $routes = $router->getRoutes();
-        $routes->attachResource($this->basename, $basePath);
+        $idToken     = ['id' => '\d+'];
+        $formatToken = ['format' => '(\.[^/]+)?'];
 
-        // Attach POST aliases for the PUT/PATCH/DELETE routes added by
-        // `attachResource`.
-        $routes->attach(
-            $this->basename,
-            $basePath,
-            function (RouteCollection $subroute) {
-                $subroute->setTokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
-                $subroute
-                    ->addPost('update:post', '/{id}/update')
-                    ->addValues(['action' => 'update']);
-                $subroute
-                    ->addPost('replace:post', '/{id}/replace')
-                    ->addValues(['action' => 'replace']);
-                $subroute
-                    ->addPost('delete:post', '/{id}/delete')
-                    ->addValues(['action' => 'delete']);
-            }
-        );
+        // Attach routes from Aura Router 2.x `attachResource`
+        $this->addGetRoute('browse', $basePath, '{format}')
+             ->tokens($formatToken);
+        $this->addGetRoute('read', $basePath, '/{id}{format}')
+             ->tokens($idToken)
+             ->tokens($formatToken);
+        $this->addGetRoute('edit', $basePath, '/{id}/edit{format}')
+             ->tokens($idToken)
+             ->tokens($formatToken);
+        $this->addGetRoute('add', $basePath, '/add');
+        $this->addRoute('delete', $basePath, '/{id}')
+             ->tokens($idToken)
+             ->allows(self::METHOD_DELETE);
+        $this->addPostRoute('create', $basePath, '');
+        $this->addRoute('update', $basePath, '/{id}')
+             ->tokens($idToken)
+             ->allows(self::METHOD_PATCH);
+        $this->addPostRoute('replace', $basePath, '/{id}')
+             ->tokens($idToken)
+             ->allows(self::METHOD_PUT);
+
+        $this->addRoute('options', $basePath, '')->allows(self::METHOD_OPTIONS);
+
+        // Attach POST aliases for PUT/PATCH/DELETE routes
+        $this->addPostRoute('update:post', $basePath, '/{id}/update')
+             ->tokens($idToken)
+             ->attributes(['action' => 'update']);
+        $this->addPostRoute('replace:post', $basePath, '/{id}/replace')
+             ->tokens($idToken)
+             ->attributes(['action' => 'replace']);
+        $this->addPostRoute('delete:post', $basePath, '/{id}/delete')
+             ->tokens($idToken)
+             ->attributes(['action' => 'delete']);
+    }
+
+    /**
+     * Add a route for `$name` and `$path`: if a route with name `$name` already
+     * exists, override it.
+     *
+     * @param string $name
+     * @param string $path
+     * @return Route
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    private function addOrOverwriteExistingRoute(string $name, string $path): Route
+    {
+        $routeMap       = $this->getRouter()->getMap();
+        $existingRoutes = $routeMap->getRoutes();
+        if (isset($existingRoutes[$name])) {
+            unset($existingRoutes[$name]);
+            $routeMap->setRoutes($existingRoutes);
+        }
+        /** @noinspection PhpUnhandledExceptionInspection - route existence has been checked already */
+        return $routeMap->route($name, $path);
     }
 
     /**
@@ -535,9 +571,9 @@ class Module
     /**
      * Typehinted convenience method for obtaining router reference
      *
-     * @return Router
+     * @return RouterContainer
      */
-    protected function getRouter()
+    protected function getRouter(): RouterContainer
     {
         return $this->injector->get('router');
     }
@@ -632,6 +668,7 @@ class Module
             ->setResponse($container->get('webFactory')->newResponse())
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
+            ->setRouteGenerator($container->get('router.generator'))
             ->setAuthorizer($container->get('authorizer'))
             ->setDi($container)
             ->setExceptionGenerator($container->get('mapperFactory')->get(ErrorMapper::class))

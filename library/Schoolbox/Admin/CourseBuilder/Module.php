@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -29,10 +29,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addGetRoute($router, 'getIndex', $basePath, "{/tab}");
-        $this->addPostRoute($router, 'postSave', $basePath, "/save");
+        $this->addGetRoute('getIndex', $basePath, "{/tab}");
+        $this->addPostRoute('postSave', $basePath, "/save");
     }
 
     /**

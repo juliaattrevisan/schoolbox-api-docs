@@ -820,10 +820,10 @@ class Controller extends Base
              * just go back to the main calendar view; this occurs
              * when you delete from the modify screen
              */
-            $route = $this->getRouter()->generate('calendarEvent.getEvent', ['eventId' => $event->getId()]);
+            $route = $this->routeGenerator->generate('calendarEvent.getEvent', ['eventId' => $event->getId()]);
 
             if ($route === $redirect) {
-                $redirect = $this->getRouter()->generate('calendar.getOwnCalendar');
+                $redirect = $this->routeGenerator->generate('calendar.getOwnCalendar');
             }
 
             $this->getResponse()->content->set($this->buildJsonOutput([

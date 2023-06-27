@@ -52,7 +52,7 @@ class Controller extends Base
             // Redirect to current year, or last year in report
             $lastReportYear = max($reportYears);
             $this->response->redirect->found(
-                $this->router->generate(
+                $this->routeGenerator->generate(
                     'customMeridenPastoral.index',
                     array(
                         'id'   => $student->getId(),

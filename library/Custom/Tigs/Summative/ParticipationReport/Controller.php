@@ -434,7 +434,7 @@ class Controller extends Web\Controller\Base
             $this->access,
             $this->database,
             $this->getAuthorizer(),
-            $this->getRouter()
+            $this->routeGenerator,
         );
 
         return $at->toContext($this->getUser(), $student, $attributes, $subjectList, $roleTypeOverride);

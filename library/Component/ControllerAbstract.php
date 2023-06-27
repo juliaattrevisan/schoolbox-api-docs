@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
@@ -139,13 +139,13 @@ abstract class Component_ControllerAbstract
 
 
     /**
-     * @return Router|object
+     * @return Generator
      * @throws RuntimeException
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
-    public function getRouter()
+    public function getRouteGenerator(): Generator
     {
-        return $this->getSitePage()->getDi()->get('router');
+        return $this->getSitePage()->getDi()->get('router.generator');
     }
 
 
@@ -545,7 +545,7 @@ abstract class Component_ControllerAbstract
     {
         // Determine what to display
 
-        list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->instance->getConfigArray());
+        [$hasWriteAccess, $processConfig] = $this->determineConfigPermissions($this->instance->getConfigArray());
 
         // If all 3 above vars are false, there is no configuration to display
 

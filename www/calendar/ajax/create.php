@@ -118,7 +118,7 @@ if (count($affectedIds) == 1) {
         $user     = $_SESSION['user'];
         $renderer = new Javascript(
             $this->getDi()->get('authorizer'),
-            $this->getDi()->get('router'),
+            $this->getDi()->get('router.generator'),
             $calendarEvent,
             $user,
             $user

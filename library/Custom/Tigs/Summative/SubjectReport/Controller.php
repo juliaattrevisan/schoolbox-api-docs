@@ -145,7 +145,7 @@ class Controller extends Web\Controller\Base
             $this->visibility,
             $this->database,
             $this->getAuthorizer(),
-            $this->getRouter(),
+            $this->routeGenerator,
             $this->getUser()
         );
 

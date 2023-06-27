@@ -73,10 +73,10 @@ class Controller extends BaseController
             $this->buildHtmlOutput('@groups/groups.twig', [
                 'groupList'         => $possibleGroups,
                 //send all the endpoint routes, to make it easier for frontend.
-                'endpointAdd'       => $this->getRouter()->generate('groups.postMyGroupAdd'),
-                'endpointDelete'    => $this->getRouter()->generate('groups.postMyGroupDelete'),
-                'endpointNotify'    => $this->getRouter()->generate('groups.postMyGroupNotify'),
-                'endpointFavourite' => $this->getRouter()->generate('groups.postMyGroupFavourite'),
+                'endpointAdd'       => $this->routeGenerator->generate('groups.postMyGroupAdd'),
+                'endpointDelete'    => $this->routeGenerator->generate('groups.postMyGroupDelete'),
+                'endpointNotify'    => $this->routeGenerator->generate('groups.postMyGroupNotify'),
+                'endpointFavourite' => $this->routeGenerator->generate('groups.postMyGroupFavourite'),
             ])
         );
     }

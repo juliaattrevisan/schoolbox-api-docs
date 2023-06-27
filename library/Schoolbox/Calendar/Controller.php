@@ -122,8 +122,16 @@ class Controller extends Base
      */
     public function redirect(?string $selectedDate, User $user): void
     {
-        if ($this->getRouter()->getMatchedRoute()->params['userId']) {
-            $route = $this->getRouter()->generate(
+        $matchedRoute = $this->router->getMatcher()->getMatchedRoute();
+        if ($matchedRoute && $matchedRoute->attributes['userId']) {
+            // If the selected date is provided: the route preloader has
+            // converted it to YYYY-MM-DD.
+            // Convert it back to DD-MM-YYYY.
+            if (isset($selectedDate)) {
+                $dateObject   = new Alaress_Date_Format($selectedDate, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $selectedDate = $dateObject->getURLDate();
+            }
+            $route = $this->routeGenerator->generate(
                 'calendar.getCalendar',
                 [
                     'selectedDate' => $selectedDate,
@@ -131,7 +139,7 @@ class Controller extends Base
                 ]
             );
         } else {
-            $route = $this->getRouter()->generate(
+            $route = $this->routeGenerator->generate(
                 'calendar.getOwnCalendar'
             );
         }

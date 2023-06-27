@@ -2,7 +2,7 @@
 
 namespace Schoolbox\Admin\HealthCheck;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\Client;
@@ -22,7 +22,7 @@ class TaskD
     private const FILENAME_MAX_LENGTH = 250;
     private Jwt $tokenBuilder;
     private IConfigLoader $config;
-    private Router $router;
+    private Generator $routeGenerator;
     private Uri $urlBase;
     private MessageFactory $messageFactory;
     private Producer $producer;
@@ -37,13 +37,13 @@ class TaskD
     public function __construct(
         Jwt $tokenBuilder,
         IConfigLoader $config,
-        Router $router,
+        Generator $routeGenerator,
         MessageFactory $messageFactory,
         Producer $producer
     ) {
         $this->tokenBuilder = $tokenBuilder;
         $this->config = $config;
-        $this->router = $router;
+        $this->routeGenerator = $routeGenerator;
         $this->urlBase = (new \Schoolbox\Url\Factory($config))->buildFullyQualified();
         $this->messageFactory = $messageFactory;
         $this->producer = $producer;
@@ -92,7 +92,7 @@ class TaskD
                     ],
                 ],
             ],
-            (string)$this->urlBase->withPath($this->router->generate('apiusernotify.apiUserNotify', ['userId' => $user->getId()]))
+            (string)$this->urlBase->withPath($this->routeGenerator->generate('apiusernotify.apiUserNotify', ['userId' => $user->getId()]))
                     ->appendQueryParameters([]),
             [
                 'message' => sprintf('Your Healthcheck %s is ready to download', $this->config->get(ConfigMapper::NAME_REPORT_TITLE)),
@@ -112,7 +112,7 @@ class TaskD
 
         //if passed url is null, generate a local url
         if (null === $url) {
-            $url = $urlBase->withPath($this->router->generate('adminHealthCheckExport.' . $report));
+            $url = $urlBase->withPath($this->routeGenerator->generate('adminHealthCheckExport.' . $report));
         }
         $this->sources[] = [
             'filename' => sprintf(

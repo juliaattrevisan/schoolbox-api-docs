@@ -674,7 +674,7 @@ class Controller extends Assessment\Controller
         return (new LaunchFactory(
             $this->registrations,
             $this->getAccess(),
-            $this->router,
+            $this->routeGenerator,
             $this->instance,
             $this->getConfigLoader(),
             $this->userCodec

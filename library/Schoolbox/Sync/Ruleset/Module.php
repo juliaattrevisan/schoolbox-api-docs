@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Router;
+use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\File\MimetypeMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -28,17 +28,17 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(string $basePath)
     {
-        $this->addGetRoute($router, 'logs', $basePath, "/logs");
-        $this->addGetRoute($router, 'logFormat', $basePath, "/log/{logId}.{format}")->addTokens(['logId' => '\d+']);
-        $this->addGetRoute($router, 'log', $basePath, "/log/{logId}");
-        $this->addGetRoute($router, 'intro', $basePath, "");
-        $this->addGetRoute($router, 'read', $basePath, "/{rulesetId}");
-        $this->addPostRoute($router, 'updateRuleset', $basePath, "/ruleset/update");
-        $this->addPostRoute($router, 'updateRule', $basePath, "/ruleset/rule/update");
-        $this->addGetRoute($router, 'dryRun', $basePath, "/{rulesetId}/dry-run");
-        $this->addGetRoute($router, 'performUpdate', $basePath, "/{rulesetId}/perform-update");
+        $this->addGetRoute('logs', $basePath, "/logs");
+        $this->addGetRoute('logFormat', $basePath, "/log/{logId}.{format}")->tokens(['logId' => '\d+']);
+        $this->addGetRoute('log', $basePath, "/log/{logId}");
+        $this->addGetRoute('intro', $basePath, "");
+        $this->addGetRoute('read', $basePath, "/{rulesetId}");
+        $this->addPostRoute('updateRuleset', $basePath, "/ruleset/update");
+        $this->addPostRoute('updateRule', $basePath, "/ruleset/rule/update");
+        $this->addGetRoute('dryRun', $basePath, "/{rulesetId}/dry-run");
+        $this->addGetRoute('performUpdate', $basePath, "/{rulesetId}/perform-update");
     }
 
     /**

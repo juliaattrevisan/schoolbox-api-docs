@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Controller extends ConfigController
 {
-
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
@@ -68,13 +67,13 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->router->generate('commsNewsPolicy.postPolicies'),
+            $this->routeGenerator->generate('commsNewsPolicy.postPolicies'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
-            'pageCurrent'   => $this->router->generate('commsNewsPolicy.getPolicies'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('commsNewsPolicy.getPolicies')),
+            'pageCurrent'   => $this->routeGenerator->generate('commsNewsPolicy.getPolicies'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('commsNewsPolicy.getPolicies')),
             'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->indexBy('id'),
             'configContext' => $configContext,
             'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
@@ -96,7 +95,7 @@ class Controller extends ConfigController
     public function postPolicies(): void
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNewsPolicy.getPolicies'));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('commsNewsPolicy.getPolicies'));
     }
 
 

@@ -25,7 +25,6 @@ use Schoolbox\RoleMapper;
 
 class Controller extends BaseController
 {
-
     /** @var RoleMapper */
     protected $roleMapper;
 
@@ -305,7 +304,7 @@ class Controller extends BaseController
                 'format' => 'json',
             ]);
         } else {
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('messages.configure'));
+            $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('messages.configure'));
         }
     }
 }

@@ -11,14 +11,13 @@
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\ResourceBooking;
 use Schoolbox\User;
 
 abstract class Base extends RendererBase
 {
-
     /** @var ResourceBooking\Event */
     protected $event;
 
@@ -27,14 +26,14 @@ abstract class Base extends RendererBase
      * Constructor
      *
      * @param Authorizer            $authorizer
-     * @param Router                $router
+     * @param Generator             $routeGenerator
      * @param ResourceBooking\Event $event
      * @param User                  $user
      * @param User                  $viewer
      */
-    public function __construct(Authorizer $authorizer, Router $router, ResourceBooking\Event $event, User $user, User $viewer)
+    public function __construct(Authorizer $authorizer, Generator $routeGenerator, ResourceBooking\Event $event, User $user, User $viewer)
     {
-        parent::__construct($authorizer, $router, $user, $viewer);
+        parent::__construct($authorizer, $routeGenerator, $user, $viewer);
         $this->event = $event;
     }
 

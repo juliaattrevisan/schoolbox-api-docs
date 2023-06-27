@@ -337,7 +337,7 @@ class Controller extends Base
         // javascript inside this template updates these in the DOM.
 
         // The launch URL generates a POST request to the embed URL.
-        $launchUrl = $this->router->generate('ltiConsumer.getLaunch', [
+        $launchUrl = $this->routeGenerator->generate('ltiConsumer.getLaunch', [
             'providerId'  => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
             'componentId' => $component->getInstance()->getId(),
             'folderId'    => $component->getContext()->getId(),
@@ -597,7 +597,7 @@ class Controller extends Base
                 // For launches:
                 // the launch URL generates a POST request to the embed URL
                 $embedUrl  = $get['url'];
-                $launchUrl = $this->router->generate('ltiConsumer.getLaunch', [
+                $launchUrl = $this->routeGenerator->generate('ltiConsumer.getLaunch', [
                     'providerId'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
                     'componentId'  => $component->getInstance()->getId(),
                     'folderId'     => $component->getContext()->getId(),

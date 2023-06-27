@@ -34,7 +34,6 @@ use function sprintf;
  */
 class AbstractMatrix extends BaseComponent
 {
-
     /** @var GenericCollection|UnitSpec\Model[] */
     protected $unitSpecs;
 
@@ -56,8 +55,8 @@ class AbstractMatrix extends BaseComponent
     /** @var Authorizer */
     protected $authorizer;
 
-    /** @var Router\Router */
-    protected $router;
+    /** @var Router\Generator */
+    protected $routeGenerator;
 
 
     /**
@@ -70,7 +69,7 @@ class AbstractMatrix extends BaseComponent
      * @param int               $targetWorkTypeId
      * @param RubricDataSource  $rubricMapper
      * @param Authorizer        $authorizer
-     * @param Router\Router     $router
+     * @param Router\Generator  $routeGenerator
      * @param string|null       $roleTypeOverride
      * @throws InvalidArgumentException
      */
@@ -84,7 +83,7 @@ class AbstractMatrix extends BaseComponent
         int $targetWorkTypeId,
         RubricDataSource $rubricMapper,
         Authorizer $authorizer,
-        Router\Router $router,
+        Router\Generator $routeGenerator,
         ?string $roleTypeOverride
     ) {
         parent::__construct($attributes, $viewer, $roleTypeOverride);
@@ -96,7 +95,7 @@ class AbstractMatrix extends BaseComponent
         $this->workTypeId   = $targetWorkTypeId;
         $this->rubricMapper = $rubricMapper;
         $this->authorizer   = $authorizer;
-        $this->router       = $router;
+        $this->routeGenerator       = $routeGenerator;
     }
 
 
@@ -168,7 +167,7 @@ class AbstractMatrix extends BaseComponent
             $routeName    = 'learningAssessment.getAssessment';
             $routeParams  = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
             if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
-                $route      = $this->router->generate($routeName, $routeParams);
+                $route      = $this->routeGenerator->generate($routeName, $routeParams);
                 $actualType = $assessment::getDefaultTypeName();
                 $title      = $assessment->getTitle();
                 $msg        .= sprintf(' Found: %s - <a href="%s">%s</a>', $actualType, $route, $title);
@@ -181,7 +180,7 @@ class AbstractMatrix extends BaseComponent
             $routeName   = 'learningAssessment.getAssessment';
             $routeParams = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
             if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
-                $route = $this->router->generate($routeName, $routeParams);
+                $route = $this->routeGenerator->generate($routeName, $routeParams);
                 $title = sprintf('<a href="%s">%s</a>', $route, $assessment->getTitle());
             } else {
                 $title = $assessment->getTitle();

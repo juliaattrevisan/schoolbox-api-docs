@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Schoolbox\Pastoral\Type;
 use Schoolbox\Submenu\IFlyoutNodes;
 
@@ -22,11 +22,10 @@ use Schoolbox\Submenu\IFlyoutNodes;
  */
 class FlyoutNodes implements IFlyoutNodes
 {
-
     /**
-     * @var Router
+     * @var Generator
      */
-    private Router $router;
+    private Generator $routeGenerator;
 
 
     /**
@@ -38,14 +37,14 @@ class FlyoutNodes implements IFlyoutNodes
     /**
      * FlyoutNodes constructor.
      *
-     * @param Router        $router
-     * @param Type\Mapper   $typeMapper
+     * @param Generator   $routeGenerator
+     * @param Type\Mapper $typeMapper
      */
-    public function __construct(Router $router, Type\Mapper $typeMapper)
+    public function __construct(Generator $routeGenerator, Type\Mapper $typeMapper)
     {
         /* Need aura to generate some routes for us
          */
-        $this->router = $router;
+        $this->routeGenerator = $routeGenerator;
 
         /* This is the source of our nodes
          */
@@ -71,7 +70,7 @@ class FlyoutNodes implements IFlyoutNodes
         $types = $this->typeMapper->findAll()->sortBy('sequence', 'asc');
 
         foreach ($types as $type) {
-            $typeUrl = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
+            $typeUrl = $this->routeGenerator->generate('pastoralAudience.getAudiencesTypeModify', [
                 'typeId' => $type->getId()
             ]);
 
@@ -92,7 +91,7 @@ class FlyoutNodes implements IFlyoutNodes
             $subtypes = $type->getSubTypes()->sortBy('sequence', 'asc');
 
             foreach ($subtypes as $subtype) {
-                $subtypeUrl = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
+                $subtypeUrl = $this->routeGenerator->generate('pastoralAudience.getAudiencesSubTypeModify', [
                     'subtypeId' => $subtype->getId()
                 ]);
 

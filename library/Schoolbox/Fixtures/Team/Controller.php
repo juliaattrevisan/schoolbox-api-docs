@@ -192,7 +192,7 @@ class Controller extends AbstractController
             $entity
         );
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getLobby', [
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesDivision.getLobby', [
             'entityId' => $divisionId
         ]));
     }
@@ -324,7 +324,7 @@ class Controller extends AbstractController
         } else {
             // Redirect back to lobby
             $this->getResponse()->redirect->afterPost(
-                $this->getRouter()->generate(
+                $this->routeGenerator->generate(
                     'sportsfixturesDivision.getLobby',
                     ['entityId' => $team->getDivision()->getId()]
                 )

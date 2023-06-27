@@ -173,8 +173,8 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/index.twig',
                 'data' => array(
-                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
+                    'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                     'usageInGraph' => $usageInGraph,
                     'showUpgradeReminder'  => $version->showUpgradeReminder(),
                     'major_site_version'   => $version->getMajor(),
@@ -219,8 +219,8 @@ class Controller extends Base
             [
                 'template' => '@adminHome/ssl-renewal-help.twig',
                 'data'     => [
-                    'pageCurrent'    => $this->router->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
+                    'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                     'is_cloud'       => $this->isCloudHosted(),
                     'api_url'        => $this->getConfigLoader()->get('schoolbox_api_url'),
                     "hostnames"      => $this->instanceHostnames(),
@@ -271,8 +271,8 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/healthcheck.twig',
                 'data' => array(
-                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
+                    'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                     'output' => $output
                 )
             )
@@ -303,8 +303,8 @@ class Controller extends Base
                 'template' => '@adminHome/disaster-recovery.twig',
                 'data'     => array_merge(
                     [
-                        'pageCurrent'    => $this->router->generate('adminHome.getIndex'),
-                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
+                        'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
+                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                         'enabled'        => $isEnabled,
                     ],
                     $enabledData

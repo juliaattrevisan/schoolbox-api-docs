@@ -50,10 +50,10 @@ class Controller extends Base
         if ($this->getRequest()->isXhr()) {
             $status = [
                 'id' => $entityId,
-                'update' => $this->getRouter()->generate('sportsfixturesSchool.postEditSchool', [
+                'update' => $this->routeGenerator->generate('sportsfixturesSchool.postEditSchool', [
                     'entityId' => $entityId
                 ]),
-                'delete' => $this->getRouter()->generate('sportsfixturesSchool.postDeleteSchool', [
+                'delete' => $this->routeGenerator->generate('sportsfixturesSchool.postDeleteSchool', [
                     'entityId' => $entityId
                 ])
             ];
@@ -62,7 +62,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
     }
 
     /**
@@ -86,10 +86,10 @@ class Controller extends Base
         if ($this->getRequest()->isXhr()) {
             $status = [
                 'id' => $entityId,
-                'update' => $this->getRouter()->generate('sportsfixturesSchool.postEditSchool', [
+                'update' => $this->routeGenerator->generate('sportsfixturesSchool.postEditSchool', [
                     'entityId' => $entityId
                 ]),
-                'delete' => $this->getRouter()->generate('sportsfixturesSchool.postDeleteSchool', [
+                'delete' => $this->routeGenerator->generate('sportsfixturesSchool.postDeleteSchool', [
                     'entityId' => $entityId
                 ])
             ];
@@ -98,7 +98,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
+        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
     }
 
     /**

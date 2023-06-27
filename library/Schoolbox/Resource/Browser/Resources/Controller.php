@@ -125,7 +125,7 @@ class Controller extends AbstractController
      */
     public function showFiles(Folder\Model $sourceFolder, ?int $componentID = null)
     {
-        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper, $this->getRouter());
+        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper, $this->routeGenerator);
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
         $accessSource = $this->getAccess($sourceFolder->getId());
