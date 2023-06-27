@@ -480,17 +480,18 @@ class Healthcheck
     private function pcschoolsTest(): void
     {
         $tables = [
-            'TIMEFILE',
-            'SUB',
-            'SUBJECT',
-            'STUDENT',
-            'TIMEPDHD',
+            'ALUMREL',
             'CALENDAR',
             'CODEMAST',
-            'TEACHER',
             'FAMILY',
-            'SYSFILE',
             'IDENTITY',
+            'STUDENT',
+            'SUB',
+            'SUBJECT',
+            'SYSFILE',
+            'TEACHER',
+            'TIMEFILE',
+            'TIMEPDHD',
             'TTABLE',
             'WORKAREA',
         ];
