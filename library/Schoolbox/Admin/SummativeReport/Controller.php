@@ -12,6 +12,10 @@ namespace Schoolbox\Admin\SummativeReport;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Interop\Queue\Exception\InvalidDestinationException;
+use Interop\Queue\Exception\InvalidMessageException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Application\Exception\Exception;
@@ -58,6 +62,13 @@ use Schoolbox\YearLevel\Mapper as YearLevelMapper;
  */
 class Controller extends ConfigController
 {
+    /**
+     * Session key and url parameter which remembers the status
+     * of a particular taskd message we generated here
+     */
+    public const SUMMATIVE_REPORT_STATUS_KEY = 'summativeReport_%s';
+
+
     /**
      * This file contains an html fragment that represents the footer
      * for all the generated summative reports. Schools wanting a custom
@@ -584,13 +595,13 @@ class Controller extends ConfigController
      * @param Model $report
      * @return void
      * @throws RouteNotFound
-     * @throws \DebugBar\DebugBarException
      * @throws \Interop\Queue\Exception
-     * @throws \Interop\Queue\Exception\InvalidDestinationException
-     * @throws \Interop\Queue\Exception\InvalidMessageException
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
+     * @throws \InvalidArgumentException
      * @throws \JsonException
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @api GET /adminv2/summative-report/{reportId}/generate
      */
     public function getGenerate(Model $report): void
@@ -673,8 +684,41 @@ class Controller extends ConfigController
             $producer->send($message);
         }
 
-        /* Show waiting screen
+        /* Arbitrarily assign a guid to this report generation
          */
+        $guid = strtoupper(md5(uniqid((string)mt_rand(), true)));
+        $reportKey = sprintf(self::SUMMATIVE_REPORT_STATUS_KEY, $guid);
+
+        /* Remember the result payload associated with this report generation
+         */
+        $statusPayload = [
+            'numReports' => $numReports,
+            'warnings' => $warnings
+        ];
+
+        $this->getSession()->set($reportKey, $statusPayload);
+
+        /* Show waiting screen for the result payload associated with this report generation
+         */
+        $this->response->redirect->to($this->routeGenerator->generate('adminSummativeReport.getStatus', [
+            'reportId' => $report->getId(),
+            'reportKey' => $reportKey
+        ]));
+    }
+
+
+    /**
+     * Show waiting screen. This is split from getGenerate() so that refreshing
+     * doesn't perpetuate new taskd processes for impatient souls
+     *
+     * @param string $reportKey
+     * @return void
+     * @throws RouteNotFound
+     */
+    public function getStatus(string $reportKey): void
+    {
+        $statusPayload = $this->getSession()->get($reportKey);
+
         $this->getResponse()->content->set([
             'template' => '@adminSummativeReport/result.twig',
             'data' => [
@@ -682,8 +726,8 @@ class Controller extends ConfigController
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
                     $this->routeGenerator->generate('adminSummativeReport.getList')
                 ),
-                'reportCount'    => $numReports,
-                'warnings'       => $warnings,
+                'reportCount'    => $statusPayload['numReports'],
+                'warnings'       => $statusPayload['warnings'],
             ]
         ]);
     }
