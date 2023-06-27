@@ -503,7 +503,7 @@ class Calendar extends DeprecatedModel
                 folder.name AS categoryName,
                 event.completed,
                 author_id,
-                if (user.pronoun, concat('(', pronoun.subjective, ' / ', pronoun.objective, ')'), '') as 'pronoun'
+                if (user.pronoun, concat('(', pronoun.subjective, '/', pronoun.objective, ')'), '') as 'pronoun'
             FROM event
             LEFT JOIN user             ON event.author_id = user.id
             LEFT JOIN luEventType      ON type = eventTypeID

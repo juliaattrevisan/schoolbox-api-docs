@@ -344,7 +344,7 @@ WHERE
         ];
 
         $query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.preferred_name userPreferredName, u.lastname userLastname, u.synergy_id,
-                  if (u.pronoun, concat('(', pronoun.subjective, ' / ', pronoun.objective, ')'), '') as 'pronoun'
+                  if (u.pronoun, concat('(', pronoun.subjective, '/', pronoun.objective, ')'), '') as 'pronoun'
                   FROM forumThread t
                   LEFT JOIN user u ON u.id = t.userID
                   LEFT JOIN `pronoun` ON u.pronoun = pronoun.id
