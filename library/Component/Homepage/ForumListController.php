@@ -131,6 +131,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                         'firstname'      => $thread['userFirstname'],
                         'preferred_name' => $thread['userPreferredName'],
                         'lastname'       => $thread['userLastname'],
+                        'pronoun'        => $thread['pronoun'],
                     ];
 
                     $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');

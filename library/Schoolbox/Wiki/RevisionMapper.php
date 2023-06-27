@@ -14,6 +14,7 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 /**
  * Class RevisionMapper
@@ -25,7 +26,6 @@ use Schoolbox\Mapper;
  */
 class RevisionMapper extends Mapper implements FeedableMapperInterface
 {
-
     /**
      * @return void
      */
@@ -139,12 +139,14 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('wiki', 'w')},
                 {$this->getJoinMapper('wiki')->getJoinColumnString('category', 'c')},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('user.pronoun', 'up')}
             FROM
                 `{$this->getTable()}`
                 INNER JOIN {$this->getJoinSql('wiki', '', 'w', true)}
                 LEFT JOIN {$this->getJoinMapper('wiki')->getJoinSql('category', 'w', 'c')}
                 INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
+            LEFT JOIN {$this->getJoinSql('user.pronoun', 'u', 'up')}
         ";
     }
 
@@ -161,7 +163,10 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
             $revision = $this->hydrate($r);
             $revision->setWiki($this->hydrateJoin($r, 'wiki', 'w'));
             $revision->getWiki()->setCategory($this->getJoinMapper('wiki')->hydrateJoin($r, 'category', 'c'));
-            $revision->setUser($this->hydrateJoin($r, 'user', 'u'));
+            /** @var User $user */
+            $user = $this->hydrateJoin($r, 'user', 'u');
+            $user->setPronoun($this->hydrateJoin($r, 'user.pronoun', 'up'));
+            $revision->setUser($user);
 
             $col->add($revision);
         }

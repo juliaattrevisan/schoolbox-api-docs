@@ -18,6 +18,8 @@ use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
 use Schoolbox\Sync\Provisioner\ValidUser;
 use Schoolbox\User as UserModel;
+use Schoolbox\User\Pronoun\Mapper as PronounMapper;
+use Schoolbox\User\Pronoun\Model as PronounModel;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 
@@ -69,6 +71,11 @@ class User extends AbstractImporter
     protected $residentialHouseList = [];
 
     /**
+     * @var array|PronounModel
+     */
+    protected array|PronounModel $pronounList = [];
+
+    /**
      * A list of user identifier classes - each one will in turn attempt to
      * retrieve a UserModel from the row.
      *
@@ -110,6 +117,7 @@ class User extends AbstractImporter
             'First Name'                           => '',
             'Preferred Name'                       => '',
             'Surname'                              => '',
+            'Pronoun'                              => '',
             'Position Title'                       => 'The user\'s position title (e.g. Admissions Manager)',
             'Role'                                 => 'The Schoolbox role for this user',
             'Campus'                               => 'A comma-separated list of campus names for this user.',
@@ -169,6 +177,13 @@ class User extends AbstractImporter
             $this->residentialHouseList[$boardingHouse->getHouse()] = $boardingHouse;
         }
 
+        // Pronouns
+        foreach (PronounMapper::getInstance()->disableCache()->findAll() as $pronoun) {
+            /** @var PronounModel $pronoun */
+            // Magic As that is how it is displayed in the system, and we should be matching on that
+            $this->pronounList[$pronoun->__toString()] = $pronoun;
+        }
+
         // Identifiers
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
@@ -200,6 +215,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail', true);
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
+        $this->userHydrators[] = new User\Hydrator\Lookup('Pronoun', 'setPronoun', $this->pronounList);
     }
 
     /**

@@ -54,11 +54,13 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')},
                 {$this->getJoinColumnString('user.role', 'ur')},
+                {$this->getJoinColumnString('user.pronoun', 'up')},
                 {$this->getJoinColumnString('team', 't')},
                 {$this->getJoinColumnString('team.division', 'td')}
             FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
             INNER JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
+            LEFT JOIN {$this->getJoinSql('user.pronoun', 'u', 'up')}
             INNER JOIN {$this->getJoinSql('team', '', 't')}
             INNER JOIN {$this->getJoinSql('team.division', 't', 'td')}
         ";
@@ -82,6 +84,7 @@ class Mapper extends BaseMapper
             $user = $this->hydrateJoin($row, 'user', 'u');
             if ($user instanceof User) {
                 $role = $this->hydrateJoin($row, 'user.role', 'ur');
+                $user->setPronoun($this->hydrateJoin($row, 'user.pronoun', 'up'));
                 if ($role instanceof Role) {
                     $user->setRole($role);
                 }

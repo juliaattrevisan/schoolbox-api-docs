@@ -78,9 +78,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getRevisionList($wikiID)
     {
-        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.preferred_name, u.lastname
+        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.preferred_name, u.lastname,
+                  if (u.pronoun, concat('(', pronoun.subjective, '/', pronoun.objective, ')'), '') as pronoun
                   FROM " . $this->_revisionTable . " r
                   LEFT JOIN user u ON u.id = r.userID
+                  LEFT JOIN pronoun ON u.pronoun = pronoun.id
                   WHERE wikiID = ?
                   ORDER BY r.created DESC";
         return $this->db->query($query, [$wikiID])->fetchAll();

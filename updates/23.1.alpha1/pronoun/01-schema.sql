@@ -20,7 +20,6 @@ alter table user
     add constraint fk_user_pronoun_id
         foreign key IF NOT EXISTS (pronoun) references pronoun (id);
 
-
 ### now for the initial data
 INSERT INTO pronoun (subjective, objective, possessive, sequence, created_at, updated_at)
 VALUES ('he', 'him', 'his', 2, now(), now()),

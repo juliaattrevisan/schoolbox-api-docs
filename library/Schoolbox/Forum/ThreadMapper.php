@@ -218,9 +218,11 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
         $stmt = $this->database->prepare("
             SELECT
                 {$this->getColumnString('t')},
-                {$this->getJoinColumnString('owner', 'o')}
+                {$this->getJoinColumnString('owner', 'o')},
+                {$this->getJoinColumnString('owner.pronoun', 'op')}
             FROM `{$this->getTable()}` t
             INNER JOIN {$this->getJoinSql('owner', 't', 'o', true)}
+            LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
             WHERE t.deleted = 'false'
             AND t.categoryID = :cat
             AND t.date < :time
@@ -239,7 +241,10 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var Thread $thread */
             $thread = $this->hydrate($r, 't');
-            $thread->setUser($this->hydrateJoin($r, 'owner', 'o'));
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($r, 'owner', 'o');
+            $owner->setPronoun($this->hydrateJoin($r, 'owner.pronoun', 'op'));
+            $thread->setUser($owner);
 
             $c->add($thread);
         }
@@ -338,9 +343,11 @@ WHERE
             'categoryID'    => $categoryID,
         ];
 
-        $query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.preferred_name userPreferredName, u.lastname userLastname, u.synergy_id
+        $query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.preferred_name userPreferredName, u.lastname userLastname, u.synergy_id,
+                  if (u.pronoun, concat('(', pronoun.subjective, '/', pronoun.objective, ')'), '') as 'pronoun'
                   FROM forumThread t
                   LEFT JOIN user u ON u.id = t.userID
+                  LEFT JOIN `pronoun` ON u.pronoun = pronoun.id
                   WHERE t.categoryID = :categoryID
                   AND t.deleted = 'false'
                   ORDER BY ";
@@ -374,7 +381,9 @@ WHERE
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('owner', 'owner')},
+                   {$this->getJoinColumnString('owner.pronoun', 'op')},
                    {$this->getJoinColumnString('lastPoster', 'lastPoster')},
+                   {$this->getJoinColumnString('lastPoster.pronoun', 'lpp')},
                    {$this->getJoinColumnString('post', 'post')}
         ";
     }
@@ -389,6 +398,8 @@ WHERE
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
             INNER JOIN {$this->getJoinSql('lastPoster', '', 'lastPoster', true)}
+            LEFT JOIN {$this->getJoinSql('owner.pronoun', 'owner', 'op')}
+            LEFT JOIN {$this->getJoinSql('lastPoster.pronoun', 'lastPoster', 'lpp')}
             LEFT JOIN {$this->getJoinSql('post', '', 'post', false)}
         ";
     }
@@ -405,10 +416,16 @@ WHERE
         $collection = $this->createCollection();
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($row, 'owner', 'owner');
+            $owner->setPronoun($this->hydrateJoin($row, 'owner.pronoun', 'op'));
+            /** @var User $lastPoster */
+            $lastPoster = $this->hydrateJoin($row, 'lastPoster', 'lastPoster');
+            $lastPoster->setPronoun($this->hydrateJoin($row, 'lastPoster.pronoun', 'lpp'));
             $thread = $this->hydrate($row)
-                         ->setUser($this->hydrateJoin($row, 'owner', 'owner'))
+                         ->setUser($owner)
                          ->setLastPost($this->hydrateJoin($row, 'post', 'post'))
-                         ->setLastPostUser($this->hydrateJoin($row, 'lastPoster', 'lastPoster'));
+                         ->setLastPostUser($lastPoster);
             $collection[$thread->getId()] = $thread;
         }
 

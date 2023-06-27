@@ -19,3 +19,6 @@ alter table user
 alter table user
     add constraint fk_user_pronoun_id
         foreign key (pronoun) references pronoun (id);
+
+alter table sis_user_profile
+    add pronoun varchar(255) null after lastname;

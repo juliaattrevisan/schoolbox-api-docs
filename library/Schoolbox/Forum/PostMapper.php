@@ -154,7 +154,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
-        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getUnixTimeStamp();
+        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getDatabase();
 
         $limit = (int)$limit;
         $offset = (int)$offset;
@@ -163,9 +163,11 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
             SELECT
                 {$this->getColumnString('p')},
                 {$this->getJoinColumnString('owner', 'o')},
+                {$this->getJoinColumnString('owner.pronoun', 'op')},
                 {$this->getJoinColumnString('thread', 't')}
             FROM `{$this->getTable()}` p
               INNER JOIN {$this->getJoinSql('owner', 'p', 'o', true)}
+              LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
               INNER JOIN {$this->getJoinSql('thread', 'p', 't', true)}
             WHERE p.deleted = 'false'
             AND t.categoryID = :cat
@@ -185,7 +187,10 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var Post $post */
             $post = $this->hydrate($r, 'p');
-            $post->setOwner($this->hydrateJoin($r, 'owner', 'o'));
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($r, 'owner', 'o');
+            $owner->setPronoun($this->hydrateJoin($r, 'owner.pronoun', 'op'));
+            $post->setOwner($owner);
             $post->setThread($this->hydrateJoin($r, 'thread', 't'));
 
             $c->add($post);
@@ -238,6 +243,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('thread', 'thread')},
                    {$this->getJoinColumnString('owner', 'owner')},
+                   {$this->getJoinColumnString('owner.pronoun', 'op')},
                    {$this->getJoinColumnString('parent', 'parent')}
         ";
     }
@@ -252,6 +258,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('thread', '', 'thread', false)}
             INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
+            LEFT JOIN {$this->getJoinSql('owner.pronoun', 'owner', 'op')}
             LEFT JOIN {$this->getJoinSql('parent', '', 'parent', false)}
         ";
     }
@@ -269,8 +276,11 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($row, 'owner', 'owner');
+            $owner->setPronoun($this->hydrateJoin($row, 'owner.pronoun', 'op'));
             $post = $this->hydrate($row)
-                ->setOwner($this->hydrateJoin($row, 'owner', 'owner'))
+                ->setOwner($owner)
                 ->setThread($this->hydrateJoin($row, 'thread', 'thread'));
             /**
              * check if the post has a parent, if so, hydrate

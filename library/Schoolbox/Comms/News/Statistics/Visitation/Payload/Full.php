@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News\Statistics\Visitation\Payload;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\UserMapper;
+use Schoolbox\User;
 
 /**
  * Class Top10
@@ -61,6 +62,7 @@ class Full
             SELECT
                 s1.user_id, s1.occurs_at,
                 u.title, u.firstname, u.preferred_name, u.lastname,
+                {$this->userMapper->getJoinColumnString('pronoun', 'op')},
                 r.`name` AS `role`
             FROM {$this->statisticsMapper->getTable()} s1
             LEFT JOIN {$this->statisticsMapper->getTable()} s2
@@ -70,6 +72,7 @@ class Full
                 AND s1.occurs_at < s2.occurs_at
             LEFT JOIN `user` u ON s1.user_id = u.id
             LEFT JOIN `groups` r ON u.group_id = r.id
+            LEFT JOIN {$this->userMapper->getJoinSql('pronoun', 'u', 'op')}
             WHERE s2.id IS NULL AND s1.article_id = :articleId
             ORDER BY s1.occurs_at DESC
         ");
@@ -85,7 +88,9 @@ class Full
 
             /* Get access to formatName(), which only exists in a User instance
              */
+            /** @var User $user **/
             $user = $this->userMapper->hydrate($stat);
+            $user->setPronoun($this->userMapper->hydrateJoin($stat, 'pronoun', 'op'));
 
             $visitors[$stat['user_id']] = [
                 'id' => $stat['user_id'],
