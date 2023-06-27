@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e8db5877039c17e9cbcbcd0d547d5a13",
+    "content-hash": "d7ba4e23b3cee216443f3dce55df89ab",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -10432,16 +10432,16 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v6.3.0",
+            "version": "v6.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "6acdcd5c122074ee9f7b051e4fb177025c277a0e"
+                "reference": "c81268d6960ddb47af17391a27d222bd58cf0515"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/6acdcd5c122074ee9f7b051e4fb177025c277a0e",
-                "reference": "6acdcd5c122074ee9f7b051e4fb177025c277a0e",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/c81268d6960ddb47af17391a27d222bd58cf0515",
+                "reference": "c81268d6960ddb47af17391a27d222bd58cf0515",
                 "shasum": ""
             },
             "require": {
@@ -10494,7 +10494,7 @@
                 "dump"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-dumper/tree/v6.3.0"
+                "source": "https://github.com/symfony/var-dumper/tree/v6.3.1"
             },
             "funding": [
                 {
@@ -10510,24 +10510,24 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-25T13:09:35+00:00"
+            "time": "2023-06-21T12:08:28+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v6.3.0",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "a9a8337aa641ef2aa39c3e028f9107ec391e5927"
+                "reference": "f3064a2e0b5eabaeaf92db0a5913a77098b3b91e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/a9a8337aa641ef2aa39c3e028f9107ec391e5927",
-                "reference": "a9a8337aa641ef2aa39c3e028f9107ec391e5927",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/f3064a2e0b5eabaeaf92db0a5913a77098b3b91e",
+                "reference": "f3064a2e0b5eabaeaf92db0a5913a77098b3b91e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
+                "php": ">=8.0.2",
                 "symfony/polyfill-ctype": "^1.8"
             },
             "conflict": {
@@ -10535,6 +10535,9 @@
             },
             "require-dev": {
                 "symfony/console": "^5.4|^6.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
             },
             "bin": [
                 "Resources/bin/yaml-lint"
@@ -10565,7 +10568,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v6.3.0"
+                "source": "https://github.com/symfony/yaml/tree/v6.0.0"
             },
             "funding": [
                 {
@@ -10581,7 +10584,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-04-28T13:28:14+00:00"
+            "time": "2021-11-28T15:34:37+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -14871,16 +14874,16 @@
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v6.3.0",
+            "version": "v6.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
-                "reference": "2611ec97006953c3b21ac9f3c52a6a252483e637"
+                "reference": "8aa333f41f05afc7fc285a976b58272fd90fc212"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/2611ec97006953c3b21ac9f3c52a6a252483e637",
-                "reference": "2611ec97006953c3b21ac9f3c52a6a252483e637",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/8aa333f41f05afc7fc285a976b58272fd90fc212",
+                "reference": "8aa333f41f05afc7fc285a976b58272fd90fc212",
                 "shasum": ""
             },
             "require": {
@@ -14918,7 +14921,7 @@
             "description": "Eases DOM navigation for HTML and XML documents",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dom-crawler/tree/v6.3.0"
+                "source": "https://github.com/symfony/dom-crawler/tree/v6.3.1"
             },
             "funding": [
                 {
@@ -14934,7 +14937,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-04-28T16:05:33+00:00"
+            "time": "2023-06-05T15:30:22+00:00"
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
@@ -15241,5 +15244,5 @@
         "ext-ldap": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
