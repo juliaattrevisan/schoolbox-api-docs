@@ -85,8 +85,12 @@ Usage: include 'sub/semesterSelector.twig
              # matching the requested year.  No results will be shown in this case.  We add the extra option to avoid the
              # situation where the user requests a year and then a different year or term is selected when the page loads.
              # Specify in the URL a year in the far future to see the extra option.
+             #
+             # If you leave data-href undefined, the string "undefined" is appended literally to the
+             # current url, sending you to /learning/grades-year/25/year/undefined, so we force this
+             # to have an href like its kindred
              #}
-            <option selected>{{ year }} Grades Summary</option>
+            <option data-href="{{ routeLookup('learningGrades.getGradesYear', routeArgs | merge({year: year}) ) }}" selected>{{ year }} Grades Summary</option>
         {% endif %}
     </select>
 </div>
