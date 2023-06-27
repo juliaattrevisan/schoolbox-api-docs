@@ -1,4 +1,3 @@
-
 /**
  * To retrieve the component id
  *

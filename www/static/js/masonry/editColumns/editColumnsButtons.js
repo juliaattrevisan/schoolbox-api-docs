@@ -9,9 +9,15 @@ import UpdateMasonryEvents from "../updateMasonryEvents";
  * Start listening for button events
  */
 export function initEditColumnsButtons() {
-    document.querySelector('[data-role="reset-to-default"]').addEventListener("click", onResetSelected);
-    document.querySelector('[data-role="undo"]').addEventListener("click", onUndoChangesSelected);
-    document.querySelector('[data-role="save"]').addEventListener("click", onSaveSelected);
+    document
+        .querySelector('[data-role="reset-to-default"]')
+        .addEventListener("click", onResetSelected);
+    document
+        .querySelector('[data-role="undo"]')
+        .addEventListener("click", onUndoChangesSelected);
+    document
+        .querySelector('[data-role="save"]')
+        .addEventListener("click", onSaveSelected);
 }
 
 /**
@@ -32,7 +38,9 @@ function onResetSelected(event) {
  */
 function onUndoChangesSelected(event) {
     event.preventDefault();
-    document.dispatchEvent(new Event(UpdateMasonryEvents.EDIT_COLUMNS_UNDO_CHANGES));
+    document.dispatchEvent(
+        new Event(UpdateMasonryEvents.EDIT_COLUMNS_UNDO_CHANGES)
+    );
 }
 
 /**

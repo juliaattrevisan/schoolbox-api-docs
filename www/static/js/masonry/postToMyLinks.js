@@ -9,9 +9,13 @@ import { getMasonryConfig } from "./masonryConfig";
  * Listen for the button press and then save the link to DB and display it on the page
  */
 export function initPostToMyLinks() {
-    const postToMyLinksBtn = document.querySelector(getMasonryConfig().postToMyLinks.selector)
+    const postToMyLinksBtn = document.querySelector(
+        getMasonryConfig().postToMyLinks.selector
+    );
     // The button will not exist for a user that has already added this page to their links.
-    if (!postToMyLinksBtn) { return; }
+    if (!postToMyLinksBtn) {
+        return;
+    }
 
     postToMyLinksBtn.addEventListener("click", (event) => {
         event.preventDefault();
@@ -58,10 +62,14 @@ function displayLinkOnPage() {
     const linkListItem = document.createElement("li");
     linkListItem.appendChild(link);
 
-    const myLinksList = document.getElementById("side-menu-mylinks").querySelector("ul");
+    const myLinksList = document
+        .getElementById("side-menu-mylinks")
+        .querySelector("ul");
     myLinksList.appendChild(linkListItem);
 
     // Remove the postToMyLinks button
-    const postToMyLinksBtn = document.querySelector(getMasonryConfig().postToMyLinks.selector)
+    const postToMyLinksBtn = document.querySelector(
+        getMasonryConfig().postToMyLinks.selector
+    );
     postToMyLinksBtn.parentNode.removeChild(postToMyLinksBtn);
 }

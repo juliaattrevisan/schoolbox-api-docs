@@ -19,17 +19,25 @@ import { merge } from "lodash";
 document.addEventListener("MASONRY__CREATE", (e) => {
     setMasonryConfig(e.detail);
 
-    if (getMasonryConfig().postToMyLinks) { initPostToMyLinks(); }
+    if (getMasonryConfig().postToMyLinks) {
+        initPostToMyLinks();
+    }
 
     initExistingComponents();
 
     if (getMasonryConfig().settings.allowEditing) {
-        if (getMasonryConfig().toggleLockComponents) { initToggleLockComponents(); }
-        if (getMasonryConfig().editColumns) { initEditColumns() };
+        if (getMasonryConfig().toggleLockComponents) {
+            initToggleLockComponents();
+        }
+        if (getMasonryConfig().editColumns) {
+            initEditColumns();
+        }
         initNewComponents();
         initUpdatePlaceHolders();
 
-        if (getMasonryConfig().settings.refreshPaletteCountsOnLoad) { updateAllComponentCounts(); }
+        if (getMasonryConfig().settings.refreshPaletteCountsOnLoad) {
+            updateAllComponentCounts();
+        }
     }
 });
 

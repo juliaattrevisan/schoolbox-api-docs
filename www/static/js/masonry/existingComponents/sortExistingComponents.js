@@ -81,16 +81,20 @@ function onComponentAddedOrUpdated(component) {
  * To remove a component from the sortable list
  */
 function initOnComponentRemovedListener() {
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, (event) => {
-        const draggableToRemove = __draggablesList.find((draggable) =>
-            draggable.target.isEqualNode(event.detail.component)
-        );
-        draggableToRemove.kill(); //disables the Draggable instance
-        __draggablesList = __draggablesList.filter(
-            (draggable) => !draggable.target.isEqualNode(event.detail.component)
-        ); //update the __draggablesList list, pullling out the removed component
-        updateSortableElements(); //update the position of all elements due to the new element being added
-    });
+    document.addEventListener(
+        UpdateMasonryEvents.COMPONENT_REMOVED,
+        (event) => {
+            const draggableToRemove = __draggablesList.find((draggable) =>
+                draggable.target.isEqualNode(event.detail.component)
+            );
+            draggableToRemove.kill(); //disables the Draggable instance
+            __draggablesList = __draggablesList.filter(
+                (draggable) =>
+                    !draggable.target.isEqualNode(event.detail.component)
+            ); //update the __draggablesList list, pullling out the removed component
+            updateSortableElements(); //update the position of all elements due to the new element being added
+        }
+    );
 }
 
 /**
@@ -117,7 +121,9 @@ function initOnProcessingEndListener() {
  * @param { Boolean }
  */
 function updateDraggablesStatus(isEnabled) {
-    __draggablesList.forEach((draggable) => (isEnabled ? draggable.enable() : draggable.disable()));
+    __draggablesList.forEach((draggable) =>
+        isEnabled ? draggable.enable() : draggable.disable()
+    );
 }
 
 /**
@@ -136,9 +142,15 @@ function initDraggables() {
  * @returns { Draggable }
  */
 function addNewDraggable(component) {
-    const componentTrigger = component.querySelector(COMPONENT_TRIGGER_SELECTOR);
-    componentTrigger.addEventListener("click", (event) => event.preventDefault());
-    componentTrigger.addEventListener("dblclick", (event) => event.preventDefault());
+    const componentTrigger = component.querySelector(
+        COMPONENT_TRIGGER_SELECTOR
+    );
+    componentTrigger.addEventListener("click", (event) =>
+        event.preventDefault()
+    );
+    componentTrigger.addEventListener("dblclick", (event) =>
+        event.preventDefault()
+    );
     return Draggable.create(component, {
         type: "x, y",
         trigger: componentTrigger,
@@ -173,7 +185,9 @@ function onDragStart(draggableInstance) {
     extractActiveComponent();
     updateSortableElements(); //ensure we have the most up to date positions
     collapseActiveComponentContent();
-    document.dispatchEvent(new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_START));
+    document.dispatchEvent(
+        new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_START)
+    );
 }
 
 /**
@@ -185,10 +199,15 @@ function onDragStart(draggableInstance) {
 function getReferenceElement() {
     const referenceElement = __activeComponent.cloneNode(true);
 
-    const collapsableContent = referenceElement.querySelector("[data-collapsable]");
-    if (collapsableContent) { collapsableContent.remove(); } //just use the top bar as reference, so remove all component controls that can be expanded
+    const collapsableContent =
+        referenceElement.querySelector("[data-collapsable]");
+    if (collapsableContent) {
+        collapsableContent.remove();
+    } //just use the top bar as reference, so remove all component controls that can be expanded
 
-    referenceElement.querySelector('[data-component-panel="settings"]')?.remove();
+    referenceElement
+        .querySelector('[data-component-panel="settings"]')
+        ?.remove();
     referenceElement.querySelector('[data-component-panel="delete"]')?.remove();
     referenceElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed
     insertElementBefore(__activeComponent, referenceElement);
@@ -213,7 +232,9 @@ function updateDragPoint() {
 function updateDocumentOnDragStart() {
     document.body.style.overflowX = "hidden"; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
     document.documentElement.style.scrollBehavior = "auto"; //disable smooth scroll as it can jar while moving elements around
-    document.querySelectorAll("[data-collapsable]").forEach((element) => (element.style.pointerEvents = "none")); //prevent any mouse interactions interferring while dragging
+    document
+        .querySelectorAll("[data-collapsable]")
+        .forEach((element) => (element.style.pointerEvents = "none")); //prevent any mouse interactions interferring while dragging
     document.addEventListener("scroll", onScroll); //prevent sorting check while moving up/down window
 }
 
@@ -251,7 +272,9 @@ function extractActiveComponent() {
     setStylesOnElement(__activeComponent, {
         //Update position and styles to match now that the __activeComponent has been moved out of context
         position: "absolute",
-        top: `${__referenceElement.getBoundingClientRect().top + window.scrollY}px`,
+        top: `${
+            __referenceElement.getBoundingClientRect().top + window.scrollY
+        }px`,
         left: `${__referenceElement.getBoundingClientRect().left - 16}px`, //subtracting 16 to deal with 1rem padding-left that's applied
         width: `${__referenceElement.getBoundingClientRect().width + 32}px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
@@ -264,12 +287,22 @@ function extractActiveComponent() {
 function addActiveComponentComputedStyles() {
     const containerPosition = __referenceElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
 
-    const headBg = getComputedStyle(__referenceElement).getPropertyValue(`--${containerPosition}-head-bg`); //use __referenceElement as it still exists in the correct context
-    __activeComponent.querySelectorAll(".component-titlebar").forEach((item) => (item.style.backgroundColor = headBg));
+    const headBg = getComputedStyle(__referenceElement).getPropertyValue(
+        `--${containerPosition}-head-bg`
+    ); //use __referenceElement as it still exists in the correct context
+    __activeComponent
+        .querySelectorAll(".component-titlebar")
+        .forEach((item) => (item.style.backgroundColor = headBg));
 
-    const headFont = getComputedStyle(__referenceElement).getPropertyValue(`--${containerPosition}-head-font`);
-    __activeComponent.querySelectorAll(".component-titlebar h2").forEach((item) => (item.style.color = headFont));
-    __activeComponent.querySelectorAll(".component-titlebar a").forEach((item) => (item.style.color = headFont));
+    const headFont = getComputedStyle(__referenceElement).getPropertyValue(
+        `--${containerPosition}-head-font`
+    );
+    __activeComponent
+        .querySelectorAll(".component-titlebar h2")
+        .forEach((item) => (item.style.color = headFont));
+    __activeComponent
+        .querySelectorAll(".component-titlebar a")
+        .forEach((item) => (item.style.color = headFont));
 }
 
 /**
@@ -277,9 +310,15 @@ function addActiveComponentComputedStyles() {
  * otherwise further user colour changes in the edit columns palette will not be reflected
  */
 function removeActiveComponentComputedStyles() {
-    __activeComponent.querySelectorAll(".component-titlebar").forEach((item) => (item.style.backgroundColor = ""));
-    __activeComponent.querySelectorAll(".component-titlebar h2").forEach((item) => (item.style.color = ""));
-    __activeComponent.querySelectorAll(".component-titlebar a").forEach((item) => (item.style.color = ""));
+    __activeComponent
+        .querySelectorAll(".component-titlebar")
+        .forEach((item) => (item.style.backgroundColor = ""));
+    __activeComponent
+        .querySelectorAll(".component-titlebar h2")
+        .forEach((item) => (item.style.color = ""));
+    __activeComponent
+        .querySelectorAll(".component-titlebar a")
+        .forEach((item) => (item.style.color = ""));
 }
 
 /**
@@ -289,19 +328,24 @@ function removeActiveComponentComputedStyles() {
 async function collapseActiveComponentContent() {
     __isChangingSize = true;
     if (isSettingsPanelOpen(__activeComponent)) {
-        const activeComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]'); //just assume it may be open
+        const activeComponentSettingsPanel = __activeComponent.querySelector(
+            '[data-component-panel="settings"]'
+        ); //just assume it may be open
         if (activeComponentSettingsPanel) {
             slideUp(activeComponentSettingsPanel, ANIMATE_SPEED);
         }
     }
     if (isRemovePanelOpen(__activeComponent)) {
-        const activeComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]'); //just assume it may be open
+        const activeComponentDeletePanel = __activeComponent.querySelector(
+            '[data-component-panel="delete"]'
+        ); //just assume it may be open
         if (activeComponentDeletePanel) {
             slideUp(activeComponentDeletePanel, ANIMATE_SPEED);
         }
     }
     if (isComponentOpen(__activeComponent)) {
-        const activeComponentContent = __activeComponent.querySelector("[data-collapsable]");
+        const activeComponentContent =
+            __activeComponent.querySelector("[data-collapsable]");
         if (activeComponentContent) {
             await slideUp(activeComponentContent, ANIMATE_SPEED);
         }
@@ -316,7 +360,8 @@ async function collapseActiveComponentContent() {
 function updateSortableElements() {
     document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
         component.dataset.originalLeft = component.getBoundingClientRect().left;
-        component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
+        component.dataset.originalTop =
+            component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
         component.removeAttribute("data-flip-id"); //sometimes FLIP currently leaves this behind
@@ -335,14 +380,21 @@ function updateSortableElements() {
  */
 function onDrag() {
     if (canCheckForChange()) {
-        const sortablesToCheckList = Array.from(document.querySelectorAll(COMPONENT_SELECTOR)); //grab all sortable elements
-        const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
+        const sortablesToCheckList = Array.from(
+            document.querySelectorAll(COMPONENT_SELECTOR)
+        ); //grab all sortable elements
+        const closestElement = getClosestElement(
+            __activeComponent,
+            sortablesToCheckList
+        ); //the element nearest to the dragged element
         if (closestElement.id !== __activeComponent.id) {
             //no need to FLIP if the closest element is still the __activeComponent
             if (isElementAboveOtherElement(__activeComponent, closestElement)) {
                 //otherwise determine movement direction, up or down into the container
                 updateActiveComponentPosition(closestElement, true);
-            } else if (isElementBelowOtherElement(__activeComponent, closestElement)) {
+            } else if (
+                isElementBelowOtherElement(__activeComponent, closestElement)
+            ) {
                 updateActiveComponentPosition(closestElement, false);
             }
         }
@@ -364,7 +416,12 @@ function canCheckForChange() {
         Math.pow(__startDragPoint.left - currentDragPoint.left, 2) +
             Math.pow(__startDragPoint.top - currentDragPoint.top, 2)
     );
-    return distance > MIN_MOVEMENT && !__isScrolling && !__isChangingSize && !__isFlipping;
+    return (
+        distance > MIN_MOVEMENT &&
+        !__isScrolling &&
+        !__isChangingSize &&
+        !__isFlipping
+    );
 }
 
 /**
@@ -388,15 +445,21 @@ function updateActiveComponentPosition(closestElement, isShiftingDown) {
 
     clearFlipElements(); //check for flip bug
 
-    document.dispatchEvent(new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_UPDATE));
+    document.dispatchEvent(
+        new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_UPDATE)
+    );
 
     __activeComponent.dataset.leftDifference =
-        __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+        __referenceElement.getBoundingClientRect().left -
+        parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
     __activeComponent.dataset.topDifference =
         __referenceElement.getBoundingClientRect().top +
         window.scrollY -
         parseInt(__referenceElement.dataset.originalTop);
-    gsap.to(__activeComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+    gsap.to(__activeComponent, {
+        width: __referenceElement.parentElement.offsetWidth,
+        duration: ANIMATE_SPEED,
+    }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
     animateFlip(state);
 }
@@ -419,12 +482,17 @@ function animateFlip(state) {
  * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
  */
 function clearFlipElements() {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer) => {
-        if (parentContainer.children.length === 1 && !parentContainer.children[0].id) {
-            //there's the flip element here, so we should clear it out
-            parentContainer.removeChild(parentContainer.children[0]);
-        }
-    });
+    document
+        .querySelectorAll(COMPONENT_CONTAINERS_SELECTOR)
+        .forEach((parentContainer) => {
+            if (
+                parentContainer.children.length === 1 &&
+                !parentContainer.children[0].id
+            ) {
+                //there's the flip element here, so we should clear it out
+                parentContainer.removeChild(parentContainer.children[0]);
+            }
+        });
 }
 
 /*****************************************************************
@@ -438,7 +506,9 @@ function clearFlipElements() {
  */
 function onDragEnd() {
     document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
-    document.dispatchEvent(new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_END));
+    document.dispatchEvent(
+        new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_END)
+    );
     snapBackActiveComponent();
 }
 
@@ -480,15 +550,20 @@ function onSnapBackActiveComponentComplete() {
  */
 async function expandActiveComponent() {
     if (isSettingsPanelOpen(__activeComponent)) {
-        const activeComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]');
+        const activeComponentSettingsPanel = __activeComponent.querySelector(
+            '[data-component-panel="settings"]'
+        );
         slideDown(activeComponentSettingsPanel, ANIMATE_SPEED);
     }
     if (isRemovePanelOpen(__activeComponent)) {
-        const activeComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]');
+        const activeComponentDeletePanel = __activeComponent.querySelector(
+            '[data-component-panel="delete"]'
+        );
         slideDown(activeComponentDeletePanel, ANIMATE_SPEED);
     }
     if (isComponentOpen(__activeComponent)) {
-        const activeComponentContent = __activeComponent.querySelector("[data-collapsable]");
+        const activeComponentContent =
+            __activeComponent.querySelector("[data-collapsable]");
         if (activeComponentContent) {
             await slideDown(activeComponentContent, ANIMATE_SPEED);
         }
@@ -515,7 +590,9 @@ async function onActiveComponentExpanded() {
 function updateDocumentOnDragEnd() {
     document.body.style.overflowX = "auto"; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = "smooth"; //was auto to avoid jarring behaviour
-    document.querySelectorAll("[data-collapsable]").forEach((element) => (element.style.pointerEvents = "auto")); //re-enable mouse interactions
+    document
+        .querySelectorAll("[data-collapsable]")
+        .forEach((element) => (element.style.pointerEvents = "auto")); //re-enable mouse interactions
     document.removeEventListener("scroll", onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event("resize")); //for components to respond to - for example swiper.js image gallerys to update to display correctly
 }

@@ -11,10 +11,14 @@ import UpdateMasonryEvents from "../updateMasonryEvents";
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
 export function initToggleLockComponents() {
-    const componentLockSwitch = document.querySelector(getMasonryConfig().toggleLockComponents.selector);
+    const componentLockSwitch = document.querySelector(
+        getMasonryConfig().toggleLockComponents.selector
+    );
     componentLockSwitch.addEventListener("change", () => {
         document
-            .querySelectorAll(getMasonryConfig().settings.existingComponentSelector)
+            .querySelectorAll(
+                getMasonryConfig().settings.existingComponentSelector
+            )
             .forEach((component) => updateComponentDisplay(component));
     });
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
@@ -34,9 +38,13 @@ export function initToggleLockComponents() {
  * @param { Element }
  */
 function updateComponentDisplay(component) {
-    component.querySelectorAll("a[data-component-settings], [data-component-handle]").forEach((element) => {
-        isToggleUnlocked() ? (element.style.display = "inline-block") : (element.style.display = "none");
-    });
+    component
+        .querySelectorAll("a[data-component-settings], [data-component-handle]")
+        .forEach((element) => {
+            isToggleUnlocked()
+                ? (element.style.display = "inline-block")
+                : (element.style.display = "none");
+        });
 }
 
 /**
@@ -46,5 +54,7 @@ function updateComponentDisplay(component) {
  * @returns { Boolean }
  */
 function isToggleUnlocked() {
-    return document.getElementById("component-lock-switch").querySelector("input").checked;
+    return document
+        .getElementById("component-lock-switch")
+        .querySelector("input").checked;
 }

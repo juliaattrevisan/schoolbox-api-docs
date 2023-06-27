@@ -13,7 +13,10 @@ import { undoColourChanges } from "./editColumnsColours";
  * Start listening for the reset event
  */
 export function initUndoChangesEditColumns() {
-    document.addEventListener(UpdateMasonryEvents.EDIT_COLUMNS_UNDO_CHANGES, onEditColumnsUndoChanges);
+    document.addEventListener(
+        UpdateMasonryEvents.EDIT_COLUMNS_UNDO_CHANGES,
+        onEditColumnsUndoChanges
+    );
 }
 
 /**

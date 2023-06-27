@@ -27,10 +27,14 @@ export function initNewComponentsTab() {
     //to show/hide the 'add components here' placeholders in empty columns when the new tabs component is open
     $.fn.tabActivator({
         onTabOpen: function () {
-            document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENTS_TABS_OPENED));
+            document.dispatchEvent(
+                new Event(UpdateMasonryEvents.NEW_COMPONENTS_TABS_OPENED)
+            );
         },
         onTabClose: function () {
-            document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENTS_TABS_CLOSED));
+            document.dispatchEvent(
+                new Event(UpdateMasonryEvents.NEW_COMPONENTS_TABS_CLOSED)
+            );
             masonryLayout.removeClass("show-empty");
         },
     });

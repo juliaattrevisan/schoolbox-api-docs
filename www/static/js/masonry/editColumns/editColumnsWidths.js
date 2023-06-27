@@ -12,9 +12,14 @@ import { getMasonryConfig } from "../masonryConfig";
  * @todo look to remove the jQuery foundation reference
  */
 export function initEditColumnsWidths() {
-    $(getMasonryConfig().editColumns.columnWidthSelector).on("change.fndtn.slider", function (event) {
-        updateColumnWidths(parseInt(event.target.getAttribute("data-slider")));
-    });
+    $(getMasonryConfig().editColumns.columnWidthSelector).on(
+        "change.fndtn.slider",
+        function (event) {
+            updateColumnWidths(
+                parseInt(event.target.getAttribute("data-slider"))
+            );
+        }
+    );
 }
 
 /**
@@ -23,11 +28,15 @@ export function initEditColumnsWidths() {
  * @param { Number }
  */
 function updateColumnWidths(width) {
-    const leftContainer = document.querySelector(getMasonryConfig().editColumns.leftContainerSelector);
+    const leftContainer = document.querySelector(
+        getMasonryConfig().editColumns.leftContainerSelector
+    );
     removeClassesThatContain(leftContainer, "large-"); //remove any previous class that set width
     leftContainer.classList.add(`large-${width}`); //add in the new one
 
-    const rightContainer = document.querySelector(getMasonryConfig().editColumns.rightContainerSelector);
+    const rightContainer = document.querySelector(
+        getMasonryConfig().editColumns.rightContainerSelector
+    );
     removeClassesThatContain(rightContainer, "large-"); //remove any previous class that set width
     rightContainer.classList.add(`large-${12 - width}`); //linked to the leftContainer, so subract from the basis of '12' set by foundation classes
 }
@@ -51,5 +60,10 @@ export function undoWidthChanges() {
  * @param { FormData }
  */
 export function appendWidth(formData) {
-    formData.append("width", document.querySelector(getMasonryConfig().editColumns.columnWidthSelector).getAttribute("data-slider"));
+    formData.append(
+        "width",
+        document
+            .querySelector(getMasonryConfig().editColumns.columnWidthSelector)
+            .getAttribute("data-slider")
+    );
 }

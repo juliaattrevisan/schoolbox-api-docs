@@ -22,7 +22,10 @@ export function initUpdateNewComponentButtons() {
  */
 function initOnComponentAddedListener() {
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => {
-        const newComponentCount = updateComponentCount(event.detail.paletteElement, true);
+        const newComponentCount = updateComponentCount(
+            event.detail.paletteElement,
+            true
+        );
         checkButtonStatus(event.detail.paletteElement, newComponentCount);
     });
 }
@@ -31,14 +34,26 @@ function initOnComponentAddedListener() {
  * To decrement the relevant counter and check if need to re-enable
  */
 function initOnComponentRemovedListener() {
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, (event) => {
-        const targetId = event.detail.component.dataset.componentDefinitionId;
-        const counter = document.querySelector(`[data-component-palette] [${getMasonryConfig().settings.formData.newComponentAddAttribute}="${targetId}"]`);
-        const paletteElement = counter.parentElement.parentElement;
+    document.addEventListener(
+        UpdateMasonryEvents.COMPONENT_REMOVED,
+        (event) => {
+            const targetId =
+                event.detail.component.dataset.componentDefinitionId;
+            const counter = document.querySelector(
+                `[data-component-palette] [${
+                    getMasonryConfig().settings.formData
+                        .newComponentAddAttribute
+                }="${targetId}"]`
+            );
+            const paletteElement = counter.parentElement.parentElement;
 
-        const newComponentCount = updateComponentCount(paletteElement, false);
-        checkButtonStatus(paletteElement, newComponentCount);
-    });
+            const newComponentCount = updateComponentCount(
+                paletteElement,
+                false
+            );
+            checkButtonStatus(paletteElement, newComponentCount);
+        }
+    );
 }
 
 /**
@@ -50,12 +65,16 @@ function initOnComponentRemovedListener() {
  * @returns { Number }
  */
 function updateComponentCount(paletteElement, isIncrement) {
-    const counterElement = paletteElement.querySelector('[data-relation="count"]');
+    const counterElement = paletteElement.querySelector(
+        '[data-relation="count"]'
+    );
     if (!counterElement) {
         return isIncrement; // No counter element, so nothing to update
     }
     const currentComponentCount = parseInt(counterElement.textContent);
-    const currentCount = isIncrement ? currentComponentCount + 1 : currentComponentCount - 1;
+    const currentCount = isIncrement
+        ? currentComponentCount + 1
+        : currentComponentCount - 1;
     counterElement.textContent = currentCount;
     return currentCount;
 }
@@ -82,13 +101,21 @@ function checkButtonStatus(paletteElement, componentCount) {
  * Note: This will not work as intended if multiple components with the same definition ID are in the pallette, e.g. on eportfolios
  */
 export function updateAllComponentCounts() {
-    document.querySelectorAll("[data-component-palette]").forEach((paletteElement) => {
-        const componentDefinitionId = paletteElement.querySelector("[data-component-definition-id]").dataset.componentDefinitionId;
-        const componentCount = document.querySelectorAll(`[data-component][data-component-definition-id="${componentDefinitionId}"]`).length;
-        const counterElement = paletteElement.querySelector('[data-relation="count"]');
-        if (counterElement) {
-            counterElement.textContent = componentCount;
-        }
-        checkButtonStatus(paletteElement, componentCount);
-    });
+    document
+        .querySelectorAll("[data-component-palette]")
+        .forEach((paletteElement) => {
+            const componentDefinitionId = paletteElement.querySelector(
+                "[data-component-definition-id]"
+            ).dataset.componentDefinitionId;
+            const componentCount = document.querySelectorAll(
+                `[data-component][data-component-definition-id="${componentDefinitionId}"]`
+            ).length;
+            const counterElement = paletteElement.querySelector(
+                '[data-relation="count"]'
+            );
+            if (counterElement) {
+                counterElement.textContent = componentCount;
+            }
+            checkButtonStatus(paletteElement, componentCount);
+        });
 }

@@ -26,9 +26,15 @@ const QUERY_STRING_ATTRIBUTE = "data-query-string"; //to store the current setti
  * new component is added or udpated
  */
 export function initUpdateComponentsSettings() {
-    document.querySelectorAll(getMasonryConfig().settings.existingComponentSelector).forEach((component) => init(component));
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
+    document
+        .querySelectorAll(getMasonryConfig().settings.existingComponentSelector)
+        .forEach((component) => init(component));
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
+        init(event.detail.component)
+    );
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
+        init(event.detail.component)
+    );
 }
 
 /**
@@ -56,7 +62,9 @@ function initToggleButtons(component) {
         event.preventDefault();
         isOpen(component) ? close(component) : open(component);
     });
-    const emptyStateToggleButtons = component.querySelectorAll(`${BUTTON_SELECTOR}.empty-edit`);
+    const emptyStateToggleButtons = component.querySelectorAll(
+        `${BUTTON_SELECTOR}.empty-edit`
+    );
     emptyStateToggleButtons.forEach((emptyStateToggleButton) => {
         emptyStateToggleButton.addEventListener("click", (event) => {
             event.preventDefault();
@@ -87,8 +95,16 @@ function open(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     if (!toggleButton) return;
     toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
-    toggleButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
-    animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    toggleButton.setAttribute(
+        QUERY_STRING_ATTRIBUTE,
+        getQueryString(component)
+    );
+    animateRotation(
+        toggleButton,
+        ANIMATE_OPEN_POSITION,
+        ANIMATE_ORIGIN,
+        ANIMATE_SPEED
+    );
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
     closeRemovePanel(component);
@@ -102,7 +118,9 @@ function open(component) {
  * @returns { String }
  */
 function getQueryString(component) {
-    const panelForm = component.querySelector(PANEL_SELECTOR).querySelector("form");
+    const panelForm = component
+        .querySelector(PANEL_SELECTOR)
+        .querySelector("form");
     const formData = Object.fromEntries(new FormData(panelForm));
     return Object.keys(formData)
         .map((key) => key + "=" + encodeURIComponent(formData[key]))
@@ -118,7 +136,12 @@ export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     if (!toggleButton) return;
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
-    animateRotation(toggleButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    animateRotation(
+        toggleButton,
+        ANIMATE_CLOSED_POSITION,
+        ANIMATE_ORIGIN,
+        ANIMATE_SPEED
+    );
     const panel = component.querySelector(PANEL_SELECTOR);
     await slideUp(panel, ANIMATE_SPEED);
 }
@@ -131,10 +154,13 @@ export async function close(component) {
 function initForm(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     if (!toggleButton) return;
-    const panelForm = component.querySelector(PANEL_SELECTOR).querySelector("form");
+    const panelForm = component
+        .querySelector(PANEL_SELECTOR)
+        .querySelector("form");
     panelForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        toggleButton.getAttribute(QUERY_STRING_ATTRIBUTE) === getQueryString(component)
+        toggleButton.getAttribute(QUERY_STRING_ATTRIBUTE) ===
+        getQueryString(component)
             ? close(component)
             : saveComponentSettings(component, panelForm);
     });
@@ -153,11 +179,16 @@ async function saveComponentSettings(component, form) {
         submitFormButton.disabled = true;
         submitFormButton.value = "Updating...";
         // Set X-Requested-With header to allow for AJAX specific processing in the backend controller
-        const response = await fetch(getMasonryConfig().settings.updateUrl + "?" + getSaveComponentSettingsParams(form), {
-            headers: {
-                'X-Requested-With' : 'XMLHttpRequest'
+        const response = await fetch(
+            getMasonryConfig().settings.updateUrl +
+                "?" +
+                getSaveComponentSettingsParams(form),
+            {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
             }
-        });
+        );
         const responseData = await response.text();
         await updateComponent(component, responseData);
     } catch (error) {
@@ -187,19 +218,25 @@ function getSaveComponentSettingsParams(form) {
 
     // Replace cid parameter if it is empty or not set and getMasonryConfig().pageInfo.type === "cid"
     if (
-        getMasonryConfig().settings.formData.pageInfo.type === "cid"
-        && (!queryParams.some(param => param.startsWith('cid=')) || queryParams.some(param => param === 'cid='))
+        getMasonryConfig().settings.formData.pageInfo.type === "cid" &&
+        (!queryParams.some((param) => param.startsWith("cid=")) ||
+            queryParams.some((param) => param === "cid="))
     ) {
-        queryParams.push('cid=' + encodeURIComponent(getMasonryConfig().settings.formData.pageInfo.id));
+        queryParams.push(
+            "cid=" +
+                encodeURIComponent(
+                    getMasonryConfig().settings.formData.pageInfo.id
+                )
+        );
     }
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
     const context = getMasonryConfig().settings.formData.pageInfo.context;
     if (context) {
-        queryParams.push('context=' + encodeURIComponent(context));
+        queryParams.push("context=" + encodeURIComponent(context));
     }
 
-    const queryString = queryParams.join('&');
+    const queryString = queryParams.join("&");
     return new URLSearchParams(queryString);
 }
 /**
@@ -219,7 +256,9 @@ async function updateComponent(component, responseData) {
         startAt: { opacity: 0 },
     });
     document.dispatchEvent(
-        new CustomEvent(UpdateMasonryEvents.COMPONENT_UPDATED, { detail: { component: newComponent } })
+        new CustomEvent(UpdateMasonryEvents.COMPONENT_UPDATED, {
+            detail: { component: newComponent },
+        })
     );
 }
 

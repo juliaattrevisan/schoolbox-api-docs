@@ -23,9 +23,15 @@ const PANEL_SELECTOR = '[data-component-panel="delete"]';
  * Toggle the remove palette and manage the confirm/deny actions
  */
 export function initRemoveComponents() {
-    document.querySelectorAll(getMasonryConfig().settings.existingComponentSelector).forEach((component) => init(component)); //existing components
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component)); //newly added components
+    document
+        .querySelectorAll(getMasonryConfig().settings.existingComponentSelector)
+        .forEach((component) => init(component)); //existing components
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
+        init(event.detail.component)
+    ); //newly added components
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
+        init(event.detail.component)
+    ); //newly added components
 }
 
 /**
@@ -75,7 +81,12 @@ export function isOpen(component) {
 function open(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
-    animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    animateRotation(
+        toggleButton,
+        ANIMATE_OPEN_POSITION,
+        ANIMATE_ORIGIN,
+        ANIMATE_SPEED
+    );
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
     closeSettingsPanel(component);
@@ -89,7 +100,12 @@ function open(component) {
 export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
-    animateRotation(toggleButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    animateRotation(
+        toggleButton,
+        ANIMATE_CLOSED_POSITION,
+        ANIMATE_ORIGIN,
+        ANIMATE_SPEED
+    );
     const panel = component.querySelector(PANEL_SELECTOR);
     await slideUp(panel, ANIMATE_SPEED);
 }
@@ -164,14 +180,23 @@ async function removeComponent(component, confirmDeleteButton) {
  */
 function getFormData(component) {
     const formData = new FormData();
-    formData.append(getMasonryConfig().settings.formData.pageInfo.type, getMasonryConfig().settings.formData.pageInfo.id)
+    formData.append(
+        getMasonryConfig().settings.formData.pageInfo.type,
+        getMasonryConfig().settings.formData.pageInfo.id
+    );
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
     if (getMasonryConfig().settings.formData.pageInfo.context) {
-        formData.append("context", getMasonryConfig().settings.formData.pageInfo.context)
+        formData.append(
+            "context",
+            getMasonryConfig().settings.formData.pageInfo.context
+        );
     }
     formData.append("delete", getComponentID(component));
-    formData.append("component", component.querySelector("[data-defn-id]").value);
+    formData.append(
+        "component",
+        component.querySelector("[data-defn-id]").value
+    );
     return formData;
 }
 
@@ -183,13 +208,17 @@ function getFormData(component) {
  */
 export function updateRemovedComponent(component) {
     component.querySelector("[data-component-handle]").remove(); //remove the drag trigger
-    component.querySelector("[data-component-titlebar-container] > nav").remove(); //as well as the edit controls to prevent any further interactions on this component
+    component
+        .querySelector("[data-component-titlebar-container] > nav")
+        .remove(); //as well as the edit controls to prevent any further interactions on this component
 
     const errorElement = document.createElement("div");
     errorElement.classList.add("alert", "alert-box");
     errorElement.innerHTML = `<b>Warning:</b> This component has been removed from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
 
-    const insideComponentElement = component.querySelector("[data-collapsable] > div > section");
+    const insideComponentElement = component.querySelector(
+        "[data-collapsable] > div > section"
+    );
     if (insideComponentElement) {
         insideComponentElement.replaceChildren(errorElement);
     }

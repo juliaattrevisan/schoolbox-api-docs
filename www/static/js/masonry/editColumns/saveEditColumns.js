@@ -11,7 +11,10 @@ import { getFormData } from "./editColumns";
  * Start listening for the save event
  */
 export function initSaveEditColumns() {
-    document.addEventListener(UpdateMasonryEvents.EDIT_COLUMNS_SAVE, onEditColumnsSave);
+    document.addEventListener(
+        UpdateMasonryEvents.EDIT_COLUMNS_SAVE,
+        onEditColumnsSave
+    );
 }
 
 /**

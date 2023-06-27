@@ -16,7 +16,8 @@ gsap.registerPlugin(Draggable, Flip);
 const COMPONENT_CONTAINERS_SELECTOR = "[data-components-container]"; //the top/left/right parent containers and the tabs container
 const COMPONENT_SELECTOR = "[data-component-palette]"; //any component that will be dragged/added/sorted
 const SORTABLE_SELECTOR = "[data-component]"; //existing components that can be sorted
-const SORTABLE_SELECTOR_NOT_PALETTE = "[data-component]:not([data-component-palette])"; //existing components that can be sorted, but not inside the palette
+const SORTABLE_SELECTOR_NOT_PALETTE =
+    "[data-component]:not([data-component-palette])"; //existing components that can be sorted, but not inside the palette
 const ANIMATE_SPEED = 0.15; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
@@ -125,7 +126,8 @@ function addNewDraggable(component) {
 function updateSortableElements() {
     document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
         component.dataset.originalLeft = component.getBoundingClientRect().left;
-        component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
+        component.dataset.originalTop =
+            component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
         component.removeAttribute("data-flip-id"); //sometimes FLIP currently leaves this behind
@@ -262,7 +264,9 @@ function updateDragPoint() {
 function updateDocumentOnDragStart() {
     document.body.style.overflowX = "hidden"; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
     document.documentElement.style.scrollBehavior = "auto"; //disable smooth scroll as it can jar while moving elements around
-    document.querySelectorAll("[data-collapsable]").forEach((element) => (element.style.pointerEvents = "none")); //prevent any mouse interactions interferring while dragging
+    document
+        .querySelectorAll("[data-collapsable]")
+        .forEach((element) => (element.style.pointerEvents = "none")); //prevent any mouse interactions interferring while dragging
     document.addEventListener("scroll", onScroll); //prevent sorting check while moving up/down window
 }
 
@@ -300,7 +304,9 @@ function extractNewComponent() {
     setStylesOnElement(__newComponent, {
         //Update position and styles to match now that the __newComponent has been moved out of context
         position: "absolute",
-        top: `${__referenceElement.getBoundingClientRect().top + window.scrollY}px`,
+        top: `${
+            __referenceElement.getBoundingClientRect().top + window.scrollY
+        }px`,
         left: `${__referenceElement.getBoundingClientRect().left}px`, //subtracting 16 to deal with 1rem padding-left that's applied
         width: `${__referenceElement.getBoundingClientRect().width}px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
         transform: "translate3d(0, 0, 0)",
@@ -323,7 +329,12 @@ function onDrag() {
     if (canCheck && componentIsOverPage) {
         //add the component to the page
         checkNewDraggedComponentOnPage();
-    } else if (canCheck && !componentIsOverPage && __hasNewComponent && __isDragging) {
+    } else if (
+        canCheck &&
+        !componentIsOverPage &&
+        __hasNewComponent &&
+        __isDragging
+    ) {
         //if the new component has been added to page already, but it back into the tabs
         putDraggedComponentBackIntoTabs();
     }
@@ -344,7 +355,12 @@ function canCheckForChange() {
         Math.pow(__startDragPoint.left - currentDragPoint.left, 2) +
             Math.pow(__startDragPoint.top - currentDragPoint.top, 2)
     );
-    return distance > MIN_MOVEMENT && __isProcessing && !__isScrolling && !__isFlipping;
+    return (
+        distance > MIN_MOVEMENT &&
+        __isProcessing &&
+        !__isScrolling &&
+        !__isFlipping
+    );
 }
 
 /**
@@ -355,8 +371,10 @@ function canCheckForChange() {
  */
 function isNewComponentOverPage() {
     const topContainer = document.querySelector('[data-position="top"]'); //the container thew new component is dragged from
-    const topContainerTopPoint = topContainer.getBoundingClientRect().top + window.scrollY;
-    const newComponentTopPoint = __newComponent.getBoundingClientRect().top + window.scrollY;
+    const topContainerTopPoint =
+        topContainer.getBoundingClientRect().top + window.scrollY;
+    const newComponentTopPoint =
+        __newComponent.getBoundingClientRect().top + window.scrollY;
     return newComponentTopPoint > topContainerTopPoint; //the new component has been dragged below the tabs container into the page
 }
 
@@ -366,12 +384,23 @@ function isNewComponentOverPage() {
  *  animate the position change.
  */
 function checkNewDraggedComponentOnPage() {
-    const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR_NOT_PALETTE)); //grab all sortable elements
-    const closestElement = getClosestElement(__newComponent, sortablesToCheckList); //the element nearest to the dragged element
-    if (closestElement.id !== __newComponent.id && isElementAboveOtherElement(__newComponent, closestElement)) {
+    const sortablesToCheckList = Array.from(
+        document.querySelectorAll(SORTABLE_SELECTOR_NOT_PALETTE)
+    ); //grab all sortable elements
+    const closestElement = getClosestElement(
+        __newComponent,
+        sortablesToCheckList
+    ); //the element nearest to the dragged element
+    if (
+        closestElement.id !== __newComponent.id &&
+        isElementAboveOtherElement(__newComponent, closestElement)
+    ) {
         //no need to FLIP if the closest element is still the __newComponent
         updateDraggedComponentOnPage(closestElement, true);
-    } else if (closestElement.id !== __newComponent.id && isElementBelowOtherElement(__newComponent, closestElement)) {
+    } else if (
+        closestElement.id !== __newComponent.id &&
+        isElementBelowOtherElement(__newComponent, closestElement)
+    ) {
         updateDraggedComponentOnPage(closestElement, false);
     }
 }
@@ -391,15 +420,21 @@ function putDraggedComponentBackIntoTabs() {
     __referenceElement.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
     __newComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
 
-    document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE));
+    document.dispatchEvent(
+        new Event(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE)
+    );
 
     __newComponent.dataset.leftDifference =
-        __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+        __referenceElement.getBoundingClientRect().left -
+        parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
     __newComponent.dataset.topDifference =
         __referenceElement.getBoundingClientRect().top +
         window.scrollY -
         parseInt(__referenceElement.dataset.originalTop);
-    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+    gsap.to(__newComponent, {
+        width: __referenceElement.parentElement.offsetWidth,
+        duration: ANIMATE_SPEED,
+    }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
     animateFlip(state);
 }
@@ -426,16 +461,22 @@ function updateDraggedComponentOnPage(closestElement, isShiftingDown) {
 
     clearFlipElements(); //check for flip bug
 
-    document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE));
+    document.dispatchEvent(
+        new Event(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE)
+    );
 
     __newComponent.dataset.leftDifference =
-        __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+        __referenceElement.getBoundingClientRect().left -
+        parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
     __newComponent.dataset.topDifference =
         __referenceElement.getBoundingClientRect().top +
         window.scrollY -
         parseInt(__referenceElement.dataset.originalTop);
 
-    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+    gsap.to(__newComponent, {
+        width: __referenceElement.parentElement.offsetWidth,
+        duration: ANIMATE_SPEED,
+    }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
     animateFlip(state);
 }
@@ -445,12 +486,17 @@ function updateDraggedComponentOnPage(closestElement, isShiftingDown) {
  * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
  */
 function clearFlipElements() {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer) => {
-        if (parentContainer.children.length === 1 && !parentContainer.children[0].id) {
-            //there's the flip element here, so we should clear it out
-            parentContainer.removeChild(parentContainer.children[0]);
-        }
-    });
+    document
+        .querySelectorAll(COMPONENT_CONTAINERS_SELECTOR)
+        .forEach((parentContainer) => {
+            if (
+                parentContainer.children.length === 1 &&
+                !parentContainer.children[0].id
+            ) {
+                //there's the flip element here, so we should clear it out
+                parentContainer.removeChild(parentContainer.children[0]);
+            }
+        });
 }
 
 /**
@@ -490,7 +536,8 @@ function onDragEnd() {
     if (__hasNewComponent) {
         reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
     }
-    if (__referenceElement) { // For some reason it is possible to have no reference element, so check for it just in case...
+    if (__referenceElement) {
+        // For some reason it is possible to have no reference element, so check for it just in case...
         alignNewComponent();
     }
 }
@@ -544,7 +591,9 @@ function resetNewComponent() {
 function updateDocumentOnDragEnd() {
     document.body.style.overflowX = "auto"; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = "smooth"; //was auto to avoid jarring behaviour
-    document.querySelectorAll("[data-collapsable]").forEach((element) => (element.style.pointerEvents = "auto")); //re-enable mouse interactions
+    document
+        .querySelectorAll("[data-collapsable]")
+        .forEach((element) => (element.style.pointerEvents = "auto")); //re-enable mouse interactions
     document.removeEventListener("scroll", onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event("resize")); //for components to respond to - for example swiper.js image gallerys to update to display correctly
 }
@@ -556,7 +605,12 @@ async function addNewComponent() {
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
     document.dispatchEvent(
-        new CustomEvent(UpdateMasonryEvents.COMPONENT_ADDED, { detail: { component: newComponent, paletteElement: __newComponentClone } })
+        new CustomEvent(UpdateMasonryEvents.COMPONENT_ADDED, {
+            detail: {
+                component: newComponent,
+                paletteElement: __newComponentClone,
+            },
+        })
     );
     await gsap.to(newComponent, {
         //fade in the updated component
@@ -585,9 +639,13 @@ function reinsertNewComponentButton() {
  * so we need to tidy that up and then add a new Draggable instance to the new component button thats back in the tabs
  */
 function updateDraggablesWithNewComponentButton() {
-    const draggableToRemove = __draggablesList.find((draggable) => draggable.target !== __newComponent);
+    const draggableToRemove = __draggablesList.find(
+        (draggable) => draggable.target !== __newComponent
+    );
     draggableToRemove.kill();
-    __draggablesList = __draggablesList.filter((draggable) => draggable.target !== __newComponent);
+    __draggablesList = __draggablesList.filter(
+        (draggable) => draggable.target !== __newComponent
+    );
     const newDraggable = addNewDraggable(__newComponentClone);
     __draggablesList = [...__draggablesList, newDraggable];
 }
