@@ -22,7 +22,7 @@ class GroupPermissionCest
      */
     public function _before(AcceptanceTester $i)
     {
-        $i->amGoingTo('Get logged in and navigate to learninng/badge page');
+        $i->amGoingTo('Get logged in and navigate to learning/badge page');
         $i->logout();
         $i->loginAsAdmin();
         $createFolder = new createFolder($i);
