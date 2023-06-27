@@ -19,6 +19,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term;
@@ -713,11 +714,22 @@ class Controller extends ConfigController
      *
      * @param string $reportKey
      * @return void
+     * @throws NotFound
      * @throws RouteNotFound
      */
     public function getStatus(string $reportKey): void
     {
         $statusPayload = $this->getSession()->get($reportKey);
+
+        /* Summative Report keys are tied to a session; if you log out
+         * and return to this url, the status paylod will be empty.
+         * Similarly if you steal someone else's url and visit it
+         *
+         * Just 404 that, because it's a transient screen anyway.
+         */
+        if (null === $statusPayload) {
+            throw new NotFound();
+        }
 
         $this->getResponse()->content->set([
             'template' => '@adminSummativeReport/result.twig',
