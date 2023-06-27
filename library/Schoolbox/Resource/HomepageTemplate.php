@@ -16,6 +16,8 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class HomepageTemplate
 {
+    use Id;
+
     /**
      * These are default column widths for homepage templates
      */
@@ -25,7 +27,6 @@ class HomepageTemplate
     public const HOMEPAGE_NONE          = -1;
     public const HOMEPAGE_KEEP_EXISTING = 0;
 
-    use Id;
 
     /**
      * Name of homepage template

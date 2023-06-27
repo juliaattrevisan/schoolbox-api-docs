@@ -21,7 +21,6 @@ use Schoolbox\Resource\Folder\Model as Category;
  */
 class HomepageConfig
 {
-
     /**
      * @var Category
      */
