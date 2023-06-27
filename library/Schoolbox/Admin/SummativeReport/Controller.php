@@ -687,8 +687,8 @@ class Controller extends ConfigController
 
         /* Arbitrarily assign a guid to this report generation
          */
-        $guid = strtoupper(md5(uniqid((string)mt_rand(), true)));
-        $reportKey = sprintf(self::SUMMATIVE_REPORT_STATUS_KEY, $guid);
+        $key = strtoupper(md5(uniqid((string)mt_rand(), true)));
+        $reportKey = sprintf(self::SUMMATIVE_REPORT_STATUS_KEY, $key);
 
         /* Remember the result payload associated with this report generation
          */
@@ -703,7 +703,7 @@ class Controller extends ConfigController
          */
         $this->response->redirect->to($this->routeGenerator->generate('adminSummativeReport.getStatus', [
             'reportId' => $report->getId(),
-            'reportKey' => $reportKey
+            'key' => $key
         ]));
     }
 
@@ -712,13 +712,17 @@ class Controller extends ConfigController
      * Show waiting screen. This is split from getGenerate() so that refreshing
      * doesn't perpetuate new taskd processes for impatient souls
      *
-     * @param string $reportKey
+     * @param string $key
      * @return void
      * @throws NotFound
      * @throws RouteNotFound
      */
-    public function getStatus(string $reportKey): void
+    public function getStatus(string $key): void
     {
+        /* Corresponds to that which was set in getGenerate()
+         * This usage prevents people inspecting the contents of one's session
+         */
+        $reportKey = sprintf(self::SUMMATIVE_REPORT_STATUS_KEY, $key);
         $statusPayload = $this->getSession()->get($reportKey);
 
         /* Summative Report keys are tied to a session; if you log out
