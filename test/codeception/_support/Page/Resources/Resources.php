@@ -57,6 +57,6 @@ class Resources
      */
     public function clickMenuItem(string $menuItem): void
     {
-        $this->tester->click('a.icon-' . $menuItem);
+        $this->tester->click(Locator::lastElement('a.icon-' . $menuItem));
     }
 }

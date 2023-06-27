@@ -12,6 +12,7 @@ class ManageGroup
 
     public const SUBMIT_BUTTON = 'input[type=submit][value=Submit]';
     public const UPDATE_BUTTON = 'button.button.submit';
+    public const ELEMENT_SEARCH = '#search-text';
 
     /**
      * This test's acceptance tester actor.
@@ -62,5 +63,36 @@ class ManageGroup
     public function clickUpdateButton(): void
     {
         $this->tester->click(Locator::lastElement(self::UPDATE_BUTTON));
+    }
+
+    /**
+     * click an option on the radio button From: name, group, role, list
+     * @param $option
+     * @return void
+     */
+    public function clickFromRadioButton($option): void
+    {
+        $this->tester->click('label[for=' . $option . ']');
+    }
+
+    /**
+     * search user, group, role by typing a text in the search bar
+     * @param string $text
+     * @return $this
+     */
+    public function search(string $text): self
+    {
+        $this->tester->fillField(self::ELEMENT_SEARCH, $text);
+        return $this;
+    }
+
+    /**
+     * select the user in the dropdown by passing user id
+     * @param int $userId
+     * @return void
+     */
+    public function selectUser(int $userId): void
+    {
+        $this->tester->click('label[for=checkbox-' . $userId . ']');
     }
 }
