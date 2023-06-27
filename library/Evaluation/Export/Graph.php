@@ -265,7 +265,7 @@ class Evaluation_Export_Graph
                                         'name' => $formatter->formatArray($currentAttempt),
                                         'responses' => $data['responses'],
                                         'responsesData' => $data['responsesData'],
-                                        'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES),
+                                        'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues ?? '')), ENT_QUOTES),
                                         'start' => $currentAttempt['start'],
                                         'finish' => $currentAttempt['finish'],
                                     );

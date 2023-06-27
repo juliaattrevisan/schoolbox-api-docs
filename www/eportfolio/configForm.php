@@ -156,7 +156,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
                 // And any other fields in the component definition
 
-                $configCopy = explode(",", $componentDefinition->getConfigCopy());
+                $configCopy = $componentDefinition->getConfigCopy() ? explode(",", $componentDefinition->getConfigCopy()) : [];
 
                 if (!empty($configCopy)) {
                     array_walk($configCopy, 'trim');
