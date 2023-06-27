@@ -39,7 +39,7 @@ interface MasonryConfig {
         formData: {
             // Some pages have differing form data requirements
             pageInfo: {
-                type: string; // Key for the page ID ('cid' on homepages, 'page_id' on eportfolio)
+                type: "cid" | "page_id"; // Key for the page ID ('cid' on homepages, 'page_id' on eportfolio)
                 id: string; // Value for the page ID (80)
                 context?: string; // (Optional) Used on admin templates to distinguish between different pages ('dashboard', 'homepage', 'eportfolio')
             };

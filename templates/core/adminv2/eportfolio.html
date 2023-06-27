@@ -54,6 +54,7 @@
                         existingComponentSelector: "[data-component]",
                         layoutSelector: "#component-layout",
                         updateUrl: "/adminv2/component/configForm.php",
+                        refreshPaletteCountsOnLoad: true,
                         formData: {
                             pageInfo: {
                                 type: "cid",
@@ -63,7 +64,6 @@
                             newComponentAddAttribute: "data-component-definition-id",
                         },
                     },
-                    refreshPaletteCountsOnLoad: true,
                 }
             }));
         }
