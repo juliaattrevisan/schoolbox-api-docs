@@ -120,7 +120,7 @@ class ModelToArrayTest extends TestCase
                 'title'         => 'Mr',
                 'firstName'     => 'John',
                 'preferredName' => 'Jack',
-                'pronoun'       => '(he / him)',
+                'pronoun'       => '(he/him)',
                 'lastName'      => 'Doe',
                 'fullName'      => 'Mr John Doe',
                 'isDeleted'     => false,
