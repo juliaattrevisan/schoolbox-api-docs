@@ -559,6 +559,7 @@ class UserMapper extends Mapper
                  ->like('u.preferred_name', "%$name%")
                  ->like('u.lastname', "%$name%")
         );
+        $pb->isNUll('u.deleted_at');
         $pb->in('u.group_id', $permittedValues);
 
         $query = "
@@ -567,7 +568,7 @@ class UserMapper extends Mapper
                 {$roleMapper->getColumnString('g')},
                 {$this->getJoinColumnString('year', 'lyl')}
             FROM `{$this->table}` u
-            LEFT JOIN `groups` g ON group_id = g.`id`
+            LEFT JOIN `groups` g ON group_id = g.`id` AND g.deleted_at IS NULL
             LEFT JOIN {$this->getJoinSql('year', 'u', 'lyl')}
             WHERE
         " . implode(' AND ', $pb->getWhere());
