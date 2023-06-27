@@ -597,7 +597,7 @@
                     <activity-feed
                         cdn-prefix="{{ CDN_PREFIX }}"
                         site-version="{{ config.site_version }}"
-                        config-grade-gradient-enabled="{{ config.grade_gradient_enable }}"
+                        :config-grade-gradient-enabled={{ config.grade_gradient_enable == 1 ? 'true' : 'false' }}
                     />
                 </div>
             </div>
