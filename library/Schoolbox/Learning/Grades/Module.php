@@ -137,7 +137,7 @@ class Module extends BaseModule
             return array_merge($loadViewee($params), $loadTerm($params), $loadFolder($params));
         };
 
-        $this->register('GET', '/grades-year/{userId}/year/{year}', 'getGradesYear', $permissions, $loadViewee);
+        $this->register('GET', '/grades-year/{userId}/year/{year:\d+}', 'getGradesYear', $permissions, $loadViewee);
 
         // Overview and single class pages
         $this->register('GET', '', 'getGradesForCurrentUser', $basicPermissions);
