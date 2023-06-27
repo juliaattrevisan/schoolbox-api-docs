@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 
 abstract class Base
 {
+
     /* Personal
      */
 
@@ -168,10 +169,6 @@ abstract class Base
     /** @var string */
     protected $customField5;
 
-    /**
-     * @var string|null
-     */
-    protected ?string $pronoun = null;
 
     /* Publicity
      */
@@ -766,24 +763,6 @@ abstract class Base
     public function setCustomField5($customField5)
     {
         $this->customField5 = $customField5;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPronoun(): ?string
-    {
-        return $this->pronoun;
-    }
-
-    /**
-     * @param string|null $pronoun
-     * @return self
-     */
-    public function setPronoun(?string $pronoun): self
-    {
-        $this->pronoun = $pronoun;
         return $this;
     }
 }
