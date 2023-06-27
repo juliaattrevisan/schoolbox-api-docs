@@ -95,6 +95,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private $markType;
 
     /**
+     * @var array<int, \Schoolbox\Role>
+     */
+    private array $roles = [];
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
@@ -441,7 +446,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $class = $this->externalClass->getClass($classCode, $owner, $fileYear, $fileSemester);
 
         if (empty($class)) {
-            $this->logger->warning("Unable to create staff markbook for assessment {$assessment->getId()}: Could not get class {$classCode}");
+            $this->logger->warning("Unable to create staff markbook for assessment {$assessment->getId()} for class code {$classCode}");
             return false;
         }
 
@@ -601,6 +606,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // folder has more than one folder code:
         // otherwise assume the folder's code is one of the student's
         if (count($folderCodes) > 1) {
+            // make sure that role is hydrated
+            if (!$student->getRole()->getType()) {
+                $student->setRole($this->getRole($student->getRole()->getId()));
+            }
             $classCodes = array_column($this->externalUser->getSubjectList($student), 'code');
 
             // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
@@ -971,7 +980,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function getSystemFileYear(): int
     {
-        return $this->fileYearOverride ?? $this->externalUser->getCurrentYear();
+        return $this->fileYearOverride ?? (int)$this->externalUser->getCurrentYear();
     }
 
 
@@ -982,7 +991,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function getSystemFileSemester(): int
     {
-        return $this->fileSemesterOverride ?? $this->externalUser->getCurrentSemester();
+        return $this->fileSemesterOverride ?? (int)$this->externalUser->getCurrentSemester();
     }
 
 
@@ -1241,5 +1250,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $normalizedClassCodes,
             array_map([$this, 'normalizeClassCode',], array_unique($codeWithCampus))
         );
+    }
+
+    /**
+     * Find role with the role id
+     * @param int|null $getId
+     * @return \Schoolbox\Role
+     * @throws MapperException
+     */
+    private function getRole(?int $getId)
+    {
+        if (!isset($this->roles[$getId])) {
+            $this->roles[$getId] = \Schoolbox\RoleMapper::getInstance()->findById($getId);
+        }
+        return $this->roles[$getId];
     }
 }
