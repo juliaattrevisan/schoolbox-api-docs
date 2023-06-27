@@ -21,7 +21,6 @@ use Schoolbox\Resource\Folder\Model as Category;
  */
 class HomepageConfig
 {
-
     /**
      * @var Category
      */
@@ -151,19 +150,19 @@ class HomepageConfig
     }
 
     /**
-     * @param float $leftColumnWidth
+     * @param null|float $leftColumnWidth
      * @return $this
      */
-    public function setLeftColumnWidth($leftColumnWidth)
+    public function setLeftColumnWidth(?float $leftColumnWidth): self
     {
         $this->leftColumnWidth = $leftColumnWidth;
         return $this;
     }
 
     /**
-     * @return float
+     * @return null|float
      */
-    public function getLeftColumnWidth()
+    public function getLeftColumnWidth(): ?float
     {
         return $this->leftColumnWidth;
     }
@@ -242,19 +241,19 @@ class HomepageConfig
     }
 
     /**
-     * @param float $rightColumnWidth
+     * @param null|float $rightColumnWidth
      * @return $this
      */
-    public function setRightColumnWidth($rightColumnWidth)
+    public function setRightColumnWidth(?float $rightColumnWidth): self
     {
         $this->rightColumnWidth = $rightColumnWidth;
         return $this;
     }
 
     /**
-     * @return float
+     * @return null|float
      */
-    public function getRightColumnWidth()
+    public function getRightColumnWidth(): ?float
     {
         return $this->rightColumnWidth;
     }

@@ -108,6 +108,15 @@ class HomepageConfigMapper extends Mapper
         foreach ($homepageConfig as $field => $colour) {
             $this->setModelProperty($homepage, $this->toCamelcase($field), $colour);
         }
+
+        /* Assign column widths from template preset;
+         * I'm inferring that resetting to default also means column widths are reset.
+         *
+         *...but this seems like a really arcane way to do it?
+         */
+        $this->setModelProperty($homepage, $this->toCamelcase('left_column_width'), $homepage->getTemplate()->getLeftColumnWidth());
+        $this->setModelProperty($homepage, $this->toCamelcase('right_column_width'), $homepage->getTemplate()->getLeftColumnWidth());
+
         // save
         $this->save($homepage);
         // no template, no homepage; don't try to add components

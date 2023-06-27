@@ -53,13 +53,13 @@ class Homepage
         try {
             $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
             return [
-                'left_column_width'  => $homepageConfig->getLeftColumnWidth(),
-                'right_column_width' => $homepageConfig->getLeftColumnWidth(),
+                'left_column_width'  => $homepageConfig->getLeftColumnWidth() ?? Resource\HomepageTemplate::DEFAULT_LEFT_COLUMN_WIDTH,
+                'right_column_width' => $homepageConfig->getLeftColumnWidth() ?? Resource\HomepageTemplate::DEFAULT_RIGHT_COLUMN_WIDTH,
             ];
         } catch (MapperException) {
             return [
-                'left_column_width'  => 70,
-                'right_column_width' => 30,
+                'left_column_width'  => Resource\HomepageTemplate::DEFAULT_LEFT_COLUMN_WIDTH,
+                'right_column_width' => Resource\HomepageTemplate::DEFAULT_RIGHT_COLUMN_WIDTH,
             ];
         }
     }
