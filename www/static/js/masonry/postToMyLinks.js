@@ -3,13 +3,13 @@
  *
  */
 
-import { masonryConfig } from "./masonryConfig";
+import { getMasonryConfig } from "./masonryConfig";
 
 /**
  * Listen for the button press and then save the link to DB and display it on the page
  */
 export function initPostToMyLinks() {
-    const postToMyLinksBtn = document.querySelector(masonryConfig.postToMyLinks.selector)
+    const postToMyLinksBtn = document.querySelector(getMasonryConfig().postToMyLinks.selector)
     // The button will not exist for a user that has already added this page to their links.
     if (!postToMyLinksBtn) { return; }
 
@@ -24,7 +24,7 @@ export function initPostToMyLinks() {
  */
 async function postLink() {
     try {
-        await fetch(masonryConfig.postToMyLinks.updateUrl, {
+        await fetch(getMasonryConfig().postToMyLinks.updateUrl, {
             method: "POST",
             body: getFormData(),
         });
@@ -42,8 +42,8 @@ async function postLink() {
  */
 function getFormData() {
     const formData = new FormData();
-    formData.append("url", masonryConfig.postToMyLinks.url);
-    formData.append("description", masonryConfig.postToMyLinks.heading);
+    formData.append("url", getMasonryConfig().postToMyLinks.url);
+    formData.append("description", getMasonryConfig().postToMyLinks.heading);
     return formData;
 }
 
@@ -52,8 +52,8 @@ function getFormData() {
  */
 function displayLinkOnPage() {
     const link = document.createElement("a");
-    link.setAttribute("href", masonryConfig.postToMyLinks.url);
-    link.innerText = masonryConfig.postToMyLinks.heading;
+    link.setAttribute("href", getMasonryConfig().postToMyLinks.url);
+    link.innerText = getMasonryConfig().postToMyLinks.heading;
 
     const linkListItem = document.createElement("li");
     linkListItem.appendChild(link);
@@ -62,6 +62,6 @@ function displayLinkOnPage() {
     myLinksList.appendChild(linkListItem);
 
     // Remove the postToMyLinks button
-    const postToMyLinksBtn = document.querySelector(masonryConfig.postToMyLinks.selector)
+    const postToMyLinksBtn = document.querySelector(getMasonryConfig().postToMyLinks.selector)
     postToMyLinksBtn.parentNode.removeChild(postToMyLinksBtn);
 }

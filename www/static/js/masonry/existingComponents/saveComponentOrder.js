@@ -4,7 +4,7 @@
  *
  */
 
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 import { getComponentID } from "../masonryFunctions";
 import { updateRemovedComponent } from "./removeComponents";
 
@@ -15,7 +15,7 @@ import { updateRemovedComponent } from "./removeComponents";
  */
 export async function saveComponentOrder(component) {
     try {
-        const response = await fetch(masonryConfig.settings.updateUrl, {
+        const response = await fetch(getMasonryConfig().settings.updateUrl, {
             method: "POST",
             body: getFormData(component),
         });
@@ -42,11 +42,11 @@ function getFormData(component) {
     formData.append("column3", getContainerComponentIDs(document.querySelector('[data-position="top"]'))); //top panel... I know right?!
     formData.append("movedComponentId", getComponentID(component));
     formData.append("type", "components");
-    formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+    formData.append(getMasonryConfig().settings.formData.pageInfo.type, getMasonryConfig().settings.formData.pageInfo.id)
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
-    if (masonryConfig.settings.formData.pageInfo.context) {
-        formData.append("context", masonryConfig.settings.formData.pageInfo.context)
+    if (getMasonryConfig().settings.formData.pageInfo.context) {
+        formData.append("context", getMasonryConfig().settings.formData.pageInfo.context)
     }
     return formData;
 }
@@ -60,7 +60,7 @@ function getFormData(component) {
  */
 function getContainerComponentIDs(componentContainer) {
     let containerComponentIDList = []; //add all ids into an array
-    componentContainer.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((sortable) => {
+    componentContainer.querySelectorAll(getMasonryConfig().settings.existingComponentSelector).forEach((sortable) => {
         if (sortable.id && !sortable.dataset.placeHolderComponent) {
             //the <div class="masonry-placeholder" /> exists in each parent container, so we don't want that
             containerComponentIDList.push(getComponentID(sortable));

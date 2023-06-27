@@ -6,7 +6,7 @@
  * See masonryConfig.js for the settings that can be passed in.
  */
 
-import { setMasonryConfig, masonryConfig } from "./masonryConfig";
+import { setMasonryConfig, getMasonryConfig } from "./masonryConfig";
 import { initPostToMyLinks } from "./postToMyLinks";
 import { initExistingComponents } from "./existingComponents/existingComponents";
 import { initToggleLockComponents } from "./existingComponents/toggleLockComponents";
@@ -19,20 +19,20 @@ import { merge } from "lodash";
 document.addEventListener("MASONRY__CREATE", (e) => {
     setMasonryConfig(e.detail);
 
-    if (masonryConfig.postToMyLinks) { initPostToMyLinks(); }
+    if (getMasonryConfig().postToMyLinks) { initPostToMyLinks(); }
 
     initExistingComponents();
 
-    if (masonryConfig.settings.allowEditing) {
-        if (masonryConfig.toggleLockComponents) { initToggleLockComponents(); }
-        if (masonryConfig.editColumns) { initEditColumns() };
+    if (getMasonryConfig().settings.allowEditing) {
+        if (getMasonryConfig().toggleLockComponents) { initToggleLockComponents(); }
+        if (getMasonryConfig().editColumns) { initEditColumns() };
         initNewComponents();
         initUpdatePlaceHolders();
 
-        if (masonryConfig.refreshPaletteCountsOnLoad) { updateAllComponentCounts(); }
+        if (getMasonryConfig().settings.refreshPaletteCountsOnLoad) { updateAllComponentCounts(); }
     }
 });
 
 document.addEventListener("MASONRY__UPDATE__CONFIG", (e) => {
-    setMasonryConfig(merge(masonryConfig, e.detail));
+    setMasonryConfig(merge(getMasonryConfig(), e.detail));
 });

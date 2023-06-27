@@ -3,7 +3,7 @@
  *
  */
 
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 import { getLoadedHTML } from "@js/util/domUtils";
 
 /**
@@ -11,7 +11,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
  */
 export async function getNewComponent(component) {
     try {
-        const response = await fetch(masonryConfig.settings.updateUrl, {
+        const response = await fetch(getMasonryConfig().settings.updateUrl, {
             method: "POST",
             body: getFormData(component),
         });
@@ -49,19 +49,19 @@ async function replaceExistingComponent(component, newComponentHTML) {
  */
 function getFormData(component) {
     const formData = new FormData();
-    formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+    formData.append(getMasonryConfig().settings.formData.pageInfo.type, getMasonryConfig().settings.formData.pageInfo.id)
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
-    if (masonryConfig.settings.formData.pageInfo.context) {
-        formData.append("context", masonryConfig.settings.formData.pageInfo.context)
+    if (getMasonryConfig().settings.formData.pageInfo.context) {
+        formData.append("context", getMasonryConfig().settings.formData.pageInfo.context)
     }
 
     //this is to retrieve the new component id to know which type of component to create
-    formData.append("add", component.querySelector("a").getAttribute(masonryConfig.settings.formData.newComponentAddAttribute));
+    formData.append("add", component.querySelector("a").getAttribute(getMasonryConfig().settings.formData.newComponentAddAttribute));
 
     // EPortfolios require a "from" field to be set
-    if (masonryConfig.settings.formData.newComponentFromAttribute) {
-        formData.append("from", component.querySelector(masonryConfig.settings.formData.newComponentFromAttribute));
+    if (getMasonryConfig().settings.formData.newComponentFromAttribute) {
+        formData.append("from", component.querySelector(getMasonryConfig().settings.formData.newComponentFromAttribute));
     }
     return formData;
 }

@@ -3,7 +3,7 @@
  *
  */
 
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 import { initCollapseComponents } from "./collapseComponents";
 import { initSortExistingComponents } from "./sortExistingComponents";
 import { initUpdateComponentsSettings } from "./updateComponentsSettings";
@@ -14,7 +14,7 @@ import { initRemoveComponents } from "./removeComponents";
  */
 export function initExistingComponents() {
     initCollapseComponents();
-    if (masonryConfig.settings.allowEditing) {
+    if (getMasonryConfig().settings.allowEditing) {
         initSortExistingComponents();
         initUpdateComponentsSettings();
         initRemoveComponents();

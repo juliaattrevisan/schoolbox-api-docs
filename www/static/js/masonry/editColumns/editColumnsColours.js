@@ -8,7 +8,7 @@
  *
  */
 
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 
 /**
  * Change the column colours
@@ -93,7 +93,7 @@ function initColourPickers() {
 
 /**
  * Update the currently selected columns with the new colour and
- * ensure the new value is saved within the masonryConfig.editColumns.colours object
+ * ensure the new value is saved within the getMasonryConfig().editColumns.colours object
  *
  * @param { Element }
  * @param { String }
@@ -116,9 +116,9 @@ function onColourChange(element, colour) {
  * @param { String }
  */
 function updateColour(colourId, colour) {
-    masonryConfig.editColumns.colours.pickers[colourId] = colour; //update the object for possible future save / reset / undo
+    getMasonryConfig().editColumns.colours.pickers[colourId] = colour; //update the object for possible future save / reset / undo
     const colourProperty = `--${colourId.replace(/_/g, "-")}`;
-    document.querySelector(masonryConfig.settings.layoutSelector).style.setProperty(colourProperty, colour);
+    document.querySelector(getMasonryConfig().settings.layoutSelector).style.setProperty(colourProperty, colour);
 }
 
 /**
@@ -153,7 +153,7 @@ function updateColourPickerColours(columnCheckboxes) {
     const colourPickers = getAllColourPickers();
     colourPickers.forEach((colourPicker) => {
         const checkboxes = columnCheckboxes; //use to retrieve the relevant colours
-        const colourList = checkboxes.map((checkbox) => masonryConfig.editColumns.colours.pickers[`${checkbox.id}_${colourPicker.id}`]); //for example top_head_font, left_head_font and right_head_font
+        const colourList = checkboxes.map((checkbox) => getMasonryConfig().editColumns.colours.pickers[`${checkbox.id}_${colourPicker.id}`]); //for example top_head_font, left_head_font and right_head_font
         const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
 
         const initialColour = areAllColoursTheSame ? colourList[0] : null; //if all the colours aren't the same, set to null
@@ -170,7 +170,7 @@ function updateColourPickerColours(columnCheckboxes) {
  * @returns { Array }
  */
 function getAllColourPickers() {
-    return Array.from(document.querySelectorAll(masonryConfig.editColumns.colourPickersSelector));
+    return Array.from(document.querySelectorAll(getMasonryConfig().editColumns.colourPickersSelector));
 }
 
 /**
@@ -179,7 +179,7 @@ function getAllColourPickers() {
  * @param { FormData }
  */
 export function appendColours(formData) {
-    for (const [key, value] of Object.entries(masonryConfig.editColumns.colours.pickers)) {
+    for (const [key, value] of Object.entries(getMasonryConfig().editColumns.colours.pickers)) {
         if (value === "") {
             // If the value is none, then fall back to the original colour
             // This might happen if the user has different colours for each column
@@ -195,7 +195,7 @@ export function appendColours(formData) {
  * This represents the admin set colours used as the default
  */
 export function resetColours() {
-    updateAllColours(masonryConfig.editColumns.colours.defaults);
+    updateAllColours(getMasonryConfig().editColumns.colours.defaults);
 }
 
 /**
@@ -203,7 +203,7 @@ export function resetColours() {
  * This represents the colours at page load, prior to any further Saves
  */
 export function undoColourChanges() {
-    updateAllColours(masonryConfig.editColumns.colours.original);
+    updateAllColours(getMasonryConfig().editColumns.colours.original);
 }
 
 /**

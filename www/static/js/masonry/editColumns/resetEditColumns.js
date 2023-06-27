@@ -3,7 +3,7 @@
  *
  */
 
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { getFormData } from "./editColumns";
 import { resetColours } from "./editColumnsColours";
@@ -25,7 +25,7 @@ async function onEditColumnsReset() {
     try {
         $toast.toastActivate({ text: "Saving..." });
         resetColours();
-        await fetch(masonryConfig.settings.updateUrl, {
+        await fetch(getMasonryConfig().settings.updateUrl, {
             method: "POST",
             body: getFormData(),
         });

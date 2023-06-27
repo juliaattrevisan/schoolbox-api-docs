@@ -4,14 +4,14 @@
  *
  */
 
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 
 /**
  * To ensure only the new components tab or the edit columns view is open at once
  */
 export function initNewComponentsTab() {
-    const masonryLayout = $(masonryConfig.settings.layoutSelector);
+    const masonryLayout = $(getMasonryConfig().settings.layoutSelector);
 
     // Fix slider on tab
     $("[data-tab]").on("toggled", function (event, tab) {

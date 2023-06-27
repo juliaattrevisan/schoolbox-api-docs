@@ -5,7 +5,7 @@
 
 import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 import { getComponentID } from "../masonryFunctions";
 import { close as closeSettingsPanel } from "./updateComponentsSettings";
 import UpdateMasonryEvents from "../updateMasonryEvents";
@@ -23,7 +23,7 @@ const PANEL_SELECTOR = '[data-component-panel="delete"]';
  * Toggle the remove palette and manage the confirm/deny actions
  */
 export function initRemoveComponents() {
-    document.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((component) => init(component)); //existing components
+    document.querySelectorAll(getMasonryConfig().settings.existingComponentSelector).forEach((component) => init(component)); //existing components
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component)); //newly added components
 }
@@ -133,7 +133,7 @@ async function removeComponent(component, confirmDeleteButton) {
         document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
         confirmDeleteButton.classList.add("disabled");
         confirmDeleteButton.innerText = "Removing...";
-        await fetch(masonryConfig.settings.updateUrl, {
+        await fetch(getMasonryConfig().settings.updateUrl, {
             method: "POST",
             body: getFormData(component),
         });
@@ -164,11 +164,11 @@ async function removeComponent(component, confirmDeleteButton) {
  */
 function getFormData(component) {
     const formData = new FormData();
-    formData.append(masonryConfig.settings.formData.pageInfo.type, masonryConfig.settings.formData.pageInfo.id)
+    formData.append(getMasonryConfig().settings.formData.pageInfo.type, getMasonryConfig().settings.formData.pageInfo.id)
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
-    if (masonryConfig.settings.formData.pageInfo.context) {
-        formData.append("context", masonryConfig.settings.formData.pageInfo.context)
+    if (getMasonryConfig().settings.formData.pageInfo.context) {
+        formData.append("context", getMasonryConfig().settings.formData.pageInfo.context)
     }
     formData.append("delete", getComponentID(component));
     formData.append("component", component.querySelector("[data-defn-id]").value);

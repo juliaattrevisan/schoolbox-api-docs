@@ -6,7 +6,7 @@
 import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
 import { getLoadedHTML } from "@js/util/domUtils";
-import { masonryConfig } from "../masonryConfig";
+import { getMasonryConfig } from "../masonryConfig";
 import { close as closeRemovePanel } from "./removeComponents";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { updateRemovedComponent } from "./removeComponents";
@@ -26,7 +26,7 @@ const QUERY_STRING_ATTRIBUTE = "data-query-string"; //to store the current setti
  * new component is added or udpated
  */
 export function initUpdateComponentsSettings() {
-    document.querySelectorAll(masonryConfig.settings.existingComponentSelector).forEach((component) => init(component));
+    document.querySelectorAll(getMasonryConfig().settings.existingComponentSelector).forEach((component) => init(component));
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
 }
@@ -153,7 +153,7 @@ async function saveComponentSettings(component, form) {
         submitFormButton.disabled = true;
         submitFormButton.value = "Updating...";
         // Set X-Requested-With header to allow for AJAX specific processing in the backend controller
-        const response = await fetch(masonryConfig.settings.updateUrl + "?" + getSaveComponentSettingsParams(form), {
+        const response = await fetch(getMasonryConfig().settings.updateUrl + "?" + getSaveComponentSettingsParams(form), {
             headers: {
                 'X-Requested-With' : 'XMLHttpRequest'
             }
@@ -185,16 +185,16 @@ function getSaveComponentSettingsParams(form) {
         queryParams.push(key + "=" + encodeURIComponent(formData[key]));
     }
 
-    // Replace cid parameter if it is empty or not set and masonryConfig.pageInfo.type === "cid"
+    // Replace cid parameter if it is empty or not set and getMasonryConfig().pageInfo.type === "cid"
     if (
-        masonryConfig.settings.formData.pageInfo.type === "cid"
+        getMasonryConfig().settings.formData.pageInfo.type === "cid"
         && (!queryParams.some(param => param.startsWith('cid=')) || queryParams.some(param => param === 'cid='))
     ) {
-        queryParams.push('cid=' + encodeURIComponent(masonryConfig.settings.formData.pageInfo.id));
+        queryParams.push('cid=' + encodeURIComponent(getMasonryConfig().settings.formData.pageInfo.id));
     }
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
-    const context = masonryConfig.settings.formData.pageInfo.context;
+    const context = getMasonryConfig().settings.formData.pageInfo.context;
     if (context) {
         queryParams.push('context=' + encodeURIComponent(context));
     }
