@@ -700,7 +700,7 @@ class Controller extends ConfigController
 
         /* Show waiting screen for the result payload associated with this report generation
          */
-        $this->response->redirect->to($this->router->generate('adminSummativeReport.getStatus', [
+        $this->response->redirect->to($this->routeGenerator->generate('adminSummativeReport.getStatus', [
             'reportId' => $report->getId(),
             'reportKey' => $reportKey
         ]));
