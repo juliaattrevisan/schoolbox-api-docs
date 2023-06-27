@@ -14,6 +14,7 @@ use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Statistics\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
+use Schoolbox\User;
 
 /**
  * Class Top10
