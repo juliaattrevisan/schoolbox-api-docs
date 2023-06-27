@@ -19,10 +19,7 @@ export async function getNewComponent(component) {
         const parser = new DOMParser(); //so we need to create an Element from it
         const document = parser.parseFromString(newComponentText, "text/html"); //by parsing it into HTML
         const newComponentHTML = document.querySelector("div"); //and then we can get the first div, which will be the entire component
-        const newComponent = replaceExistingComponent(
-            component,
-            newComponentHTML
-        );
+        const newComponent = replaceExistingComponent(component, newComponentHTML);
         return newComponent;
     } catch (error) {
         console.warn(error);
@@ -59,29 +56,20 @@ function getFormData(component) {
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
     if (getMasonryConfig().settings.formData.pageInfo.context) {
-        formData.append(
-            "context",
-            getMasonryConfig().settings.formData.pageInfo.context
-        );
+        formData.append("context", getMasonryConfig().settings.formData.pageInfo.context);
     }
 
     //this is to retrieve the new component id to know which type of component to create
     formData.append(
         "add",
-        component
-            .querySelector("a")
-            .getAttribute(
-                getMasonryConfig().settings.formData.newComponentAddAttribute
-            )
+        component.querySelector("a").getAttribute(getMasonryConfig().settings.formData.newComponentAddAttribute)
     );
 
     // EPortfolios require a "from" field to be set
     if (getMasonryConfig().settings.formData.newComponentFromAttribute) {
         formData.append(
             "from",
-            component.querySelector(
-                getMasonryConfig().settings.formData.newComponentFromAttribute
-            )
+            component.querySelector(getMasonryConfig().settings.formData.newComponentFromAttribute)
         );
     }
     return formData;

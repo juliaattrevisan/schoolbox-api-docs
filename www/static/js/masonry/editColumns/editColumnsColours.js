@@ -118,9 +118,7 @@ function onColourChange(element, colour) {
 function updateColour(colourId, colour) {
     getMasonryConfig().editColumns.colours.pickers[colourId] = colour; //update the object for possible future save / reset / undo
     const colourProperty = `--${colourId.replace(/_/g, "-")}`;
-    document
-        .querySelector(getMasonryConfig().settings.layoutSelector)
-        .style.setProperty(colourProperty, colour);
+    document.querySelector(getMasonryConfig().settings.layoutSelector).style.setProperty(colourProperty, colour);
 }
 
 /**
@@ -156,14 +154,9 @@ function updateColourPickerColours(columnCheckboxes) {
     colourPickers.forEach((colourPicker) => {
         const checkboxes = columnCheckboxes; //use to retrieve the relevant colours
         const colourList = checkboxes.map(
-            (checkbox) =>
-                getMasonryConfig().editColumns.colours.pickers[
-                    `${checkbox.id}_${colourPicker.id}`
-                ]
+            (checkbox) => getMasonryConfig().editColumns.colours.pickers[`${checkbox.id}_${colourPicker.id}`]
         ); //for example top_head_font, left_head_font and right_head_font
-        const areAllColoursTheSame = colourList.every(
-            (value, index, array) => value === array[0]
-        ); //are all colour values within the array the same as the first value in the array
+        const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
 
         const initialColour = areAllColoursTheSame ? colourList[0] : null; //if all the colours aren't the same, set to null
 
@@ -178,11 +171,7 @@ function updateColourPickerColours(columnCheckboxes) {
  * @returns { Array }
  */
 function getAllColourPickers() {
-    return Array.from(
-        document.querySelectorAll(
-            getMasonryConfig().editColumns.colourPickersSelector
-        )
-    );
+    return Array.from(document.querySelectorAll(getMasonryConfig().editColumns.colourPickersSelector));
 }
 
 /**
@@ -191,9 +180,7 @@ function getAllColourPickers() {
  * @param { FormData }
  */
 export function appendColours(formData) {
-    for (const [key, value] of Object.entries(
-        getMasonryConfig().editColumns.colours.pickers
-    )) {
+    for (const [key, value] of Object.entries(getMasonryConfig().editColumns.colours.pickers)) {
         if (value === "") {
             // If the value is none, then fall back to the original colour
             // This might happen if the user has different colours for each column

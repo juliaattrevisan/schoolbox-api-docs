@@ -6,7 +6,6 @@
 
 import UpdateMasonryEvents from "./updateMasonryEvents";
 import { isOpen as isNewComponentTabsOpen } from "./newComponents/newComponentsTabs";
-import { masonryConfig } from "./masonryConfig";
 
 const COMPONENT_CONTAINERS_SELECTOR = "[data-components-container]"; //the top/left/right parent containers
 
@@ -18,38 +17,14 @@ let __placeHolderComponentsList = []; //to contain the place holder instances
 export function initUpdatePlaceHolders() {
     initPlaceHolderComponents();
     if (isNewComponentTabsOpen()) addPlaceHolderComponents();
-    document.addEventListener(
-        UpdateMasonryEvents.COMPONENT_ADDED,
-        onComponentUpdate
-    );
-    document.addEventListener(
-        UpdateMasonryEvents.COMPONENT_REMOVED,
-        onComponentUpdate
-    );
-    document.addEventListener(
-        UpdateMasonryEvents.EXISTING_COMPONENT_SORT_START,
-        addPlaceHolderComponents
-    );
-    document.addEventListener(
-        UpdateMasonryEvents.NEW_COMPONENTS_TABS_OPENED,
-        addPlaceHolderComponents
-    );
-    document.addEventListener(
-        UpdateMasonryEvents.EXISTING_COMPONENT_SORT_UPDATE,
-        updatePlaceHolderComponents
-    );
-    document.addEventListener(
-        UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE,
-        updatePlaceHolderComponents
-    );
-    document.addEventListener(
-        UpdateMasonryEvents.EXISTING_COMPONENT_SORT_END,
-        onExistingComponentSortEnd
-    );
-    document.addEventListener(
-        UpdateMasonryEvents.NEW_COMPONENTS_TABS_CLOSED,
-        removePlaceHolderComponents
-    );
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, onComponentUpdate);
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, onComponentUpdate);
+    document.addEventListener(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_START, addPlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.NEW_COMPONENTS_TABS_OPENED, addPlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_END, onExistingComponentSortEnd);
+    document.addEventListener(UpdateMasonryEvents.NEW_COMPONENTS_TABS_CLOSED, removePlaceHolderComponents);
 }
 
 /**
@@ -57,23 +32,17 @@ export function initUpdatePlaceHolders() {
  * if there's no children need to show that items can be dragged into this container
  */
 function initPlaceHolderComponents() {
-    document
-        .querySelectorAll(COMPONENT_CONTAINERS_SELECTOR)
-        .forEach((container, index) => {
-            const placeHolderComponent = document.createElement("div");
-            placeHolderComponent.id = `placeHolderComponent-${index}`;
-            placeHolderComponent.classList.add("masonry-placeholder");
-            placeHolderComponent.style.display = "block";
-            placeHolderComponent.style.height = "51px";
-            placeHolderComponent.dataset.component = "true";
-            placeHolderComponent.dataset.placeHolderComponent = "true"; //to distinguish it from the components, used in removePlaceHolderComponents()
-            placeHolderComponent.innerText =
-                "You can drag components into this space";
-            __placeHolderComponentsList = [
-                ...__placeHolderComponentsList,
-                placeHolderComponent,
-            ];
-        });
+    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((container, index) => {
+        const placeHolderComponent = document.createElement("div");
+        placeHolderComponent.id = `placeHolderComponent-${index}`;
+        placeHolderComponent.classList.add("masonry-placeholder");
+        placeHolderComponent.style.display = "block";
+        placeHolderComponent.style.height = "51px";
+        placeHolderComponent.dataset.component = "true";
+        placeHolderComponent.dataset.placeHolderComponent = "true"; //to distinguish it from the components, used in removePlaceHolderComponents()
+        placeHolderComponent.innerText = "You can drag components into this space";
+        __placeHolderComponentsList = [...__placeHolderComponentsList, placeHolderComponent];
+    });
 }
 
 /**
@@ -92,23 +61,18 @@ function onComponentUpdate() {
  * if there's no children except the .masonry-placeholder need to show that items can be dragged into this container
  */
 function addPlaceHolderComponents() {
-    document
-        .querySelectorAll(COMPONENT_CONTAINERS_SELECTOR)
-        .forEach((parentContainer, index) => {
-            if (canAddPlaceHolderComponent(parentContainer)) {
-                const placeHolderComponent = __placeHolderComponentsList[index];
+    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
+        if (canAddPlaceHolderComponent(parentContainer)) {
+            const placeHolderComponent = __placeHolderComponentsList[index];
 
-                if (parentContainer.firstChild !== null) {
-                    // if we already have components, insert the placeholder before the first component
-                    parentContainer.insertBefore(
-                        placeHolderComponent,
-                        parentContainer.firstChild
-                    );
-                } else {
-                    parentContainer.append(placeHolderComponent);
-                }
+            if (parentContainer.firstChild !== null) {
+                // if we already have components, insert the placeholder before the first component
+                parentContainer.insertBefore(placeHolderComponent, parentContainer.firstChild);
+            } else {
+                parentContainer.append(placeHolderComponent);
             }
-        });
+        }
+    });
 }
 
 /**
@@ -144,9 +108,7 @@ function onExistingComponentSortEnd() {
  * Remove all the placeholders
  */
 function removePlaceHolderComponents() {
-    document
-        .querySelectorAll("[data-place-holder-component]")
-        .forEach((placeHolderComponent) => {
-            placeHolderComponent.remove(); //will just fail silently if isn't in the DOM
-        });
+    document.querySelectorAll("[data-place-holder-component]").forEach((placeHolderComponent) => {
+        placeHolderComponent.remove(); //will just fail silently if isn't in the DOM
+    });
 }

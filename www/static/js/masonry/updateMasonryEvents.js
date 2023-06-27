@@ -7,10 +7,8 @@ export default Object.freeze({
     COMPONENT_ADDED: "UPDATE_MASONRY__COMPONENT_ADDED", //to set up the new component, dispatched with the { Element } newComponent that's been added
     COMPONENT_REMOVED: "UPDATE_MASONRY__COMPONENT_REMOVED", //to set up the new component, dispatched with the { Element } component that's been removed
     COMPONENT_UPDATED: "UPDATE_MASONRY__COMPONENT_UPDATED", //to remove the component, dispatched with the { Element } component that's been updated
-    EXISTING_COMPONENT_SORT_START:
-        "UPDATE_MASONRY__EXISTING_COMPONENT_SORT_START", //to show/hide 'add component here' placeholders
-    EXISTING_COMPONENT_SORT_UPDATE:
-        "UPDATE_MASONRY__EXISTING_COMPONENT_SORT_UPDATE", //to show/hide 'add component here' placeholders
+    EXISTING_COMPONENT_SORT_START: "UPDATE_MASONRY__EXISTING_COMPONENT_SORT_START", //to show/hide 'add component here' placeholders
+    EXISTING_COMPONENT_SORT_UPDATE: "UPDATE_MASONRY__EXISTING_COMPONENT_SORT_UPDATE", //to show/hide 'add component here' placeholders
     EXISTING_COMPONENT_SORT_END: "UPDATE_MASONRY__EXISTING_COMPONENT_SORT_END", //to show/hide 'add component here' placeholders
     NEW_COMPONENT_SORT_UPDATE: "UPDATE_MASONRY__NEW_COMPONENT_SORT_UPDATE", //to show/hide 'add component here' placeholders
     NEW_COMPONENTS_TABS_OPENED: "UPDATE_MASONRY__NEW_COMPONENTS_TABS_OPENED", //to show/hide 'add component here' placeholders

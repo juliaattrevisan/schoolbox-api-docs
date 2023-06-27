@@ -37,10 +37,7 @@ export function getFormData() {
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
     if (getMasonryConfig().settings.formData.pageInfo.context) {
-        formData.append(
-            "context",
-            getMasonryConfig().settings.formData.pageInfo.context
-        );
+        formData.append("context", getMasonryConfig().settings.formData.pageInfo.context);
     }
     appendWidth(formData);
     appendColours(formData);

@@ -12,10 +12,7 @@ import { resetColours } from "./editColumnsColours";
  * Start listening for the reset event
  */
 export function initResetEditColumns() {
-    document.addEventListener(
-        UpdateMasonryEvents.EDIT_COLUMNS_RESET,
-        onEditColumnsReset
-    );
+    document.addEventListener(UpdateMasonryEvents.EDIT_COLUMNS_RESET, onEditColumnsReset);
 }
 
 /**

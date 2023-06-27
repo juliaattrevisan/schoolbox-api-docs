@@ -22,12 +22,8 @@ export function initCollapseComponents() {
     document
         .querySelectorAll(getMasonryConfig().settings.existingComponentSelector)
         .forEach((component) => init(component));
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
-        init(event.detail.component)
-    );
-    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
-        init(event.detail.component)
-    );
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
 }
 
 /**
@@ -68,12 +64,7 @@ export function isOpen(component) {
  */
 export async function open(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(
-        collapseButton,
-        ANIMATE_OPEN_POSITION,
-        ANIMATE_ORIGIN,
-        ANIMATE_SPEED
-    );
+    animateRotation(collapseButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
     collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
@@ -88,12 +79,7 @@ export async function open(component) {
  */
 export async function close(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(
-        collapseButton,
-        ANIMATE_CLOSED_POSITION,
-        ANIMATE_ORIGIN,
-        ANIMATE_SPEED
-    );
+    animateRotation(collapseButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "collapsed");
     collapsePanel.dispatchEvent(new CustomEvent("collapseStart.collapsable"));
@@ -109,13 +95,9 @@ export async function close(component) {
  * @returns { Boolean }
  */
 export function isCollapseComponentSelected(component) {
-    const collapseCheckbox = component.querySelector(
-        `#${component.id}-collapse`
-    );
+    const collapseCheckbox = component.querySelector(`#${component.id}-collapse`);
     if (!collapseCheckbox) {
         return false;
     }
-    return collapseCheckbox.getAttribute("checked") === "checked"
-        ? true
-        : false;
+    return collapseCheckbox.getAttribute("checked") === "checked" ? true : false;
 }
