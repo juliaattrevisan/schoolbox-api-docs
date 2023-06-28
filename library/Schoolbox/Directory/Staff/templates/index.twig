@@ -1,12 +1,48 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
 
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Staff Directory</h2>
-        <section class="content">
-
-        </section>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Staff Directory</h1>
+        </div>
     </div>
+    <nav>
+        <a data-action='print' class="icon-print" title="Print" href="#"></a>
+    </nav>
 </div>
 
+<div class="row">
+    <div class="small-12 columns">
+        <div class="scrollable">
+            <table data-tablesorter>
+                <thead>
+                <tr>
+                    <th class="hide-for-small" data-orderable="false">Image</th>
+                    <th>First name</th>
+                    <th>Surname</th>
+                    <th class="hide-for-medium-down">Department</th>
+                    <th class="hide-for-small">Role</th>
+                    <th class="hide-for-medium-down">Campus</th>
+                    <th>Phone</th>
+                    <th>Ext</th>
+                    <th>Email</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for staff in payload %}
+                <tr>
+                    <td class="hide-for-small"><img src="{{ staff.portrait_url }}"></td>
+                    <td>{{ staff.StaffPreferredName }}</td>
+                    <td>{{ staff.StaffSurname }}</td>
+                    <td class="hide-for-medium-down">{{ staff.StaffDepartment }}</td>
+                    <td class="hide-for-small">{{ staff.JobPositionDescription }}</td>
+                    <td class="hide-for-medium-down">{{ staff.StaffCampusDescription }}</td>
+                    <td><a href="tel:{{ staff.StaffOccupPhone }}">{{ staff.StaffOccupPhone }}</a></td>
+                    <td>{{ staff.StaffExtension }}</td>
+                    <td><a href="mailto:{{ staff.StaffOccupEmail }}">{{ staff.StaffOccupEmail }}</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

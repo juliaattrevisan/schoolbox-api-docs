@@ -39,28 +39,70 @@ class Controller extends Base
     public function getList(): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@staffDirectory/index.twig', [
-            'payload' => $this->generatePayload()
+            'payload' => $this->generatePayload(),
         ])->setTitle('Staff Directory'));
     }
 
     /**
      * Generate a set of staff members but augment with additional info
      *
-     * @return string
+     * @return array
      */
-    private function generatePayload(): string
+    private function generatePayload(): array
     {
-        $staffs = $this->externalUser->getStaffContactListExtended();
+        // Agglutinate multiple JobPositionDescription
+        $staffs = array_reduce(
+            $this->externalUser->getStaffContactListExtended(),
+            [$this, 'mergeStaffRecords'],
+            []
+        );
 
-        /* Manufacture a portrait url
-         * FIXME You might not need this, because you could infer it on frontend.
-         */
         foreach ($staffs as &$staff) {
+            /* Condense into one csv
+             */
+            $staff['JobPositionDescription'] = implode(', ', $staff['JobPositionDescription']);
+
+            /* Manufacture a portrait url
+             * FIXME You might not need this, because you could infer it on frontend.
+             */
             $staff['portrait_url'] = sprintf('/portrait.php?userId=%s&size=square32', $staff['StaffID']);
         }
 
         unset($staff);
 
-        return json_encode($staffs);
+        return $staffs;
+    }
+
+
+    /**
+     * Merge staff records method, used as an array_reduce() callback to merge
+     * job position descriptions.
+     *
+     * @param array $mergedRecords
+     * @param array $record
+     *
+     * @return array
+     */
+    protected function mergeStaffRecords(array $mergedRecords, array $record): array
+    {
+        $staffId = $record['StaffID'];
+
+        if (!array_key_exists($staffId, $mergedRecords)) {
+            $mergedRecords[$staffId] = $record;
+            $mergedRecords[$staffId]['JobPositionDescription'] = array();
+            $mergedRecords[$staffId]['JobPositionDescriptionAlternate'] = array();
+        }
+
+        // Only set descriptions that aren't empty and aren't dupes
+        if (!empty($record['JobPositionDescription'])) {
+            $mergedRecords[$staffId]['JobPositionDescription'][$record['JobPositionDescription']]
+                = $record['JobPositionDescription'];
+        }
+        if (!empty($record['JobPositionDescriptionAlternate'])) {
+            $mergedRecords[$staffId]['JobPositionDescriptionAlternate'][$record['JobPositionDescriptionAlternate']]
+                = $record['JobPositionDescriptionAlternate'];
+        }
+
+        return $mergedRecords;
     }
 }
