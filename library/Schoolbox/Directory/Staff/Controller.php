@@ -62,6 +62,10 @@ class Controller extends Base
              */
             $staff['JobPositionDescription'] = implode(', ', $staff['JobPositionDescription']);
 
+            /* This was used for a TKDS custom work (sloane)
+             */
+            $staff['JobPositionDescriptionAlternate'] = implode(', ', $staff['JobPositionDescriptionAlternate']);
+
             /* Manufacture a portrait url
              * FIXME You might not need this, because you could infer it on frontend.
              */
