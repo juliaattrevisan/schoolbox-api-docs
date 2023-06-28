@@ -418,20 +418,68 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Displays the iframe variant for the return page for after the instructor
+     * has finished with the LTI assessment's status page within the LTI tool.
+     *
+     * This is intended to be used as the return URL for the resource link
+     * launch, if the LTI assessment launches within an iframe: this simply
+     * redirects to the window variant in the parent window.
+     *
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/instructor/return/iframe
+     * @since 23.0.0
+     *
+     * @param int $assessmentId The assessment ID to redirect to.
+     *                          Intentionally not preloaded: this is only a
+     *                          redirect.
+     * @return void
+     */
+    public function getLaunchAssessmentAsInstructorReturnIframe(int $assessmentId): void
+    {
+        // Do not check for permissions: this is only a redirect
+        $statusUrl = $this->router->generate(
+            'learningAssessment.getStatus',
+            ['assessmentId' => $assessmentId,],
+        );
+        $returnUrl = new Uri(
+            $this->router->generate(
+                'learningAssessment.getLaunchAssessmentAsInstructorReturnWindow',
+                ['assessmentId' => $assessmentId,],
+            ),
+        );
+        $returnUrl = $returnUrl->appendQueryParameters(
+            array_filter(
+                [
+                    'lti_msg'                       => $this->request->query->get('lti_msg', ''),
+                    'lti_errormsg'                  => $this->request->query->get('lti_errormsg', ''),
+                    Assessment\Redirect::RETURN_URL => $this->request->query->get(Assessment\Redirect::RETURN_URL, $statusUrl),
+                ]
+            )
+        );
+
+        // Launches:
+        // should automatically redirect, but contain a button if they do not
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@learningAssessment/lti/return/instructor/iframe.twig',
+                ['returnUrl'   => $returnUrl->__toString(),],
+            )
+        );
+    }
+
+    /**
      * Displays the return page for after the instructor has finished with the
      * LTI assessment's status page within the LTI tool.
      *
      * This is intended to be used as the return URL for the resource link
      * launch.
      *
-     * @api   GET /learning/assessments/:assessmentId/lti/launch/instructor/return/:target
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/instructor/return/window
      * @since 23.0.0
      *
-     * @param Model  $assessment
-     * @param string $target
+     * @param Model $assessment
      * @return void
      */
-    public function getLaunchAssessmentAsInstructorReturn(Model $assessment, string $target): void
+    public function getLaunchAssessmentAsInstructorReturnWindow(Model $assessment): void
     {
         $statusUrl = $this->getRouteIfAuthorized(
             'learningAssessment.getStatus',
@@ -462,36 +510,40 @@ class Controller extends Assessment\Controller
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        if ($target === LtiTool\Model::TARGET_WINDOW) {
-            $this->response->content->set(
-                $this->buildHtmlOutput(
-                    '@learningAssessment/lti/return/instructor/window.twig',
-                    $params,
-                )
-            );
-        } else {
-            $this->response->content->set(
-                $this->buildUnthemedHtmlOutput(
-                    '@learningAssessment/lti/return/instructor/iframe.twig',
-                    $params,
-                )
-            );
-        }
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningAssessment/lti/return/instructor/window.twig',
+                $params,
+            )
+        );
     }
 
     /**
-     * POST alias for `getLaunchAssessmentAsInstructorReturn`.
+     * POST alias for `getLaunchAssessmentAsInstructorReturnIframe`.
      *
-     * @api   POST /learning/assessments/:assessmentId/lti/launch/instructor/return/:target
+     * @api   POST /learning/assessments/:assessmentId/lti/launch/instructor/return/iframe
      * @since 23.0.0
      *
-     * @param Model  $assessment
-     * @param string $target
+     * @param int $assessmentId
      * @return void
      */
-    public function postLaunchAssessmentAsInstructorReturn(Model $assessment, string $target): void
+    public function postLaunchAssessmentAsInstructorReturnIframe(int $assessmentId): void
     {
-        $this->getLaunchAssessmentAsInstructorReturn($assessment, $target);
+        $this->getLaunchAssessmentAsInstructorReturnIframe($assessmentId);
+    }
+
+    /**
+     * POST alias for `getLaunchAssessmentAsInstructorReturnWindow`.
+     *
+     * @api   POST /learning/assessments/:assessmentId/lti/launch/instructor/return/window
+     * @since 23.0.0
+     *
+     * @param Model $assessment
+     * @return void
+     */
+    public function postLaunchAssessmentAsInstructorReturnWindow(Model $assessment): void
+    {
+        $this->getLaunchAssessmentAsInstructorReturnWindow($assessment);
     }
 
     /**
