@@ -40,9 +40,8 @@ class Controller extends Base
     {
         $staffs = $this->externalUser->getStaffContactListExtended();
 
-        new \Alaress_Probe($staffs);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@staffDirectory/index.twig', [
+            'payload' => array_map('json_encode', $staffs)
         ])->setTitle('Staff Directory'));
     }
 }
