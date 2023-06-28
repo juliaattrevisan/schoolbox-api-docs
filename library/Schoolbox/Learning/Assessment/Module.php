@@ -250,15 +250,15 @@ class Module extends BaseModule
         );
         $this->register(
             self::METHOD_GET,
-            "$assRoute/lti/launch/instructor/return/iframe",
-            'getLaunchAssessmentAsInstructorReturnIframe',
+            "$assRoute/lti/launch/student/$studentParam/return/iframe",
+            'getLaunchAssessmentAsStudentReturnIframe',
         );
         $this->register(
             self::METHOD_GET,
-            "$assRoute/lti/launch/student/$studentParam/return/window",
-            'getLaunchAssessmentAsStudentReturnWindow',
-            $canSubmit,
-            $preloadParticipant,
+            "$assRoute/lti/launch/instructor/return/window",
+            'getLaunchAssessmentAsInstructorReturnWindow',
+            $canViewStatus,
+            $preloadAssessment,
         );
         $this->register(
             self::METHOD_GET,
