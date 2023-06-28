@@ -62,6 +62,7 @@ export INSTANCE_ID=ci
 
 echo "Running phpstan checks"
 
+vendor/bin/codecept build
 vendor/phpstan/phpstan/phpstan analyze
 
 phpstanResult=$?
