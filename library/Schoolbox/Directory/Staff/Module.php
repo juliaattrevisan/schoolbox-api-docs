@@ -71,7 +71,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(UserMapper::class)
+            $this->getMapperFactory()->get(UserMapper::class),
+            new \External_User(),
         );
     }
 

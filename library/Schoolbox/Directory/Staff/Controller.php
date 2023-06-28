@@ -21,11 +21,15 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param ErrorMapper    $errorMapper
+     * @param UserMapper     $userMapper
+     * @param \External_User $externalUser
      */
-    public function __construct(private ErrorMapper $errorMapper, private UserMapper $userMapper)
-    {
+    public function __construct(
+        private ErrorMapper $errorMapper,
+        private UserMapper $userMapper,
+        private \External_User $externalUser
+    ) {
     }
 
 
@@ -34,6 +38,10 @@ class Controller extends Base
      */
     public function getList(): void
     {
+        $staffs = $this->externalUser->getStaffContactListExtended();
+
+        new \Alaress_Probe($staffs);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@staffDirectory/index.twig', [
         ])->setTitle('Staff Directory'));
     }
