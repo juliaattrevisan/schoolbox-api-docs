@@ -40,7 +40,6 @@ class TextBoxModify extends Request
 
     protected function getUrl(): string
     {
-
         return "/textbox/{$this->folderId}";
     }
 }

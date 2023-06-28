@@ -14,7 +14,6 @@ class Delete extends Request
 
     public function __construct(int $courseId, int $unitId)
     {
-
         $this->courseId = $courseId;
         $this->unitId = $unitId;
         $this->setReferer('/course/modify/' . $courseId . '#' . $unitId);

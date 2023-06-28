@@ -13,7 +13,7 @@
  * ./vendor/codeception/codeception/codecept --steps run acceptance Survey/QuestionBankCest
  */
 
-namespace Survey;
+namespace Tests\Acceptance\Survey;
 
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Common;
@@ -43,7 +43,6 @@ class QuestionBankCest
      */
     public function questionBank(AcceptanceTester $i)
     {
-
         $classId = Common::CLASS_ID_9AENG;
         $surveyTitle = 'Cest Survey One ' . Common::gentext(6);
         $sectionTitle = 'Cest Section One ' . Common::gentext(6);

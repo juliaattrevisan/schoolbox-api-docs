@@ -18,7 +18,6 @@ class Create extends Request
 
     public function __construct(string $returnUrl)
     {
-
         $this->setReferer('/news/create');
 
         $this->setFormParam('returnUrl', $returnUrl);

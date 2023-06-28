@@ -31,7 +31,6 @@ use Symfony\Component\BrowserKit\Cookie;
  */
 class Integration extends REST
 {
-
     /**
      * **HOOK** executed before test
      *

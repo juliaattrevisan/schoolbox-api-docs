@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Markbook;
+namespace Tests\Acceptance\Markbook;
 
 /**
  * Steps:
@@ -51,7 +51,6 @@ class ParticipantCest
      */
     public function testMarkbookBasic(AcceptanceTester $i)
     {
-
         $classId = Common::CLASS_ID_DEMO2;
         $student = Common::USER_LOUISASMITH;
         $studentId = Common::USER_ID_LOUISASMITH;

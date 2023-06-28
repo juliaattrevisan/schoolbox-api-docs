@@ -272,7 +272,6 @@ class Form
      */
     public function fillCampuses(array $campuses): self
     {
-
         foreach ($campuses as &$campus) {
             $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
             $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);

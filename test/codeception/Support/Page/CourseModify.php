@@ -17,7 +17,6 @@ use Tests\Support\AcceptanceTester;
  */
 class CourseModify
 {
-
     public const URL = '/course/modify/{course_id}';
     public const URL_ID_FRAGMENT = '{course_id}';
 

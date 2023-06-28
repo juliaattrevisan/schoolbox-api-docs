@@ -1,6 +1,6 @@
 <?php
 
-namespace Homepage;
+namespace Tests\Acceptance\Homepage;
 
 use Tests\Support\AcceptanceTester;
 use Exception;

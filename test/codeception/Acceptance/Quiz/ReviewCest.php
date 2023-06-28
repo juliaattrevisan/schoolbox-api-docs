@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Quiz;
+namespace Tests\Acceptance\Quiz;
 
 /**
  * Steps:
@@ -61,7 +61,6 @@ class ReviewCest
      */
     public function testQuizBasic(AcceptanceTester $i)
     {
-
         $className = Common::CLASS_9AENG;
         $classId = Common::CLASS_ID_9AENG;
         $student1 = Common::USER_LOUISASMITH;
@@ -110,7 +109,6 @@ class ReviewCest
      */
     public function testQuizReviewHorizontal(AcceptanceTester $i)
     {
-
         $className = Common::CLASS_9AENG;
         $classId = Common::CLASS_ID_9AENG;
         $student1 = Common::USER_LOUISASMITH;
@@ -217,7 +215,6 @@ class ReviewCest
      */
     public function testQuizGradeVisibility(AcceptanceTester $i)
     {
-
         $className = Common::CLASS_9AENG;
         $classId = Common::CLASS_ID_9AENG;
         $student1 = Common::USER_LOUISASMITH;

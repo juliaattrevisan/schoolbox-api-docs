@@ -1,6 +1,6 @@
 <?php
 
-namespace Duework;
+namespace Tests\Acceptance\Duework;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;

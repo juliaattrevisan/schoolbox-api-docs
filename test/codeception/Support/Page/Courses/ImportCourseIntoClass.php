@@ -9,8 +9,6 @@ use Alaress_Date_Format;
 
 class ImportCourseIntoClass
 {
-
-
     private AcceptanceTester $tester;
 
     public const CLASS_NAME = 'input.search-input';
@@ -31,7 +29,6 @@ class ImportCourseIntoClass
      */
     public function typeClassName($className): void
     {
-
         $this->tester->fillField(self::CLASS_NAME, $className);
     }
 
@@ -67,7 +64,6 @@ class ImportCourseIntoClass
      */
     public function insertDueDate($dueDateIdNumber, $dueDate): void
     {
-
         $this->tester->fillField(['css' => 'input[id=due_date-' . $dueDateIdNumber . ']'], $dueDate);
     }
 
@@ -85,7 +81,6 @@ class ImportCourseIntoClass
      */
     public function clickSubmit($buttonValue): void
     {
-
         $this->tester->click(['css' => 'input[type=submit][value=' . $buttonValue . ']']);
     }
 }

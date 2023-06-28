@@ -12,7 +12,6 @@ class RemoveGoal extends \Tests\Support\Payload\Request
 
     public function __construct(int $badgeId, string $userId)
     {
-
         $this->badgeId = $badgeId;
         $this->setFormParam('userIds[0]', $userId);
         $this->setReferer("/learning/badge");

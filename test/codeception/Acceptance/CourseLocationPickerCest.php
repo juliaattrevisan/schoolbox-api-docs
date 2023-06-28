@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace acceptance;
+namespace Tests\Acceptance;
 
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\CourseModify;
@@ -20,7 +20,6 @@ use Exception;
  */
 class CourseLocationPickerCest
 {
-
     /**
      * Go to the course modify page before every test
      *

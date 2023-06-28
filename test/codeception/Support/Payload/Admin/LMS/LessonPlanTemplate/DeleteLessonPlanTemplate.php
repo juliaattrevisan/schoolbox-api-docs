@@ -21,7 +21,6 @@ class DeleteLessonPlanTemplate extends \Tests\Support\Payload\Request
      */
     public function __construct(int $lessonPanTemplateId)
     {
-
         $this->lessonPanTemplateId = $lessonPanTemplateId;
         $this->setReferer("/adminv2/lesson-plan/template");
     }

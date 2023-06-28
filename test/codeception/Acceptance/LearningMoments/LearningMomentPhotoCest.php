@@ -1,6 +1,6 @@
 <?php
 
-namespace LearningMoments;
+namespace Tests\Acceptance\LearningMoments;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;

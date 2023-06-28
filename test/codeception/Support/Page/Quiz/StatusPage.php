@@ -10,15 +10,13 @@ declare(strict_types=1);
 namespace Tests\Support\Page\Quiz;
 
 use Tests\Support\AcceptanceTester;
-use Codeception\Util\Locator;
 
 /**
  * Quiz status page
  */
 class StatusPage
 {
-
-    public const URL = '/learning/assessments/{assessment_id}/status';
+   public const URL = '/learning/assessments/{assessment_id}/status';
     public const LINK_JELLY_TOT = '#content a.icon-more';
     public const LINK_REVIEW_HORIZONTAL = '#header-options a.icon-class-list';
     public const LINK_BULK_REVIEW = '#header-options a.icon-approve';

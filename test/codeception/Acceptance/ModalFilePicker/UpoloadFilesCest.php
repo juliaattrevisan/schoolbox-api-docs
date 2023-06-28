@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Page\ModalFilePicker;
+namespace Tests\Acceptance\ModalFilePicker;
 
 use Tests\Support\AcceptanceTester;
 use Exception;

@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Homepage;
+namespace Tests\Acceptance\Homepage;
 
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Common;

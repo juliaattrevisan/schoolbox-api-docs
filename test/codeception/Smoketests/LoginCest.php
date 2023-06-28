@@ -5,9 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-/** @noinspection PhpDocMissingThrowsInspection */
-/** @noinspection PhpUnhandledExceptionInspection */
-/** @noinspection PhpUnused */
+/** @noinspection PhpDocMissingThrowsInspection,PhpUnhandledExceptionInspection,PhpUnused */
 declare(strict_types=1);
 
 namespace Tests\Smoketests;
@@ -39,7 +37,7 @@ class LoginCest
      *
      * @param IntegrationTester $i
      */
-    public function LoginLocalUser(IntegrationTester $i): void
+    public function loginLocalUser(IntegrationTester $i): void
     {
         #GIVEN
         $user     = 'alaress';
@@ -64,7 +62,7 @@ class LoginCest
      *
      * @param IntegrationTester      $i
      */
-    public function LoginForgotPassword(IntegrationTester $i): void
+    public function loginForgotPassword(IntegrationTester $i): void
     {
         #GIVEN
         $user_email    = 'alaress@schoolbox.com.au';
@@ -92,7 +90,7 @@ class LoginCest
         $i->seeHttpHeader('location', '/passwordReset');
     }
 
-    public function ApiLogin(IntegrationTester $i): void
+    public function apiLogin(IntegrationTester $i): void
     {
         #GIVEN
         $user     = 'alaress';
@@ -120,7 +118,7 @@ class LoginCest
         $i->seeResponseCodeIs(200);
     }
 
-    public function ApiLoginFailBadPass(IntegrationTester $i): void
+    public function apiLoginFailBadPass(IntegrationTester $i): void
     {
         #GIVEN
         $user     = 'alaress';
@@ -142,7 +140,7 @@ class LoginCest
         $i->seeResponseCodeIs(401);
     }
 
-    public function RedirectApiLogin(IntegrationTester $i): void
+    public function redirectApiLogin(IntegrationTester $i): void
     {
         #GIVEN
         $user     = 'alaress';

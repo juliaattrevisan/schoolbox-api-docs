@@ -13,7 +13,6 @@ class Delete extends \Tests\Support\Payload\Request
 
     public function __construct(int $courseId, int $assessmentId)
     {
-
         $this->courseId = $courseId;
         $this->assessmentId = $assessmentId;
         $this->setReferer('/course/modify/' . $courseId);

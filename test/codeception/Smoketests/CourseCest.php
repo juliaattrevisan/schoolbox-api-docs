@@ -526,7 +526,6 @@ class CourseCest
      */
     private function createAssessment(IntegrationTester $i, int $unitSpecId, int $unitFolderId, string $title, string $assessmentType)
     {
-
         $timestamp      = time();
         $assessment_title = 'Assessment' . $title . ' for Course tests On Unit spec ID '  . $unitSpecId . ' at ' . $timestamp;
 
@@ -545,7 +544,6 @@ class CourseCest
      */
     private function createUnit(IntegrationTester $i, int $courseSpecId, string $unit_name): void
     {
-
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($courseSpecId);
         $unitSpecPayload->setFormParam('name', $unit_name);
         $i->amGoingTo('Send request create a unit spec');

@@ -15,7 +15,7 @@
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest:<test method name>
  */
 
-namespace Duework;
+namespace Tests\Acceptance\Duework;
 
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Common;

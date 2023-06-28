@@ -1,6 +1,6 @@
 <?php
 
-namespace Calendar;
+namespace Tests\Acceptance\Calendar;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;

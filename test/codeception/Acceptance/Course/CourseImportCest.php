@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Course;
+namespace Tests\Acceptance\Course;
 
 use Tests\Support\AcceptanceTester;
 use Exception;
@@ -13,7 +13,6 @@ use Tests\Support\Page\Folder\CreateFolder;
 
 class CourseImportCest
 {
-
     /**
      * Preparations
      *
@@ -43,7 +42,6 @@ class CourseImportCest
      */
     public function importCourseIntoClass(AcceptanceTester $i)
     {
-
         $createFolder = new CreateFolder($i);
         $courseList = new CourseList($i);
         $importCourseIntoClass = new ImportCourseIntoClass($i);

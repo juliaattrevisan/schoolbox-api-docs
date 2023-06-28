@@ -15,7 +15,6 @@ class Delete extends Request
 
     public function __construct(int $studentId, int $evidenceId)
     {
-
         $this->evidenceId =  $evidenceId;
         $this->setReferer("/search/user/$studentId");
         $this->setHeader('content-type', 'application/json');

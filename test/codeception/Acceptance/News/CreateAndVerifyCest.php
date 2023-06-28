@@ -9,7 +9,7 @@
  * Class SubmissionHistoryCest
  */
 
-namespace News;
+namespace Tests\Acceptance\News;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;

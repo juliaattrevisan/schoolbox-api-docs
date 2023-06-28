@@ -16,7 +16,6 @@ use Tests\Support\AcceptanceTester;
  */
 class AssessmentPage
 {
-
     public const URL = '/learning/assessments/{assessment_id}/{user_id}';
     public const LINK_JELLY_TOT = '#content a.icon-more';
     public const LINK_MODIFY = '#header-options a.icon-modify';

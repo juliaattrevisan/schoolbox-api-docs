@@ -18,7 +18,6 @@ use Schoolbox\Calendar;
 
 class CalendarCest
 {
-
     /**
      * Push a login payload to Schoolbox each test to ensure session is active and logged in.
      *

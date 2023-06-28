@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace acceptance;
+namespace Tests\Acceptance;
 
 /**
  * Steps:

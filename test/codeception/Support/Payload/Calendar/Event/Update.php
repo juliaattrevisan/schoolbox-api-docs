@@ -21,7 +21,6 @@ class Update extends Request
 
     public function __construct(Calendar\Event $event)
     {
-
         $eventTimestamp = time();
         $eventDate      = date('d/m/Y', $eventTimestamp);
         $this->event = $event;

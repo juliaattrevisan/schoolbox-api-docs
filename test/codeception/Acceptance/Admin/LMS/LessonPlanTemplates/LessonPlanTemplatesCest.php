@@ -1,6 +1,6 @@
 <?php
 
-namespace Admin\LMS\LessonPlanTemplates;
+namespace Tests\Acceptance\Admin\LMS\LessonPlanTemplates;
 
 use Tests\Support\AcceptanceTester;
 use Exception;
@@ -132,7 +132,6 @@ class LessonPlanTemplatesCest
      */
     public function deleteLessonPlanTemplate(AcceptanceTester $i): void
     {
-
         $templates = new CreateLessonPlanTemplate($i);
         $templateList = new LessonPlanTemplateList($i);
 

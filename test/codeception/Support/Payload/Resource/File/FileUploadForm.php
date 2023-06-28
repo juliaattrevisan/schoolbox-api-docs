@@ -4,7 +4,6 @@ namespace Tests\Support\Payload\Resource\File;
 
 class FileUploadForm extends Upload
 {
-
     /**
      * FileUploadForm constructor.
      * @param        $folder_id

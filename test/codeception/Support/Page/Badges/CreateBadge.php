@@ -94,7 +94,6 @@ class CreateBadge
      */
     public function createBadge(AcceptanceTester $i, string $badgeName)
     {
-
         $badges = new Badges($i);
         $category = "Learning";
         $badges->clickAddBadgeButton();

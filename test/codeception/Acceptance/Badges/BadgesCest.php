@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Badges;
+namespace Tests\Acceptance\Badges;
 
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Badges\Badges;

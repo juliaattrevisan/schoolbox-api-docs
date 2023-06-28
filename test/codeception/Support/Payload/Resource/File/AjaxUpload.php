@@ -11,7 +11,6 @@ use Tests\Support\Payload;
 
 class AjaxUpload extends Upload
 {
-
     /**
      * AjaxUpload constructor.
      * @param $folder_id

@@ -1,6 +1,6 @@
 <?php
 
-namespace Folder;
+namespace Tests\Acceptance\Folder;
 
 use Tests\Support\AcceptanceTester;
 use Exception;

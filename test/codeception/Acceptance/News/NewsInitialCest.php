@@ -1,6 +1,6 @@
 <?php
 
-namespace NewsInitial;
+namespace Tests\Acceptance\News;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;

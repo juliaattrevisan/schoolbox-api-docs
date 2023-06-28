@@ -5,11 +5,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Homepage;
+namespace Tests\Acceptance\Homepage;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
-use Tests\Support\Page\Common;
 
 /**
  * Test for attaching a textbox to a page.

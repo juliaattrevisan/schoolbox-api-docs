@@ -1,6 +1,6 @@
 <?php
 
-namespace acceptance;
+namespace Tests\Acceptance;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Exception\TestRuntimeException;

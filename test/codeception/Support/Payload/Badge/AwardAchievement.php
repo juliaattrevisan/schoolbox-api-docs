@@ -21,7 +21,6 @@ class AwardAchievement extends \Tests\Support\Payload\Request
         string $name,
         string $role
     ) {
-
         $array = array();
         $array[] = array(
             'external_id' => $externalId,

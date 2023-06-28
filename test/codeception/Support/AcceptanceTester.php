@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Support;
+
 use Codeception\Actor;
 use Exception;
 use SensitiveParameter;

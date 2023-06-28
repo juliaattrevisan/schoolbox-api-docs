@@ -9,7 +9,6 @@ use Tests\Support\Payload\Pastoral\FormTrait;
 
 class Delete extends \Tests\Support\Payload\Request
 {
-
     use DeleteTrait;
     use FormTrait;
 
@@ -17,7 +16,6 @@ class Delete extends \Tests\Support\Payload\Request
 
     public function __construct(int $badgeId)
     {
-
         $this->badgeId = $badgeId;
         $file= null;
         $this->setReferer("/learning/badge");

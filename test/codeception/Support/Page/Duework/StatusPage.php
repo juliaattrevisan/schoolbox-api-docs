@@ -10,14 +10,12 @@ declare(strict_types=1);
 namespace Tests\Support\Page\Duework;
 
 use Tests\Support\AcceptanceTester;
-use Tests\Support\Page\Common;
 
 /**
  * Duework status page
  */
 class StatusPage
 {
-
     public const URL = '/learning/assessments/{assessment_id}/status';
 
     public const LINK_JELLY_TOT = '#content a.icon-more';
@@ -63,7 +61,6 @@ class StatusPage
      */
     public static function getStatusSelector(int $studentId, string $fieldSelector)
     {
-
         return '#assessment-status li[data-participant="' . $studentId . '"] ' . $fieldSelector;
     }
 
