@@ -39,8 +39,6 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
-         */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -62,33 +60,7 @@ class Module extends BaseModule
             )
         );
 
-        $preloadUser = function ($params) {
-            return $this->preloadUser($params);
-        };
-
         $this->register('GET', '', 'getList', $getPerms);
-    }
-
-
-    /**
-     * Preload a User instance
-     *
-     * @param array $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadUser(array $params): array
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['id']);
-        } catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'user' => $user,
-        ];
     }
 
 
