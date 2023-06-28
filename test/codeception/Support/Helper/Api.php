@@ -126,11 +126,11 @@ class Api extends \Codeception\Module
         $this->assessmentDataSource = $this->cliKernel->get('assessmentDataSource');
         $this->classFolder          = $classFolder;
         $this->courseSpecMapper     = CourseSpecMapper::getInstance();
-        $this->courseImplMapper = CourseImplMapper::getInstance();
-        $this->unitSpecMapper   = UnitSpecMapper::getInstance();
-        $this->unitImplMapper   = UnitImplMapper::getInstance();
-        $this->eventMapper      = EventMapper::getInstance();
-        $this->eventTypeMapper  = EventTypeMapper::getInstance();
+        $this->courseImplMapper     = CourseImplMapper::getInstance();
+        $this->unitSpecMapper       = UnitSpecMapper::getInstance();
+        $this->unitImplMapper       = UnitImplMapper::getInstance();
+        $this->eventMapper          = EventMapper::getInstance();
+        $this->eventTypeMapper      = EventTypeMapper::getInstance();
     }
 
     private array $users = [];
@@ -164,7 +164,7 @@ class Api extends \Codeception\Module
      * @param string $username
      * @return  \Schoolbox\User
      */
-    public function getUserByUsername(string $username):  \Schoolbox\User
+    public function getUserByUsername(string $username): \Schoolbox\User
     {
         return $this->userMapper->findByUsername($username);
     }
@@ -231,7 +231,7 @@ class Api extends \Codeception\Module
      * @return  \Schoolbox\User
      * @throws MapperException
      */
-    public function createTestUser(string $username, string $roleType, bool $superUser):  \Schoolbox\User
+    public function createTestUser(string $username, string $roleType, bool $superUser): \Schoolbox\User
     {
         $user = $this->userMapper->createModel()
                                  ->setUsername($username)
@@ -249,12 +249,12 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * @param  \Schoolbox\User $groupAdmin
-     * @param  \Schoolbox\User $readMember
+     * @param \Schoolbox\User $groupAdmin
+     * @param \Schoolbox\User $readMember
      * @return Folder
      * @throws MapperException
      */
-    public function createGroup( \Schoolbox\User $groupAdmin,  \Schoolbox\User $readMember): Folder
+    public function createGroup(\Schoolbox\User $groupAdmin, \Schoolbox\User $readMember): Folder
     {
         $template = HomepageTemplateMapper::getInstance()->findAll()->first();
         $parent   = $this->folderMapper->findByParent(0)->last();
@@ -555,7 +555,7 @@ class Api extends \Codeception\Module
         return $quiz;
     }
 
-    public function addReview(IAssessable $assessment,  \Schoolbox\User $student,  \Schoolbox\User $teacher, ?float $normalisedMark)
+    public function addReview(IAssessable $assessment, \Schoolbox\User $student, \Schoolbox\User $teacher, ?float $normalisedMark)
     {
         /** @var FeedbackDataSource $feedbackDataSource */
         $feedbackDataSource = $this->cliKernel->get('feedbackDataSource');
@@ -595,14 +595,14 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * @param  \Schoolbox\User $owner
-     * @param int           $accessLevel
-     * @param int           $attendance
-     * @param bool          $showAttendance
+     * @param \Schoolbox\User $owner
+     * @param int             $accessLevel
+     * @param int             $attendance
+     * @param bool            $showAttendance
      * @return Event
      * @throws MapperException
      */
-    public function createEvent( \Schoolbox\User $owner, int $accessLevel, int $attendance, bool $showAttendance): Event
+    public function createEvent(\Schoolbox\User $owner, int $accessLevel, int $attendance, bool $showAttendance): Event
     {
         $event = $this->eventMapper->createModel();
         $event->setTitle($this->generateText(50))
