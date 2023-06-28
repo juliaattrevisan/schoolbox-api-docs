@@ -1,19 +1,13 @@
 {% extends 'include/styledIframe.twig' %}
 
 {% block title %}
-    {{ assessment.title }} &ndash; Attempt Complete
+    Redirecting...
 {% endblock title %}
 
 {% block content %}
     <div class="row">
-        <div class="small-12">
-            <h1>{{ assessment.title }} &ndash; Attempt Complete</h1>
-        </div>
-    </div>
-
-    <div class="row">
         <div class="small-12 island">
-            <section class="content">
+            <section class="content hide">
                 <p>You will soon automatically return to the activity page.</p>
                 <p>If you are not automatically returned, <a target="_parent" href="{{ returnUrl }}">click here</a>.</p>
             </section>
