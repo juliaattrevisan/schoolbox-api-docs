@@ -40,7 +40,15 @@ class Module extends BaseModule
         /* Anyone can see the form
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
+            new Rule\IsLoggedIn(),
+
+            /* If you're a parent and report_staff_access is truthy,
+             * You can go in (this config allows parents to see staff details)
+             */
+
+            /* Or, if you're a staff member whose role has View Staff Directory,
+             * You can go in
+             */
         );
 
         $preloadUser = function ($params) {
