@@ -19,27 +19,13 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(private ErrorMapper $errorMapper, private UserMapper $userMapper)
     {
-        $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -47,9 +33,8 @@ class Controller extends Base
      * Provide form
      *
      * @param User $user
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
-    public function getExample(User $user)
+    public function getExample(User $user): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@example/index.twig', [
             'user' => $user
@@ -60,7 +45,7 @@ class Controller extends Base
     /**
      * Process the form vars
      */
-    public function postExample()
+    public function postExample(): void
     {
         try {
             $user = $this->userMapper->findById($this->getRequest()->post['id']);
