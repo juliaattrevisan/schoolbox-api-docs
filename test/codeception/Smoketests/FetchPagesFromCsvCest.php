@@ -136,7 +136,7 @@ class FetchPagesFromCsvCest
             $session = $i->getSessionCookie();
             $this->users[$persona] = [$session];
         } else {
-            $i->setSessionCookie($this->users[$persona][0]);
+            $i->setSessionCookie($this->users[$persona][0] ?? '');
         }
 
         #Need to login to the right user
