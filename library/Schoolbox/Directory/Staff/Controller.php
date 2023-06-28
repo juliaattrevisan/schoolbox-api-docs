@@ -34,14 +34,33 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * Provide list of staff members in this directory
      */
     public function getList(): void
     {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@staffDirectory/index.twig', [
+            'payload' => $this->generatePayload()
+        ])->setTitle('Staff Directory'));
+    }
+
+    /**
+     * Generate a set of staff members but augment with additional info
+     *
+     * @return string
+     */
+    private function generatePayload(): string
+    {
         $staffs = $this->externalUser->getStaffContactListExtended();
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@staffDirectory/index.twig', [
-            'payload' => array_map('json_encode', $staffs)
-        ])->setTitle('Staff Directory'));
+        /* Manufacture a portrait url
+         * FIXME You might not need this, because you could infer it on frontend.
+         */
+        foreach ($staffs as &$staff) {
+            $staff['portrait_url'] = sprintf('/portrait.php?userId=%s&size=square32', $staff['StaffID']);
+        }
+
+        unset($staff);
+
+        return json_encode($staffs);
     }
 }
