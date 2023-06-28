@@ -14,7 +14,7 @@ class UpdateBooking extends Payload\Request
 {
     use PostTrait;
 
-    var $BookingID;
+    private $BookingID;
 
     public function __construct(\Schoolbox\ResourceBooking\Booking\Model $Booking, string $title)
     {

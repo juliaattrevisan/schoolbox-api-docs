@@ -20,14 +20,14 @@ class ModerateBooking extends Payload\Request
 
     const ACTION_APPROVE = 3;
 
-    var $ResourceID;
-    var $BookingID;
-    var $action_string;
+    private $resourceID;
+    private $bookingID;
+    private $actionString;
 
     public function __construct(\Schoolbox\ResourceBooking\Booking\Model $Booking, int $type)
     {
-        $this->BookingID = $Booking->getId();
-        $this->ResourceID = $Booking->getResource()->getId();
+        $this->bookingID  = $Booking->getId();
+        $this->resourceID = $Booking->getResource()->getId();
         $this->setHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
         $this->setHeader('Accept-Encoding', 'gzip, deflate, br');
         $this->setHeader('Origin', 'https://vagrant.dev.schoolbox.cloud');
@@ -36,21 +36,21 @@ class ModerateBooking extends Payload\Request
         $this->setHeader('TE', 'Trailers');
         switch ($type) {
             case $this::ACTION_CANCEL:
-                $this->action_string = 'cancel';
+                $this->actionString = 'cancel';
                 $this->setEfficacy('self');
-                $this->setQueryParam('callbackUrl', '/resource-booking/item/' . $this->ResourceID);
+                $this->setQueryParam('callbackUrl', '/resource-booking/item/' . $this->resourceID);
                 break;
             case $this::ACTION_REJECT:
-                $this->action_string = 'reject';
+                $this->actionString = 'reject';
                 $this->setEfficacy('false');
                 break;
             case $this::ACTION_APPROVE:
-                $this->action_string = 'approve';
+                $this->actionString = 'approve';
                 $this->setEfficacy('false');
             default:
-                $this->action_string = 'approve';
+                $this->actionString = 'approve';
         }
-        $this->setReferer('/resource-booking/item/' . $this->ResourceID);
+        $this->setReferer('/resource-booking/item/' . $this->resourceID);
     }
 
     public function setEfficacy(string $efficacy): void
@@ -61,6 +61,6 @@ class ModerateBooking extends Payload\Request
     /** @inheritDoc*/
     protected function getUrl(): string
     {
-        return "/resource-booking/booking/" . $this->BookingID . "/" . $this->action_string;
+        return "/resource-booking/booking/" . $this->bookingID . "/" . $this->actionString;
     }
 }

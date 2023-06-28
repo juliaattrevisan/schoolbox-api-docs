@@ -5,9 +5,10 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-namespace Tests\Acceptance;
-use Tests\Support\AcceptanceTester;
 
+namespace Tests\Acceptance;
+
+use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Login as LoginPage;
 
 class LoginCest

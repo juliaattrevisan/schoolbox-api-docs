@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Support\Payload\Badge;
-
 
 use Tests\Support\Payload\DeleteTrait;
 use Tests\Support\Payload\Pastoral\FormTrait;
@@ -17,9 +15,9 @@ class Delete extends \Tests\Support\Payload\Request
     public function __construct(int $badgeId)
     {
         $this->badgeId = $badgeId;
-        $file= null;
+        $file          = null;
         $this->setReferer("/learning/badge");
-        $this->setHeader('content-type','application/json');
+        $this->setHeader('content-type', 'application/json');
     }
 
 

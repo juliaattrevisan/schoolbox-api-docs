@@ -9,7 +9,7 @@ class Update extends Payload\Request
 {
     use PostTrait;
 
-    var $catId;
+    private $catId;
 
     /**
      */
@@ -31,7 +31,7 @@ class Update extends Payload\Request
         $this->setFormParam('id', $id);
     }
 
-    /** @inheritDoc*/
+    /** @inheritDoc */
     public function getUrl(): string
     {
         return "/resource-booking/category/" . $this->catId . '/update';

@@ -14,7 +14,7 @@ class BookItem extends Payload\Request
 {
     use PostTrait;
 
-    var $ItemID;
+    private $ItemID;
 
     /**
      * Hit /resource-booking/category url with POST to create a category.

@@ -17,13 +17,13 @@ use Tests\Support\Payload\Request;
  */
 class Config extends Request
 {
+    use PostTrait;
+
     public const HOMEPAGE_COMPONENT_POSITION = [
         'left'  => 'column1',
         'right' => 'column2',
         'top'   => 'column3',
     ];
-
-    use PostTrait;
 
     public function __construct(int $folderId)
     {

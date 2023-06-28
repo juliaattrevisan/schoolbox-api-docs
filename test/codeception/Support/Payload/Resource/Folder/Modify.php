@@ -17,9 +17,9 @@ use Tests\Support\Payload\PostTrait;
  */
 abstract class Modify extends Payload\Request
 {
-    public const TEMPLATE_BLANK = 11;
-
     use PostTrait;
+
+    public const TEMPLATE_BLANK = 11;
 
     public function setName(string $name): void
     {
