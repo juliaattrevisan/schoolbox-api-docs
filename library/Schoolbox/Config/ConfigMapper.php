@@ -258,6 +258,10 @@ class ConfigMapper extends Mapper
     public const NAME_EMAIL_BANNER_IMAGE = 'email_banner_image';
     public const NAME_SKIN_FAVICON = 'skin_favicon';
 
+    /* Directories
+     */
+    public const NAME_REPORT_STAFF_ACCESS = 'report_staff_access';
+
     /**
      * Config settings which may affect the behaviour of the router daemon.
      *

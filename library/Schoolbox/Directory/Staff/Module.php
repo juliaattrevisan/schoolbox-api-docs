@@ -16,9 +16,11 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -41,14 +43,23 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\Any(
+                /* If you're a parent and report_staff_access is truthy,
+                 * You can go in (this config allows parents to see staff details)
+                 */
+                new Rule\All(
+                    new Rule\HasRole(\Schoolbox\Role::PARENT),
+                    new Rule\IsConfigOn(ConfigMapper::NAME_REPORT_STAFF_ACCESS, $this->getConfig())
+                ),
 
-            /* If you're a parent and report_staff_access is truthy,
-             * You can go in (this config allows parents to see staff details)
-             */
-
-            /* Or, if you're a staff member whose role has View Staff Directory,
-             * You can go in
-             */
+                /* Or, if you're a staff member whose role has View Staff Directory,
+                 * You can go in
+                 */
+                new Rule\All(
+                    new Rule\HasRole(\Schoolbox\Role::STAFF),
+                    new Rule\HasRolePermission(\Schoolbox\Role::PERMISSION_VIEW_STAFF_DIRECTORY, Role::STAFF)
+                ),
+            )
         );
 
         $preloadUser = function ($params) {
