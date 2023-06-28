@@ -49,7 +49,6 @@ class Module extends BaseModule
                     new Rule\HasRole(\Schoolbox\Role::PARENT),
                     new Rule\IsConfigOn(ConfigMapper::NAME_REPORT_STAFF_ACCESS, $this->getConfig())
                 ),
-
                 /* Or, if you're a staff member whose role has View Staff Directory,
                  * You can go in
                  */
