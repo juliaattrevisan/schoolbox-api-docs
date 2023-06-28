@@ -1,3 +1,16 @@
+<style>
+    /**
+     * Fade in the show redirect link
+     */
+    #redirect-prompt {
+        animation: fadeIn 1s;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+</style>
+
 {% autoescape 'js' %}
     <script type="text/javascript">
         // Redirect
