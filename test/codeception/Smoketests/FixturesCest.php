@@ -539,7 +539,7 @@ class FixturesCest
 
         $i->sendRequest($addPlayer);
 
-        $removePlayer = new Payload\Fixtures\Division\removePlayer($divModel, $user);
+        $removePlayer = new Payload\Fixtures\Division\RemovePlayer($divModel, $user);
 
         $i->sendRequest($removePlayer);
 
@@ -897,7 +897,7 @@ class FixturesCest
         /** @var \Schoolbox\Fixtures\Position\Model $onePosition **/
         $onePosition = $positions->first();
 
-        $setPosition = new Payload\Fixtures\Division\setPosition($teamModel, $user, $onePosition);
+        $setPosition = new Payload\Fixtures\Division\SetPosition($teamModel, $user, $onePosition);
 
         $i->sendRequest($setPosition);
 
@@ -968,7 +968,7 @@ class FixturesCest
         $teamModel = $teamMapper->findOneByColumn('name', $teamName);
 
         //For some reason the Team model doesn't have the players even though they are there and exist on the system.
-        $reorderPlayers = new Payload\Fixtures\Team\reorderPlayers($teamModel);
+        $reorderPlayers = new Payload\Fixtures\Team\ReorderPlayers($teamModel);
 
         //So we have to do this manually.
         $reorderPlayers->manuallyPopulatePlayer($user1, 0);
@@ -1037,7 +1037,7 @@ class FixturesCest
 
         $i->sendRequest($addPlayer);
 
-        $removePlayer = new Payload\Fixtures\Team\removePlayer($teamModel, $user);
+        $removePlayer = new Payload\Fixtures\Team\RemovePlayer($teamModel, $user);
 
         $i->sendRequest($removePlayer);
 
