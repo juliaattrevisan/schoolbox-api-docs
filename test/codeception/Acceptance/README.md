@@ -52,10 +52,10 @@ To run the Codeception tests:
     cd /usr/share/schoolbox
     ./vendor/bin/codecept run --steps
 
-To run a single test, provide the suite (`acceptance`) and the test file name,
-relative to `test/acceptance`:
+To run a single test, provide the suite (`Acceptance`) and the test file name,
+relative to `test/Acceptance`:
 
-    ./vendor/bin/codecept run --steps acceptance LoginCest.php
+    ./vendor/bin/codecept run --steps Acceptance LoginCest.php
 
 
 

@@ -25,6 +25,7 @@ class QuestionForm
     public const SELECTOR_TYPE_ID = 'select[name="type_id"]';
     public const SELECTOR_MARKS = 'input[name="marks"]';
     public const SELECTOR_ANSWER = 'input[name="answer"]';
+    public const SELECTOR_SECTION_ID = 'input[name="section_id"]';
 
     public const TYPE_NUMERIC_ANSWER = 13;
     public const TYPE_SHORT_ANSWER = 1;
