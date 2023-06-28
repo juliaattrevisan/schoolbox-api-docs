@@ -247,15 +247,11 @@ class Module extends BaseModule
             self::METHOD_GET,
             "$assRoute/lti/launch/instructor/return/iframe",
             'getLaunchAssessmentAsInstructorReturnIframe',
-            null,
-            $preloadAssessment,
         );
         $this->register(
             self::METHOD_GET,
             "$assRoute/lti/launch/instructor/return/iframe",
             'getLaunchAssessmentAsInstructorReturnIframe',
-            null,
-            $preloadAssessment,
         );
         $this->register(
             self::METHOD_GET,
@@ -277,15 +273,11 @@ class Module extends BaseModule
             self::METHOD_POST,
             "$assRoute/lti/launch/instructor/return/iframe",
             'postLaunchAssessmentAsInstructorReturnIframe',
-            null,
-            $preloadAssessment,
         );
         $this->register(
             self::METHOD_POST,
             "$assRoute/lti/launch/student/$studentParam/return/iframe",
             'postLaunchAssessmentAsStudentReturnIframe',
-            null,
-            $preloadParticipant,
         );
         $this->register(
             self::METHOD_POST,
