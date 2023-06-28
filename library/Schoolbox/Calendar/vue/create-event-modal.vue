@@ -3,6 +3,8 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast.vue";
 import debounce from "lodash/debounce";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
+import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /* Vue select
  */
@@ -19,10 +21,15 @@ vSelect.props.components.default = () => ({ Deselect });
 export default {
     name: "create-event-modal",
 
+    mixins: [
+        cdnPrefixMixin
+    ],
+
     components: {
         RevealModal,
         Toast,
         vSelect,
+        DynamicInput,
     },
 
     props: [
@@ -322,6 +329,7 @@ export default {
 
                         <label class="detail">
                             Note
+
                             <textarea name="detail" v-model="event.detail"></textarea>
                         </label>
                     </section>
