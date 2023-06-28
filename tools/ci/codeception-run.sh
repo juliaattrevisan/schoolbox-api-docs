@@ -3,19 +3,19 @@
 TEST_SUITE=$1
 case "$TEST_SUITE" in
     smoketests)
-      TEST_ARGS="smoketests"
+      TEST_ARGS="Smoketests"
       ;;
     acceptance)
-      TEST_ARGS="acceptance LoginCest.php"
+      TEST_ARGS="Acceptance LoginCest.php"
       ;;
     api)
-      TEST_ARGS="api"
+      TEST_ARGS="Api"
       ;;
     ci)
-      TEST_ARGS="smoketests,api"
+      TEST_ARGS="Smoketests,Api"
       ;;
     *)
-      echo "{smoketests|acceptance|api|ci}"
+      echo "{Smoketests|Acceptance|Api|Ci}"
       exit 1
 esac
 
