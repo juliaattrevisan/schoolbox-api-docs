@@ -125,7 +125,7 @@ if (!empty($_POST)) {
         $crumbs = array_merge($crumbs, [
             [
                 'text'  => $assessment->getContext()->getTitle(),
-                'href'  => $this->getDi()->get('router')->generate('learningAssessment.getStatus', [
+                'href'  => $this->getDi()->get('router.generator')->generate('learningAssessment.getStatus', [
                     'assessmentId' => $assessment->getContext()->getId(),
                     'assessment'   => $assessment->getContext(),
                 ]) . $returnUrl,

@@ -76,7 +76,7 @@ json_encode($myModel);
 
 json_encode($myModel->jsonSerialize(
     new \Alaress\Json\Decorator\PropertyDecorator([ 'propertyA' ]),
-    new LinkDecorator($di->get('router'), $di->get('authorizer'))
+    new LinkDecorator($di->get('router.generator'), $di->get('authorizer'))
 ));
 
 /* output:

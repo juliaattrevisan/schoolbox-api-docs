@@ -60,7 +60,7 @@ class Renderer extends Base
             foreach ($mapperResult->getResult() as $currentArticle) {
                 $this->getPage()->setVar(array(
                     'NEWS_ID' => $currentArticle->getId(),
-                    'NEWS_LINK' => $this->getPage()->getDi()->get('router')->generate('commsNews.getDetail', ['articleId' => $currentArticle->getId()]),
+                    'NEWS_LINK' => $this->getPage()->getDi()->get('router.generator')->generate('commsNews.getDetail', ['articleId' => $currentArticle->getId()]),
                     'NEWS_TITLE' => \Scrub::text($currentArticle->getTitle()),
                     'NEWS_AUTHOR_ID' => $currentArticle->getAuthor()->getId(),
                     'NEWS_AUTHOR_NAME' => \Scrub::text($currentArticle->getAuthor()->getFullname()),
