@@ -12,12 +12,13 @@
 
 <script>
     $(function() {
-        $.get('/learning/assessment/timeline/733/user/25', function(response) {
-            console.log(response);
-        });
+        let url = $('#test').data('href');
+
+        window.location.href = url;
     });
 </script>
 
+<div id="test"></div>
 
 
 
