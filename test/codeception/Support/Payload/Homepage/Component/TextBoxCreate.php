@@ -25,18 +25,12 @@ class TextBoxCreate extends Request
      */
     private int $homepageId;
 
-    /**
-     * @var int
-     */
-    private int $componentInstanceId;
-
-    public function __construct(int $homepageId, int $componentInstanceId)
+    public function __construct(int $homepageId)
     {
         $this->setReferer("/textbox/$homepageId");
         $this->setHeading('');
         $this->setBody('');
-        $this->homepageId          = $homepageId;
-        $this->componentInstanceId = $componentInstanceId;
+        $this->homepageId = $homepageId;
 
         $this->setHeader('content-type', 'application/json');
         $this->setAccepts('application/json, text/javascript, */*; q=0.01');

@@ -34,9 +34,9 @@ class UserGroupMembershipCest
      */
     public function testGet(ApiTester $i)
     {
-        /** @var Model $newGroup */
         $groupAdmin = $this->users['staff'];
-        $newGroup   = $i->createGroup($groupAdmin, $this->users['student']);
+        /** @var Model $newGroup */
+        $newGroup = $i->createGroup($groupAdmin, $this->users['student']);
 
         /** @var User $user */
         foreach ($this->users as $user) {

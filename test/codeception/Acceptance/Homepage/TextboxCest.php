@@ -20,9 +20,6 @@ use Tests\Support\Page\Resources\Resources;
  */
 class TextboxCest
 {
-    private const CREATE_FOLDER_URL = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
-
-
     /**
      * @param AcceptanceTester $i
      * @throws Exception

@@ -45,12 +45,12 @@ class StatusPage
     /**
      * Generates route for this page.
      *
-     * @param $assessmentId
-     * @return mixed
+     * @param int $assessmentId
+     * @return string
      */
-    public function generateRoute(int $assessmentId)
+    public function generateRoute(int $assessmentId): string
     {
-        return str_replace('{assessment_id}', $assessmentId, self::URL);
+        return str_replace('{assessment_id}', (string)$assessmentId, self::URL);
     }
 
     /**

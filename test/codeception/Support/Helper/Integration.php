@@ -12,6 +12,7 @@ use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\Module\REST;
 use Codeception\TestInterface;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Tests\Support\Payload\Request;
 use Symfony\Component\BrowserKit\Cookie;
 
@@ -41,7 +42,7 @@ class Integration extends REST
     {
         parent::_before($test);
 
-        if ($this->_getConfig('xdebug') ?? false) {
+        if (($this->_getConfig('xdebug') ?? false) && ($this->client instanceof AbstractBrowser)) {
             $this->client->getCookieJar()->set(new Cookie('XDEBUG_SESSION', 'PHPSTORM'));
         }
     }
@@ -51,7 +52,9 @@ class Integration extends REST
      */
     public function setSessionCookie(string $sessionID)
     {
-        $this->client->getCookieJar()->set(new Cookie('PHPSESSID', $sessionID));
+        if ($this->client instanceof AbstractBrowser) {
+            $this->client->getCookieJar()->set(new Cookie('PHPSESSID', $sessionID));
+        }
     }
 
     /**
@@ -59,9 +62,11 @@ class Integration extends REST
      */
     public function getSessionCookie()
     {
-        $sessionCookie = $this->client->getCookieJar()->get('PHPSESSID');
-        if ($sessionCookie !== null) {
-            return $this->client->getCookieJar()->get('PHPSESSID')->getValue();
+        if ($this->client instanceof AbstractBrowser) {
+            $sessionCookie = $this->client->getCookieJar()->get('PHPSESSID');
+            if ($sessionCookie !== null) {
+                return $this->client->getCookieJar()->get('PHPSESSID')->getValue();
+            }
         }
         return null;
     }

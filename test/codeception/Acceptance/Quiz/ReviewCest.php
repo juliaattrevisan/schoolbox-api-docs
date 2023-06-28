@@ -295,11 +295,12 @@ class ReviewCest
     /**
      * Internal steps to create a quiz
      * @param AcceptanceTester $i
-     * @param AssessmentForm $quizForm
-     * @param array $students
-     * @param String $teacher
-     * @param String $quizTitle
-     * @param int $visibility
+     * @param array            $students
+     * @param int              $classId
+     * @param string           $className
+     * @param String           $teacher
+     * @param String           $quizTitle
+     * @param int              $visibility
      * @throws Exception
      */
     private function createQuiz(

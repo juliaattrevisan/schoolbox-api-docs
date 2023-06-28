@@ -42,9 +42,7 @@ class SearchNodes
     }
 
     /**
-     * to check the number of expected results matches the actual
-     *
-     * @param int $value
+     * hide disabled nodes
      */
     public function uncheckShowDisabledNodes(): void
     {

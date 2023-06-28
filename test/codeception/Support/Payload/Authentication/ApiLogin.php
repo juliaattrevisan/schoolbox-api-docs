@@ -41,7 +41,7 @@ class ApiLogin extends Request
 
     public function setRedirectPageQueryParam(string $page): void
     {
-        if ($page != '' && isset($page)) {
+        if ($page !== '') {
             $this->setQueryParam('redirect', $page);
         } else {
             if ($this->getQueryParam('redirect') != null) {

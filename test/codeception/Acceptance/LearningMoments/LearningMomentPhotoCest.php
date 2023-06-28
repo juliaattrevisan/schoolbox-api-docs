@@ -7,8 +7,6 @@ use Codeception\Util\Locator;
 use Exception;
 use Tests\Support\Page\LearningMoments\LearningMoments;
 
-use function _HumbugBox243b3a4ed02c\React\Promise\Stream\first;
-
 class LearningMomentPhotoCest
 {
     /**

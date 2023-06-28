@@ -75,7 +75,7 @@ class Update extends Request
             $new_positions = new Collection();
             $counter = 0;
             foreach ($this->positions as $position) {
-                if ($position->getId() != $this->getFormParams('positions[id][' . ($position_number - 1) . ']')) {
+                if ($position->getId() != $this->getFormParam('positions[id][' . ($position_number - 1) . ']')) {
                     $new_positions->add($position);
                     $counter++;
                 }

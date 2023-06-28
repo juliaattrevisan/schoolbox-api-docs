@@ -51,10 +51,10 @@ trait UpdateFormTrait
         $this->setFormParam('weight', $assessable->getWeight());
         if ($assessable instanceof DueWork\Model) {
             $this->setFormParam('self_reviewable', $assessable->getSelfReviewability());
+            $this->setFormParam('maxMark', $assessable->getMaxMark());
         }
         $this->setFormParam('visibility', $assessable->getMarkVisibility());
-        $this->setFormParam('markType', $assessable->getMarkType() ? $assessable->getMarkType()->getId() : '');
-        $this->setFormParam('maxMark', $assessable->getMaxMark());
+        $this->setFormParam('markType', $assessable->getMarkType()->getId());
         $this->setFormParam('gradingScheme', $assessable->getGradeGroup() ? $assessable->getGradeGroup()->getId() : 1);
         $this->setFormParam('resultSet', 1);
 

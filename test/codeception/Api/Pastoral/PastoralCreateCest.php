@@ -40,7 +40,7 @@ class PastoralCreateCest
         $this->userPrivate = $i->createTestUser('private-' . time(), Role::STAFF, false);
         $this->userPublic  = $i->createTestUser('public-' . time(), Role::STAFF, false);
         $this->userDeny    = $i->createTestUser('deny-' . time(), Role::STAFF, false);
-        $this->student     = $i->getUsers()['student'];
+        $this->student     = $i->createTestUser('student-' . time(), Role::STUDENT, false);
 
         /** @var User $user */
         foreach ($users as $user) {

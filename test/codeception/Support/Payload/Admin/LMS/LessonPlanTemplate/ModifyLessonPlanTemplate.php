@@ -22,9 +22,8 @@ class ModifyLessonPlanTemplate extends \Tests\Support\Payload\Request
     /**
      * modify a lesson plan template by passing the lesson plan id, name and lesson fields details
      * @param string $lessonPlanTemplateName
-     * @param string $fieldName
-     * @param string $visibility
-     * @param string $body
+     * @param int    $lessonPlanTemplateId
+     * @param array  $lessons
      */
     public function __construct(string $lessonPlanTemplateName, int $lessonPlanTemplateId, array $lessons)
     {

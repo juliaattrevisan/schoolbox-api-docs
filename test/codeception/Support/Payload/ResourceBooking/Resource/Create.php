@@ -73,7 +73,7 @@ class Create extends Payload\Request
         if ($this->related_resources == []) {
             $this->unsetFormParam('related_resource_id');
         } else {
-            $this->setFormParam('related_resource_id', $this->related_resources[]);
+            $this->setFormParam('related_resource_id', $this->related_resources);
         }
     }
 

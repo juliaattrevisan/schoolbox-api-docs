@@ -46,7 +46,7 @@ class TextboxForm
      * @param int $componentId
      * @return string
      */
-    private function generateRoute(int $homepageId, int $componentId): string
+    public function generateRoute(int $homepageId, int $componentId): string
     {
         return strtr(static::URL, ['{homepageId}' => $homepageId, '{componentId}' => $componentId]);
     }

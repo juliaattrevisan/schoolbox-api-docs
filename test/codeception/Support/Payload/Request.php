@@ -141,7 +141,6 @@ abstract class Request
      * Unsets a query param
      *
      * @param string $name
-     * @param string $value
      */
     protected function unsetQueryParam(string $name): void
     {
@@ -156,6 +155,17 @@ abstract class Request
     public function getFormParams(): array
     {
         return $this->formParams;
+    }
+
+    /**
+     * Gets a form param if it exists
+     *
+     * @param string $name
+     * @return mixed
+     */
+    protected function getFormParam(string $name): mixed
+    {
+        return $this->formParams[$name] ?? null;
     }
 
     /**

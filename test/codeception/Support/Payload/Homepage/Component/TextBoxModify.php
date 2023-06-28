@@ -14,12 +14,10 @@ class TextBoxModify extends Request
     /**
      * @var int
      */
-    private int $homepageId;
     private int $folderId;
 
     public function __construct(int $homepageId, int $folderId)
     {
-        $this->homepageId =  $homepageId;
         $this->folderId =  $folderId;
         $this->setReferer("/homepage/$homepageId");
         $this->setHeading('');

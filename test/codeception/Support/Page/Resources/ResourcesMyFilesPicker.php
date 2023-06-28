@@ -106,8 +106,7 @@ class ResourcesMyFilesPicker
 
 
     /**
-     * @param string $fileTitle
-     * clicks a file
+     * @param string $folderTitle
      */
     public function clickFiles(string $folderTitle)
     {

@@ -555,6 +555,7 @@ class Acceptance extends \Codeception\Module
      */
     private function getWebDriverModule(): WebDriver
     {
+        /** @var WebDriver */
         return $this->getModule('WebDriver');
     }
 
@@ -583,6 +584,7 @@ class Acceptance extends \Codeception\Module
      */
     private function getDbModule(): Db
     {
+        /** @var Db */
         return $this->getModule('Db');
     }
 
@@ -593,6 +595,7 @@ class Acceptance extends \Codeception\Module
      */
     private function getCliModule(): Cli
     {
+        /** @var Cli */
         return $this->getModule('Cli');
     }
 

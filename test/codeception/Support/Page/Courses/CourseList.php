@@ -34,8 +34,8 @@ class CourseList
     /**
      * click import into class
      */
-    public function clickImportIntoClass(): void
+    public function clickImportIntoClass($courseDropdownNumber): void
     {
-        $this->tester->click(['css' => 'a[href="/course/import/6/folder/0/0?returnUrl=L2NvdXJzZS9saXN0"]']);
+        $this->tester->click(['css' => sprintf('a[href="/course/import/%s/folder/0/0?returnUrl=L2NvdXJzZS9saXN0"]', $courseDropdownNumber)]);
     }
 }

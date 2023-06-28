@@ -22,7 +22,8 @@ class UserViewCest
     /**
      * @var User[]
      */
-    private $users;
+    private array $users;
+
     /**
      * @param ApiTester $i
      * @return void

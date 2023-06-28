@@ -34,17 +34,6 @@ class MarkbookPage
     }
 
     /**
-     * Generates route for this page.
-     *
-     * @param string $classId
-     * @return string
-     */
-    public function generateRoute(string $classId): string
-    {
-        return str_replace('{class_id}', $classId, self::URL);
-    }
-
-    /**
      * Navigates to markbook page
      * @param $classId
      * @return MarkbookPage

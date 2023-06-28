@@ -102,7 +102,7 @@ class BlogForm
     }
 
     /**
-     * @return $this
+     * @return int
      */
     public function submit(): int
     {

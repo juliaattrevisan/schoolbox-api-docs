@@ -69,8 +69,7 @@ class SurveyForm
 
     /**
      * Submits this form to create a survey
-     * @return SurveyForm
-     * @throws \Exception
+     * @return SectionForm
      */
     public function create(): SectionForm
     {

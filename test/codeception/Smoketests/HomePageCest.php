@@ -297,7 +297,7 @@ class HomePageCest
         #WHEN
         $heading = 'Text Component Test Create Text at ' . $timestamp;
         $text    = 'This text has been created';
-        $textBoxPayload = new Payload\Homepage\Component\TextBoxCreate($homePage->getId(), $created_component_id);
+        $textBoxPayload = new Payload\Homepage\Component\TextBoxCreate($homePage->getId());
         $textBoxPayload->setHeading($heading);
         $textBoxPayload->setBody($text);
         $i->amGoingTo('send request create text on component #' . $created_component_id . ' on homepage #' . $homePage->getId());
@@ -340,7 +340,7 @@ class HomePageCest
         //creating a heading and body into the text box (post trait)
         $heading = 'Text Component Test Deleted Text at ' . $timestamp;
         $text    = 'This text has been deleted';
-        $textBoxPayload = new Payload\Homepage\Component\TextBoxCreate($homePage->getId(), $deleted_component_id);
+        $textBoxPayload = new Payload\Homepage\Component\TextBoxCreate($homePage->getId());
         $textBoxPayload->setHeading($heading);
         $textBoxPayload->setBody($text);
         $i->amGoingTo('send request create text on component #' . $created_component_id . ' on homepage #' . $homePage->getId());

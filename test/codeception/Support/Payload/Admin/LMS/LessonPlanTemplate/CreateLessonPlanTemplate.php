@@ -16,9 +16,7 @@ class CreateLessonPlanTemplate extends \Tests\Support\Payload\Request
     /**
      * create a lesson plan template by passing the lesson plan name and lesson fields details
      * @param string $lessonPlanTemplateName
-     * @param string $fieldName
-     * @param string $visibility
-     * @param string $body
+     * @param array  $lessons
      */
     public function __construct(string $lessonPlanTemplateName, array $lessons)
     {

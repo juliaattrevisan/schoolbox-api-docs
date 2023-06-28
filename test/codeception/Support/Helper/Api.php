@@ -54,7 +54,6 @@ use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -62,7 +61,6 @@ use Schoolbox\UserMapper;
  *
  * Run "./vendor/bin/codecept build" to access methods in this class
  */
-//class Api extends \Codeception\Module
 class Api extends \Codeception\Module
 {
     /** @var Kernel */
@@ -155,7 +153,7 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * @return User[]
+     * @return  \Schoolbox\User[]
      */
     public function getUsers(): array
     {
@@ -164,9 +162,9 @@ class Api extends \Codeception\Module
 
     /**
      * @param string $username
-     * @return User
+     * @return  \Schoolbox\User
      */
-    public function getUserByUsername(string $username): User
+    public function getUserByUsername(string $username):  \Schoolbox\User
     {
         return $this->userMapper->findByUsername($username);
     }
@@ -230,10 +228,10 @@ class Api extends \Codeception\Module
      * @param string $username
      * @param string $roleType
      * @param bool   $superUser
-     * @return User
+     * @return  \Schoolbox\User
      * @throws MapperException
      */
-    public function createTestUser(string $username, string $roleType, bool $superUser): User
+    public function createTestUser(string $username, string $roleType, bool $superUser):  \Schoolbox\User
     {
         $user = $this->userMapper->createModel()
                                  ->setUsername($username)
@@ -251,12 +249,12 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * @param User $groupAdmin
-     * @param User $readMember
+     * @param  \Schoolbox\User $groupAdmin
+     * @param  \Schoolbox\User $readMember
      * @return Folder
      * @throws MapperException
      */
-    public function createGroup(User $groupAdmin, User $readMember): Folder
+    public function createGroup( \Schoolbox\User $groupAdmin,  \Schoolbox\User $readMember): Folder
     {
         $template = HomepageTemplateMapper::getInstance()->findAll()->first();
         $parent   = $this->folderMapper->findByParent(0)->last();
@@ -557,7 +555,7 @@ class Api extends \Codeception\Module
         return $quiz;
     }
 
-    public function addReview(IAssessable $assessment, User $student, User $teacher, ?float $normalisedMark)
+    public function addReview(IAssessable $assessment,  \Schoolbox\User $student,  \Schoolbox\User $teacher, ?float $normalisedMark)
     {
         /** @var FeedbackDataSource $feedbackDataSource */
         $feedbackDataSource = $this->cliKernel->get('feedbackDataSource');
@@ -597,14 +595,14 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * @param User $owner
-     * @param int  $accessLevel
-     * @param int  $attendance
-     * @param bool $showAttendance
+     * @param  \Schoolbox\User $owner
+     * @param int           $accessLevel
+     * @param int           $attendance
+     * @param bool          $showAttendance
      * @return Event
      * @throws MapperException
      */
-    public function createEvent(User $owner, int $accessLevel, int $attendance, bool $showAttendance): Event
+    public function createEvent( \Schoolbox\User $owner, int $accessLevel, int $attendance, bool $showAttendance): Event
     {
         $event = $this->eventMapper->createModel();
         $event->setTitle($this->generateText(50))
@@ -629,6 +627,7 @@ class Api extends \Codeception\Module
      */
     private function getDbModule(): Db
     {
+        /** @var Db */
         return $this->getModule('Db');
     }
 

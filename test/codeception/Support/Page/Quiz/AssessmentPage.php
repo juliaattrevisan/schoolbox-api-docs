@@ -38,8 +38,9 @@ class AssessmentPage
     /**
      * Generates route for this page.
      *
-     * @param $assessmentId
-     * @return mixed
+     * @param int $assessmentId
+     * @param int $userId
+     * @return string
      */
     public function generateRoute(int $assessmentId, int $userId): string
     {

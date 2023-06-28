@@ -37,8 +37,8 @@ class ReorderPlayers extends Request
 
     public function swapPlayerAwithB(int $order_posA, int $order_posB)
     {
-        $playerSwapA = $this->getFormParams('userId[' . $order_posA . ']');
-        $playerSwapB = $this->getFormParams('userId[' . $order_posB . ']');
+        $playerSwapA = $this->getFormParam('userId[' . $order_posA . ']');
+        $playerSwapB = $this->getFormParam('userId[' . $order_posB . ']');
         if ($playerSwapA && $playerSwapB) {
             $this->setFormParam('userId[' . $order_posA . ']', $playerSwapB);
             $this->setFormParam('userId[' . $order_posB . ']', $playerSwapA);
