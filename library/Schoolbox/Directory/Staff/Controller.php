@@ -13,6 +13,7 @@ namespace Schoolbox\Directory\Staff;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -57,6 +58,11 @@ class Controller extends Base
             []
         );
 
+        /* Grab a lookup of existing users, indexed by external_id,
+         * who are in a staff user.group_id
+         */
+        $userLookup = $this->generateUserLookup();
+
         foreach ($staffs as &$staff) {
             /* Condense into one csv
              */
@@ -70,11 +76,61 @@ class Controller extends Base
              * FIXME You might not need this, because you could infer it on frontend.
              */
             $staff['portrait_url'] = sprintf('/portrait.php?userId=%s&size=square32', $staff['StaffID']);
+
+            /* Figure out a link to profile screen
+             */
+            $staff['profile_url'] = null;
+
+            $externalId = trim((string)$staff['StaffID']);
+
+            if ('' !== $externalId) {
+                $userId = $userLookup[$externalId] ?? null;
+
+                if ($userId) {
+                    $staff['profile_url'] = sprintf('/search/user/%s', $userId);
+                }
+            }
         }
 
         unset($staff);
 
         return $staffs;
+    }
+
+
+    /**
+     * Use this to make a convenient inference about a user id
+     * via someone's external id
+     *
+     * @return array
+     */
+    private function generateUserLookup(): array
+    {
+        /* Get a list of people who:
+         *   - are not deleted
+         *   - have a non-zero synergy_id (externalId) value
+         *   - are in the staff group type
+         */
+        $query = "
+            SELECT `user`.synergy_id, `user`.id
+            FROM `user`
+            INNER JOIN `groups` ON `groups`.id = `user`.group_id
+            WHERE `user`.synergy_id IS NOT NULL
+            AND `user`.synergy_id != ''
+            AND `groups`.group_type = :groupType
+            AND `user`.deleted_at IS NULL
+
+        ";
+
+        $statement = $this->userMapper->getDatabase()->executeQuery($query, ['groupType' => Role::STAFF]);
+
+        $lookup = [];
+
+        while ($row = $statement->fetch()) {
+            $lookup[$row['synergy_id']] = (int)$row['id'];
+        }
+
+        return $lookup;
     }
 
 

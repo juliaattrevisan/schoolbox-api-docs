@@ -31,8 +31,20 @@
                 {% for staff in payload %}
                 <tr>
                     <td class="hide-for-small"><img src="{{ staff.portrait_url }}"></td>
-                    <td>{{ staff.StaffPreferredName }}</td>
-                    <td>{{ staff.StaffSurname }}</td>
+                    <td>
+                        {% if staff.profile_url %}
+                            <a href="{{ staff.profile_url }}">{{ staff.StaffPreferredName }}</a>
+                        {% else %}
+                            {{ staff.StaffPreferredName }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if staff.profile_url %}
+                            <a href="{{ staff.profile_url }}">{{ staff.StaffSurname }}</a>
+                        {% else %}
+                            {{ staff.StaffSurname }}
+                        {% endif %}
+                    </td>
                     <td class="hide-for-medium-down">{{ staff.StaffDepartment }}</td>
                     <td class="hide-for-small">{{ staff.JobPositionDescription }}</td>
                     <td class="hide-for-medium-down">{{ staff.StaffCampusDescription }}</td>
