@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper;
@@ -163,6 +164,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(Access::class),
             $this->getAssessmentMapperProxy(),
+            $this->getCourseImplementationMapper(),
             $this->getUnitImplementationMapper(),
             new Replicator(
                 $this->getAssessmentMapperProxy(),
@@ -213,6 +215,16 @@ class Module extends BaseModule
     protected function getAssessmentMapperProxy()
     {
         return $this->injector->get('assessmentDataSource');
+    }
+
+
+    /**
+     * @return CourseImplementationMapper|Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getCourseImplementationMapper()
+    {
+        return $this->getMapperFactory()->get(CourseImplementationMapper::class);
     }
 
 

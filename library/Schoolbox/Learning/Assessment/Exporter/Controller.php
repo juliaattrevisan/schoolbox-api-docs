@@ -21,11 +21,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
@@ -52,6 +50,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var CourseImplementation\Mapper
+     */
+    private $courseImplementationMapper;
+
+
+    /**
      * @var UnitImplementation\Mapper
      */
     private $unitImplementationMapper;
@@ -74,7 +78,7 @@ class Controller extends BaseController
      *
      * @param Access                     $access
      * @param AssessmentDataSource       $assessmentDataSource
-     * @param Mapper                     $unitImplementationMapper
+     * @param UnitImplementation\Mapper  $unitImplementationMapper
      * @param Replicator                 $replicator
      * @param IdFinder                   $assessmentIdFinder
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
@@ -82,16 +86,18 @@ class Controller extends BaseController
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
+        CourseImplementation\Mapper $courseImplementationMapper,
         UnitImplementation\Mapper $unitImplementationMapper,
         Replicator $replicator,
         AssessmentFilter\IdFinder $assessmentIdFinder,
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
-        $this->access                   = $access;
-        $this->assessmentDataSource     = $assessmentDataSource;
-        $this->unitImplementationMapper = $unitImplementationMapper;
-        $this->replicator               = $replicator;
-        $this->assessmentIdFinder       = $assessmentIdFinder;
+        $this->access                     = $access;
+        $this->assessmentDataSource       = $assessmentDataSource;
+        $this->courseImplementationMapper = $courseImplementationMapper;
+        $this->unitImplementationMapper   = $unitImplementationMapper;
+        $this->replicator                 = $replicator;
+        $this->assessmentIdFinder         = $assessmentIdFinder;
     }
 
 
@@ -124,14 +130,14 @@ class Controller extends BaseController
             return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
         });
 
-        $imported    = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
+        $imported = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
             return $assessmentImpl->getId();
         })->sortByCallback(static function (IAssessable $a, IAssessable $b) {
             return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
         });
 
         // Find interactions with imported assessments
-        $assessmentIds  = $imported->getPropertyValues('id');
+        $assessmentIds = $imported->getPropertyValues('id');
         $responseCounts = $this->assessmentDataSource->findResponseCountsForAssessments($assessmentIds);
         $feedbackCounts = $this->assessmentDataSource->findFeedbackCountsForAssessments($assessmentIds);
 
@@ -172,32 +178,66 @@ class Controller extends BaseController
      * @api   GET /learning/export/unit/:unitSpecId
      * @since 230
      *
-     * @param UnitSpecificationModel $unitSpec UnitSpec
+     * @param UnitSpecification\Model $unitSpec UnitSpec
      * @throws MapperException
      * @throws RouteNotFound
      */
-    public function getExportFormForUnit(UnitSpecificationModel $unitSpec): void
+    public function getExportFormForUnit(UnitSpecification\Model $unitSpec): void
     {
-        $course = $unitSpec->getCourse();
-        echo "This unit spec belongs to course '" . $course->getTitle() . "', id: " . $course->getId() . "<br/>\n";
+// Test URL: https://vagrant.dev.schoolbox.cloud/learning/export/unit/54
+// TestDataCheck: $unitSpec is course_unit_specification 54 => folder_id 201 'Semester 2'.
+        $courseSpec = $unitSpec->getCourse();
 
-        // TODO: This function is not returning linked course implementations.  Fix the function by hydrating the model.
-        $courseImpls = $course->getCourseImplementations();
+// TestDataOutput:
+echo "This unit spec belongs to course '" . $courseSpec->getTitle() . "', id: " . $courseSpec->getId() . "<br/>\n";
+// TestDataCheck: $courseSpec is course_specification 16 - 'MYP Reported Grades'.
 
-        $notImported = $courseImpls->filter(function (CourseImplemention $courseImpl) {
-            return null === $courseImpl->getId();
-        })->sortByCallback(static function (CourseSpecification $a, CourseSpecification $b) {
-            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
-        });
+        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
 
-        $imported = $courseImpls->filter(function (CourseSpecification $courseImpl) {
-            return $courseImpl->getId();
-        })->sortByCallback(static function (CourseSpecification $a, CourseSpecification $b) {
-            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
-        });
+        foreach ($courseImpls as $courseImpl) {
+            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
+        }
 
-        // Find interactions with imported unitSpecs
-        $unitSpecIds = $imported->getPropertyValues('id');
+// TestDataOutput:
+foreach ($courseImpls as $courseImpl) {
+    echo "For courseImpl " . $courseImpl->getId() . ", found units:<br/>\n";
+    foreach ($courseImpl->getUnits() as $unit) {
+        echo " * " . $unit->getTitle() . "<br/>\n";
+    }
+}
+
+// TestDataCheck: $courseImpls are:
+// TestDataCheck:  * course_implementation 12 => folder_id 85 '9PDHC' - (Semesters 1 and 2 have been imported, so this ends up in $courseImplsInWhichUnitImported)
+// TestDataCheck:  * course_implementation 13 => folder_id 82 '9ENGC' - (Only Semesters 1 has been imported, so this ends up in $courseImplsInWhichUnitNotImported)
+        // Split $courseImpls into two collections:
+        //  * those in which $unitSpec has been imported, and
+        //  * those in which $unitSpec has not been imported.
+        $courseImplsInWhichUnitImported = new GenericCollection(CourseImplementation\Model::class);
+        $courseImplsInWhichUnitNotImported = new GenericCollection(CourseImplementation\Model::class);
+        foreach ($courseImpls as $courseImpl) {
+            $found = false;
+            foreach ($courseImpl->getUnits() as $unit) {
+                if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
+                    $found = true;
+                }
+            }
+
+            if ($found) {
+                $courseImplsInWhichUnitImported->add($courseImpl);
+            } else {
+                $courseImplsInWhichUnitNotImported->add($courseImpl);
+            }
+        }
+
+        // Sort both collections by title.
+        foreach (array($courseImplsInWhichUnitImported, $courseImplsInWhichUnitNotImported) as $collection) {
+            $collection->sortByCallback(static function (CourseImplementation\Model $a, CourseImplementation\Model $b) {
+                return strnatcasecmp($a->getFolder()->getTitle(), $b->getFolder()->getTitle());
+            });
+        }
+
+        // Find interactions with imported unitSpecs.
+        $unitSpecIds = $courseImplsInWhichUnitImported->getPropertyValues('id');
 //        $responseCounts = $this->unitSpecDataSource->findResponseCountsForAssessments($unitSpecIds);
 //        $feedbackCounts = $this->unitSpecDataSource->findFeedbackCountsForAssessments($unitSpecIds);
         $responseCounts = [];
@@ -205,22 +245,20 @@ class Controller extends BaseController
 
         $breadcrumbs = [];
 
-        $unitSpec->context = false; // Context property is required by the Twig template, which was designed for assessments, not units.
-
         $data = [
-            'assessmentSpec'   => $unitSpec,
-            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
-            'returnUrlName'    => Redirect::RETURN_URL,
-            'unImported'       => $notImported,
-            'imported'         => $imported,
-            'folderWritePerms' => $this->buildFolderWritePermissions($courseImpls),
-            'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
-            'breadcrumbs'      => $breadcrumbs,
-            'responseCounts'   => $responseCounts,
-            'feedbackCounts'   => $feedbackCounts,
+            'unitSpec'                          => $unitSpec,
+            'returnUrl'                         => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'                     => Redirect::RETURN_URL,
+            'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
+            'courseImplsInWhichUnitImported'    => $courseImplsInWhichUnitImported,
+            'folderWritePerms'                  => $this->buildFolderWritePermissions($courseImpls),
+            'enableReimport'                    => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+            'breadcrumbs'                       => $breadcrumbs,
+            'responseCounts'                    => $responseCounts,
+            'feedbackCounts'                    => $feedbackCounts,
         ];
 
-        $template = '@learningAssessmentExporter/exportUnit.twig';
+        $template = '@learningAssessmentExporter/export_unit.twig';
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
@@ -236,7 +274,7 @@ class Controller extends BaseController
     {
         $folderWritePerms = [];
         foreach ($assessmentImpls as $assessmentImpl) {
-            $folder                             = $assessmentImpl->getContext()->getFolder();
+            $folder                             = $assessmentImpl->getFolder();
             $folderWritePerms[$folder->getId()] = $this->access->isInstructor($this->getUser(), $folder);
         }
         return $folderWritePerms;
