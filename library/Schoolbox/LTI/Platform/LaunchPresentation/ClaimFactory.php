@@ -66,7 +66,7 @@ class ClaimFactory
             ;
             $params = [
                 'assessmentId' => $assessment->getId(),
-                'userId'       => $user->getId(),
+                'studentId'    => $user->getId(),
             ];
         }
         $returnUrl = $this->routeGenerator->generate($route, $params);
