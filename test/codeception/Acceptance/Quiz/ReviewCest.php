@@ -20,6 +20,7 @@ namespace Tests\Acceptance\Quiz;
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Homepage;
 use Tests\Support\Page\Quiz\AssessmentForm;
+use Tests\Support\Page\Quiz\QuestionForm;
 use Tests\Support\Page\Quiz\StatusPage;
 use Tests\Support\Page\Quiz\SectionForm;
 use Tests\Support\Page\Quiz\AssessmentPage;
@@ -329,7 +330,7 @@ class ReviewCest
             ->create();
 
         // add a question
-        $questionForm = new \Test\Support\Page\Quiz\QuestionForm($i);
+        $questionForm = new QuestionForm($i);
         $question1 = 'What kind of food do you like? ' . time();
         $correctAnswer = Common::gentext(5);
         $wrongAnswer = Common::gentext(6);

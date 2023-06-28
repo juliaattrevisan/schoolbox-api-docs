@@ -34,7 +34,7 @@ class Fixture
      */
     protected $tester;
 
-    public function __construct(\AcceptanceTester $i)
+    public function __construct(AcceptanceTester $i)
     {
         $this->tester = $i;
     }
