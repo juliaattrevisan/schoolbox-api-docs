@@ -17,8 +17,4 @@
     </div>
 </div>
 
-{% autoescape 'js' %}
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => window.parent.location.href = '{{ returnUrl }}')
-    </script>
-{% endautoescape %}
+{% include '@learningAssessment/lti/return/fragments/redirect.twig' with {returnUrl: returnUrl} only %}

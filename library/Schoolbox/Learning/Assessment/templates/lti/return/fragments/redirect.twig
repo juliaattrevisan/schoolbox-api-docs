@@ -1,0 +1,18 @@
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        // Redirect
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => window.parent.location.href = '{{ returnUrl }}',
+        );
+
+        // 3s and still no redirect? Show the link
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => window.setTimeout(
+                () => document.getElementById('redirect-prompt').classList.remove('hide'),
+                3000,
+            ),
+        );
+    </script>
+{% endautoescape %}
