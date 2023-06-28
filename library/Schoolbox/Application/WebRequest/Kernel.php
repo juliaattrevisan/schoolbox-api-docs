@@ -22,8 +22,8 @@ use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Aura\Di\Container;
-use Aura\Router\Matcher;
 use Aura\Router\Route;
+use Aura\Router\RouterContainer;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -114,8 +114,9 @@ class Kernel extends WebKernelAbstract
             $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);
         }
 
-        /** @var Matcher $matcher */
-        $matcher = $this->di->get('router.matcher');
+        /** @var RouterContainer $router */
+        $router  = $this->di->get('router');
+        $matcher = $router->getMatcher();
         if ('OPTIONS' === $server['REQUEST_METHOD']) {
             /**
              * if system is requesting OPTIONS lets give them what the endpoint actually accepts, not just all.
@@ -187,7 +188,7 @@ class Kernel extends WebKernelAbstract
                     ->getSegment(LoginController::class)
                     ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
                 $output = $this->di->get("webOutput:noContent");
-                $response->redirect->to($this->di->get('router')->generate('login.getLogin') . '?page=' . urlencode($uri));
+                $response->redirect->to($router->getGenerator()->generate('login.getLogin') . '?page=' . urlencode($uri));
             }
             $output->output($response);
         } catch (\Schoolbox\Mapper\Exception\NotFound | Deleted $e) {

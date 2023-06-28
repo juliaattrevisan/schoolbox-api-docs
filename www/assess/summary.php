@@ -72,7 +72,7 @@ $returnUrl = ($_GET[Redirect::RETURN_URL] ?? '')
     : '';
 
 $modifyRouteArgs = [ 'assessmentId' => $assess['assessment_id']];
-$modifyUrl = $this->getDi()->get('router')->generate('learningAssessment.getUpdateAssessmentForm', $modifyRouteArgs);
+$modifyUrl = $this->getDi()->get('router.generator')->generate('learningAssessment.getUpdateAssessmentForm', $modifyRouteArgs);
 
 $this->setVar(array(
     'RETURN_URL'           => $returnUrl ? : Redirect::queryString("/homepage/{$folder->getId()}"),
@@ -139,7 +139,7 @@ if ($assessment->getContext() instanceof Project) {
     $crumbs = array_merge($crumbs, [
         [
             'text'  => $assessment->getContext()->getTitle(),
-            'href'  => $this->getDi()->get('router')->generate('learningAssessment.getStatus', [
+            'href'  => $this->getDi()->get('router.generator')->generate('learningAssessment.getStatus', [
                 'assessmentId' => $assessment->getContext()->getId(),
                 'assessment'   => $assessment->getContext(),
             ]),
