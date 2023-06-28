@@ -238,33 +238,66 @@ class Module extends BaseModule
         );
 
         // LTI assessment return URLs
-        // * iframe: open launch in an iframe
+        // * iframe: open launch in an iframe.
+        //   This return URL has no permissions, and simply redirects to the
+        //   window variant: this gets around issues with sessions not being
+        //   respected when the LTI tool returns to iframed content.
         // * window: redirect to launch
         $this->register(
             self::METHOD_GET,
-            "$assRoute/lti/launch/instructor/return/{target}",
-            'getLaunchAssessmentAsInstructorReturn',
-            $canViewStatus,
+            "$assRoute/lti/launch/instructor/return/iframe",
+            'getLaunchAssessmentAsInstructorReturnIframe',
+            null,
             $preloadAssessment,
         );
         $this->register(
             self::METHOD_GET,
-            "$assRoute/lti/launch/student/$studentParam/return/{target}",
-            'getLaunchAssessmentAsStudentReturn',
+            "$assRoute/lti/launch/instructor/return/iframe",
+            'getLaunchAssessmentAsInstructorReturnIframe',
+            null,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/lti/launch/student/$studentParam/return/window",
+            'getLaunchAssessmentAsStudentReturnWindow',
             $canSubmit,
             $preloadParticipant,
         );
         $this->register(
+            self::METHOD_GET,
+            "$assRoute/lti/launch/student/$studentParam/return/window",
+            'getLaunchAssessmentAsStudentReturnWindow',
+            $canSubmit,
+            $preloadParticipant,
+        );
+
+        // POST variants of the above
+        $this->register(
             self::METHOD_POST,
-            "$assRoute/lti/launch/instructor/return/{target}",
-            'postLaunchAssessmentAsInstructorReturn',
+            "$assRoute/lti/launch/instructor/return/iframe",
+            'postLaunchAssessmentAsInstructorReturnIframe',
+            null,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/launch/student/$studentParam/return/iframe",
+            'postLaunchAssessmentAsStudentReturnIframe',
+            null,
+            $preloadParticipant,
+        );
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/launch/instructor/return/window",
+            'postLaunchAssessmentAsInstructorReturnWindow',
             $canViewStatus,
             $preloadAssessment,
         );
         $this->register(
             self::METHOD_POST,
-            "$assRoute/lti/launch/student/$studentParam/return/{target}",
-            'postLaunchAssessmentAsStudentReturn',
+            "$assRoute/lti/launch/student/$studentParam/return/window",
+            'postLaunchAssessmentAsStudentReturnWindow',
             $canSubmit,
             $preloadParticipant,
         );
