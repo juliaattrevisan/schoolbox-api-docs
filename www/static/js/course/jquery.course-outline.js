@@ -5,7 +5,6 @@
     $.fn.setupCourseOutline = function (options) {
         var defaults = {
             course_homepage: "",
-            import_base_url: "",
             readonly: false,
             previewSelector: "[data-plugin=preview]",
         };
@@ -16,15 +15,6 @@
         // Browser options: now based on component
         var component_id = component.attr("id");
         var destination = "#" + component_id + ' input[name="homepage"]';
-
-        // Event for opening the import page - tied to change event of input
-        // that gets changed by resource selector, instead of a button.
-        component.on("change.courseInstance", 'input[name="homepage"]', function () {
-            var homepage_id = this.value.replace(/.*?(\d+$)/, "$1");
-            // Strip trailing / off of the import base URL
-            var base_href = settings.import_base_url.replace(/\/*$/, "");
-            window.location.href = base_href + "/" + homepage_id;
-        });
 
         // Expand/collapse of units
         component.on("click.courseInstance", 'a[data-interaction="toggle-expanded"]', function (event) {
