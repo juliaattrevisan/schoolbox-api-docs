@@ -1,4 +1,4 @@
-import type {Editor} from "@ckeditor/ckeditor5-core";
+import {ClassicEditor} from "@ckeditor/ckeditor5-build-classic";
 import {EditorConfig} from "@js/editor/types/editorTypes";
 import {EditorEvent, EditorDeletedEventInfo} from "@js/editor/event/editorEvent";
 import {insertElementAfter} from "@js/util/domUtils";
@@ -158,13 +158,13 @@ function addListenersForDisablingSubmitButtons(
 /**
  * To display the warning when the character limit has been reached.
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor has replaced
- * @param { Editor } editor - the CKEditor instance
+ * @param { ClassicEditor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  * @param { HTMLDivElement } wordCountContainer - the word count container
  */
 function updateWordCount(
     sourceElement: HTMLElement,
-    editor: Editor,
+    editor: ClassicEditor,
     config: EditorConfig,
     wordCountContainer: HTMLDivElement
 ) {
@@ -252,10 +252,10 @@ function updateWordCount(
  * Its assumed this method is called once the editor has been created,
  * so editorTextArea.nextSibling will be the newly created editor instance
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor has replaced
- * @param { Editor } editor - the CKEditor instance
+ * @param { ClassicEditor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-export function insertWordCount(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
+export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEditor, config: EditorConfig) {
     const wordCountContainer = editor.plugins.get("WordCount").wordCountContainer as HTMLDivElement;
 
     insertElementAfter(sourceElement.nextSibling, wordCountContainer);
@@ -284,7 +284,7 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
              * @param { Event } event - Information about the event.
              */
             (event) => {
-                const eventDetail: EditorDeletedEventInfo = event.detail;
+                const eventDetail = event.detail as EditorDeletedEventInfo;
 
                 // If one submit button is disabled, they will all be disabled. Therefore, we only need to check the first.
                 const firstSubmitButton: HTMLButtonElement|HTMLInputElement = eventDetail.submitButtons[0];
@@ -293,13 +293,21 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
                     let oneOrMoreEditorsAreOverfilled = false;
 
                     // Check each CKEditor in the same form as the deleted editor to see whether its content storage limit has been exceeded.
-                    Object.values(window.sbProps.editors).forEach((ed: Editor) => {
-                        const edContainingFormId = ed.sourceElement.closest('form').getAttribute('id');
+                    Object.values(window.sbProps.editors as Array<ClassicEditor>).forEach((ed) => {
+                        const edSourceElement = ed.sourceElement as HTMLElement;
+                        const edContainingForm = edSourceElement.closest('form');
+
+                        if (edContainingForm === null) {
+                            return; // This editor does not belong to a form, so we don't need to check it.
+                        }
+
+                        const edContainingFormId = edContainingForm.getAttribute('id');
 
                         if (eventDetail.containingFormId !== edContainingFormId) {
                             return; // This editor does not belong to the form specified in eventDetail.
                         }
-                        const container = ed.plugins.get("WordCount").wordCountContainer;
+
+                        const container = ed.plugins.get("WordCount").wordCountContainer as HTMLDivElement;
                         if (container.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
                             oneOrMoreEditorsAreOverfilled = true;
                         }
