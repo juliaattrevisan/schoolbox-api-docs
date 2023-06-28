@@ -6,7 +6,7 @@ modules:
     - REST:
         depends: PhpBrowser
         url: 'https://vagrant.dev.schoolbox.cloud'
-        xdebug: true
+        xdebug: false
         part: Json
     - Db:
         dsn: "mysql:host=localhost;dbname=schoolbox"
