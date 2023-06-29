@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Web\Controller\Base;
-use LearnositySdk\Request\Init;
 use LearnositySdk\Utils\Uuid as LearnosityUuid;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
@@ -38,37 +37,20 @@ class Controller extends Base
      */
     public function getExample()
     {
-        $userId = LearnosityUuid::generate();
-        $sessionId = LearnosityUuid::generate();
-        $consumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
-        $consumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
-
-        $request = [
-            'user_id'              => $userId,
+        $payload = [
+            'user_id'              => LearnosityUuid::generate(),
             'activity_template_id' => 'quickstart_examples_activity_template_001',
-            'session_id'           => $sessionId,
+            'session_id'           => LearnosityUuid::generate(),
             'activity_id'          => 'quickstart_examples_activity_001',
             'rendering_type'   => 'assess',
             'type'             => 'submit_practice',
             'name'             => 'Items API Quickstart',
         ];
 
-        $security = [
-            'domain'       => $_SERVER['SERVER_NAME'],
-            'consumer_key' => $consumerKey
-        ];
-
-        new \Alaress_Probe($request, $security);
-
-        $initOptions = (new Init(
-            'items',
-            $security,
-            $consumerSecret,
-            $request
-        ))->generate();
+        $api = new Api($this->getConfigLoader()->get('learnosity_consumer_key'), $this->getConfigLoader()->get('learnosity_consumer_secret'));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/index.twig', [
-            'initOptions' => $initOptions
+            'initOptions' => $api->initOptions('items', $payload)
         ])->setTitle('Example'));
     }
 }
