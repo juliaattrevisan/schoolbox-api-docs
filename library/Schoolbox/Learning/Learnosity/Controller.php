@@ -39,7 +39,16 @@ class Controller extends Base
         $payload = [
             'mode' => 'activity_list',
             'user' => [
-                'id' => (string)$this->getUser()->getId(),
+                /* Corresponds to a user in the Learnosity Console who will be
+                 * considered "the author" of stuff created by the school's teachers
+                 * Misconfiguring this leads to Error 10000 which has no definition
+                 */
+                'id' => (string)$this->getConfigLoader()->get('learnosity_author_id'),
+                /* These fields are superfluous and are presumably
+                 * used for auditing; we attribute an individual user's
+                 * name to a collectively-utilised author account
+                 * configured in Learnosity itself (that's the id above)
+                 */
                 'firstname' => $this->getUser()->getFirstname(),
                 'lastname' => $this->getUser()->getLastname(),
                 'email' => $this->getUser()->getEmail()
