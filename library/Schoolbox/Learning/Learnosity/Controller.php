@@ -55,7 +55,11 @@ class Controller extends Base
             ]
         ];
 
-        $api = new Api($this->getConfigLoader()->get('learnosity_consumer_key'), $this->getConfigLoader()->get('learnosity_consumer_secret'));
+        $api = new Api(
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->getConfigLoader()->get('logs_dir')
+        );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/index.twig', [
             'initOptions' => $api->initOptions('author', $payload)

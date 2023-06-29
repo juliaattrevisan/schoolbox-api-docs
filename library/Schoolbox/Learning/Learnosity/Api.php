@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
+use Alaress\Lumberjack\Logger;
+use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Request\Init;
 
 /**
@@ -20,16 +22,23 @@ use LearnositySdk\Request\Init;
  */
 class Api
 {
+    /**
+     * Payloads logged here
+     */
+    private const LOG_FILE = 'learnosity.log';
+
 
     /**
      * Constructor.
      *
-     * @param string $consumerKey
-     * @param string $consumerSecret
+     * @param string      $consumerKey
+     * @param string      $consumerSecret
+     * @param string|null $logDir
      */
     public function __construct(
         private string $consumerKey,
-        private string $consumerSecret
+        private string $consumerSecret,
+        private ?string $logDir = null
     ) {
     }
 
@@ -40,10 +49,23 @@ class Api
      * @param string $service
      * @param array  $payload
      * @return string|array
-     * @throws \LearnositySdk\Exceptions\ValidationException
+     * @throws \JsonException
+     * @throws ValidationException
      */
     public function initOptions(string $service, array $payload): string|array
     {
+        /* Optionally log our payloads to learnosity
+         */
+        if (null !== $this->logDir) {
+            $logger = $this->spawnLogger();
+
+            $logger->debug(sprintf(
+                'Accessed service %s with payload %s',
+                $service,
+                json_encode($payload, JSON_THROW_ON_ERROR)
+            ));
+        }
+
         return (new Init(
             $service,
             [
@@ -53,5 +75,24 @@ class Api
             $this->consumerSecret,
             $payload
         ))->generate();
+    }
+
+
+    /**
+     * Spawn a Logger instance, for the lock mechanism
+     *
+     * @return Logger
+     */
+    private function spawnLogger(): Logger
+    {
+        $logFile = sprintf(
+            '%s/%s',
+            $this->logDir,
+            self::LOG_FILE
+        );
+
+        $fp = fopen($logFile, 'a');
+
+        return new Logger($fp, $fp, \Monolog\Logger::DEBUG, [], true);
     }
 }
