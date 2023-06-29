@@ -215,13 +215,13 @@ export default {
 
             return new Promise((resolve) => {
                 if (window.sbProps.editors["detail"]) {
+                    // Clear the ckeditor
+                    window.sbProps.editors["detail"].setData("");
+
                     return resolve();
                 }
 
                 document.getElementById("detail").addEventListener("EDITOR__CREATED", function () {
-                    // Clear the ckeditor
-                    window.sbProps.editors["detail"].setData("");
-
                     resolve();
                 });
                 document.dispatchEvent(
