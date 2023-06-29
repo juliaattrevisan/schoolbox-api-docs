@@ -17,7 +17,7 @@ class External_Synergetic_Luc_User extends External_Synergetic_User
     {
         // Restrict staff categories to provided list
 
-        $staffCategory = explode(',', $this->config->get('synergetic_staff_dir_restrict'));
+        $staffCategory = explode(',', $this->config->get('staff_dir_category_restrict'));
 
         $filter = '';
         $bindings = [];
