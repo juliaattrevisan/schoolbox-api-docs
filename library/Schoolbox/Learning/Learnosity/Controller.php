@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Web\Controller\Base;
-use LearnositySdk\Utils\Uuid as LearnosityUuid;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
 
@@ -38,19 +37,19 @@ class Controller extends Base
     public function getExample()
     {
         $payload = [
-            'user_id'              => LearnosityUuid::generate(),
-            'activity_template_id' => 'quickstart_examples_activity_template_001',
-            'session_id'           => LearnosityUuid::generate(),
-            'activity_id'          => 'quickstart_examples_activity_001',
-            'rendering_type'   => 'assess',
-            'type'             => 'submit_practice',
-            'name'             => 'Items API Quickstart',
+            'mode' => 'activity_list',
+            'user' => [
+                'id' => (string)$this->getUser()->getId(),
+                'firstname' => $this->getUser()->getFirstname(),
+                'lastname' => $this->getUser()->getLastname(),
+                'email' => $this->getUser()->getEmail()
+            ]
         ];
 
         $api = new Api($this->getConfigLoader()->get('learnosity_consumer_key'), $this->getConfigLoader()->get('learnosity_consumer_secret'));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/index.twig', [
-            'initOptions' => $api->initOptions('items', $payload)
+            'initOptions' => $api->initOptions('author', $payload)
         ])->setTitle('Example'));
     }
 }
