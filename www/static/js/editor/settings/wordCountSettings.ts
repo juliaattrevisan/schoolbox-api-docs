@@ -251,6 +251,8 @@ function updateWordCount(
  * The submit buttons may be disabled due to one or more of the CKEditor fields being overfilled.
  * Each time a CKEditor is removed from a page, we need to check whether the submit buttons are disabled,
  * and if so, whether any overfilled CKEditor fields remain.  If not, we can re-enable the submit buttons.
+ *    Note that since this function is only concerned with submit buttons, it only needs to be called for deleted editors
+ * that were inside a form.
  * @param { Event } event - Information about the event.
  */
 function onEditorDeleted(event) {
