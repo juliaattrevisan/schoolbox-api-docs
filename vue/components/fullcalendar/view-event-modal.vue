@@ -394,26 +394,26 @@ export default {
                 await injectScript(editorScript);
             }
 
-            return new Promise((resolve) => {
-                if (window.sbProps.editors["view-detail"]) {
-                    // load data into the ckeditor
-                    window.sbProps.editors["view-detail"].setData(this.eventExtendedProps?.detail);
+            // if the editor already exists, set the data and avoid re-initialising
+            const detailEditor = window.sbProps.editors["view-detail"];
+            if (detailEditor) {
+                detailEditor.setData(this.eventExtendedProps?.detail);
+                return;
+            }
 
-                    return resolve();
-                }
-
-                document.getElementById("view-detail").addEventListener("EDITOR__CREATED", function () {
-                    resolve();
-                });
-                document.dispatchEvent(
-                    new CustomEvent("EDITOR__CREATE", {
-                        detail: {
-                            targetElements: ["#view-detail"],
-                            toolbar: "simple",
-                        },
-                    })
-                );
+            // otherwise initialise the editor and set the data once its created
+            this.$refs.eventDetailInput.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
+                event.detail.editor.setData(this.eventExtendedProps?.detail);
             });
+
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: ["#view-detail"],
+                        toolbar: "simple",
+                    },
+                })
+            );
         },
 
         /**
@@ -818,9 +818,6 @@ export default {
                         id="view-detail"
                         ref="eventDetailInput"
                         name="detail"
-                        :value="eventExtendedProps.detail"
-                        @change="updateFormSubmittable"
-                        @keyup="updateFormSubmittable"
                     ></textarea>
                 </label>
 
