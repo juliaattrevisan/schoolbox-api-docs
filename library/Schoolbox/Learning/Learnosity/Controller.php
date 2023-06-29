@@ -40,8 +40,8 @@ class Controller extends Base
     {
         $userId = LearnosityUuid::generate();
         $sessionId = LearnosityUuid::generate();
-        $consumerKey = 'yis0TYCu7U9V4o7M';
-        $consumerSecret = '74c5fd430cf1242a527f6223aebd42d30464be22';
+        $consumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
+        $consumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
 
         $request = [
             'user_id'              => $userId,
@@ -54,7 +54,7 @@ class Controller extends Base
         ];
 
         $security = [
-            'domain'       => 'localhost',
+            'domain'       => $_SERVER['SERVER_NAME'],
             'consumer_key' => $consumerKey
         ];
 
