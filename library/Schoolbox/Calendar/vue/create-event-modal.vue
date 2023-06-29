@@ -163,6 +163,7 @@ export default {
         async createNewEvent(form) {
             this.isProcessing = true;
             const formContent = new FormData(form);
+            formContent.set('detail', window.sbProps.editors["detail"].getData());
             this.$refs.toast.activate("Saving...");
 
             try {
