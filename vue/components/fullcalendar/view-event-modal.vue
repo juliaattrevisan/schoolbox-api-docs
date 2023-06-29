@@ -331,7 +331,7 @@ export default {
                     eventId: this.eventExtendedProps.eventId,
                     completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
                     title: this.$refs.eventTitleInput.value.trim(),
-                    detail: this.$refs.eventDetailInput.value,
+                    detail: window.sbProps.editors["detail"].getData(),
                 },
                 toast = this.jQuery("[data-toast]");
 
@@ -396,6 +396,9 @@ export default {
 
             return new Promise((resolve) => {
                 if (window.sbProps.editors["detail"]) {
+                    // load data into the ckeditor
+                    window.sbProps.editors["detail"].setData(this.eventExtendedProps.detail);
+
                     return resolve();
                 }
 

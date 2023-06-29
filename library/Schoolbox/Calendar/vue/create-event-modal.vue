@@ -218,6 +218,9 @@ export default {
                 }
 
                 document.getElementById("detail").addEventListener("EDITOR__CREATED", function () {
+                    // Clear the ckeditor
+                    window.sbProps.editors["detail"].setData("");
+
                     resolve();
                 });
                 document.dispatchEvent(
