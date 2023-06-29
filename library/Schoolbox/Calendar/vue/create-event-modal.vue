@@ -224,6 +224,7 @@ export default {
                     new CustomEvent("EDITOR__CREATE", {
                         detail: {
                             targetElements: ["#detail"],
+                            toolbar: "simple",
                         },
                     })
                 );
