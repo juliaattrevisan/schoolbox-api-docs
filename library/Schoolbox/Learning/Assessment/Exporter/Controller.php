@@ -235,16 +235,6 @@ foreach ($courseImpls as $courseImpl) {
                 return strnatcasecmp($a->getFolder()->getTitle(), $b->getFolder()->getTitle());
             });
         }
-
-        // Find interactions with imported unitSpecs.
-        $unitSpecIds = $courseImplsInWhichUnitImported->getPropertyValues('id');
-//        $responseCounts = $this->unitSpecDataSource->findResponseCountsForAssessments($unitSpecIds);
-//        $feedbackCounts = $this->unitSpecDataSource->findFeedbackCountsForAssessments($unitSpecIds);
-        $responseCounts = [];
-        $feedbackCounts = [];
-
-        $breadcrumbs = [];
-
         $data = [
             'unitSpec'                          => $unitSpec,
             'returnUrl'                         => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
@@ -253,9 +243,7 @@ foreach ($courseImpls as $courseImpl) {
             'courseImplsInWhichUnitImported'    => $courseImplsInWhichUnitImported,
             'folderWritePerms'                  => $this->buildFolderWritePermissions($courseImpls),
             'enableReimport'                    => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
-            'breadcrumbs'                       => $breadcrumbs,
-            'responseCounts'                    => $responseCounts,
-            'feedbackCounts'                    => $feedbackCounts,
+            'breadcrumbs'                       => [],
         ];
 
         $template = '@learningAssessmentExporter/export_unit.twig';
@@ -394,6 +382,15 @@ foreach ($courseImpls as $courseImpl) {
         } else {
             $this->getResponse()->redirect->afterPost($returnUrl);
         }
+    }
+
+
+    /**
+     * @param UnitSpecification $unitSpec
+     * @return void
+     */
+    public function postExportForUnit(UnitSpecification $unitSpec): void
+    {
     }
 
 

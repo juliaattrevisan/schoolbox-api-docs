@@ -49,7 +49,7 @@
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 
             <form method="post"
-                  action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: unitSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
+                  action="{{ routeLookup('learningAssessmentExporter.postExportForUnit', {unitSpecId: unitSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
                   id="importForm">
                 {% if courseImplsInWhichUnitNotImported|length %}
                     <section data-not-imported>
@@ -69,14 +69,11 @@
                         <ul class="information-list card-selectable">
                             {% for courseImpl in courseImplsInWhichUnitNotImported %}
                                 {% include '@learningAssessmentExporter/unit_row.twig' with {
-                                    unitSpec:               unitSpec,
-                                    courseImpl:             courseImpl,
-                                    folderWritePerms:       folderWritePerms,
-                                    enableReimport:         enableReimport,
-                                    submittedResponseCount: responseCounts[courseImpl.id].submitted ?? 0,
-                                    draftResponseCount:     responseCounts[courseImpl.id].draft ?? 0,
-                                    publishedFeedbackCount: feedbackCounts[courseImpl.id].published ?? 0,
-                                    draftFeedbackCount:     feedbackCounts[courseImpl.id].draft ?? 0,
+                                    unitSpec:         unitSpec,
+                                    courseImpl:       courseImpl,
+                                    folderWritePerms: folderWritePerms,
+                                    isImported:       false,
+                                    enableReimport:   enableReimport,
                                 } only %}
                             {% endfor %}
                         </ul>
@@ -88,14 +85,11 @@
                         <ul class="information-list card-selectable">
                             {% for courseImpl in courseImplsInWhichUnitImported %}
                                 {% include '@learningAssessmentExporter/unit_row.twig' with {
-                                    unitSpec:               unitSpec,
-                                    courseImpl:             courseImpl,
-                                    folderWritePerms:       folderWritePerms,
-                                    enableReimport:         enableReimport,
-                                    submittedResponseCount: responseCounts[courseImpl.id].submitted ?? 0,
-                                    draftResponseCount:     responseCounts[courseImpl.id].draft ?? 0,
-                                    publishedFeedbackCount: feedbackCounts[courseImpl.id].published ?? 0,
-                                    draftFeedbackCount:     feedbackCounts[courseImpl.id].draft ?? 0,
+                                    unitSpec:         unitSpec,
+                                    courseImpl:       courseImpl,
+                                    folderWritePerms: folderWritePerms,
+                                    isImported:       true,
+                                    enableReimport:   enableReimport,
                                 } only %}
                             {% endfor %}
                         </ul>
