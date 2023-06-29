@@ -9,6 +9,7 @@ import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullC
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
+import {injectScript, isScriptAdded} from "@js/util/domUtils";
 
 const EFFICACY_SELF = "self";
 const EFFICACY_SERIES = "series";
@@ -385,6 +386,34 @@ export default {
         },
 
         /**
+         * Initialise CKEditor
+         */
+        async initCKE() {
+            const editorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`;
+            if (!isScriptAdded(editorScript)) {
+                await injectScript(editorScript);
+            }
+
+            return new Promise((resolve) => {
+                if (window.sbProps.editors["detail"]) {
+                    return resolve();
+                }
+
+                document.getElementById("detail").addEventListener("EDITOR__CREATED", function () {
+                    resolve();
+                });
+                document.dispatchEvent(
+                    new CustomEvent("EDITOR__CREATE", {
+                        detail: {
+                            targetElements: ["#detail"],
+                            toolbar: "simple",
+                        },
+                    })
+                );
+            });
+        },
+
+        /**
          * Open this modal.
          */
         open(event) {
@@ -398,6 +427,9 @@ export default {
             /* Pop modal open
              */
             this.$refs.modal.open();
+
+            //loadCkeditor
+            this.initCKE();
 
             /**
              * Enusre video/audio files can be played in the modal
@@ -777,6 +809,7 @@ export default {
                 <label class="detail">
                     Note
                     <textarea
+                        id="detail"
                         ref="eventDetailInput"
                         name="detail"
                         :value="eventExtendedProps.detail"
