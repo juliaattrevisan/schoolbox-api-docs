@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
@@ -433,11 +434,10 @@ class External_Schoolbox_User implements External_UserInterface
         $staffCategorySql = $this->buildRestrictionSql('staffCategory', (string)$config->get('staff_dir_category_restrict'));
 
         if (null !== $staffCategorySql) {
-            $params = array_merge($staffCategorySql['bindings']);
-            $placeholders = implode(',', $staffCategorySql['placeholders']);
+            $params = array_merge($staffCategorySql['bindings'], $params);
 
             $query .= "
-                AND sups.category NOT IN ($placeholders)
+                AND (sups.category IS NULL OR sups.category NOT IN ({$staffCategorySql['placeholders']}))
             ";
         }
 
@@ -447,11 +447,10 @@ class External_Schoolbox_User implements External_UserInterface
         $staffPositionTitleSql = $this->buildRestrictionSql('staffPositionTitle', (string)$config->get('staff_dir_position_title_restrict'));
 
         if (null !== $staffPositionTitleSql) {
-            $params = array_merge($staffPositionTitleSql['bindings']);
-            $placeholders = implode(',', $staffPositionTitleSql['placeholders']);
+            $params = array_merge($staffPositionTitleSql['bindings'], $params);
 
             $query .= "
-                AND sups.position_title NOT IN ($placeholders)
+                AND (sups.position_title IS NULL OR sups.position_title NOT IN ({$staffPositionTitleSql['placeholders']}))
             ";
         }
 
@@ -475,24 +474,9 @@ class External_Schoolbox_User implements External_UserInterface
             return null;
         }
 
-        $blacklist = explode(',', $csv);
+        $blacklist = array_map('trim', explode(',', $csv));
 
-        $placeholders = [];
-        $bindings = [];
-
-        $n = \count($blacklist);
-
-        for ($i = 0; $i < $n; $i++) {
-            $key = "{$name}{$i}";
-
-            $placeholders[] = ":{$key}";
-            $bindings[$key] = trim($blacklist[$i]);
-        }
-
-        return [
-            'placeholders' => $placeholders,
-            'bindings' => $bindings
-        ];
+        return Builder::getArrayBindings($blacklist, $name);
     }
 
 
