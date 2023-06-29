@@ -4,6 +4,9 @@
     'folderWritePerms' bool[]                       - Does current user have WRITE+ perm to the class folder
     'isImported'       bool                         - Has the unitSpec already been imported into this courseImpl?
     'enableReimport'   bool                         - Should already imported class units be re-importable?
+
+    TODO: When user selects a class, prompt for start and end datetimes for the unit to be imported.
+          When the form is submitted, submit start and end datetimes with each courseImplementationId.
 #}
 {% set unitImpl = null %}
 {% if isImported %}

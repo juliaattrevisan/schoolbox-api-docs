@@ -396,6 +396,8 @@ foreach ($courseImpls as $courseImpl) {
     {
         $courseImplIds = array_keys($this->getRequest()->post->get('courseImplementationIds', []));
 
+        // TODO: Get start and end datetimes for the unit in each class into which we are exporting the unit.
+
         if (count($courseImplIds) === 0) {
             // If empty form submitted, do nothing.
             return;
