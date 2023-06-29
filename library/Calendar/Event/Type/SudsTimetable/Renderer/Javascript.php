@@ -81,7 +81,8 @@ class Javascript extends Base
             $titlePart,
             $this->event->getLocation()
         ], static function ($val) {
-            return '' !== trim($val);
+            // the day / period / location may not be set (null), we should accommodate and just ignore these entries
+            return '' !== trim($val ?? '');
         }));
 
         /* Flatten the representation into a standardised structure
