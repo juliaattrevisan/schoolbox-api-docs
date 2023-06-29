@@ -37,6 +37,9 @@ class Module extends BaseModule
     {
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
+            /* Staff Directory must be enabled in admin
+             */
+            new Rule\IsConfigOn(ConfigMapper::NAME_REPORT_STAFF_DIRECTORY_ENABLED, $this->getConfig()),
             new Rule\Any(
                 /* If you're a parent and report_staff_access is truthy,
                  * You can go in (this config allows parents to see staff details)

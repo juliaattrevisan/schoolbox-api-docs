@@ -261,6 +261,8 @@ class ConfigMapper extends Mapper
     /* Directories
      */
     public const NAME_REPORT_STAFF_ACCESS = 'report_staff_access';
+    public const NAME_REPORT_STAFF_DIRECTORY_ENABLED = 'staff_directory_enabled';
+
 
     /**
      * Config settings which may affect the behaviour of the router daemon.
