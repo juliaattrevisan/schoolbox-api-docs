@@ -89,7 +89,7 @@
         <div class="selector">
             <input type="checkbox"
                    id="import-{{ courseImpl.id }}"
-                   name="courseImplementation[{{ courseImpl.id }}]"
+                   name="courseImplementationIds[{{ courseImpl.id }}]"
                    value="1"
                    {% if not canImport %}disabled{% endif %}
                    {% if enableReimport and isImported %}

@@ -386,11 +386,15 @@ foreach ($courseImpls as $courseImpl) {
 
 
     /**
-     * @param UnitSpecification $unitSpec
+     * @param UnitSpecification\Model $unitSpec
+     * @internal param int[] $_POST['courseImplementationIds'] course implementation IDs into which to export the $unitSpec.
      * @return void
      */
-    public function postExportForUnit(UnitSpecification $unitSpec): void
+    public function postExportForUnit(UnitSpecification\Model $unitSpec): void
     {
+        $courseImplementationIds = $this->getRequest()->post->get('courseImplementationIds', []);
+        echo "Exporting unitSpec (unitSpecId: " . $unitSpec->getId() . ") to courseImplementations (courseImplementationIds: " . implode(', ', $courseImplementationIds) . ")...<br/>\n";
+        die;
     }
 
 

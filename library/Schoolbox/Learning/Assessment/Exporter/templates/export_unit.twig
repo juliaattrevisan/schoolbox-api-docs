@@ -1,4 +1,21 @@
 {#
+    Overview:
+
+    This page allows the user to select classes into which they want a unit specification exported.
+    Only classes into which the unit specification's course has already been implemented are available for selection.
+
+    To 'export a unit specification to a class' means to 'export a unit specification to a pre-existing course implementation'.
+
+    So this is for the situation where a course specification has already been partially implemented in a class, and now
+    the user wants to either:
+     * export a unit into a course implementation that currently does not contain that unit, or
+     * export a unit into a course implementation that already contains that unit (and in doing so overwrite that pre-
+       existing unit)
+
+    The classes are displayed in two lists:
+     * Those whose relevant course implementation does not contain the unit
+     * Those whose relevant course implementation already contains the unit
+
     'unitSpec'                          CourseUnitSpecificationModel - The unit spec
     'returnUrl'                         string                       - A URL to return to
     'returnUrlName'                     string                       - query arg name
@@ -14,9 +31,9 @@
 {{ bread.crumbsArray(breadcrumbs) }}
 <script type="text/javascript">
     $(function () {
-        var $importForm   = $('#importForm'),
-            $checkboxes   = $importForm.find('input[type=checkbox][data-unit-id]'),
-            $submitButton = $importForm.find('input[type=submit]');
+        const $importForm = $('#importForm');
+        const $checkboxes = $importForm.find('input[type=checkbox][data-course-id]');
+        const $submitButton = $importForm.find('input[type=submit]');
 
         // Enable submit button if any checkbox is checked.
         $checkboxes.change(function () {
@@ -27,6 +44,7 @@
             }
         });
         $importForm.alaressValidate();
+        $checkboxes.change(); // Run on page load.
     });
 </script>
 
