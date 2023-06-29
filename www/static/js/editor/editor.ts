@@ -6,7 +6,7 @@ import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor"
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
-import { EditorEvent } from "@js/editor/event/editorEvent";
+import { EditorDeleteEventInfo, EditorEvent } from "@js/editor/event/editorEvent";
 import { initCheckData } from "@js/editor/config/editorCheckData";
 import { modifyEditor } from "@js/editor/config/editorCreated";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
@@ -92,4 +92,34 @@ function onCreate(event: CustomEvent) {
     });
 }
 
+/**
+ * Respond to a request to delete an editor instance, by deleting the editor instance, and then firing another event
+ * informing that an editor instance has been deleted.
+ * @param { CustomEvent } event - Information about the event.
+ */
+function onDelete(event: CustomEvent) {
+    const eventDetail = event.detail as EditorDeleteEventInfo;
+
+    let keyOfEditorToDelete = null;
+    for (const key of Object.keys(window.sbProps.editors)) {
+        if (window.sbProps.editors[key] === eventDetail.editor) {
+            keyOfEditorToDelete = key;
+            break;
+        }
+    }
+
+    if (keyOfEditorToDelete !== null) {
+        delete window.sbProps.editors[keyOfEditorToDelete];
+
+        document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
+            detail: {
+                keyOfDeletedEditor: keyOfEditorToDelete,
+                containingFormId:'lesson-plan-template-form',
+                submitButtons: [document.getElementById('save-button')]
+            }
+        }));
+    }
+}
+
 document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
+document.addEventListener(EditorEvent.EDITOR__DELETE, onDelete);

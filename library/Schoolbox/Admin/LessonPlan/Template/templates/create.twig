@@ -154,16 +154,18 @@
                     const textarea = li.querySelector('textarea');
                     const textareaId = textarea.getAttribute('id');
 
-                    // Delete editor instance from sbProps.editors, then dispatch an event in case there are listeners.
-                    delete window.sbProps.editors[textareaId];
-                    document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
+                    // Request that the editor instance be deleted from window.sbProps.editors.
+                    // The event listener in editor.ts will deal with re-enabling the submit buttons if necessary.
+                    document.dispatchEvent(new CustomEvent("EDITOR__DELETE", {
                         detail: {
                             // See definition of type EditorDeletedEventInfo in editorEvents.ts.
+                            editor: window.sbProps.editors[textareaId],
                             containingFormId:'lesson-plan-template-form',
                             submitButtons: [document.getElementById('save-button')]
                         }
                     }));
 
+                    // We assume the deletion was successful, and now we remove the enclosing <li> too.
                     $(li).remove();
 
                     /* Mandate at least one field existing at all times
