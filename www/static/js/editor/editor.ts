@@ -109,6 +109,7 @@ function onDelete(event: CustomEvent) {
     }
 
     if (keyOfEditorToDelete !== null) {
+        window.sbProps.editors[keyOfEditorToDelete].destroy();
         delete window.sbProps.editors[keyOfEditorToDelete];
 
         document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
