@@ -36,7 +36,7 @@ function initOnComponentRemovedListener() {
         const counter = document.querySelector(
             `[data-component-palette] [${getMasonryConfig().settings.formData.newComponentAddAttribute}="${targetId}"]`
         );
-        const paletteElement = counter.parentElement.parentElement;
+        const paletteElement = counter.parentElement;
 
         const newComponentCount = updateComponentCount(paletteElement, false);
         checkButtonStatus(paletteElement, newComponentCount);
