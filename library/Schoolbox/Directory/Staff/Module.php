@@ -15,7 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -69,7 +68,6 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             new \External_User(),
         );

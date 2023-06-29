@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Directory\Staff;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -19,12 +18,10 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper    $errorMapper
      * @param UserMapper     $userMapper
      * @param \External_User $externalUser
      */
     public function __construct(
-        private ErrorMapper $errorMapper,
         private UserMapper $userMapper,
         private \External_User $externalUser
     ) {
