@@ -83,9 +83,6 @@ function initColourPickers() {
             onColourChange(event.currentTarget, event.currentTarget.value);
         });
         colourPicker.addEventListener("change", (event) => {
-            if (event.currentTarget.value === "") {
-                event.currentTarget.value = "#00000000";
-            }
             onColourChange(event.currentTarget, event.currentTarget.value);
         });
     });
@@ -99,6 +96,11 @@ function initColourPickers() {
  * @param { String }
  */
 function onColourChange(element, colour) {
+    // If the colour has been set to empty, don't update (the user hasn't triggered this change, we have)
+    if (colour === "") {
+        return;
+    }
+
     const elementId = element.id;
     const selectedColumnCheckboxes = getSelectedColumnCheckboxes();
     for (let i = 0; i < selectedColumnCheckboxes.length; i++) {
