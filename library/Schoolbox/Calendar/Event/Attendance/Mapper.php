@@ -53,7 +53,8 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('event', 'e')},
-                   {$this->getJoinColumnString('user', 'u')}
+                   {$this->getJoinColumnString('user', 'u')},
+                   {$this->getJoinColumnString('user.pronoun', 'up')}
         ";
     }
 
@@ -68,6 +69,7 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('event', '', 'e')}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user.pronoun', 'u', 'up')}
         ";
     }
 
@@ -87,6 +89,7 @@ class Mapper extends \Schoolbox\Mapper
 
             /** @var User $user */
             $user = $this->getJoinMapper('user')->hydrate($row, 'u');
+            $user->setPronoun($this->hydrateJoin($row, 'user.pronoun', 'up'));
 
             /** @var Event $event */
             $event = $this->getJoinMapper('event')->hydrate($row, 'e');
