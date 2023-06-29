@@ -19,7 +19,6 @@ export interface EditorConfig {
     addToToolbar?: string[]; // the list of extra plugins to add to the ckeditor outside of the scope of the EditorToolbar options
     removeFromToolbar?: string[]; // the list of plugins to remove from the ckeditor outside of the scope of the EditorToolbar options
     maxCharCount?: number; // The maximum number of bytes allowed in the editor.  For ASCII text, 1 byte = 1 character.  Unicode characters can be multi-byte.
-    maxCharCountDocumentEventListenersAdded: boolean; // True if event listeners pertaining to maxCharCount have been added to the document.  Document event listeners must only be added once, even if there are multiple CKEditor instances on the page.
     addMaxCharCountDefaultEventListeners?: boolean; // Whether to add the default event listeners for dealing with events relating to max char count.
     showWordCount?: boolean; // whether or not to show the word count
     fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal

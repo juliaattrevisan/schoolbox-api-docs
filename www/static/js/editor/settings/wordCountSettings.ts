@@ -248,6 +248,53 @@ function updateWordCount(
 }
 
 /**
+ * The submit buttons may be disabled due to one or more of the CKEditor fields being overfilled.
+ * Each time a CKEditor is removed from a page, we need to check whether the submit buttons are disabled,
+ * and if so, whether any overfilled CKEditor fields remain.  If not, we can re-enable the submit buttons.
+ * @param { Event } event - Information about the event.
+ */
+function onEditorDeleted(event) {
+    const eventDetail = event.detail as EditorDeletedEventInfo;
+
+    // If one submit button is disabled, they will all be disabled. Therefore, we only need to check the first.
+    const firstSubmitButton: HTMLButtonElement|HTMLInputElement = eventDetail.submitButtons[0];
+
+    if (firstSubmitButton !== null && firstSubmitButton.disabled) {
+        let oneOrMoreEditorsAreOverfilled = false;
+
+        // Check each CKEditor in the same form as the deleted editor to see whether its content storage limit has been exceeded.
+        Object.values(window.sbProps.editors as Array<ClassicEditor>).forEach((ed) => {
+            const edSourceElement = ed.sourceElement as HTMLElement;
+            const edContainingForm = edSourceElement.closest('form');
+
+            if (edContainingForm === null) {
+                return; // This editor does not belong to a form, so we don't need to check it.
+            }
+
+            const edContainingFormId = edContainingForm.getAttribute('id');
+
+            if (eventDetail.containingFormId !== edContainingFormId) {
+                return; // This editor does not belong to the form specified in eventDetail.
+            }
+
+            const container = ed.plugins.get("WordCount").wordCountContainer as HTMLDivElement;
+            if (container.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
+                oneOrMoreEditorsAreOverfilled = true;
+            }
+        });
+
+        if (!oneOrMoreEditorsAreOverfilled) {
+            // Re-enable submit button(s) and restore the original button text.
+            eventDetail.submitButtons.forEach((submitButton) => {
+                const buttonText = submitButton.getAttribute('value') ?? '';
+                const buttonTextOrig = buttonText.replace(getButtonTextDisabledDueToStorageLimitSuffix(), '');
+                changeButtonState(submitButton, false, buttonTextOrig);
+            });
+        }
+    }
+}
+
+/**
  * Add the word count UI to the bottom of the editor
  * Its assumed this method is called once the editor has been created,
  * so editorTextArea.nextSibling will be the newly created editor instance
@@ -272,59 +319,11 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
 
     const containingForm = sourceElement.closest('form');
 
-    // If the editor is contained withing a form, and the 'document' event listeners have not already been added...
-    // (The 'document' event listeners are those that are added to the DOM document.)
-    if (containingForm !== null && !config.maxCharCountDocumentEventListenersAdded) {
-        document.addEventListener(
-            EditorEvent.EDITOR__DELETED,
-            /**
-             * The submit buttons may be disabled due to one or more of the CKEditor fields being overfilled.
-             * Each time a CKEditor is removed from a page, we need to check whether the submit buttons are disabled,
-             * and if so, whether any overfilled CKEditor fields remain.  If not, we can re-enable the submit buttons.
-             * @param { Event } event - Information about the event.
-             */
-            (event) => {
-                const eventDetail = event.detail as EditorDeletedEventInfo;
-
-                // If one submit button is disabled, they will all be disabled. Therefore, we only need to check the first.
-                const firstSubmitButton: HTMLButtonElement|HTMLInputElement = eventDetail.submitButtons[0];
-
-                if (firstSubmitButton !== null && firstSubmitButton.disabled) {
-                    let oneOrMoreEditorsAreOverfilled = false;
-
-                    // Check each CKEditor in the same form as the deleted editor to see whether its content storage limit has been exceeded.
-                    Object.values(window.sbProps.editors as Array<ClassicEditor>).forEach((ed) => {
-                        const edSourceElement = ed.sourceElement as HTMLElement;
-                        const edContainingForm = edSourceElement.closest('form');
-
-                        if (edContainingForm === null) {
-                            return; // This editor does not belong to a form, so we don't need to check it.
-                        }
-
-                        const edContainingFormId = edContainingForm.getAttribute('id');
-
-                        if (eventDetail.containingFormId !== edContainingFormId) {
-                            return; // This editor does not belong to the form specified in eventDetail.
-                        }
-
-                        const container = ed.plugins.get("WordCount").wordCountContainer as HTMLDivElement;
-                        if (container.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
-                            oneOrMoreEditorsAreOverfilled = true;
-                        }
-                    });
-
-                    if (!oneOrMoreEditorsAreOverfilled) {
-                        // Re-enable submit button(s) and restore the original button text.
-                        eventDetail.submitButtons.forEach((submitButton) => {
-                            const buttonText = submitButton.getAttribute('value') ?? '';
-                            const buttonTextOrig = buttonText.replace(getButtonTextDisabledDueToStorageLimitSuffix(), '');
-                            changeButtonState(submitButton, false, buttonTextOrig);
-                        });
-                    }
-                }
-            }
-        );
-
-        config.maxCharCountDocumentEventListenersAdded = true;
+    // If the editor is contained withing a form...
+    if (containingForm !== null) {
+        // NOTE: The below line may be called multiple times (if multiple editors are added to a page), but the repeated
+        //       calls will not cause the event listener to be added multiple times.  This would be different if the
+        //       function was defined inside the call below.
+        document.addEventListener(EditorEvent.EDITOR__DELETED, onEditorDeleted);
     }
 }
