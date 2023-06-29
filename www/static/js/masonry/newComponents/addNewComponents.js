@@ -168,7 +168,7 @@ function onNewComponentClicked(draggableInstance) {
         const topContainer = document.querySelector('[data-position="top"]');
         insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
         __newComponent.style.float = "none"; //needs to be factored into the document flow, so take float off
-        __newComponent.style.marginBottom = "2rem"; //add the appropriate margin in
+        __newComponent.style.marginBottom = "1rem"; //add the appropriate margin in
         __newComponent.style.zIndex = 9999;
         __newComponent.style.position = "static";
         __newComponent.style.width = "100%";
@@ -424,8 +424,8 @@ function updateDraggedComponentOnPage(closestElement, isShiftingDown) {
         ? insertElementAfter(closestElement, __referenceElement)
         : insertElementBefore(closestElement, __referenceElement); //insert into the appropriate spot depending on drag position
 
-    __referenceElement.style.marginBottom = "2rem"; //existing components all have a margin
-    __newComponent.style.marginBottom = "2rem"; //existing components all have a margin
+    __referenceElement.style.marginBottom = "1rem"; //existing components all have a margin
+    __newComponent.style.marginBottom = "1rem"; //existing components all have a margin
 
     clearFlipElements(); //check for flip bug
 

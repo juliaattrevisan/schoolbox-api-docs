@@ -1,26 +1,18 @@
+<style type="text/css">
+    #component-layout {
+        --top-head-bg:        var(--content-ui-background);
+        --left-head-bg:       var(--content-ui-background);
+        --right-head-bg:      var(--content-ui-background);
+    }
+</style>
 <div class="show-empty component-configurator" id="component-layout">
-    <div class="small-12 columns">
-        <h2 class="subheader">Full Width</h2>
-        <section class="content">
-            <div data-components-container data-position="top">
-                <!-- BEGIN position_top --><!-- END position_top -->
-            </div>
-        </section>
+    <div class="small-12 column column-top" data-components-container data-position="top">
+        <!-- BEGIN position_top --><!-- END position_top -->
     </div>
-    <div class="small-12 large-6 columns">
-        <h2 class="subheader">Left Column</h2>
-        <section class="content">
-            <div data-components-container data-position="left">
-                <!-- BEGIN position_left --><!-- END position_left -->
-            </div>
-        </section>
+    <div class="small-12 large-6 column column-left" data-components-container data-position="left">
+        <!-- BEGIN position_left --><!-- END position_left -->
     </div>
-    <div class="small-12 large-6 columns">
-        <h2 class="subheader">Right Column</h2>
-        <section class="content">
-            <div data-components-container data-position="right">
-                <!-- BEGIN position_right --><!-- END position_right -->
-            </div>
-        </section>
+    <div class="small-12 large-6 column column-right" data-components-container data-position="right">
+        <!-- BEGIN position_right --><!-- END position_right -->
     </div>
 </div>
