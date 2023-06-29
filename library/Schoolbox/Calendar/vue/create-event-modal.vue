@@ -15,6 +15,7 @@ import "vue-select/dist/vue-select.css";
  */
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
 import {injectScript, isScriptAdded} from "@js/util/domUtils";
+import {EditorEvent} from "@js/editor/event/editorEvent";
 vSelect.props.components.default = () => ({ Deselect });
 
 export default {
@@ -222,7 +223,7 @@ export default {
 
             // otherwise lets set an editor up
             document.dispatchEvent(
-                new CustomEvent("EDITOR__CREATE", {
+                new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: {
                         targetElements: ["#detail"],
                         toolbar: "simple",

@@ -10,6 +10,7 @@ import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
 import {injectScript, isScriptAdded} from "@js/util/domUtils";
+import {EditorEvent} from "@js/editor/event/editorEvent";
 
 const EFFICACY_SELF = "self";
 const EFFICACY_SERIES = "series";
@@ -407,7 +408,7 @@ export default {
             });
 
             document.dispatchEvent(
-                new CustomEvent("EDITOR__CREATE", {
+                new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: {
                         targetElements: ["#view-detail"],
                         toolbar: "simple",
