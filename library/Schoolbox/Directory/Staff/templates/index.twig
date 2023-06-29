@@ -13,6 +13,13 @@
     </div>
 </div>
 
+<div id="staff-directory-container">
+    <staff-directory
+        payload="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/staffDirectory.js?v={{ config.site_version }}"></script>
+
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">

@@ -166,6 +166,9 @@ module.exports = {
         usageSpecific: "./library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js",
         emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
 
+        //Staff Directory
+        staffDirectory: "./library/Schoolbox/Directory/Staff/templates/vue/staffDirectory.ts",
+
         // Record Media Modal
         recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.js",
 
