@@ -397,28 +397,102 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaffContactListExtended(): array
     {
-        return $this->internalDatabase->executeQuery(
-            "SELECT
-                      external_id AS StaffID,
-                      username AS NetworkLogin,
-                      '' AS ActiveFlag,
-                      title AS StaffTitle,
-                      firstname AS StaffPreferredName,
-                      lastname AS StaffSurname,
-                      email AS StaffOccupEmail,
-                      '' AS DefaultEmailCode,
-                      building AS StaffBuilding,
-                      room AS StaffRoom,
-                      position_title AS JobPositionDescription,
-                      phone AS StaffOccupPhone,
-                      '' AS StaffExtension,
-                      campus_name AS StaffCampusDescription,
-                      category AS StaffCategory,
-                      department AS StaffDepartment
-            FROM      `sis_user_profile` sup
-            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
-        "
-        )->fetchAll();
+        $query = "
+            SELECT
+                external_id AS StaffID,
+                username AS NetworkLogin,
+                '' AS ActiveFlag,
+                title AS StaffTitle,
+                firstname AS StaffPreferredName,
+                lastname AS StaffSurname,
+                email AS StaffOccupEmail,
+                '' AS DefaultEmailCode,
+                building AS StaffBuilding,
+                room AS StaffRoom,
+                position_title AS JobPositionDescription,
+                phone AS StaffOccupPhone,
+                '' AS StaffExtension,
+                campus_name AS StaffCampusDescription,
+                category AS StaffCategory,
+                department AS StaffDepartment
+            FROM `sis_user_profile` sup
+            JOIN `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+            WHERE 1=1
+        ";
+
+        /* Apply any restrictions that were specified in admin
+         * Filter out any meaningless values
+         *
+         * Do I not have a configLoader here...?
+         */
+        $config = \Schoolbox\Config\Loader::getInstance();
+        $params = [];
+
+        /* Staff Category blacklist
+         */
+        $staffCategorySql = $this->buildRestrictionSql('staffCategory', (string)$config->get('staff_dir_category_restrict'));
+
+        if (null !== $staffCategorySql) {
+            $params = array_merge($staffCategorySql['bindings']);
+            $placeholders = implode(',', $staffCategorySql['placeholders']);
+
+            $query .= "
+                AND sups.category NOT IN ($placeholders)
+            ";
+        }
+
+        /* Staff Position Title blacklist
+         * Note: this is only from the sis tables, *not* user account's Position Title
+         */
+        $staffPositionTitleSql = $this->buildRestrictionSql('staffPositionTitle', (string)$config->get('staff_dir_position_title_restrict'));
+
+        if (null !== $staffPositionTitleSql) {
+            $params = array_merge($staffPositionTitleSql['bindings']);
+            $placeholders = implode(',', $staffPositionTitleSql['placeholders']);
+
+            $query .= "
+                AND sups.position_title NOT IN ($placeholders)
+            ";
+        }
+
+        return $this->internalDatabase->executeQuery($query, $params)->fetchAll();
+    }
+
+
+    /**
+     * Build sql fragments for staff directory restrictions, compiling them
+     * out of the config fields' csv strings.
+     *
+     * @param string $name
+     * @param string $csv
+     * @return array|null
+     */
+    private function buildRestrictionSql(string $name, string $csv): ?array
+    {
+        /* Exit early if csv is an empty string
+         */
+        if ('' === trim($csv)) {
+            return null;
+        }
+
+        $blacklist = explode(',', $csv);
+
+        $placeholders = [];
+        $bindings = [];
+
+        $n = \count($blacklist);
+
+        for ($i = 0; $i < $n; $i++) {
+            $key = "{$name}{$i}";
+
+            $placeholders[] = ":{$key}";
+            $bindings[$key] = trim($blacklist[$i]);
+        }
+
+        return [
+            'placeholders' => $placeholders,
+            'bindings' => $bindings
+        ];
     }
 
 
