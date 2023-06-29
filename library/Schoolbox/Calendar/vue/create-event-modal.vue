@@ -3,8 +3,6 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast.vue";
 import debounce from "lodash/debounce";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /* Vue select
  */
@@ -16,20 +14,16 @@ import "vue-select/dist/vue-select.css";
  * https://github.com/sagalbot/vue-select/issues/994
  */
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
+import {injectScript, isScriptAdded} from "@js/util/domUtils";
 vSelect.props.components.default = () => ({ Deselect });
 
 export default {
     name: "create-event-modal",
 
-    mixins: [
-        cdnPrefixMixin
-    ],
-
     components: {
         RevealModal,
         Toast,
         vSelect,
-        DynamicInput,
     },
 
     props: [
@@ -119,6 +113,9 @@ export default {
 
             this.$refs.modal.open();
 
+            //loadCkeditor
+            this.initCKE();
+
             /* Clear selectize contents
              */
             this.selected = [];
@@ -205,6 +202,33 @@ export default {
                 "&" +
                 $(this.$refs.createEventForm).serialize();
         },
+
+        /**
+         * Initialise CKEditor
+         */
+        async initCKE() {
+            const editorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`;
+            if (!isScriptAdded(editorScript)) {
+                await injectScript(editorScript);
+            }
+
+            return new Promise((resolve) => {
+                if (window.sbProps.editors["detail"]) {
+                    return resolve();
+                }
+
+                document.getElementById("detail").addEventListener("EDITOR__CREATED", function () {
+                    resolve();
+                });
+                document.dispatchEvent(
+                    new CustomEvent("EDITOR__CREATE", {
+                        detail: {
+                            targetElements: ["#detail"],
+                        },
+                    })
+                );
+            });
+        }
     },
 };
 </script>
@@ -329,8 +353,7 @@ export default {
 
                         <label class="detail">
                             Note
-
-                            <textarea name="detail" v-model="event.detail"></textarea>
+                            <textarea id="detail" name="detail" v-model="event.detail"></textarea>
                         </label>
                     </section>
                     <div class="row">
