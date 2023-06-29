@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Directory\Staff;
 
+use Alaress\Database\Exception;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -29,6 +30,7 @@ class Payload
      * Generate a set of staff members but augment with additional info
      *
      * @return array
+     * @throws Exception
      */
     public function generate(): array
     {
@@ -84,6 +86,7 @@ class Payload
      * via someone's external id
      *
      * @return array
+     * @throws Exception
      */
     private function generateUserLookup(): array
     {
@@ -100,7 +103,6 @@ class Payload
             AND `user`.synergy_id != ''
             AND `groups`.group_type = :groupType
             AND `user`.deleted_at IS NULL
-
         ";
 
         $statement = $this->userMapper->getDatabase()->executeQuery($query, ['groupType' => Role::STAFF]);
