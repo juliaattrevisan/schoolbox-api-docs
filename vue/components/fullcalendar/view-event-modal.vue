@@ -331,7 +331,7 @@ export default {
                     eventId: this.eventExtendedProps.eventId,
                     completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
                     title: this.$refs.eventTitleInput.value.trim(),
-                    detail: window.sbProps.editors["detail"].getData(),
+                    detail: window.sbProps.editors["view-detail"].getData(),
                 },
                 toast = this.jQuery("[data-toast]");
 
@@ -395,20 +395,21 @@ export default {
             }
 
             return new Promise((resolve) => {
-                if (window.sbProps.editors["detail"]) {
-                    // load data into the ckeditor
-                    window.sbProps.editors["detail"].setData(this.eventExtendedProps.detail);
-
+                if (window.sbProps.editors["view-detail"]) {
                     return resolve();
                 }
 
-                document.getElementById("detail").addEventListener("EDITOR__CREATED", function () {
+                document.getElementById("view-detail").addEventListener("EDITOR__CREATED", function (event) {
+                    const editor = event.detail.editor;
+                    // load data into the ckeditor
+                    editor.setData(this.eventExtendedProps?.detail);
+
                     resolve();
                 });
                 document.dispatchEvent(
                     new CustomEvent("EDITOR__CREATE", {
                         detail: {
-                            targetElements: ["#detail"],
+                            targetElements: ["#view-detail"],
                             toolbar: "simple",
                         },
                     })
@@ -812,7 +813,7 @@ export default {
                 <label class="detail">
                     Note
                     <textarea
-                        id="detail"
+                        id="view-detail"
                         ref="eventDetailInput"
                         name="detail"
                         :value="eventExtendedProps.detail"
