@@ -178,7 +178,10 @@ function updateWordCount(
     const limitExceededElement = wordCountContainer.querySelector(".ck-word-count__limit-exceeded") as HTMLSpanElement;
     const textEncoder = new TextEncoder();
 
-    const onUpdateText = function () {
+    /**
+     * Each time the text is updated, check whether the maxCharCount is exceeded or is no longer exceeded.
+     */
+    function onUpdateText() {
         if (config.maxCharCount !== undefined && config.maxCharCount > 0) {
             const currentByteLength = textEncoder.encode(editor.getData()).length;
             const currentProportionOfMaxLength = currentByteLength / config.maxCharCount;
@@ -223,7 +226,7 @@ function updateWordCount(
                 }
             }
         }
-    };
+    }
 
     // Default event listeners should be added by default (obviously).
     if (config.addMaxCharCountDefaultEventListeners === undefined) {
