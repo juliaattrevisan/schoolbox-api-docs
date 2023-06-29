@@ -402,9 +402,7 @@ export default {
                     return resolve();
                 }
 
-                document.getElementById("view-detail").addEventListener("EDITOR__CREATED", function (event) {
-                    const editor = event.detail.editor;
-
+                document.getElementById("view-detail").addEventListener("EDITOR__CREATED", function () {
                     resolve();
                 });
                 document.dispatchEvent(
