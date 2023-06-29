@@ -100,26 +100,18 @@ function onCreate(event: CustomEvent) {
 function onDelete(event: CustomEvent) {
     const eventDetail = event.detail as EditorDeleteEventInfo;
 
-    let keyOfEditorToDelete = null;
-    for (const key of Object.keys(window.sbProps.editors)) {
-        if (window.sbProps.editors[key] === eventDetail.editor) {
-            keyOfEditorToDelete = key;
-            break;
+    let keyOfEditorToDelete = eventDetail.editor.sourceElement.id;
+
+    window.sbProps.editors[keyOfEditorToDelete].destroy();
+    delete window.sbProps.editors[keyOfEditorToDelete];
+
+    document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
+        detail: {
+            keyOfDeletedEditor: keyOfEditorToDelete,
+            containingFormId:'lesson-plan-template-form',
+            submitButtons: [document.getElementById('save-button')]
         }
-    }
-
-    if (keyOfEditorToDelete !== null) {
-        window.sbProps.editors[keyOfEditorToDelete].destroy();
-        delete window.sbProps.editors[keyOfEditorToDelete];
-
-        document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
-            detail: {
-                keyOfDeletedEditor: keyOfEditorToDelete,
-                containingFormId:'lesson-plan-template-form',
-                submitButtons: [document.getElementById('save-button')]
-            }
-        }));
-    }
+    }));
 }
 
 document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
