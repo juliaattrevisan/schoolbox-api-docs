@@ -432,7 +432,10 @@ export default {
             this.$refs.modal.open();
 
             //loadCkeditor
-            this.initCKE();
+            if (this.eventExtendedProps.editable && this.eventExtendedProps.task.isTask) {
+                //only if we are inside a task
+                this.initCKE();
+            }
 
             /**
              * Enusre video/audio files can be played in the modal
