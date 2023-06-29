@@ -396,13 +396,14 @@ export default {
 
             return new Promise((resolve) => {
                 if (window.sbProps.editors["view-detail"]) {
+                    // load data into the ckeditor
+                    window.sbProps.editors["view-detail"].setData(this.eventExtendedProps?.detail);
+
                     return resolve();
                 }
 
                 document.getElementById("view-detail").addEventListener("EDITOR__CREATED", function (event) {
                     const editor = event.detail.editor;
-                    // load data into the ckeditor
-                    editor.setData(this.eventExtendedProps?.detail);
 
                     resolve();
                 });
