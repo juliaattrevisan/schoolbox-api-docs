@@ -258,7 +258,7 @@ function updateWordCount(
  * that were inside a form.
  * @param { Event } event - Information about the event.
  */
-function onEditorDeleted(event) {
+function onEditorDeleted(event: Event) {
     const eventDetail = event.detail as EditorDeletedEventInfo;
 
     // If one submit button is disabled, they will all be disabled. Therefore, we only need to check the first.
