@@ -37,7 +37,18 @@ class Controller extends Base
     public function getList(): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@staffDirectory/index.twig', [
-            'payload' => (new Payload($this->userMapper, $this->externalUser))->generate(),
         ])->setTitle('Staff Directory'));
+    }
+
+
+    /**
+     * Return a json payload of all the staff members
+     *
+     * @return void
+     * @throws \Alaress\Database\Exception
+     */
+    public function getPayload(): void
+    {
+        $this->response->content->set($this->buildJsonOutput((new Payload($this->userMapper, $this->externalUser))->generate()));
     }
 }

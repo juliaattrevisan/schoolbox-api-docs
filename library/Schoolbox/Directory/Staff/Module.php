@@ -14,12 +14,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -35,7 +32,6 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
@@ -60,6 +56,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getList', $getPerms);
+        $this->register('GET', '/payload', 'getPayload', $getPerms);
     }
 
 

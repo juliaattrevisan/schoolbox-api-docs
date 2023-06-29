@@ -77,7 +77,9 @@ class Payload
 
         unset($staff);
 
-        return $staffs;
+        /* Remove lookup index
+         */
+        return array_values($staffs);
     }
 
 
