@@ -213,27 +213,23 @@ export default {
                 await injectScript(editorScript);
             }
 
-            return new Promise((resolve) => {
-                if (window.sbProps.editors["detail"]) {
-                    // Clear the ckeditor
-                    window.sbProps.editors["detail"].setData("");
+            // if an editor already exists, just clear its content and avoid creating another
+            const detailEditor = window.sbProps.editors["detail"];
+            if (detailEditor) {
+                detailEditor.setData("");
+                return;
+            }
 
-                    return resolve();
-                }
-
-                document.getElementById("detail").addEventListener("EDITOR__CREATED", function () {
-                    resolve();
-                });
-                document.dispatchEvent(
-                    new CustomEvent("EDITOR__CREATE", {
-                        detail: {
-                            targetElements: ["#detail"],
-                            toolbar: "simple",
-                        },
-                    })
-                );
-            });
-        }
+            // otherwise lets set an editor up
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: ["#detail"],
+                        toolbar: "simple",
+                    },
+                })
+            );
+        },
     },
 };
 </script>
@@ -358,7 +354,7 @@ export default {
 
                         <label class="detail">
                             Note
-                            <textarea id="detail" name="detail" v-model="event.detail"></textarea>
+                            <textarea id="detail" name="detail"></textarea>
                         </label>
                     </section>
                     <div class="row">
