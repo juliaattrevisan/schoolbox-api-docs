@@ -76,12 +76,13 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Access                     $access
-     * @param AssessmentDataSource       $assessmentDataSource
-     * @param UnitImplementation\Mapper  $unitImplementationMapper
-     * @param Replicator                 $replicator
-     * @param IdFinder                   $assessmentIdFinder
-     * @param Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param Access                      $access
+     * @param AssessmentDataSource        $assessmentDataSource
+     * @param CourseImplementation\Mapper $courseImplementationMapper
+     * @param UnitImplementation\Mapper   $unitImplementationMapper
+     * @param Replicator                  $replicator
+     * @param IdFinder                    $assessmentIdFinder
+     * @param Project\ResultCache\Mapper  $projectResultCacheMapper
      */
     public function __construct(
         Access $access,
@@ -254,15 +255,15 @@ foreach ($courseImpls as $courseImpl) {
     /**
      * Determine whether the current user has WRITE+ perm to the assessments' folders.
      *
-     * @param IAssessable[]|GenericCollection $assessmentImpls
+     * @param GenericCollection $items Collection of objects each having a getFolder() method.
      * @return bool[] Indexed by folder.id
      * @throws MapperException
      */
-    private function buildFolderWritePermissions(GenericCollection $assessmentImpls): array
+    private function buildFolderWritePermissions(GenericCollection $items): array
     {
         $folderWritePerms = [];
-        foreach ($assessmentImpls as $assessmentImpl) {
-            $folder                             = $assessmentImpl->getFolder();
+        foreach ($items as $item) {
+            $folder                             = $item->getFolder();
             $folderWritePerms[$folder->getId()] = $this->access->isInstructor($this->getUser(), $folder);
         }
         return $folderWritePerms;
@@ -386,15 +387,76 @@ foreach ($courseImpls as $courseImpl) {
 
 
     /**
+     * Export a unit specification to one or more pre-existing course implementations.
      * @param UnitSpecification\Model $unitSpec
      * @internal param int[] $_POST['courseImplementationIds'] course implementation IDs into which to export the $unitSpec.
      * @return void
      */
     public function postExportForUnit(UnitSpecification\Model $unitSpec): void
     {
-        $courseImplementationIds = $this->getRequest()->post->get('courseImplementationIds', []);
-        echo "Exporting unitSpec (unitSpecId: " . $unitSpec->getId() . ") to courseImplementations (courseImplementationIds: " . implode(', ', $courseImplementationIds) . ")...<br/>\n";
-        die;
+        $courseImplIds = array_keys($this->getRequest()->post->get('courseImplementationIds', []));
+
+        if (count($courseImplIds) === 0) {
+            // If empty form submitted, do nothing.
+            return;
+        }
+
+// TestDataOutput:
+echo "Exporting unitSpec (unitSpecId: " . $unitSpec->getId() . ") to courseImplementations (courseImplementationIds: " . implode(', ', $courseImplIds) . ")...<br/>\n";
+
+        $courseImpls = $this->courseImplementationMapper->findByColumn('id', $courseImplIds);
+
+// TestDataOutput:
+echo "courseImpls:<br/>\n";
+foreach ($courseImpls as $courseImpl) {
+    echo " * courseImplementationId, folderTitle: " . $courseImpl->getId() . ", " . $courseImpl->getFolder()->getTitle() . "<br/>\n";
+}
+
+        $folderWritePerms = $this->buildFolderWritePermissions($courseImpls);
+
+        // Check all permissions before making any changes to system
+        $errors = [];
+        foreach ($courseImpls as $courseImpl) {
+            $folderId = $courseImpl->getFolder()->getId();
+            if (!$folderWritePerms[$folderId]) {
+                $errors[$folderId] = true;
+            }
+        }
+
+        if (\count($errors)) {
+            $folderIds = '[' . implode(',', array_keys($errors)) . ']';
+            $this->sendError(
+                "You do not have permission to write to the selected classes: $folderIds",
+                [],
+                403
+            );
+            return;
+        }
+
+        $reimportIsEnabled = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
+
+        foreach ($courseImpls as $courseImpl) {
+            $units = $courseImpl->getUnits();
+            $unitSpecIsFound = false;
+
+            foreach ($units as $unit) {
+                if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
+                    $unitSpecIsFound = true;
+                }
+            }
+
+            if (!$unitSpecIsFound || $reimportIsEnabled) {
+                // TODO: Export $unitSpec into $courseImpl somehow.
+            }
+        }
+die;
+
+        // Redir back to the return URL (if set) or the course page if not
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
+        } else {
+            $this->getResponse()->redirect->afterPost($returnUrl);
+        }
     }
 
 
