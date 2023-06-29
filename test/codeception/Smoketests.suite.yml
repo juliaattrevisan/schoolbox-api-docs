@@ -1,0 +1,15 @@
+actor: IntegrationTester
+modules:
+  enabled:
+    - Tests\Support\Helper\Integration:
+        depends: PhpBrowser
+        url: 'https://vagrant.dev.schoolbox.cloud'
+        xdebug: false
+        curl:
+          CURLOPT_SSL_VERIFYPEER: false
+    - Db:
+        dsn: "mysql:host=localhost;dbname=schoolbox"
+        user: "root"
+        password: "tnp879"
+    - Tests\Support\Helper\SchoolboxCli:
+    - Asserts:

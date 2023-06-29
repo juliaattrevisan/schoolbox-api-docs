@@ -1,107 +1,26 @@
-# suite config
-suites:
-    acceptance:
-        actor: AcceptanceTester
-        path: acceptance
-        modules:
-            enabled:
-                - WebDriver:
-                    url: https://vagrant.dev.schoolbox.cloud
-                    browser: chrome
-                    port: 9515
-                    window_size: false
-                    capabilities:
-                        chromeOptions:
-                            args: ["--headless", "--disable-gpu", "--window-size=1920x9999", "--ignore-certificate-errors", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"]
-                            binary: "/usr/bin/chromium-browser"
-                        acceptInsecureCerts: true
-                - \Helper\Acceptance
-                - \Helper\SchoolboxCli
-                - Asserts
-                - Db:
-                    dsn: "mysql:host=localhost;dbname=schoolbox"
-                    user: "root"
-                    password: "tnp879"
-                    # dump goes here
-                - Cli:
-
-        extensions:
-            enabled:
-                - Codeception\Extension\RunProcess:
-                    0: '/usr/bin/chromedriver --url-base=/wd/hub'
-                    sleep: 5
-
-    integration:
-        actor: IntegrationTester
-        path: integration
-        modules:
-            enabled:
-                - \Helper\Integration:
-                    depends: PhpBrowser
-                    url: 'https://vagrant.dev.schoolbox.cloud'
-                    xdebug: false
-                - \Helper\SchoolboxCli:
-                - Asserts:
-
-    smoketests:
-        actor: IntegrationTester
-        path: smoketests
-        modules:
-            enabled:
-                - \Helper\Integration:
-                    depends: PhpBrowser
-                    url: 'https://vagrant.dev.schoolbox.cloud'
-                    xdebug: false
-                    curl:
-                        CURLOPT_SSL_VERIFYPEER: false
-                - Db:
-                    dsn: "mysql:host=localhost;dbname=schoolbox"
-                    user: "root"
-                    password: "tnp879"
-                - \Helper\SchoolboxCli:
-                - Asserts:
-
-    api:
-      actor: ApiTester
-      path: api
-      step_decorators:
-        - \Codeception\Step\AsJson
-      modules:
-        enabled:
-          - REST:
-              depends: PhpBrowser
-              url: 'https://vagrant.dev.schoolbox.cloud'
-              xdebug: true
-              part: Json
-          - Db:
-              dsn: "mysql:host=localhost;dbname=schoolbox"
-              user: "root"
-              password: "tnp879"
-          - \Helper\Api:
-
-extensions:
-    enabled:
-        - Codeception\Extension\Logger
-        - Codeception\Extension\RunFailed
-        - Codeception\Extension\Recorder
-#        - Codeception\Extension\Recorder:
-#            delete_successful: false
+namespace: Tests
+support_namespace: Support
+paths:
+  tests: test/codeception
+  output: test/codeception/_output
+  data: test/codeception/Support/Data
+  support: test/codeception/Support
+  envs: test/codeception/_envs
+actor_suffix: Tester
 
 params:
     - env
 
 gherkin: []
-
-# additional paths
-paths:
-    tests: test/codeception
-    output: test/codeception/_output
-    data: test/codeception/_data
-    support: test/codeception/_support
-    envs: test/codeception/_envs
-
 settings:
     shuffle: false
     lint: true
 
 bootstrap: ./_bootstrap.php
+extensions:
+  enabled:
+    - Codeception\Extension\Logger
+    - Codeception\Extension\RunFailed
+    - Codeception\Extension\Recorder
+#        - Codeception\Extension\Recorder:
+#            delete_successful: false

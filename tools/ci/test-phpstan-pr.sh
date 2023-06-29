@@ -59,9 +59,10 @@ cp tools/ci/etc/config.ini /etc/schoolbox/config.ini
 cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
 export INSTANCE_ID=ci
 
+## build codecept before running phpstan
+vendor/bin/codecept build
 
 echo "Running phpstan checks"
-
 vendor/phpstan/phpstan/phpstan analyze
 
 phpstanResult=$?

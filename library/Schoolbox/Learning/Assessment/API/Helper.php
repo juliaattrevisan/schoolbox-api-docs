@@ -156,7 +156,7 @@ class Helper
                         // Weight is not applicable to 'lessonPlan' and 'task'.
                         (in_array($row['assessmentType'], ['lessonPlan', 'task'])) ? null : (float)$row['weight']
                     ),
-                    'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
+                    'dueDate'          => $row['due_date'] ? \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String() : null,
                     'rubric'           => $this->getRubric($assessmentId),
                     'participants'     => (
                         // Participants is not applicable to 'lessonPlan'.

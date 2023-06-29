@@ -1,0 +1,9 @@
+actor: IntegrationTester
+modules:
+  enabled:
+    - Tests\Support\Helper\Integration:
+        depends: PhpBrowser
+        url: 'https://vagrant.dev.schoolbox.cloud'
+        xdebug: false
+    - Tests\Support\Helper\SchoolboxCli:
+    - Asserts:

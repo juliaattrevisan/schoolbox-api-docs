@@ -1,0 +1,16 @@
+actor: ApiTester
+step_decorators:
+  - \Codeception\Step\AsJson
+modules:
+  enabled:
+    - REST:
+        depends: PhpBrowser
+        url: 'https://vagrant.dev.schoolbox.cloud'
+        xdebug: false
+        part: Json
+    - Db:
+        dsn: "mysql:host=localhost;dbname=schoolbox"
+        user: "root"
+        password: "tnp879"
+    - Tests\Support\Helper\Api:
+    - Asserts:

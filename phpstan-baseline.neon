@@ -4991,51 +4991,6 @@ parameters:
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
 
 		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:alert\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:critical\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:debug\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:emergency\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:error\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:info\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:log\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:notice\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:warning\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
 			message: "#^Property Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:\\$client \\(Predis\\\\Client\\) does not accept Predis\\\\ClientInterface\\.$#"
 			count: 1
 			path: library/Schoolbox/Notif/StoredisLogger.php

@@ -75,7 +75,7 @@ class Notif implements NotifInterface
      *
      * @return string
      */
-    public function getTopic()
+    public function getTopic(): string
     {
         return $this->topic;
     }
@@ -87,7 +87,7 @@ class Notif implements NotifInterface
      * @param string $topic
      * @return self
      */
-    public function setTopic($topic)
+    public function setTopic($topic): self
     {
         $this->topic = $topic;
         return $this;
@@ -155,10 +155,15 @@ class Notif implements NotifInterface
      * @param array  $context
      * @return bool
      */
-    public function logTo($topic, $level, $message, array $context = array())
+    public function logTo($topic, $level, $message, array $context = array()): bool
     {
         $this->setTopic($topic);
-        return $this->log($level, $message, $context);
+        try {
+            $this->log($level, $message, $context);
+            return true;
+        } catch (InvalidArgumentException) {
+            return false;
+        }
     }
 
 
@@ -166,20 +171,13 @@ class Notif implements NotifInterface
      * @param mixed  $level
      * @param string $message
      * @param array  $context
-     * @return bool
+     * @return void
+     * @throw InvalidArgumentException
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = array()): void
     {
-        try {
-            $log = new Logger($this->topic, $this->getHandlers());
-            return $log->addRecord($level, $message, $context);
-        } catch (TransportExceptionInterface $e) {
-            // rabbit failed... email failed... at least it's logged to file
-            return false;
-        } catch (InvalidArgumentException $e) {
-            // failed to load the handler stack
-            return false;
-        }
+        $log = new Logger($this->topic, $this->getHandlers());
+        $log->addRecord($level, $message, $context);
     }
 
 
@@ -188,11 +186,11 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function debug($message, array $context = array())
+    public function debug($message, array $context = array()): void
     {
-        return $this->log(Logger::DEBUG, $message, $context);
+        $this->log(Logger::DEBUG, $message, $context);
     }
 
 
@@ -201,11 +199,11 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function info($message, array $context = array())
+    public function info($message, array $context = array()): void
     {
-        return $this->log(Logger::INFO, $message, $context);
+        $this->log(Logger::INFO, $message, $context);
     }
 
 
@@ -214,11 +212,11 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function notice($message, array $context = array())
+    public function notice($message, array $context = array()): void
     {
-        return $this->log(Logger::NOTICE, $message, $context);
+        $this->log(Logger::NOTICE, $message, $context);
     }
 
 
@@ -228,11 +226,11 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function warning($message, array $context = array())
+    public function warning($message, array $context = array()): void
     {
-        return $this->log(Logger::WARNING, $message, $context);
+        $this->log(Logger::WARNING, $message, $context);
     }
 
 
@@ -241,11 +239,11 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function error($message, array $context = array())
+    public function error($message, array $context = array()): void
     {
-        return $this->log(Logger::ERROR, $message, $context);
+        $this->log(Logger::ERROR, $message, $context);
     }
 
 
@@ -255,11 +253,11 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function critical($message, array $context = array())
+    public function critical($message, array $context = array()): void
     {
-        return $this->log(Logger::CRITICAL, $message, $context);
+        $this->log(Logger::CRITICAL, $message, $context);
     }
 
 
@@ -269,11 +267,11 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function alert($message, array $context = array())
+    public function alert($message, array $context = array()): void
     {
-        return $this->log(Logger::ALERT, $message, $context);
+        $this->log(Logger::ALERT, $message, $context);
     }
 
 
@@ -282,10 +280,10 @@ class Notif implements NotifInterface
      *
      * @param string $message
      * @param array $context
-     * @return bool
+     * @return void
      */
-    public function emergency($message, array $context = array())
+    public function emergency($message, array $context = []): void
     {
-        return $this->log(Logger::EMERGENCY, $message, $context);
+        $this->log(Logger::EMERGENCY, $message, $context);
     }
 }

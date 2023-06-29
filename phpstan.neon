@@ -9,6 +9,9 @@ parameters:
         - dav
         - library
         - tools
+        - test/codeception
+    excludePaths:
+        - test/*/_generated/*
     inferPrivatePropertyTypeFromConstructor: true
 
 includes:

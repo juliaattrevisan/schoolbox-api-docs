@@ -1,0 +1,29 @@
+<?php
+
+namespace Tests\Support\Payload\Resource\File;
+
+use Tests\Support\Payload\PostTrait;
+use Tests\Support\Payload\Request;
+
+class StorageUpload extends Request
+{
+    use PostTrait;
+
+    /**
+     * StorageUpload constructor.
+     * @param $container_name
+     * @param $filename
+     * @param $file_location_in_data
+     */
+    public function __construct($container_name, $filename, $file_location_in_data)
+    {
+        $this->unsetHeader('Content-Type');
+        $this->setFile($container_name, $filename, codecept_data_dir($file_location_in_data));
+    }
+
+    /** @inheritDoc*/
+    public function getUrl(): string
+    {
+        return "/storage/asyncUpload.php";
+    }
+}

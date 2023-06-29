@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Tests\Support\Payload\Homepage\Component;
+
+use Tests\Support\Payload\PostTrait;
+use Tests\Support\Payload\Request;
+
+/**
+ * Encapsulates a homepage component create request
+ */
+class Config extends Request
+{
+    use PostTrait;
+
+    public const HOMEPAGE_COMPONENT_POSITION = [
+        'left'  => 'column1',
+        'right' => 'column2',
+        'top'   => 'column3',
+    ];
+
+    public function __construct(int $folderId)
+    {
+        $this->setReferer("/homepage/$folderId");
+        $this->setFormParam('cid', $folderId);
+    }
+
+    /** @inheritDoc */
+    protected function getUrl(): string
+    {
+        return '/homepage/configForm.php';
+    }
+}
