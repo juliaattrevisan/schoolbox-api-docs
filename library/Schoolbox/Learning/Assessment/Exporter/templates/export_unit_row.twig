@@ -104,4 +104,19 @@
             </p>
         </div>
     </div>
+    <div class="list-item" id="unit-dates" hidden>
+        {% set dates = [
+            {type: 'publish', label: 'Publish', date: null},
+            {type: 'due',     label: 'Due',     date: null},
+        ] %}
+        {% for date in dates %}
+            {% include '@learningAssessmentExporter/date.twig' with {
+                fullSetOfDates:     false,
+                date:               date.date,
+                dateType:           date.type,
+                label:              date.label,
+                unitImplementation: unitImpl,
+            } only %}
+        {% endfor %}
+    </div>
 </li>

@@ -121,7 +121,7 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws RouteNotFound
      */
-    public function getExportForm(IAssessable $assessment): void
+    public function getExportFormForAssessment(IAssessable $assessment): void
     {
         $assessmentImpls = $this->buildImplementationsForSpecification($assessment);
 
@@ -165,7 +165,7 @@ class Controller extends BaseController
             'feedbackCounts'   => $feedbackCounts,
         ];
 
-        $template = '@learningAssessmentExporter/export.twig';
+        $template = '@learningAssessmentExporter/export_assessment.twig';
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
@@ -291,7 +291,7 @@ foreach ($courseImpls as $courseImpl) {
      *                                           value: true/false
      * @internal param string[][] $_GET ['dates']            by unitImpl.id, then ['publish', 'open', 'due', 'late']
      */
-    public function postExport(IAssessable $assessment): void
+    public function postExportForAssessment(IAssessable $assessment): void
     {
         $importedImplementations     = $this->getRequest()->post->get('unitImplementation', []);
         $importedImplementationDates = $this->getRequest()->post->get('unit', []);
