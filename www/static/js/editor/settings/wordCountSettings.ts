@@ -69,7 +69,7 @@ function getButtonText(buttonElem: Element) {
             buttonText = buttonElem.innerHTML;
             break;
         default:
-            throw new DOMException(`Unsupported button tag name '${  buttonTagName  }'.`);
+            throw new Error(`Unsupported button tag name '${  buttonTagName  }'.`);
     }
 
     return buttonText ?? "";
@@ -92,7 +92,7 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
             buttonElem.innerHTML = newText;
             break;
         default:
-            throw new DOMException(`Unsupported button tag name '${  buttonTagName  }'.`);
+            throw new Error(`Unsupported button tag name '${  buttonTagName  }'.`);
     }
 
     (buttonElem as HTMLInputElement | HTMLButtonElement).disabled = maxCharCountExceeded;
