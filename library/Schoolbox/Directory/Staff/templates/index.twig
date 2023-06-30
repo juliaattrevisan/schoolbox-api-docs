@@ -1,16 +1,8 @@
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>Staff Directory</h1>
-        </div>
-    </div>
-</div>
-
 {# To allow schools to alter whats displayed in the columns #}
 {% set columnsConfig = [
     { heading: "Image", data: "portrait_url", class: "image-td" },
     { heading: "First name", data: "StaffPreferredName", class: ""  },
-    { heading: "Surname",data: "StaffSurname", class: "" },
+    { heading: "Surname", data: "StaffSurname", class: "" },
     { heading: "Department", data: "StaffDepartment", class: "hide-for-medium-down" },
     { heading: "Role", data: "JobPositionDescription", class: "hide-for-small" },
     { heading: "Campus", data: "StaffCampusDescription", class: "hide-for-medium-down" },
@@ -18,6 +10,14 @@
     { heading: "Ext", data: "StaffExtension", class: "" },
     { heading: "Email", data: "StaffOccupEmail", class: "" },
 ] %}
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Staff Directory</h1>
+        </div>
+    </div>
+</div>
 
 <div id="staff-directory-container">
     <staff-directory
