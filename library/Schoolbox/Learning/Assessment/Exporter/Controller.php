@@ -396,8 +396,6 @@ foreach ($courseImpls as $courseImpl) {
     {
         $courseImplIds = array_keys($this->getRequest()->post->get('courseImplementationIds', []));
 
-        // TODO: Get start and end datetimes for the unit in each class into which we are exporting the unit.
-
         if (count($courseImplIds) === 0) {
             // If empty form submitted, do nothing.
             return;
@@ -405,6 +403,11 @@ foreach ($courseImpls as $courseImpl) {
 
 // TestDataOutput:
 echo "Exporting unitSpec (unitSpecId: " . $unitSpec->getId() . ") to courseImplementations (courseImplementationIds: " . implode(', ', $courseImplIds) . ")...<br/>\n";
+
+        $unitDatesByCourseId = $this->getRequest()->post->get('unitDatesByCourseId');
+echo "<pre>\n";
+var_export($unitDatesByCourseId);
+echo "</pre>\n";
 
         $courseImpls = $this->courseImplementationMapper->findByColumn('id', $courseImplIds);
 
