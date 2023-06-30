@@ -5,7 +5,7 @@
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import StaffDirectoryTable from "./staff-directory-table.vue";
+import SdTable from "./sd-table.vue";
 
 interface Props {
     payload: string; // the endpoint to retrieve all the staff data from
@@ -46,7 +46,7 @@ window.Vue.onMounted(() => {
         <div class="small-12 columns">
             <loading-table v-if="isLoading" />
             <data-load-error v-else-if="hasLoadError" data-title="Staff Directory" />
-            <staff-directory-table v-else :data="data" />
+            <sd-table v-else :data="data" />
         </div>
     </div>
 </template>
