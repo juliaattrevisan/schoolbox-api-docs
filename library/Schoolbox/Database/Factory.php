@@ -230,7 +230,7 @@ class Factory
                 $config->get('external_db_passwd')
             );
 
-            $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
+            $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
 
             return $connectorExternal;
         } catch (Exception $e) {
