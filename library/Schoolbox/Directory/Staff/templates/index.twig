@@ -1,10 +1,3 @@
-<script>
-    $(function() {
-        $.get('{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}', function(responseText) {
-            console.log(responseText);
-        });
-    });
-</script>
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
@@ -19,52 +12,3 @@
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/staffDirectory.js?v={{ config.site_version }}"></script>
-
-<div class="row">
-    <div class="small-12 columns">
-        <div class="scrollable">
-            <table data-tablesorter>
-                <thead>
-                <tr>
-                    <th class="hide-for-small" data-orderable="false">Image</th>
-                    <th>First name</th>
-                    <th>Surname</th>
-                    <th class="hide-for-medium-down">Department</th>
-                    <th class="hide-for-small">Role</th>
-                    <th class="hide-for-medium-down">Campus</th>
-                    <th>Phone</th>
-                    <th>Ext</th>
-                    <th>Email</th>
-                </tr>
-                </thead>
-                <tbody>
-{#                {% for staff in payload %}#}
-{#                <tr>#}
-{#                    <td class="hide-for-small"><img src="{{ staff.portrait_url }}"></td>#}
-{#                    <td>#}
-{#                        {% if staff.profile_url %}#}
-{#                            <a href="{{ staff.profile_url }}">{{ staff.StaffPreferredName }}</a>#}
-{#                        {% else %}#}
-{#                            {{ staff.StaffPreferredName }}#}
-{#                        {% endif %}#}
-{#                    </td>#}
-{#                    <td>#}
-{#                        {% if staff.profile_url %}#}
-{#                            <a href="{{ staff.profile_url }}">{{ staff.StaffSurname }}</a>#}
-{#                        {% else %}#}
-{#                            {{ staff.StaffSurname }}#}
-{#                        {% endif %}#}
-{#                    </td>#}
-{#                    <td class="hide-for-medium-down">{{ staff.StaffDepartment }}</td>#}
-{#                    <td class="hide-for-small">{{ staff.JobPositionDescription }}</td>#}
-{#                    <td class="hide-for-medium-down">{{ staff.StaffCampusDescription }}</td>#}
-{#                    <td><a href="tel:{{ staff.StaffOccupPhone }}">{{ staff.StaffOccupPhone }}</a></td>#}
-{#                    <td>{{ staff.StaffExtension }}</td>#}
-{#                    <td><a href="mailto:{{ staff.StaffOccupEmail }}">{{ staff.StaffOccupEmail }}</a></td>#}
-{#                </tr>#}
-{#                {% endfor %}#}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>

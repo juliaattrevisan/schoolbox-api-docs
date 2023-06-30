@@ -5,6 +5,8 @@
 
 import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
 import SdTableImage from "./sd-table-image.vue";
+import SdTablePhone from "./sd-table-phone.vue";
+import SdTableEmail from "./sd-table-email.vue";
 
 interface Props {
     data: unknown[]; // the staff data to display
@@ -82,6 +84,12 @@ async function onLoaded() {
     <v-client-table ref="tableEl" :data="props.data" :columns="columns" :options="options" @loaded="onLoaded">
         <template #portrait_url="tableData">
             <sd-table-image :data="tableData.row" />
+        </template>
+        <template #StaffOccupPhone="tableData">
+            <sd-table-phone :data="tableData.row" />
+        </template>
+        <template #StaffOccupEmail="tableData">
+            <sd-table-email :data="tableData.row" />
         </template>
         <template #afterTable>
             <div ref="tableFooterEl" class="VueTables__table-footer" data-table-footer></div>

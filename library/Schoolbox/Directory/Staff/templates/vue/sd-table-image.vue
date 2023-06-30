@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The staff directory table row that displays the users profile image
+ * The staff directory table cell that displays the staff profile image
  */
 
 interface Props {
