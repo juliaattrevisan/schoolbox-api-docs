@@ -538,6 +538,16 @@ abstract class Kernel
             }
         );
 
+        // Schoolbox internal read-only database connection
+        $di->set(
+            'databaseInternalRead',
+            function () use ($di) {
+                /** @var SchoolboxDatabaseFactory $factory */
+                $factory = $di->get('databaseFactory');
+                return $factory->getInternalReadDatabase();
+            }
+        );
+
         // External SIS database connection(s)
         $di->set(
             'databaseExternal',
