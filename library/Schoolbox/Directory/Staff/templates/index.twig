@@ -6,8 +6,8 @@
     </div>
 </div>
 
-{%
-set columnsConfig = [
+{# To allow schools to alter whats displayed in the columns #}
+{% set columnsConfig = [
     { heading: "Image", data: "portrait_url", class: "image-td" },
     { heading: "First name", data: "StaffPreferredName", class: ""  },
     { heading: "Surname",data: "StaffSurname", class: "" },
@@ -17,8 +17,7 @@ set columnsConfig = [
     { heading: "Phone", data: "StaffOccupPhone", class: "" },
     { heading: "Ext", data: "StaffExtension", class: "" },
     { heading: "Email", data: "StaffOccupEmail", class: "" },
-]
-%}
+] %}
 
 <div id="staff-directory-container">
     <staff-directory

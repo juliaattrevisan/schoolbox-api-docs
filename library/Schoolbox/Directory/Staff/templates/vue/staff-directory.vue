@@ -6,10 +6,11 @@
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import SdTable from "./sd-table.vue";
+import type { ColumnsConfig } from "./staffDirectory";
 
 interface Props {
     endpoint: string; // the endpoint to retrieve all the staff data from
-    columnsConfig: object[]; //
+    columnsConfig: ColumnsConfig[]; // the columns to display in the table
 }
 const props = defineProps<Props>();
 

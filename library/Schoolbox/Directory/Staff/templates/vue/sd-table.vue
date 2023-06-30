@@ -7,26 +7,27 @@ import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI"
 import SdTableImage from "./sd-table-image.vue";
 import SdTablePhone from "./sd-table-phone.vue";
 import SdTableEmail from "./sd-table-email.vue";
+import type { ColumnsConfig } from "./staffDirectory";
 
 interface Props {
     data: unknown[]; // the staff data to display
-    columnsConfig: object[]; //
+    columnsConfig: ColumnsConfig[]; // the columns to display in the table
 }
 const props = defineProps<Props>();
 
 // the columns to display in the table, retrieved by getting the data key from the column config
-const columns: string[] = props.columnsConfig.map((column: object) => column.data as string);
+const columns: string[] = props.columnsConfig.map((column: ColumnsConfig) => column.data);
 
 // to return an object where each heading is the key and the value is the class
-const columnsClasses = props.columnsConfig.reduce((result, item) => {
-    result[item.data] = item.class;
-    return result;
+const columnsClasses = props.columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
+    accumulator[column.data] = column.class;
+    return accumulator;
 }, {});
 
 // to return an object where each heading is the key and the value is the data
-const headings = props.columnsConfig.reduce((result, item) => {
-    result[item.data] = item.heading;
-    return result;
+const headings = props.columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
+    accumulator[column.data] = column.heading;
+    return accumulator;
 }, {});
 
 const options = {
