@@ -10,12 +10,16 @@
 namespace Schoolbox\Realtime;
 
 use Alaress\Lumberjack\Logger;
+use Alaress\Serializable\LegacySerializable;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
+use Serializable;
 
-abstract class WorkNotifier
+abstract class WorkNotifier implements Serializable
 {
+    use LegacySerializable;
+
     /** @var IConfigLoader */
     protected $conf;
 

@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Serializable\LegacySerializable;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
@@ -31,6 +32,8 @@ use Schoolbox\User;
 
 abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiConfigurable
 {
+    use LegacySerializable;
+
     /**
      * Generic deleted trigger, available to all notifiers
      */
