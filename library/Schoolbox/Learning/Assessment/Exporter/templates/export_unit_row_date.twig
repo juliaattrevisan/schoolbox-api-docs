@@ -1,0 +1,36 @@
+{#
+    'fullSetOfDates'     bool
+    'date'               Alaress_Date_Format
+    'dateType'           string
+    'label'              string
+    'unitImplementation' UnitImplementation\Model
+#}
+
+{% set large = (fullSetOfDates) ? 3 : 6 %}
+
+{% if dateType == 'publish' %}
+    {% set endSync = (fullSetOfDates) ? 'open' : 'due' %}
+{% elseif dateType == 'open' %}
+    {% set startSync = 'publish' %}
+    {% set endSync = 'due' %}
+{% elseif dateType == 'due' %}
+    {% set startSync = (fullSetOfDates) ? 'open' : 'publish' %}
+    {% set endSync = (fullSetOfDates) ? 'late' : '' %}
+{% else %}
+    {% set startSync = 'due' %}
+{% endif %}
+
+<div class="small-12 medium-6 large-{{ large }} columns">
+    <label for="{{ dateType }}Date-{{ unitImplementation.id }}">{{ label }} Date</label>
+    <input id="{{ dateType }}Date-{{ unitImplementation.id }}"
+           name="unit[{{ unitImplementation.id }}][{{ dateType }}]"
+           type="text"
+           value="{{ date.local }}"
+           data-datepicker
+           data-datepicker-time
+           data-datepicker-format="datetime"
+           data-datepicker-buttontext=""
+           {% if startSync is defined %}data-datesync-startdate="#{{ startSync }}Date-{{ unitImplementation.id }}"{% endif %}
+           {% if endSync is defined %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
+    />
+</div>

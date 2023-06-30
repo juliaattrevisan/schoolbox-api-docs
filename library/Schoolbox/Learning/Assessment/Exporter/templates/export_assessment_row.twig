@@ -141,7 +141,7 @@
 
     <div class="list-item" id="unit-{{ unitImpl.id }}-dates" hidden>
         {% for date in dates %}
-            {% include '@learningAssessmentExporter/date.twig' with {
+            {% include '@learningAssessmentExporter/export_assessment_row_date.twig' with {
                 fullSetOfDates:     fullSetOfDates,
                 date:               date.date,
                 dateType:           date.type,
