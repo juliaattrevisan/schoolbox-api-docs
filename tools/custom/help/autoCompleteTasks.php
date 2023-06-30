@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Project\ResultCache as ProjectResultCache;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -72,6 +75,7 @@ HELP;
 
         // running log of updated entries
         $updated = [];
+        $regenerateList = [];
 
         // finds all tasks that require to update
         $courseTaskStatement = $db->prepareQuery("select `t`.id as id from task as `t`
@@ -99,6 +103,11 @@ HELP;
                 continue;
             }
             $updated[] = $token;
+            if (true) {
+                // dedupe assessment, so we can process these later
+                $regenerateList[$completionEntry->getTask()->getAssessmentModel()->getId()][] = $completionEntry->getTask()->getAssessmentModel()->getId();
+            }
+
 
             // find if this entry has a teacher complete status
             //all the tmp variables
@@ -127,6 +136,29 @@ HELP;
             } else {
                 $this->getLogger()->info(sprintf("Assessment: %s, studentId: %s Not Complete, would have updated", $completionEntry->getTask()->getAssessmentModel()->getId(), $completionEntry->getStudent()->getId()));
             }
+        }
+
+        /** @var AssessmentDataSource $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        $projectCache = new ProjectResultCache\ResultCache(ProjectResultCache\Mapper::getInstance());
+
+        // reload project cache
+        // grab the list of projects these assessments are part of...
+        $projectStatement = $db->prepareQuery("SELECT project_id, assessment_id FROM project_assessment where assessment_id in (:values)");
+        $projectStatement->execute([
+                                'values' => implode(',', array_keys($regenerateList))
+                            ]);
+
+        while ($row = $projectStatement->fetch()) {
+            /** @var Project $project **/
+            $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+            if ($this->perform()) {
+                $this->getLogger()->info(sprintf("Project: %s, results updated", $project->getId()));
+                $projectCache->refresh($assessmentMapperProxy, $project);
+            } else {
+                $this->getLogger()->info(sprintf("Would have updated Project: %s results", $project->getId()));
+            }
+
         }
     }
 };
