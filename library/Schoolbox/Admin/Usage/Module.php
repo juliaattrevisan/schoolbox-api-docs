@@ -103,7 +103,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->injector->get('databaseInternal'),
+            $this->injector->get('databaseInternalRead'),
             Redis::getCacheInstance()
         );
     }

@@ -56,7 +56,7 @@ HELP;
 
 
         /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
+        $database = $this->getDi()->get('databaseInternalRead');
 
         $regenerate = new Regenerate(Redis::getCacheInstance(), $database);
         $regenerate->regenerateUsage($this->getLogger());
