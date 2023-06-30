@@ -18,6 +18,10 @@ function addToGlobalScope(editor: Editor, sourceElement: HTMLElement) {
     if (sourceElement.id) {
         window.sbProps.editors[sourceElement.id] = editor;
     } else if ((sourceElement as HTMLTextAreaElement).name) {
+        // TODO: Enforce that all editor sourceElements have an 'id' attribute.
+        //       This should be done because 'ids' can be expected to be unique on a page, but 'ids' and 'names' can not
+        //       be expected to be unique.  So we should not be using a combination of 'id' and 'name' as a storage key.
+        console.warn("Source element for CKEditor does not have an 'id' attribute.");
         window.sbProps.editors[sourceElement.name] = editor;
     }
 }
