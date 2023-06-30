@@ -4,7 +4,7 @@
  */
 
 import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
-// import MgMembersFilters from "./mg-members-filters.vue";
+import StaffDirectoryTableImage from "./staff-directory-table-image.vue";
 // import MgMembersName from "./mg-members-name.vue";
 // import MgMembersAccess from "./mg-members-access.vue";
 
@@ -79,12 +79,12 @@ async function onLoaded() {
 
 <template>
     <v-client-table ref="tableEl" :data="props.data" :columns="tableColumns" :options="tableOptions" @loaded="onLoaded">
-        <!-- <template #name="data">
-            <mg-members-name :member="data.row" />
+        <template #portrait_url="tableData">
+            <staff-directory-table-image :data="tableData.row" />
         </template>
-        <template #accessType="data">
+        <!-- <template #accessType="data">
             <mg-members-access :member="data.row" />
-        </template> -->
+        </template>  -->
         <template #afterTable>
             <div ref="tableFooterEl" class="VueTables__table-footer" data-table-footer></div>
         </template>
