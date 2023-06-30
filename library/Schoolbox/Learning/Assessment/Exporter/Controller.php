@@ -456,8 +456,9 @@ echo "<br/>Exporting units to course implementations...<br/>\n";
 
 echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation " . $courseImpl->getId() . " with open date " . $unitDates['open'] . " and close date " . $unitDates['close'] . "... (TODO)<br/>\n";
 
+            $this->
                 // TODO:
-                // INSERT INTO course_unit_specification SET
+                // INSERT INTO course_unit_implementation SET
                 // course_unit_specification_id= $unitSpec->getId(),                // 54
                 // title                       = $unitSpec->getFolder()->getTitle() // "Semester 2"
                 // open_date                   = $unitDates['open'],
