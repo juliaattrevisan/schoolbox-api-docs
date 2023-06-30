@@ -440,6 +440,7 @@ foreach ($courseImpls as $courseImpl) {
 
         $reimportIsEnabled = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
 
+echo "<br/>Exporting units to course implementations...<br/>\n";
         foreach ($courseImpls as $courseImpl) {
             $units = $courseImpl->getUnits();
             $unitSpecIsFound = false;
@@ -451,7 +452,10 @@ foreach ($courseImpls as $courseImpl) {
             }
 
             if (!$unitSpecIsFound || $reimportIsEnabled) {
+                $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
+
                 // TODO: Export $unitSpec into $courseImpl somehow.
+echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation " . $courseImpl->getId() . " with open date " . $unitDates['open'] . " and close date " . $unitDates['close'] . "... (TODO)<br/>\n";
             }
         }
 die;
