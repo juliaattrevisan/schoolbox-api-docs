@@ -110,7 +110,7 @@
             {type: 'due',     label: 'Due',     date: null},
         ] %}
         {% for date in dates %}
-            {% include '@learningAssessmentExporter/date.twig' with {
+            {% include '@learningAssessmentExporter/export_unit_row_date.twig' with {
                 fullSetOfDates:     false,
                 date:               date.date,
                 dateType:           date.type,
