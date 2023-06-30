@@ -10,6 +10,7 @@ namespace Schoolbox\Pastoral\Attachment;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
@@ -122,7 +123,7 @@ class Mapper extends BaseMapper
         if (
             !$previous instanceof Model
             && !$model->getPrivate()
-            && $this->getConfigLoader()->get("external_pastoral_upload")
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)
         ) {
             // Queue file for upload to Synergetic DocMan
             // TODO don't getInstance, instead inject

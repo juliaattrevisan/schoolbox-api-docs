@@ -51,6 +51,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     private const STYLE_ODBC_CANONICAL_WITH_MILLISECONDS = 121; // yyyy-mm-dd hh:mi:ss.mmm(24h);
 
     // Mappers
+    protected const MODULE_CODE = 'SPC';
 
     /** @var UserMapper $userMapper */
     protected $userMapper;
@@ -577,7 +578,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Get insert/update query based on the absence/presence of an external ID on the pastoral record
 
-        if (empty($pastoral->getExternalId())) {
+        $isCreate = empty($pastoral->getExternalId());
+
+        if ($isCreate) {
             $query = "
                 INSERT INTO tPastoralCare (
                     ID,
@@ -647,7 +650,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             if ($this->connector->executeQuery($query, $params)) {
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
-                if (empty($pastoral->getExternalId())) {
+                if ($isCreate) {
                     // gets pastoralCareSeq for the inserted record, and set it to SB pastoral table
                     // lastInsertId() does not work because of DB trigger attached to this table
                     $pastoralCareSeq = $this->connector->executeQuery(
@@ -702,6 +705,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $this->updatePastoralCareContacts($pastoral);
                 if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
                     $this->updateActions($pastoral);
+                }
+
+                if ($this->config->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD) && !$isCreate) {
+                    $existingFiles = $pastoral->getAttachments()->getPropertyValues('realname');
+                    $this->deletePastoralDocument($pastoral, $existingFiles);
                 }
 
                 if (!$inOuterTransaction) {
@@ -1091,6 +1099,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     ['externalId' => $pastoral->getExternalId()]
                 );
 
+                if ($this->config->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)) {
+                    $this->deletePastoralDocument($pastoral, []);
+                }
+
                 // Delete the pastoral care record itself now that its dependencies are gone
                 $this->connector->executeQuery(
                     "DELETE FROM tPastoralCare WHERE PastoralCareSeq = :externalId",
@@ -1277,7 +1289,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             SELECT  0,
                     :documentReferencesSeq,
                     '',
-                    'SPC',
+                    :relatedSeqModuleCode,
                     COALESCE(MAX(SortOrder) + 1, 0),
                     :pastoralExternalId
             FROM    {$this->schemaMedia}.tDocumentReferences
@@ -1290,6 +1302,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     'pastoralExternalId'     => $pastoralExternalId,
                     'documentReferencesSeq'  => $documentReferencesSeq,
                     'documentReferencesSeq2' => $documentReferencesSeq,
+                    'relatedSeqModuleCode'   => self::MODULE_CODE
                 ]
             );
 
@@ -1303,6 +1316,66 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             throw new ExternalException('Error linking pastoral document to record in Synergetic database:' . $e->getTraceAsString());
         }
         return true;
+    }
+
+    /**
+     * Deletes documents from tDocuments which are no longer attached to the pastoral record
+     * @param Pastoral $pastoral
+     * @param array    $skipFileNames
+     * @return void
+     */
+    private function deletePastoralDocument(Pastoral $pastoral, array $skipFileNames): void
+    {
+        // find tDocuments for the pastoral record and which filename is not in $skipFileNames
+        $sql = "SELECT doc.tDocumentsSeq
+               FROM {$this->schemaMedia}.tDocumentReferences tref
+               JOIN {$this->schemaMedia}.DocumentReferences ref ON tref.tDocumentsSeq = ref.DocumentReferencesSeq
+               JOIN {$this->schemaMedia}.tDocuments doc ON ref.DocumentReferencesSeq = doc.tDocumentsSeq
+             WHERE tref.RelatedSeqModuleCode = :RelatedSeqModuleCode
+               AND tref.RelatedSeq = :RelatedSeq
+               AND ref.ID = :studentExternalId";
+
+        $parameters = [
+            'RelatedSeqModuleCode' => self::MODULE_CODE,
+            'RelatedSeq'           => $pastoral->getExternalId(),
+            'studentExternalId'    => $pastoral->getStudent()->getExternalId(),
+        ];
+        if (!empty($skipFileNames)) {
+            $fileBindings = PredicateBuilder::getBindings($skipFileNames, 'f');
+            $sql          .= " AND doc.Description NOT IN ({$fileBindings->getPlaceholder()})";
+            $parameters   = array_merge($parameters, $fileBindings->getParams());
+        }
+        $documentSeqs = $this->connector->executeQuery($sql, $parameters)->fetchAll(\PDO::FETCH_COLUMN);
+
+        if (!empty($documentSeqs)) {
+            $docBindings = PredicateBuilder::getBindings($documentSeqs, 'd');
+            // delete DocumentReferences (student reference)
+            $this->connector->executeQuery(
+                "DELETE FROM {$this->schemaMedia}.DocumentReferences WHERE DocumentReferencesSeq IN ({$docBindings->getPlaceholder()})",
+                $docBindings->getParams()
+            );
+
+            // delete tDocumentReferences (pastoral reference)
+            $this->connector->executeQuery(
+                "DELETE FROM {$this->schemaMedia}.tDocumentReferences
+                               WHERE tDocumentsSeq IN ({$docBindings->getPlaceholder()})
+                                 AND RelatedSeqModuleCode = :RelatedSeqModuleCode
+                                 AND RelatedSeq = :RelatedSeq",
+                array_merge(
+                    [
+                        'RelatedSeqModuleCode' => self::MODULE_CODE,
+                        'RelatedSeq'           => $pastoral->getExternalId(),
+                    ],
+                    $docBindings->getParams()
+                )
+            );
+
+            // Delete tDocuments
+            $this->connector->executeQuery(
+                "DELETE FROM {$this->schemaMedia}.tDocuments WHERE tDocumentsSeq in ({$docBindings->getPlaceholder()})",
+                $docBindings->getParams()
+            );
+        }
     }
 
     // Helper functions below

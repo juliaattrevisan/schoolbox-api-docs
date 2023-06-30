@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\CommandLineTool;
 
 use External_Pastoral;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
@@ -61,7 +62,7 @@ HELP;
         $pastoralAttachmentMapper  = PastoralAttachmentMapper::getInstance();
         $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
         $externalPastoral          = new External_Pastoral();
-        $externalPastoralUpload    = $this->getConfig()->get("external_pastoral_upload");
+        $externalPastoralUpload    = $this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD);
         if ($externalPastoralUpload) {
             $log->info('Pastoral external attachment upload is enabled');
         } else {

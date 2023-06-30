@@ -15,6 +15,7 @@ use PDOException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -65,7 +66,7 @@ class AttachmentUploader extends CliTool\App
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
 
         // Only process if pastoral docman writeback is actually enabled in config
-        if (!$this->getConfig()->get('external_pastoral_upload')) {
+        if (!$this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)) {
             $this->getLogger()->info('Pastoral Attachment Upload is disabled in config; exiting');
             exit;
         }

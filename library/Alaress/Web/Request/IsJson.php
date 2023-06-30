@@ -31,6 +31,6 @@ class IsJson extends Specification\Leaf
                 )
             );
         }
-        return strpos($candidate->headers->get('accept'), 'application/json') !== false;
+        return str_contains($candidate->headers->get('accept') ?? '', 'application/json');
     }
 }
