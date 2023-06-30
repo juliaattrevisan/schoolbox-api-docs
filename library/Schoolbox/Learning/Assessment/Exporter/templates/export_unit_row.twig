@@ -35,9 +35,11 @@
             }
         });
 
+        $checkbox.change(); // Run function on page load.
+
         // Warn user they are about to clobber previous interactions
         {% if enableReimport %}
-        $('[data-warn-destructive-export]').click(function(e) {
+        $('[data-warn-destructive-export]').click(function (e) {
             const $checkbox = $(this);
 
             if ($checkbox.prop('checked')) {
@@ -50,7 +52,7 @@
                     format: 'html',
                     confirmLabel: 'Delete and re-export',
                     cancelLabel: 'Cancel',
-                    confirmEvent: function() {
+                    confirmEvent: function () {
                         $checkbox.prop('checked', true);
                         $checkbox.trigger('change')
                     }
@@ -80,6 +82,7 @@
             <h3><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></h3>
             <p class="meta">
                 {% if isImported %}
+                    Unit duration:
                     {% apply spaceless %}
                         <time title="{{ unitImpl.openDate.short }}"
                               datetime="{{ unitImpl.openDate.databaseDate }}"
@@ -104,18 +107,16 @@
             </p>
         </div>
     </div>
-    <div class="list-item" id="unit-dates" hidden>
-        {% set dates = [
-            {type: 'publish', label: 'Publish', date: null},
-            {type: 'due',     label: 'Due',     date: null},
+    <div class="list-item" id="course-{{ courseImpl.id }}-dates" hidden>
+        {% set dateFieldsInfo = [
+            {type: 'open' , label: 'Open' },
+            {type: 'close', label: 'Close'},
         ] %}
-        {% for date in dates %}
+        {% for dateFieldInfo in dateFieldsInfo %}
             {% include '@learningAssessmentExporter/export_unit_row_date.twig' with {
-                fullSetOfDates:     false,
-                date:               date.date,
-                dateType:           date.type,
-                label:              date.label,
-                unitImplementation: unitImpl,
+                dateType:             dateFieldInfo.type,
+                label:                dateFieldInfo.label,
+                courseImplementation: courseImpl,
             } only %}
         {% endfor %}
     </div>
