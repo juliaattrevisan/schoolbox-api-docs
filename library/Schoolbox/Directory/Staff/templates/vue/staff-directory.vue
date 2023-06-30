@@ -5,31 +5,29 @@
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import StaffDirectoryTable from "./staff-directory-table.vue";
 
-const props = defineProps({
-    /**
-     * the endpoint to retrieve all the staff data from
-     */
-    payload: {
-        type: String,
-        required: true,
-        default: "",
-    },
+interface Props {
+    payload: string; // the endpoint to retrieve all the staff data from
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    payload: "",
 });
 
-const rows = window.Vue.ref([] as any[]); // the staff data to display
+const data = window.Vue.ref([] as any[]); // the staff data to display
 const isLoading = window.Vue.ref(true); // whether the staff data has been loaded
 const hasLoadError = window.Vue.ref(false); // whether there was an error loading the staff data
 
 /**
  * load the staff data for display
  */
-async function loadRows() {
+async function loadData() {
     try {
         const response = await fetch(props.payload);
-        rows.value = await response.json();
+        data.value = await response.json();
     } catch (error) {
-        hasLoadError.value = true; // display error note in the DOM
+        hasLoadError.value = true; // display load error note
     } finally {
         isLoading.value = false; // hide the loading table
     }
@@ -39,7 +37,7 @@ async function loadRows() {
  * Start loading the group data
  */
 window.Vue.onMounted(() => {
-    loadRows();
+    loadData();
 });
 </script>
 
@@ -48,9 +46,7 @@ window.Vue.onMounted(() => {
         <div class="small-12 columns">
             <loading-table v-if="isLoading" />
             <data-load-error v-else-if="hasLoadError" data-title="Staff Directory" />
-            <div v-else>
-                <p>Loaded</p>
-            </div>
+            <staff-directory-table v-else :data="data" />
         </div>
     </div>
 </template>
