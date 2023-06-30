@@ -27,6 +27,8 @@
             }
         });
 
+        $checkbox.change(); // Run function on page load.
+
         // Warn user they are about to clobber previous interactions
         {% if enableReimport %}
         $('[data-warn-destructive-export]').click(function(e) {
