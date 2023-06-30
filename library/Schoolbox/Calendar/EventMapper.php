@@ -169,6 +169,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         $ownerMapper = $this->getJoinMapper('owner');
         $authorMapper = $this->getJoinMapper('author');
+        $ownerPronounMapper = $ownerMapper->getJoinMapper('pronoun');
+        $authorPronounMapper = $authorMapper->getJoinMapper('pronoun');
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
         $folderMapper = $this->getJoinMapper('event_folder');
@@ -181,7 +183,9 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
                 {$this->getColumnString()},
                 {$ownerMapper->getColumnString('o')},
                 {$userRoleMapper->getColumnString('ro')},
+                {$ownerPronounMapper->getColumnString('op')},
                 {$authorMapper->getColumnString('a')},
+                {$authorPronounMapper->getColumnString('ap')},
                 {$userRoleMapper->getColumnString('ra')},
                 {$eventTypeMapper->getColumnString('t')},
                 {$personalMapper->getColumnString('p')},
@@ -200,8 +204,10 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN {$this->getJoinSql('owner.role','o', 'ro')}
+            LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
             LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
             LEFT JOIN {$this->getJoinSql('author.role', 'a', 'ra')}
+            LEFT JOIN {$this->getJoinSql('author.pronoun', 'a', 'ap')}
             LEFT JOIN {$this->getJoinSql('eventType', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
             LEFT JOIN {$this->getJoinSql('event_folder', '', 'f')}
@@ -221,6 +227,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         $ownerMapper = $this->getJoinMapper('owner');
         $authorMapper = $this->getJoinMapper('author');
+        $pronounMapper = $this->getJoinMapper('owner.pronoun');
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
         $folderMapper = $this->getJoinMapper('event_folder');
@@ -252,6 +259,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             /** @var User $ownerItem */
             $ownerItem = $ownerMapper->hydrate($row, 'o');
             $ownerItem->setRole($userRoleMapper->hydrate($row, 'ro'));
+            $ownerItem->setPronoun($this->hydrateJoin($row, 'owner.pronoun', 'op'));
             $eventItem->setOwner($ownerItem);
 
             /* Author
@@ -259,6 +267,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             /** @var User $authorItem */
             $authorItem = $authorMapper->hydrate($row, 'a');
             $authorItem->setRole($userRoleMapper->hydrate($row, 'ra'));
+            $authorItem->setPronoun($this->hydrateJoin($row, 'author.pronoun', 'ap'));
             $eventItem->setAuthor($authorItem);
 
             /* Event Type
