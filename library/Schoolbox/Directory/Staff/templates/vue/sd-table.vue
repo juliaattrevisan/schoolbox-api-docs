@@ -10,45 +10,31 @@ import SdTableEmail from "./sd-table-email.vue";
 
 interface Props {
     data: unknown[]; // the staff data to display
+    columnsConfig: object[]; //
 }
-
 const props = defineProps<Props>();
 
-const tableEl = window.Vue.ref(null);
-const columns = [
-    "portrait_url",
-    "StaffPreferredName",
-    "StaffSurname",
-    "StaffDepartment",
-    "JobPositionDescription",
-    "StaffCampusDescription",
-    "StaffOccupPhone",
-    "StaffExtension",
-    "StaffOccupEmail",
-];
+// the columns to display in the table, retrieved by getting the data key from the column config
+const columns: string[] = props.columnsConfig.map((column: object) => column.data as string);
+
+// to return an object where each heading is the key and the value is the class
+const columnsClasses = props.columnsConfig.reduce((result, item) => {
+    result[item.data] = item.class;
+    return result;
+}, {});
+
+// to return an object where each heading is the key and the value is the data
+const headings = props.columnsConfig.reduce((result, item) => {
+    result[item.data] = item.heading;
+    return result;
+}, {});
+
 const options = {
     // options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     alwaysShowPerPageSelect: true,
-    columnsClasses: {
-        // to be able to add extra styles to columns
-        portrait_url: "image-td",
-        StaffDepartment: "hide-for-medium-down",
-        JobPositionDescription: "hide-for-small",
-        StaffCampusDescription: "hide-for-medium-down",
-    },
+    columnsClasses,
     debounce: 100, // shorter debounce time as data is stored locally
-    headings: {
-        portrait_url: "Image",
-        StaffPreferredName: "First name",
-        StaffSurname: "Surname",
-        StaffDepartment: "Department",
-        JobPositionDescription: "Role",
-        StaffCampusDescription: "Campus",
-        StaffOccupPhone: "Phone",
-        StaffExtension: "Ext",
-        StaffOccupEmail: "Email",
-    },
-    // hiddenColumns: ["firstName", "givenName", "preferredName", "lastName", "role", "campus", "yearLevel", "house"], // these are all added to name, but we need to add them to columns so we can search them
+    headings,
     orderBy: {
         // initial sorting display
         ascending: true,
@@ -57,7 +43,6 @@ const options = {
     perPage: 50,
     perPageValues: [50, 100, 200],
     resizableColumns: false,
-    // sortable: ["name"], // the access column doesn't need to be sortable
     tabbable: false,
     texts: {
         count: "{from}-{to} of {count} members|{count} members|1 member",
@@ -81,7 +66,7 @@ async function onLoaded() {
 </script>
 
 <template>
-    <v-client-table ref="tableEl" :data="props.data" :columns="columns" :options="options" @loaded="onLoaded">
+    <v-client-table :data="props.data" :columns="columns" :options="options" @loaded="onLoaded">
         <template #portrait_url="tableData">
             <sd-table-image :data="tableData.row" />
         </template>

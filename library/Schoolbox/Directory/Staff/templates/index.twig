@@ -6,9 +6,24 @@
     </div>
 </div>
 
+{%
+set columnsConfig = [
+    { heading: "Image", data: "portrait_url", class: "image-td" },
+    { heading: "First name", data: "StaffPreferredName", class: ""  },
+    { heading: "Surname",data: "StaffSurname", class: "" },
+    { heading: "Department", data: "StaffDepartment", class: "hide-for-medium-down" },
+    { heading: "Role", data: "JobPositionDescription", class: "hide-for-small" },
+    { heading: "Campus", data: "StaffCampusDescription", class: "hide-for-medium-down" },
+    { heading: "Phone", data: "StaffOccupPhone", class: "" },
+    { heading: "Ext", data: "StaffExtension", class: "" },
+    { heading: "Email", data: "StaffOccupEmail", class: "" },
+]
+%}
+
 <div id="staff-directory-container">
     <staff-directory
-        payload="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
+        endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
+        :columns-config="{{ columnsConfig|json_encode() }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/staffDirectory.js?v={{ config.site_version }}"></script>
