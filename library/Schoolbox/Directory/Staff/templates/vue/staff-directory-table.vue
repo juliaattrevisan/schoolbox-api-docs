@@ -35,14 +35,21 @@ const tableOptions = {
     },
     debounce: 100, // shorter debounce time as data is stored locally
     headings: {
-        name: "Name",
-        accessType: "Access",
+        portrait_url: "Image",
+        StaffPreferredName: "First name",
+        StaffSurname: "Surname",
+        StaffDepartment: "Department",
+        JobPositionDescription: "Role",
+        StaffCampusDescription: "Campus",
+        StaffOccupPhone: "Phone",
+        StaffExtension: "Ext",
+        StaffOccupEmail: "Email",
     },
     // hiddenColumns: ["firstName", "givenName", "preferredName", "lastName", "role", "campus", "yearLevel", "house"], // these are all added to name, but we need to add them to tableColumns so we can search them
     orderBy: {
         // initial sorting display
         ascending: true,
-        column: "name",
+        column: "StaffSurname",
     },
     perPage: 50,
     perPageValues: [50, 100, 200],
@@ -65,26 +72,9 @@ async function onLoaded() {
     if (isFirstLoad) {
         // loaded gets called on every state change, and we only want to do the below once
         isFirstLoad = false;
-        updateFooterUI();
-        // addSearchNote();
+        await updateFooterUI();
     }
 }
-
-/**
- * Add a note on what the table can be searched for just below the search
- * We add below rather than in a placeholder so the long list of search
- * options is always available and are visible on mobile
- */
-// async function addSearchNote() {
-//     await window.Vue.nextTick(); //ensure the dom is updated
-//     const searchNote = document.createElement("p");
-//     searchNote.classList.add("meta");
-//     searchNote.style.marginTop = "0.25rem";
-//     searchNote.innerText =
-//         "The group can be searched by name, " + store.yearLevelLabel + ", house, campus, role or access.";
-//     const searchInput = document.querySelector(".VueTables__search__input"); //safe to assume only one, despite class selection
-//     searchInput.parentElement.appendChild(searchNote);
-// }
 </script>
 
 <template>
