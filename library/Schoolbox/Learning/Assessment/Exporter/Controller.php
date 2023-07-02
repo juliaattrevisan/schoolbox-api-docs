@@ -443,29 +443,38 @@ foreach ($courseImpls as $courseImpl) {
 echo "<br/>Exporting units to course implementations...<br/>\n";
         foreach ($courseImpls as $courseImpl) {
             $units = $courseImpl->getUnits();
-            $unitSpecIsFound = false;
+            $unitIdToOverwrite = null;
 
             foreach ($units as $unit) {
                 if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
-                    $unitSpecIsFound = true;
+                    $unitIdToOverwrite = $unit->getId();
                 }
             }
 
-            if (!$unitSpecIsFound || $reimportIsEnabled) {
-                $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
+            if ($unitIdToOverwrite !== null) {
+                if ($reimportIsEnabled) {
+                    // TODO:
+                    // UPDATE course_unit_implementation
+                    // SET deleted_at=NOW()
+                    // WHERE id=$unitIdToOverwrite
+                } else {
+                    continue; // We cannot overwrite the existing unit, so skip this course implementation.
+                }
+            }
+
+            $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
 
 echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation " . $courseImpl->getId() . " with open date " . $unitDates['open'] . " and close date " . $unitDates['close'] . "... (TODO)<br/>\n";
 
-                // TODO:
-                // INSERT INTO course_unit_implementation SET
-                // course_unit_specification_id= $unitSpec->getId(),                // 54
-                // title                       = $unitSpec->getFolder()->getTitle() // "Semester 2"
-                // open_date                   = $unitDates['open'],
-                // due_date                    = $unitDates['close'],
-                // created_at                  = NOW(),
-                // updated_at                  = NOW(),
-                // deleted_at                  = NULL
-            }
+            // TODO:
+            // INSERT INTO course_unit_implementation SET
+            // course_unit_specification_id= $unitSpec->getId(),                // 54
+            // title                       = $unitSpec->getFolder()->getTitle() // "Semester 2"
+            // open_date                   = $unitDates['open'],
+            // due_date                    = $unitDates['close'],
+            // created_at                  = NOW(),
+            // updated_at                  = NOW(),
+            // deleted_at                  = NULL
         }
 die;
 
