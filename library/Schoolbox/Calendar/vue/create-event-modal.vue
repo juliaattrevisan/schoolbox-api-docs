@@ -14,8 +14,10 @@ import "vue-select/dist/vue-select.css";
  * https://github.com/sagalbot/vue-select/issues/994
  */
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
-import {injectScript, isScriptAdded} from "@js/util/domUtils";
-import {EditorEvent} from "@js/editor/event/editorEvent";
+import { injectScript, isScriptAdded } from "@js/util/domUtils";
+import { EditorEvent } from "@js/editor/event/editorEvent";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+
 vSelect.props.components.default = () => ({ Deselect });
 
 export default {
@@ -164,7 +166,7 @@ export default {
         async createNewEvent(form) {
             this.isProcessing = true;
             const formContent = new FormData(form);
-            formContent.set('detail', window.sbProps.editors["detail"].getData());
+            formContent.set("detail", window.sbProps.editors["detail"].getData());
             this.$refs.toast.activate("Saving...");
 
             try {
@@ -226,7 +228,7 @@ export default {
                 new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: {
                         targetElements: ["#detail"],
-                        toolbar: "simple",
+                        toolbar: EditorToolbar.SIMPLE,
                     },
                 })
             );

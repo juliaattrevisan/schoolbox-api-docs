@@ -11,6 +11,7 @@ import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
 
 const EFFICACY_SELF = "self";
 const EFFICACY_SERIES = "series";
@@ -412,7 +413,7 @@ export default {
                     new CustomEvent(EditorEvent.EDITOR__CREATE, {
                         detail: {
                             targetElements: ["#view-detail"],
-                            toolbar: "simple",
+                            toolbar: EditorToolbar.SIMPLE,
                         },
                     })
                 );
