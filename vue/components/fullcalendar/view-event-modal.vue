@@ -9,8 +9,8 @@ import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullC
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
-import {injectScript, isScriptAdded} from "@js/util/domUtils";
-import {EditorEvent} from "@js/editor/event/editorEvent";
+import { injectScript, isScriptAdded } from "@js/util/domUtils";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 
 const EFFICACY_SELF = "self";
 const EFFICACY_SERIES = "series";
@@ -402,19 +402,21 @@ export default {
                 return;
             }
 
-            // otherwise initialise the editor and set the data once its created
-            this.$refs.eventDetailInput.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
-                event.detail.editor.setData(this.eventExtendedProps?.detail);
-            });
+            this.$nextTick(() => {
+                // otherwise initialise the editor and set the data once its created
+                this.$refs.eventDetailInput.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
+                    event.detail.editor.setData(this.eventExtendedProps?.detail);
+                });
 
-            document.dispatchEvent(
-                new CustomEvent(EditorEvent.EDITOR__CREATE, {
-                    detail: {
-                        targetElements: ["#view-detail"],
-                        toolbar: "simple",
-                    },
-                })
-            );
+                document.dispatchEvent(
+                    new CustomEvent(EditorEvent.EDITOR__CREATE, {
+                        detail: {
+                            targetElements: ["#view-detail"],
+                            toolbar: "simple",
+                        },
+                    })
+                );
+            });
         },
 
         /**
@@ -815,11 +817,7 @@ export default {
 
                 <label class="detail">
                     Note
-                    <textarea
-                        id="view-detail"
-                        ref="eventDetailInput"
-                        name="detail"
-                    ></textarea>
+                    <textarea id="view-detail" ref="eventDetailInput" name="detail"></textarea>
                 </label>
 
                 <ul class="flex-list buttons">
