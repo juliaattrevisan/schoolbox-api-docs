@@ -7,10 +7,10 @@ import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI"
 import SdTableImage from "./sd-table-image.vue";
 import SdTablePhone from "./sd-table-phone.vue";
 import SdTableEmail from "./sd-table-email.vue";
-import type { ColumnsConfig } from "./staffDirectory";
+import type { ColumnsConfig, ColumnsData } from "./staffDirectory";
 
 interface Props {
-    data: unknown[]; // the staff data to display
+    data: ColumnsData[]; // the staff data to display
     columnsConfig: ColumnsConfig[]; // the columns to display in the table
 }
 const props = defineProps<Props>();
@@ -85,12 +85,4 @@ async function onLoaded() {
 
 <style lang="scss">
 @import "@schoolboxVue/components/vueTables2/vueTables2";
-
-//
-@media only screen and (max-width: 800px) {
-    .VueTables__table .StaffDepartment-td,
-    .VueTables__table .StaffCampusDescription-td {
-        display: none;
-    }
-}
 </style>

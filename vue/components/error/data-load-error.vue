@@ -6,7 +6,6 @@
 interface Props {
     dataTitle?: string;
 }
-
 const props = withDefaults(defineProps<Props>(), {
     dataTitle: "",
 });

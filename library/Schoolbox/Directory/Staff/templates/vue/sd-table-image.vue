@@ -3,10 +3,11 @@
  * The staff directory table cell that displays the staff profile image
  */
 
-interface Props {
-    data: object; // the row of data
-}
+import type { ColumnsData } from "./staffDirectory";
 
+interface Props {
+    data: ColumnsData; // the row of data
+}
 const props = defineProps<Props>();
 </script>
 
@@ -22,7 +23,8 @@ const props = defineProps<Props>();
 </template>
 
 <style lang="scss">
+// .image-td is declared via columnsClasses in sd-table
 .VueTables__table .image-td {
-    max-width: 3rem; // prevent the image column from being too large
+    max-width: 3rem; // prevent the image column from being too wide
 }
 </style>

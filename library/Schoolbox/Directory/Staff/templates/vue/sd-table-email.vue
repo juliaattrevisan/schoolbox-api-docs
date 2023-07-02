@@ -3,10 +3,11 @@
  * The staff directory table cell that displays the staff email
  */
 
-interface Props {
-    data: object; // the row of data
-}
+import type { ColumnsData } from "./staffDirectory";
 
+interface Props {
+    data: ColumnsData; // the row of data
+}
 const props = defineProps<Props>();
 </script>
 
