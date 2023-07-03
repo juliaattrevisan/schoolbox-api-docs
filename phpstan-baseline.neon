@@ -4321,11 +4321,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Exporter/Exporter.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Exporter/Module.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Factory.php
