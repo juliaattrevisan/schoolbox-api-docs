@@ -134,7 +134,7 @@ class Controller extends BaseController
      * * returnUrl: a URL to return to once done
      *
      * @api   GET /learning/export/unit/:unitSpecId
-     * @since 230
+     * @since 23.1
      *
      * @param UnitSpecification\Model $unitSpec UnitSpec
      * @throws MapperException
@@ -334,6 +334,10 @@ class Controller extends BaseController
 
     /**
      * Export a unit specification to one or more pre-existing course implementations.
+     *
+     * @api   POST /learning/export/unit/:unitSpecId
+     * @since 23.1
+     *
      * @param UnitSpecification\Model $unitSpec
      * @return void
      * @throws ControllerException
