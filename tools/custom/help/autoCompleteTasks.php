@@ -158,7 +158,8 @@ HELP;
             } else {
                 $this->getLogger()->info(sprintf("Would have updated Project: %s results", $project->getId()));
             }
-
+            // Cache cleaning
+            unset($project);
         }
     }
 };
