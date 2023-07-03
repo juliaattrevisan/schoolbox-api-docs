@@ -2,10 +2,26 @@
 /**
  * To search Schoolobx
  */
+
+import SpInput from "./input/sp-input.vue";
+import SpResults from "./results/sp-results.vue";
+import SpFilters from "./filters/sp-filters.vue";
 </script>
 
 <template>
-    <div></div>
+    <div class="row">
+        <div class="small-12 columns">
+            <sp-input />
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 large-9 columns">
+            <sp-results />
+        </div>
+        <div class="small-12 large-3 columns">
+            <sp-filters />
+        </div>
+    </div>
 </template>
 
 <style scoped></style>
