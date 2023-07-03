@@ -152,6 +152,7 @@ echo "This unit spec belongs to course '" . $courseSpec->getTitle() . "', id: " 
 
         $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
 
+        // Hydrate existing unit implementations.
         foreach ($courseImpls as $courseImpl) {
             $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
         }
@@ -368,6 +369,11 @@ echo "</pre>\n";
 
         $courseImpls = $this->courseImplementationMapper->findByColumn('id', $courseImplIds);
 
+        // Hydrate existing unit implementations.
+        foreach ($courseImpls as $courseImpl) {
+            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId());
+        }
+
 // TestDataOutput:
 echo "courseImpls:<br/>\n";
 foreach ($courseImpls as $courseImpl) {
@@ -420,7 +426,7 @@ echo " * Found unit to overwrite.<br/>\n";
                     // UPDATE course_unit_implementation
                     // SET deleted_at=NOW()
                     // WHERE id=$unitIdToOverwrite
-                    $unitToOverwrite->setDeletedAt(new Alaress_Date_Format(time(), Alaress_Date_Format::DATABASE_FORMAT));
+                    $unitToOverwrite->setDeletedAt(new Alaress_Date_Format(time(), Alaress_Date_Format::TIMESTAMP));
                     $this->unitImplementationMapper->save($unitToOverwrite);
                 } else {
                     continue; // We cannot overwrite the existing unit, so skip this course implementation.
