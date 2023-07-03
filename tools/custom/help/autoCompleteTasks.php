@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -141,11 +142,11 @@ HELP;
         $projectCache = new ProjectResultCache\ResultCache(ProjectResultCache\Mapper::getInstance());
 
         // reload project cache
-        // grab the list of projects these assessments are part of...
-        $projectStatement = $db->prepareQuery("SELECT project_id, assessment_id FROM project_assessment where assessment_id in (:values)");
-        $projectStatement->execute([
-                                'values' => implode(',', array_keys($regenerateList))
-                            ]);
+        $projects = array_keys($regenerateList);
+        $params = Builder::getArrayPlaceholders($projects, 'assessments');
+        // grab the list of projects these assessments are part of.$params = Builder::getArrayPlaceholders(self::COURSE_IDS);..
+        $projectStatement = $db->prepareQuery("SELECT project_id, assessment_id FROM project_assessment where assessment_id in {$params}");
+        $projectStatement->execute(Builder::getArrayParameters($projects, 'assessments'));
 
         while ($row = $projectStatement->fetch()) {
             /** @var Project $project **/
