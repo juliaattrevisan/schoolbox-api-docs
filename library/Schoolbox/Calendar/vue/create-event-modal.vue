@@ -14,6 +14,10 @@ import "vue-select/dist/vue-select.css";
  * https://github.com/sagalbot/vue-select/issues/994
  */
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
+import { injectScript, isScriptAdded } from "@js/util/domUtils";
+import { EditorEvent } from "@js/editor/event/editorEvent";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+
 vSelect.props.components.default = () => ({ Deselect });
 
 export default {
@@ -112,6 +116,9 @@ export default {
 
             this.$refs.modal.open();
 
+            //loadCkeditor
+            this.initCKE();
+
             /* Clear selectize contents
              */
             this.selected = [];
@@ -159,6 +166,7 @@ export default {
         async createNewEvent(form) {
             this.isProcessing = true;
             const formContent = new FormData(form);
+            formContent.set("detail", window.sbProps.editors["detail"].getData());
             this.$refs.toast.activate("Saving...");
 
             try {
@@ -197,6 +205,33 @@ export default {
                 btoa(window.location.pathname) +
                 "&" +
                 $(this.$refs.createEventForm).serialize();
+        },
+
+        /**
+         * Initialise CKEditor
+         */
+        async initCKE() {
+            const editorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`;
+            if (!isScriptAdded(editorScript)) {
+                await injectScript(editorScript);
+            }
+
+            // if an editor already exists, just clear its content and avoid creating another
+            const detailEditor = window.sbProps.editors["detail"];
+            if (detailEditor) {
+                detailEditor.setData("");
+                return;
+            }
+
+            // otherwise lets set an editor up
+            document.dispatchEvent(
+                new CustomEvent(EditorEvent.EDITOR__CREATE, {
+                    detail: {
+                        targetElements: ["#detail"],
+                        toolbar: EditorToolbar.SIMPLE,
+                    },
+                })
+            );
         },
     },
 };
@@ -322,7 +357,7 @@ export default {
 
                         <label class="detail">
                             Note
-                            <textarea name="detail" v-model="event.detail"></textarea>
+                            <textarea id="detail" name="detail"></textarea>
                         </label>
                     </section>
                     <div class="row">

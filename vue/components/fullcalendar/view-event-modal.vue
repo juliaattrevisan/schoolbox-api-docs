@@ -9,6 +9,9 @@ import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullC
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
+import { injectScript, isScriptAdded } from "@js/util/domUtils";
+import { EditorEvent } from "@js/editor/event/editorEvent";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
 
 const EFFICACY_SELF = "self";
 const EFFICACY_SERIES = "series";
@@ -330,7 +333,7 @@ export default {
                     eventId: this.eventExtendedProps.eventId,
                     completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
                     title: this.$refs.eventTitleInput.value.trim(),
-                    detail: this.$refs.eventDetailInput.value,
+                    detail: window.sbProps.editors["view-detail"].getData(),
                 },
                 toast = this.jQuery("[data-toast]");
 
@@ -385,6 +388,39 @@ export default {
         },
 
         /**
+         * Initialise CKEditor
+         */
+        async initCKE() {
+            const editorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`;
+            if (!isScriptAdded(editorScript)) {
+                await injectScript(editorScript);
+            }
+
+            // if the editor already exists, set the data and avoid re-initialising
+            const detailEditor = window.sbProps.editors["view-detail"];
+            if (detailEditor) {
+                detailEditor.setData(this.eventExtendedProps?.detail);
+                return;
+            }
+
+            this.$nextTick(() => {
+                // otherwise initialise the editor and set the data once its created
+                this.$refs.eventDetailInput.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
+                    event.detail.editor.setData(this.eventExtendedProps?.detail);
+                });
+
+                document.dispatchEvent(
+                    new CustomEvent(EditorEvent.EDITOR__CREATE, {
+                        detail: {
+                            targetElements: ["#view-detail"],
+                            toolbar: EditorToolbar.SIMPLE,
+                        },
+                    })
+                );
+            });
+        },
+
+        /**
          * Open this modal.
          */
         open(event) {
@@ -398,6 +434,12 @@ export default {
             /* Pop modal open
              */
             this.$refs.modal.open();
+
+            //loadCkeditor
+            if (this.eventExtendedProps.editable && this.eventExtendedProps.task.isTask) {
+                //only if we are inside a task
+                this.initCKE();
+            }
 
             /**
              * Enusre video/audio files can be played in the modal
@@ -776,13 +818,7 @@ export default {
 
                 <label class="detail">
                     Note
-                    <textarea
-                        ref="eventDetailInput"
-                        name="detail"
-                        :value="eventExtendedProps.detail"
-                        @change="updateFormSubmittable"
-                        @keyup="updateFormSubmittable"
-                    ></textarea>
+                    <textarea id="view-detail" ref="eventDetailInput" name="detail"></textarea>
                 </label>
 
                 <ul class="flex-list buttons">
