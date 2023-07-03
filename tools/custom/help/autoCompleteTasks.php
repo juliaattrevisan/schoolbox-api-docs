@@ -103,11 +103,9 @@ HELP;
                 continue;
             }
             $updated[] = $token;
-            if (true) {
-                // dedupe assessment, so we can process these later
-                $regenerateList[$completionEntry->getTask()->getAssessmentModel()->getId()][] = $completionEntry->getTask()->getAssessmentModel()->getId();
-            }
 
+            // dedupe assessment, so we can process these later
+            $regenerateList[$completionEntry->getTask()->getAssessmentModel()->getId()][] = $completionEntry->getTask()->getAssessmentModel()->getId();
 
             // find if this entry has a teacher complete status
             //all the tmp variables
