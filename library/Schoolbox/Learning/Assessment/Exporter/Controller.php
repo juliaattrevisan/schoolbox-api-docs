@@ -410,7 +410,8 @@ class Controller extends BaseController
         if ($encodedReturnUrl) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
-            $returnUrl = $this->getRouter()->generate(
+            $router = $this->getRouter();
+            $returnUrl = $router->generate(
                 'course.modifyCourse',
                 ['id' => $unitSpec->getCourse()->getId(),]
             ) . "#{$unitSpec->getId()}";
