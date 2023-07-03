@@ -25,10 +25,14 @@
 
         // Toggle date fields
         $checkbox.change(function () {
+            const datesContainer = $('#course-' + courseId + '-dates');
+
             if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
-                $('#course-' + courseId + '-dates').removeAttr('hidden');
+                datesContainer.removeAttr('hidden');
+                datesContainer.find('input').attr('required', true);
             } else {
-                $('#course-' + courseId + '-dates').attr('hidden', true);
+                datesContainer.attr('hidden', true);
+                datesContainer.find('input').removeAttr('required');
             }
         });
 
