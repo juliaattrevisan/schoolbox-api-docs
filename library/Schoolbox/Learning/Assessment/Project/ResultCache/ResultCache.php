@@ -260,6 +260,9 @@ class ResultCache
                 $this->persist($project, $user, null);
             }
         }
+        // Attempt some cache cleaning
+        // We spawned this, we should remove it
+        unset($project);
     }
 
 
