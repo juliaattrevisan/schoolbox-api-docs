@@ -8,7 +8,7 @@ const mswHandlers = [
     rest.get(endpoint, (req, res, ctx) => {
         return res(
             //we grab an endpoint and then modify the data before it's returned
-            ctx.delay(1000),
+            ctx.delay(3000),
             ctx.json(data)
         );
     }),

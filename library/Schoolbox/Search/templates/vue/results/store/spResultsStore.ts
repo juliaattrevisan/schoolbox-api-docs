@@ -9,7 +9,7 @@ import { useStore } from "../../store/searchPageStore";
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 
 export const useResultsStore = defineStore("spResults", () => {
-    const hasSearched = ref(false); // to determine whether any searches have been made
+    const hasNotSearched = ref(true); // to determine whether any searches have been made
     const isLoading = ref(false); // to notify that search results
     const hasLoadError = ref(false); // to notify of a search error
     const query = ref(""); // current search term
@@ -38,16 +38,17 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasNoResults = computed(() => {
-        return hasSearched.value && results.value.length === 0 && !isLoading.value;
+        return !hasNotSearched.value && results.value.length === 0 && !isLoading.value;
     });
 
     /**
      * search for nodes that match
      */
     async function search() {
+        hasNotSearched.value = false;
         isLoading.value = true;
         try {
-            const response = await fetch(useStore().endpoint, {
+            const response = await fetch(`${useStore().endpoint}?query=${query.value}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -71,7 +72,9 @@ export const useResultsStore = defineStore("spResults", () => {
     }
 
     return {
+        hasNotSearched,
         isLoading,
+        hasLoadError,
         query,
         results,
         isActive,
