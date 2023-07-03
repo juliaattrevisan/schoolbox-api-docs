@@ -13,8 +13,9 @@ class NewsInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
+     * @throws Exception
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -23,7 +24,7 @@ class NewsInitialCest
     /**
      * @throws Exception
      */
-    public function createNews(AcceptanceTester $i)
+    public function createNews(AcceptanceTester $i): void
     {
         $i->amOnPage('/news');
         $i->waitForElementVisible(['css' => 'a.icon-add[title=Create\ news]'], 5);
@@ -49,8 +50,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends createNews
      */
-    public function unpublishNews(AcceptanceTester $i)
+    public function unpublishNews(AcceptanceTester $i): void
     {
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -67,8 +69,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends unpublishNews
      */
-    public function publishNews(AcceptanceTester $i)
+    public function publishNews(AcceptanceTester $i): void
     {
         $i->amOnPage('/news/me?status=Rejected');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -79,8 +82,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends publishNews
      */
-    public function audienceViewsNewsFeed(AcceptanceTester $i)
+    public function audienceViewsNewsFeed(AcceptanceTester $i): void
     {
         $i->impersonate("Jana Reed");
         $i->amOnPage('/news');
@@ -91,8 +95,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends publishNews
      */
-    public function audienceViewsNewsItem(AcceptanceTester $i)
+    public function audienceViewsNewsItem(AcceptanceTester $i): void
     {
         $i->impersonate("Jana Reed");
         $i->amOnPage('/news');
@@ -104,8 +109,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends publishNews
      */
-    public function enableNewsComments(AcceptanceTester $i)
+    public function enableNewsComments(AcceptanceTester $i): void
     {
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -118,8 +124,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends enableNewsComments
      */
-    public function addTwoNewsComments(AcceptanceTester $i)
+    public function addTwoNewsComments(AcceptanceTester $i): void
     {
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -141,8 +148,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends addTwoNewsComments
      */
-    public function deleteNewsComments(AcceptanceTester $i)
+    public function deleteNewsComments(AcceptanceTester $i): void
     {
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -155,8 +163,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends enableNewsComments
      */
-    public function disableNewsComments(AcceptanceTester $i)
+    public function disableNewsComments(AcceptanceTester $i): void
     {
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -168,8 +177,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @depends createNews
      */
-    public function deleteNews(AcceptanceTester $i)
+    public function deleteNews(AcceptanceTester $i): void
     {
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');

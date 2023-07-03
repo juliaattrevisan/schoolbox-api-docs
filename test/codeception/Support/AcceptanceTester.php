@@ -53,6 +53,7 @@ class AcceptanceTester extends Actor
     public function loginAsAdmin(): void
     {
         $this->login('alaress', 'alaress');
+        $this->waitForElementVisible(['css' => 'a[title=Schoolbox\ Admin]']);
     }
 
     /**

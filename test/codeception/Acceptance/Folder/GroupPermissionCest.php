@@ -20,7 +20,7 @@ class GroupPermissionCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->amGoingTo('Get logged in and navigate to learning/badge page');
         $i->logout();
@@ -41,7 +41,7 @@ class GroupPermissionCest
      * get logged in as that users and check whether that groups are presented to join or not
      * table with scenarios described in 13387
      */
-    public function groupsAccessibilityGroupFree(AcceptanceTester $i)
+    public function groupsAccessibilityGroupFree(AcceptanceTester $i): void
     {
         $createFolder = new CreateFolder($i);
         $manageGroup = new ManageGroup($i);
@@ -118,7 +118,7 @@ class GroupPermissionCest
      * get logged in as that users and check whether that groups are presented to join or not
      * table with scenarios described in 13387
      */
-    public function groupsAccessibilityGroupModerated(AcceptanceTester $i)
+    public function groupsAccessibilityGroupModerated(AcceptanceTester $i): void
     {
         $createFolder = new CreateFolder($i);
         $manageGroup = new ManageGroup($i);
@@ -197,7 +197,7 @@ class GroupPermissionCest
      * get logged in as that users and check whether that groups are presented to join or not
      * table with scenarios described in 13387
      */
-    public function groupsAccessibilityGroupRestricted(AcceptanceTester $i)
+    public function groupsAccessibilityGroupRestricted(AcceptanceTester $i): void
     {
         $createFolder = new CreateFolder($i);
         $manageGroup = new ManageGroup($i);
