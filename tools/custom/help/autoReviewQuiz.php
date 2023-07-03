@@ -107,7 +107,7 @@ HELP;
         while ($row = $completedAttempts->fetch()) {
             if ($this->perform()) {
                 $this->getLogger()->info(sprintf("Updating quiz attempt: %s for user: %s, and project results updated", $row['assessmentId'], $row['userId']));
-                $this->updateAttempt($row['attemptId']);
+                $this->updateAttempt((int)$row['attemptId']);
                 // reload project cache for that assessment / student
                 /** @var Schoolbox\Learning\Assessment\Quiz\Model $quiz **/
                 $quiz = $assessmentMapperProxy->findById($row['assessmentId']);
@@ -123,10 +123,12 @@ HELP;
     }
 
     /**
-     * @param $attemptID
+     * clone of `tools/custom/help/auto-review-quiz.sh` update function to just mark this attempt as complete and give them the automarked score
+     *
+     * @param int $attemptID
      * @return void
      */
-    private function updateAttempt($attemptID)
+    private function updateAttempt(int $attemptID)
     {
         $db     = $this->getDatabaseInternal();
         $query = $db->prepareQuery("UPDATE assess_attempt,
