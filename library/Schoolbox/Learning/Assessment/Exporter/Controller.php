@@ -400,14 +400,7 @@ class Controller extends BaseController
             $unitImplToInsert->setSpecification($unitSpec);
             $unitImplToInsert->setOpenDate(new Alaress_Date_Format($unitDates['open'] . ' 12:00am', Alaress_Date_Format::FORMAT_DATE_PICKER));
             $unitImplToInsert->setDueDate(new Alaress_Date_Format($unitDates['close'] . ' 12:00am', Alaress_Date_Format::FORMAT_DATE_PICKER));
-
-            try {
-                $this->unitImplementationMapper->save($unitImplToInsert);
-            } catch (MapperException $e) {
-                // Could not save.
-                die;
-            }
-
+            $this->unitImplementationMapper->save($unitImplToInsert);
         }
 
         // Decode the return URL, if it was set
@@ -417,9 +410,9 @@ class Controller extends BaseController
         } else {
             /** @var UnitSpecification\Model $unitSpec */
             $returnUrl = $this->getRouter()->generate(
-                    'course.modifyCourse',
-                    ['id' => $unitSpec->getCourse()->getId(),]
-                ) . "#{$unitSpec->getId()}";
+                'course.modifyCourse',
+                ['id' => $unitSpec->getCourse()->getId(),]
+            ) . "#{$unitSpec->getId()}";
         }
 
         // Redir back to the return URL (if set) or the course page if not
