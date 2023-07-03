@@ -6,14 +6,13 @@ import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor"
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
-import { EditorEvent } from "@js/editor/event/editorEvent";
+import { EditorDeleteEventInfo, EditorEvent } from "@js/editor/event/editorEvent";
 import { initCheckData } from "@js/editor/config/editorCheckData";
 import { modifyEditor } from "@js/editor/config/editorCreated";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
- *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
@@ -46,7 +45,6 @@ function addDefaultConfig(config: EditorConfig) {
 
 /**
  * create the ckeditor instance
- *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { EditorConfig } config - the config to use when creating the editor
  */
@@ -63,7 +61,6 @@ function create(sourceElement: HTMLElement, config: EditorConfig) {
 
 /**
  * Listen for init events to create any instances
- *
  * @param { CustomEvent } event - the custom event
  */
 function onCreate(event: CustomEvent) {
@@ -92,4 +89,37 @@ function onCreate(event: CustomEvent) {
     });
 }
 
+/**
+ * Respond to a request to delete an editor instance, by deleting the editor instance, and then firing another event
+ * informing that an editor instance has been deleted.
+ * @param { CustomEvent } event - Information about the event.
+ */
+function onDelete(event: CustomEvent) {
+    const eventDetail = event.detail as EditorDeleteEventInfo;
+    const sourceElement = eventDetail.editor.sourceElement as HTMLTextAreaElement;
+
+    const keyOfEditorToDelete = (
+        (sourceElement.id !== undefined) ? sourceElement.id :
+        ((sourceElement.name !== undefined) ? sourceElement.name : null)
+    );
+
+    if (keyOfEditorToDelete !== null) {
+        if (window.sbProps.editors[keyOfEditorToDelete] === undefined) {
+            throw new Error('Editor with key "' + keyOfEditorToDelete + '" does not exist in window.sbProps.editors.');
+        }
+
+        window.sbProps.editors[keyOfEditorToDelete].destroy();
+        delete window.sbProps.editors[keyOfEditorToDelete];
+
+        document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
+            detail: {
+                keyOfDeletedEditor: keyOfEditorToDelete,
+                containingFormId:'lesson-plan-template-form',
+                submitButtons: [document.getElementById('save-button')]
+            }
+        }));
+    }
+}
+
 document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
+document.addEventListener(EditorEvent.EDITOR__DELETE, onDelete);

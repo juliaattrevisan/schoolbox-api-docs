@@ -3,7 +3,6 @@
  * The buttons at the bottom of the create news page
  * There can be 1 or 2 depending on the status of the news
  * They are also only active when the news is drafted
- *
  */
 
 export default {
@@ -28,8 +27,7 @@ export default {
     computed: {
         /**
          * to change the text of the submit button depending on the news state
-         *
-         * @returns {String}
+         * @returns {string} Text on submit button.
          */
         submitText() {
             if (this.isSubmitted && !this.isRejected) {
@@ -45,24 +43,24 @@ export default {
          * Global moderation config is turned on
          * Global posting is turned on (no case where a user can post for moderation otherwise)
          * The draft save response has returned false for an approveRoute
-         *
-         * @returns {Boolean}
+         * @returns {boolean} True if requires moderation.
          */
         requiresModeration() {
             return this.globalModeration && this.globalPosting && !this.approveRoute;
         },
 
         /**
-         * to disable buttons when the news isn't ready to be submitted
-         *
-         * @returns {Boolean}
+         * To disable buttons when the news isn't ready to be submitted
+         * @returns {boolean} True if the preview button should be disabled, false otherwise.
          */
         isDisabled() {
-            if (this.articleId === 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return (
+                this.articleId === 0 ||
+                this.$refs.newsSubmit.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') || (
+                    this.$refs.newsPreview !== null &&
+                    this.$refs.newsPreview.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
+                )
+            );
         },
     },
 
@@ -84,11 +82,8 @@ export default {
         /**
          * Once the news item has been saved, can enable the preview/publish buttons
          * Event is dispatched from /library/Schoolbox/Comms/News/templates/create.twig
-         *
-         * @params {Event} with articleId and approveRoute
-         *
          */
-        initNewsSaveListener(setting) {
+        initNewsSaveListener() {
             document.addEventListener("create-news-form-actions__on-news-saved", (event) => {
                 this.articleId = event.detail.articleId;
                 this.approveRoute = event.detail.approveRoute;
@@ -102,11 +97,11 @@ export default {
     <ul class="flex-list buttons">
         <template v-if="isAutoSavable">
             <li>
-                <button type="submit" id="news-preview" :disabled="isDisabled">Preview</button>
+                <button type="submit" id="news-preview" ref="newsPreview" :disabled="isDisabled">Preview</button>
             </li>
         </template>
         <li>
-            <button type="submit" class="submit" id="news-submit" :disabled="isDisabled">{{ submitText }}</button>
+            <button type="submit" class="submit" id="news-submit" ref="newsSubmit" :disabled="isDisabled">{{ submitText }}</button>
         </li>
     </ul>
 </template>

@@ -115,6 +115,23 @@
              * Alternatively I could've returned the vars in this function and reassigned them above.
              */
             function checkForChanges() {
+                let doSave = true;
+
+                // Check each CKEditor to see whether the content storage limit has been exceeded.
+                Object.values(window.sbProps.editors).forEach((editor) => {
+                    const wordCountContainer = editor.plugins.get("WordCount").wordCountContainer;
+                    if (wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
+                        // The content storage limit has been exceeded for this CKEditor, so we cannot save to the database.
+                        // !! Note that this means we are skipping autosave for all fields, not just the one
+                        //    whose max char count was exceeded.  If we want to skip only the field whose
+                        //    max char count wsa exceeded, server-side changes will be required.
+                        // !! Note also that the current behaviour of skipping autosave for all fields if any are
+                        //    overfilled matches the behaviour for manual save.  This is because if any field is
+                        //    overfilled, the submit button for the form is normally disabled.
+                        doSave = false;
+                    }
+                });
+
                 // kill any other timeout pending, and resolve the deferred
                 clearTimeout(draftTimeout);
                 if (deferred !== undefined) {
@@ -126,7 +143,16 @@
 
                 // Set a timeout for the draft to save
                 draftTimeout = setTimeout(function () {
-                    save(deferred);
+                    if (doSave) {
+                        save(deferred);
+                    } else {
+                        config.toaster.toastActivate({text: "Saving...",});
+                        config.toaster.toastTimeout({
+                            text: "Save skipped because storage limit exceeded",
+                            css: "alert",
+                        });
+                        deferred.resolve(); // Resolve the deferred for stallSubmit.
+                    }
                 }, config.interval * 1000);
 
                 // install the deferred as stalling form submit

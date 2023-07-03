@@ -112,12 +112,14 @@
         {# CKEditors #}
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ["#createForm textarea[name=body]"],
             }
         }));
 
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_TEXT,
                 targetElements: ["#createForm textarea[name=blurb]"],
                 toolbar: "simple",
             }
@@ -162,7 +164,6 @@
         });
 
         var $createForm = $('#createForm');
-        var $submitButtons = $('#news-submit, #news-preview');
         var $submitButton = $('#news-submit');
 
         // Init validation
@@ -233,14 +234,6 @@
                     }
                 });
                 document.dispatchEvent(event);
-
-                // Enable the submit buttons unless they have the 'data-ckeditorMaxCharCountExceededAtLastCheck'
-                // attribute, which will have been added if the content storage limit was exceeded at the last check.
-                for (let submitButton of $submitButtons) {
-                    if (!submitButton.hasAttribute('data-ckeditorMaxCharCountExceededAtLastCheck')) {
-                        submitButton.disabled = false;
-                    }
-                }
             }
         });
         {% endif %}
