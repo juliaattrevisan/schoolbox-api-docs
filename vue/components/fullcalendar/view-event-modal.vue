@@ -414,6 +414,9 @@ export default {
                         detail: {
                             targetElements: ["#view-detail"],
                             toolbar: EditorToolbar.SIMPLE,
+                            removeFromToolbar: [
+                                'link',
+                            ]
                         },
                     })
                 );
