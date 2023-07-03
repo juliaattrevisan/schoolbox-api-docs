@@ -5,7 +5,8 @@
 </script>
 
 <template>
-    <div>Filters</div>
+    <h2 class="subheader">Filters</h2>
+    <section class="content"></section>
 </template>
 
 <style scoped></style>

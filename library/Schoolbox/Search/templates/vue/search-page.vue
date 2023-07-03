@@ -15,10 +15,10 @@ import SpFilters from "./filters/sp-filters.vue";
         </div>
     </div>
     <div class="row">
-        <div class="small-12 large-9 columns">
+        <div class="small-12 large-9 island">
             <sp-results />
         </div>
-        <div class="small-12 large-3 columns">
+        <div class="small-12 large-3 island">
             <sp-filters />
         </div>
     </div>
