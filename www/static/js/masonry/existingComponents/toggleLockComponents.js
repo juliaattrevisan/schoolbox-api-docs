@@ -4,25 +4,28 @@
  *
  */
 
-import { EXISTING_COMPONENT_SELECTOR } from "../updateHomepage";
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import { getMasonryConfig } from "../masonryConfig";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 
 /**
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
 export function initToggleLockComponents() {
-    const componentLockSwitch = document.getElementById("component-lock-switch").querySelector("input");
+    const componentLockSwitch = document.querySelector(getMasonryConfig().toggleLockComponents.selector);
     componentLockSwitch.addEventListener("change", () => {
         document
-            .querySelectorAll(EXISTING_COMPONENT_SELECTOR)
+            .querySelectorAll(getMasonryConfig().settings.existingComponentSelector)
             .forEach((component) => updateComponentDisplay(component));
     });
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) =>
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
         updateComponentDisplay(event.detail.component)
     );
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) =>
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
         updateComponentDisplay(event.detail.component)
     );
+
+    // Set the initial state of the toggle, in case the page is loaded with the toggle already checked
+    updateComponentDisplay(document);
 }
 
 /**

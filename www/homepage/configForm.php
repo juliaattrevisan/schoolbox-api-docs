@@ -57,20 +57,18 @@ if (is_numeric($_REQUEST['cid'])) {
             Component_InstanceMapper::getInstance()->save($instanceList);
         }
 
-        // Was any one component requested?
-        // If so render it only so it can be re-rendered
+        // Check if the component has been deleted, so the client can display a warning
+        // otherwise, the client will just re-render the component
         if ($_POST['movedComponentId']) {
-            $instance   = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+            $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
             if (is_object($instance)) {
-                $cClass = $instance->getDefinition()->getClass();
+                $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
             } else {
                 $page->outputJson(['hasComponentBeenDeleted' => true], false, 200);
-                die();
             }
-            $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
         }
     } elseif ($cid && is_numeric($_POST['delete'] ?? false)) { // AJAX request to delete component from homepage
-// locate the instance, locate its config instances, then blast them away
+        // locate the instance, locate its config instances, then blast them away
         try {
             /** @var Component_Instance $instance */
             $instance = $componentInstanceMapper->findById($_POST['delete']);
@@ -118,7 +116,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $renderer = new Component_Renderer();
         $renderer->renderHomepageComponent($page, $folder, $component);
     } elseif ($cid && is_array($_POST['colors'])) { // AJAX Save homepage colours
-            $homepage = new Homepage($cid);
+        $homepage = new Homepage($cid);
         // Also try to save width
         if (!empty($_POST['width'])) {
             // Mangle width into percentages
@@ -126,7 +124,7 @@ if (is_numeric($_REQUEST['cid'])) {
         }
         $homepage->saveDisplayProperties($_POST['colors']);
     } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
-    // GET config options from homepage
+        // GET config options from homepage
         $config = $_GET;
 
         /** @var Component_Instance $instance */
@@ -150,7 +148,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
             // No need to execute at all just to set configuration,
             // and doing so can break components that rely on context
-//            $controller->execute();
+            //            $controller->execute();
 
             /** @var Component_Config[] $configInstances */
             $configInstances = $componentConfigInstanceMapper->createCollection();
@@ -207,12 +205,7 @@ if (is_numeric($_REQUEST['cid'])) {
             }
         }
         $page->outputJson('error: component does not exist', false, 409);
-//        SitePage::localRedir("/homepage/" . $_GET['cid']);
-    } // AJAX new column widths
-//    elseif ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-//        $homepage = new Homepage($_POST['cid']);
-//        $homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
-//    }
+    }
 } else { // no cid provided
     error(2);
 }

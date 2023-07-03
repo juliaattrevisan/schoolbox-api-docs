@@ -3,8 +3,8 @@
  *
  */
 
-import { UPDATE_URL } from "../updateHomepage";
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import { getMasonryConfig } from "../masonryConfig";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 import { getFormData } from "./editColumns";
 import { undoWidthChanges } from "./editColumnsWidths";
 import { undoColourChanges } from "./editColumnsColours";
@@ -13,7 +13,7 @@ import { undoColourChanges } from "./editColumnsColours";
  * Start listening for the reset event
  */
 export function initUndoChangesEditColumns() {
-    document.addEventListener(UpdateHomepageEvents.EDIT_COLUMNS_UNDO_CHANGES, onEditColumnsUndoChanges);
+    document.addEventListener(UpdateMasonryEvents.EDIT_COLUMNS_UNDO_CHANGES, onEditColumnsUndoChanges);
 }
 
 /**
@@ -27,7 +27,7 @@ async function onEditColumnsUndoChanges() {
         $toast.toastActivate({ text: "Saving..." });
         undoWidthChanges();
         undoColourChanges();
-        await fetch(UPDATE_URL, {
+        await fetch(getMasonryConfig().settings.updateUrl, {
             method: "POST",
             body: getFormData(),
         });

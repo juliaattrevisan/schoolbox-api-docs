@@ -126,7 +126,7 @@ class Component_Renderer
                     'ID' => (string)$folder->getId(),
                     'HEADING' => Scrub::text($folder->getName()),
                     'RETURN_URL_NAME' => Redirect::RETURN_URL,
-                    'RETURN_URL', Redirect::encode('/homepage/' . $_POST['cid'])
+                    'RETURN_URL', Redirect::encode('/homepage/' . $_REQUEST['cid'])
                 ]);
 
                 /* Localise terminologies

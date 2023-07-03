@@ -4,7 +4,7 @@
  *
  */
 
-import UpdateHomepageEvents from "./updateHomepageEvents";
+import UpdateMasonryEvents from "./updateMasonryEvents";
 import { isOpen as isNewComponentTabsOpen } from "./newComponents/newComponentsTabs";
 
 const COMPONENT_CONTAINERS_SELECTOR = "[data-components-container]"; //the top/left/right parent containers
@@ -16,14 +16,15 @@ let __placeHolderComponentsList = []; //to contain the place holder instances
  */
 export function initUpdatePlaceHolders() {
     initPlaceHolderComponents();
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, onComponentUpdate);
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, onComponentUpdate);
-    document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_START, addPlaceHolderComponents);
-    document.addEventListener(UpdateHomepageEvents.NEW_COMPONENTS_TABS_OPENED, addPlaceHolderComponents);
-    document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
-    document.addEventListener(UpdateHomepageEvents.NEW_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
-    document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_END, onExistingComponentSortEnd);
-    document.addEventListener(UpdateHomepageEvents.NEW_COMPONENTS_TABS_CLOSED, removePlaceHolderComponents);
+    if (isNewComponentTabsOpen()) addPlaceHolderComponents();
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, onComponentUpdate);
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, onComponentUpdate);
+    document.addEventListener(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_START, addPlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.NEW_COMPONENTS_TABS_OPENED, addPlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
+    document.addEventListener(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_END, onExistingComponentSortEnd);
+    document.addEventListener(UpdateMasonryEvents.NEW_COMPONENTS_TABS_CLOSED, removePlaceHolderComponents);
 }
 
 /**
@@ -63,7 +64,13 @@ function addPlaceHolderComponents() {
     document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
         if (canAddPlaceHolderComponent(parentContainer)) {
             const placeHolderComponent = __placeHolderComponentsList[index];
-            parentContainer.append(placeHolderComponent);
+
+            if (parentContainer.firstChild !== null) {
+                // if we already have components, insert the placeholder before the first component
+                parentContainer.insertBefore(placeHolderComponent, parentContainer.firstChild);
+            } else {
+                parentContainer.append(placeHolderComponent);
+            }
         }
     });
 }

@@ -9,7 +9,7 @@ import {
 } from "@js/util/domUtils";
 import { getNewComponent } from "./getNewComponent";
 import { saveComponentOrder } from "../existingComponents/saveComponentOrder";
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -30,6 +30,7 @@ let __isFlipping = false; //prevent quick shifts / odd flickers while using FLIP
 let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position changes, have to move a minimum amount prior to another change
 let __newComponentClone; //to later insert back into the palette
 let __newComponentTabsContainer; //to reinsert the newComponentClone into the new component tabs to replace the one that was taken out
+let __isDragging = false; //to prevent some funky behaviour when a user has just stopped dragging
 
 /*****************************************************************
  *
@@ -58,7 +59,7 @@ function initListeners() {
  * Prevent rapid fire dragging while a data save is already taking place
  */
 function initOnProcessingStartListener() {
-    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, (event) => {
+    document.addEventListener(UpdateMasonryEvents.PROCESSING_START, (event) => {
         updateDraggablesStatus(false); //ensure all are disabled while process is active
     });
 }
@@ -67,7 +68,7 @@ function initOnProcessingStartListener() {
  * Re-enable dragging once any processes (like sort saving) have taken place
  */
 function initOnProcessingEndListener() {
-    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, (event) => {
+    document.addEventListener(UpdateMasonryEvents.PROCESSING_END, (event) => {
         updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
     });
 }
@@ -149,7 +150,7 @@ function onNewComponentClicked(draggableInstance) {
         __hasNewComponent = true;
         __isFlipping = true;
 
-        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
+        document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
 
         updateNewComponentVars(draggableInstance.target);
         __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
@@ -166,7 +167,7 @@ function onNewComponentClicked(draggableInstance) {
         const topContainer = document.querySelector('[data-position="top"]');
         insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
         __newComponent.style.float = "none"; //needs to be factored into the document flow, so take float off
-        __newComponent.style.marginBottom = "2rem"; //add the appropriate margin in
+        __newComponent.style.marginBottom = "1rem"; //add the appropriate margin in
         __newComponent.style.zIndex = 9999;
         __newComponent.style.position = "static";
         __newComponent.style.width = "100%";
@@ -216,6 +217,7 @@ function updateNewComponentVars(newComponent) {
  */
 function onDragStart(draggableInstance) {
     if (!__isProcessing) {
+        __isDragging = true;
         __isProcessing = true;
         updateNewComponentVars(draggableInstance.target); //use the parent container regardless of selection to ensure correct dimensions etc
         __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
@@ -315,10 +317,12 @@ function extractNewComponent() {
  * Moving it onto the page or back into the tabs based on the drag position
  */
 function onDrag() {
-    if (canCheckForChange() && isNewComponentOverPage()) {
+    const canCheck = canCheckForChange();
+    const componentIsOverPage = isNewComponentOverPage();
+    if (canCheck && componentIsOverPage) {
         //add the component to the page
         checkNewDraggedComponentOnPage();
-    } else if (canCheckForChange() && __hasNewComponent) {
+    } else if (canCheck && !componentIsOverPage && __hasNewComponent && __isDragging) {
         //if the new component has been added to page already, but it back into the tabs
         putDraggedComponentBackIntoTabs();
     }
@@ -386,7 +390,7 @@ function putDraggedComponentBackIntoTabs() {
     __referenceElement.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
     __newComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
 
-    document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENT_SORT_UPDATE));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE));
 
     __newComponent.dataset.leftDifference =
         __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
@@ -394,7 +398,10 @@ function putDraggedComponentBackIntoTabs() {
         __referenceElement.getBoundingClientRect().top +
         window.scrollY -
         parseInt(__referenceElement.dataset.originalTop);
-    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+    gsap.to(__newComponent, {
+        width: __referenceElement.parentElement.offsetWidth,
+        duration: ANIMATE_SPEED,
+    }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
     animateFlip(state);
 }
@@ -416,12 +423,12 @@ function updateDraggedComponentOnPage(closestElement, isShiftingDown) {
         ? insertElementAfter(closestElement, __referenceElement)
         : insertElementBefore(closestElement, __referenceElement); //insert into the appropriate spot depending on drag position
 
-    __referenceElement.style.marginBottom = "2rem"; //existing components all have a margin
-    __newComponent.style.marginBottom = "2rem"; //existing components all have a margin
+    __referenceElement.style.marginBottom = "1rem"; //existing components all have a margin
+    __newComponent.style.marginBottom = "1rem"; //existing components all have a margin
 
     clearFlipElements(); //check for flip bug
 
-    document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENT_SORT_UPDATE));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE));
 
     __newComponent.dataset.leftDifference =
         __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
@@ -430,7 +437,10 @@ function updateDraggedComponentOnPage(closestElement, isShiftingDown) {
         window.scrollY -
         parseInt(__referenceElement.dataset.originalTop);
 
-    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+    gsap.to(__newComponent, {
+        width: __referenceElement.parentElement.offsetWidth,
+        duration: ANIMATE_SPEED,
+    }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
     animateFlip(state);
 }
@@ -473,7 +483,8 @@ function animateFlip(state) {
  * Just snap back to where it now belongs
  */
 function onDragEnd() {
-    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
+    __isDragging = false;
+    document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
     if (isNewComponentOverPage()) {
         //add the component to the page
         checkNewDraggedComponentOnPage();
@@ -484,7 +495,10 @@ function onDragEnd() {
     if (__hasNewComponent) {
         reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
     }
-    alignNewComponent();
+    if (__referenceElement) {
+        // For some reason it is possible to have no reference element, so check for it just in case...
+        alignNewComponent();
+    }
 }
 
 /**
@@ -512,7 +526,7 @@ function onAlignNewComponentComplete() {
     if (__hasNewComponent) {
         addNewComponent();
     } else {
-        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
+        document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_END));
         __isProcessing = false;
     }
 }
@@ -548,7 +562,12 @@ async function addNewComponent() {
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
     document.dispatchEvent(
-        new CustomEvent(UpdateHomepageEvents.COMPONENT_ADDED, { detail: { component: newComponent } })
+        new CustomEvent(UpdateMasonryEvents.COMPONENT_ADDED, {
+            detail: {
+                component: newComponent,
+                paletteElement: __newComponentClone,
+            },
+        })
     );
     await gsap.to(newComponent, {
         //fade in the updated component
@@ -557,7 +576,7 @@ async function addNewComponent() {
         startAt: { opacity: 0 },
     });
     await saveComponentOrder(newComponent);
-    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_END));
     __hasNewComponent = false;
     __isProcessing = false;
 }

@@ -4,8 +4,8 @@
  */
 
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
-import { EXISTING_COMPONENT_SELECTOR } from "../updateHomepage";
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import { getMasonryConfig } from "../masonryConfig";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 
 const ANIMATE_CLOSED_POSITION = 180;
 const ANIMATE_OPEN_POSITION = 0;
@@ -19,9 +19,11 @@ const BUTTON_SELECTOR = '[data-collapser="true"]';
  * Set up all components and listen for newly added ones
  */
 export function initCollapseComponents() {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
+    document
+        .querySelectorAll(getMasonryConfig().settings.existingComponentSelector)
+        .forEach((component) => init(component));
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
 }
 
 /**
@@ -49,6 +51,9 @@ function init(component) {
  */
 export function isOpen(component) {
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
+    if (!collapsePanel) {
+        return false;
+    }
     return collapsePanel.getAttribute("data-collapse-state") === "uncollapsed";
 }
 
@@ -91,5 +96,8 @@ export async function close(component) {
  */
 export function isCollapseComponentSelected(component) {
     const collapseCheckbox = component.querySelector(`#${component.id}-collapse`);
+    if (!collapseCheckbox) {
+        return false;
+    }
     return collapseCheckbox.getAttribute("checked") === "checked" ? true : false;
 }

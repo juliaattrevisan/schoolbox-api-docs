@@ -96,6 +96,12 @@ module.exports = {
             // Global property storage
             "./www/static/js/global/sbProps.js",
         ],
+        masonry: {
+            import: [
+                "./www/static/js/masonry/masonry.js",
+            ],
+            dependOn: "main", // ensures jQuery is loaded prior
+        },
         mage: {
             import: ["./www/static/js/form/jquery.mage.js"],
             dependOn: "main", // ensures jQuery is loaded prior
@@ -188,9 +194,6 @@ module.exports = {
         // Resource
         googleFiles: "./library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js",
         viewAllFiles: "./library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js",
-
-        // Most functionality for a home page
-        updateHomepage: "./templates/core/homepage/js/updateHomepage.js",
 
         // Canvas
         canvasAssignments: "./library/Schoolbox/Canvas/templates/vue/canvasAssignments.js",
@@ -417,11 +420,6 @@ module.exports = {
                     "./node_modules/flatpickr/dist/flatpickr.min.js",
                     // For feature tours
                     "./node_modules/intro.js/minified/intro.min.js",
-                ],
-                "masonry.js": [
-                    // homepage editing
-                    "./www/static/js/masonry/jquery.masonry.js",
-                    "./www/static/js/masonry/jquery.masonry.colourPicker.js",
                 ],
                 "dataTables.js": [
                     // DataTables

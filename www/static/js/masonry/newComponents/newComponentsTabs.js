@@ -4,33 +4,34 @@
  *
  */
 
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import { getMasonryConfig } from "../masonryConfig";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 
 /**
  * To ensure only the new components tab or the edit columns view is open at once
  */
 export function initNewComponentsTab() {
-    const homepage = $("#component-layout");
+    const masonryLayout = $(getMasonryConfig().settings.layoutSelector);
 
     // Fix slider on tab
     $("[data-tab]").on("toggled", function (event, tab) {
         tab.foundation("reflow");
         const tabData = tab.data(); // What tab is this?
         if ("hideEmpty" in tabData) {
-            homepage.removeClass("show-empty");
+            masonryLayout.removeClass("show-empty");
         } else if ("showEmpty" in tabData) {
-            homepage.addClass("show-empty");
+            masonryLayout.addClass("show-empty");
         }
     });
 
     //to show/hide the 'add components here' placeholders in empty columns when the new tabs component is open
     $.fn.tabActivator({
         onTabOpen: function () {
-            document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENTS_TABS_OPENED));
+            document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENTS_TABS_OPENED));
         },
         onTabClose: function () {
-            document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENTS_TABS_CLOSED));
-            homepage.removeClass("show-empty");
+            document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENTS_TABS_CLOSED));
+            masonryLayout.removeClass("show-empty");
         },
     });
 }
@@ -43,5 +44,6 @@ export function initNewComponentsTab() {
  */
 export function isOpen() {
     const tabs = document.getElementById("tabs-1");
+    if (!tabs) return true;
     return tabs.classList.contains("active");
 }

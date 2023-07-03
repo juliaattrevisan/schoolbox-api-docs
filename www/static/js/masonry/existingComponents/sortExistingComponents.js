@@ -15,7 +15,7 @@ import {
 } from "@js/util/domUtils";
 import { saveComponentOrder } from "./saveComponentOrder";
 import { slideUp, slideDown } from "@js/util/animateUtils";
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 import { isOpen as isSettingsPanelOpen } from "./updateComponentsSettings";
 import { isOpen as isRemovePanelOpen } from "./removeComponents";
 import { isOpen as isComponentOpen } from "./collapseComponents";
@@ -56,10 +56,10 @@ export function initSortExistingComponents() {
  * To respond to any events that require action
  */
 function initListeners() {
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) =>
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
         onComponentAddedOrUpdated(event.detail.component)
     ); //newly added components
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) =>
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
         onComponentAddedOrUpdated(event.detail.component)
     ); //updated components
     initOnComponentRemovedListener();
@@ -81,7 +81,7 @@ function onComponentAddedOrUpdated(component) {
  * To remove a component from the sortable list
  */
 function initOnComponentRemovedListener() {
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, (event) => {
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, (event) => {
         const draggableToRemove = __draggablesList.find((draggable) =>
             draggable.target.isEqualNode(event.detail.component)
         );
@@ -97,7 +97,7 @@ function initOnComponentRemovedListener() {
  * Prevent rapid fire dragging while a data save is already taking place
  */
 function initOnProcessingStartListener() {
-    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, () => {
+    document.addEventListener(UpdateMasonryEvents.PROCESSING_START, () => {
         updateDraggablesStatus(false); //ensure all are enabled again once animation and form change is complete
     });
 }
@@ -106,7 +106,7 @@ function initOnProcessingStartListener() {
  * Re-enable dragging once any processes (like sort saving) have taken place
  */
 function initOnProcessingEndListener() {
-    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, () => {
+    document.addEventListener(UpdateMasonryEvents.PROCESSING_END, () => {
         updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
     });
 }
@@ -173,7 +173,7 @@ function onDragStart(draggableInstance) {
     extractActiveComponent();
     updateSortableElements(); //ensure we have the most up to date positions
     collapseActiveComponentContent();
-    document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_START));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_START));
 }
 
 /**
@@ -184,9 +184,14 @@ function onDragStart(draggableInstance) {
  */
 function getReferenceElement() {
     const referenceElement = __activeComponent.cloneNode(true);
-    referenceElement.querySelector("[data-collapsable]").remove(); //just use the top bar as reference, so remove all component controls that can be expanded
-    referenceElement.querySelector('[data-component-panel="settings"]').remove();
-    referenceElement.querySelector('[data-component-panel="delete"]').remove();
+
+    const collapsableContent = referenceElement.querySelector("[data-collapsable]");
+    if (collapsableContent) {
+        collapsableContent.remove();
+    } //just use the top bar as reference, so remove all component controls that can be expanded
+
+    referenceElement.querySelector('[data-component-panel="settings"]')?.remove();
+    referenceElement.querySelector('[data-component-panel="delete"]')?.remove();
     referenceElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed
     insertElementBefore(__activeComponent, referenceElement);
     return referenceElement;
@@ -287,15 +292,21 @@ async function collapseActiveComponentContent() {
     __isChangingSize = true;
     if (isSettingsPanelOpen(__activeComponent)) {
         const activeComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]'); //just assume it may be open
-        slideUp(activeComponentSettingsPanel, ANIMATE_SPEED);
+        if (activeComponentSettingsPanel) {
+            slideUp(activeComponentSettingsPanel, ANIMATE_SPEED);
+        }
     }
     if (isRemovePanelOpen(__activeComponent)) {
         const activeComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]'); //just assume it may be open
-        slideUp(activeComponentDeletePanel, ANIMATE_SPEED);
+        if (activeComponentDeletePanel) {
+            slideUp(activeComponentDeletePanel, ANIMATE_SPEED);
+        }
     }
     if (isComponentOpen(__activeComponent)) {
         const activeComponentContent = __activeComponent.querySelector("[data-collapsable]");
-        await slideUp(activeComponentContent, ANIMATE_SPEED);
+        if (activeComponentContent) {
+            await slideUp(activeComponentContent, ANIMATE_SPEED);
+        }
     }
     __isChangingSize = false;
 }
@@ -379,7 +390,7 @@ function updateActiveComponentPosition(closestElement, isShiftingDown) {
 
     clearFlipElements(); //check for flip bug
 
-    document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_UPDATE));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_UPDATE));
 
     __activeComponent.dataset.leftDifference =
         __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
@@ -387,7 +398,10 @@ function updateActiveComponentPosition(closestElement, isShiftingDown) {
         __referenceElement.getBoundingClientRect().top +
         window.scrollY -
         parseInt(__referenceElement.dataset.originalTop);
-    gsap.to(__activeComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+    gsap.to(__activeComponent, {
+        width: __referenceElement.parentElement.offsetWidth,
+        duration: ANIMATE_SPEED,
+    }); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
     animateFlip(state);
 }
@@ -428,8 +442,8 @@ function clearFlipElements() {
  * Just snap back to where it now belongs
  */
 function onDragEnd() {
-    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
-    document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_END));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.EXISTING_COMPONENT_SORT_END));
     snapBackActiveComponent();
 }
 
@@ -480,7 +494,9 @@ async function expandActiveComponent() {
     }
     if (isComponentOpen(__activeComponent)) {
         const activeComponentContent = __activeComponent.querySelector("[data-collapsable]");
-        await slideDown(activeComponentContent, ANIMATE_SPEED);
+        if (activeComponentContent) {
+            await slideDown(activeComponentContent, ANIMATE_SPEED);
+        }
     }
     onActiveComponentExpanded();
 }
@@ -495,7 +511,7 @@ async function onActiveComponentExpanded() {
     }
     updateDocumentOnDragEnd();
     updateSortableElements();
-    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_END));
 }
 
 /**

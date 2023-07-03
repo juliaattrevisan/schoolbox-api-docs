@@ -53,27 +53,48 @@
 
 <!-- BEGIN modify_layout -->
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/colourPicker.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/updateHomepage.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/course/jquery.course-selector.js?v={SITE_VERSION}"></script>
 
-<script type="text/javascript">
-    $(function() {
-
-        /* Attach Course Selector Modal listeners
-         */
-        $.fn.courseSelectorModal({
-            courseSelector: {
-                query: {
-                    hasClose:      true,
-                    hasAdd:        false,
-                    hasTot:        false,
-                    linkToUnits:   false,
-                    folder:        {ID},
-                    encodedReturnUrl: "{ENCODED_RETURN_URL}"
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry.js?v={SITE_VERSION}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Initialise the masonry layout
+        document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
+            detail: {
+                settings: {
+                    allowEditing: document.getElementById("component-lock-switch") ? true : false, // Whether the user has full edit control, or is read-only
+                    existingComponentSelector: "[data-component]",
+                    layoutSelector: "#component-layout",
+                    updateUrl: "/homepage/configForm.php",
+                    // The backend for EPortfolios differs slightly to Homepages, so we need to
+                    // pass in a different set of data for each type of page.
+                    formData: {
+                        pageInfo: {
+                            type: "cid",
+                            id: "{ID}",
+                        },
+                        newComponentAddAttribute: "data-component-definition-id",
+                    }
+                },
+                postToMyLinks: {
+                    selector: "#postToMyLinks",
+                    url: "{HOMEPAGE_URL}",
+                    heading: "{HEADING}",
+                    updateUrl: "/cms/myLinksForm.php",
+                },
+                toggleLockComponents: {
+                    selector: "#component-lock-switch input"
+                },
+                editColumns: {
+                    columnWidthSelector: '[data-interaction="column-width"]',
+                    leftContainerSelector: '[data-position="left"]',
+                    rightContainerSelector: '[data-position="right"]',
+                    colourPickersSelector: "[data-colorpicker]",
+                    colours: colours,
                 }
             }
-        });
-
+        }));
     });
 </script>
 <!-- END modify_layout -->
@@ -319,7 +340,7 @@
                              data-count="{HOMEPAGE_COMPONENT_COUNT}"
                              data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
                              data-component-palette>
-                            <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                            <a href="#" data-component-definition-id="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
                                 <span class="size-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
                                 <p>{HOMEPAGE_COMPONENT_NAME}</p>
                                 <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>

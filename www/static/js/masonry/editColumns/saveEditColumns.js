@@ -1,18 +1,17 @@
 /**
- * Reset the latest changes back to the original state
+ * Save the latest column width/colour changes
  *
  */
 
-import { UPDATE_URL } from "../updateHomepage";
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import { getMasonryConfig } from "../masonryConfig";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 import { getFormData } from "./editColumns";
-import { resetColours } from "./editColumnsColours";
 
 /**
- * Start listening for the reset event
+ * Start listening for the save event
  */
-export function initResetEditColumns() {
-    document.addEventListener(UpdateHomepageEvents.EDIT_COLUMNS_RESET, onEditColumnsReset);
+export function initSaveEditColumns() {
+    document.addEventListener(UpdateMasonryEvents.EDIT_COLUMNS_SAVE, onEditColumnsSave);
 }
 
 /**
@@ -20,12 +19,11 @@ export function initResetEditColumns() {
  *
  * @param { Element }
  */
-async function onEditColumnsReset() {
+async function onEditColumnsSave() {
     const $toast = $('[data-relation="saveLayout"]');
     try {
         $toast.toastActivate({ text: "Saving..." });
-        resetColours();
-        await fetch(UPDATE_URL, {
+        await fetch(getMasonryConfig().settings.updateUrl, {
             method: "POST",
             body: getFormData(),
         });
@@ -37,7 +35,7 @@ async function onEditColumnsReset() {
         });
     } finally {
         $toast.toastTimeout({
-            text: "Colours successfully reset.",
+            text: "Columns successfully saved.",
             css: "success",
         });
     }

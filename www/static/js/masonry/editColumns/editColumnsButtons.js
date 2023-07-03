@@ -3,7 +3,7 @@
  *
  */
 
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 
 /**
  * Start listening for button events
@@ -22,7 +22,7 @@ export function initEditColumnsButtons() {
  */
 function onResetSelected(event) {
     event.preventDefault();
-    document.dispatchEvent(new Event(UpdateHomepageEvents.EDIT_COLUMNS_RESET));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.EDIT_COLUMNS_RESET));
 }
 
 /**
@@ -32,7 +32,7 @@ function onResetSelected(event) {
  */
 function onUndoChangesSelected(event) {
     event.preventDefault();
-    document.dispatchEvent(new Event(UpdateHomepageEvents.EDIT_COLUMNS_UNDO_CHANGES));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.EDIT_COLUMNS_UNDO_CHANGES));
 }
 
 /**
@@ -42,5 +42,5 @@ function onUndoChangesSelected(event) {
  */
 function onSaveSelected(event) {
     event.preventDefault();
-    document.dispatchEvent(new Event(UpdateHomepageEvents.EDIT_COLUMNS_SAVE));
+    document.dispatchEvent(new Event(UpdateMasonryEvents.EDIT_COLUMNS_SAVE));
 }

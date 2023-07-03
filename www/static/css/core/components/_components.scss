@@ -60,9 +60,9 @@
     opacity: 0.5;
 }
 
-#component-layout .column-top .component-titlebar nav a:hover,
-#component-layout .column-left .component-titlebar nav a:hover,
-#component-layout .column-right .component-titlebar nav a:hover {
+#component-layout .component-titlebar nav a:hover,
+#component-layout .component-titlebar nav a:hover,
+#component-layout .component-titlebar nav a:hover {
     opacity: 1;
     background-color: transparent;
 }
@@ -76,23 +76,15 @@
      */
     .component {
         margin-bottom: rem-calc(($base-font-size));
-
-        /* Absorb from Skin Builder colour set
-         *
-         * wow nested identical css names - that's a really bad
-         * outcome. I shall rename .component.information-list
-         * into component-titlebar
-         */
-        .component-titlebar {
-            background-color: $content-ui-background;
-            margin-bottom: 0px;
-        }
     }
 }
 
 /* Component Title Bar
  */
 .component-titlebar {
+    background-color: $content-ui-background;
+    margin-bottom: 0px;
+
     .list-item {
         padding: 0.475rem 1rem;
     }
@@ -200,7 +192,8 @@
 
 /* Adding Components to homepages
  */
-#tabs-homepage .component-tabs {
+#tabs-homepage .component-tabs,
+#tabs-eportfolio .component-tabs {
     display: block;
     max-height: 0;
     visibility: hidden;

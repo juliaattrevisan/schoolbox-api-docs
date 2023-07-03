@@ -4,6 +4,7 @@
  */
 
 import { removeClassesThatContain } from "@js/util/cssUtils";
+import { getMasonryConfig } from "../masonryConfig";
 
 /**
  * Change the column width
@@ -11,7 +12,7 @@ import { removeClassesThatContain } from "@js/util/cssUtils";
  * @todo look to remove the jQuery foundation reference
  */
 export function initEditColumnsWidths() {
-    $('[data-interaction="column-width"]').on("change.fndtn.slider", function (event) {
+    $(getMasonryConfig().editColumns.columnWidthSelector).on("change.fndtn.slider", function (event) {
         updateColumnWidths(parseInt(event.target.getAttribute("data-slider")));
     });
 }
@@ -22,11 +23,11 @@ export function initEditColumnsWidths() {
  * @param { Number }
  */
 function updateColumnWidths(width) {
-    const leftContainer = document.querySelector('[data-position="left"]');
+    const leftContainer = document.querySelector(getMasonryConfig().editColumns.leftContainerSelector);
     removeClassesThatContain(leftContainer, "large-"); //remove any previous class that set width
     leftContainer.classList.add(`large-${width}`); //add in the new one
 
-    const rightContainer = document.querySelector('[data-position="right"]');
+    const rightContainer = document.querySelector(getMasonryConfig().editColumns.rightContainerSelector);
     removeClassesThatContain(rightContainer, "large-"); //remove any previous class that set width
     rightContainer.classList.add(`large-${12 - width}`); //linked to the leftContainer, so subract from the basis of '12' set by foundation classes
 }
@@ -39,7 +40,7 @@ function updateColumnWidths(width) {
  * @param { FormData }
  */
 export function undoWidthChanges() {
-    const $slider = $('[data-interaction="column-width"]');
+    const $slider = $(getMasonryConfig().editColumns.columnWidthSelector);
     $slider.foundation("slider", "set_value", $slider.data("original-value"));
     updateColumnWidths($slider.data("original-value"));
 }
@@ -50,5 +51,8 @@ export function undoWidthChanges() {
  * @param { FormData }
  */
 export function appendWidth(formData) {
-    formData.append("width", document.querySelector('[data-interaction="column-width"]').getAttribute("data-slider"));
+    formData.append(
+        "width",
+        document.querySelector(getMasonryConfig().editColumns.columnWidthSelector).getAttribute("data-slider")
+    );
 }

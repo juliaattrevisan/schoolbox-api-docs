@@ -5,9 +5,10 @@
 
 import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../updateHomepage";
+import { getMasonryConfig } from "../masonryConfig";
+import { getComponentID } from "../masonryFunctions";
 import { close as closeSettingsPanel } from "./updateComponentsSettings";
-import UpdateHomepageEvents from "../updateHomepageEvents";
+import UpdateMasonryEvents from "../updateMasonryEvents";
 
 const ANIMATE_CLOSED_POSITION = 0;
 const ANIMATE_OPEN_POSITION = 180;
@@ -22,9 +23,11 @@ const PANEL_SELECTOR = '[data-component-panel="delete"]';
  * Toggle the remove palette and manage the confirm/deny actions
  */
 export function initRemoveComponents() {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => init(event.detail.component)); //newly added components
+    document
+        .querySelectorAll(getMasonryConfig().settings.existingComponentSelector)
+        .forEach((component) => init(component)); //existing components
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
+    document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) => init(event.detail.component)); //newly added components
 }
 
 /**
@@ -129,10 +132,10 @@ function initConfirmButton(component) {
  */
 async function removeComponent(component, confirmDeleteButton) {
     try {
-        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
+        document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
         confirmDeleteButton.classList.add("disabled");
         confirmDeleteButton.innerText = "Removing...";
-        await fetch(UPDATE_URL, {
+        await fetch(getMasonryConfig().settings.updateUrl, {
             method: "POST",
             body: getFormData(component),
         });
@@ -144,13 +147,13 @@ async function removeComponent(component, confirmDeleteButton) {
     } finally {
         component.remove();
         document.dispatchEvent(
-            new CustomEvent(UpdateHomepageEvents.COMPONENT_REMOVED, {
+            new CustomEvent(UpdateMasonryEvents.COMPONENT_REMOVED, {
                 detail: {
                     component: component,
                 },
             })
         );
-        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
+        document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_END));
     }
 }
 
@@ -163,7 +166,15 @@ async function removeComponent(component, confirmDeleteButton) {
  */
 function getFormData(component) {
     const formData = new FormData();
-    formData.append("cid", document.getElementById("categoryID").value);
+    formData.append(
+        getMasonryConfig().settings.formData.pageInfo.type,
+        getMasonryConfig().settings.formData.pageInfo.id
+    );
+
+    // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
+    if (getMasonryConfig().settings.formData.pageInfo.context) {
+        formData.append("context", getMasonryConfig().settings.formData.pageInfo.context);
+    }
     formData.append("delete", getComponentID(component));
     formData.append("component", component.querySelector("[data-defn-id]").value);
     return formData;
@@ -184,7 +195,9 @@ export function updateRemovedComponent(component) {
     errorElement.innerHTML = `<b>Warning:</b> This component has been removed from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
 
     const insideComponentElement = component.querySelector("[data-collapsable] > div > section");
-    insideComponentElement.replaceChildren(errorElement);
+    if (insideComponentElement) {
+        insideComponentElement.replaceChildren(errorElement);
+    }
 
     gsap.from(errorElement, { opacity: 0, duration: ANIMATE_SPEED });
 }
