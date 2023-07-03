@@ -134,6 +134,34 @@ class Factory
         return $connectorInternal;
     }
 
+    /**
+     * Retrieve a connection to Read only Schoolbox database
+     *
+     * @return IConnector
+     * @throws DatabaseException
+     */
+    public function getInternalReadDatabase(): IConnector
+    {
+        $connectorInternalRead = $this->factory->createMysql();
+
+        $hostRead = SQL_host_read;
+        $dbRead   = SQL_db_read;
+        $userRead = SQL_user_read;
+        $passRead = SQL_passwd_read;
+
+        /** @phpstan-ignore-next-line - these values are not always defined */
+        if (!isset($hostRead, $dbRead, $userRead, $passRead)) {
+            throw new DatabaseException("Schoolbox read-only database not configured.");
+        }
+        if (!$connectorInternalRead->connect($hostRead, $dbRead, $userRead, $passRead)) {
+            throw new DatabaseException("Unable to connect to Schoolbox read-only database.");
+        }
+
+        $connectorInternalRead->setTimezone($this->fetchTimezone($connectorInternalRead));
+
+        return $connectorInternalRead;
+    }
+
 
     /**
      * Retrieve an appropriate external database connection based on the 'external_type' set in Schoolbox configuration
@@ -202,7 +230,7 @@ class Factory
                 $config->get('external_db_passwd')
             );
 
-            $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
+            $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
 
             return $connectorExternal;
         } catch (Exception $e) {

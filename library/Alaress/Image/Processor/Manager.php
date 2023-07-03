@@ -342,7 +342,7 @@ class Manager
             PDO::ATTR_PERSISTENT         => false,
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
         ];
-        $pdo     = new PDO(SQL_dsn, SQL_user, SQL_passwd, $options);
+        $pdo     = new PDO(SQL_dsn_read, SQL_user_read, SQL_passwd_read, $options);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->exec("SET time_zone = (SELECT `value` FROM `config` WHERE name LIKE 'date_timezone')");
         return $pdo;
