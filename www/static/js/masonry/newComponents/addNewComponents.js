@@ -16,7 +16,6 @@ gsap.registerPlugin(Draggable, Flip);
 const COMPONENT_CONTAINERS_SELECTOR = "[data-components-container]"; //the top/left/right parent containers and the tabs container
 const COMPONENT_SELECTOR = "[data-component-palette]"; //any component that will be dragged/added/sorted
 const SORTABLE_SELECTOR = "[data-component]"; //existing components that can be sorted
-const SORTABLE_SELECTOR_NOT_PALETTE = "[data-component]:not([data-component-palette])"; //existing components that can be sorted, but not inside the palette
 const ANIMATE_SPEED = 0.15; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
@@ -366,7 +365,7 @@ function isNewComponentOverPage() {
  *  animate the position change.
  */
 function checkNewDraggedComponentOnPage() {
-    const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR_NOT_PALETTE)); //grab all sortable elements
+    const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements
     const closestElement = getClosestElement(__newComponent, sortablesToCheckList); //the element nearest to the dragged element
     if (closestElement.id !== __newComponent.id && isElementAboveOtherElement(__newComponent, closestElement)) {
         //no need to FLIP if the closest element is still the __newComponent
