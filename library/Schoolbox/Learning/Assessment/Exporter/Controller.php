@@ -144,6 +144,13 @@ class Controller extends BaseController
         $courseSpec = $unitSpec->getCourse();
         $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
 
+        // Filter out historical classes (no class code, no group).
+        $courseImpls->filter(
+            function (CourseImplementation\Model $courseImpl) {
+                return !($courseImpl->getFolder()->getCodeString() === '' && $courseImpl->getFolder()->getGroup() === null);
+            }
+        );
+
         // Hydrate existing unit implementations.
         foreach ($courseImpls as $courseImpl) {
             $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
