@@ -371,7 +371,7 @@ echo "</pre>\n";
 
         // Hydrate existing unit implementations.
         foreach ($courseImpls as $courseImpl) {
-            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId());
+            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
         }
 
 // TestDataOutput:
