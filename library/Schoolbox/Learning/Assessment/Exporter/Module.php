@@ -200,10 +200,10 @@ class Module extends BaseModule
 
 
     /**
-     * @return ErrorMapper|Mapper
+     * @return ErrorMapper
      * @throws \InvalidArgumentException
      */
-    protected function getErrorMapper()
+    protected function getErrorMapper(): ErrorMapper
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
@@ -212,7 +212,7 @@ class Module extends BaseModule
     /**
      * @return AssessmentMapperProxy
      */
-    protected function getAssessmentMapperProxy()
+    protected function getAssessmentMapperProxy(): AssessmentMapperProxy
     {
         return $this->injector->get('assessmentDataSource');
     }
