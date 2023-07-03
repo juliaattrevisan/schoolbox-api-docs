@@ -142,14 +142,7 @@ class Controller extends BaseController
      */
     public function getExportFormForUnit(UnitSpecification\Model $unitSpec): void
     {
-// Test URL: https://vagrant.dev.schoolbox.cloud/learning/export/unit/54
-// TestDataCheck: $unitSpec is course_unit_specification 54 => folder_id 201 'Semester 2'.
         $courseSpec = $unitSpec->getCourse();
-
-// TestDataOutput:
-echo "This unit spec belongs to course '" . $courseSpec->getTitle() . "', id: " . $courseSpec->getId() . "<br/>\n";
-// TestDataCheck: $courseSpec is course_specification 16 - 'MYP Reported Grades'.
-
         $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
 
         // Hydrate existing unit implementations.
@@ -157,17 +150,6 @@ echo "This unit spec belongs to course '" . $courseSpec->getTitle() . "', id: " 
             $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
         }
 
-// TestDataOutput:
-foreach ($courseImpls as $courseImpl) {
-    echo "For courseImpl " . $courseImpl->getId() . ", found units:<br/>\n";
-    foreach ($courseImpl->getUnits() as $unit) {
-        echo " * " . $unit->getTitle() . "<br/>\n";
-    }
-}
-
-// TestDataCheck: $courseImpls are:
-// TestDataCheck:  * course_implementation 12 => folder_id 85 '9PDHC' - (Semesters 1 and 2 have been imported, so this ends up in $courseImplsInWhichUnitImported)
-// TestDataCheck:  * course_implementation 13 => folder_id 82 '9ENGC' - (Only Semesters 1 has been imported, so this ends up in $courseImplsInWhichUnitNotImported)
         // Split $courseImpls into two collections:
         //  * those in which $unitSpec has been imported, and
         //  * those in which $unitSpec has not been imported.
@@ -359,13 +341,7 @@ foreach ($courseImpls as $courseImpl) {
             return;
         }
 
-// TestDataOutput:
-echo "Exporting unitSpec (unitSpecId: " . $unitSpec->getId() . ") to courseImplementations (courseImplementationIds: " . implode(', ', $courseImplIds) . ")...<br/>\n";
-
         $unitDatesByCourseId = $this->getRequest()->post->get('unitDatesByCourseId');
-echo "<pre>\n";
-var_export($unitDatesByCourseId);
-echo "</pre>\n";
 
         $courseImpls = $this->courseImplementationMapper->findByColumn('id', $courseImplIds);
 
@@ -373,12 +349,6 @@ echo "</pre>\n";
         foreach ($courseImpls as $courseImpl) {
             $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
         }
-
-// TestDataOutput:
-echo "courseImpls:<br/>\n";
-foreach ($courseImpls as $courseImpl) {
-    echo " * courseImplementationId, folderTitle: " . $courseImpl->getId() . ", " . $courseImpl->getFolder()->getTitle() . "<br/>\n";
-}
 
         $folderWritePerms = $this->buildFolderWritePermissions($courseImpls);
 
@@ -403,29 +373,18 @@ foreach ($courseImpls as $courseImpl) {
 
         $reimportIsEnabled = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
 
-echo "<br/>Exporting units to course implementations...<br/>\n";
         foreach ($courseImpls as $courseImpl) {
             $units = $courseImpl->getUnits();
-echo "Existing units:<br/>\n";
-foreach ($units as $unit) {
-    echo " * Title, unitSpecId: " . $unit->getTitle() . ', ', $unit->getSpecification()->getId() . "<br/>\n";
-}
-echo "<br/>\n";
             $unitToOverwrite = null;
 
-echo "Finding unit to overwrite...<br/>\n";
             foreach ($units as $unit) {
                 if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
-echo " * Found unit to overwrite.<br/>\n";
                     $unitToOverwrite = $unit;
                 }
             }
 
             if ($unitToOverwrite !== null) {
                 if ($reimportIsEnabled) {
-                    // UPDATE course_unit_implementation
-                    // SET deleted_at=NOW()
-                    // WHERE id=$unitIdToOverwrite
                     $unitToOverwrite->setDeletedAt(new Alaress_Date_Format(time(), Alaress_Date_Format::TIMESTAMP));
                     $this->unitImplementationMapper->save($unitToOverwrite);
                 } else {
@@ -435,16 +394,6 @@ echo " * Found unit to overwrite.<br/>\n";
 
             $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
 
-echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation " . $courseImpl->getId() . " with open date " . $unitDates['open'] . " and close date " . $unitDates['close'] . "...<br/>\n";
-
-            // INSERT INTO course_unit_implementation SET
-            // course_unit_specification_id= $unitSpec->getId(),                // 54
-            // title                       = $unitSpec->getFolder()->getTitle() // "Semester 2"
-            // open_date                   = $unitDates['open'],
-            // due_date                    = $unitDates['close'],
-            // created_at                  = NOW(),
-            // updated_at                  = NOW(),
-            // deleted_at                  = NULL
             $unitImplToInsert = new UnitImplementation\Model($unitSpec);
             $unitImplToInsert->setCourse($courseImpl);
             $unitImplToInsert->setTitle($unitSpec->getFolder()->getTitle());
@@ -456,13 +405,10 @@ echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation "
                 $this->unitImplementationMapper->save($unitImplToInsert);
             } catch (MapperException $e) {
                 // Could not save.
-                echo $e->getMessage();
                 die;
             }
 
-echo "Saved successfully.<br/>\n";
         }
-die;
 
         // Redir back to the return URL (if set) or the course page if not
         if ($this->getRequest()->isXhr()) {
