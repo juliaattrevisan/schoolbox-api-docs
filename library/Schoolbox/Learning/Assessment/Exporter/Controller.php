@@ -138,7 +138,6 @@ class Controller extends BaseController
      *
      * @param UnitSpecification\Model $unitSpec UnitSpec
      * @throws MapperException
-     * @throws RouteNotFound
      */
     public function getExportFormForUnit(UnitSpecification\Model $unitSpec): void
     {
@@ -329,8 +328,11 @@ class Controller extends BaseController
     /**
      * Export a unit specification to one or more pre-existing course implementations.
      * @param UnitSpecification\Model $unitSpec
-     * @internal param int[] $_POST['courseImplementationIds'] course implementation IDs into which to export the $unitSpec.
      * @return void
+     * @throws ControllerException
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @internal param int[] $_POST['courseImplementationIds'] course implementation IDs into which to export the $unitSpec.
      */
     public function postExportForUnit(UnitSpecification\Model $unitSpec): void
     {
