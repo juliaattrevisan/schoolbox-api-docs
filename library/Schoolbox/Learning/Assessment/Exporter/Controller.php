@@ -15,7 +15,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\BrokenFilterException;
-use Schoolbox\Filter\Filters\Assessment\IdFinder;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -28,7 +28,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
-use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 use InvalidArgumentException;
 use Alaress_Date_Format;
 
@@ -38,42 +37,6 @@ use Alaress_Date_Format;
 class Controller extends BaseController
 {
     /**
-     * @var Access
-     */
-    protected $access;
-
-
-    /**
-     * @var AssessmentDataSource
-     */
-    protected $assessmentDataSource;
-
-
-    /**
-     * @var CourseImplementation\Mapper
-     */
-    private $courseImplementationMapper;
-
-
-    /**
-     * @var UnitImplementation\Mapper
-     */
-    private $unitImplementationMapper;
-
-
-    /**
-     * @var Replicator
-     */
-    private $replicator;
-
-
-    /**
-     * @var AssessmentFilter\IdFinder
-     */
-    private $assessmentIdFinder;
-
-
-    /**
      * Constructor
      *
      * @param Access                      $access
@@ -81,24 +44,18 @@ class Controller extends BaseController
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper   $unitImplementationMapper
      * @param Replicator                  $replicator
-     * @param IdFinder                    $assessmentIdFinder
+     * @param AssessmentFilter\IdFinder   $assessmentIdFinder
      * @param Project\ResultCache\Mapper  $projectResultCacheMapper
      */
     public function __construct(
-        Access $access,
-        AssessmentDataSource $assessmentDataSource,
-        CourseImplementation\Mapper $courseImplementationMapper,
-        UnitImplementation\Mapper $unitImplementationMapper,
-        Replicator $replicator,
-        AssessmentFilter\IdFinder $assessmentIdFinder,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Access $access,
+        protected AssessmentDataSource $assessmentDataSource,
+        private CourseImplementation\Mapper $courseImplementationMapper,
+        private UnitImplementation\Mapper $unitImplementationMapper,
+        private Replicator $replicator,
+        private AssessmentFilter\IdFinder $assessmentIdFinder,
+        private Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
-        $this->access                     = $access;
-        $this->assessmentDataSource       = $assessmentDataSource;
-        $this->courseImplementationMapper = $courseImplementationMapper;
-        $this->unitImplementationMapper   = $unitImplementationMapper;
-        $this->replicator                 = $replicator;
-        $this->assessmentIdFinder         = $assessmentIdFinder;
     }
 
 
