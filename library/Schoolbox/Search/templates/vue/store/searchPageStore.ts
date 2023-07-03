@@ -14,7 +14,6 @@ export const useStore = defineStore("searchPage", () => {
      */
     function checkForStorybook() {
         if (typeof window.STORYBOOK_ENV !== "undefined") {
-            $reset();
             // useViewNodesStore().$reset();
             // useActiveNodeStore().$reset();
         }

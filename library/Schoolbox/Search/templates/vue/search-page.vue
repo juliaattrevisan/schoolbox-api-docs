@@ -6,6 +6,15 @@
 import SpInput from "./input/sp-input.vue";
 import SpResults from "./results/sp-results.vue";
 import SpFilters from "./filters/sp-filters.vue";
+import { useStore } from "./store/searchPageStore";
+
+interface Props {
+    endpoint: string; // the search api endpoint
+}
+const props = defineProps<Props>();
+
+// initialise the store
+useStore().init(props.endpoint);
 </script>
 
 <template>
