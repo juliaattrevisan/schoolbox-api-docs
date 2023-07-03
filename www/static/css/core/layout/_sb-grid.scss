@@ -1,0 +1,144 @@
+/**
+ *  sb-grid.scss
+ *
+ *  Created to house the new css grid based implementation of grid. This file will
+ *  hopefully replace the Foundation grid eventually once we land on the Normandy
+ *  beaches of Operation Crumble.
+**/
+@use "sass:list";
+@use "sass:map";
+
+/*  NEW GRID LAYOUT STYLES - Consider if you really *need* to use a 12 col layout */
+//  Class used on our parent container to declare it as a grid layout.
+$minColWidth: 12rem;
+
+/* Variables for legacy sizing */
+//$foundation-size-array: "xxlarge", "xlarge", "large", "medium", "small";
+
+/**
+ *  Why are we decrementing in sizes? Because of the way CSS works. If we declare classes
+ *  later into our style sheet their properties will overwrite any properties of classes
+ *  declared earlier than them. Given we want our smaller rules to clobber larger rules
+ *  in the event an element has multiple sizing classes, this is the best way to get CSS
+ *  to apply that logic.
+**/
+
+$foundation-breakpoint-map: (
+    "xxlarge": (
+        "breakpoint": $xxlarge-only,
+        "breakpoint-smaller-down": $xlarge-down,
+    ),
+    "xlarge": (
+        "breakpoint": $xlarge-up,
+        "breakpoint-smaller-down": $large-down,
+    ),
+    "large": (
+        "breakpoint": $large-up,
+        "breakpoint-smaller-down": $medium-down,
+    ),
+    "medium": (
+        "breakpoint": $medium-up,
+        "breakpoint-smaller-down": $small-only,
+    ),
+    "small": (
+        "breakpoint": $small-up,
+        "breakpoint-smaller-down": $small-only,
+    ),
+);
+
+// Generate an array of keys for our for loops later to utilise later
+$foundation-size-array: map.keys($foundation-breakpoint-map);
+
+.sb-grid {
+    display: grid;
+    grid-gap: var(--whitespace-m);
+    grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr));
+
+    &--2-col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    &--3-col {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    &--4-col {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+//  Support legacy styles and 12 column layout.
+.sb-grid--12 {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+
+    /**
+     *  This is a little weird but necessary to replicate how Foundation's grid system worked.
+     *  Long story short, we
+    **/
+    @for $i from 1 through list.length($foundation-size-array) {
+        // Get the array key.
+        $key: list.nth($foundation-size-array, $i);
+        // Get the value from our map of breakpoints
+        $map-val: map.get($foundation-breakpoint-map, $key);
+
+        @if $i == list.length($foundation-size-array) {
+            //Only generate the rule for our current breakpoint as we have nothing smaller than us
+            $breakpoint: map.get($map-val, "breakpoint");
+
+            @media #{$breakpoint} {
+                @for $j from 1 through 12 {
+                    .#{$key}-#{$j} {
+                        content: "AAAZ";
+                        border: 5px solid orange !important;
+                        grid-column: span $i;
+                    }
+                }
+            }
+        } @else {
+            /* We need to generate a rule for our current breakpoint up and set everything smaller
+            * than the current breakpoint to span all columns. As we are decrementing in sizes,
+            * this means get the NEXT key in the array.
+            */
+            $next-key: list.nth($foundation-size-array, $i + 1);
+            // Nested values...
+            $breakpoint: map.get($map-val, "breakpoint");
+            $breakpoint-smaller-down: map.get($map-val, "breakpoint-smaller-down");
+
+            @media #{$breakpoint} {
+                @for $j from 1 through 12 {
+                    .#{$key}-#{$j} {
+                        content: "AAAX";
+                        border: 5px solid red !important;
+                        grid-column: span $i;
+                    }
+                }
+            }
+
+            @media #{$breakpoint-smaller-down} {
+                @for $j from 1 through 12 {
+                    .#{$key}-#{$j} {
+                        content: "AAAY";
+                        grid-column: span 12;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Override all the foundation set values back to default. Not necessary once Foundation is removed.
+.sb-grid--12 > * {
+    width: 100% !important;
+}
+
+/*  GENERAL MEDIA QUERIES */
+@media (max-width: 700px) {
+    .sb-grid {
+        &--2-col,
+        &--3-col,
+        &--4-col {
+            grid-template-columns: 1fr;
+        }
+    }
+}
