@@ -122,7 +122,11 @@ HELP;
         }
     }
 
-    private function updateAttempt(string $attemptID)
+    /**
+     * @param $attemptID
+     * @return void
+     */
+    private function updateAttempt($attemptID)
     {
         $db     = $this->getDatabaseInternal();
         $query = $db->prepareQuery("UPDATE assess_attempt,
