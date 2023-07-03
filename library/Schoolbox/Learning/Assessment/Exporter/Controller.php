@@ -394,7 +394,7 @@ class Controller extends BaseController
 
             $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
 
-            $unitImplToInsert = new UnitImplementation\Model($unitSpec);
+            $unitImplToInsert = new UnitImplementation\Model();
             $unitImplToInsert->setCourse($courseImpl);
             $unitImplToInsert->setTitle($unitSpec->getFolder()->getTitle());
             $unitImplToInsert->setSpecification($unitSpec);
