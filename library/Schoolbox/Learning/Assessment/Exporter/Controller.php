@@ -400,20 +400,28 @@ foreach ($courseImpls as $courseImpl) {
 echo "<br/>Exporting units to course implementations...<br/>\n";
         foreach ($courseImpls as $courseImpl) {
             $units = $courseImpl->getUnits();
-            $unitIdToOverwrite = null;
+echo "Existing units:<br/>\n";
+foreach ($units as $unit) {
+    echo " * Title, unitSpecId: " . $unit->getTitle() . ', ', $unit->getSpecification()->getId() . "<br/>\n";
+}
+echo "<br/>\n";
+            $unitToOverwrite = null;
 
+echo "Finding unit to overwrite...<br/>\n";
             foreach ($units as $unit) {
                 if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
-                    $unitIdToOverwrite = $unit->getId();
+echo " * Found unit to overwrite.<br/>\n";
+                    $unitToOverwrite = $unit;
                 }
             }
 
-            if ($unitIdToOverwrite !== null) {
+            if ($unitToOverwrite !== null) {
                 if ($reimportIsEnabled) {
-                    // TODO:
                     // UPDATE course_unit_implementation
                     // SET deleted_at=NOW()
                     // WHERE id=$unitIdToOverwrite
+                    $unitToOverwrite->setDeletedAt(new Alaress_Date_Format(time(), Alaress_Date_Format::DATABASE_FORMAT));
+                    $this->unitImplementationMapper->save($unitToOverwrite);
                 } else {
                     continue; // We cannot overwrite the existing unit, so skip this course implementation.
                 }
@@ -421,9 +429,8 @@ echo "<br/>Exporting units to course implementations...<br/>\n";
 
             $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
 
-echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation " . $courseImpl->getId() . " with open date " . $unitDates['open'] . " and close date " . $unitDates['close'] . "... (TODO)<br/>\n";
+echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation " . $courseImpl->getId() . " with open date " . $unitDates['open'] . " and close date " . $unitDates['close'] . "...<br/>\n";
 
-            // TODO:
             // INSERT INTO course_unit_implementation SET
             // course_unit_specification_id= $unitSpec->getId(),                // 54
             // title                       = $unitSpec->getFolder()->getTitle() // "Semester 2"
@@ -432,6 +439,22 @@ echo " * Exporting unitSpec " . $unitSpec->getId() . " to courseImplementation "
             // created_at                  = NOW(),
             // updated_at                  = NOW(),
             // deleted_at                  = NULL
+            $unitImplToInsert = new UnitImplementation\Model($unitSpec);
+            $unitImplToInsert->setCourse($courseImpl);
+            $unitImplToInsert->setTitle($unitSpec->getFolder()->getTitle());
+            $unitImplToInsert->setSpecification($unitSpec);
+            $unitImplToInsert->setOpenDate(new Alaress_Date_Format($unitDates['open'] . ' 12:00am', Alaress_Date_Format::FORMAT_DATE_PICKER));
+            $unitImplToInsert->setDueDate(new Alaress_Date_Format($unitDates['close'] . ' 12:00am', Alaress_Date_Format::FORMAT_DATE_PICKER));
+
+            try {
+                $this->unitImplementationMapper->save($unitImplToInsert);
+            } catch (MapperException $e) {
+                // Could not save.
+                echo $e->getMessage();
+                die;
+            }
+
+echo "Saved successfully.<br/>\n";
         }
 die;
 
