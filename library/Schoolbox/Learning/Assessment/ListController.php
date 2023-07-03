@@ -1023,12 +1023,12 @@ class ListController extends Web\Controller\Base
     public function getLaunchAssessmentAsInstructorReturnIframe(int $assessmentId): void
     {
         // Do not check for permissions: this is only a redirect
-        $statusUrl = $this->router->generate(
+        $statusUrl = $this->routeGenerator->generate(
             'learningAssessment.getStatus',
             ['assessmentId' => $assessmentId,],
         );
         $returnUrl = new Uri(
-            $this->router->generate(
+            $this->routeGenerator->generate(
                 'learningAssessment.getLaunchAssessmentAsInstructorReturnWindow',
                 ['assessmentId' => $assessmentId,],
             ),
@@ -1158,7 +1158,7 @@ class ListController extends Web\Controller\Base
     public function getLaunchAssessmentAsStudentReturnIframe(int $assessmentId, int $studentId): void
     {
         // Do not check for permissions: this is only a redirect
-        $summaryUrl = $this->router->generate(
+        $summaryUrl = $this->routeGenerator->generate(
             'learningAssessment.getSummary',
             [
                 'assessmentId' => $assessmentId,
@@ -1167,7 +1167,7 @@ class ListController extends Web\Controller\Base
         );
 
         $returnUrl = new Uri(
-            $this->router->generate(
+            $this->routeGenerator->generate(
                 'learningAssessment.getLaunchAssessmentAsStudentReturnWindow',
                 [
                     'assessmentId' => $assessmentId,
