@@ -420,12 +420,6 @@ function updateDraggedComponentOnPage(closestElement, isShiftingDown) {
 
     const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
 
-    // If the closestElement is a placeholder (data-place-holder-component)
-    // Then we should ensure the new component is always added after the placeholder
-    if (closestElement.dataset.placeHolderComponent) {
-        isShiftingDown = true;
-    }
-
     isShiftingDown
         ? insertElementAfter(closestElement, __referenceElement)
         : insertElementBefore(closestElement, __referenceElement); //insert into the appropriate spot depending on drag position
@@ -434,6 +428,8 @@ function updateDraggedComponentOnPage(closestElement, isShiftingDown) {
     __newComponent.style.marginBottom = "1rem"; //existing components all have a margin
 
     clearFlipElements(); //check for flip bug
+
+    document.dispatchEvent(new Event(UpdateMasonryEvents.NEW_COMPONENT_SORT_UPDATE));
 
     __newComponent.dataset.leftDifference =
         __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
@@ -566,7 +562,6 @@ function updateDocumentOnDragEnd() {
 async function addNewComponent() {
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
-    console.log("newComponent", newComponent);
     document.dispatchEvent(
         new CustomEvent(UpdateMasonryEvents.COMPONENT_ADDED, {
             detail: {
