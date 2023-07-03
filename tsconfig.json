@@ -17,5 +17,5 @@
         "target": "ES6" // Modern browsers support all ES6 features, so ES6 is a good choice.
     },
     "exclude": [".vagrant", "conf", "debian", "docs", "node_modules", "packages", "sql", "tools", "updates", "www", "**/*.spec.ts",], // Specifies an array of filenames or patterns that should be skipped when resolving include.
-    "include": ["types/*", "library/**/*", "templates/**/*", "vue/**/*", "www/static/js/**/*"] // Specifies an array of filenames or patterns to include in the program.
+    "include": ["types/*", "library/**/*", "templates/**/*", "vue/**/*", "www/static/js/**/*", "stories/**/*"] // Specifies an array of filenames or patterns to include in the program.
 }
