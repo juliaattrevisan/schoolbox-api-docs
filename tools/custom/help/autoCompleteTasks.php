@@ -146,11 +146,11 @@ HELP;
         $params = Builder::getArrayPlaceholders($projects, 'assessments');
         // grab the list of projects these assessments are part of.$params = Builder::getArrayPlaceholders(self::COURSE_IDS);..
         $projectStatement = $db->prepareQuery("SELECT
-            project_id, project.assessment_id as 'assessment_id'
+            DISTINCT project.assessment_id as 'assessment_id'
         FROM project_assessment
         JOIN project on project_assessment.project_id = project.id
         where project_assessment.assessment_id in {$params}
-        group by project_id");
+        ");
         $projectStatement->execute(Builder::getArrayParameters($projects, 'assessments'));
 
         while ($row = $projectStatement->fetch()) {
