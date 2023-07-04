@@ -60,6 +60,15 @@
 }
 
 /**
+ * to allow enough space for the media/table baloon UI's
+ * so they don't overlap the toolbar
+ */
+.ck.ck-content > figure:first-child,
+.ck.ck-content > p:first-child span.image-inline.ck-widget_selected {
+    margin-top: 3rem !important;
+}
+
+/**
  * add a custom highlight style
  */
 .ck.ck-content span.highlighted-note {
