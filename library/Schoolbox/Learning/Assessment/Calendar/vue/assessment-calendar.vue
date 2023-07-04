@@ -219,7 +219,7 @@ export default {
             resources: this.resources,
             firstDay: "1",
             initialDate: this.termStartDate,
-            viewDidMount: this.viewDidMount,
+            viewClassNames: this.viewClassNames,
             weekNumberCalculation: "ISO",
             loading: this.fullCalendarHelper_onLoading,
             eventClick: this.onEventClick,
@@ -447,11 +447,19 @@ export default {
         },
 
         /**
-         * Callback for when the calendar view changes: preserve the
-         * newly selected view for this user.
+         * Callback for when the calendar view's class list changes (as it does
+         * when a new view is selected): preserve the newly selected view for
+         * this user.
+         *
+         * Changed from `viewDidMount`, as that only fires when a new view is
+         * added to the DOM: the day and week views share the same view, thus
+         * this event didn't fire when switching between day and week view.
+         *
          * @see https://fullcalendar.io/docs/view-render-hooks
+         * @see https://github.com/fullcalendar/fullcalendar/issues/5543 for
+         *      discussion of `viewDidMount` vs. `viewClassNames`
          */
-        viewDidMount() {
+        viewClassNames() {
             const calendarApi = this.$refs.fullCalendar.getApi(); //runs before the nextTick, so need api here
             const eventSource = calendarApi.getEventSourceById("events");
             const groupedEventSource = calendarApi.getEventSourceById("groupedEvents");
@@ -586,7 +594,7 @@ export default {
                     return result;
                 })
                 .then((result) => {
-                    this.viewDidMount();
+                    this.viewClassNames();
                     this.fullCalendarHelper_onLoading(false);
                     return result;
                 });
