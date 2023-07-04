@@ -522,34 +522,39 @@
         {% for folder in folders %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
-            <div class="folder-title">
-                <div class="left">
-                    <h4>{{ folder.title }}</h4>
+            {# if there are no filtered assessments for this folder, or no class mark ignore the folder #}
+            {% if ((summaryAssessments[folder.id] ?? [])| length) or (weightedMean != '') %}
+
+                <div class="folder-title">
+                    <div class="left">
+                        <h4>{{ folder.title }}</h4>
+                    </div>
+
+                    {% if showSummaryOverallGrade %}
+                    <p class="grade">{{ weightedMean ?? '' }}</p>
+                    {% endif %}
                 </div>
 
-                {% if showSummaryOverallGrade %}
-                <p class="grade">{{ weightedMean ?? '' }}</p>
+                {% if allGraphs['summary'][folder.id] is defined %}
+                    {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id, folderType: allGraphs['summary'][folder.id].type, location: 'summary' } only %}
                 {% endif %}
-            </div>
 
-            {% if allGraphs['summary'][folder.id] is defined %}
-                {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id, folderType: allGraphs['summary'][folder.id].type, location: 'summary' } only %}
-            {% endif %}
-
-            {% if (summaryAssessments[folder.id] ?? [])| length %}
-                {% for assessment in summaryAssessments[folder.id] %}
-                    {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-                    {% include '@adminSummativeReport/assessmentReport.twig' with
-                        {
-                            student: student,
-                            assessment: assessment,
-                            feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
-                            showGrades: showSummaryGrades,
-                            showComments: showSummaryComments,
-                            showRubrics: showSummaryRubrics,
-                            page: 'subject-summary'
-                        } only %}
-                {% endfor %}
+                {# The class may have a mark but no assessments, ignore this class and move along #}
+                {% if (summaryAssessments[folder.id] ?? [])| length %}
+                    {% for assessment in summaryAssessments[folder.id] %}
+                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
+                        {% include '@adminSummativeReport/assessmentReport.twig' with
+                            {
+                                student: student,
+                                assessment: assessment,
+                                feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
+                                showGrades: showSummaryGrades,
+                                showComments: showSummaryComments,
+                                showRubrics: showSummaryRubrics,
+                                page: 'subject-summary'
+                            } only %}
+                    {% endfor %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     </div>
