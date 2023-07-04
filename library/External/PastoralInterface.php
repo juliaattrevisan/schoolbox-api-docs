@@ -94,6 +94,13 @@ interface External_PastoralInterface extends External\IConnector
     public function uploadPastoralDocument(Pastoral\UploadQueue\Model $upload): bool;
 
     /**
+     * Deletes pastoral attachment
+     * @param Pastoral\Attachment\Model $pastoralAttachment
+     * @return bool
+     */
+    public function deletePastoralDocument(Pastoral\Attachment\Model $pastoralAttachment): bool;
+
+    /**
      * Gets available pastoral types
      * @return array
      */

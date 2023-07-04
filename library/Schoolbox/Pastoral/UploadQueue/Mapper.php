@@ -41,6 +41,7 @@ class Mapper extends BaseMapper
         $this->uses('realname', self::TYPE_STRING);
         $this->uses('external_id', self::TYPE_INTEGER);
         $this->uses('student_external_id', self::TYPE_INTEGER);
+        $this->uses('pastoral_attachment_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_STRING);
         $this->uses('message', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

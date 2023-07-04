@@ -11,6 +11,7 @@
  */
 
 use External\IOfflineConnector;
+use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
@@ -58,6 +59,15 @@ class External_Offline_Pastoral implements External_PastoralInterface, IOfflineC
      * @inheritdoc
      */
     public function uploadPastoralDocument(UploadQueue $upload): bool
+    {
+        // NOOP
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deletePastoralDocument(PastoralAttachment $pastoralAttachment): bool
     {
         // NOOP
         return false;

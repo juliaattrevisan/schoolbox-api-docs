@@ -177,8 +177,9 @@ HELP;
 
         // Upload file to DocMan
         try {
-            $this->externalPastoral->uploadPastoralDocument($pendingUpload);
-            $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_COMPLETED);
+            $result = $this->externalPastoral->uploadPastoralDocument($pendingUpload);
+            // result will be false, when SIS is offline
+            $pendingUpload->setStatus($result ? Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_COMPLETED : Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_PENDING);
         } catch (\InvalidArgumentException $e) {
             $this->getLogger()->warning("File could not be processed: {$e->getMessage()}", ['exception' => $e]);
             $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED);
@@ -191,6 +192,9 @@ HELP;
         if ($pendingUpload->getStatus() === Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED) {
             $this->getLogger()->error("Uploading of file '{$hash}' failed");
             return false;
+        } elseif ($pendingUpload->getStatus() === Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_PENDING) {
+            $this->getLogger()->warning("Skipped uploading of file '{$hash}'");
+            return true;
         }
         $this->getLogger()->info("Uploading of file '{$hash}' completed");
         return true;

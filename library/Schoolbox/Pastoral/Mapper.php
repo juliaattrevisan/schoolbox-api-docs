@@ -20,7 +20,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
-use Schoolbox\Pastoral\Action\Model as Action;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Report\Model as Report;

@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Database\Exception;
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Html2Text\Html2Text;
 use Schoolbox\Config\ConfigMapper;
@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
+use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
@@ -119,6 +120,43 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     const CHARACTER_ENCODING = 'UTF-8';
 
+    /** @var Html2Text $htmlConverter */
+    protected $htmlConverter;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
+
+        $this->setupDatabase();
+
+        $this->htmlConverter = new Html2Text();
+
+        $externalPing = new External_Ping();
+
+        // The upload location varies depending on the version of Synergetic
+
+        if ($externalPing->getVersion() > 67) {
+            $this->schemaMedia = "media";
+        } else {
+            $this->schemaMedia = "SynergyOneMedia.dbo";
+        }
+
+        // Grab mapper instances
+        $this->userMapper                           = UserMapper::getInstance();
+        $this->pastoralMapper                       = PastoralMapper::getInstance();
+        $this->pastoralAccessMapper                 = PastoralAccessMapper::getInstance();
+        $this->pastoralDocumentClassificationMapper = PastoralDocumentClassificationMapper::getInstance();
+        $this->pastoralCommentMapper                = PastoralCommentMapper::getInstance();
+        $this->pastoralLogMapper                    = PastoralLogMapper::getInstance();
+        $this->pastoralTypeMapper                   = PastoralTypeMapper::getInstance();
+        $this->pastoralSubTypeMapper                = PastoralSubTypeMapper::getInstance();
+        $this->pastoralSeverityMapper               = PastoralSeverityMapper::getInstance();
+        $this->pastoralRevisionMapper               = PastoralRevisionMapper::getInstance();
+        $this->pastoralAttachmentMapper             = PastoralAttachmentMapper::getInstance();
+    }
 
     /**
      * Returns a query for finding pastoral records in external system
@@ -195,45 +233,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             AND DATEDIFF(DAY, {$this->getStudentViewName()}.StudentLeavingDate, GETDATE()) > 0)
         ";
     }
-
-
-    /** @var Html2Text $htmlConverter */
-    protected $htmlConverter;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
-
-        $this->setupDatabase();
-
-        $this->htmlConverter = new Html2Text();
-
-        $externalPing = new External_Ping();
-
-        // The upload location varies depending on the version of Synergetic
-
-        if ($externalPing->getVersion() > 67) {
-            $this->schemaMedia = "media";
-        } else {
-            $this->schemaMedia = "SynergyOneMedia.dbo";
-        }
-
-        // Grab mapper instances
-        $this->userMapper                           = UserMapper::getInstance();
-        $this->pastoralMapper                       = PastoralMapper::getInstance();
-        $this->pastoralAccessMapper                 = PastoralAccessMapper::getInstance();
-        $this->pastoralDocumentClassificationMapper = PastoralDocumentClassificationMapper::getInstance();
-        $this->pastoralCommentMapper                = PastoralCommentMapper::getInstance();
-        $this->pastoralLogMapper                    = PastoralLogMapper::getInstance();
-        $this->pastoralTypeMapper                   = PastoralTypeMapper::getInstance();
-        $this->pastoralSubTypeMapper                = PastoralSubTypeMapper::getInstance();
-        $this->pastoralSeverityMapper               = PastoralSeverityMapper::getInstance();
-        $this->pastoralRevisionMapper               = PastoralRevisionMapper::getInstance();
-    }
-
     /**
      * @inheritdoc
      */
@@ -459,14 +458,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $storageMapper = StorageMapper::getInstance();
                                         $storageObject = $storageMapper->accept("{$document['filename']}.{$document['extension']}", $filename, false);
 
-                                        $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
-
-                                        $attachment = $pastoralAttachmentMapper->createModel();
+                                        $attachment = $this->pastoralAttachmentMapper->createModel();
                                         $attachment->setPastoral($pastoralRecord);
                                         $attachment->setStorage($storageObject);
                                         $attachment->setRealname($storageObject->getFilename());
                                         $attachment->setPrivate(true);
-                                        $pastoralAttachmentMapper->save($attachment);
+                                        $this->pastoralAttachmentMapper->save($attachment);
 
                                         $log = $this->pastoralLogMapper->createModel();
                                         $log->setImportId($importId);
@@ -492,7 +489,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                             $logRecord->setResult("Skipped Blank Record ({$record["PastoralCareSeq"]})");
                         }
-                    } catch (Exception $e) {
+                    } catch (DatabaseException $e) {
                         // If ANYTHING goes wrong during the import we need to log it. The import is running in a detached
                         // state, so there is no other way to communicate with the user, so an exception would leave the user
                         // thinking the import is still running.
@@ -705,11 +702,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $this->updatePastoralCareContacts($pastoral);
                 if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
                     $this->updateActions($pastoral);
-                }
-
-                if ($this->config->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD) && !$isCreate) {
-                    $existingFiles = $pastoral->getAttachments()->getPropertyValues('realname');
-                    $this->deletePastoralDocument($pastoral, $existingFiles);
                 }
 
                 if (!$inOuterTransaction) {
@@ -1045,7 +1037,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // Restore the proper propagator
             $this->pastoralCommentMapper->setEventPropagator($propagator);
             return true;
-        } catch (Exception $e) {
+        } catch (DatabaseException $e) {
             $this->connector->rollBack();
             // most likely that corresponding pastoral record is deleted in Synergetic
             return false;
@@ -1098,10 +1090,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     "DELETE FROM PastoralCareComments WHERE PastoralCareSeq = :externalId",
                     ['externalId' => $pastoral->getExternalId()]
                 );
-
-                if ($this->config->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)) {
-                    $this->deletePastoralDocument($pastoral, []);
-                }
 
                 // Delete the pastoral care record itself now that its dependencies are gone
                 $this->connector->executeQuery(
@@ -1311,7 +1299,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
             }
             $this->connector->commit();
-        } catch (Exception $e) {
+            $pastoralAttachment = $this->pastoralAttachmentMapper->findById($upload->getPastoralAttachmentId());
+            $pastoralAttachment->setExternalId($documentReferencesSeq);
+            $this->pastoralAttachmentMapper->save($pastoralAttachment);
+        } catch (DatabaseException $e) {
             $this->connector->rollBack();
             throw new ExternalException('Error linking pastoral document to record in Synergetic database:' . $e->getTraceAsString());
         }
@@ -1320,62 +1311,41 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /**
      * Deletes documents from tDocuments which are no longer attached to the pastoral record
-     * @param Pastoral $pastoral
-     * @param array    $skipFileNames
-     * @return void
+     * @param PastoralAttachment $pastoralAttachment
+     * @return bool
+     * @throws ExternalException
      */
-    private function deletePastoralDocument(Pastoral $pastoral, array $skipFileNames): void
+    public function deletePastoralDocument(PastoralAttachment $pastoralAttachment): bool
     {
-        // find tDocuments for the pastoral record and which filename is not in $skipFileNames
-        $sql = "SELECT doc.tDocumentsSeq
-               FROM {$this->schemaMedia}.tDocumentReferences tref
-               JOIN {$this->schemaMedia}.DocumentReferences ref ON tref.tDocumentsSeq = ref.DocumentReferencesSeq
-               JOIN {$this->schemaMedia}.tDocuments doc ON ref.DocumentReferencesSeq = doc.tDocumentsSeq
-             WHERE tref.RelatedSeqModuleCode = :RelatedSeqModuleCode
-               AND tref.RelatedSeq = :RelatedSeq
-               AND ref.ID = :studentExternalId";
-
-        $parameters = [
-            'RelatedSeqModuleCode' => self::MODULE_CODE,
-            'RelatedSeq'           => $pastoral->getExternalId(),
-            'studentExternalId'    => $pastoral->getStudent()->getExternalId(),
-        ];
-        if (!empty($skipFileNames)) {
-            $fileBindings = PredicateBuilder::getBindings($skipFileNames, 'f');
-            $sql          .= " AND doc.Description NOT IN ({$fileBindings->getPlaceholder()})";
-            $parameters   = array_merge($parameters, $fileBindings->getParams());
+        if (!$pastoralAttachment->getExternalId()) {
+            return true;
         }
-        $documentSeqs = $this->connector->executeQuery($sql, $parameters)->fetchAll(\PDO::FETCH_COLUMN);
+        $this->connector->beginTransaction();
 
-        if (!empty($documentSeqs)) {
-            $docBindings = PredicateBuilder::getBindings($documentSeqs, 'd');
+        try {
             // delete DocumentReferences (student reference)
             $this->connector->executeQuery(
-                "DELETE FROM {$this->schemaMedia}.DocumentReferences WHERE DocumentReferencesSeq IN ({$docBindings->getPlaceholder()})",
-                $docBindings->getParams()
+                "DELETE FROM {$this->schemaMedia}.DocumentReferences WHERE DocumentReferencesSeq = :tDocumentSeq",
+                ['tDocumentSeq' => $pastoralAttachment->getExternalId()]
             );
 
             // delete tDocumentReferences (pastoral reference)
             $this->connector->executeQuery(
-                "DELETE FROM {$this->schemaMedia}.tDocumentReferences
-                               WHERE tDocumentsSeq IN ({$docBindings->getPlaceholder()})
-                                 AND RelatedSeqModuleCode = :RelatedSeqModuleCode
-                                 AND RelatedSeq = :RelatedSeq",
-                array_merge(
-                    [
-                        'RelatedSeqModuleCode' => self::MODULE_CODE,
-                        'RelatedSeq'           => $pastoral->getExternalId(),
-                    ],
-                    $docBindings->getParams()
-                )
+                "DELETE FROM {$this->schemaMedia}.tDocumentReferences WHERE tDocumentsSeq = :tDocumentSeq",
+                ['tDocumentSeq' => $pastoralAttachment->getExternalId()]
             );
 
             // Delete tDocuments
             $this->connector->executeQuery(
-                "DELETE FROM {$this->schemaMedia}.tDocuments WHERE tDocumentsSeq in ({$docBindings->getPlaceholder()})",
-                $docBindings->getParams()
+                "DELETE FROM {$this->schemaMedia}.tDocuments WHERE tDocumentsSeq = :tDocumentSeq",
+                ['tDocumentSeq' => $pastoralAttachment->getExternalId()]
             );
+        } catch (DatabaseException $e) {
+            $this->connector->rollBack();
+            throw new ExternalException("Error delete pastoral attachment: {$pastoralAttachment->getExternalId()}" . $e->getTraceAsString());
         }
+        $this->connector->commit();
+        return true;
     }
 
     // Helper functions below
