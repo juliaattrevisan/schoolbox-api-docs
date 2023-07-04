@@ -81,3 +81,21 @@ export const NoResults: Story = {
         },
     },
 };
+
+/**
+ * To show an error if the search fails,
+ * we update the msw handlers to return a 500 error
+ */
+export const Error: Story = {
+    ...Default,
+    parameters: {
+        msw: {
+            handlers: [
+                rest.get(endpoint, (req, res, ctx) => {
+                    return res(ctx.delay(1000), ctx.status(500));
+                }),
+                ...mswHandlers,
+            ],
+        },
+    },
+};

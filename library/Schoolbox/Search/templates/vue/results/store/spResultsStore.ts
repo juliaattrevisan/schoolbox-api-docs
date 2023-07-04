@@ -13,7 +13,7 @@ export const useResultsStore = defineStore("spResults", () => {
     const hasNotSearched = ref(true); // to determine whether any searches have been made
     const isSearching = ref(false); // to notify that search results
     const hasLoadError = ref(false); // to notify of a search error
-    const query = ref(""); // current search input
+    const query = ref("biology"); // current search input
     const activeQuery = ref(""); // the latest query that was searched
     const hasSearchedWithActiveFilters = ref(false); // to determine whether the latest search has been made with filters
     const results = ref<unknown[]>([]); // returned search results
@@ -41,7 +41,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasResults = computed(() => {
-        return !hasNotSearched.value && results.value.length !== 0 && !isSearching.value;
+        return !hasNotSearched.value && results.value.length !== 0 && !isSearching.value && !hasLoadError.value;
     });
 
     /**
@@ -49,7 +49,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasNoResults = computed(() => {
-        return !hasNotSearched.value && results.value.length === 0 && !isSearching.value;
+        return !hasNotSearched.value && results.value.length === 0 && !isSearching.value && !hasLoadError.value;
     });
 
     /**

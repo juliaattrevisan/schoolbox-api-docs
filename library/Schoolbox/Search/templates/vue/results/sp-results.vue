@@ -6,6 +6,7 @@
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import SpResultsHeader from "./sp-results-header.vue";
 import SpResultsPrompt from "./sp-results-prompt.vue";
+import SpResultsError from "./sp-results-error.vue";
 import SpResultsNone from "./sp-results-none.vue";
 import { useResultsStore } from "./store/spResultsStore";
 
@@ -16,7 +17,7 @@ const resultsStore = useResultsStore();
     <sp-results-header />
     <sp-results-prompt v-if="resultsStore.hasNotSearched" />
     <loading-table v-else-if="resultsStore.isSearching" />
-    <div v-else-if="resultsStore.hasLoadError">Load error</div>
+    <sp-results-error v-else-if="resultsStore.hasLoadError" />
     <sp-results-none v-else-if="resultsStore.hasNoResults" />
     <div v-else>Show results</div>
 </template>
