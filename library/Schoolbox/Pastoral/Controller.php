@@ -1285,7 +1285,8 @@ class Controller extends Base
                     $attachment = $this->pastoralAttachmentMapper->createModel()
                                                                  ->setRealname($storageObject->getFilename())
                                                                  ->setStorage($storageObject)
-                                                                 ->setPrivate($isPrivate);
+                                                                 ->setPrivate($isPrivate)
+                                                                 ->setExternalId(null);
                     $newAttachments->add($attachment);
                     $processedHash[] = $storageObject->getHash();
                 }

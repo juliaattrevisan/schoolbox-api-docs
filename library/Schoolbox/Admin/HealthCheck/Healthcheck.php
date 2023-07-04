@@ -622,7 +622,7 @@ class Healthcheck
             $prefix              = $mediaDb ? ($mediaDb . '.') : '';
 
             // Pastoral upload tests.
-            if ($this->configMapper->get('external_pastoral_upload')) {
+            if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)) {
                 $tablesForInsertTest[] = $prefix . $mediaSchema . '.tDocuments';
                 $tablesForInsertTest[] = $prefix . $mediaSchema . '.DocumentReferences';
                 $tablesForInsertTest[] = $prefix . $mediaSchema . '.tDocumentReferences';
@@ -641,6 +641,9 @@ class Healthcheck
             }
 
             $this->insertTest(array_unique($tablesForInsertTest));
+            if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)) {
+                $this->deleteTest(array_unique($tablesForInsertTest));
+            }
             $this->selectTest(
                 array_unique($tablesForSelectTest),
                 $mediaDb,

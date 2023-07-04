@@ -41,6 +41,9 @@ class Model implements IStorage, ISoftDeletable, IModel
     /** @var string */
     private $realname;
 
+    /** @var ?int Synergetic media.tDocuments.tDocumentsSeq */
+    private int|null $externalId;
+
     /**
      * Returns whether this is a public attachment
      *
@@ -122,5 +125,23 @@ class Model implements IStorage, ISoftDeletable, IModel
     public function getFilename(): string
     {
         return $this->realname;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getExternalId(): ?int
+    {
+        return $this->externalId;
+    }
+
+    /**
+     * @param int|null $externalId
+     * @return static
+     */
+    public function setExternalId(?int $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

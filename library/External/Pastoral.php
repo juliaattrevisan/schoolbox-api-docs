@@ -90,6 +90,14 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * @inheritDoc
      */
+    public function deletePastoralDocument(Pastoral\Attachment\Model $pastoralAttachment): bool
+    {
+        return $this->database->deletePastoralDocument($pastoralAttachment);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getTypeList(): array
     {
         return $this->database->getTypeList();

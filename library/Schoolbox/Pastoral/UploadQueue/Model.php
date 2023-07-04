@@ -47,6 +47,8 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $realname;
 
+    private ?int $pastoralAttachmentId;
+
     /**
      * @param Pastoral $pastoral
      *
@@ -184,5 +186,23 @@ class Model implements ISoftDeletable
     public function getMessage()
     {
         return $this->message;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPastoralAttachmentId(): ?int
+    {
+        return $this->pastoralAttachmentId;
+    }
+
+    /**
+     * @param int|null $pastoralAttachmentId
+     * @return static
+     */
+    public function setPastoralAttachmentId(?int $pastoralAttachmentId): self
+    {
+        $this->pastoralAttachmentId = $pastoralAttachmentId;
+        return $this;
     }
 }

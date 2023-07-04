@@ -15,6 +15,7 @@ use PDOException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -65,7 +66,7 @@ class AttachmentUploader extends CliTool\App
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
 
         // Only process if pastoral docman writeback is actually enabled in config
-        if (!$this->getConfig()->get('external_pastoral_upload')) {
+        if (!$this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)) {
             $this->getLogger()->info('Pastoral Attachment Upload is disabled in config; exiting');
             exit;
         }
@@ -176,8 +177,9 @@ HELP;
 
         // Upload file to DocMan
         try {
-            $this->externalPastoral->uploadPastoralDocument($pendingUpload);
-            $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_COMPLETED);
+            $result = $this->externalPastoral->uploadPastoralDocument($pendingUpload);
+            // result will be false, when SIS is offline
+            $pendingUpload->setStatus($result ? Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_COMPLETED : Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_PENDING);
         } catch (\InvalidArgumentException $e) {
             $this->getLogger()->warning("File could not be processed: {$e->getMessage()}", ['exception' => $e]);
             $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED);
@@ -190,6 +192,9 @@ HELP;
         if ($pendingUpload->getStatus() === Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED) {
             $this->getLogger()->error("Uploading of file '{$hash}' failed");
             return false;
+        } elseif ($pendingUpload->getStatus() === Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_PENDING) {
+            $this->getLogger()->warning("Skipped uploading of file '{$hash}'");
+            return true;
         }
         $this->getLogger()->info("Uploading of file '{$hash}' completed");
         return true;

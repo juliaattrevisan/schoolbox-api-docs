@@ -10,10 +10,12 @@ namespace Schoolbox\Pastoral\Attachment;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
@@ -39,6 +41,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('private', self::TYPE_BOOLEAN);
+        $this->uses('external_id', self::TYPE_INTEGER);
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING);
@@ -122,7 +125,7 @@ class Mapper extends BaseMapper
         if (
             !$previous instanceof Model
             && !$model->getPrivate()
-            && $this->getConfigLoader()->get("external_pastoral_upload")
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)
         ) {
             // Queue file for upload to Synergetic DocMan
             // TODO don't getInstance, instead inject
@@ -134,6 +137,7 @@ class Mapper extends BaseMapper
             $queue->setStorage($model->getStorage());
             $queue->setRealname($model->getRealname());
             $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+            $queue->setPastoralAttachmentId($model->getId());
             $pastoralUploadQueueMapper->save($queue);
         }
     }
@@ -141,16 +145,27 @@ class Mapper extends BaseMapper
     /**
      * Delete corresponding pastoral uploads
      * @param Model $object
+     * @throws MapperException
      */
     public function postDelete(Model $object)
     {
         $uploadMapper = PastoralUploadQueueMapper::getInstance();
         $uploadMapper->deleteByColumnList(
             [
-                'pastoral_id' => $object->getPastoral()->getId(),
-                'hash'        => $object->getHash(),
+                'pastoral_id'            => $object->getPastoral()->getId(),
+                'pastoral_attachment_id' => $object->getId(),
             ]
         );
+        if (
+            $this->getConfigLoader()->get(ConfigMapper::NAME_EXTERNAL_PASTORAL)
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_DELETE)
+            && $object->getExternalId()
+        ) {
+            (new \External_Pastoral())->deletePastoralDocument($object);
+            // unset external id
+            $object->setExternalId(null);
+            $this->save($object);
+        }
     }
 
     /**
