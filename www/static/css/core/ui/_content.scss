@@ -33,7 +33,8 @@
         color: $aluminum;
     }
     p,
-    a {
+    a,
+    li {
         font-size: 0.875rem;
         font-weight: 400;
         margin-bottom: 0;
@@ -56,6 +57,9 @@
         &:hover {
             background: none;
         }
+    }
+    ul {
+        list-style-position: inside;
     }
 }
 
