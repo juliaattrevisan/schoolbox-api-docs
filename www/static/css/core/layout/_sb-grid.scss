@@ -8,12 +8,14 @@
 @use "sass:list";
 @use "sass:map";
 
-/*  NEW GRID LAYOUT STYLES - Consider if you really *need* to use a 12 col layout */
+/**
+ *  NEW GRID LAYOUT STYLES - Consider if you really *need* to use a 12 col layout. They
+ *  aren't conducive to flexibile design!
+**/
 //  Class used on our parent container to declare it as a grid layout.
 $minColWidth: 16rem;
 
 /* Variables for legacy sizing */
-//$foundation-size-array: "xxlarge", "xlarge", "large", "medium", "small";
 
 /**
  *  Why are we decrementing in sizes? Because of the way CSS works. If we declare classes
@@ -22,7 +24,6 @@ $minColWidth: 16rem;
  *  in the event an element has multiple sizing classes, this is the best way to get CSS
  *  to apply that logic.
 **/
-
 $foundation-breakpoint-map: (
     "small": (
         "breakpoint": $small-up,
@@ -51,7 +52,6 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 
 .sb-grid {
     display: grid;
-    //grid-gap: var(--whitespace-m);
     grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr));
 
     &--2-col {
@@ -65,6 +65,10 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
     &--4-col {
         grid-template-columns: repeat(4, 1fr);
     }
+
+    &--gap-m {
+        grid-gap: var(--whitespace-m);
+    }
 }
 
 //  Support legacy styles and 12 column layout.
@@ -74,7 +78,12 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 
     /**
      *  This is a little weird but necessary to replicate how Foundation's grid system worked.
-     *  Long story short, we
+     *  Long story short, we need to declare them in this order and in two separate loops to
+     *  preserve the fallback sizing Foundation had in their grid.
+     *
+     *  By declaring the fallback sizing on smaller breakpoints first they appear earlier in the
+     *  stylesheet, meaning they'll only apply when none of the explicit sizes are relevant in the
+     *  current breakpoints.
     **/
 
     @for $i from 1 through list.length($foundation-size-array) {
@@ -84,18 +93,24 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
         $map-val: map.get($foundation-breakpoint-map, $key);
         $breakpoint-smaller-down: map.get($map-val, "breakpoint-smaller-down");
 
+        // Generate the fallback rules to span all columns below the relevant breakpoints.
         @media #{$breakpoint-smaller-down} {
             @for $j from 1 through 12 {
                 .#{$key}-#{$j} {
-                    content: "AAA";
                     box-sizing: border-box;
-                    border: 5px solid orange !important;
                     grid-column: span 12;
                 }
             }
         }
     }
 
+    /**
+     *  As mentioned above, we do this down here so explicit sizes always rule over fallback sizes.
+     *  Also, we declare them from smallest to largest so the large rules don't get overwritten by
+     *  smaller rules that only apply on smaller screen sizes. If we declared small-6 last, it would
+     *  always apply, even if you had medium-3 and were in a medium size screen. Doing it in descending
+     *  order means xxlarge clobers xlarge, which clobbers large, which clobbers medium, which clobbers small.
+    **/
     @for $i from 1 through list.length($foundation-size-array) {
         // Get the array key.
         $key: list.nth($foundation-size-array, $i);
@@ -103,12 +118,11 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
         $map-val: map.get($foundation-breakpoint-map, $key);
         $breakpoint: map.get($map-val, "breakpoint");
 
+        // Generate the rules to scale across the columns as required
         @media #{$breakpoint} {
             @for $j from 1 through 12 {
                 .#{$key}-#{$j} {
-                    content: "AAA";
                     box-sizing: border-box;
-                    border: 5px solid red !important;
                     grid-column: span $j;
                 }
             }
