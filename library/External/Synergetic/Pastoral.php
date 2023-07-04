@@ -1326,11 +1326,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // tDocumentReferences table
         $sql         = "SELECT COUNT(*) FROM {$this->schemaMedia}.tDocumentReferences
                         WHERE tDocumentsSeq = :tDocumentSeq";
-        $docRefCount = $this->connector->executeQuery($sql, $parameters)->fetchColumn();
+        $docRefCount = (int)$this->connector->executeQuery($sql, $parameters)->fetchColumn();
         // DocumentReferences table
         $sql             = "SELECT COUNT(*) FROM {$this->schemaMedia}.DocumentReferences
                             WHERE DocumentReferencesSeq = :tDocumentSeq";
-        $studentRefCount = $this->connector->executeQuery($sql, $parameters)->fetchColumn();
+        $studentRefCount = (int)$this->connector->executeQuery($sql, $parameters)->fetchColumn();
 
         $this->connector->beginTransaction();
 
