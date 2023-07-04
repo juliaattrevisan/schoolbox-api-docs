@@ -1317,29 +1317,57 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function deletePastoralDocument(PastoralAttachment $pastoralAttachment): bool
     {
-        if (!$pastoralAttachment->getExternalId()) {
+        if (!$pastoralAttachment->getExternalId() || !$pastoralAttachment->getPastoral()->getExternalId()) {
             return true;
         }
+
+        // Count references for the file
+        $parameters = ['tDocumentSeq' => $pastoralAttachment->getExternalId()];
+        // tDocumentReferences table
+        $sql         = "SELECT COUNT(*) FROM {$this->schemaMedia}.tDocumentReferences
+                        WHERE tDocumentsSeq = :tDocumentSeq";
+        $docRefCount = $this->connector->executeQuery($sql, $parameters)->fetchColumn();
+        // DocumentReferences table
+        $sql             = "SELECT COUNT(*) FROM {$this->schemaMedia}.DocumentReferences
+                            WHERE DocumentReferencesSeq = :tDocumentSeq";
+        $studentRefCount = $this->connector->executeQuery($sql, $parameters)->fetchColumn();
+
         $this->connector->beginTransaction();
 
         try {
-            // delete DocumentReferences (student reference)
-            $this->connector->executeQuery(
-                "DELETE FROM {$this->schemaMedia}.DocumentReferences WHERE DocumentReferencesSeq = :tDocumentSeq",
-                ['tDocumentSeq' => $pastoralAttachment->getExternalId()]
-            );
+            // delete DocumentReferences (student reference), only if there's only one reference
+            if ($docRefCount === 1 && $studentRefCount === 1) {
+                $this->connector->executeQuery(
+                    "DELETE FROM {$this->schemaMedia}.DocumentReferences
+                            WHERE DocumentReferencesSeq = :tDocumentSeq
+                            AND ID = :studentId",
+                    [
+                        'tDocumentSeq' => $pastoralAttachment->getExternalId(),
+                        'studentId'           => $pastoralAttachment->getPastoral()->getStudent()->getExternalId(),
+                    ]
+                );
+            }
 
             // delete tDocumentReferences (pastoral reference)
             $this->connector->executeQuery(
-                "DELETE FROM {$this->schemaMedia}.tDocumentReferences WHERE tDocumentsSeq = :tDocumentSeq",
-                ['tDocumentSeq' => $pastoralAttachment->getExternalId()]
+                "DELETE FROM {$this->schemaMedia}.tDocumentReferences
+                               WHERE tDocumentsSeq = :tDocumentSeq
+                                 AND RelatedSeqModuleCode = :RelatedSeqModuleCode
+                                 AND RelatedSeq = :RelatedSeq",
+                [
+                    'tDocumentSeq'         => $pastoralAttachment->getExternalId(),
+                    'RelatedSeqModuleCode' => self::MODULE_CODE,
+                    'RelatedSeq'           => $pastoralAttachment->getPastoral()->getExternalId(),
+                ]
             );
 
-            // Delete tDocuments
-            $this->connector->executeQuery(
-                "DELETE FROM {$this->schemaMedia}.tDocuments WHERE tDocumentsSeq = :tDocumentSeq",
-                ['tDocumentSeq' => $pastoralAttachment->getExternalId()]
-            );
+            // Delete tDocuments, only if there's only one reference to this document
+            if ($docRefCount === 1 && $studentRefCount === 1) {
+                $this->connector->executeQuery(
+                    "DELETE FROM {$this->schemaMedia}.tDocuments WHERE tDocumentsSeq = :tDocumentSeq",
+                    ['tDocumentSeq' => $pastoralAttachment->getExternalId()]
+                );
+            }
         } catch (DatabaseException $e) {
             $this->connector->rollBack();
             throw new ExternalException("Error delete pastoral attachment: {$pastoralAttachment->getExternalId()}" . $e->getTraceAsString());
