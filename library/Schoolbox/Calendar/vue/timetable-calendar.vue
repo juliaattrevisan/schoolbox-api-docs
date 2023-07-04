@@ -218,7 +218,6 @@ export default {
                 },
             ],
             eventDidMount: this.eventRender,
-            viewDidMount: this.viewDidMount,
             loading: this.fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
             eventClick: this.onEventClick,
@@ -365,58 +364,6 @@ export default {
                 slotMaxTime: slotMaxTime ?? "00:00:00",
                 allDaySlot: allDaySlot,
             };
-        },
-
-        /**
-         * Callback for when the calendar view changes: preserve the
-         * newly selected view for this user.
-         * @see https://fullcalendar.io/docs/viewDidMount
-         *
-         * @param info
-         */
-        viewDidMount(info) {
-            const customGroup = document.querySelector(".fc-custom-group");
-
-            this.currentDisplay = info.view.type;
-
-            // document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach((element) => {
-            document.querySelectorAll(".fc-button-group, .fc-toolbar-title").forEach((element) => {
-                if (this.currentViewIsList()) {
-                    if (!element.firstChild?.classList?.contains("fc-customFilters-button")) {
-                        //never hide the right side buttons
-                        element.classList.add("hide");
-                    }
-                    if (customGroup?.classList && customGroup?.classList.contains("hide") !== null) {
-                        customGroup.classList.remove("hide");
-                    }
-                } else {
-                    element.classList.remove("hide");
-                    if (customGroup?.classList) {
-                        customGroup.classList.add("hide");
-                    }
-                }
-            });
-
-            if (this.currentViewIsList()) {
-                this.registerListCustomInputFields();
-
-                /**
-                 * Re-initialise datepicker upon date update on list view.
-                 * Without this, date picker fields just turns into a normal text field.
-                 */
-                let attachAlaressDatePicker = function () {
-                    var $dateinput = $(this);
-                    if ($dateinput.attr("data-datepicker-id") === undefined) {
-                        $dateinput.alaressDateTimePicker();
-                    }
-                };
-
-                $(function () {
-                    $("[data-datepicker]").each(attachAlaressDatePicker);
-                });
-            }
-
-            axios.post(URL_STATE_CHANGE, qs.stringify({ calendarView: info.view.type }));
         },
 
         /**
