@@ -5,6 +5,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useStore } from "../../store/searchPageStore";
+import { useFiltersStore } from "../../filters/store/spFiltersStore";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 
@@ -14,6 +15,7 @@ export const useResultsStore = defineStore("spResults", () => {
     const hasLoadError = ref(false); // to notify of a search error
     const query = ref(""); // current search input
     const activeQuery = ref(""); // the latest query that was searched
+    const hasSearchedWithActiveFilters = ref(false); // to determine whether the latest search has been made with filters
     const results = ref<unknown[]>([]); // returned search results
 
     /**
@@ -55,6 +57,7 @@ export const useResultsStore = defineStore("spResults", () => {
      */
     async function search() {
         activeQuery.value = query.value;
+        hasSearchedWithActiveFilters.value = useFiltersStore().hasActiveFilters;
         hasNotSearched.value = false;
         isSearching.value = true;
         try {
@@ -88,6 +91,7 @@ export const useResultsStore = defineStore("spResults", () => {
         hasLoadError,
         query,
         activeQuery,
+        hasSearchedWithActiveFilters,
         results,
         isActive,
         queryWordList,

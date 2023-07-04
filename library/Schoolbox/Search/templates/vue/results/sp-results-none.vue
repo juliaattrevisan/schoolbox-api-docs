@@ -2,12 +2,32 @@
 /**
  * The notify that no results have been found
  */
+
+import { useFiltersStore } from "../filters/store/spFiltersStore";
+import { useResultsStore } from "./store/spResultsStore";
+
+const filtersStore = useFiltersStore();
+const resultsStore = useResultsStore();
+
+/**
+ * Search again with all the filters cleared
+ */
+async function onNoFiltersSelected() {
+    await filtersStore.clearAndSearch();
+}
 </script>
 
 <template>
     <div class="empty-state-flex-centered">
         <i class="icon-search"></i>
-        <p>Sorry, but your search did not return any results.</p>
+        <p>
+            Sorry, but your search did not return any results.
+            <template v-if="resultsStore.hasSearchedWithActiveFilters"
+                >You can try again with
+                <button title="Search with no filters active" @click="onNoFiltersSelected">no filters</button> otherwise
+                modify your search term.</template
+            >
+        </p>
         <p>Here are some tips for improving your search:</p>
         <ul>
             <li>
