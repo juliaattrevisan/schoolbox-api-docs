@@ -25,6 +25,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementa
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -202,6 +203,15 @@ class Controller extends Component_Homepage_ControllerAbstract
             // unit spec folder ids which are not deleted
             $specFolderIds = $this->courseImplementation
                 ->getUnits()
+                // this is to sort units and needs to be placed right after getUnits()
+                ->sortByCallback(
+                    static function (Unit $a, Unit $b) {
+                        if ($a->getDueDate()->eq($b->getDueDate())) {
+                            return strnatcasecmp($a->getTitle(), $b->getTitle());
+                        }
+                        return $a->getDueDate()->compare($b->getDueDate());
+                    }
+                )
                 ->filter(static function (\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unit) {
                     return !$unit->getSpecification()->getFolder()->isDeleted();
                 })
