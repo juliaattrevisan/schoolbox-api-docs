@@ -3,17 +3,15 @@
  * The notify that no results have been found
  */
 
-import { useFiltersStore } from "../filters/store/spFiltersStore";
 import { useResultsStore } from "./store/spResultsStore";
 
-const filtersStore = useFiltersStore();
 const resultsStore = useResultsStore();
 
 /**
  * Search again with all the filters cleared
  */
 async function onNoFiltersSelected() {
-    await filtersStore.clearAndSearch();
+    await resultsStore.clearFiltersAndSearch();
 }
 </script>
 

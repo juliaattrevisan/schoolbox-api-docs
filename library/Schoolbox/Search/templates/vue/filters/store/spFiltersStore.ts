@@ -4,7 +4,6 @@
 
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { useResultsStore } from "../../results/store/spResultsStore";
 
 export const useFiltersStore = defineStore("spFilters", () => {
     const activeFilters = ref([]); // the currently active filters
@@ -22,18 +21,9 @@ export const useFiltersStore = defineStore("spFilters", () => {
         activeFilters.value = [];
     }
 
-    /**
-     * clear the current filters
-     */
-    async function clearAndSearch() {
-        clear();
-        await useResultsStore().search();
-    }
-
     return {
         activeFilters,
         hasActiveFilters,
         clear,
-        clearAndSearch,
     };
 });

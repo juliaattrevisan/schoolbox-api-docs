@@ -85,6 +85,14 @@ export const useResultsStore = defineStore("spResults", () => {
         isSearching.value = false;
     }
 
+    /**
+     * clear the filters and search
+     */
+    async function clearFiltersAndSearch() {
+        useFiltersStore().clear();
+        await search();
+    }
+
     return {
         hasNotSearched,
         isSearching,
@@ -99,5 +107,6 @@ export const useResultsStore = defineStore("spResults", () => {
         hasNoResults,
         search,
         clear,
+        clearFiltersAndSearch,
     };
 });
