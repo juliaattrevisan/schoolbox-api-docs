@@ -10,9 +10,10 @@ const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search 
 
 export const useResultsStore = defineStore("spResults", () => {
     const hasNotSearched = ref(true); // to determine whether any searches have been made
-    const isLoading = ref(false); // to notify that search results
+    const isSearching = ref(false); // to notify that search results
     const hasLoadError = ref(false); // to notify of a search error
-    const query = ref(""); // current search term
+    const query = ref(""); // current search input
+    const activeQuery = ref(""); // the latest query that was searched
     const results = ref<unknown[]>([]); // returned search results
 
     /**
@@ -20,17 +21,25 @@ export const useResultsStore = defineStore("spResults", () => {
      * have been added
      * @returns {boolean}
      */
-    const isActive = computed(() => query.value.length >= MIN_QUERY_LENGTH);
+    const isActive = computed(() => activeQuery.value.length >= MIN_QUERY_LENGTH);
 
     /**
      * the search string broken into words, to search for each word
      * @returns {string[]} the search string broken into single words
      */
     const queryWordList = computed(() => {
-        const queryTrimmed = query.value.trim(); // remove any front or back white space
+        const queryTrimmed = activeQuery.value.trim(); // remove any front or back white space
         const regularExpression = /\s*(?:,|$)\s*/; // adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
         const commaSeparated = queryTrimmed.split(regularExpression) ?? []; // split the string into a comma separated list
         return commaSeparated.filter((word) => word.length > 0); // and ensure each contains a character
+    });
+
+    /**
+     * To show that there is results that match the current search
+     * @returns {boolean}
+     */
+    const hasResults = computed(() => {
+        return !hasNotSearched.value && results.value.length !== 0 && !isSearching.value;
     });
 
     /**
@@ -38,17 +47,18 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasNoResults = computed(() => {
-        return !hasNotSearched.value && results.value.length === 0 && !isLoading.value;
+        return !hasNotSearched.value && results.value.length === 0 && !isSearching.value;
     });
 
     /**
      * search for nodes that match
      */
     async function search() {
+        activeQuery.value = query.value;
         hasNotSearched.value = false;
-        isLoading.value = true;
+        isSearching.value = true;
         try {
-            const response = await fetch(`${useStore().endpoint}?query=${query.value}`, {
+            const response = await fetch(`${useStore().endpoint}?query=${activeQuery.value}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -58,7 +68,7 @@ export const useResultsStore = defineStore("spResults", () => {
         } catch (error) {
             hasLoadError.value = true;
         } finally {
-            isLoading.value = false;
+            isSearching.value = false;
         }
     }
 
@@ -67,18 +77,21 @@ export const useResultsStore = defineStore("spResults", () => {
      */
     function clear() {
         query.value = "";
+        activeQuery.value = "";
         results.value = [];
-        isLoading.value = false;
+        isSearching.value = false;
     }
 
     return {
         hasNotSearched,
-        isLoading,
+        isSearching,
         hasLoadError,
         query,
+        activeQuery,
         results,
         isActive,
         queryWordList,
+        hasResults,
         hasNoResults,
         search,
         clear,

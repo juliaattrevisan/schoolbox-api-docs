@@ -15,7 +15,7 @@ const resultsStore = useResultsStore();
 <template>
     <sp-results-header />
     <sp-results-prompt v-if="resultsStore.hasNotSearched" />
-    <loading-table v-else-if="resultsStore.isLoading" />
+    <loading-table v-else-if="resultsStore.isSearching" />
     <div v-else-if="resultsStore.hasLoadError">Load error</div>
     <sp-results-none v-else-if="resultsStore.hasNoResults" />
     <div v-else>Show results</div>
