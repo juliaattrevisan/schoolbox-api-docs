@@ -10,7 +10,7 @@
 
 /*  NEW GRID LAYOUT STYLES - Consider if you really *need* to use a 12 col layout */
 //  Class used on our parent container to declare it as a grid layout.
-$minColWidth: 12rem;
+$minColWidth: 16rem;
 
 /* Variables for legacy sizing */
 //$foundation-size-array: "xxlarge", "xlarge", "large", "medium", "small";
@@ -24,25 +24,25 @@ $minColWidth: 12rem;
 **/
 
 $foundation-breakpoint-map: (
-    "xxlarge": (
-        "breakpoint": $xxlarge-only,
-        "breakpoint-smaller-down": $xlarge-down,
-    ),
-    "xlarge": (
-        "breakpoint": $xlarge-up,
-        "breakpoint-smaller-down": $large-down,
-    ),
-    "large": (
-        "breakpoint": $large-up,
-        "breakpoint-smaller-down": $medium-down,
+    "small": (
+        "breakpoint": $small-up,
+        "breakpoint-smaller-down": $small-only,
     ),
     "medium": (
         "breakpoint": $medium-up,
         "breakpoint-smaller-down": $small-only,
     ),
-    "small": (
-        "breakpoint": $small-up,
-        "breakpoint-smaller-down": $small-only,
+    "large": (
+        "breakpoint": $large-up,
+        "breakpoint-smaller-down": $mediumwide-down,
+    ),
+    "xlarge": (
+        "breakpoint": $xlarge-up,
+        "breakpoint-smaller-down": $large-down,
+    ),
+    "xxlarge": (
+        "breakpoint": $xxlarge-up,
+        "breakpoint-smaller-down": $xlarge-down,
     ),
 );
 
@@ -51,7 +51,7 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 
 .sb-grid {
     display: grid;
-    grid-gap: var(--whitespace-m);
+    //grid-gap: var(--whitespace-m);
     grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr));
 
     &--2-col {
@@ -76,51 +76,40 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
      *  This is a little weird but necessary to replicate how Foundation's grid system worked.
      *  Long story short, we
     **/
+
     @for $i from 1 through list.length($foundation-size-array) {
         // Get the array key.
         $key: list.nth($foundation-size-array, $i);
         // Get the value from our map of breakpoints
         $map-val: map.get($foundation-breakpoint-map, $key);
+        $breakpoint-smaller-down: map.get($map-val, "breakpoint-smaller-down");
 
-        @if $i == list.length($foundation-size-array) {
-            //Only generate the rule for our current breakpoint as we have nothing smaller than us
-            $breakpoint: map.get($map-val, "breakpoint");
-
-            @media #{$breakpoint} {
-                @for $j from 1 through 12 {
-                    .#{$key}-#{$j} {
-                        content: "AAAZ";
-                        border: 5px solid orange !important;
-                        grid-column: span $i;
-                    }
+        @media #{$breakpoint-smaller-down} {
+            @for $j from 1 through 12 {
+                .#{$key}-#{$j} {
+                    content: "AAA";
+                    box-sizing: border-box;
+                    border: 5px solid orange !important;
+                    grid-column: span 12;
                 }
             }
-        } @else {
-            /* We need to generate a rule for our current breakpoint up and set everything smaller
-            * than the current breakpoint to span all columns. As we are decrementing in sizes,
-            * this means get the NEXT key in the array.
-            */
-            $next-key: list.nth($foundation-size-array, $i + 1);
-            // Nested values...
-            $breakpoint: map.get($map-val, "breakpoint");
-            $breakpoint-smaller-down: map.get($map-val, "breakpoint-smaller-down");
+        }
+    }
 
-            @media #{$breakpoint} {
-                @for $j from 1 through 12 {
-                    .#{$key}-#{$j} {
-                        content: "AAAX";
-                        border: 5px solid red !important;
-                        grid-column: span $i;
-                    }
-                }
-            }
+    @for $i from 1 through list.length($foundation-size-array) {
+        // Get the array key.
+        $key: list.nth($foundation-size-array, $i);
+        // Get the value from our map of breakpoints
+        $map-val: map.get($foundation-breakpoint-map, $key);
+        $breakpoint: map.get($map-val, "breakpoint");
 
-            @media #{$breakpoint-smaller-down} {
-                @for $j from 1 through 12 {
-                    .#{$key}-#{$j} {
-                        content: "AAAY";
-                        grid-column: span 12;
-                    }
+        @media #{$breakpoint} {
+            @for $j from 1 through 12 {
+                .#{$key}-#{$j} {
+                    content: "AAA";
+                    box-sizing: border-box;
+                    border: 5px solid red !important;
+                    grid-column: span $j;
                 }
             }
         }
