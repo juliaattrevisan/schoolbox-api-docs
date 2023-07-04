@@ -218,7 +218,6 @@ export default {
                 },
             ],
             eventDidMount: this.eventRender,
-            viewClassNames: this.viewClassNames,
             loading: this.fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
             eventClick: this.onEventClick,
@@ -365,66 +364,6 @@ export default {
                 slotMaxTime: slotMaxTime ?? "00:00:00",
                 allDaySlot: allDaySlot,
             };
-        },
-
-        /**
-         * Callback for when the calendar view's class list changes (as it does
-         * when a new view is selected): preserve the newly selected view for
-         * this user.
-         *
-         * Changed from `viewDidMount`, as that only fires when a new view is
-         * added to the DOM: the day and week views share the same view, thus
-         * this event didn't fire when switching between day and week view.
-         *
-         * @see https://fullcalendar.io/docs/view-render-hooks
-         * @see https://github.com/fullcalendar/fullcalendar/issues/5543 for
-         *      discussion of `viewDidMount` vs. `viewClassNames`
-         *
-         * @param info
-         */
-        viewClassNames(info) {
-            const customGroup = document.querySelector(".fc-custom-group");
-
-            this.currentDisplay = info.view.type;
-
-            // document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach((element) => {
-            document.querySelectorAll(".fc-button-group, .fc-toolbar-title").forEach((element) => {
-                if (this.currentViewIsList()) {
-                    if (!element.firstChild?.classList?.contains("fc-customFilters-button")) {
-                        //never hide the right side buttons
-                        element.classList.add("hide");
-                    }
-                    if (customGroup?.classList && customGroup?.classList.contains("hide") !== null) {
-                        customGroup.classList.remove("hide");
-                    }
-                } else {
-                    element.classList.remove("hide");
-                    if (customGroup?.classList) {
-                        customGroup.classList.add("hide");
-                    }
-                }
-            });
-
-            if (this.currentViewIsList()) {
-                this.registerListCustomInputFields();
-
-                /**
-                 * Re-initialise datepicker upon date update on list view.
-                 * Without this, date picker fields just turns into a normal text field.
-                 */
-                let attachAlaressDatePicker = function () {
-                    var $dateinput = $(this);
-                    if ($dateinput.attr("data-datepicker-id") === undefined) {
-                        $dateinput.alaressDateTimePicker();
-                    }
-                };
-
-                $(function () {
-                    $("[data-datepicker]").each(attachAlaressDatePicker);
-                });
-            }
-
-            axios.post(URL_STATE_CHANGE, qs.stringify({ calendarView: info.view.type }));
         },
 
         /**
