@@ -54,6 +54,7 @@
             // callbacks
             onSelect: noop,
             onDetach: noop,
+            onUploadComplete: noop,
         };
 
     function ResourceAttach(element, options) {
@@ -187,9 +188,13 @@
                 this.on("sending", function () {
                     submit.prop("disabled", true);
                 });
+
                 // Re-enable form submission when upload is done
                 this.on("queuecomplete", function () {
                     submit.prop("disabled", false);
+                    if (typeof opt.onUploadComplete === "function") {
+                        opt.onUploadComplete();
+                    }
                 });
 
                 this.on("thumbnail", function (file, dataUrl) {
