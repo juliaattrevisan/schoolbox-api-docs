@@ -100,11 +100,30 @@
  # It implicitly constructs an attachments[] POST key which contains
  # all the hashes of the files you uploaded via the Mr Matt's Modal
  #}
+{% autoescape 'js' %}
+<script>
+    /**
+     * Trigger an update event on the CKEditor WordCount plugin for each applicable textarea.
+     * This will cause the form's submit button to be enabled/disabled depending on whether the textarea is overfilled.
+     */
+    function fireCKEditorUpdateEvents() {
+        const textareas = document.querySelectorAll('textarea');
+        const editors = window.sbProps.editors;
+
+        for (const textarea of document.querySelectorAll('textarea')) {
+            const id = textarea.getAttribute('id');
+            if (editors[id] !== undefined) {
+                editors[id].plugins.get("WordCount").fire('update');
+            }
+        }
+    }
+</script>
+{% endautoescape %}
 <fieldset>
     <div class="row">
         <div class="small-12 columns">
             <label>Attach Files</label>
-            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone, onUploadComplete: 'fireCKEditorUpdateEvents'} %}
         </div>
     </div>
 
