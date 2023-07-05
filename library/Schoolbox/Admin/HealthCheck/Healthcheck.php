@@ -653,6 +653,7 @@ class Healthcheck
 
         // Community portal password update.
         if ($this->configMapper->get('synergetic_password_reset')) {
+            $this->selectTest(['CommunityLogins']);
             $this->updateTest(['CommunityLogins']);
 
             if ($this->configMapper->get('synergetic_portal_create_account')) {
