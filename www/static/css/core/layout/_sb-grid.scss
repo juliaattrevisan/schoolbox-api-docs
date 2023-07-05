@@ -66,8 +66,24 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
         grid-template-columns: repeat(4, 1fr);
     }
 
+    &--gap-xs {
+        grid-gap: var(--whitespace-xs);
+    }
+
+    &--gap-s {
+        grid-gap: var(--whitespace-s);
+    }
+
     &--gap-m {
         grid-gap: var(--whitespace-m);
+    }
+
+    &--gap-l {
+        grid-gap: var(--whitespace-l);
+    }
+
+    &--gap-xl {
+        grid-gap: var(--whitespace-xl);
     }
 }
 
