@@ -53,7 +53,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $asyncRedis = $di->get('redis.signalQueue.sub');
 
     try {
-        /** @var AMQPInterface $amqp */
+        /** @var \Schoolbox\Notif\MQ\Connector $amqp */
         $amqp = $di->get('amqp');
 
         // we'll be using the schedule broker for receiving...
@@ -61,15 +61,18 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
         // ...and the route broker for sending
         $routeBroker    = new Routing\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
-
-
         $postman        = new Postman($routeBroker, $log);
 
         $strat          = new DefaultDispatchStrategy($flags);
         $scheduler      = new Scheduler($loop, $strat, $log, new Clock(), $conf, new ResolutionManager(), $postman);
 
-        $scheduler->setJitCache(new RedisCache($redis, $log, INSTANCE_ID));
-
+        // restoring from redis cache
+        $jit = new RedisCache($redis, $log, INSTANCE_ID);
+        $scheduler->setJitCache($jit);
+        $tff = new Schedule\Trigger\TriggerFactoryFactory(true);
+        $splitter = new Schedule\Event\Splitter(new Schedule\Event\NotifierInflector(new \Schoolbox\Di\Configurator($di)), $tff);
+        $propagator = new Schedule\Trigger\Propagator($splitter, $scheduleBroker, INSTANCE_ID);
+        $jit->restoreSchedule($amqp, $propagator, Schedule\Broker::QUEUE);
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established
         $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log, $asyncRedis) {

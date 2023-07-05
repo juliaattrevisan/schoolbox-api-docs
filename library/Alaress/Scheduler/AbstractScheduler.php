@@ -9,6 +9,7 @@
 
 namespace Alaress\Scheduler;
 
+use Alaress\Async\Broker\IResolver;
 use Alaress\Async\SignalEmitter;
 use Alaress\Date\IClock;
 use Alaress\Scheduler\Trigger\CancelTrigger;
@@ -87,7 +88,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @throws InvalidArgumentException
      * @return void
      */
-    protected function scheduleNotification(TriggerInterface $trigger): void
+    protected function scheduleNotification(TriggerInterface $trigger, ?IResolver $resolver = null): void
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
             $this->unschedule($trigger);
@@ -113,6 +114,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         }
 
         $this->schedule($trigger, $this->timerCallback($trigger));
+        $resolver?->acknowledge();
     }
 
 

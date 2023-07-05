@@ -306,10 +306,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param IResolver        $resolver
      * @throws InvalidArgumentException
      */
-    public function scheduleNotification(TriggerInterface $trigger, $resolver = null): void
+    public function scheduleNotification(TriggerInterface $trigger, ?IResolver $resolver = null): void
     {
         // This should come first to clear existing resolver for the trigger
-        parent::scheduleNotification($trigger);
+        parent::scheduleNotification($trigger, $resolver);
 
         // if this is a cancel trigger, we're not going to even attempt attaching a resolver for it
         if (!$trigger instanceof CancelTrigger) {
