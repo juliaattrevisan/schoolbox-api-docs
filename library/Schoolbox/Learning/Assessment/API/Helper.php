@@ -370,7 +370,6 @@ class Helper
                 $params['projectID'] = $filter['project']['id'];
             }
         }
-
         //was a folder requested?
         if (!empty($folderIds) || !empty($folderCodes)) {
             $where .= " AND ( ";
