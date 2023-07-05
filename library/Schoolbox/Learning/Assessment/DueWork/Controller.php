@@ -1563,7 +1563,7 @@ class Controller extends Assessment\Controller
         /* TODO: Make this more generalised
          * For now the only utility here is to update Skip Unsubmitted setting
          */
-        if ((int)$this->getRequest()->post['showSubmittedOnly']) {
+        if ((int)($this->request->content->get()['showSubmittedOnly'])) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;
         } else {
