@@ -106,10 +106,7 @@
 
             if (event.namespace != 'preload') {
                 $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id, assessment: participant.assessable }) }}', {
-                    headers: {
-                        'X-HTTP-Method-Override': 'PATCH'
-                    },
-                    type: 'POST',
+                    type: 'PATCH',
                     dataType: 'json',
                     data: {
                         showSubmittedOnly: skip

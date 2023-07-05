@@ -23,11 +23,8 @@
                     $toast.toastActivate({text: 'Deleting submission...'});
 
                     $.ajax(element.data('delete'), {
-                        headers: {
-                            'X-HTTP-Method-Override': 'DELETE'
-                        },
                         dataType: 'json',
-                        type: 'POST'
+                        type: 'DELETE'
                     })
                         .done(function () {
 

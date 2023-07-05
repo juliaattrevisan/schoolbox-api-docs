@@ -24,11 +24,8 @@
                     $toast.toastActivate({text: 'Deleting interaction...'});
 
                     $.ajax($a.data('delete'), {
-                        headers: {
-                            'X-HTTP-Method-Override': 'DELETE'
-                        },
                         dataType: 'json',
-                        type: 'POST'
+                        type: 'DELETE'
                     })
                     .done(function () {
                         {# successful: reload the page to show the changed content -#}
