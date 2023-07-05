@@ -111,6 +111,7 @@ class Kernel extends WebKernelAbstract
 
         // check for a method override and act accordingly
         if (!empty($server['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+            $request = $request->withMethod(strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']));
             $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);
         }
 
