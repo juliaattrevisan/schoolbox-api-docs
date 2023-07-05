@@ -1563,7 +1563,9 @@ class Controller extends Assessment\Controller
         /* TODO: Make this more generalised
          * For now the only utility here is to update Skip Unsubmitted setting
          */
-        if ((int)($this->request->content->get()['showSubmittedOnly'])) {
+        /** @phpstan-ignore-next-line - get() returns a string */
+        $showSubmittedOnly = $this->request->content->get()['showSubmittedOnly'] ?? 0;
+        if ((int)$showSubmittedOnly) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;
         } else {
