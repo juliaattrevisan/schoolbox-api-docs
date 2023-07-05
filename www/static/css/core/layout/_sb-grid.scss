@@ -3,16 +3,13 @@
  *
  *  Created to house the new css grid based implementation of grid. This file will
  *  hopefully replace the Foundation grid eventually once we land on the Normandy
- *  beaches of Operation Crumble.
+ *  beaches of Operation Crumble. This class also houses the styles to support old
+ *  Foundation twelve column styles (aka our legacy grid) inside a new grid container.
 **/
 @use "sass:list";
 @use "sass:map";
 
-/**
- *  NEW GRID LAYOUT STYLES - Consider if you really *need* to use a 12 col layout. They
- *  aren't conducive to flexibile design!
-**/
-//  Class used on our parent container to declare it as a grid layout.
+// TODO - This should probably be globally controllable somewhere
 $minColWidth: 16rem;
 
 /* Variables for legacy sizing */
@@ -50,9 +47,15 @@ $foundation-breakpoint-map: (
 // Generate an array of keys for our for loops later to utilise later
 $foundation-size-array: map.keys($foundation-breakpoint-map);
 
+/**
+ *  NEW GRID LAYOUT STYLES - Consider if you really *need* to use a 12 col layout. They
+ *  aren't always easy to convert over to flexibile designs!
+**/
+//  Class used on our parent container to declare it as a grid layout.
 .sb-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr));
+    width: 100%;
 
     &--2-col {
         grid-template-columns: repeat(2, 1fr);
@@ -66,24 +69,10 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
         grid-template-columns: repeat(4, 1fr);
     }
 
-    &--gap-xs {
-        grid-gap: var(--whitespace-xs);
-    }
-
-    &--gap-s {
-        grid-gap: var(--whitespace-s);
-    }
-
-    &--gap-m {
-        grid-gap: var(--whitespace-m);
-    }
-
-    &--gap-l {
-        grid-gap: var(--whitespace-l);
-    }
-
-    &--gap-xl {
-        grid-gap: var(--whitespace-xl);
+    @each $size in $global-sizes {
+        &--gap-#{$size} {
+            grid-gap: var(--whitespace-#{$size});
+        }
     }
 }
 
@@ -149,15 +138,4 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 // Override all the foundation set values back to default. Not necessary once Foundation is removed.
 .sb-grid--12 > * {
     width: 100% !important;
-}
-
-/*  GENERAL MEDIA QUERIES */
-@media (max-width: 700px) {
-    .sb-grid {
-        &--2-col,
-        &--3-col,
-        &--4-col {
-            grid-template-columns: 1fr;
-        }
-    }
 }
