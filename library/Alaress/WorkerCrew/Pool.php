@@ -414,28 +414,6 @@ class Pool extends EventEmitter implements PoolInterface
 
 
     /**
-     * Method to advise the pool that the Dispatcher is idle.
-     *
-     * @return void
-     */
-    public function dispatcherIdle()
-    {
-        $this->strat->dispatcherIdle();
-    }
-
-
-    /**
-     * Method to advise the pool that the Dispatcher is engaged.
-     *
-     * @return void
-     */
-    public function dispatcherEngage()
-    {
-        $this->strat->dispatcherEngage();
-    }
-
-
-    /**
      * Return the number of seconds a Worker should be idle before self-destructing
      *
      * @return int

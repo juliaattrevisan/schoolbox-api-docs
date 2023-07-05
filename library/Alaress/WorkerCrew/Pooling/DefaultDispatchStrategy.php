@@ -19,11 +19,9 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use SplQueue;
 
 class DefaultDispatchStrategy implements DispatchStrategyInterface
 {
-
     const MIN_WORKERS  = 1;
     const MAX_WORKERS  = 6;
     const MAX_FLYWHEEL = 0;
@@ -313,28 +311,6 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
 
 
     /**
-     * Method to advise the pool that the Dispatcher is idle.
-     *
-     * @return void
-     */
-    public function dispatcherIdle()
-    {
-        // TODO: Implement dispatcherIdle() method.
-    }
-
-
-    /**
-     * Method to advise the pool that the Dispatcher is engaged.
-     *
-     * @return void
-     */
-    public function dispatcherEngage()
-    {
-        // TODO: Implement dispatcherEngage() method.
-    }
-
-
-    /**
      * Returns a NEW, empty WorkerBundle.
      *
      * @return WorkerBundleInterface
@@ -371,43 +347,6 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
         if ($exception instanceof PDOException) {
             throw $exception;
         }
-    }
-
-
-    /**
-     * Returns a Queue, populated from storage if persistence is part of the strategy.
-     *
-     * @return SplQueue
-     */
-    public function buildQueue()
-    {
-        return new SplQueue();
-    }
-
-
-    /**
-     * Persistent enqueue.
-     *
-     * @param object $identifier
-     * @param string $command
-     * @param array  $data
-     * @return void
-     */
-    public function penqueue($identifier, $command, $data)
-    {
-        // noop: this strategy does not use persistent queues.
-    }
-
-
-    /**
-     * Persistent dequeue.
-     *
-     * @param object $identifier
-     * @return void
-     */
-    public function pdequeue($identifier)
-    {
-        // noop: this strategy does not use persistent queues.
     }
 
 

@@ -21,7 +21,6 @@ use UnexpectedValueException;
 
 class DataIOListener extends AbstractIOStreamListener
 {
-
     /** @var TaskResponseHandlerInterface */
     protected $handler;
 
@@ -137,8 +136,6 @@ class DataIOListener extends AbstractIOStreamListener
                     $this->log->info("Response from worker {{$pid}} failed to parse, still DONE");
                 }
 
-                // regardless of whether or not the handling of the response succeeded, we need to ditch this message
-                $this->strat->pdequeue($task->getIdentifier());
                 break;
         }
 

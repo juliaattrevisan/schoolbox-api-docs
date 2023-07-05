@@ -14,11 +14,9 @@ use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use SplQueue;
 
 interface DispatchStrategyInterface
 {
-
     // non-printable characters used for message stream control
     const STR_END_OF_TRANSMISSION = "\004";
     const STR_ACKNOWLEDGE         = "\006";
@@ -179,22 +177,6 @@ interface DispatchStrategyInterface
 
 
     /**
-     * Method to advise the pool that the Dispatcher is idle.
-     *
-     * @return void
-     */
-    public function dispatcherIdle();
-
-
-    /**
-     * Method to advise the pool that the Dispatcher is engaged.
-     *
-     * @return void
-     */
-    public function dispatcherEngage();
-
-
-    /**
      * Returns the number of seconds a Worker should be idle before self-destructing
      *
      * @return int
@@ -217,34 +199,6 @@ interface DispatchStrategyInterface
      * @return void
      */
     public function handleException($exception, $log);
-
-
-    /**
-     * Returns a Queue, populated from storage if persistence is part of the strategy.
-     *
-     * @return SplQueue
-     */
-    public function buildQueue();
-
-
-    /**
-     * Persistent enqueue.
-     *
-     * @param object $identifier
-     * @param string $command
-     * @param array  $data
-     * @return void
-     */
-    public function penqueue($identifier, $command, $data);
-
-
-    /**
-     * Persistent dequeue.
-     *
-     * @param object $identifier
-     * @return void
-     */
-    public function pdequeue($identifier);
 
 
     /**

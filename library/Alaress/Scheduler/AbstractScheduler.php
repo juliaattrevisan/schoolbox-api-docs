@@ -26,7 +26,6 @@ use React\EventLoop\TimerInterface;
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
-
     /** @var LoggerInterface */
     protected $log;
 
@@ -65,21 +64,6 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $this->dispatcher = new Dispatcher($loop, $this, $log, $dispatchStrategy); // TODO IoC
         $this->clock      = $clock;
     }
-
-
-    /**
-     * Convenience method to schedule an array of triggers
-     *
-     * @param TriggerInterface[] $triggers
-     * @throws InvalidArgumentException
-     */
-    protected function scheduleNotifications(array $triggers)
-    {
-        foreach ($triggers as $trigger) {
-            $this->scheduleNotification($trigger);
-        }
-    }
-
 
     /**
      * Schedule a trigger for deferred execution

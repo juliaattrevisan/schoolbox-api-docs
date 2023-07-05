@@ -272,36 +272,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
 
     /**
-     * @param TriggerInterface[] $triggers
-     * @param IResolver          $resolver
-     * @throws InvalidArgumentException
-     * @throws DuplicateResolutionException
-     * @return void
-     */
-    public function scheduleNotifications(array $triggers, IResolver $resolver = null)
-    {
-        $c = count($triggers);
-
-        if ($c === 0) {
-            $this->log->info('No triggers to schedule');
-
-            if ($resolver instanceof IResolver) {
-                $resolver->acknowledge();
-                $this->log->debug('Resolver acknowledged');
-            }
-
-            return;
-        }
-
-        $this->log->info(sprintf('Scheduling %s trigger%s', $c, $c === 1 ? '' : 's'));
-
-        foreach ($triggers as $trigger) {
-            $this->scheduleNotification($trigger, $resolver);
-        }
-    }
-
-
-    /**
      * @param TriggerInterface $trigger
      * @param IResolver        $resolver
      * @throws InvalidArgumentException
