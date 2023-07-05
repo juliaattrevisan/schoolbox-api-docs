@@ -137,6 +137,10 @@ class Receiver
                 'function' => [$this, 'publishDailyData'],
             ],
 
+            'liss.publishClassMemberships' => [
+                'function' => [$this, 'publishClassMemberships'],
+            ],
+
             /* All these ones fulfil a cyclic timetable afaict
              * We don't need them
              *
@@ -147,9 +151,6 @@ class Receiver
             ],
             'liss.publishClasses' => [
                 'function' => [$this, 'publishClasses'],
-            ],
-            'liss.publishClassMemberships' => [
-                'function' => [$this, 'publishClassMemberships'],
             ],
             'liss.publishBellTimes' => [
                 'function' => [$this, 'publishBellTimes'],
@@ -220,6 +221,56 @@ class Receiver
         $this->transact($this->importLogMapper->getDatabase(), $composites);
 
         return $this->generateResponse('publishDailyData finished.');
+    }
+
+
+    /**
+     * Publish students to the Schoolbox
+     *
+     * @param Request $message
+     * @return Response
+     * @throws Exception
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function publishClassMemberships(Request $message): Response
+    {
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator($this->externalEnable, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        /* Cache locally whatever liss sent to us
+         * This allows you to replay locally
+         */
+        if ($this->storageLogging) {
+            $this->log()->debug('Logging LISS payload to local storage');
+
+            (new PayloadCache($this->storageMapper))->cache('classmemberships', $this->superuser, $message);
+        }
+
+        /* This is the equivalent of a combined Scheduler.php and Factory.php
+         * since the liss receiver immediately processes upon receiving data
+         *
+         * Since we are receiving a push from schools,
+         * we are always in Perform mode
+         */
+        $composites = (new GenericCollection(IStrategy::class))
+            ->add(new TimetableCalendar\ClassMemberships(
+                $this->log(),
+                true,
+                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
+                $message
+            ));
+
+        /* Shank a database instance
+         */
+        $this->transact($this->importLogMapper->getDatabase(), $composites);
+
+        return $this->generateResponse('publishClassMemberships finished.');
     }
 
 
@@ -341,24 +392,6 @@ class Receiver
         }
 
         return $this->generateResponse('getRooms finished but unused.');
-    }
-
-
-    /**
-     * Publish students to the Schoolbox
-     *
-     * @param Request $message
-     * @return Response
-     */
-    public function publishClassMemberships(Request $message): Response
-    {
-        /* Requires schoolbox connector
-         */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
-            return $this->generateResponse(self::AUTHENTICATION_FAILED);
-        }
-
-        return $this->generateResponse('publishClassMemberships finished but unused.');
     }
 
 
