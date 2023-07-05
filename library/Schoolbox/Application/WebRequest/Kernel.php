@@ -33,6 +33,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\User;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -141,10 +142,11 @@ class Kernel extends WebKernelAbstract
         $route = $matcher->match($request);
 
         try {
+            $authHeaderUser = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
             if ($route instanceof Route) {
-                $this->outputAuraContent($route, $server);
+                $this->outputAuraContent($route, $authHeaderUser);
             } else {
-                $this->outputSitepageContent($path, $server);
+                $this->outputSitepageContent($path, $authHeaderUser);
             }
         } catch (Unauthenticated $e) {
             // Unauthenticated response - redirect to a login page.
@@ -248,16 +250,17 @@ class Kernel extends WebKernelAbstract
     /**
      * Renders Aura-based content.
      *
-     * @param Route $route  the route to render: the controller and action are
-     *                      extracted from its name.
-     * @param array $server Vars from $_SERVER
+     * @param Route     $route          the route to render: the controller and
+     *                                  action are extracted from its name.
+     * @param User|null $authHeaderUser A user from the `Authorization` header,
+     *                                  if provided and valid.
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      * @throws Throwable
      */
-    private function outputAuraContent(Route $route, array $server): void
+    private function outputAuraContent(Route $route, ?User $authHeaderUser): void
     {
         // The route name's format:
         // "[controllerName].[action](:[label])"
@@ -271,15 +274,14 @@ class Kernel extends WebKernelAbstract
         $module = Registry::buildModuleFromRegistration($this->di, $controllerName);
         $module->initControllerDependencies();
 
-        // User is from:
-        // * Authorization header
-        // * Session, if not in auth header
-        $user = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
-
-        // Did token auth fail to find a user?
+        // Was a user received via an auth header?
+        // If so: auth the user for only this request.
+        // Currently, this destroys all previous session data: but we presume
+        // you aren't making requests with a JWT when you are already logged in.
         $session = null;
-        if ($user) {
-            $this->authenticateUserForThisRequestOnly($user);
+        if ($authHeaderUser) {
+            $this->authenticateUserForThisRequestOnly($authHeaderUser);
+            $user = $authHeaderUser;
         } else {
             /** @var \Alaress\Session\Session $session */
             $session = $this->di->get('session');
@@ -435,11 +437,13 @@ class Kernel extends WebKernelAbstract
     /**
      * Renders Sitepage-based content.
      *
-     * @param string|null $path  the base path that was requested
-     * @param array       $server Vars from $_SERVER
+     * @param string|null $path           the base path that was requested
+     * @param User|null   $authHeaderUser A user authenticated from the
+     *                                    `Authorization` header, if provided
+     *                                    and valid.
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
-    private function outputSitepageContent(?string $path, array $server): void
+    private function outputSitepageContent(?string $path, ?User $authHeaderUser): void
     {
         // we shall assume that if a specific page is requested,
         // the user just be sent to that page regardless of device
@@ -449,13 +453,12 @@ class Kernel extends WebKernelAbstract
             $pageName = 'dashboard';
         }
 
-        // Was an auth header received?
+        // Was a user received via an auth header?
         // If so: auth the user for only this request.
         // Currently, this destroys all previous session data: but we presume
         // you aren't making requests with a JWT when you are already logged in.
-        $user = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
-        if ($user) {
-            $this->authenticateUserForThisRequestOnly($user);
+        if ($authHeaderUser) {
+            $this->authenticateUserForThisRequestOnly($authHeaderUser);
         }
 
         // Time to start the session
