@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector\Edumate\Base;
 
+use InvalidArgumentException;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\User;
@@ -45,6 +46,5 @@ class ExternalEvents extends Base implements IExternalEvents
              'endDate'    => date('Y-m-d', $endDate)
             ]
         );
-
     }
 }
