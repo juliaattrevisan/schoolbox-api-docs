@@ -105,9 +105,6 @@ HELP;
             }
             $updated[] = $token;
 
-            // dedupe assessment, so we can process these later
-            $regenerateList[$completionEntry->getTask()->getAssessmentModel()->getId()][] = $completionEntry->getTask()->getAssessmentModel()->getId();
-
             // find if this entry has a teacher complete status
             //all the tmp variables
             $thisTaskList = $completionEntries->filterBy('task', $completionEntry->getTask());
@@ -120,6 +117,9 @@ HELP;
                 $this->getLogger()->debug("Task Not Complete");
                 continue;
             }
+
+            // dedupe assessment, so we can process these later
+            $regenerateList[$completionEntry->getTask()->getAssessmentModel()->getId()][] = $completionEntry->getTask()->getAssessmentModel()->getId();
 
             //this assessment has no teacher feedback, so lets add that in now, making sure not to do this multiple times
             if ($this->perform()) {
