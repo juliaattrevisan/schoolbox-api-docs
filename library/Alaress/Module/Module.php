@@ -22,10 +22,12 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use LogicException;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Url\Uri;
 use Twig\Loader\FilesystemLoader;
 use Twig\Error\LoaderError;
 
@@ -663,10 +665,16 @@ class Module
      */
     public function installControllerDependencies(Base $controller, ContainerInterface $container): Base
     {
+        // Generate a URI here (with Schoolbox's augmentations),
+        // and inject it into the controller
+        /** @var ServerRequestInterface $request */
+        $request    = $container->get('request');
+        $requestUri = new Uri($request->getUri()->__toString());
         $controller
             ->setRequest($container->get('webFactory')->newRequest())
             ->setResponse($container->get('webFactory')->newResponse())
-            ->setPsr7Request($container->get('request'))
+            ->setPsr7Request($request)
+            ->setRequestUri($requestUri)
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
             ->setRouteGenerator($container->get('router.generator'))

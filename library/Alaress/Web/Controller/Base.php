@@ -49,6 +49,15 @@ abstract class Base
     protected ServerRequestInterface $psr7Request;
 
     /**
+     * A URI object, representing the URI of the current request.
+     *
+     * Supplements `$this->psr7Request->getUri()` with Schoolbox's
+     * `UriInterface` implementation, which adds a convenient `getQueryAsArray`
+     * method.
+     */
+    protected Uri $requestUri;
+
+    /**
      * Response object from Aura.Web package.
      *
      * @deprecated This will be replaced with a PSR-7 compliant response object
@@ -162,6 +171,24 @@ abstract class Base
     public function setPsr7Request(ServerRequestInterface $psr7Request): self
     {
         $this->psr7Request = $psr7Request;
+        return $this;
+    }
+
+    /**
+     * @return Uri
+     */
+    public function getRequestUri(): Uri
+    {
+        return $this->requestUri;
+    }
+
+    /**
+     * @param Uri $requestUri
+     * @return $this
+     */
+    public function setRequestUri(Uri $requestUri): self
+    {
+        $this->requestUri = $requestUri;
         return $this;
     }
 
