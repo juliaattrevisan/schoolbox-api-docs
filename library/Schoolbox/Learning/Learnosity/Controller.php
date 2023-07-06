@@ -33,7 +33,7 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * Build quiz contents
      */
     public function getActivityList(): void
     {
@@ -69,10 +69,15 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * Do an attempt
      */
     public function getItem(): void
     {
+        /* This should be stored in assess_attempt and/or $_SESSION
+         * because this lets you resume your attempt where you left off
+         * Generating a new sessionId here causes you spawn a new attempt
+         * in Learnosity
+         */
         $sessionId = Uuid::generate();
 
         $quiz = [
