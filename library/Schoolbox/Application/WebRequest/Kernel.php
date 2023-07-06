@@ -146,16 +146,11 @@ class Kernel extends WebKernelAbstract
             // Unauthenticated response - redirect to a login page.
             // Preserve GET params that aren't "page" or "samlAuth", so the user
             // can get redirected back to what they requested when they log in.
-            /** @var Request $request */
-            $request  = $this->di->get('webFactory')->newRequest();
-            $query    = [];
-            foreach ($request->query as $key => $value) {
-                if (!in_array($key, ['page', 'samlAuth'])) {
-                    $query[$key] = $value;
-                }
-            }
+            $query       = new Uri($request->getUri());
+            $queryParams = array_diff_key($query->getQueryAsArray(), ['page' => true, 'samlAuth' => true]);
+
             // using http_build_query to handle array in filters
-            $uri = (new Uri($path))->withQuery(http_build_query($query));
+            $uri = (new Uri($path))->appendQueryParameters($queryParams);
 
             // Start constructing a response
             /** @var Response $response */
@@ -191,8 +186,6 @@ class Kernel extends WebKernelAbstract
         } catch (\Schoolbox\Mapper\Exception\NotFound | Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
             // Output something plain
-            /** @var Request $request */
-            $request  = $this->di->get('webFactory')->newRequest();
             /** @var Response $response */
             $response = $this->di->get('webFactory')->newResponse();
             $code     = $e instanceof Deleted ? 410 : 404;

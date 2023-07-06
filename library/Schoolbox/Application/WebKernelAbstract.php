@@ -13,6 +13,7 @@ use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
 use InvalidArgumentException;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\API\Token\JwtParser;
@@ -370,7 +371,8 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $config                   = $di->get('config');
                 $args['outputStackTrace'] = $config->get('debug_show_stack_trace');
 
-                $request = $di->get('webFactory')->newRequest();
+                /** @var ServerRequestInterface $request */
+                $request = $di->get('request');
                 if ((new IsJson())->isSatisfiedBy($request)) {
                     $problem = (new ApiProblem($message))
                         ->setStatus($code)

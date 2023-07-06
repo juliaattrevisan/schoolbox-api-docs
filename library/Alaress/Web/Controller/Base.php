@@ -332,7 +332,7 @@ abstract class Base
      */
     public function isJsonRequest(): bool
     {
-        return $this->isJsonSpec->isSatisfiedBy($this->request);
+        return $this->isJsonSpec->isSatisfiedBy($this->psr7Request);
     }
 
 
@@ -352,7 +352,7 @@ abstract class Base
      */
     public function isXhrRequest(): bool
     {
-        return $this->isXhrSpec->isSatisfiedBy($this->request);
+        return $this->isXhrSpec->isSatisfiedBy($this->psr7Request);
     }
 
 
