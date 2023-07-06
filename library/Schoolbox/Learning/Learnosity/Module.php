@@ -39,7 +39,9 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/activityList', 'getActivityList', $getPerms, null);
-        $this->register('GET', '/item', 'getItem', $getPerms, null);
+        $this->register('GET', '/items', 'getItems', $getPerms, null);
+        $this->register('GET', '/feedback', 'getFeedback', $getPerms, null);
+        $this->register('GET', '/sessionList', 'getSessionListReport', $getPerms, null);
     }
 
 
@@ -66,7 +68,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return \Learning\Learnosity\Mapper|UserMapper
+     * @return UserMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()

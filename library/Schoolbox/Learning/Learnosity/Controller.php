@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Web\Controller\Base;
+use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
@@ -71,13 +72,14 @@ class Controller extends Base
     /**
      * Do an attempt
      */
-    public function getItem(): void
+    public function getItems(): void
     {
         /* This should be stored in assess_attempt and/or $_SESSION
          * because this lets you resume your attempt where you left off
          * Generating a new sessionId here causes you spawn a new attempt
          * in Learnosity
          */
+        // 381c864b-cb14-45e3-b901-0d5b493ece47 is one of my test attempts
         $sessionId = Uuid::generate();
 
         $quiz = [
@@ -184,8 +186,142 @@ class Controller extends Base
             $this->getConfigLoader()->get('logs_dir')
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/item.twig', [
-            'initOptions' => $api->initOptions('author', $payload)
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
+            'initOptions' => $api->initOptions('items', $payload)
         ])->setTitle('Example Item'));
+    }
+
+
+    /**
+     * Do an attempt
+     */
+    public function getFeedback(): void
+    {
+        /* This should be stored in assess_attempt and/or $_SESSION
+         * because this lets you resume your attempt where you left off
+         * Generating a new sessionId here causes you spawn a new attempt
+         * in Learnosity
+         */
+        // 381c864b-cb14-45e3-b901-0d5b493ece47 is one of my test attempts
+//        $sessionId = Uuid::generate();
+        $sessionId = '381c864b-cb14-45e3-b901-0d5b493ece47';
+
+        $quiz = [
+            'id' => '733',
+            'title' => 'schoolbox test quiz'
+        ];
+
+        $payload = [
+            /* Our internal Quiz implementation id, it seems?
+             */
+            'activity_id' => $quiz['id'],
+            "config" => [
+                "configuration" => [
+                    "idle_timeout" => [
+                        "interval" => 300
+                    ]
+                ],
+                "navigation" => [
+                    "auto_save" => [
+                        "save_interval_duration" => 300
+                    ],
+                    "show_intro" => true,
+                    "show_outro" => true
+                ],
+                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
+                 */
+                'regions' => 'main',
+                /* This is our Quiz title, I guess
+                 */
+                "title" =>  $quiz['title'],
+                "subtitle" => "This is a random subtitle"
+            ],
+            /* This is our Quiz title, I guess
+             */
+            'name' => $quiz['title'],
+            'rendering_type' => 'assess',
+            /* An "attempt identifier", I think
+             */
+            'session_id' => $sessionId,
+            /* This saves attempt results into Learnosity servers, enabling reporting etc.
+             * You can use 'local_practice' to preview a quiz.
+             * You can use 'feedback' to grade an attempt with feedback etc.
+             */
+            'type' => 'feedback',
+            /* A uniquely-identifying string for us, I think
+             */
+            'user_id' => (string)$this->getUser()->getId(),
+            'items' => [
+                [
+                    'id' => '7d6b64f9-88af-4e40-b74f-7895cccbff00',
+                    'reference' => '7d6b64f9-88af-4e40-b74f-7895cccbff00',
+                ],
+                [
+                    'id' => '0a64ef3b-eaff-43bc-a2ed-081305c2ee12',
+                    'reference' => '0a64ef3b-eaff-43bc-a2ed-081305c2ee12',
+                ],
+                [
+                    'id' => '572287db-3764-43be-b2e7-2af2e3ee9c2f',
+                    'reference' => '572287db-3764-43be-b2e7-2af2e3ee9c2f',
+                ]
+            ],
+        ];
+
+        $api = new Api(
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->getConfigLoader()->get('logs_dir')
+        );
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
+            'initOptions' => $api->initOptions('items', $payload)
+        ])->setTitle('Example Item'));
+    }
+
+
+    /**
+     * Get an overview for all the sessions conducted
+     *
+     * This gives teachers a strategic idea of how many questions were
+     * attempted correctly
+     *
+     * @return void
+     * @throws \JsonException
+     * @throws ValidationException
+     */
+    public function getSessionListReport(): void
+    {
+        $api = new Api(
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->getConfigLoader()->get('logs_dir')
+        );
+
+        $payload = [
+            'user_id' => (string)$this->getUser()->getId(),
+            'reports' => [
+                [
+                    /* DOM element id, where this goes in
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
+                    'id' => 'schoolbox-result',
+                    'type' => 'sessions-list',
+                    'limit' => 100,
+                    'ui' => 'table',
+                    'activities' => [
+                        [
+                            'id' => 'fdf98aef-3a7c-4851-ab3a-0fd499ee3553',
+                            'name' => 'the thing'
+                        ]
+                    ]
+                ]
+            ],
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/sessionList.twig', [
+            'initOptions' => $api->initOptions('reports', $payload)
+        ])->setTitle('Example Session List'));
     }
 }
