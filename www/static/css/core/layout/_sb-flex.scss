@@ -27,9 +27,23 @@
         height: 100%;
     }
 
+    &--wrap {
+        flex-wrap: wrap;
+    }
+
+    &--wrap-reverse {
+        flex-wrap: wrap-reverse;
+    }
+
     &__item {
         &--1 {
             flex: 1;
+        }
+    }
+
+    @each $size in $global-sizes {
+        &-gap--#{$size} {
+            grid-gap: var(--whitespace-#{$size});
         }
     }
 }

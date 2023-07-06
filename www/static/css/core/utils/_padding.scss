@@ -22,6 +22,32 @@
                 padding-top: var(--whitespace-#{$size});
                 padding-bottom: var(--whitespace-#{$size});
             }
+
+            &--horiz {
+                padding-left: var(--whitespace-#{$size});
+                padding-right: var(--whitespace-#{$size});
+            }
+
+            &--vert {
+                padding-top: var(--whitespace-#{$size});
+                padding-bottom: var(--whitespace-#{$size});
+            }
+
+            &--top {
+                padding-top: var(--whitespace-#{$size});
+            }
+
+            &--bottom {
+                padding-bottom: var(--whitespace-#{$size});
+            }
+
+            &--left {
+                padding-left: var(--whitespace-#{$size});
+            }
+
+            &--right {
+                padding-right: var(--whitespace-#{$size});
+            }
         }
     }
 }

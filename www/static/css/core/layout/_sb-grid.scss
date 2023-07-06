@@ -9,8 +9,9 @@
 @use "sass:list";
 @use "sass:map";
 
-// TODO - This should probably be globally controllable somewhere
-$minColWidth: 16rem;
+//  TODO - This should probably be globally controllable somewhere. 18rem corresponds to
+//  ROUGHLY our medium-to-small breakpoint.
+$minColWidth: 18rem;
 
 /* Variables for legacy sizing */
 
@@ -53,10 +54,17 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 **/
 //  Class used on our parent container to declare it as a grid layout.
 .sb-grid {
+    /**
+     *  If you can support smaller minimum sizes then overwrite grid-template-columns in
+     *  another class with smaller minColWidth. For example...
+     *  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    **/
+
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr));
     width: 100%;
 
+    // If you need explicit column sizes... here;
     &--2-col {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -70,8 +78,26 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
     }
 
     @each $size in $global-sizes {
-        &--gap-#{$size} {
+        &-gap--#{$size} {
             grid-gap: var(--whitespace-#{$size});
+        }
+    }
+
+    @media #{$medium-down} {
+        &--4-col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        &--3-col {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+
+    @media #{$small-only} {
+        &--4-col,
+        &--3-col,
+        &--2-col {
+            grid-template-columns: repeat(1, 1fr);
         }
     }
 }

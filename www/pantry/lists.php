@@ -34,7 +34,8 @@ $data = [
         '/lists' => 'Lists',
         '/feature-tour' => 'Feature Tour',
         '/reveal' => 'Reveal',
-        '/reference' => 'Visibility Classes'
+        '/reference' => 'Visibility Classes',
+        '/grid-flex' => 'New Grid / Flex'
 
     ]
 ];

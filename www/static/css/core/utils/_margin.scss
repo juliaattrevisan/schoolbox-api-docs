@@ -11,16 +11,32 @@
 .u-margin {
     @each $size in $global-sizes {
         &-#{$size} {
-            padding: var(--whitespace-#{$size});
+            margin: var(--whitespace-#{$size});
 
             &--horiz {
-                padding-left: var(--whitespace-#{$size});
-                padding-right: var(--whitespace-#{$size});
+                margin-left: var(--whitespace-#{$size});
+                margin-right: var(--whitespace-#{$size});
             }
 
             &--vert {
-                padding-top: var(--whitespace-#{$size});
-                padding-bottom: var(--whitespace-#{$size});
+                margin-top: var(--whitespace-#{$size});
+                margin-bottom: var(--whitespace-#{$size});
+            }
+
+            &--top {
+                margin-top: var(--whitespace-#{$size});
+            }
+
+            &--bottom {
+                margin-bottom: var(--whitespace-#{$size});
+            }
+
+            &--left {
+                margin-left: var(--whitespace-#{$size});
+            }
+
+            &--right {
+                margin-right: var(--whitespace-#{$size});
             }
         }
     }
