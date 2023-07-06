@@ -62,11 +62,8 @@
                     /* The list element containing this row
                      */
                     $.ajax(element.attr("href"), {
-                        headers: {
-                            "X-HTTP-Method-Override": "DELETE",
-                        },
                         dataType: "json",
-                        type: "POST",
+                        type: "DELETE",
                     })
                         .done(function () {
                             // Delete this unit from the list

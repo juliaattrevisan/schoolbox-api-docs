@@ -56,10 +56,7 @@ Usage:
 
                     var url = $element[0].href;
                     var settings = {
-                        headers: {
-                            'X-HTTP-Method-Override': 'DELETE'
-                        },
-                        type: 'POST',
+                        type: 'DELETE',
                         success: function(resp) {
                             if(resp.data){
                                 // Toast success
