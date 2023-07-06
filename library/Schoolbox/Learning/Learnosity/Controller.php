@@ -312,7 +312,7 @@ class Controller extends Base
                     'ui' => 'table',
                     'activities' => [
                         [
-                            'id' => 'fdf98aef-3a7c-4851-ab3a-0fd499ee3553',
+                            'id' => '733',
                             'name' => 'the thing'
                         ]
                     ]
