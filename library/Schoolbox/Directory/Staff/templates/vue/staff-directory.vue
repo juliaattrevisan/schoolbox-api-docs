@@ -36,7 +36,7 @@ async function loadData() {
  * Start loading the group data
  */
 window.Vue.onMounted(() => {
-    void loadData();
+    loadData();
 });
 </script>
 
