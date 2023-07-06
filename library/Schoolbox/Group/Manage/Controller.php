@@ -164,7 +164,7 @@ class Controller extends Base
      */
     public function updateMembers(Folder $folder)
     {
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
         $newAccesses = array_combine(
             array_map('intval', array_column($requestBody['accessTypes'], 'userId')),
             $requestBody['accessTypes']
