@@ -3,14 +3,12 @@
  * https://ilikekillnerds.com/2022/09/how-to-extend-the-window-object-in-typescript/
  */
 
-export {};
+import Vue from "vue";
 
 declare global {
     interface Window {
         cdnPrefix: string;
-        siteVersion: string;
         CKEDITOR: any;
-        STORYBOOK_ENV: string;
         sbProps: {
             lightGallery: Function;
             lightGalleryInit: Function;
@@ -19,6 +17,9 @@ declare global {
             imageSlideshows: { [key: string]: any };
             colourDefaults: { [key: string]: any };
         };
+        siteVersion: string;
+        STORYBOOK_ENV: string;
+        Vue: typeof Vue;
     }
 }
 
