@@ -74,7 +74,7 @@ class Controller extends Base
         $category->setName('All');
 
         // Use the paginator to limit searches
-        $this->paginator->setUrl($this->request->url->get());
+        $this->paginator->setUrl($this->psr7Request->getUri()->__toString());
         $list = $this->mapper->createCollection();
         if (strlen($search) > 0) {
             $total = $this->mapper->searchCount($search);

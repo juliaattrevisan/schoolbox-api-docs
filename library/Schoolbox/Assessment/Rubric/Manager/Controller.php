@@ -121,7 +121,7 @@ class Controller extends BaseController
                         'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
                         'status' => $this->response->status->getCode(),
                         'detail' => $e->getMessage(),
-                        'instance' => $this->request->url
+                        'instance' => $this->psr7Request->getUri()->__toString(),
                     ])
                 );
             }

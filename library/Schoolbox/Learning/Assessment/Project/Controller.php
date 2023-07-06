@@ -256,7 +256,7 @@ class Controller extends Assessment\Controller
             'student'         => $student,
             'assessment'      => $assessment,
             'transitions'     => $tickTransitions,
-            'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode(parse_url($this->request->url->get(), PHP_URL_PATH)),
+            'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->psr7Request->getUri()->getPath()),
         ];
 
         $this->getResponse()->content->set(
