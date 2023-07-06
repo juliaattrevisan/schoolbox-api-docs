@@ -1563,9 +1563,7 @@ class Controller extends Assessment\Controller
         /* TODO: Make this more generalised
          * For now the only utility here is to update Skip Unsubmitted setting
          */
-        /** @phpstan-ignore-next-line - get() returns a string */
-        $showSubmittedOnly = $this->request->content->get()['showSubmittedOnly'] ?? 0;
-        /** @phpstan-ignore-next-line - $showSubmittedOnly may be a non-zero int */
+        $showSubmittedOnly = $this->psr7Request->getParsedBody()['showSubmittedOnly'] ?? 0;
         if ((int)$showSubmittedOnly) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;

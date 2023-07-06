@@ -107,10 +107,9 @@
             if (event.namespace != 'preload') {
                 $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id, assessment: participant.assessable }) }}', {
                     type: 'PATCH',
+                    contentType: 'application/json',
                     dataType: 'json',
-                    data: {
-                        showSubmittedOnly: skip
-                    }
+                    data: JSON.stringify({ showSubmittedOnly: skip }),
                 });
             }
 
