@@ -30,17 +30,10 @@
                 return;
             }
 
-            const fontUnit = $tile.attr('data-font-size-unit');
-            if (fontUnit === undefined) {
-                throw new Error(
-                    "Expected attribute 'data-font-size-unit' not set on tile with id '" + $tile.attr('id') + "'."
-                );
-            }
-
             const $tileTitle = $tile.find('.title');
             $tileTitle.css({
-                fontSize: String(fontSize) + fontUnit,
-                padding: String(fontSize / 4) + fontUnit,
+                fontSize: String(fontSize) + 'rem',
+                padding: String(fontSize / 4) + 'rem',
             });
 
             // If the title is taller than the tile:
