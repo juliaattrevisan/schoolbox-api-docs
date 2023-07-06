@@ -45,8 +45,8 @@
 
 <script type="text/javascript">
     (function($) {
-        const resizeTileTitles = function () {
-            $('#{{ componentId }}-tile-{{ tile.id }}').resizeTileTitle(
+        const resizeTiles = function () {
+            $('#{{ componentId }}-tile-{{ tile.id }}').resizeTile(
                 {
                     minFontSize: {{ tile.getTitleTextMinSize()/100 }},
                     maxFontSize: {{ tile.getTitleTextMaxSize()/100 }},
@@ -58,16 +58,16 @@
         $(function () {
             // Cheat's responsive text size:
             // Constrain font size based on width of tile
-            resizeTileTitles();
-            $(window).resize(resizeTileTitles);
+            resizeTiles();
+            $(window).resize(resizeTiles);
 
-            // Also run the resizeTileTitles() after the tile contents have been expanded.
+            // Also run the resizeTiles() after the tile contents have been expanded.
             // This is necessary because the calculation for the new font-size depends on the tile width, and the tile width
             // cannot be ascertained when the tile is hidden.
             const $collapsable = $('#{{ componentId }}-tile-{{ tile.id }}').closest('.component-container').find('[data-collapsable=true]');
             if ($collapsable.length > 0) {
                 $collapsable[0].addEventListener("expandStarted.collapsable", function () {
-                    resizeTileTitles();
+                    resizeTiles();
                 });
             }
         });

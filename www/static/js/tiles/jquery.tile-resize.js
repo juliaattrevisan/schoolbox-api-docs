@@ -1,6 +1,7 @@
 /**
  * Tile resizer:
  * Resizes the title within grid tiles based on the width of the tile.
+ * Also adjusts tile height.
  *
  * Settings:
  * * minFontSize, maxFontSize: the font size bounds for the title
@@ -13,7 +14,7 @@
  *                     Defaults to ".title"
  */
 (function ($) {
-    $.fn.resizeTileTitle = function (options) {
+    $.fn.resizeTile = function (options) {
         const defaults = {
             minFontSize: 1,
             maxFontSize: 6,
@@ -34,7 +35,9 @@
             },
             titleSelector: ".title",
         };
+
         const settings = $.extend({}, defaults, options);
+
         $(this).each(function () {
             const tile = $(this);
             const tileTitle = tile.find(settings.titleSelector);
@@ -61,15 +64,7 @@
                 fontSize: String(fontSize) + settings.unit,
                 padding: String(fontSize / 4) + settings.unit,
             });
-            /**
-             * Using padding-bottom values such as 7.0175438596491% to provide appropriate height for
-             * tiles can lead to display issues when there's one tile per row. Refer to: SA-15725.
-             * To resolve we need to instead set a rounded height and remove the padding-bottom.
-             * We get the padding-bottom from the parent as it's the easiest way to get percentage values.
-             * Prior to setting the height, on each resize we need to first set it to auto and revert
-             * the padding-bottom to ensure we can accurately calculate the height.
-             */
-            tile.css({ height: "auto", paddingBottom: tile.parent().data("padding-bottom") });
+
             // If the title is taller than the tile:
             // reduce the tile's top and bottom padding so it fits.
             const titleHeight = tileTitle.outerHeight();
@@ -82,8 +77,71 @@
                     paddingBottom: newPadding,
                 });
             }
-            // Use the height to display the tile instead of padding-bottom.
-            tile.css({ height: `${Math.round(tileHeight)}px`, paddingBottom: 0 });
+
+            /**
+             * Using padding-bottom values such as 7.0175438596491% to provide appropriate height for
+             * tiles can lead to display issues when there's one tile per row. Refer to: SA-15725.
+             * To resolve we need to instead set a rounded height and remove the padding-bottom.
+             * We get the padding-bottom from the parent as it's the easiest way to get percentage values.
+             * Prior to setting the height, on each resize we need to first set it to auto and revert
+             * the padding-bottom to ensure we can accurately calculate the height.
+             */
+            tile.css({ height: "auto", paddingBottom: calculatePaddingBottom(tile) }); // Allow height to resize due to padding-bottom.
+            tile.css({ height: `${Math.round(tile.outerHeight())}px`, paddingBottom: 0 }); // Set height explicitly and remove padding-bottom.
         });
     };
 })(jQuery);
+
+/**
+ * @param { HTMLElement } tile
+ * @returns { string } paddingBottomCss
+ */
+function calculatePaddingBottom(tile) {
+    const $tileListUl = $(tile.parent());
+    const layoutType = $tileListUl.attr('data-layout-type');
+    const columnCount = $tileListUl.attr('data-column-count');
+    const aspectRatio = getAspectRatioForTile(tile);
+
+    let paddingBottomCss = null;
+
+    switch (layoutType) {
+        case 'grid':
+            const gridWidth = $tileListUl.attr('data-grid-width');
+            // The below line matches the calculation in tileList.twig: {% set paddingBottom = layout.gridWidth * aspectRatio ~ "px" %}
+            paddingBottomCss = gridWidth * aspectRatio + 'px';
+            break;
+        case 'column':
+            const baseColumnWidthPercent = 100 / columnCount;
+            const paddingPercent = $tileListUl.attr('data-padding-percentage');
+            const tilePaddingPercent = baseColumnWidthPercent * paddingPercent;
+            const tileWidthPercent = baseColumnWidthPercent - tilePaddingPercent;
+            // The below line matches the calculation in tileList.twig: {% set paddingBottom = tileWidth * aspectRatio ~ "%" %}
+            paddingBottomCss = tileWidthPercent * aspectRatio + '%';
+            break;
+        default:
+            throw new Error("Unexpected value '" + layoutType + "' for data-layout-type.");
+    }
+
+    return paddingBottomCss;
+}
+
+/**
+ * @param { HTMLElement } tile
+ * @returns { float } aspectRatio
+ */
+function getAspectRatioForTile(tile) {
+    const $aspectRatioXInput = $('#aspect_ratio_x');
+    const $aspectRatioYInput = $('#aspect_ratio_y');
+
+    let aspectRatio = null;
+
+    if ($aspectRatioXInput.length === 1 && $aspectRatioYInput.length === 1) {
+        // The inputs will be present on the Modify Tile Layout page (route GET /tile/layout/{layoutId}).
+        aspectRatio = $aspectRatioYInput.val() / $aspectRatioXInput.val();
+    } else {
+        const $tileListUl = $(tile.parent());
+        aspectRatio = $tileListUl.attr('data-aspect-ratio');
+    }
+
+    return aspectRatio;
+}

@@ -117,11 +117,11 @@
                             tileList.find('[data-tile]').css({
                                 "width":          String(tileWidth)+"%",
                                 "margin":         String(tilePadding / 2)+"%",
-                                "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
+                                "padding-bottom": String(tileWidth * aspect)+"%"
                             });
                         }
                 }
-                tileList.find('.tile').resizeTileTitle({minFontSize: 0.725, maxFontSize: 1.725, unit: 'rem'});
+                tileList.find('.tile').resizeTile({minFontSize: 0.725, maxFontSize: 1.725, unit: 'rem'});
             }
         });
 

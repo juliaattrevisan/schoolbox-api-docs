@@ -2,30 +2,33 @@
  # Grid Layout:
  # Tile width: gridWidth px
  # Padding-bottom (height): gridWidth*aspectRatioY/aspectRatioX
+ #
  # Column Layout:
  # Tile width: 100/column_count
  # Padding-bottom (height): 100/column_count*aspectRatioY/aspectRatioX
  #}
-{# Store the paddingBottom on each <ul> to access within www/static/js/tiles/jquery.tile-resize.js  #}
-{% set paddingBottom = "0px" %}
 {% if layout.aspectRatioY > 0 and layout.aspectRatioX > 0 %}
-<style type="text/css">
+<style>
 #tileList-{{ layout.id }}.tileList .tile {
+    {% set aspectRatio = (layout.aspectRatioY/layout.aspectRatioX) %}
+    {% set paddingPercentage = 0 %}
+
     {% if layout.isGridLayoutType and layout.gridWidth > 0 %}
-    width: {{ layout.gridWidth|e('css') }}px;
-    margin: {{ layout.getGridPadding|e('css') }}px;
-    {% set paddingBottom = layout.gridWidth * (layout.aspectRatioY/layout.aspectRatioX) ~ "px" %}
+        width: {{ layout.gridWidth|e('css') }}px;
+        margin: {{ layout.getGridPadding|e('css') }}px;
+        {% set paddingBottom = layout.gridWidth * aspectRatio ~ "px" %}
     {% endif %}
 
     {% if layout.isColumnLayoutType and layout.columnCount > 0 %}
-    {% set baseColumnWidth   = (100 / layout.columnCount) %}
-    {% set paddingProportion = (layout.columnPadding / 100) %}
-    {% set tilePadding       = baseColumnWidth * paddingProportion %}
-    {% set tileWidth         = baseColumnWidth - tilePadding %}
-    width: {{ tileWidth }}%;
-    margin: {{ tilePadding / 2 }}%;
-    {% set paddingBottom = tileWidth * (layout.aspectRatioY/layout.aspectRatioX) ~ "%" %}
+        {% set baseColumnWidth   = (100 / layout.columnCount) %}
+        {% set paddingPercentage = (layout.columnPadding / 100) %}
+        {% set tilePadding       = baseColumnWidth * paddingPercentage %}
+        {% set tileWidth         = baseColumnWidth - tilePadding %}
+        width: {{ tileWidth }}%;
+        margin: {{ tilePadding / 2 }}%;
+        {% set paddingBottom = tileWidth * aspectRatio ~ "%" %}
     {% endif %}
+
     padding-bottom: {{ paddingBottom }};
 }
 </style>
@@ -36,7 +39,13 @@
 {# spaceless because spaces between inline-block elements split the element. WTF #}
 {% apply spaceless %}
 {% if (tileList|length > 0) or editable %}
-<ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list data-padding-bottom="{{ paddingBottom }}">
+{# Store data on each <ul> for access within www/static/js/tiles/jquery.tile-resize.js #}
+<ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list
+    data-layout-type="{% if layout.isGridLayoutType %}grid{% else %}column{% endif %}"
+    data-aspect-ratio="{{ aspectRatio }}"
+    data-column-count="{{ layout.columnCount }}"
+    data-grid-width="{{ layout.gridWidth }}"
+    data-padding-percentage="{{ paddingPercentage }}">
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {
             componentId: 'component' ~ componentId,
