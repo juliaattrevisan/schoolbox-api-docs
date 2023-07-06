@@ -89,7 +89,17 @@ class RedisCache implements ICache
 
             // Unserialize
             $event = unserialize($uncompressedValue, []);
-            if (!$event instanceof CrudEventInterface) {
+            if ($event instanceof TriggerInterface) {
+                $hash   = sha1($value);
+                $storageKey = "msg:{$this->instanceId}:s:$hash";
+
+                $context = ["msg:{$this->instanceId}:"];
+                $amqpPayload = $context ? json_encode([ $storageKey, $context ]) : $storageKey;
+                $mq->publish($amqpPayload, \Schoolbox\Realtime\Schedule\Broker::QUEUE, [ 'exchange' => '' ]);
+                $this->log->debug(sprintf("Restoring event in key %s", $itemKey));
+                ++$i;
+                continue;
+            } elseif (!$event instanceof CrudEventInterface) {
                 $this->log->warning(
                     sprintf(
                         "Error unserializing data in key %s (expected %s, received %s): cannot restore",
@@ -137,7 +147,7 @@ class RedisCache implements ICache
             foreach ($resolvers->offsetGet($resolver) as $trigger) {
                 /** @var TriggerInterface $trigger */
 
-                $zip = gzcompress(serialize($trigger->getEvent()), 9);
+                $zip = gzcompress(serialize($trigger), 9);
                 $hash = sha1($zip); // this might not be...erm..good.
                 $size = strlen($zip);
                 $timestamp = date('Y-m-d H:i:s', $trigger->getTimestamp());
