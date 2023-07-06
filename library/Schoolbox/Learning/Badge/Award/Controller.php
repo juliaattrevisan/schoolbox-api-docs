@@ -265,7 +265,7 @@ class Controller extends Base
         }
 
         // requires filter params and returnUrl
-        $requestUri = RequestUriParser::parseUrlPath($this->request->server->getArrayCopy());
+        $requestUri = RequestUriParser::parseUrlPath($this->psr7Request->getServerParams());
         $returnUrl  = $requestUri . '?' . http_build_query($queryArgs);
 
         $translator = new User\Translator\Author\ModelToArray();

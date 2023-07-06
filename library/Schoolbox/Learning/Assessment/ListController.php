@@ -155,7 +155,7 @@ class ListController extends Web\Controller\Base
     {
         $sebPayload = new SebPayload(
             $this->getConfigLoader(),
-            $this->getRequest()->server->get('HTTP_HOST'),
+            $this->psr7Request->getServerParams()['HTTP_HOST'] ?? '',
             $this->routeGenerator
         );
 
@@ -201,7 +201,7 @@ class ListController extends Web\Controller\Base
             $this->session->set(Payload::SEB_KEY, $this->request->query->get(Payload::SEB_KEY));
         }
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
-            $this->request->server->getArrayCopy(),
+            $this->psr7Request->getServerParams(),
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
              */
@@ -210,7 +210,7 @@ class ListController extends Web\Controller\Base
              */
             (new SebPayload(
                 $this->getConfigLoader(),
-                $this->request->server->get('HTTP_HOST'),
+                $this->psr7Request->getServerParams()['HTTP_HOST'] ?? '',
                 $this->routeGenerator
             ))->generateConfigKey($assessment, $this->getUser()),
             $this->session->get(Payload::SEB_KEY)

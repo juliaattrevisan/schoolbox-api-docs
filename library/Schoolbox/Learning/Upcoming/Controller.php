@@ -295,7 +295,7 @@ class Controller extends Base
         $data = [
             'student'         => $student,
             'upcomingWork'    => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
-            'returnUrl'       => Redirect::queryString(RequestUriParser::parseUrlPath($this->request->server->getArrayCopy())),
+            'returnUrl'       => Redirect::queryString(RequestUriParser::parseUrlPath($this->psr7Request->getServerParams())),
             'readableFolders' => array_unique($readableFolders),
             'isFiltered'      => (new Filter\RequestChecker())->isFilteredRequest($request),
         ];

@@ -81,13 +81,17 @@ class Controller extends AbstractController
 
         $folderId = $link->getFolder()->getId();
 
-        $server = $this->getRequest()->server;
+        $server = $this->psr7Request->getServerParams();
 
         $data = [
             'file'       => $link,
             'type'       => 'link',
             'tree'       => $this->getBreadcrumbs($link->getFolder()),
-            'host'       => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_X_FORWARDED_HOST') ?? $server->get('HTTP_HOST')),
+            'host'       => sprintf(
+                'http%s://%s',
+                ($server['HTTPS'] ?? false) ? 's' : '',
+                $server['HTTP_X_FORWARDED_HOST'] ?? $server['HTTP_HOST'] ?? '',
+            ),
             'access'     => Access::getInstance()->getFolderAccess($this->getUser(), $folderId),
             'namespace'  => $this->namespace,
         ];

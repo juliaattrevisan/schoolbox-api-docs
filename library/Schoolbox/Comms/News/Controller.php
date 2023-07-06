@@ -764,7 +764,7 @@ class Controller extends Base
             'key' => $this->getUser()->getKey(),
         ];
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
 
         $data = array_merge($data, $sidebar->generate());
 
@@ -963,7 +963,7 @@ class Controller extends Base
             ],
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
-            'page' => RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()),
+            'page' => RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()),
             'pageWithoutParams' => $this->routeGenerator->generate('commsNews.getArchive'),
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
@@ -1146,7 +1146,7 @@ class Controller extends Base
             $status = 'All';
         }
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
 
         $data = array_merge([
             'pageNum' => $pageNum,

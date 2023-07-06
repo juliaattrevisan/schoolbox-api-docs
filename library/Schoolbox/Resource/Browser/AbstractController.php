@@ -346,13 +346,17 @@ abstract class AbstractController extends BaseController
         $folderId = $file->getFolder()->getId();
         $folderUrl = sprintf("/%s/$folderId", ($this->nodeType === NodeFactory::MYFILE) ? 'my-files' : 'resources');
 
-        $server = $this->getRequest()->server;
+        $server = $this->psr7Request->getServerParams();
 
         $data = [
             'file'   => $file,
             'type'   => 'file',
             'tree'   => $this->getBreadcrumbs($file->getFolder()),
-            'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_X_FORWARDED_HOST') ?? $server->get('HTTP_HOST')),
+            'host'   => sprintf(
+                'http%s://%s',
+                ($server['HTTPS'] ?? false) ? 's' : '',
+                $server['HTTP_X_FORWARDED_HOST'] ?? $server['HTTP_HOST'] ?? '',
+            ),
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
             'RETURN_URL' => Redirect::RETURN_URL . '=' . Redirect::encode($folderUrl),

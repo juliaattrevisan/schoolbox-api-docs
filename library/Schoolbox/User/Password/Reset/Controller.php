@@ -130,7 +130,7 @@ class Controller extends Base
 
             $this->passwordMailService->sendResetLinkToAddress(
                 $emailAddress,
-                $this->getRequest()->server->get('REMOTE_ADDR')
+                $this->psr7Request->getServerParams()['REMOTE_ADDR'] ?? ''
             );
         } else {
             $sessionSegment->setFlash('isEmailValid', false);

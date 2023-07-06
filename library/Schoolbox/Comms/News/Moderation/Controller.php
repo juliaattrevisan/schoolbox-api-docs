@@ -75,7 +75,7 @@ class Controller extends Base
     public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
-        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
 
         $data = array_merge([
             'articles' => $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
