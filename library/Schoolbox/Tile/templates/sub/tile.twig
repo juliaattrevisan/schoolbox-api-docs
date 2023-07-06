@@ -46,13 +46,7 @@
 <script type="text/javascript">
     (function($) {
         const resizeTiles = function () {
-            $('#{{ componentId }}-tile-{{ tile.id }}').resizeTile(
-                {
-                    minFontSize: {{ tile.getTitleTextMinSize()/100 }},
-                    maxFontSize: {{ tile.getTitleTextMaxSize()/100 }},
-                    unit: 'rem'
-                }
-            );
+            $('#{{ componentId }}-tile-{{ tile.id }}').resizeTile();
         };
 
         $(function () {
@@ -76,7 +70,10 @@
 
 <li data-tile
     class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
-    id="{{ componentId }}-tile-{{ tile.id|e('html_attr') }}">
+    id="{{ componentId }}-tile-{{ tile.id|e('html_attr') }}"
+    data-min-font-size="{{ tile.getTitleTextMinSize()/100 }}"
+    data-max-font-size="{{ tile.getTitleTextMaxSize()/100 }}"
+    data-font-size-unit="{{ 'rem' }}">
     <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
 
     {% if tile.link %}

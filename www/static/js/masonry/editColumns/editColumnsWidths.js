@@ -31,11 +31,7 @@ function updateColumnWidths(width) {
     removeClassesThatContain(rightContainer, "large-"); //remove any previous class that set width
     rightContainer.classList.add(`large-${12 - width}`); //linked to the leftContainer, so subract from the basis of '12' set by foundation classes
 
-    $('[id^=tileList-] > li').resizeTile(
-        {
-            // TODO: Get font size settings somehow.
-        }
-    );
+    $('[id^=tileList-] > li').resizeTile();
 }
 
 /**
