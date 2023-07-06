@@ -4,6 +4,7 @@
  */
 
 import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
+import getDefaultOptions from "@schoolboxVue/components/vueTables2/getDefaultOptions";
 import SdTableImage from "./sd-table-image.vue";
 import SdTablePhone from "./sd-table-phone.vue";
 import SdTableEmail from "./sd-table-email.vue";
@@ -12,6 +13,7 @@ import type { ColumnsConfig, ColumnsData } from "./staffDirectory";
 interface Props {
     data: ColumnsData[]; // the staff data to display
     columnsConfig: ColumnsConfig[]; // the columns to display in the table
+    options: object; // the configuration for the vue-tables-2 component
 }
 const props = defineProps<Props>();
 
@@ -30,26 +32,12 @@ const headings = props.columnsConfig.reduce((accumulator: object, column: Column
     return accumulator;
 }, {});
 
+// the configuration for the vue-tables-2 component
 const options = {
-    // options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-    alwaysShowPerPageSelect: true,
+    ...getDefaultOptions(),
     columnsClasses,
-    debounce: 100, // shorter debounce time as data is stored locally
     headings,
-    orderBy: {
-        // initial sorting display
-        ascending: true,
-        column: "StaffSurname",
-    },
-    perPage: 50,
-    perPageValues: [50, 100, 200],
-    resizableColumns: false,
-    tabbable: false,
-    texts: {
-        count: "{from}-{to} of {count} members|{count} members|1 member",
-        filterPlaceholder: "Search staff members...",
-        noResults: "No matching staff members",
-    },
+    ...props.options,
 };
 
 let isFirstLoad = true;

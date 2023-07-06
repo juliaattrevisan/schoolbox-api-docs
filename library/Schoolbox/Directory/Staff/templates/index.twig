@@ -11,6 +11,19 @@
     { heading: "Email", data: "StaffOccupEmail", class: "" },
 ] %}
 
+{% set tableConfig = {
+    orderBy: {
+        ascending: true,
+        column: "StaffSurname",
+    },
+    sortable: ["StaffPreferredName", "StaffSurname", "StaffDepartment", "JobPositionDescription", "StaffCampusDescription", "StaffOccupPhone", "StaffExtension", "StaffOccupEmail"],
+    texts: {
+        count: "{from}-{to} of {count} members|{count} members|1 member",
+        filterPlaceholder: "Search staff members...",
+        noResults: "No matching staff members",
+    },
+ } %}
+
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
@@ -23,6 +36,7 @@
     <staff-directory
         endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
         :columns-config="{{ columnsConfig|json_encode() }}"
+        :table-options="{{ tableConfig|json_encode() }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/staffDirectory.js?v={{ config.site_version }}"></script>

@@ -11,6 +11,7 @@ import type { ColumnsConfig } from "./staffDirectory";
 interface Props {
     endpoint: string; // the endpoint to retrieve all the staff data from
     columnsConfig: ColumnsConfig[]; // the columns to display in the table
+    tableOptions: object; // the configuration for the vue-tables-2 component
 }
 const props = defineProps<Props>();
 
@@ -45,7 +46,7 @@ window.Vue.onMounted(() => {
         <div class="small-12 columns">
             <loading-table v-if="isLoading" />
             <data-load-error v-else-if="hasLoadError" data-title="Staff Directory" />
-            <sd-table v-else :data="data" :columns-config="props.columnsConfig" />
+            <sd-table v-else :data="data" :columns-config="props.columnsConfig" :options="props.tableOptions" />
         </div>
     </div>
 </template>
