@@ -10,15 +10,11 @@
             const $tile = $(tile);
 
             /**
-             * Using padding-bottom values such as 7.0175438596491% to provide appropriate height for
-             * tiles can lead to display issues when there's one tile per row. Refer to: SA-15725.
+             * Using padding-bottom percentage values to provide appropriate height for tiles can lead to display
+             * issues when there's one tile per row. Refer to: https://github.com/alaress/schoolbox/pull/28566.
              * To resolve we need to instead set a rounded height and remove the padding-bottom.
-             * We get the padding-bottom from the parent as it's the easiest way to get percentage values.
-             * Prior to setting the height, on each resize we need to first set it to auto and revert
-             * the padding-bottom to ensure we can accurately calculate the height.
              */
-            $tile.css({ height: "auto", paddingBottom: calculatePaddingBottom(tile) }); // Allow height to resize due to padding-bottom.
-            $tile.css({ height: `${Math.round($tile.outerHeight())}px`, paddingBottom: 0 }); // Set height explicitly and remove padding-bottom.
+            $tile.css({ height: (Math.round($tile.outerWidth() * getAspectRatioForTile(tile)) + 'px'), paddingBottom: 0 });
 
             let fontSize = getFontSize(tile);
 
@@ -49,60 +45,6 @@
                 });
             }
         });
-
-        /**
-         * @param { HTMLElement } tile
-         * @returns { string } paddingBottomCss
-         */
-        function calculatePaddingBottom(tile) {
-            const $tile = $(tile);
-            const $tileListUl = $tile.parent();
-            const layoutType = $tileListUl.attr('data-layout-type');
-            const columnCount = $tileListUl.attr('data-column-count');
-            const tileId = $tile.attr('id');
-
-            if (layoutType === undefined || columnCount === undefined) {
-                throw new Error(
-                    "Expected attribute 'data-layout-type' and/or 'data-column-count' not set on tile with id '" + tileId + "'."
-                );
-            }
-
-            const aspectRatio = getAspectRatioForTile(tile);
-
-            let paddingBottomCss = null;
-
-            switch (layoutType) {
-                case 'grid':
-                    const gridWidth = $tileListUl.attr('data-grid-width');
-                    if (gridWidth === undefined) {
-                        throw new Error(
-                            "Expected attribute 'data-grid-width' not set on tile with id '" + tileId + "'."
-                        );
-                    }
-                    // The below line matches the calculation in tileList.twig: {% set paddingBottom = gridWidth * aspectRatio ~ "px" %}
-                    paddingBottomCss = gridWidth * aspectRatio + 'px';
-                    break;
-                case 'column':
-                    const paddingPercentage = $tileListUl.attr('data-padding-percentage');
-                    if (paddingPercentage === undefined) {
-                        throw new Error(
-                            "Expected attribute 'data-padding-percentage' not set on tile with id '" + tileId + "'."
-                        );
-                    }
-                    const baseColumnWidthPercentage = 100 / columnCount;
-                    const tilePaddingPercentage = baseColumnWidthPercentage * paddingPercentage;
-                    const tileWidthPercentage = baseColumnWidthPercentage - tilePaddingPercentage;
-                    // The below line matches the calculation in tileList.twig: {% set paddingBottom = tileWidth * aspectRatio ~ "%" %}
-                    paddingBottomCss = tileWidthPercentage * aspectRatio + '%';
-                    break;
-                default:
-                    throw new Error(
-                        "Unexpected value '" + layoutType + "' for data-layout-type on tile with id '" + tileId + "'."
-                    );
-            }
-
-            return paddingBottomCss;
-        }
 
         /**
          * @param { HTMLElement } tile

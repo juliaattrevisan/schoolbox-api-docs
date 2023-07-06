@@ -11,7 +11,6 @@
 <style>
 #tileList-{{ layout.id }}.tileList .tile {
     {% set aspectRatio = (layout.aspectRatioY/layout.aspectRatioX) %}
-    {% set paddingPercentage = 0 %}
 
     {% if layout.isGridLayoutType and layout.gridWidth > 0 %}
         width: {{ layout.gridWidth|e('css') }}px;
@@ -40,12 +39,7 @@
 {% apply spaceless %}
 {% if (tileList|length > 0) or editable %}
 {# Store data on each <ul> for access within www/static/js/tiles/jquery.tile-resize.js #}
-<ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list
-    data-layout-type="{% if layout.isGridLayoutType %}grid{% else %}column{% endif %}"
-    data-aspect-ratio="{{ aspectRatio }}"
-    data-column-count="{{ layout.columnCount }}"
-    data-grid-width="{{ layout.gridWidth }}"
-    data-padding-percentage="{{ paddingPercentage }}">
+<ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list data-aspect-ratio="{{ aspectRatio }}">
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {
             componentId: 'component' ~ componentId,
