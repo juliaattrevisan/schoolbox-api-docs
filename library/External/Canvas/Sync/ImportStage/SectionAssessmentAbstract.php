@@ -230,6 +230,8 @@ abstract class SectionAssessmentAbstract
         /** @var User[] $classTeacherCache Indexed by `section`.`sisSourceId` */
         $classTeacherCache = [];
 
+        $this->schoolboxDb->beginTransaction();
+
         foreach ($coursesSectionData as $courseCanvasId => $courseSectionsData) {
             $this->log->info("Processing Canvas Course '{$courseSectionsData['name']}' (CanvasId: $courseCanvasId)");
             $unitSpec = $this->unitSpecMapper->findOneByPredicates($this->courseBridge->equalsCanvasCourse($courseCanvasId, 'f'));
@@ -292,7 +294,7 @@ abstract class SectionAssessmentAbstract
                             $unitImplCache[$sectionSisSourceId] = $this->unitImplMapper->findOneByColumnList(
                                 [
                                     'cf.id' => $classFolder->getId(),
-                                    's.id'  => $unitSpec->getId(),
+                                    'cus.id' => $unitSpec->getId(),
                                 ]
                             );
                         } catch (Mapper\Exception $e) {
@@ -430,7 +432,7 @@ abstract class SectionAssessmentAbstract
 
         $this->deleteUnSynchronisedAssessableImpl($assessmentImplIdSynchronised);
         $this->deleteUnSynchronisedAssessablePlans($this->getCandidatePlanIds(), array_keys($plansSynchronised));
-
+        $this->schoolboxDb->commit();
         $this->printCounts();
     }
 
