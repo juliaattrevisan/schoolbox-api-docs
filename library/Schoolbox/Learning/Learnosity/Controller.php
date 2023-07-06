@@ -97,7 +97,9 @@ class Controller extends Base
                     "show_intro" => true,
                     "show_outro" => true
                 ],
-                "regions" => "horizontal-fixed",
+                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
+                 */
+                'regions' => 'main',
                 /* This is our Quiz title, I guess
                  */
                 "title" =>  $quiz['title'],
@@ -118,14 +120,57 @@ class Controller extends Base
             /* A uniquely-identifying string for us, I think
              */
             'user_id' => (string)$this->getUser()->getId(),
-
-            'items' => [
-                '7d6b64f9-88af-4e40-b74f-7895cccbff00',
-                '0a64ef3b-eaff-43bc-a2ed-081305c2ee12',
-                '572287db-3764-43be-b2e7-2af2e3ee9c2f'
-            ]
-
-
+            'sections' => [
+                [
+                    'config' => [
+                        "configuration" => [
+                            "idle_timeout" => [
+                                "interval" => 300
+                            ]
+                        ],
+                        "navigation" => [
+                            "auto_save" => [
+                                "save_interval_duration" => 300
+                            ],
+                            "show_intro" => true,
+                            "show_outro" => true
+                        ],
+                        /* Each section can have their own unique
+                         * title/subtitle combo
+                         */
+                        'title' => 'Do this section first',
+                        'subtitle' => 'first section subtitle'
+                    ],
+                    'items' => [
+                        '7d6b64f9-88af-4e40-b74f-7895cccbff00',
+                        '0a64ef3b-eaff-43bc-a2ed-081305c2ee12'
+                    ]
+                ],
+                [
+                    'config' => [
+                        "configuration" => [
+                            "idle_timeout" => [
+                                "interval" => 300
+                            ]
+                        ],
+                        "navigation" => [
+                            "auto_save" => [
+                                "save_interval_duration" => 300
+                            ],
+                            "show_intro" => true,
+                            "show_outro" => true
+                        ],
+                        /* Each section can have their own unique
+                         * title/subtitle combo
+                         */
+                        'title' => 'Do this other section',
+                        'subtitle' => 'second section subtitle'
+                    ],
+                    'items' => [
+                        '572287db-3764-43be-b2e7-2af2e3ee9c2f'
+                    ]
+                ],
+            ],
         ];
 
         $api = new Api(
