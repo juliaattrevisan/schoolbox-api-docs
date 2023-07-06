@@ -105,9 +105,6 @@ HELP;
             }
             $updated[] = $token;
 
-            // dedupe assessment, so we can process these later
-            $regenerateList[$completionEntry->getTask()->getAssessmentModel()->getId()][] = $completionEntry->getTask()->getAssessmentModel()->getId();
-
             // find if this entry has a teacher complete status
             //all the tmp variables
             $thisTaskList = $completionEntries->filterBy('task', $completionEntry->getTask());
@@ -120,6 +117,9 @@ HELP;
                 $this->getLogger()->debug("Task Not Complete");
                 continue;
             }
+
+            // dedupe assessment, so we can process these later
+            $regenerateList[$completionEntry->getTask()->getAssessmentModel()->getId()][] = $completionEntry->getTask()->getAssessmentModel()->getId();
 
             //this assessment has no teacher feedback, so lets add that in now, making sure not to do this multiple times
             if ($this->perform()) {
@@ -142,33 +142,39 @@ HELP;
         $projectCache = new ProjectResultCache\ResultCache(ProjectResultCache\Mapper::getInstance());
 
         // reload project cache
-        $projects = array_keys($regenerateList);
-        $params = Builder::getArrayPlaceholders($projects, 'assessments');
-        // grab the list of projects these assessments are part of.$params = Builder::getArrayPlaceholders(self::COURSE_IDS);..
-        $projectStatement = $db->prepareQuery("SELECT
+        if (count($regenerateList)) {
+            $projects = array_keys($regenerateList);
+            $params   = Builder::getArrayPlaceholders($projects, 'assessments');
+            // grab the list of projects these assessments are part of.$params = Builder::getArrayPlaceholders(self::COURSE_IDS);..
+            $projectStatement = $db->prepareQuery(
+                "SELECT
             DISTINCT project.assessment_id as 'assessment_id'
         FROM project_assessment
         JOIN project on project_assessment.project_id = project.id
         where project_assessment.assessment_id in {$params}
-        ");
-        $projectStatement->execute(Builder::getArrayParameters($projects, 'assessments'));
+        "
+            );
+            $projectStatement->execute(Builder::getArrayParameters($projects, 'assessments'));
 
-        while ($row = $projectStatement->fetch()) {
-            /** @var Project $project **/
-            $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
-            if ($this->perform()) {
-                $this->getLogger()->info(sprintf("Project: %s, results updated", $project->getId()));
-                $projectCache->refresh($assessmentMapperProxy, $project);
-            } else {
-                $this->getLogger()->info(sprintf("Would have updated Project: %s results", $project->getId()));
+            while ($row = $projectStatement->fetch()) {
+                /** @var Project $project * */
+                $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+                if ($this->perform()) {
+                    $this->getLogger()->info(sprintf("Project: %s, results updated", $project->getId()));
+                    $projectCache->refresh($assessmentMapperProxy, $project);
+                } else {
+                    $this->getLogger()->info(sprintf("Would have updated Project: %s results", $project->getId()));
+                }
+                // Cache cleaning
+                unset($project);
             }
-            // Cache cleaning
-            unset($project);
+        } else {
+            $this->getLogger()->info("No Tasks updated, no projects to update");
         }
     }
 };
 
-$options = [CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

@@ -153,7 +153,7 @@ HELP;
     }
 };
 
-$options = [CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
