@@ -6,7 +6,8 @@
 (function ($) {
     $.fn.resizeTile = function () {
         $(this).each(function () {
-            const $tile = $(this);
+            const tile = this;
+            const $tile = $(tile);
 
             /**
              * Using padding-bottom values such as 7.0175438596491% to provide appropriate height for
@@ -16,10 +17,10 @@
              * Prior to setting the height, on each resize we need to first set it to auto and revert
              * the padding-bottom to ensure we can accurately calculate the height.
              */
-            $tile.css({ height: "auto", paddingBottom: calculatePaddingBottom($tile) }); // Allow height to resize due to padding-bottom.
+            $tile.css({ height: "auto", paddingBottom: calculatePaddingBottom(tile) }); // Allow height to resize due to padding-bottom.
             $tile.css({ height: `${Math.round($tile.outerHeight())}px`, paddingBottom: 0 }); // Set height explicitly and remove padding-bottom.
 
-            let fontSize = getFontSize($tile);
+            let fontSize = getFontSize(tile);
 
             if (fontSize === null) {
                 // If we could not calculate the fontSize, there is nothing more we can do.
@@ -57,10 +58,11 @@
         });
 
         /**
-         * @param { jQuery HTMLElement } $tile
+         * @param { HTMLElement } tile
          * @returns { string } paddingBottomCss
          */
-        function calculatePaddingBottom($tile) {
+        function calculatePaddingBottom(tile) {
+            const $tile = $(tile);
             const $tileListUl = $tile.parent();
             const layoutType = $tileListUl.attr('data-layout-type');
             const columnCount = $tileListUl.attr('data-column-count');
@@ -72,7 +74,7 @@
                 );
             }
 
-            const aspectRatio = getAspectRatioForTile($tile);
+            const aspectRatio = getAspectRatioForTile(tile);
 
             let paddingBottomCss = null;
 
@@ -110,10 +112,11 @@
         }
 
         /**
-         * @param { jQuery HTMLElement } $tile
+         * @param { HTMLElement } tile
          * @returns { Number|null } fontSize in rem based on tile width, or null if could not calculate.
          */
-        function getFontSize($tile) {
+        function getFontSize(tile) {
+            const $tile = $(tile);
             const tileWidth = $tile.width();
 
             if (tileWidth === 0) {
@@ -165,7 +168,7 @@
                 // The inputs will be present on the Modify Tile Layout page (route GET /tile/layout/{layoutId}).
                 aspectRatio = $aspectRatioYInput.val() / $aspectRatioXInput.val();
             } else {
-                const $tileListUl = $(tile.parent());
+                const $tileListUl = $(tile).parent();
                 aspectRatio = $tileListUl.attr('data-aspect-ratio');
             }
 
