@@ -37,20 +37,20 @@
                 );
             }
 
-            const tileTitle = $tile.find('.title');
-            tileTitle.css({
+            const $tileTitle = $tile.find('.title');
+            $tileTitle.css({
                 fontSize: String(fontSize) + fontUnit,
                 padding: String(fontSize / 4) + fontUnit,
             });
 
             // If the title is taller than the tile:
             // reduce the tile's top and bottom padding so it fits.
-            const titleHeight = tileTitle.outerHeight();
+            const titleHeight = $tileTitle.outerHeight();
             const tileHeight = $tile.outerHeight();
             if (titleHeight > tileHeight) {
-                const heightDifference = tileHeight - tileTitle.height();
+                const heightDifference = tileHeight - $tileTitle.height();
                 const newPadding = String(heightDifference / 2) + "px";
-                tileTitle.css({
+                $tileTitle.css({
                     paddingTop: newPadding,
                     paddingBottom: newPadding,
                 });
