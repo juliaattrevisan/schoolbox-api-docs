@@ -25,7 +25,6 @@ use TypeError;
  */
 class IsXhr extends Specification\Leaf
 {
-
     /**
      * Returns whether the candidate audience specification satisfies this specification
      *
