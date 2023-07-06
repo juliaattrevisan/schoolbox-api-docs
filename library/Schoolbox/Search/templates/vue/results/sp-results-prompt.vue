@@ -7,7 +7,7 @@
 <template>
     <div class="empty-state-flex-centered">
         <i class="icon-search"></i>
-        <p>To begin, enter a serach term in the textbox above.</p>
+        <p>To begin, enter a search term in the textbox above.</p>
     </div>
 </template>
 

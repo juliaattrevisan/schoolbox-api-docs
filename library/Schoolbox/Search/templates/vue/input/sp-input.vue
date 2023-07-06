@@ -3,21 +3,21 @@
  * The search input to start searching for results
  */
 
-import { useResultsStore } from "../results/store/spResultsStore";
+import { useSearchStore } from "../store/spSearchStore";
 
-const resultsStore = useResultsStore();
+const searchStore = useSearchStore();
 
 /**
  * Toggle the search
  */
 async function onSearch() {
-    await resultsStore.search();
+    await searchStore.search();
 }
 </script>
 
 <template>
     <form @submit.prevent="onSearch">
-        <input v-model="resultsStore.query" type="text" />
+        <input v-model="searchStore.query" type="text" />
         <button type="submit">Search</button>
     </form>
 </template>

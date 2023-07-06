@@ -3,15 +3,15 @@
  * To display an error if the search fails
  */
 
-import { useResultsStore } from "../results/store/spResultsStore";
+import { useSearchStore } from "../store/spSearchStore";
 
-const resultsStore = useResultsStore();
+const searchStore = useSearchStore();
 
 /**
  * Try to search again
  */
 async function onTryAgainSelected() {
-    await resultsStore.search();
+    await searchStore.search();
 }
 </script>
 
