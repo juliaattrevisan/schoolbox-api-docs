@@ -1565,6 +1565,7 @@ class Controller extends Assessment\Controller
          */
         /** @phpstan-ignore-next-line - get() returns a string */
         $showSubmittedOnly = $this->request->content->get()['showSubmittedOnly'] ?? 0;
+        /** @phpstan-ignore-next-line - $showSubmittedOnly may be a non-zero int */
         if ((int)$showSubmittedOnly) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;
