@@ -80,7 +80,7 @@ try {
                 $propagator = new Propagator($splitter, $broker, INSTANCE_ID);
 
                 // restore data if possible
-                $restored = $jit->restoreSchedule($amqp, $propagator, $q);
+                $restored = $jit->restoreSchedule($amqp, $q);
 
                 if (!$restored) {
                     throw new RuntimeException("Could not read cached data");

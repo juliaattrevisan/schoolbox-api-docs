@@ -69,10 +69,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         // restoring from redis cache
         $jit = new RedisCache($redis, $log, INSTANCE_ID);
         $scheduler->setJitCache($jit);
-        $tff = new Schedule\Trigger\TriggerFactoryFactory(true);
-        $splitter = new Schedule\Event\Splitter(new Schedule\Event\NotifierInflector(new \Schoolbox\Di\Configurator($di)), $tff);
-        $propagator = new Schedule\Trigger\Propagator($splitter, $scheduleBroker, INSTANCE_ID);
-        $jit->restoreSchedule($amqp, $propagator, Schedule\Broker::QUEUE);
+        $jit->restoreSchedule($amqp, Schedule\Broker::QUEUE);
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established
         $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log, $asyncRedis) {
