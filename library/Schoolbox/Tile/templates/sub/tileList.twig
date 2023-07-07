@@ -38,7 +38,7 @@
 {# spaceless because spaces between inline-block elements split the element. WTF #}
 {% apply spaceless %}
 {% if (tileList|length > 0) or editable %}
-{# Store data on each <ul> for access within www/static/js/tiles/jquery.tile-resize.js #}
+{# Store aspect-ration on each <ul> for access within www/static/js/tiles/jquery.tile-resize.js #}
 <ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list data-aspect-ratio="{{ aspectRatio }}">
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {
