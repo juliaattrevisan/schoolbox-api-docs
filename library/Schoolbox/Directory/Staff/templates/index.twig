@@ -38,7 +38,9 @@
         :columns-config="{{ columnsConfig|json_encode() }}"
         :table-options="{{ tableConfig|json_encode() }}"
     >
-        <template #StaffOccupEmail="tableData"></template>
+        <template v-slot:header>
+            Hai
+        </template>
     </staff-directory>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/staffDirectory.js?v={{ config.site_version }}"></script>

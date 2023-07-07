@@ -46,12 +46,11 @@ window.Vue.onMounted(() => {
         <div class="small-12 columns">
             <loading-table v-if="isLoading" />
             <data-load-error v-else-if="hasLoadError" data-title="Staff Directory" />
-            <sd-table
-                v-else
-                :data="data"
-                :columns-config="props.columnsConfig"
-                :options="props.tableOptions"
-            ></sd-table>
+            <sd-table v-else :data="data" :columns-config="props.columnsConfig" :options="props.tableOptions">
+                <template v-for="(slot, index) of Object.keys($slots)" :key="index" #[slot]>
+                    <slot :name="slot"></slot>
+                </template>
+            </sd-table>
         </div>
     </div>
 </template>
