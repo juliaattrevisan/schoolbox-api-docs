@@ -13,6 +13,8 @@
              * Using padding-bottom percentage values to provide appropriate height for tiles can lead to display
              * issues when there's one tile per row. Refer to: https://github.com/alaress/schoolbox/pull/28566.
              * To resolve we need to instead set a rounded height and remove the padding-bottom.
+             * This line can be removed once the Chrome developers fix the display bug we found in SA-15725.
+             * To test whether this code can be removed, follow the STR in SA-15725.
              */
             $tile.css({ height: (Math.round($tile.outerWidth() * getAspectRatioForTile(tile)) + 'px'), paddingBottom: 0 });
 
