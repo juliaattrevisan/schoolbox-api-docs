@@ -56,7 +56,7 @@ async function onLoaded() {
 
 <template>
     <v-client-table :data="props.data" :columns="columns" :options="options" @loaded="onLoaded">
-        <!-- <template #portrait_url="tableData">
+        <template #portrait_url="tableData">
             <sd-table-image :data="tableData.row" />
         </template>
         <template #StaffOccupPhone="tableData">
@@ -64,7 +64,7 @@ async function onLoaded() {
         </template>
         <template #StaffOccupEmail="tableData">
             <sd-table-email :data="tableData.row" />
-        </template> -->
+        </template>
         <template #afterTable>
             <div ref="tableFooterEl" class="VueTables__table-footer" data-table-footer></div>
         </template>

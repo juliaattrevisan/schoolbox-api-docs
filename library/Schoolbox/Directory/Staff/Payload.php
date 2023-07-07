@@ -58,7 +58,7 @@ class Payload
             /* Manufacture a portrait url
              * FIXME You might not need this, because you could infer it on frontend.
              */
-            $staff['portrait_url'] = sprintf('/portrait.php?userId=%s&size=square32', $staff['StaffID']);
+            $staff['portrait_url'] = sprintf('/portrait.php?userId=%s&size=square64', $staff['StaffID']);
 
             /* Figure out a link to profile screen
              */
