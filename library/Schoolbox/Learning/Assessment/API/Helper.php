@@ -79,13 +79,13 @@ class Helper
         [$query, $params] = $this->buildSearch($filter);
 
         if (0 !== $cursor) {
-            $query .= " AND assessment.id > :cursor ";
+            $query .= "\nAND assessment.id > :cursor ";
         }
 
-        $query .= "ORDER BY assessment.id";
+        $query .= "\nORDER BY assessment.id ";
 
         if (0 !== $limit) {
-            $query .= " LIMIT :limit";
+            $query .= "\nLIMIT :limit ";
         }
 
         $statement = $this->mapper->getDatabase()->prepare($query);
@@ -316,7 +316,7 @@ class Helper
             }
         }
         if (array_key_exists('weighted', $filter)) {
-            $where .= " AND assessment.weight";
+            $where .= " AND assessment.weight ";
             if ((bool)$filter['weighted'] === true) {
                 $where .= " != 0.00 ";
             } else {
@@ -352,12 +352,12 @@ class Helper
             if (array_key_exists('id', $filter['yearLevel'])) {
                 $where .= " AND folder_year_level.year_level_id = :yearLevelId ";
                 $params['yearLevelId'] = $filter['yearLevel']['id'];
-                $from .= "JOIN folder_year_level on folder_year_level.folder_id = mv_assessment_relation.folder_id";
+                $from .= " JOIN folder_year_level on folder_year_level.folder_id = mv_assessment_relation.folder_id ";
             } elseif (array_key_exists('name', $filter['yearLevel'])) {
                 $where .= " AND lu_year_level.name = :yearLevelName ";
                 $params['yearLevelName'] = $filter['yearLevel']['name'];
-                $from .= "JOIN folder_year_level on folder_year_level.folder_id = mv_assessment_relation.folder_id
-                JOIN lu_year_level on folder_year_level.year_level_id= lu_year_level.id";
+                $from .= " JOIN folder_year_level on folder_year_level.folder_id = mv_assessment_relation.folder_id
+                JOIN lu_year_level on folder_year_level.year_level_id= lu_year_level.id ";
             }
         }
         if (array_key_exists('title', $filter)) {
@@ -405,7 +405,7 @@ class Helper
         }
 
         return [
-            $select . $from . $where,
+            trim($select) . "\n" . trim($from) . "\n" . trim($where), // Trim and newlines prevent bugs due to inconsistent spacing.
             $params
         ];
     }
