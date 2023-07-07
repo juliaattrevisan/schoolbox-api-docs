@@ -17,14 +17,18 @@
 .sb-flex {
     display: flex;
 
-    &--row {
-        flex-direction: row;
-        width: 100%;
+    &-col,
+    &-row {
+        display: flex;
     }
 
-    &--col {
+    &-col {
         flex-direction: column;
         height: 100%;
+    }
+    &-row {
+        flex-direction: row;
+        width: 100%;
     }
 
     &--wrap {
@@ -33,6 +37,11 @@
 
     &--wrap-reverse {
         flex-wrap: wrap-reverse;
+    }
+
+    &--center {
+        justify-content: center;
+        align-items: center;
     }
 
     &__item {
