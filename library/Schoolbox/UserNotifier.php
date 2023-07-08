@@ -170,7 +170,7 @@ class UserNotifier extends AbstractModuleNotifier
                     ->setUser($user)
             );
 
-            Redis::getSignalQueueClientInstance()->publish('routed.' . INSTANCE_ID . '.reload', $user->getId());
+            Redis::getSignalQueueClientInstance()->publish('scheduled.' . INSTANCE_ID . '.reload', $user->getId());
         } catch (DefinitionException $e) {
             // ur access mapper be broked, homeslice.
         }

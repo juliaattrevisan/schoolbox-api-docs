@@ -21,7 +21,7 @@ use UnderflowException;
  */
 class WriteCache extends ReadCache implements WritableCache
 {
-    const SIGNAL_PATTERN = 'routed.%s.reload';
+    const SIGNAL_PATTERN = 'scheduled.%s.reload';
 
     /** @var Subscription\Loader\Factory */
     private $loaderFactory;

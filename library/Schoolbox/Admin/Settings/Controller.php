@@ -205,7 +205,7 @@ class Controller extends ConfigController
         if ($reloadRouteDaemon || $reloadScheduleDaemon) {
             $redisClient = Redis::getSignalQueueClientInstance();
             if ($redisClient && $reloadRouteDaemon) {
-                $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
+                $redisClient->publish('scheduled.' . INSTANCE_ID . '.reload', '');
             }
             if ($redisClient && $reloadScheduleDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.refreshConfiguration', '');

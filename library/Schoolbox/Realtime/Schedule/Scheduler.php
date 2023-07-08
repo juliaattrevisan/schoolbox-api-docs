@@ -50,7 +50,7 @@ use Schoolbox\User;
 class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
     /** @var ResolutionManager */
-    private $resolvers;
+    private ResolutionManager $resolutionManager;
 
     /** @var Postman */
     private $postman;
@@ -85,9 +85,9 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         Postman $postman
     ) {
         parent::__construct($loop, $dispatchStrategy, $log, $clock);
-        $this->conf      = $conf;
-        $this->resolvers = $resolutionManager;
-        $this->postman   = $postman;
+        $this->conf              = $conf;
+        $this->resolutionManager = $resolutionManager;
+        $this->postman           = $postman;
 
         // register signal listeners
         $this->on(SIGHUP, [ $this, 'onHangup' ]);
@@ -156,11 +156,14 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         }
 
         // comes in the form 'digestd.vagrantx.reload'
-        list (, , $action) = explode('.', $event->getChannel());
+        [, , $action] = explode('.', $event->getChannel());
 
         if ($action === 'reload') {
+            $this->log->debug('Reloading subscription cache to router');
             // this is the only action we currently know about
+            $this->postman->reloadRouter();
             $this->onHangup();
+            return;
         }
 
         if ($action === 'refreshConfiguration') {
@@ -192,7 +195,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             $this->log->info("[Scheduler] Received trigger to schedule: {$trigger->getEventObjectId()} - {$trigger->getLabel()}", [ 'char' => '>' ]);
 
             $effector = $trigger->getEvent()->getEffector();
-            if ($effector && $effector instanceof User) {
+            if ($effector instanceof User) {
                 $this->log->debug('[Scheduler] triggered by user.' . $effector->getId());
             }
 
@@ -260,7 +263,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         // if we have a just-in-time handler, use it
         if ($this->jit) {
-            if ($this->jit->saveSchedule($this->resolvers)) {
+            if ($this->jit->saveSchedule($this->resolutionManager)) {
                 $this->log->debug('Queue save successful');
             } else {
                 $this->log->alert('Failed to save queue!');
@@ -297,7 +300,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     /**
      * @param TriggerInterface $trigger
      */
-    public function dispatchTrigger(TriggerInterface $trigger)
+    public function dispatchTrigger(TriggerInterface $trigger): void
     {
         if (count($trigger->getCallbacks()) === 0) {
             $this->log->warning("Trigger '{$trigger->getIdString()}' has no callbacks");
@@ -386,10 +389,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param IResolver        $resolver
      * @param TriggerInterface $trigger
      */
-    protected function attachResolverTrigger(IResolver $resolver, $trigger)
+    protected function attachResolverTrigger(IResolver $resolver, TriggerInterface $trigger): void
     {
-        $this->resolvers->attachTriggerToResolver($resolver, $trigger);
-        $resolverCount = count($this->resolvers->getAllResolvers());
+        $this->resolutionManager->attachTriggerToResolver($resolver, $trigger);
+        $resolverCount = count($this->resolutionManager->getAllResolvers());
         $this->log->debug("Attached trigger '{$trigger->getIdString()}' to resolver [Resolver count {$resolverCount}]");
     }
 
@@ -398,10 +401,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param TriggerInterface $trigger
      * @return int the number of triggers left on the associated resolver, or -1 if not found
      */
-    protected function detachTrigger($trigger)
+    protected function detachTrigger(TriggerInterface $trigger): int
     {
         try {
-            $count = $this->resolvers->detachTrigger($trigger);
+            $count = $this->resolutionManager->detachTrigger($trigger);
 
             switch ($count) {
                 case -1:
@@ -415,7 +418,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                     break;
             }
 
-            $resolverCount = count($this->resolvers->getAllResolvers());
+            $resolverCount = count($this->resolutionManager->getAllResolvers());
             $this->log->debug("Trigger '{$trigger->getIdString()}' detached: $msg [Resolver count {$resolverCount}]");
             return $count;
         } catch (OutOfBoundsException $e) {
@@ -441,8 +444,8 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                 $this->schedule($trigger, $this->timerCallback($trigger), false);
 
                 // don't detach, just return the count
-                $resolver = $this->resolvers->getResolverByTrigger($trigger);
-                return $this->resolvers->getTriggerCount($resolver);
+                $resolver = $this->resolutionManager->getResolverByTrigger($trigger);
+                return $this->resolutionManager->getTriggerCount($resolver);
             } catch (OutOfBoundsException $e) {
                 // resolver was already detached; this isn't good, since a scheduler restart would lose state
                 $this->log->warning("Resolver was already detached for trigger '{$trigger->getIdString()}'");

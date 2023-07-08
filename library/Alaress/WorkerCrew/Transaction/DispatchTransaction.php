@@ -22,18 +22,21 @@ class DispatchTransaction extends AbstractTransaction
     private $command;
 
     /**
+     * Moved from Routing\Subscription|Handler
+     */
+    private const TRANSACTION_CACHE_TIMEOUT = 0.5;
+    private const TRANSACTION_COUNT_LIMIT   = 80;
+
+    /**
      * Create a new Transaction
      *
      * @param LoopInterface       $loop
      * @param DispatcherInterface $dispatcher
      * @param string              $command
-     * @param int                 $cacheInterval - how long to cache for, in seconds
-     * @param int                 $size          - the max size of the cache, or 0 for no limit. If this limit is reached, the
-     *                                           transaction will execute prematurely
      */
-    public function __construct(LoopInterface $loop, DispatcherInterface $dispatcher, $command, $cacheInterval = 1, $size = 0)
+    public function __construct(LoopInterface $loop, DispatcherInterface $dispatcher, $command)
     {
-        parent::__construct($loop, $cacheInterval, $size);
+        parent::__construct($loop, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
 
         $this->dispatcher = $dispatcher;
         $this->command    = $command;

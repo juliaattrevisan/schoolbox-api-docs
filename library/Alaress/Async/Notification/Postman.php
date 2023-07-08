@@ -1,6 +1,6 @@
 <?php
 
- /**
+/**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,36 +9,51 @@
 
 namespace Alaress\Async\Notification;
 
-use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
+use Alaress\Routing\Router;
+use Alaress\WorkerCrew\Transaction\ITransaction;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
+use Schoolbox\Realtime\Routing\RouteTXRX;
+use Schoolbox\Realtime\Routing\Subscription\Resolver;
 
 class Postman
 {
-    /** @var IBroker */
-    private $broker;
-
-    /** @var LoggerInterface */
-    private $log;
-
+    private Resolver $resolver;
 
     /**
-     * @param IBroker         $broker
      * @param LoggerInterface $log
+     * @param Router          $router
+     * @param ITransaction    $transaction
+     * @param RouteTXRX       $txrx
+     * @param ReadCache       $subscriptionCache
      */
-    public function __construct(IBroker $broker, LoggerInterface $log)
-    {
-        $this->broker = $broker;
-        $this->log    = $log;
+    public function __construct(
+        private LoggerInterface $log,
+        private Router $router,
+        private ITransaction $transaction,
+        private RouteTXRX $txrx,
+        private ReadCache $subscriptionCache
+    ) {
+        $this->subscriptionCache->setLog($log);
+        $this->reloadRouter();
     }
 
+    /**
+     * @return void
+     */
+    public function reloadRouter()
+    {
+        $this->subscriptionCache->readIntoRouter(INSTANCE_ID, $this->router);
+        $this->resolver = new Resolver($this->router);
+    }
 
     /**
      * Delivers the contents of the given bundle, according to the notifier given
      *
      * @param InstanceBundle $bundle
-     * @param array $appendContext
+     * @param array          $appendContext
      * @return int
      */
     public function deliver(InstanceBundle $bundle, array $appendContext = []): int
@@ -73,7 +88,7 @@ class Postman
                 continue;
             }
 
-            $this->broker->publish($serializable, [$topic], $instance->getTTL());
+            $this->handleMessage($serializable, [$topic]);
 
             if ($instance->isActionRetractSingle()) {
                 $this->log->info("Retracting a message from '$routeKey'", ['char' => '<']);
@@ -87,5 +102,54 @@ class Postman
         }
 
         return $i;
+    }
+
+    /**
+     * Moved from routed - Routing\Subscription\Handler
+     * @param Instance $instance
+     * @param array    $topics
+     * @throws \InvalidArgumentException
+     */
+    private function handleMessage(Instance $instance, array $topics): void
+    {
+        // if topics are explicitly given, use those rather than what you find in the instance
+        $topics = $topics ?: $instance->getTopics();
+
+        // typically there's only 1, but the possibility of more
+        foreach ($topics as $topic) {
+            try {
+                if ($instance->isActionRetractSingle()) {
+                    // Retract actions route to nobody in particular
+                    $msgType = 'targeted retraction';
+                    $suffix  = 'nobody in particular';
+                    $userIds = [];
+                } elseif ($instance->isActionRetractAll()) {
+                    // Retract actions route to nobody in particular
+                    $msgType = 'full retraction';
+                    $suffix  = 'nobody in particular';
+                    $userIds = [];
+                } else {
+                    $msgType   = 'send';
+                    $userIds   = $this->resolver->getSubscribedUserIds($topic);
+                    $userCount = \count($userIds);
+                    if ($userCount === 0) {
+                        $this->log->info("Nobody is subscribed to '$topic', dropping message");
+                        return;
+                    }
+
+                    if ($userCount > 16) {
+                        $suffix = "$userCount users";
+                    } else {
+                        $suffix = json_encode($userIds);
+                    }
+                }
+
+                $this->log->info("Routing message $msgType via '$topic' to $suffix");
+                $this->txrx->send($instance, $this->transaction, $userIds);
+            } catch (\OverflowException $e) {
+                // recursion detected
+                $this->log->error($e->getMessage());
+            }
+        }
     }
 }

@@ -119,7 +119,7 @@ class CampusReassignment extends AbstractNotificationTest
                 $this->cacheSubscriptions();
 
                 // signal routed to drop the cache and reload
-                $this->sendSignal('routed', 'reload');
+                $this->sendSignal('scheduled', 'reload');
                 break;
 
             default:

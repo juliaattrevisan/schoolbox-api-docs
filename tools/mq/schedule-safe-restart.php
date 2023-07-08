@@ -89,7 +89,7 @@ $loop  = $kernel->getDependencyInjector()->values['react.loop'];
 /** @var IClient $stomp */
 $stomp = $kernel->getDependencyInjector()->get('stomp');
 
-/** @var AMQPConnector $amqpConn */
+/** @var Connector $amqpConn */
 $amqpConn = $kernel->getDependencyInjector()->get('amqp');
 $amqpConn->declareQueue(INSTANCE_ID . '.sb.reviewsched');
 $amqpConn->bindQueue(INSTANCE_ID . '.sb.reviewsched', 'deadmessage');

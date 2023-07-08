@@ -126,7 +126,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     /**
      * @param TriggerInterface $trigger
      */
-    protected function dispatchTrigger(TriggerInterface $trigger)
+    protected function dispatchTrigger(TriggerInterface $trigger): void
     {
         $event = $trigger->getEvent();
         foreach ($trigger->getCallbacks() as $callback) {

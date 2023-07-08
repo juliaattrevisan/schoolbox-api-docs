@@ -35,63 +35,65 @@ $kernel = new Daemon\Kernel('Routing', [Daemon\Kernel::OPTION_ERRORS => E_ALL,])
 // ROUTING APP
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
-    $di->get('stomp')->connect()->then(function (IClient $client) use ($di, $loop, $log, $opts, $flags) {
-        try {
-            $log->info('Connected to STOMP', [ 'char' => '+' ]);
-
-            // the list of instances this particular daemon will listen for
-            $instances = [ INSTANCE_ID ];
-
-            /** @var ClientInterface $redis */
-            $redis = $di->get('redis.storage');
-
-            /** @var AMQPInterface $amqp */
-            $amqp = $di->get('amqp');
-
-            // also listen for signals
-            /** @var Async\Client $asyncRedis */
-            $asyncRedis = $di->get('redis.signalQueue.sub');
-            $dispatcher = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
-
-            /** @var Routing\Cache\Redis\ReadCache $cache */
-            $cache = $di->get('subscriptionCache.readonly');
-            $cache->setLog($log);
-
-            // ensure endpoints exist
-            foreach ($instances as $instance) {
-                $txrx = RouteTXRX::buildTransmitter(new ListFactory($instance, $redis));
-
-                // this holds and traverses all our subscription data
-                $router = new Router(new SubscriptionDictionary('.'));
-                $routeBroker = new Routing\Broker($instance, $amqp, $redis, $client);
-
-                $q = $routeBroker->getQueue();
-                $t = "routed.$instance.*";
-
-                $amqp->declareQueue($q);
-
-                $cache->readIntoRouter($instance, $router);
-
-                $transaction = new DispatchTransaction(
-                    $loop,
-                    $dispatcher,
-                    DispatchStrategy::TASK_ROUTE,
-                    Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
-                    Subscription\Handler::TRANSACTION_COUNT_LIMIT
-                );
-
-                $handler = new Subscription\Handler(new Subscription\Resolver($router), $log, $txrx, $transaction, $cache);
-
-                $routeBroker->registerConsumer($handler);
-                $log->info("Consuming amqp://$q");
-
-                $asyncRedis->psubscribe($t, $handler);
-                $log->info("Listening on redis://$t");
-            }
-        } catch (\Throwable $e) {
-            $loop->stop();
-            $log->alert($e->getMessage(), [ 'exception' => $e ]);
-            throw $e;
-        }
-    });
+    // TODO: remove this file
+//    $di->get('stomp')->connect()->then(function (IClient $client) use ($di, $loop, $log, $opts, $flags) {
+//        try {
+//            $log->info('Connected to STOMP', [ 'char' => '+' ]);
+//
+//            // the list of instances this particular daemon will listen for
+//            $instances = [ INSTANCE_ID ];
+//
+//            /** @var ClientInterface $redis */
+//            $redis = $di->get('redis.storage');
+//
+//            /** @var AMQPInterface $amqp */
+//            $amqp = $di->get('amqp');
+//
+//            // also listen for signals
+//            /** @var Async\Client $asyncRedis */
+//            $asyncRedis = $di->get('redis.signalQueue.sub');
+//            $dispatcher = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
+//
+//            /** @var Routing\Cache\Redis\ReadCache $cache */
+//            $cache = $di->get('subscriptionCache.readonly');
+//            $cache->setLog($log);
+//
+//            // ensure endpoints exist
+//            foreach ($instances as $instance) {
+//                $txrx = RouteTXRX::buildTransmitter(new ListFactory($instance, $redis));
+//
+//                // this holds and traverses all our subscription data
+//                $router = new Router(new SubscriptionDictionary('.'));
+//                $routeBroker = new Routing\Broker($instance, $amqp, $redis, $client);
+//
+//                $q = $routeBroker->getQueue();
+//                $t = "routed.$instance.*";
+//
+//                $amqp->declareQueue($q);
+//
+//                $cache->readIntoRouter($instance, $router);
+//
+//                $transaction = new DispatchTransaction(
+//                    $loop,
+//                    $dispatcher,
+//                    DispatchStrategy::TASK_ROUTE,
+//                    Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
+//                    Subscription\Handler::TRANSACTION_COUNT_LIMIT
+//                );
+//
+//                $handler = new Subscription\Handler(new Subscription\Resolver($router), $log, $txrx, $transaction, $cache);
+//
+//                $routeBroker->registerConsumer($handler);
+//                $log->info("Consuming amqp://$q");
+//
+//                // this is for reload cache only
+//                $asyncRedis->psubscribe($t, $handler);
+//                $log->info("Listening on redis://$t");
+//            }
+//        } catch (\Throwable $e) {
+//            $loop->stop();
+//            $log->alert($e->getMessage(), [ 'exception' => $e ]);
+//            throw $e;
+//        }
+//    });
 });
