@@ -86,6 +86,11 @@ abstract class SubmissionAbstract
      */
     protected function loadParticipants(IAssessable $assessmentImpl): ?IAssessable
     {
+        if (!$assessmentImpl->getContext()) {
+            // this seems to happen for assessments in future term
+            $this->log->warning("Failed to load participant: assessment {$assessmentImpl->getId()} does not have context.");
+            return null;
+        }
         $assessmentCollection = $this->assessmentDataSource->createCollection()
                                                            ->add($assessmentImpl);
         try {
