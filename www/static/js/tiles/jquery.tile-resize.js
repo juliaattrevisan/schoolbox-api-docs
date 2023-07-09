@@ -9,13 +9,11 @@
             const tile = this;
             const $tile = $(tile);
 
-            /**
-             * Using padding-bottom percentage values to provide appropriate height for tiles can lead to display
-             * issues when there's one tile per row. Refer to: https://github.com/alaress/schoolbox/pull/28566.
-             * To resolve we need to instead set a rounded height and remove the padding-bottom.
-             * This line can be removed once the Chrome developers fix the display bug we found in SA-15725.
-             * To test whether this code can be removed, follow the STR in SA-15725.
-             */
+            // Using padding-bottom percentage to provide appropriate height for tiles causes display
+            // issues due to Chrome bug. Refer to: https://github.com/alaress/schoolbox/pull/28566.
+            // To resolve we need to instead set a rounded height and remove the padding-bottom.
+            // This line can be removed once the Chrome developers fix the display bug we found in SA-15725.
+            // To test whether this code can be removed, follow the STR in SA-15725.
             $tile.css({ height: (Math.round($tile.outerWidth() * getAspectRatioForTile(tile)) + 'px'), paddingBottom: 0 });
 
             let fontSize = getFontSize(tile);
@@ -70,14 +68,17 @@
             // So if the default settings are used, the font-size returned by this function will typically be beyond the
             // max end of the range, and scaling of font will typically only happen at the narrowest tile widths.
             let fontSize = tileWidth / 120; // Units 'rem'.
+            let minFontSize = $tile.attr('data-min-font-size');
+            let maxFontSize = $tile.attr('data-max-font-size');
 
-            const minFontSize = $tile.attr('data-min-font-size');
-            const maxFontSize = $tile.attr('data-max-font-size');
-            if (minFontSize === undefined || maxFontSize === undefined) {
-                throw new Error(
-                    "Expected attribute 'data-min-font-size' and/or 'data-max-font-size' not set" +
-                    " on tile with id '" + $tile.attr('id') + "'."
-                );
+            if (minFontSize === undefined) {
+                // This should never happen because minFontSize is a required field on the Modify Tile page.
+                minFontSize = 0.75; // Same as default percentage value on Modify Tile page.
+            }
+
+            if (maxFontSize === undefined) {
+                // This should never happen because maxFontSize is a required field on the Modify Tile page.
+                maxFontSize = 1.75; // Same as default percentage value on Modify Tile page.
             }
 
             if (fontSize < minFontSize) {
