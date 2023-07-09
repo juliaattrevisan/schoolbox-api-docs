@@ -1,6 +1,6 @@
 {# To allow schools to alter whats displayed in the columns #}
 {% set columnsConfig = [
-    { heading: "Image", data: "portrait_url", class: "image-td" },
+    { heading: "Image", data: "portrait_url", class: "portrait-td", isSortable: false },
     { heading: "First name", data: "StaffPreferredName", class: ""  },
     { heading: "Surname", data: "StaffSurname", class: "" },
     { heading: "Department", data: "StaffDepartment", class: "hide-for-medium-down" },
@@ -11,18 +11,45 @@
     { heading: "Email", data: "StaffOccupEmail", class: "" },
 ] %}
 
+{# Add any config specific to the staff directory table #}
 {% set tableConfig = {
     orderBy: {
         ascending: true,
         column: "StaffSurname",
     },
-    sortable: ["StaffPreferredName", "StaffSurname", "StaffDepartment", "JobPositionDescription", "StaffCampusDescription", "StaffOccupPhone", "StaffExtension", "StaffOccupEmail"],
     texts: {
         count: "{from}-{to} of {count} members|{count} members|1 member",
         filterPlaceholder: "Search staff members...",
         noResults: "No matching staff members",
     },
  } %}
+
+ {% set templates = [
+    {   name: "portrait_url",
+        component: "portrait",
+        componentData: {
+            src: "portrait_url",
+            href: "profile_url",
+            title: "View profile",
+            alt: "Portrait photo of user"
+        }
+    },
+    {   name: "StaffOccupEmail",
+        component: "portrait",
+        componentData: {
+            src: "portrait_url",
+            href: "profile_url",
+            title: "View profile",
+            alt: "Portrait photo of user"
+        }
+    }
+ ] %}
+
+<style>
+.VueTables__table .portrait-td {
+    max-width: 3rem; /* prevent the image column from being too wide */
+}
+</style>
 
 <div class="row actions-small-1">
     <div class="list-item">
@@ -32,11 +59,12 @@
     </div>
 </div>
 
-<div id="staff-directory-container">
-    <staff-directory
+<div id="data-table-container">
+    <data-table
         endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
         :columns-config="{{ columnsConfig|json_encode() }}"
         :table-options="{{ tableConfig|json_encode() }}"
+        :templates="{{ templates|json_encode() }}"
     />
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/staffDirectory.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/dataTable.js?v={{ config.site_version }}"></script>

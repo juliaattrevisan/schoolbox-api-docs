@@ -97,9 +97,7 @@ module.exports = {
             "./www/static/js/global/sbProps.js",
         ],
         masonry: {
-            import: [
-                "./www/static/js/masonry/masonry.js",
-            ],
+            import: ["./www/static/js/masonry/masonry.js"],
             dependOn: "main", // ensures jQuery is loaded prior
         },
         mage: {
@@ -167,7 +165,7 @@ module.exports = {
         emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
 
         //Staff Directory
-        staffDirectory: "./library/Schoolbox/Directory/Staff/templates/vue/staffDirectory.ts",
+        dataTable: "./vue/components/dataTable/dataTable.ts",
 
         // Record Media Modal
         recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.js",
