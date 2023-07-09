@@ -12,15 +12,21 @@
         $('[data-component]').find('[data-collapser=true]').collapsable();
     });
 </script>
+<script type="text/javascript">
+    $(function() {
+        $('#content').find('ul[data-sortable]').sortable({
+            handle:      '.grip',
+            axis:        'y'
+        });
+    });
+</script>
+
 <!-- END custom_head -->
 
-<div class="row">
+<div class="sb-grid sb-grid--12">
     <div class="small-12 columns">
         <h1>Pantry - Generic Content</h1>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 columns">
         <ul class="sub-nav">
             <li class="active"><a href="/pantry">Generic Content</a></li>
@@ -37,11 +43,9 @@
             <li><a href="/pantry/feature-tour">Feature Tour</a></li>
             <li><a href="/pantry/reveal">Reveal</a></li>
             <li><a href="/pantry/reference">Visibility Classes</a></li>
+            <li><a href="/pantry/grid-flex">New Grid / Flex</a></li>
         </ul>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 columns">
         <div class="component-titlebar" style='background-color:#ddd'>
             <div class="actions-small-3">
@@ -56,50 +60,44 @@
             </div>
         </div>
     </div>
-</div>
-<div data-component>
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <ul class="information-list threaded">
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <a href="#">
-                                    <img src="/portrait.php?id=0&size=square64" />
-                                    <h3>Class Cancelled - 21st June</h3>
-                                </a>
-                                <p class="meta">
-                                    Posted by <a href="/search/user/3">Ms Celia Glenn</a> 2 days ago
-                                </p>
-                            </div>
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list threaded">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="#">
+                                <img src="/portrait.php?id=0&size=square64" />
+                                <h3>Class Cancelled - 21st June</h3>
+                            </a>
+                            <p class="meta">
+                                Posted by <a href="/search/user/3">Ms Celia Glenn</a> 2 days ago
+                            </p>
                         </div>
-                        <nav>
-                            <a class="icon-modify no-text" href="#" title="Modify"></a>
-                        </nav>
-                        <article>
-                            <p>Come and see why Schoolbox is more than a school.&nbsp;&nbsp;You can find out more about the broad range of learning experiences offered - from academia,
-                                internationalism and earth studies, to sensational music, theatre and sport.&nbsp; Talk to students, staff&nbsp;and parents to learn more at Open Day.</p>
-                        </article>
-                    </li>
-                    <li class="child">
-                        <div class="content">
-                            <h3>This is a child element of a discussion/thread.</h3>
-                            <p class="meta">This style is also used in replies of the <code>.discussion</code> or <code>.threaded</code> class</p>
-                        </div>
-                    </li>
-                </ul>
-                <div class="component-action">
-                    <section>
-                        <a class="button">Component Actions</a>
-                        <a class="button">View More</a>
-                    </section>
-                </div>
-            </section>
-        </div>
+                    </div>
+                    <nav>
+                        <a class="icon-modify no-text" href="#" title="Modify"></a>
+                    </nav>
+                    <article>
+                        <p>Come and see why Schoolbox is more than a school.&nbsp;&nbsp;You can find out more about the broad range of learning experiences offered - from academia,
+                            internationalism and earth studies, to sensational music, theatre and sport.&nbsp; Talk to students, staff&nbsp;and parents to learn more at Open Day.</p>
+                    </article>
+                </li>
+                <li class="child">
+                    <div class="content">
+                        <h3>This is a child element of a discussion/thread.</h3>
+                        <p class="meta">This style is also used in replies of the <code>.discussion</code> or <code>.threaded</code> class</p>
+                    </div>
+                </li>
+            </ul>
+            <div class="component-action">
+                <section>
+                    <a class="button">Component Actions</a>
+                    <a class="button">View More</a>
+                </section>
+            </div>
+        </section>
     </div>
-</div>
-<div class="row" data-equalizer>
     <div class="small-12 medium-6 island">
         <h2 class="subheader" id="labels">Labels</h2>
         <section class="content" data-equalizer-watch>
@@ -154,9 +152,6 @@
             </div>
         </section>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader" id="progress-bars">Progress Bars</h2>
         <section class="content">
@@ -180,9 +175,6 @@
             </div>
         </section>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12">
         <h2 class="subheader" id="empty-states">Empty States</h2>
     </div>
@@ -200,9 +192,6 @@
             <p><a href="#" title="Add an Event">Add</a> or <a href="#" title="Import an Event">Import</a> some.</p>
         </div>
     </div>
-</div>
-
-<div class="row" data-equalizer>
     <div class="small-12 medium-4 columns island">
         <h2 class="subheader" id="reveal">Modal / Reveal</h2>
         <section class="content" data-equalizer-watch>
@@ -268,34 +257,6 @@
             </script>
         </section>
     </div>
-</div>
-
-<!-- Reveal Modals begin -->
-<div id="firstModal" class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="firstModalTitle">This is a modal.</h2>
-    <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
-    <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
-    <p><a href="#" data-reveal-id="secondModal" class="button">Second Modal...</a></p>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="secondModal" class="reveal-modal" data-reveal aria-labelledby="secondModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="secondModalTitle">This is a second modal.</h2>
-    <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="videoModal" class="reveal-modal large" data-reveal aria-labelledby="videoModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="videoModalTitle">This modal has video</h2>
-    <div class="flex-video widescreen vimeo">
-        <iframe width="1280" height="720" src="//www.youtube-nocookie.com/embed/wnXCopXXblE?rel=0" frameborder="0" allowfullscreen></iframe>
-    </div>
-
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-<!-- Reveal Modals end -->
-
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Preloader <span class="loader"></span></h2>
         <section class="content">
@@ -303,9 +264,6 @@
             <img src="{CDN_PREFIX}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center;margin:auto;display: block;" />
         </section>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader" id="gradients">Grade-ients</h2>
         <section class="content">
@@ -324,17 +282,6 @@
             </ul>
         </section>
     </div>
-</div>
-
-<script type="text/javascript">
-    $(function() {
-        $('#content').find('ul[data-sortable]').sortable({
-            handle:      '.grip',
-            axis:        'y'
-        });
-    });
-</script>
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Interactive Lists</h2>
         <ul class="meta">
@@ -526,9 +473,6 @@
             </ul>
         </section>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 columns island">
         <h3 class="subheader">Expandable</h3>
         <section>
@@ -604,9 +548,6 @@
             </script>
         </section>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 columns">
         <h2 class="subheader" id="accordion">Accordion</h2>
         <dl class="accordion" data-accordion>
@@ -633,25 +574,21 @@
                 <p>Fourth panel content goes here...</p>
             </div>
         </div>
+        </dd>
+        <dd class="accordion-navigation">
+            <a href="#panel2">Accordion 2</a>
+            <div id="panel2" class="content">
+                Panel 2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </div>
+        </dd>
+        <dd class="accordion-navigation">
+            <a href="#panel3">Accordion 3</a>
+            <div id="panel3" class="content">
+                Panel 3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </div>
+        </dd>
+        </dl>
     </div>
-    </dd>
-    <dd class="accordion-navigation">
-        <a href="#panel2">Accordion 2</a>
-        <div id="panel2" class="content">
-            Panel 2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </div>
-    </dd>
-    <dd class="accordion-navigation">
-        <a href="#panel3">Accordion 3</a>
-        <div id="panel3" class="content">
-            Panel 3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </div>
-    </dd>
-    </dl>
-</div>
-</div>
-
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Block Grid</h2>
         <section>
@@ -704,9 +641,6 @@
             </div>
         </section>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader" id="lightbox">Lightbox</h2>
         <section class="content">
@@ -729,9 +663,6 @@
             </ul>
         </section>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader" id="image-slideshow">Image Slideshow</h2>
         <div class="swiper" id="pantry-imageslideshow">
@@ -765,10 +696,6 @@
             );
         </script>
     </div>
-</div>
-
-
-<div class="row">
     <div class="small-12 island">
         <h2 class="subheader" id="flex-video">Flex Video</h2>
         <div class="flex-video">
@@ -776,6 +703,31 @@
         </div>
     </div>
 </div>
+
+<!-- Reveal Modals begin -->
+<div id="firstModal" class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="firstModalTitle">This is a modal.</h2>
+    <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
+    <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
+    <p><a href="#" data-reveal-id="secondModal" class="button">Second Modal...</a></p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="secondModal" class="reveal-modal" data-reveal aria-labelledby="secondModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="secondModalTitle">This is a second modal.</h2>
+    <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="videoModal" class="reveal-modal large" data-reveal aria-labelledby="videoModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="videoModalTitle">This modal has video</h2>
+    <div class="flex-video widescreen vimeo">
+        <iframe width="1280" height="720" src="//www.youtube-nocookie.com/embed/wnXCopXXblE?rel=0" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<!-- Reveal Modals end -->
 
 <script>
     $(document).ready( function () {

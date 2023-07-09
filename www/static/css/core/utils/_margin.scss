@@ -1,0 +1,43 @@
+/*****************************
+    MARGIN
+*****************************/
+/* Utility classes to quickly apply standardised margin without having
+ * to explicity define a class for it.
+*/
+
+@use "sass:list";
+
+// Generate utility classes for margin
+.u-margin {
+    @each $size in $global-sizes {
+        &-#{$size} {
+            margin: var(--whitespace-#{$size});
+
+            &--horiz {
+                margin-left: var(--whitespace-#{$size});
+                margin-right: var(--whitespace-#{$size});
+            }
+
+            &--vert {
+                margin-top: var(--whitespace-#{$size});
+                margin-bottom: var(--whitespace-#{$size});
+            }
+
+            &--top {
+                margin-top: var(--whitespace-#{$size});
+            }
+
+            &--bottom {
+                margin-bottom: var(--whitespace-#{$size});
+            }
+
+            &--left {
+                margin-left: var(--whitespace-#{$size});
+            }
+
+            &--right {
+                margin-right: var(--whitespace-#{$size});
+            }
+        }
+    }
+}

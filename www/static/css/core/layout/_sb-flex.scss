@@ -1,0 +1,58 @@
+/**
+ *  sb-flex.scss
+ *
+ *  This is basically a utility class for us to create flex containers without having to...
+ *  a) explicitly create a class definition somewhere
+ *  b) leverage other classes for this purpose that probably *shouldn't be used*
+ *
+ *  "Isn't this the same as using inline styles" I hear you ask?
+ *  No. Firstly, it's abundantly clear that these classes are applying the explict styles
+ *  you're seeing via the naming convention and structure. More importantly though, all
+ *  implementations of these flex containers using these classes can have their styles
+ *  updated and controlled from this specific file. Let's say flex changes a property in
+ *  the future and we want to target all flex containers - we can do that here in a single
+ *  location. Could we do that if this was the same as "inline styles?"
+**/
+
+.sb-flex {
+    display: flex;
+
+    &-col,
+    &-row {
+        display: flex;
+    }
+
+    &-col {
+        flex-direction: column;
+        height: 100%;
+    }
+    &-row {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    &--wrap {
+        flex-wrap: wrap;
+    }
+
+    &--wrap-reverse {
+        flex-wrap: wrap-reverse;
+    }
+
+    &--center {
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__item {
+        &--1 {
+            flex: 1;
+        }
+    }
+
+    @each $size in $global-sizes {
+        &-gap--#{$size} {
+            grid-gap: var(--whitespace-#{$size});
+        }
+    }
+}

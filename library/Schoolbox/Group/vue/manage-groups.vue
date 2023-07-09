@@ -162,7 +162,7 @@ export default {
             :selected-groups="selectedGroups"
             :is-search-active="isSearchActive"
         />
-        <div v-else class="row group-items">
+        <div v-else class="sb-grid sb-grid--12">
             <manage-groups-item
                 v-for="group in filteredGroups"
                 :key="group.id"
@@ -183,10 +183,5 @@ export default {
 <style>
 body {
     overflow-y: scroll; /*to prevent jarring shifts when moving between group selections */
-}
-
-.group-items {
-    display: flex; /*to avoid misaligned rows due to differences in group item heights */
-    flex-wrap: wrap;
 }
 </style>
