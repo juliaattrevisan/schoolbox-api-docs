@@ -7,9 +7,8 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
 import getDefaultOptions from "@schoolboxVue/components/vueTables2/getDefaultOptions";
-import DataTablePortrait from "./data-table-portrait.vue";
-// import SdTablePhone from "./sd-table-phone.vue";
-// import SdTableEmail from "./sd-table-email.vue";
+import DataTableImage from "./templates/data-table-image.vue";
+import DataTableLink from "./templates/data-table-link.vue";
 import type { ColumnsConfig } from "./dataTable";
 
 interface Props {
@@ -98,8 +97,11 @@ async function onLoaded() {
             <data-load-error v-else-if="hasLoadError" data-title="Staff Directory" />
             <v-client-table :data="data" :columns="columns" :options="options" @loaded="onLoaded">
                 <template v-for="slot in props.templates" :key="slot.name" #[slot.name]="tableData">
-                    <template v-if="slot.component === 'portrait'">
-                        <data-table-portrait :row-data="tableData.row" :component-data="slot.componentData" />
+                    <template v-if="slot.component === 'image'">
+                        <data-table-image :row-data="tableData.row" :component-data="slot.componentData" />
+                    </template>
+                    <template v-else-if="slot.component === 'link'">
+                        <data-table-link :row-data="tableData.row" :component-data="slot.componentData" />
                     </template>
                 </template>
                 <template #afterTable>

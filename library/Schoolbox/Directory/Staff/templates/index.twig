@@ -25,22 +25,23 @@
  } %}
 
  {% set templates = [
-    {   name: "portrait_url",
-        component: "portrait",
+    {
+        name: "portrait_url",
+        component: "image",
         componentData: {
             src: "portrait_url",
             href: "profile_url",
             title: "View profile",
-            alt: "Portrait photo of user"
+            alt: "Portrait photo of user",
         }
     },
-    {   name: "StaffOccupEmail",
-        component: "portrait",
+    {
+        name: "StaffPreferredName",
+        component: "link",
         componentData: {
-            src: "portrait_url",
+            text: "StaffPreferredName",
             href: "profile_url",
             title: "View profile",
-            alt: "Portrait photo of user"
         }
     }
  ] %}
