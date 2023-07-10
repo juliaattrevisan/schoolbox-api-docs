@@ -301,6 +301,8 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
     }
 
     // We only need to set up the maxCharCount-related event handlers if config.maxCharCount is enabled.
+    // Testing URL for page with word count enabled but maxCharCount disabled:
+    //  * https://vagrant.dev.schoolbox.cloud/learning/assessments/733/25/submit
     if (config.maxCharCount !== undefined && config.maxCharCount !== -1) {
         setupOnUpdateTextEventHandler(sourceElement, editor, config, wordCountContainer);
 
