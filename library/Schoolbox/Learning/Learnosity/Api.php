@@ -91,7 +91,7 @@ class Api
             self::LOG_FILE
         );
 
-        $fp = fopen($logFile, 'a');
+        $fp = fopen($logFile, 'a+');
 
         return new Logger($fp, $fp, \Monolog\Logger::DEBUG, [], true);
     }
