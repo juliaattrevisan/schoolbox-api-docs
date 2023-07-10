@@ -1371,7 +1371,7 @@ class DataSource
             return false;
         }
 
-        $dstBox    = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
+        $dstBox    = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId, ['queryWrite' => true]);
         $dstFolder = $dstBox->getCategory();
 
         // Cannot mutate identity of objects returned from mappers.

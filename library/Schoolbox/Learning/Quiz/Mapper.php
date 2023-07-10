@@ -244,10 +244,10 @@ class Mapper extends BaseMapper
         }
 
         /** @var Model $destinationQuiz */
-        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
+        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId, ['queryWrite' => true]);
 
         // Ensure that we don't clobber destination Sections
-        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
+        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId(), ['queryWrite' => true]));
         if ($destinationQuiz->getSections()->count()) {
             throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
         }

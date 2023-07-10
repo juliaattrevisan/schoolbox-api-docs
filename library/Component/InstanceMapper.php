@@ -265,11 +265,16 @@ class Component_InstanceMapper extends BaseMapper
 
     /**
      * @param int $id
+     * @param array $options
      * @return Component_Instance|null
      */
-    public function findByInstanceId($id)
+    public function findByInstanceId($id, $options = [])
     {
-        $componentInstanceTable = $this->databaseRead->getQuoter()->quoteIdentifier($this->getTable());
+        if ($options['queryWrite'] ?? false) {
+            $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
+        } else {
+            $componentInstanceTable = $this->databaseRead->getQuoter()->quoteIdentifier($this->getTable());
+        }
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`id` = :id
@@ -280,17 +285,22 @@ class Component_InstanceMapper extends BaseMapper
 
         return $this->findByFields($sql, [
             ':id' => $id
-        ])->first();
+        ], $options)->first();
     }
 
     /**
      * @param string $sql
      * @param array $fields
+     * @param array $options
      * @return Component_Instance[]|GenericCollection
      */
-    protected function findByFields($sql, $fields)
+    protected function findByFields($sql, $fields, $options = [])
     {
-        $statement = $this->databaseRead->prepare($sql);
+        if ($options['queryWrite'] ?? false) {
+            $statement = $this->database->prepare($sql);
+        } else {
+            $statement = $this->databaseRead->prepare($sql);
+        }
         $statement->execute($fields);
 
         // Hydrate a whole bunch of stuff here.
