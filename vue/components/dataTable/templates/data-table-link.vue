@@ -3,15 +3,11 @@
  * To wrap the text within a link
  */
 
-interface ComponentData {
-    text: string; // the text to display, typically a data key
-    title: string; // the title text for the link
-    prependHref?: string; // to prepend the href with something like mailto: or tel:
-}
+import type { Data, LinkComponentData } from "../types/dataTableTypes";
 
 interface Props {
-    rowData: object; // the row of data
-    componentData: ComponentData; // the component data
+    rowData: Data; // the row of data
+    componentData: LinkComponentData; // the component data
 }
 const props = defineProps<Props>();
 
@@ -20,14 +16,14 @@ const props = defineProps<Props>();
  */
 const href = window.Vue.computed(() => {
     if (props.componentData.prependHref) {
-        return `${props.componentData.prependHref}${props.rowData[props.componentData.text]}`;
+        return `${props.componentData.prependHref}${props.rowData[props.componentData.text] as string}`;
     }
     return props.rowData[props.componentData.text];
 });
 </script>
 
 <template>
-    <a :href="href" :title="componentData.title">
+    <a :href="(href as string)" :title="componentData.title">
         {{ props.rowData[componentData.text] }}
     </a>
 </template>

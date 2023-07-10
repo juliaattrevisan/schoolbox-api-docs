@@ -1,17 +1,18 @@
 /**
- *
+ * To return the options for the vue-tables-2 component linked
+ * specifically to the <data-table> component implementation
  */
 
 import getDefaultOptions from "@schoolboxVue/components/vueTables2/getDefaultOptions";
-import type { ColumnsConfig } from "./dataTable";
+import type { ColumnConfig } from "./types/dataTableTypes";
 
 /**
  * to return an object where each heading is the key and the value is the class
- * @param {ColumnsConfig[]} columnsConfig - the configuration for the columns
+ * @param {ColumnConfig[]} columnConfig - the configuration for the columns
  * @returns {object} the columns that have custom classes linked
  */
-function getColumnClasses(columnsConfig: ColumnsConfig[]) {
-    const columnClasses = columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
+function getColumnClasses(columnConfig: ColumnConfig[]) {
+    const columnClasses = columnConfig.reduce((accumulator: object, column: ColumnConfig) => {
         accumulator[column.key] = column.class;
         return accumulator;
     }, {});
@@ -20,11 +21,11 @@ function getColumnClasses(columnsConfig: ColumnsConfig[]) {
 
 /**
  * to return an object where each heading is the key and the value is the data
- * @param {ColumnsConfig[]} columnsConfig - the configuration for the columns
+ * @param {ColumnConfig[]} columnConfig - the configuration for the columns
  * @returns {object} the columns that have custom classes linked
  */
-function getHeadings(columnsConfig: ColumnsConfig[]) {
-    const headings = columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
+function getHeadings(columnConfig: ColumnConfig[]) {
+    const headings = columnConfig.reduce((accumulator: object, column: ColumnConfig) => {
         accumulator[column.key] = column.heading;
         return accumulator;
     }, {});
@@ -33,12 +34,12 @@ function getHeadings(columnsConfig: ColumnsConfig[]) {
 
 /**
  * its assumed all columns are sortable unless isSortable is set to false
- * @param {ColumnsConfig[]} columnsConfig - the configuration for the columns
+ * @param {ColumnConfig[]} columnConfig - the configuration for the columns
  * @returns {string[]} the columns that are sortable
  */
-function getSortable(columnsConfig: ColumnsConfig[]) {
+function getSortable(columnConfig: ColumnConfig[]) {
     const sortable: string[] = [];
-    columnsConfig.forEach((column) => {
+    columnConfig.forEach((column) => {
         if (!Object.prototype.hasOwnProperty.call(column, "isSortable")) {
             sortable.push(column.key);
         }
@@ -48,16 +49,16 @@ function getSortable(columnsConfig: ColumnsConfig[]) {
 
 /**
  *
- * @param {ColumnsConfig} columnsConfig - the configuration for the columns
+ * @param {ColumnConfig} columnConfig - the configuration for the columns
  * @param {object} tableOptions - the options passed to the vue-tables-2 component
  * @returns {object} the configuration for the vue-tables-2 component
  */
-export function getOptions(columnsConfig: ColumnsConfig[], tableOptions: object) {
+export function getOptions(columnConfig: ColumnConfig[], tableOptions: object) {
     return {
         ...getDefaultOptions(),
-        ...getColumnClasses(columnsConfig),
-        ...getHeadings(columnsConfig),
+        ...getColumnClasses(columnConfig),
+        ...getHeadings(columnConfig),
         ...tableOptions,
-        ...getSortable(columnsConfig),
+        ...getSortable(columnConfig),
     };
 }

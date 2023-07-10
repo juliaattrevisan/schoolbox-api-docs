@@ -47,5 +47,6 @@ module.exports = {
         "arrow-body-style": "off",
         // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
+        "no-void": "off", // void is a valid return type in TypeScript
     },
 };

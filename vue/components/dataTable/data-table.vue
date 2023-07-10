@@ -10,11 +10,11 @@ import { getOptions } from "./getDataTableOptions";
 import { getTemplates } from "./templates/getTemplates";
 import DataTableImage from "./templates/data-table-image.vue";
 import DataTableLink from "./templates/data-table-link.vue";
-import type { ColumnsConfig } from "./dataTable";
+import type { ColumnConfig, ImageComponentData, LinkComponentData } from "./types/dataTableTypes";
 
 interface Props {
     endpoint: string; // the endpoint to retrieve all the staff data from
-    columnsConfig: ColumnsConfig[]; // the columns to display in the table
+    columnsConfig: ColumnConfig[]; // the columns to display in the table
     tableOptions: object; // the configuration for the vue-tables-2 component
 }
 const props = defineProps<Props>();
@@ -22,7 +22,7 @@ const props = defineProps<Props>();
 const data = window.Vue.ref([] as unknown[]); // the table data to display
 const isLoading = window.Vue.ref(true); // whether the table data has been loaded
 const hasLoadError = window.Vue.ref(false); // whether there was an error loading the table data
-const columns: string[] = props.columnsConfig.map((column: ColumnsConfig) => column.key); // the columns to display in the table, retrieved by getting the data key from the columns config
+const columns: string[] = props.columnsConfig.map((column: ColumnConfig) => column.key); // the columns to display in the table, retrieved by getting the data key from the columns config
 const options = getOptions(props.columnsConfig, props.tableOptions); // the options for the vue-tables-2 component
 const templates = getTemplates(props.columnsConfig); // any columns that use templates
 
@@ -44,7 +44,7 @@ async function loadData() {
  * Start loading the group data
  */
 window.Vue.onMounted(() => {
-    loadData();
+    void loadData();
 });
 
 let isFirstLoad = true;
@@ -69,10 +69,16 @@ async function onLoaded() {
             <v-client-table :data="data" :columns="columns" :options="options" @loaded="onLoaded">
                 <template v-for="slot in templates" :key="slot.key" #[slot.key]="tableData">
                     <template v-if="slot.component === 'image'">
-                        <data-table-image :row-data="tableData.row" :component-data="slot.componentData" />
+                        <data-table-image
+                            :row-data="tableData.row"
+                            :component-data="(slot.componentData as ImageComponentData)"
+                        />
                     </template>
                     <template v-else-if="slot.component === 'link'">
-                        <data-table-link :row-data="tableData.row" :component-data="slot.componentData" />
+                        <data-table-link
+                            :row-data="tableData.row"
+                            :component-data="(slot.componentData as LinkComponentData)"
+                        />
                     </template>
                 </template>
                 <template #afterTable>
