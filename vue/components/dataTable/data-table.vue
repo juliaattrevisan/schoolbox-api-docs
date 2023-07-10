@@ -6,7 +6,8 @@
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
-import getDefaultOptions from "@schoolboxVue/components/vueTables2/getDefaultOptions";
+import { getOptions } from "./getDataTableOptions";
+import { getTemplates } from "./templates/getTemplates";
 import DataTableImage from "./templates/data-table-image.vue";
 import DataTableLink from "./templates/data-table-link.vue";
 import type { ColumnsConfig } from "./dataTable";
@@ -18,9 +19,12 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const data = window.Vue.ref([] as unknown[]); // the staff data to display
-const isLoading = window.Vue.ref(true); // whether the staff data has been loaded
-const hasLoadError = window.Vue.ref(false); // whether there was an error loading the staff data
+const data = window.Vue.ref([] as unknown[]); // the table data to display
+const isLoading = window.Vue.ref(true); // whether the table data has been loaded
+const hasLoadError = window.Vue.ref(false); // whether there was an error loading the table data
+const columns: string[] = props.columnsConfig.map((column: ColumnsConfig) => column.key); // the columns to display in the table, retrieved by getting the data key from the columns config
+const options = getOptions(props.columnsConfig, props.tableOptions); // the options for the vue-tables-2 component
+const templates = getTemplates(props.columnsConfig); // any columns that use templates
 
 /**
  * load the staff data for display
@@ -42,44 +46,6 @@ async function loadData() {
 window.Vue.onMounted(() => {
     loadData();
 });
-
-// the columns to display in the table, retrieved by getting the data key from the column config
-const columns: string[] = props.columnsConfig.map((column: ColumnsConfig) => column.key);
-
-// to return an object where each heading is the key and the value is the class
-const columnsClasses = props.columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
-    accumulator[column.key] = column.class;
-    return accumulator;
-}, {});
-
-// to return an object where each heading is the key and the value is the data
-const headings = props.columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
-    accumulator[column.key] = column.heading;
-    return accumulator;
-}, {});
-
-// its assumed all columns are sortable unless isSortable is set to false
-const sortable: string[] = [];
-props.columnsConfig.forEach((column) => {
-    if (!Object.prototype.hasOwnProperty.call(column, "isSortable")) {
-        sortable.push(column.key);
-    }
-});
-
-// return the templates for the columns
-const justTemplates = props.columnsConfig.filter((column) => column.template);
-const templates = justTemplates.map((column) => {
-    return { key: column.key, ...column.template };
-});
-
-// the configuration for the vue-tables-2 component
-const options = {
-    ...getDefaultOptions(),
-    columnsClasses,
-    headings,
-    ...props.tableOptions,
-    sortable,
-};
 
 let isFirstLoad = true;
 
