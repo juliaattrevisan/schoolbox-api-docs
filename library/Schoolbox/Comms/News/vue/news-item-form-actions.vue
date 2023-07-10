@@ -54,13 +54,16 @@ export default {
          * @returns {boolean} True if the preview button should be disabled, false otherwise.
          */
         isDisabled() {
-            return (
+            const returnValue = (
                 this.articleId === 0 ||
                 this.$refs.newsSubmit.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') || (
+                    this.$refs.newsPreview !== undefined &&
                     this.$refs.newsPreview !== null &&
                     this.$refs.newsPreview.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
                 )
             );
+
+            return returnValue;
         },
     },
 
