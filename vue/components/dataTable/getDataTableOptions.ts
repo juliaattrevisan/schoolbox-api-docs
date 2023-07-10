@@ -10,10 +10,10 @@ import type { ColumnConfig } from "./types/dataTableTypes";
 /**
  * to return an object where each heading is the key and the value is the class
  * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {object} the columns that have custom classes linked
+ * @returns {TableOptions} the columns that have custom classes linked
  */
 function getColumnsClasses(columnConfig: ColumnConfig[]) {
-    const columnsClasses = columnConfig.reduce((accumulator: object, column: ColumnConfig) => {
+    const columnsClasses = columnConfig.reduce((accumulator: Record<string, string>, column: ColumnConfig) => {
         accumulator[column.key] = column.class;
         return accumulator;
     }, {});
@@ -23,10 +23,10 @@ function getColumnsClasses(columnConfig: ColumnConfig[]) {
 /**
  * to return an object where each heading is the key and the value is the data
  * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {object} the columns that have custom classes linked
+ * @returns {TableOptions} the columns that have custom classes linked
  */
 function getHeadings(columnConfig: ColumnConfig[]) {
-    const headings = columnConfig.reduce((accumulator: object, column: ColumnConfig) => {
+    const headings = columnConfig.reduce((accumulator: Record<string, string>, column: ColumnConfig) => {
         accumulator[column.key] = column.heading;
         return accumulator;
     }, {});
@@ -36,7 +36,7 @@ function getHeadings(columnConfig: ColumnConfig[]) {
 /**
  * its assumed all columns are sortable unless isSortable is set to false
  * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {string[]} the columns that are sortable
+ * @returns {TableOptions} the columns that are sortable
  */
 function getSortable(columnConfig: ColumnConfig[]) {
     const sortable: string[] = [];
