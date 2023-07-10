@@ -21,7 +21,6 @@ use Schoolbox\Sync\Condition\Fragment\Factory as ConditionFragmentFactory;
  */
 class Controller extends Base
 {
-
     /**
      * A meta field for various Condition-specific UI
      */

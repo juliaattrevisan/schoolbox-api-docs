@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-
     /**
      * Const for when accreditation succeeds
      */

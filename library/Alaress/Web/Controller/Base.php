@@ -34,7 +34,6 @@ use Schoolbox\Url\Uri;
 
 abstract class Base
 {
-
     /**
      * A PSR-7 compliant request object, which represents the current incoming
      * request.

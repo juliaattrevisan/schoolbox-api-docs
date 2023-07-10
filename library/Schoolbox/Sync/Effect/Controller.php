@@ -21,7 +21,6 @@ use Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
  */
 class Controller extends Base
 {
-
     /**
      * A meta field for various Condition-specific UI
      */

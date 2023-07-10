@@ -22,7 +22,6 @@ use function rtrim;
 
 class Controller extends Alaress\Web\Controller\Base
 {
-
     /**
      * Connection to SSO server
      *

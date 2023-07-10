@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-
     /** @var Mapper $tourMapper */
     private $tourMapper;
 

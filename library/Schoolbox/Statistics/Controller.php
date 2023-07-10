@@ -22,7 +22,6 @@ use Schoolbox\Role;
  */
 class Controller extends Base
 {
-
     /**
      * @var DataSource
      */
