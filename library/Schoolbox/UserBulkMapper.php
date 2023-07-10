@@ -138,7 +138,7 @@ class UserBulkMapper extends UserMapper
 
         $query .= ' WHERE ' . implode(' AND ', $whereList) . ' ORDER BY u.lastname';
 
-        $statement = $this->getDatabase()->prepare($query);
+        $statement = $this->getDatabaseRead()->prepare($query);
         $statement->setFetchMode(\PDO::FETCH_ASSOC);
         $statement->execute($params);
 

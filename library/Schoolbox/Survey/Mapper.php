@@ -140,7 +140,7 @@ class Mapper extends BaseMapper
 
         $sql = $this->getSelectString() . " WHERE " . implode(' AND ', $pb->getWhere());
 
-        $statement = $this->getDatabase()->prepare($sql);
+        $statement = $this->getDatabaseRead()->prepare($sql);
         $statement->execute($pb->getParams());
 
         // Hydrate results and return unique surveys

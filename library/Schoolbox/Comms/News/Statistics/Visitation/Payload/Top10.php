@@ -50,7 +50,7 @@ class Top10
          * Users can have multiple records per article if their referrers are different so we can't
          * just take the first ten items in the findByColumn() stack
          */
-        $statement = $this->statisticsMapper->getDatabase()->prepare("
+        $statement = $this->statisticsMapper->getDatabaseRead()->prepare("
             SELECT
                 s1.user_id, s1.occurs_at,
                 u.title, u.firstname, u.preferred_name, u.lastname,

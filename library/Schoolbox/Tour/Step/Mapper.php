@@ -92,7 +92,7 @@ class Mapper extends BaseMapper
             INNER JOIN  {$this->getJoinSql('tour', '', 't')}
             LEFT JOIN   {$this->getJoinSql('nextStep', '','ns')}
             LEFT JOIN   {$this->getJoinSql('modalStep','','ms')}
-            LEFT JOIN   {$this->getJoinSql('tooltipStep','','ts')}            
+            LEFT JOIN   {$this->getJoinSql('tooltipStep','','ts')}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
         ";
     }
@@ -173,10 +173,10 @@ class Mapper extends BaseMapper
                         `tour`.`active` = 1 AND
                         `tour`.`deleted_at` IS NULL AND
                         `tour_step`.`deleted_at` IS NULL AND
-                        `tour_step_tooltip`.`deleted_at` IS NULL 
+                        `tour_step_tooltip`.`deleted_at` IS NULL
             ORDER BY    `tour_step_event`.`order`
         ";
-        $statement = $this->getDatabase()->prepare($query);
+        $statement = $this->getDatabaseRead()->prepare($query);
         $statement->execute([
             'tourUuid' => $tourUuid
         ]);

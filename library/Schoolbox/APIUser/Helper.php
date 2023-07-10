@@ -28,7 +28,7 @@ class Helper
         ?array $filter
     ) {
         [$query, $params] = $this->buildSearch($keyword, $filter);
-        $statement = $this->userMapper->getDatabase()->prepare($query);
+        $statement = $this->userMapper->getDatabaseRead()->prepare($query);
         foreach ($params as $label => $value) {
             $statement->bindValue($label, $value);
         }
@@ -63,7 +63,7 @@ class Helper
             $query .= " LIMIT :limit";
         }
 
-        $statement = $this->userMapper->getDatabase()->prepare($query);
+        $statement = $this->userMapper->getDatabaseRead()->prepare($query);
         if (0 !== $limit) {
             $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }
@@ -123,16 +123,16 @@ class Helper
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $params['firstName'] = $params['preferredName'] =
-                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[1]) . '%';
+                        '%' . $this->userMapper->getDatabaseRead()->getQuoter()->escapeForLike($name[1]) . '%';
                     $params['lastName']  =
-                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[2]) . '%';
+                        '%' . $this->userMapper->getDatabaseRead()->getQuoter()->escapeForLike($name[2]) . '%';
                     $where .= "AND (
                         (firstname like :firstName or preferred_name like :preferredName)
                         and lastname like :lastName
                     ) ";
                 } else {
                     $params['username'] = $params['lastName'] = $params['firstName'] = $params['preferredName'] =
-                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
+                        '%' . $this->userMapper->getDatabaseRead()->getQuoter()->escapeForLike($keyword) . '%';
                     $where .= "AND (
                         firstname like :firstName
                         or preferred_name like :preferredName

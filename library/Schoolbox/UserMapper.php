@@ -336,7 +336,7 @@ class UserMapper extends Mapper
             }
         }
         $query = $this->getSelectString() . ' WHERE ' . $query . ' AND user.deleted_at IS NULL';
-        $statement = $this->getDatabase()->prepare($query);
+        $statement = $this->getDatabaseRead()->prepare($query);
         $statement->execute($params);
         return $this->hydrateSelect($statement);
     }
@@ -633,7 +633,7 @@ class UserMapper extends Mapper
 
                     $foundValidKeyword = true;
 
-                    $searchLike = "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%";
+                    $searchLike = "%{$this->getDatabaseRead()->getQuoter()->escapeForLike($keyword)}%";
                     $pb->like('firstname', $searchLike)
                        ->like('preferred_name', $searchLike)
                        ->like('lastname', $searchLike);

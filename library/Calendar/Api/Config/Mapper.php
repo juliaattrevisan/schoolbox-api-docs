@@ -125,7 +125,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
             )
         ";
 
-        $statement = $this->getDatabase()->prepare($query);
+        $statement = $this->getDatabaseRead()->prepare($query);
         $statement->execute();
 
         $stack = $this->createCollection();

@@ -152,7 +152,7 @@ class Mapper extends BaseMapper
     {
         $userQuery = $this->getUserFilterQuery($user);
 
-        $statement = $this->getDatabase()->prepare("{$this->getSelectString()} WHERE {$userQuery['query']}");
+        $statement = $this->getDatabaseRead()->prepare("{$this->getSelectString()} WHERE {$userQuery['query']}");
         $statement->execute($userQuery['bindings']);
 
         return $this->hydrateSelect($statement);
@@ -194,7 +194,7 @@ class Mapper extends BaseMapper
 
         $sql .= ' ORDER BY updated_at';
 
-        $statement = $this->getDatabase()->prepare($sql);
+        $statement = $this->getDatabaseRead()->prepare($sql);
         $statement->execute($userQuery['bindings']);
 
         return $this->hydrateSelect($statement);
