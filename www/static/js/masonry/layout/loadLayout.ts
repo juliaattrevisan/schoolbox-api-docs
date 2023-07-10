@@ -1,3 +1,5 @@
+import { getLoadedHTML } from "@js/util/domUtils";
+
 /**
  * Load the selected layout and insert it into the page
  * @param {string} templateSelectURL - the ID of the layout to load
@@ -12,8 +14,8 @@ async function loadLayout(templateSelectURL: string, layoutId: number) {
         },
     });
     const responseData = await response.text();
-
-    document.getElementById("layoutContainer").innerHTML = responseData;
+    const loadedHTML = await getLoadedHTML(responseData);
+    document.getElementById("layoutContainer")?.appendChild(loadedHTML);
     document.dispatchEvent(new CustomEvent("MASONRY__LAYOUT_LOADED"));
 }
 
