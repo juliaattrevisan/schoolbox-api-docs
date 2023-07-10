@@ -57,11 +57,11 @@ class Values extends ArrayObject
      */
     public function getInt(string $key, ?int $alt = null): ?int
     {
-        return filter_var(
-            $this->get($key, $alt),
-            FILTER_VALIDATE_INT,
-            FILTER_NULL_ON_FAILURE,
-        );
+        $val = $this->get($key, $alt);
+        if (!is_numeric($val)) {
+            return null;
+        }
+        return (int)$val;
     }
 
     /**
@@ -83,13 +83,15 @@ class Values extends ArrayObject
     }
 
     /**
-     * Retrieves a value from the array as a bool, if it's either a bool or it
-     * is either truthy or falsy.
+     * Retrieves a value from the array as a bool, if it's either:
+     * - a bool
+     * - a numeric value (cast to bool)
+     * - a truthy or falsy value
      *
      * @param string    $key
      * @param bool|null $alt
      * @return bool|null The value from the array as a bool, or null if it isn't
-     *                   truthy or falsy or doesn't exist.
+     *                   sensibly castable to a bool.
      */
     public function getBool(string $key, ?bool $alt = null): ?bool
     {
@@ -97,10 +99,13 @@ class Values extends ArrayObject
         if (is_bool($val)) {
             return $val;
         }
-        if (in_array($val, self::FALSY_VALUES)) {
+        if (is_numeric($val)) {
+            return (bool)$val;
+        }
+        if (in_array($val, self::FALSY_VALUES, true)) {
             return false;
         }
-        if (in_array($val, self::TRUTHY_VALUES)) {
+        if (in_array($val, self::TRUTHY_VALUES, true)) {
             return true;
         }
         return null;
