@@ -4,9 +4,16 @@
  * If there's a href, wrap the image in a link
  */
 
+interface ComponentData {
+    src: string; // the src of the image, typically a data key
+    alt: string; // alternative text for the image
+    href?: string; // to link the image, typically a data key
+    title?: string; // the title text for the link
+}
+
 interface Props {
     rowData: object; // the row of data
-    componentData: object; // the component data
+    componentData: ComponentData; // the component data
 }
 const props = defineProps<Props>();
 </script>
