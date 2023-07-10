@@ -13,6 +13,7 @@ namespace Alaress\Web\Controller;
 use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
+use Alaress\Web\Request\Values;
 use Aura\Router\Generator;
 use Aura\Router\RouterContainer;
 use Aura\Session\SegmentInterface;
@@ -49,13 +50,17 @@ abstract class Base
     protected ServerRequestInterface $psr7Request;
 
     /**
-     * A URI object, representing the URI of the current request.
+     * A values container, representing the parsed query string (a.k.a. $_GET).
      *
-     * Supplements `$this->psr7Request->getUri()` with Schoolbox's
-     * `UriInterface` implementation, which adds a convenient `getQueryAsArray`
-     * method.
+     * Provided in order to ease the transition from `Aura.Web` to PSR-7 request
+     * objects.
      */
-    protected Uri $requestUri;
+    protected Values $requestQuery;
+
+    /**
+     * A values container, representing $_POST data if provided.
+     */
+    protected Values $requestPost;
 
     /**
      * Response object from Aura.Web package.
@@ -175,20 +180,38 @@ abstract class Base
     }
 
     /**
-     * @return Uri
+     * @return Values
      */
-    public function getRequestUri(): Uri
+    public function getRequestQuery(): Values
     {
-        return $this->requestUri;
+        return $this->requestQuery;
     }
 
     /**
-     * @param Uri $requestUri
+     * @param Values $requestQuery
      * @return $this
      */
-    public function setRequestUri(Uri $requestUri): self
+    public function setRequestQuery(Values $requestQuery): self
     {
-        $this->requestUri = $requestUri;
+        $this->requestQuery = $requestQuery;
+        return $this;
+    }
+
+    /**
+     * @return Values
+     */
+    public function getRequestPost(): Values
+    {
+        return $this->requestPost;
+    }
+
+    /**
+     * @param Values $requestPost
+     * @return $this
+     */
+    public function setRequestPost(Values $requestPost): self
+    {
+        $this->requestPost = $requestPost;
         return $this;
     }
 

@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Alaress\Web\Request\Values;
 use Aura\Router\RouterContainer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -666,15 +667,24 @@ class Module
     public function installControllerDependencies(Base $controller, ContainerInterface $container): Base
     {
         // Generate a URI here (with Schoolbox's augmentations),
-        // and inject it into the controller
+        // and inject its query params into the controller
         /** @var ServerRequestInterface $request */
         $request    = $container->get('request');
         $requestUri = new Uri($request->getUri()->__toString());
+
+        $requestQuery = new Values($requestUri->getQueryAsArray());
+        $requestPost  = new Values(
+            strtoupper($request->getMethod()) === self::METHOD_POST
+                ? $request->getParsedBody()
+                : []
+        );
+
         $controller
             ->setRequest($container->get('webFactory')->newRequest())
             ->setResponse($container->get('webFactory')->newResponse())
             ->setPsr7Request($request)
-            ->setRequestUri($requestUri)
+            ->setRequestQuery($requestQuery)
+            ->setRequestPost($requestPost)
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
             ->setRouteGenerator($container->get('router.generator'))
