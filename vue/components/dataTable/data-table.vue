@@ -15,7 +15,6 @@ interface Props {
     endpoint: string; // the endpoint to retrieve all the staff data from
     columnsConfig: ColumnsConfig[]; // the columns to display in the table
     tableOptions: object; // the configuration for the vue-tables-2 component
-    templates: object; //
 }
 const props = defineProps<Props>();
 
@@ -45,17 +44,17 @@ window.Vue.onMounted(() => {
 });
 
 // the columns to display in the table, retrieved by getting the data key from the column config
-const columns: string[] = props.columnsConfig.map((column: ColumnsConfig) => column.data);
+const columns: string[] = props.columnsConfig.map((column: ColumnsConfig) => column.key);
 
 // to return an object where each heading is the key and the value is the class
 const columnsClasses = props.columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
-    accumulator[column.data] = column.class;
+    accumulator[column.key] = column.class;
     return accumulator;
 }, {});
 
 // to return an object where each heading is the key and the value is the data
 const headings = props.columnsConfig.reduce((accumulator: object, column: ColumnsConfig) => {
-    accumulator[column.data] = column.heading;
+    accumulator[column.key] = column.heading;
     return accumulator;
 }, {});
 
@@ -63,8 +62,14 @@ const headings = props.columnsConfig.reduce((accumulator: object, column: Column
 const sortable: string[] = [];
 props.columnsConfig.forEach((column) => {
     if (!Object.prototype.hasOwnProperty.call(column, "isSortable")) {
-        sortable.push(column.data);
+        sortable.push(column.key);
     }
+});
+
+// return the templates for the columns
+const justTemplates = props.columnsConfig.filter((column) => column.template);
+const templates = justTemplates.map((column) => {
+    return { key: column.key, ...column.template };
 });
 
 // the configuration for the vue-tables-2 component
@@ -96,7 +101,7 @@ async function onLoaded() {
             <loading-table v-if="isLoading" />
             <data-load-error v-else-if="hasLoadError" data-title="Staff Directory" />
             <v-client-table :data="data" :columns="columns" :options="options" @loaded="onLoaded">
-                <template v-for="slot in props.templates" :key="slot.name" #[slot.name]="tableData">
+                <template v-for="slot in templates" :key="slot.key" #[slot.key]="tableData">
                     <template v-if="slot.component === 'image'">
                         <data-table-image :row-data="tableData.row" :component-data="slot.componentData" />
                     </template>

@@ -1,14 +1,94 @@
 {# To allow schools to alter whats displayed in the columns #}
 {% set columnsConfig = [
-    { heading: "Image", data: "portrait_url", class: "portrait-td", isSortable: false },
-    { heading: "First name", data: "StaffPreferredName", class: ""  },
-    { heading: "Surname", data: "StaffSurname", class: "" },
-    { heading: "Department", data: "StaffDepartment", class: "hide-for-medium-down" },
-    { heading: "Role", data: "JobPositionDescription", class: "hide-for-small" },
-    { heading: "Campus", data: "StaffCampusDescription", class: "hide-for-medium-down" },
-    { heading: "Phone", data: "StaffOccupPhone", class: "" },
-    { heading: "Ext", data: "StaffExtension", class: "" },
-    { heading: "Email", data: "StaffOccupEmail", class: "" },
+    {
+        key: "portrait_url",
+        heading: "Image",
+        class: "portrait-td",
+        isSortable: false,
+        template: {
+            component: "image",
+            componentData: {
+                src: "portrait_url",
+                href: "profile_url",
+                title: "View profile",
+                alt: "Portrait photo of user",
+            },
+        },
+    },
+    {
+        key: "StaffPreferredName",
+        heading: "First name",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffPreferredName",
+                href: "profile_url",
+                title: "View profile",
+            }
+        },
+    },
+    {
+        key: "StaffSurname",
+        heading: "Surname",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffSurname",
+                href: "profile_url",
+                title: "View profile",
+            }
+        },
+    },
+    {
+        key: "StaffDepartment",
+        heading: "Department",
+        class: "hide-for-medium-down",
+    },
+    {
+        key: "JobPositionDescription",
+        heading: "Role",
+        class: "hide-for-small",
+    },
+    {
+        key: "StaffCampusDescription",
+        heading: "Campus",
+        class: "hide-for-medium-down",
+    },
+    {
+        key: "StaffOccupPhone",
+        heading: "Phone",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffOccupPhone",
+                href: "StaffOccupPhone",
+                prependHref: "tel:",
+                title: "View profile",
+            }
+        },
+    },
+    {
+        key: "StaffExtension",
+        heading: "Ext",
+        class: "",
+    },
+    {
+        key: "StaffOccupEmail",
+        heading: "Email",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffOccupEmail",
+                href: "StaffOccupEmail",
+                prependHref: "mailto:",
+                title: "View profile",
+            }
+        }
+    },
 ] %}
 
 {# Add any config specific to the staff directory table #}
@@ -24,56 +104,6 @@
     },
  } %}
 
- {% set templates = [
-    {
-        name: "portrait_url",
-        component: "image",
-        componentData: {
-            src: "portrait_url",
-            href: "profile_url",
-            title: "View profile",
-            alt: "Portrait photo of user",
-        }
-    },
-    {
-        name: "StaffPreferredName",
-        component: "link",
-        componentData: {
-            text: "StaffPreferredName",
-            href: "profile_url",
-            title: "View profile",
-        }
-    },
-    {
-        name: "StaffSurname",
-        component: "link",
-        componentData: {
-            text: "StaffSurname",
-            href: "profile_url",
-            title: "View profile",
-        }
-    },
-    {
-        name: "StaffOccupPhone",
-        component: "link",
-        componentData: {
-            text: "StaffOccupPhone",
-            href: "StaffOccupPhone",
-            prependHref: "tel:",
-            title: "View profile",
-        }
-    },
-    {
-        name: "StaffOccupEmail",
-        component: "link",
-        componentData: {
-            text: "StaffOccupEmail",
-            href: "StaffOccupEmail",
-            prependHref: "mailto:",
-            title: "View profile",
-        }
-    }
- ] %}
 
 <style>
 .VueTables__table .portrait-td {
@@ -94,7 +124,6 @@
         endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
         :columns-config="{{ columnsConfig|json_encode() }}"
         :table-options="{{ tableConfig|json_encode() }}"
-        :templates="{{ templates|json_encode() }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/dataTable.js?v={{ config.site_version }}"></script>

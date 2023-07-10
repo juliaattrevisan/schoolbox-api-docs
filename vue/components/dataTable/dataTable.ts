@@ -17,7 +17,9 @@ app.mount("#data-table-container");
  * To allow schools to alter whats displayed in the columns
  */
 export interface ColumnsConfig {
+    key: string; // the key within the row data to display in each column
     heading: string; // the heading of each column
-    data: string; // the id of the data to display in each column
     class: string; // to allow any custom styling, such as hiding a column on smaller screens
+    isSortable?: boolean; // to allow sorting of the column
+    template?: object; // to allow custom templates to be used in the column
 }
