@@ -240,7 +240,7 @@ class Controller extends ConfigController
      */
     public function postConfig(): void
     {
-        $this->updateConfig($this->requestPost->get(), $this->buildConfigPredicate());
+        $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
         $this->response->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 

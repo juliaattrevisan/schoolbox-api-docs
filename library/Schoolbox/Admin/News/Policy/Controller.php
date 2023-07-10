@@ -94,7 +94,7 @@ class Controller extends ConfigController
      */
     public function postPolicies(): void
     {
-        $this->updateConfig($this->requestPost->get(), $this->buildConfigPredicate());
+        $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
         $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('commsNewsPolicy.getPolicies'));
     }
 

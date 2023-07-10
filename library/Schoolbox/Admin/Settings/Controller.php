@@ -169,7 +169,7 @@ class Controller extends ConfigController
      */
     public function postSettings(string $typeLabel): void
     {
-        $postedValues = $this->requestPost->get();
+        $postedValues = $this->requestPost->getArrayCopy();
 
         /** @var GenericCollection|Config[] $existingConfigs */
         $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate($typeLabel))->indexBy(ConfigMapper::COL_NAME);

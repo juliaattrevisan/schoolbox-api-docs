@@ -415,7 +415,6 @@ class Controller extends BaseController
 
         $assessment->setCapabilityMarkType($markType)
                    ->setCapabilityGradeGroup($gradeGroup);
-        // @phpstan-ignore-next-line: getBool can return null
         $assessment->setUseMarkRange($this->requestPost->getBool('useMarkRange') ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(

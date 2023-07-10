@@ -190,7 +190,7 @@ class Controller extends ConfigController
      */
     public function postSchoolDataOptions(): void
     {
-        $postData = $this->requestPost->get();
+        $postData = $this->requestPost->getArrayCopy();
 
         /* Check the DSN assembly here - produce the corresponding DSN codec,
          * encode the parts, modify $postData, then save it
