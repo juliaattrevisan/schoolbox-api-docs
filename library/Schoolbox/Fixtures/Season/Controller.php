@@ -322,7 +322,7 @@ class Controller extends AbstractController
      */
     protected function outputPostSuccess(Season $season)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $divisionCounts = $this->getMapper()->getDivisionCounts([$season->getId()]);
             if (!isset($divisionCounts[$season->getId()])) {
                 $divisionCounts[$season->getId()] = 0;
@@ -357,7 +357,7 @@ class Controller extends AbstractController
      */
     protected function outputPostError(Season $season, Exception $e)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Dump out an AJAX error
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set($this->buildJsonOutput($e->getMessage()));

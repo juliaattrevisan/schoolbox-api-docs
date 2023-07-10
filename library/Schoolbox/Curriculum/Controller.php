@@ -206,7 +206,7 @@ class Controller extends Base
         }
 
         // Send something back
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 array(
@@ -259,7 +259,7 @@ class Controller extends Base
         }
 
         // Send something back
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 array(
@@ -293,7 +293,7 @@ class Controller extends Base
         }
 
         // Send something back
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 array(

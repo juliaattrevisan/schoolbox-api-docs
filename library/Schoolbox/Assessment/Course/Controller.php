@@ -313,7 +313,7 @@ class Controller extends Base\Base
     {
         $this->getResponse()->status->set($code);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput($message));
         } else {
             die(json_encode($message));
@@ -508,7 +508,7 @@ class Controller extends Base\Base
         }
 
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // respond to XHR with JSON
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'id'              => $courseSpec->getId(),
@@ -725,7 +725,7 @@ class Controller extends Base\Base
             $this->folderMapper->save($courseSpecFolder);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // respond to XHR with JSON
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'id' => $courseSpec->getId(),
@@ -945,7 +945,7 @@ class Controller extends Base\Base
             $data['suggestions'] = $this->getLinkSuggestions($folderModel);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $options = [
                 'hasClose'         => true,
                 'hasAdd'           => false,

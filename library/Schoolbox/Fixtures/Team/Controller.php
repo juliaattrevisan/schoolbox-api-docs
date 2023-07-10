@@ -299,7 +299,7 @@ class Controller extends AbstractController
      */
     protected function renderPostAddPlayersResponse(Team $team)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getTeamTranslator()->collectPlayers($team);
 
             // Output a XHR data model + HTML output

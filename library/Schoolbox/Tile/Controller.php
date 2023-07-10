@@ -149,7 +149,7 @@ class Controller extends Base
         }
 
         // XHR: return a simple JSON response
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set(
                 [
                     'format' => 'json',
@@ -310,7 +310,7 @@ class Controller extends Base
         if (!$this->mapper->delete($item)) {
             $code = 500;
         }
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 [

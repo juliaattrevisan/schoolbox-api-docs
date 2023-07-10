@@ -227,7 +227,7 @@ class Controller extends Base
     {
         $linesPerPage = 50;
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $template = 'lines';
             $format   = 'nochrome';
         } elseif ($format == 'html') {
@@ -304,7 +304,7 @@ class Controller extends Base
             exit;
         } catch (OutOfBoundsException $e) {
             // 400: requested a page that doesn't exist
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 // just tell them they're naughty, that will be enough
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set([

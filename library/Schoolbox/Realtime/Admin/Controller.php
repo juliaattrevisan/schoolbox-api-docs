@@ -344,7 +344,7 @@ class Controller extends BaseController
                 ->setCertificate($certificate)
         );
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // respond with an empty 200 OK
             $this->getResponse()->content->set($this->buildJsonOutput(null));
             return;

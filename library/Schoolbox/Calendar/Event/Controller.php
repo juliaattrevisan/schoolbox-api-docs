@@ -815,7 +815,7 @@ class Controller extends Base
 
         /* Calculate redirect for async javascript
          */
-        if ($this->request->isXhr()) {
+        if ($this->isXhrRequest()) {
             /* If you try to return to a place that no longer exists,
              * just go back to the main calendar view; this occurs
              * when you delete from the modify screen

@@ -191,7 +191,7 @@ class Controller extends AbstractController
         $dataModel = $this->getDivisionTranslator()->translateDivision($division);
         $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Output as XHR data model
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($dataModel)
@@ -486,7 +486,7 @@ class Controller extends AbstractController
      */
     protected function renderPostAddPlayersResponse(Division $division)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Output a XHR data model + HTML output
             $division = $this->getDivisionCollector()->collectPlayers($division);
             $division = $this->getDivisionCollector()->collectTeams($division);

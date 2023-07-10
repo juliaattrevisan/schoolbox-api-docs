@@ -223,7 +223,7 @@ class Controller extends Base
      */
     protected function outputPostSuccess(Term\Model $term)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set([
                 'template' => "@adminTerms/listItem.twig",
                 'format'   => 'nochrome',
@@ -244,7 +244,7 @@ class Controller extends Base
      */
     protected function outputPostError(Term\Model $term, \Exception $e)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Dump out an AJAX error
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set([

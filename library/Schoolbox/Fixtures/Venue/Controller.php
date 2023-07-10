@@ -48,7 +48,7 @@ class Controller extends AbstractController
 
         /* ajax a list of venues
          */
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $query = $this->requestQuery->get('query');
 
             /** @var VenueMapper $mapper */

@@ -47,7 +47,7 @@ class Controller extends Base
     {
         $entityId = $this->getSchoolTagCloudMapper()->getTagId($this->requestPost["name"]);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $status = [
                 'id' => $entityId,
                 'update' => $this->routeGenerator->generate('sportsfixturesSchool.postEditSchool', [
@@ -83,7 +83,7 @@ class Controller extends Base
         $tag->setName($this->requestPost["name"]);
         $this->getSchoolTagCloudMapper()->save($tag);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $status = [
                 'id' => $entityId,
                 'update' => $this->routeGenerator->generate('sportsfixturesSchool.postEditSchool', [

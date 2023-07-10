@@ -272,7 +272,7 @@ class Controller extends BaseController
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(204);
         } catch (SchoolboxException $e) {
-            if ($this->request->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->response->status->set(400);
                 $this->response->content->set(
                     $this->buildJsonOutput($e->getMessage())

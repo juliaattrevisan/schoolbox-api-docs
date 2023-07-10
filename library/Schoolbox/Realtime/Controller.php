@@ -298,7 +298,7 @@ class Controller extends BaseController
             }
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set([
                 'data'   => $conf,
                 'format' => 'json',

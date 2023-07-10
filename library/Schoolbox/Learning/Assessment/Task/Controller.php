@@ -293,7 +293,7 @@ class Controller extends Assessment\Controller
             $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
             $this->getResponse()->status->setCode(200);
 
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                     'message' => 'OK',
@@ -320,7 +320,7 @@ class Controller extends Assessment\Controller
 
             $this->getResponse()->status->setCode(400);
 
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => false,
                     'message' => $e->getMessage(),

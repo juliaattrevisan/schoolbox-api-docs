@@ -271,7 +271,7 @@ class ListController extends Web\Controller\Base
             'icon'            => '',
             'readOnly'        => $readOnly,
             'compact'         => false,
-            '_is_xhr'         => $this->getRequest()->isXhr(),
+            '_is_xhr'         => $this->isXhrRequest(),
         ];
 
         $this->tpl('learningAssessment', 'component', $data);
@@ -850,7 +850,7 @@ class ListController extends Web\Controller\Base
      */
     protected function redirect($url)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $url ]));
         } else {
             $this->getResponse()->redirect->afterPost($url);

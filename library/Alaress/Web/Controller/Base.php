@@ -722,7 +722,7 @@ abstract class Base
         $this->getResponse()->status->set($statusCode);
 
         // if this isn't XHR, let the kernel and SitePage take care of
-        if (!$this->getRequest()->isXhr()) {
+        if (!$this->isXhrRequest()) {
             throw $this->generateException($errorCode, null, $problem . implode(', ', $resolutions));
         }
 

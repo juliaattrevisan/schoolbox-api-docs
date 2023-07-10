@@ -102,7 +102,7 @@ class Controller extends BaseController
         );
 
         // Done: redirect back to homepage, or AJAX
-        if ($this->request->isXhr()) {
+        if ($this->isXhrRequest()) {
             try {
                 $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 

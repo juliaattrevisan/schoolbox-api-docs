@@ -888,7 +888,7 @@ class Controller extends Assessment\Controller
     {
         $rs = $this->getResponse();
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $result['success'] = false;
             $result['message'] = $errorMessage;
 

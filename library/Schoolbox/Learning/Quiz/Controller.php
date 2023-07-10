@@ -236,7 +236,7 @@ class Controller extends AbstractController
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput(['status' => 200]));
         } elseif (isset($get['returnUrl'])) {
             $this->getResponse()->redirect->to(Redirect::decode($get['returnUrl']));

@@ -172,7 +172,7 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([]));
             return;
         }
@@ -197,7 +197,7 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([]));
             return;
         }

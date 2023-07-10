@@ -88,7 +88,7 @@ class Controller extends AbstractController
     {
         $this->saveStatus($entity, $this->requestPost['name']);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $status = [
                 'id' => $entity->getId(),
                 'update' => $this->routeGenerator->generate('sportsfixturesStatus.updateEntity', [

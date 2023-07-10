@@ -289,7 +289,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  * via the Course Creation process...
                  */
                 if ('' === trim((string)$this->requestQuery->get('part-1'))) {
-                    if ($this->getRequest()->isXhr()) {
+                    if ($this->isXhrRequest()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
                             '@learningAssessment/%s/selectionContainer.twig',
                             AssessmentType::TYPE_LESSON_PLAN
@@ -305,7 +305,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 } else {
                     $data['lessonPlanMeta']['mageAsync'] = true;
 
-                    if ($this->getRequest()->isXhr()) {
+                    if ($this->isXhrRequest()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
                             '@learningAssessment/%s/selection.twig',
                             AssessmentType::TYPE_LESSON_PLAN
@@ -329,7 +329,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  */
                 $data['lessonPlanMeta']['fields'] = $lessonPlanTemplate->getFields();
 
-                if ($this->getRequest()->isXhr()) {
+                if ($this->isXhrRequest()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(
                         "@learningAssessment/%s/create.twig",
                         AssessmentType::TYPE_LESSON_PLAN
@@ -340,7 +340,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         } else {
             // either output the fragment to the mage, or use the synchronous form
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
             } else {
                 $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
@@ -582,7 +582,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([
                 Redirect::RETURN_URL => $returnUrl
             ]));

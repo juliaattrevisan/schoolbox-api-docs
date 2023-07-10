@@ -392,7 +392,7 @@ class Kernel extends WebKernelAbstract
 
         // Post-processing: if this is a HTML request and not a redirect,
         // store this request in history.
-        $isXhr                = $controller->getRequest()->isXhr();
+        $isXhr                = $controller->isXhrRequest();
         $redirect             = $controller->getResponse()->headers->get('location');
         $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
         $isJson               = $output instanceof Json;

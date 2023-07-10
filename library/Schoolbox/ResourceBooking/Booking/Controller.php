@@ -275,7 +275,7 @@ class Controller extends Base
             $returnUrl = Redirect::decode($this->requestPost['returnUrl']);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
 
             $this->getResponse()->content->set(
@@ -405,7 +405,7 @@ class Controller extends Base
             $returnUrl = Redirect::decode($this->requestPost->get('returnUrl'));
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 [
@@ -989,7 +989,7 @@ class Controller extends Base
      */
     protected function setUpdateStatusResponse(Model $booking, $callbackUrl, $errors = [])
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode(empty($errors) ? 200 : 400);
             $this->getResponse()->content->set(
                 [

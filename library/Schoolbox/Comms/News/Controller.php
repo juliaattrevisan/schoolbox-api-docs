@@ -389,7 +389,7 @@ class Controller extends Base
          * This can occur from either the Create or Update context
          * Update the form action accordingly
          */
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Send the update page route, JS will update the window state to this
             $url = $this->routeGenerator->generate('commsNews.getUpdate', $routeParams);
             if (isset($data[Querystring::RETURN_URL])) {
@@ -473,7 +473,7 @@ class Controller extends Base
                 $nextStep = $this->routeGenerator->generate('commsNews.getIndex');
             }
 
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                     'redirect' => $nextStep
@@ -482,7 +482,7 @@ class Controller extends Base
                 $this->getResponse()->redirect->to($nextStep);
             }
         } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => false,
