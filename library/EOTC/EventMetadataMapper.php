@@ -21,7 +21,6 @@ use Schoolbox\UserMapper;
 
 class EventMetadataMapper extends BaseMapper
 {
-
     /**
      * Mapping
      */
