@@ -1,6 +1,8 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/loadLayout.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
+    /*
     TEMPLATE_SELECT_URL = "/adminv2/component/get/homepage"
 
     // Load the selected layout and insert it into the page
@@ -21,7 +23,7 @@
         document.getElementById("layoutContainer").innerHTML = responseData;
         return true;
     }
-
+    */
     // Set the selected layout in the template selector if a URL hash is present
     function setSelectedLayout() {
         if (window.location.hash) {
@@ -41,10 +43,17 @@
         });
 
         const layoutId = setSelectedLayout(); // Ensure the correct layout is selected
-        const layoutLoaded = await loadLayout(layoutId);
+        // const layoutLoaded = await loadLayout(layoutId);
+        document.dispatchEvent(new CustomEvent("MASONRY__LOAD_LAYOUT", {
+            detail: {
+                templateSelectURL:  "/adminv2/component/get/homepage",
+                layoutId,
+            }
+        }));
 
         // Initialise the masonry layout
-        if (layoutLoaded) {
+        // if (layoutLoaded) {
+        document.addEventListener("MASONRY__LAYOUT_LOADED", () => {
             document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
                 detail: {
                     settings: {
@@ -64,7 +73,7 @@
                     },
                 }
             }));
-        }
+        });
 
 
         $('[data-button=delete]').click(function(event) {
