@@ -1,10 +1,9 @@
 /**
- * Tile resizer:
- * Resizes the title within grid tiles based on the width of the tile.
- * Also adjusts tile height.
+ * Fix tile height and tile text size.
+ * Designed to be called on page load and then in response to change in tile width.
  */
 (function ($) {
-    $.fn.resizeTile = function () {
+    $.fn.fixTileHeightAndFontSize = function () {
         $(this).each(function () {
             const tile = this;
             const $tile = $(tile);

@@ -44,28 +44,25 @@
 </style>
 
 <script type="text/javascript">
-    (function($) {
-        const resizeTiles = function () {
-            $('#{{ componentId }}-tile-{{ tile.id }}').resizeTile();
-        };
+$(function () {
+    const tile = document.querySelector("#{{ componentId }}-tile-{{ tile.id }}");
 
-        $(function () {
-            // Cheat's responsive text size:
-            // Constrain font size based on width of tile
-            resizeTiles();
-            $(window).resize(resizeTiles);
+    let prevTileWidthPx = null; // Initial value null to force detection of change in width on initial page load.
 
-            // Also run the resizeTiles() after the tile contents have been expanded.
-            // This is necessary because the calculation for the new font-size depends on the tile width, and the tile width
-            // cannot be ascertained when the tile is hidden.
-            const $collapsable = $('#{{ componentId }}-tile-{{ tile.id }}').closest('.component-container').find('[data-collapsable=true]');
-            if ($collapsable.length > 0) {
-                $collapsable[0].addEventListener("expandStarted.collapsable", function () {
-                    resizeTiles();
-                });
+    const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+            const currentTileWidthPx = entry.contentRect.width;
+
+            // After initial run on page load, run resizeTile() only if width changes.
+            if (currentTileWidthPx !== prevTileWidthPx) {
+                $(entry.target).fixTileHeightAndFontSize();
+                prevTileWidthPx = currentTileWidthPx;
             }
-        });
-    })(jQuery);
+        }
+    });
+
+    resizeObserver.observe(tile);
+});
 </script>
 
 <li data-tile
