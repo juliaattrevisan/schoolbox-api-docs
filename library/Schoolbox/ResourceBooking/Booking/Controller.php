@@ -96,7 +96,7 @@ class Controller extends Base
         $booking  = (new Model())
             ->setResource($resource)
             ->setEvent(new Calendar\Event())
-            ->setName($this->request->query->get('name'))
+            ->setName($this->requestQuery->get('name'))
             ->setRelatedBookingList(new GenericCollection(Model::class));
 
         // Create datetime is unique to this method, so it can be a function.
@@ -117,12 +117,12 @@ class Controller extends Base
 
         // Was the time set here? If so set it into the booking.
         $startDate = $createDatetime(
-            $this->request->query->get('startDate'),
-            $this->request->query->get('startTime')
+            $this->requestQuery->get('startDate'),
+            $this->requestQuery->get('startTime')
         );
         $endDate   = $createDatetime(
-            $this->request->query->get('endDate'),
-            $this->request->query->get('endTime')
+            $this->requestQuery->get('endDate'),
+            $this->requestQuery->get('endTime')
         );
         if ($startDate instanceof DateTime) {
             $booking->getEvent()->setStartDateTime(new Alaress_Date_Format($startDate));
@@ -158,7 +158,7 @@ class Controller extends Base
                     'item'              => $booking,
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
-                    'returnUrl'         => $this->request->query->get('returnUrl'),
+                    'returnUrl'         => $this->requestQuery->get('returnUrl'),
                     'cancelReturnUrl'   => $this->session->getHistory(),
                     'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
@@ -660,7 +660,7 @@ class Controller extends Base
             [$item->getId()]
         );
 
-        $query = $this->getRequest()->query;
+        $query = $this->requestQuery;
 
         // When no event types are selected in the modal, query['status'] is not set.
         // We set it to an empty array here so we can handle the case of no event types selected.
@@ -771,7 +771,7 @@ class Controller extends Base
                     'item'              => $item,
                     'resource'          => $item->getResource(),
                     'campusList'        => $this->getCampusList(),
-                    'returnUrl'         => $this->getRequest()->query->get('returnUrl'),
+                    'returnUrl'         => $this->requestQuery->get('returnUrl'),
                     'cancelReturnUrl'   => $this->session->getHistory(),
                     'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
@@ -969,7 +969,7 @@ class Controller extends Base
     protected function getSeriesBookings(Model $booking)
     {
         if (
-            $this->request->query->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
+            $this->requestQuery->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
             || $this->request->post->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
         ) {
             if ($seriesId = $booking->getEvent()->getSeriesId()) {

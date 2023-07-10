@@ -207,8 +207,8 @@ class Controller extends Assessment\Controller
              */
         }
 
-        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         } else {
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }

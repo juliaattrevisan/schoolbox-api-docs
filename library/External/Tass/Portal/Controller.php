@@ -225,7 +225,7 @@ class Controller extends Alaress\Web\Controller\Base
      */
     private function getDeepLinkV2(): array
     {
-        parse_str($this->getRequest()->query->get('deep_link', ''), $deepLink);
+        parse_str($this->requestQuery->get('deep_link', ''), $deepLink);
         return $deepLink;
     }
 
@@ -239,7 +239,7 @@ class Controller extends Alaress\Web\Controller\Base
      */
     private function getProdMenu(): bool
     {
-        $prodMenu = $this->getRequest()->query->get('prod_menu', true);
+        $prodMenu = $this->requestQuery->get('prod_menu', true);
         if (\in_array($prodMenu, [false, 0, '0', 'n', 'N'], true)) {
             return false;
         }

@@ -82,7 +82,7 @@ class Controller extends Base
     {
         $pageTitle = sprintf('%s Calendar', $this->rosettaStone->translate('assessment', false, true));
 
-        $queryArgs = $this->request->query->getArrayCopy();
+        $queryArgs = $this->requestQuery->getArrayCopy();
         unset($queryArgs['page']);
 
         $inContext = false;

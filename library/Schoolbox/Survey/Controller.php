@@ -35,7 +35,7 @@ class Controller extends Base
     {
         return $this->getResponse()->content->set($this->buildJsonOutput(
             $this->surveyMapper->findByKeyword(
-                $this->getRequest()->query['query']
+                $this->requestQuery['query']
             )
         ));
     }

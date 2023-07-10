@@ -122,7 +122,7 @@ class Controller extends Base
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningBadgeAward.getAwardAsAchievementForm',
-                    ['userIds' => $this->request->query->get('userIds')]
+                    ['userIds' => $this->requestQuery->get('userIds')]
                 ),
                 [Redirect::RETURN_URL]
             )
@@ -162,7 +162,7 @@ class Controller extends Base
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningBadgeAward.getSetAsGoalForm',
-                    ['userIds' => $this->request->query->get('userIds')]
+                    ['userIds' => $this->requestQuery->get('userIds')]
                 ),
                 [Redirect::RETURN_URL]
             )
@@ -214,7 +214,7 @@ class Controller extends Base
      */
     private function getAwardBadgeForm(GenericCollection $targetUsers, string $template, string $title): void
     {
-        $queryArgs = $this->request->query->getArrayCopy();
+        $queryArgs = $this->requestQuery->getArrayCopy();
 
         // In the year level filter, select selected students' year levels and None by default
         $yearLevelFilterDefinition = Filter\Filters\Badge\YearLevel\Definition::class;
@@ -295,13 +295,13 @@ class Controller extends Base
      */
     public function getAwardWithEvidenceForm(GenericCollection $users): void
     {
-        $badgeIds = $this->request->query->get('badges') ? array_unique(array_map('intval', explode(',', $this->request->query->get('badges')))) : [];
+        $badgeIds = $this->requestQuery->get('badges') ? array_unique(array_map('intval', explode(',', $this->requestQuery->get('badges')))) : [];
         $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
         if (empty($badgeIds) || !$badges->count()) {
             $this->sendError('No badge provided');
         }
 
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL) ??
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ??
             Redirect::encode($this->routeGenerator->generate('learningBadge.getBadgeListPage'));
         $cancelUrl       = Redirect::decode($returnUrl);
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
@@ -349,7 +349,7 @@ class Controller extends Base
         foreach ($badges as $badge) {
             $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
         }
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $this->response->redirect->afterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 
@@ -369,8 +369,8 @@ class Controller extends Base
             'awardId' => $award->getId(),
             'award'   => $award,
         ]);
-        $cancelUrl       = $this->request->query->get(Redirect::RETURN_URL)
-            ? Redirect::decode($this->request->query->get(Redirect::RETURN_URL))
+        $cancelUrl       = $this->requestQuery->get(Redirect::RETURN_URL)
+            ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
             : $this->routeGenerator->generate('searchUser.getProfile', [
                 'userId' => $award->getRecipient()->getId(),
                 'user'   => $award->getRecipient(),
@@ -643,7 +643,7 @@ class Controller extends Base
      */
     public function getAchievementRecipients(Model $badge): void
     {
-        $keyword = (string)($this->getRequest()->query['query'] ?? '');
+        $keyword = (string)($this->requestQuery['query'] ?? '');
 
         /* For now, just search for student recipients
          */
@@ -666,7 +666,7 @@ class Controller extends Base
      */
     public function getGoalRecipients(Model $badge): void
     {
-        $keyword = (string)($this->getRequest()->query['query'] ?? '');
+        $keyword = (string)($this->requestQuery['query'] ?? '');
 
         /* For now, just search for student recipients
          */
@@ -781,8 +781,8 @@ class Controller extends Base
         $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
 
-        if ($this->request->query->get(Redirect::RETURN_URL)) {
-            $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         } elseif ($this->getAuthorizer()->isPathAuthorizedForUser('learningBadgeAward.getAwardWithEvidence', ['awardId' => $award->getId()])) {
             $returnUrl = Redirect::encode(
                 $this->routeGenerator->generate('learningBadgeAward.getAwardWithEvidence', [
@@ -846,8 +846,8 @@ class Controller extends Base
             'userId' => $award->getRecipient()->getId(),
             'user'   => $award->getRecipient(),
         ]);
-        if (null !== $this->request->query->get(Redirect::RETURN_URL)) {
-            $redirectUrl = Redirect::decode($this->request->query->get(Redirect::RETURN_URL));
+        if (null !== $this->requestQuery->get(Redirect::RETURN_URL)) {
+            $redirectUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         }
         $this->response->redirect->to($redirectUrl);
     }
@@ -955,7 +955,7 @@ class Controller extends Base
             null,
             $this->getUser(),
             [],
-            $this->request->query->getArrayCopy(),
+            $this->requestQuery->getArrayCopy(),
         );
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -982,7 +982,7 @@ class Controller extends Base
         // Process filters
         $page = Filter\Page\Model::PAGE_AWARD_LIST;
 
-        $qsFilters      = $this->request->query->get('filters', []);
+        $qsFilters      = $this->requestQuery->get('filters', []);
         $codec          = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
         $user           = $this->getUser();
         $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);

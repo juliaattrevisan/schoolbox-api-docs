@@ -194,7 +194,7 @@ class Controller extends AbstractController
         $entity->setDivision($context);
 
         // Was a season specified ?
-        $seasonId = $this->getRequest()->query['season'] ?? null;
+        $seasonId = $this->requestQuery['season'] ?? null;
 
         if ($seasonId) {
             try {

@@ -69,7 +69,7 @@ class Controller extends Base
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',
-                    ['userIds' => $this->request->query->get('userIds')]
+                    ['userIds' => $this->requestQuery->get('userIds')]
                 ),
                 [Redirect::RETURN_URL, 'momentType']
             )
@@ -102,7 +102,7 @@ class Controller extends Base
         // Which variant is being shown?
         // * text
         // * upload
-        $momentType = $this->request->query->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
+        $momentType = $this->requestQuery->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
         $params = [
             'users'                    => $users,
@@ -179,7 +179,7 @@ class Controller extends Base
      */
     public function getMomentsForUser(User $user): void
     {
-        $encodedCursor = $this->request->query->get('cursor');
+        $encodedCursor = $this->requestQuery->get('cursor');
         $cursor        = new Cursor($this->mapper, $user);
         $data          = $cursor->retrieveResults($encodedCursor);
         $mappedData    = $data

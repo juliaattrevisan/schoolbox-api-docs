@@ -111,7 +111,7 @@ class Controller extends BaseController
 
         $data = [
             'assessmentSpec'   => $assessment,
-            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrl'        => $this->requestQuery->get(Redirect::RETURN_URL, ''),
             'returnUrlName'    => Redirect::RETURN_URL,
             'unImported'       => $notImported,
             'imported'         => $imported,

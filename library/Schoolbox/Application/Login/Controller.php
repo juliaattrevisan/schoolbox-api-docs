@@ -60,8 +60,8 @@ class Controller extends Base
             $this->getResponse()->redirect->to('/');
         }
 
-        $samlAuth = $this->getRequest()->query->get('samlAuth');
-        $page = $page ?: $this->getRequest()->query->get('page');
+        $samlAuth = $this->requestQuery->get('samlAuth');
+        $page = $page ?: $this->requestQuery->get('page');
         $pageUri = $page ? new Uri($page) : null;
 
         // Don't output login screen if XHR request

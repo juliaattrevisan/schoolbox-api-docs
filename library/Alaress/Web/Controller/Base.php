@@ -487,7 +487,7 @@ abstract class Base
     {
         $url = new Uri($path);
         foreach ($queryStringKeys as $queryStringKey) {
-            $queryStringValue = $this->request->query->get($queryStringKey);
+            $queryStringValue = $this->requestQuery->get($queryStringKey);
             if (isset($queryStringValue)) {
                 $url = $url->appendQueryParameters([$queryStringKey => $queryStringValue]);
             }

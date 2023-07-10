@@ -57,8 +57,8 @@ class Controller extends Base
     public function getNodeUsage(Node\Model $node): void
     {
         // Fetch usage
-        $encodedCursor = $this->request->query->get('cursor');
-        $limit         = $this->request->query->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $encodedCursor = $this->requestQuery->get('cursor');
+        $limit         = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
         $cursor        = new Cursor($this->database, $node, $this->counter, $limit, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 

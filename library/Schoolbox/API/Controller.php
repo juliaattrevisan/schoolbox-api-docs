@@ -204,7 +204,7 @@ class Controller extends Base
             if ($this->isJsonRequest()) {
                 $this->assignJsonResponseForAuthenticatedUser($sessionUser);
             } else {
-                $this->assignRedirectResponseForAuthenticatedUser((string)$this->getRequest()->query->get('redirect'));
+                $this->assignRedirectResponseForAuthenticatedUser((string)$this->requestQuery->get('redirect'));
             }
         }
     }
@@ -247,7 +247,7 @@ class Controller extends Base
                 return $this->authenticateViaJwt($postData['jwt']);
             }
             if ($allowQueryStringJwt) {
-                $queryStringJwt = $this->request->query->get('jwt') ?? $this->request->query->get('id_token');
+                $queryStringJwt = $this->requestQuery->get('jwt') ?? $this->requestQuery->get('id_token');
                 if ($queryStringJwt) {
                     return $this->authenticateViaJwt($queryStringJwt);
                 }

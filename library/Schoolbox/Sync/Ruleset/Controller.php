@@ -242,7 +242,7 @@ class Controller extends Base
             $format   = 'html';
         }
 
-        $query    = $this->getRequest()->query;
+        $query    = $this->requestQuery;
         $page     = $query->get('p', 1);
         $filter   = $query->get('filter', '');
         $template = "@upsRuleset/log/$template.twig";

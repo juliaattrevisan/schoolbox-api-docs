@@ -340,7 +340,7 @@ class Controller extends AbstractController
      */
     private function getJsonList(Division $context = null)
     {
-        $query = trim($this->getRequest()->query->get('query'));
+        $query = trim($this->requestQuery->get('query'));
 
         $teams = [];
         if ($context === null) {
@@ -402,7 +402,7 @@ class Controller extends AbstractController
 
         // If the 'schools' parameter is set we also want to add schools from the tag cloud
 
-        if ((int)$this->getRequest()->query->get('schools') === 1) {
+        if ((int)$this->requestQuery->get('schools') === 1) {
             // Add schools from the tag cloud
             $schools = $this->getSchoolTagCloudMapper()->findForTag($this->getUser(), $query);
 

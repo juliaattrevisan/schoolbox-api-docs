@@ -84,7 +84,7 @@ class Controller extends Base
      */
     public function search()
     {
-        $search = trim($this->getRequest()->query['query']);
+        $search = trim($this->requestQuery['query']);
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',

@@ -156,7 +156,7 @@ class Controller extends BaseController
      */
     public function getCommentsByThread(Model $thread, IThreadLocation $context): void
     {
-        $responseData = $this->retrieveCommentList($thread, $context, $this->request->query->get('cursor'));
+        $responseData = $this->retrieveCommentList($thread, $context, $this->requestQuery->get('cursor'));
 
         // Clean-up every content before returning the result
         foreach ($responseData['data'] as $key => $data) {

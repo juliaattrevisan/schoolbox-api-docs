@@ -77,7 +77,7 @@ class Controller extends AbstractController
          */
         if (str_contains($this->psr7Request->getHeaderLine('accept'), 'application/json')) {
             // quote the query string to protect against injection and the like
-            $query = $this->getRequest()->query->get('query');
+            $query = $this->requestQuery->get('query');
 
             $pb = $this->getMapper()->getPredicateBuilder();
             $pb->like('name', "%{$this->getMapper()->getDatabase()->getQuoter()->escapeForLike($query)}%");

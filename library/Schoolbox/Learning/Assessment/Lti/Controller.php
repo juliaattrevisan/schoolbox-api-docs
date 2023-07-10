@@ -190,8 +190,8 @@ class Controller extends Assessment\Controller
                     'assessment'  => $assessment,
                     'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                                                        ->add([ $assessment->getTitle(), '' ]),
-                    'message'      => strip_tags($this->request->query->get('lti_msg', '')),
-                    'errorMessage' => strip_tags($this->request->query->get('lti_errormsg', '')),
+                    'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
+                    'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -255,9 +255,9 @@ class Controller extends Assessment\Controller
                     'participant'  => $participant,
                     'student'      => $student,
                     'timeline'     => $timeline,
-                    'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL),
-                    'message'      => strip_tags($this->request->query->get('lti_msg', '')),
-                    'errorMessage' => strip_tags($this->request->query->get('lti_errormsg', '')),
+                    'returnUrl'    => $this->requestQuery->get(Assessment\Redirect::RETURN_URL),
+                    'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
+                    'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -339,7 +339,7 @@ class Controller extends Assessment\Controller
         }
 
         // Then redir to the return URL, or the assessment's folder
-        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $this->response->redirect->afterPost(
             isset($encodedReturnUrl)
                 ? Redirect::decode($encodedReturnUrl)
@@ -520,6 +520,6 @@ class Controller extends Assessment\Controller
             $this->instance,
             $this->getConfigLoader(),
             $this->userCodec
-        ))->buildForAssessment($assessment, $currentUser, $actingUser, $this->request->query->getInt('height'));
+        ))->buildForAssessment($assessment, $currentUser, $actingUser, $this->requestQuery->getInt('height'));
     }
 }

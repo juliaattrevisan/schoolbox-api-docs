@@ -209,7 +209,7 @@ class Controller extends Base
             'termCode'  => $term->getCode(),
             'subjectId' => $subject->getId(),
         ]);
-        $request     = $this->getRequest()->query->getArrayCopy();
+        $request     = $this->requestQuery->getArrayCopy();
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $request);
 
         /* Build an markbook of assessments that:

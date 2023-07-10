@@ -183,7 +183,7 @@ class Controller extends Base
      */
     public function change()
     {
-        $queryData = $this->getRequest()->query;
+        $queryData = $this->requestQuery;
 
         $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
 
@@ -249,7 +249,7 @@ class Controller extends Base
      */
     public function newMappedRow()
     {
-        $queryData = $this->getRequest()->query;
+        $queryData = $this->requestQuery;
 
         $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
 

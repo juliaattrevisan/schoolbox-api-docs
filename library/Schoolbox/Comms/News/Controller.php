@@ -164,7 +164,7 @@ class Controller extends Base
 
         // Prefill audience
         $audienceSegments = [];
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $folderId = $params->getFolderId();
         $entityType = $params->getEntityType();
 
@@ -222,7 +222,7 @@ class Controller extends Base
      */
     public function getCreateInFolder(int $folderId): void
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $params->setFolderId($folderId);
         $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
         $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
@@ -467,8 +467,8 @@ class Controller extends Base
             /* Redirect to returnUrl if provided, otherwise to news feed.
              */
 
-            if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
-                $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
+            if ($this->requestQuery->get(Querystring::RETURN_URL)) {
+                $nextStep = Querystring::decode($this->requestQuery->get(Querystring::RETURN_URL));
             } else {
                 $nextStep = $this->routeGenerator->generate('commsNews.getIndex');
             }
@@ -548,7 +548,7 @@ class Controller extends Base
          * Even when you copy/paste a link to someone in email or instant messenger,
          * and they visit it from that place, "we" decided to  consider them as a conversion.
          */
-        $referrer = $this->request->query->get(Querystring::REFERRER);
+        $referrer = $this->requestQuery->get(Querystring::REFERRER);
 
         /* Record this Conversion/Open
          * referrer value determines what kind it was
@@ -631,12 +631,12 @@ class Controller extends Base
      */
     public function getListForHomepage(int $folderId): void
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $params->setFolderId($folderId);
 
         $partialData = $this->generatePartialForHomepage($params);
         // homepage student view
-        $partialData['readonly'] = $this->request->query->get('readonly') ?? false;
+        $partialData['readonly'] = $this->requestQuery->get('readonly') ?? false;
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
@@ -725,7 +725,7 @@ class Controller extends Base
     {
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
 
         /* Merge a whole bunch of other settings too
@@ -795,7 +795,7 @@ class Controller extends Base
      */
     public function getListForIndex(): void
     {
-        $topicSlug = $this->getRequest()->query->get(Querystring::TOPIC_SLUG);
+        $topicSlug = $this->requestQuery->get(Querystring::TOPIC_SLUG);
         $this->assertValidTopic($topicSlug);
 
         $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);
@@ -925,7 +925,7 @@ class Controller extends Base
 
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
 
         $this->assertValidFolder($params->getFolderId());
 
@@ -985,7 +985,7 @@ class Controller extends Base
             $pageTitle = $details['label'];
         }
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->request->query->get('page'));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->requestQuery->get('page'));
 
         $data = array_merge($data, $sidebar->generate());
 
@@ -1091,7 +1091,7 @@ class Controller extends Base
      */
     public function getListByTopic(?int $year, ?int $month): void
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
 
         /* The requested data set to load, given the params provided
          */
@@ -1138,7 +1138,7 @@ class Controller extends Base
      */
     public function getAuthored()
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $pageNum = $params->getPageNum();
         $status = $params->getStatus();
 
@@ -1571,7 +1571,7 @@ class Controller extends Base
      */
     private function getExplicitReturnUrl(): ?string
     {
-        $returnUrl = $this->getRequest()->query->get(Querystring::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Querystring::RETURN_URL);
         if ($returnUrl) {
             return $returnUrl;
         }

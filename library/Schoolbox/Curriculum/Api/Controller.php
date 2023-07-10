@@ -68,7 +68,7 @@ class Controller extends Base
     {
         $ancestorCount         = $this->determineAncestorCount();
         $descendantCount       = $this->determineDescendantCount();
-        $searchQuery           = trim($this->request->query->get('query') ?? '');
+        $searchQuery           = trim($this->requestQuery->get('query') ?? '');
         $searchKeywords        = explode(',', $searchQuery);
         /** @var GenericCollection|Node\Model[] $resultsForAllKeywords */
         $resultsForAllKeywords = new GenericCollection(Node\Model::class);
@@ -80,9 +80,9 @@ class Controller extends Base
                 $this->determineOffset(),
                 $ancestorCount,
                 $descendantCount,
-                $this->request->query->getBool('topLevelOnly', false),
-                $this->request->query->getInt('parentId'),
-                $this->request->query->getBool('enabled'),
+                $this->requestQuery->getBool('topLevelOnly', false),
+                $this->requestQuery->getInt('parentId'),
+                $this->requestQuery->getBool('enabled'),
             );
 
             $resultsForAllKeywords = $resultsForAllKeywords->mergeUnique($resultsForKeyword, 'id');
@@ -261,7 +261,7 @@ class Controller extends Base
     {
         return min(
             self::MAX_ANCESTORS,
-            max(0, $this->request->query->getInt('ancestors', 0)),
+            max(0, $this->requestQuery->getInt('ancestors', 0)),
         );
     }
 
@@ -276,7 +276,7 @@ class Controller extends Base
     {
         return min(
             self::MAX_DESCENDANTS,
-            max(0, $this->request->query->getInt('descendants', 0)),
+            max(0, $this->requestQuery->getInt('descendants', 0)),
         );
     }
 
@@ -291,7 +291,7 @@ class Controller extends Base
     {
         return min(
             self::MAX_LIMIT,
-            max(self::MIN_LIMIT, $this->request->query->getInt('limit', self::DEFAULT_LIMIT)),
+            max(self::MIN_LIMIT, $this->requestQuery->getInt('limit', self::DEFAULT_LIMIT)),
         );
     }
 
@@ -302,7 +302,7 @@ class Controller extends Base
      */
     private function determineOffset(): int
     {
-        return max(0, $this->request->query->getInt('offset', 0));
+        return max(0, $this->requestQuery->getInt('offset', 0));
     }
 
     /**

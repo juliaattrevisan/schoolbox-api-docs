@@ -197,8 +197,8 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
-        if ($this->request->query->get(Payload::SEB_KEY)) {
-            $this->session->set(Payload::SEB_KEY, $this->request->query->get(Payload::SEB_KEY));
+        if ($this->requestQuery->get(Payload::SEB_KEY)) {
+            $this->session->set(Payload::SEB_KEY, $this->requestQuery->get(Payload::SEB_KEY));
         }
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
             $this->psr7Request->getServerParams(),
@@ -237,7 +237,7 @@ class ListController extends Web\Controller\Base
             throw new NotFound();
         }
 
-        $q = $this->getRequest()->query;
+        $q = $this->requestQuery;
 
         if ($readOnly = $q->get('readOnly')) {
             // inject dummy to purposefully fail auth checks
@@ -368,7 +368,7 @@ class ListController extends Web\Controller\Base
 
         // Redirect to a return URL or something
         // If not provided, redirect to somewhere relevant to context
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if ($encodedReturnUrl) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
@@ -506,7 +506,7 @@ class ListController extends Web\Controller\Base
     public function getCreateAssessmentForm(AssessmentContext $context)
     {
         // check for a valid type declaration
-        if ($type = $this->getRequest()->query->get('type')) {
+        if ($type = $this->requestQuery->get('type')) {
             try {
                 // delegate to the appropriate sub-controller
                 $delegate = $this->getDelegateController($type);
@@ -520,7 +520,7 @@ class ListController extends Web\Controller\Base
         }
 
         // Did the caller request a returnUrl?
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
 
         if ($returnUrl) {
             $data[Redirect::RETURN_URL] = $returnUrl;

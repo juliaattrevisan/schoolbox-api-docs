@@ -313,7 +313,7 @@ class Controller extends Base
         }
 
         if (200 === $httpCode) {
-            $returnUrl = News\Querystring::decode($this->getRequest()->query->get(News\Querystring::RETURN_URL));
+            $returnUrl = News\Querystring::decode($this->requestQuery->get(News\Querystring::RETURN_URL));
             if ($returnUrl) {
                 $route = $returnUrl;
             } else {

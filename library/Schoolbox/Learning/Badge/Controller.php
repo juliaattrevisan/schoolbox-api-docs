@@ -144,10 +144,10 @@ class Controller extends Base
     public function getBadgeJsonList(): void
     {
         $page = Filter\Page\Model::PAGE_BADGE_LIST;
-        $allowAsGoalOnly = $this->request->query->get('sag') ? true : false;
+        $allowAsGoalOnly = $this->requestQuery->get('sag') ? true : false;
 
         // Boilerplate for getting a set of badges which match filter
-        $qsFilters      = $this->request->query->get('filters', []);
+        $qsFilters      = $this->requestQuery->get('filters', []);
         $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
         $user           = $this->getUser();
         $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
@@ -179,7 +179,7 @@ class Controller extends Base
                 ],
                 $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
             );
-            $results = $cursor->retrieveResults($this->request->query->get('cursor'));
+            $results = $cursor->retrieveResults($this->requestQuery->get('cursor'));
             $data    = $results->map($this->buildModelToArrayTranslator());
             $count   = $cursor->retrieveResultCount();
             $next    = $cursor->next($results);
@@ -221,7 +221,7 @@ class Controller extends Base
             null,
             $this->getUser(),
             [],
-            $this->request->query->getArrayCopy(),
+            $this->requestQuery->getArrayCopy(),
         );
 
         $this->response->content->set(

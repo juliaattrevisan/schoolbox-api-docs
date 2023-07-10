@@ -135,7 +135,7 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
         $route       = $this->routeGenerator->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $queryArgs   = $this->getRequest()->query->getArrayCopy();
+        $queryArgs   = $this->requestQuery->getArrayCopy();
         $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $queryArgs);
 
         $title = 'Pending Assessments';

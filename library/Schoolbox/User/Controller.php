@@ -136,7 +136,7 @@ class Controller extends Base
      */
     public function search()
     {
-        $keyword = $this->request->query['keyword'];
+        $keyword = $this->requestQuery['keyword'];
         $result = [];
 
         if ($keyword !== null) {

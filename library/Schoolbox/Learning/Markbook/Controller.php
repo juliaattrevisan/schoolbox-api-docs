@@ -91,7 +91,7 @@ class Controller extends Base
                 'folderId' => $folder->getId(),
             ]
         );
-        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        $queryArgs = $this->requestQuery->getArrayCopy();
 
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
@@ -298,7 +298,7 @@ class Controller extends Base
         // This report may take a while
         $this->extendExecutionTime();
 
-        $filtersArray = $this->request->query->getArrayCopy();
+        $filtersArray = $this->requestQuery->getArrayCopy();
         unset($filtersArray['page']);
 
         [$filters] = $this->convertRequestToFilters($filtersArray, false);

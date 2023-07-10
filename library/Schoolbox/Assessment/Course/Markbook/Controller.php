@@ -151,7 +151,7 @@ class Controller extends WebController\Base
      */
     public function getMarkbook(CourseSpec\Model $courseSpec): void
     {
-        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        $queryArgs = $this->requestQuery->getArrayCopy();
         unset($queryArgs['page']);
 
         $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
@@ -179,7 +179,7 @@ class Controller extends WebController\Base
         // This report may take a while
         $this->extendExecutionTime();
 
-        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        $queryArgs = $this->requestQuery->getArrayCopy();
         [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
 
         $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());

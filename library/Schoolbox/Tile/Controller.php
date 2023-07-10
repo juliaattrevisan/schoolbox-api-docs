@@ -161,7 +161,7 @@ class Controller extends Base
         }
 
         // Otherwise: redirect back to a return URL if there is one
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if (!empty($returnUrl)) {
             $href = Redirect::decode($returnUrl);
         } elseif ($layout->getHomepageTemplate()) {
@@ -450,7 +450,7 @@ class Controller extends Base
      */
     private function buildReturnUrl(): string
     {
-        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if (!isset($encodedReturnUrl)) {
             return '';
         }

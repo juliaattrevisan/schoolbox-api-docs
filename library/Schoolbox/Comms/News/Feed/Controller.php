@@ -79,7 +79,7 @@ class Controller extends Base
         $userFeed = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
         $this->renderArticlesAsXml(
             $userFeed->find($user, News\Model::STATE_PUBLISHED, false),
-            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
+            $this->requestQuery->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
         );
     }
 
@@ -107,7 +107,7 @@ class Controller extends Base
 
         $this->renderArticlesAsXml(
             $folderFeed->find($folder->getId()),
-            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
+            $this->requestQuery->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
         );
     }
 

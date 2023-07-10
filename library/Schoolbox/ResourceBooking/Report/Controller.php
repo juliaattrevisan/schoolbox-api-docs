@@ -73,7 +73,7 @@ class Controller extends Base
         // Default values: start of today + 1 week
         /** @var Alaress_Date_Format $start */
         $start = Alaress_Date_Format::now()->startOfDay();
-        if ($formStart = $this->getRequest()->query->get('start')) {
+        if ($formStart = $this->requestQuery->get('start')) {
             try {
                 $start = Alaress_Date_Format::newLocalShort($formStart);
             } catch (\Exception $e) {
@@ -84,7 +84,7 @@ class Controller extends Base
         /** @var Alaress_Date_Format $end */
         $end = clone $start;
         $end->addDays(7);
-        if ($formEnd = $this->getRequest()->query->get('end')) {
+        if ($formEnd = $this->requestQuery->get('end')) {
             try {
                 $end = Alaress_Date_Format::newLocalShort($formEnd);
 
@@ -105,7 +105,7 @@ class Controller extends Base
         $allCategories = array_keys($categoryList);
 
         // Filter out non-existent categories from $selectedCategories
-        $selectedCategories = $this->getRequest()->query->get('category', []);
+        $selectedCategories = $this->requestQuery->get('category', []);
         if (!empty($selectedCategories)) {
             $selectedCategories = array_intersect($selectedCategories, $allCategories);
         } else {
@@ -127,7 +127,7 @@ class Controller extends Base
         }
 
         // Build the list of events (slowly)
-        $showClasses = $this->getRequest()->query->getBool('classes', true);
+        $showClasses = $this->requestQuery->getBool('classes', true);
         $this->getApi()->add(
             $this->getApiFactory()->buildFromResourceCollection(
                 $resources,

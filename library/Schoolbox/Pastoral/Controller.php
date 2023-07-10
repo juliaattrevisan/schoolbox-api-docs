@@ -158,7 +158,7 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         $this->getResponse()->content->set(
             [
@@ -214,7 +214,7 @@ class Controller extends Base
      */
     public function getStudent(User $student): void
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         // Create an audit record of anyone viewing a student record
         // Hydrate user with group membership
@@ -292,7 +292,7 @@ class Controller extends Base
      */
     public function getLinked(User $student, User $linkedStudent): void
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         // Create an audit record of anyone viewing a student record
 
@@ -504,7 +504,7 @@ class Controller extends Base
 
         // When student ids are provided to copy this record to:
         // add all those students and their parents to the role user counts.
-        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
+        $duplicateIds = explode(',', $this->requestQuery->get('duplicates') ?? '');
         /** @var User[] $duplicates */
         $duplicates = $this->userMapper->findByColumnList([
             'id'           => $duplicateIds,
@@ -639,7 +639,7 @@ class Controller extends Base
                     'audiences'         => $audienceDefaults,
                     'students'          => json_encode($students),
                     'returnUrlName'     => Redirect::RETURN_URL,
-                    'encodedReturnUrl'  => $this->request->query->get(Redirect::RETURN_URL),
+                    'encodedReturnUrl'  => $this->requestQuery->get(Redirect::RETURN_URL),
                 ],
                 'title'    => 'Pastoral Record',
             ]
@@ -1343,18 +1343,18 @@ class Controller extends Base
     public function getActions()
     {
         // If subtype id is provided, attempt to get actions of the subtype
-        if (is_numeric($this->request->query->get('subtypeId'))) {
+        if (is_numeric($this->requestQuery->get('subtypeId'))) {
             try {
-                $subtype = $this->pastoralSubTypeMapper->findById((int)$this->request->query->get('subtypeId'));
+                $subtype = $this->pastoralSubTypeMapper->findById((int)$this->requestQuery->get('subtypeId'));
                 $actions = $subtype->getTypeActions();
             } catch (MapperException $e) {
             }
         }
 
         // If type id is provided, attempt to get actions of the type
-        if (!isset($actions) && is_numeric($this->request->query->get('typeId'))) {
+        if (!isset($actions) && is_numeric($this->requestQuery->get('typeId'))) {
             try {
-                $type    = $this->pastoralTypeMapper->findById((int)$this->request->query->get('typeId'));
+                $type    = $this->pastoralTypeMapper->findById((int)$this->requestQuery->get('typeId'));
                 $actions = $type->getTypeActions();
             } catch (MapperException $e) {
             }
@@ -1413,7 +1413,7 @@ class Controller extends Base
      */
     public function searchTags()
     {
-        $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->request->query->get('query'));
+        $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->requestQuery->get('query'));
         $data = $tags->map(function ($tag) {
             /** @var Tag\Model $tag */
             return [

@@ -129,13 +129,13 @@ class Controller extends Base\Base
                 ] : [],
             'componentId'      => $component ? $component->getId() : null,
             'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'encodedReturnUrl' => $this->requestQuery->get(Redirect::RETURN_URL),
 
             /* Go to the redirect destination if you've already imported this course
              * and you chose to cancel what you were doing
              */
             'importedAlready' => $exists,
-            'importedAlreadyRedirect' => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL)),
+            'importedAlreadyRedirect' => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL)),
         ];
 
         if (self::IMPORT_STAGE_UNITS === $initialStage) {
@@ -235,7 +235,7 @@ class Controller extends Base\Base
      */
     public function searchClasses()
     {
-        $query          = (string)$this->getRequest()->query->get('query');
+        $query          = (string)$this->requestQuery->get('query');
         $folders        = (new Destinations($this->folderMapper))->findImportable($query);
 
         /* Swap keys for selectize compatibility -_-
@@ -493,7 +493,7 @@ class Controller extends Base\Base
         /* Redirect back to wherever you came from...
          * ...hopefully (...your confidence is inspiring)
          */
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if ($encodedReturnUrl) {
             $redirect = Redirect::decode($encodedReturnUrl);
         } else {
@@ -605,7 +605,7 @@ class Controller extends Base\Base
             ],
             'unitsImpls'       => $courseImpl->getUnits(),
             'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'encodedReturnUrl' => $this->requestQuery->get(Redirect::RETURN_URL),
             'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
 
             /* You're modifying an already-imported course so don't worry about this warning

@@ -208,7 +208,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
@@ -233,7 +233,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
@@ -266,7 +266,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
@@ -347,14 +347,13 @@ class Controller extends Base
      */
     public function getUsersBySchool(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
-        $fuzzy = $rq->query->getBool('fuzzy', false);
+        $fuzzy = $this->requestQuery->getBool('fuzzy', false);
 
         try {
             $users = $this->handler->getUsersBySchool($schoolCode, $fuzzy);
@@ -380,7 +379,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
@@ -405,7 +404,7 @@ class Controller extends Base
             return;
         }
 
-        $byUsername = $rq->query->getBool('byUsername', false);
+        $byUsername = $this->requestQuery->getBool('byUsername', false);
 
         $failedUsers = $this->handler->postUserRegistrations($schoolCode, $byUsername, $post);
 
@@ -451,30 +450,29 @@ class Controller extends Base
      *
      * If not, also sets up a JSON-formatted response.
      *
-     * @param Request $request
      * @param string $schoolCode
      * @return bool
      */
-    private function isValidAuth(Request $request, string $schoolCode): bool
+    private function isValidAuth(string $schoolCode): bool
     {
         // 1. Check we have all the pieces we need
         $authHeader = $this->psr7Request->getHeaderLine('Authentication');
         if ($authHeader !== '') {
             $authDigest = $authHeader;
-        } elseif (null !== $request->query->get('digest')) {
+        } elseif (null !== $this->requestQuery->get('digest')) {
             // to support previous way of authentication
-            $authDigest = $request->query->get('digest');
+            $authDigest = $this->requestQuery->get('digest');
         } else {
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Missing authentication parameter');
             return false;
         }
-        if (null === $request->query->get('ts')) {
+        if (null === $this->requestQuery->get('ts')) {
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Missing timestamp');
             return false;
         }
 
         // 2. Check the request's timestamp
-        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($request->query->get('ts', 0));
+        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($this->requestQuery->get('ts', 0));
 
         // 3. Ensure the route is valid (ie the school-code exists)
         try {

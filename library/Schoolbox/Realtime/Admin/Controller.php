@@ -226,7 +226,7 @@ class Controller extends BaseController
      */
     public function getCreateAppForm()
     {
-        $provider = $this->getRequest()->query->get('provider');
+        $provider = $this->requestQuery->get('provider');
         $data     = ['provider' => $provider];
         switch ($provider) {
             case MobileApp\Registry::PROVIDER_APPLE:
@@ -440,7 +440,7 @@ class Controller extends BaseController
      */
     public function customConfig()
     {
-        $q = $this->getRequest()->query;
+        $q = $this->requestQuery;
 
         $config = $this->getConfig()->find($q['role'], $q['source'], $q['slug']);
 
@@ -537,7 +537,7 @@ class Controller extends BaseController
      */
     public function testPush($userId = null)
     {
-        $liveMessage = $this->request->query->getBool('live', false);
+        $liveMessage = $this->requestQuery->getBool('live', false);
         $write = fopen('php://memory', 'rb+');
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);

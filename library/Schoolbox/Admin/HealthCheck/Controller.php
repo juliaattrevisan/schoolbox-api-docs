@@ -69,7 +69,7 @@ class Controller extends Base
     {
         // Reports to be included in "all" reports
         $allReports = ['assessment', 'uxui', 'user', 'lms', 'community'];
-        $query = $this->getRequest()->query->get('report');
+        $query = $this->requestQuery->get('report');
         if ('' === trim((string)$query)) {
             //if no value was handed, just assume the user was after everything
             $query = 'all';

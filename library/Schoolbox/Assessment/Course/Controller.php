@@ -936,7 +936,7 @@ class Controller extends Base\Base
      */
     public function courseList(): void
     {
-        $query = $this->getRequest()->query;
+        $query = $this->requestQuery;
         $data = $this->getCourseData();
         $data['returnUrlKey'] = Redirect::RETURN_URL;
 
@@ -994,7 +994,7 @@ class Controller extends Base\Base
      */
     public function courseListAjax()
     {
-        $query = $this->getRequest()->query;
+        $query = $this->requestQuery;
 
         $search = $query->get('search');
         $folder = $query->get('folder');
@@ -1307,7 +1307,7 @@ class Controller extends Base\Base
      */
     public function listNodes($folderId)
     {
-        $mime = $this->getRequest()->query['mime'];
+        $mime = $this->requestQuery['mime'];
 
         if (empty($mime)) {
             $mime = '*/*';

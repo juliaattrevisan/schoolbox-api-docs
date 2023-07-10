@@ -57,7 +57,7 @@ class Controller extends Base
     {
         $filterPanel = $this->filterHelper->buildFilterPanel(
             $this->getUser(),
-            $this->request->query->getArrayCopy(),
+            $this->requestQuery->getArrayCopy(),
         );
         $this->getResponse()->content->set(
             [
@@ -86,7 +86,7 @@ class Controller extends Base
         // Save selected filters
         $this->filterHelper->saveSelections(
             $this->getUser(),
-            $this->request->query->getArrayCopy(),
+            $this->requestQuery->getArrayCopy(),
         );
 
         // Find all students in class
@@ -98,7 +98,7 @@ class Controller extends Base
         $pastoralIds = $this->filterHelper->findPastoralRecordIds(
             $this->getUser(),
             $students,
-            $this->request->query->getArrayCopy(),
+            $this->requestQuery->getArrayCopy(),
         );
 
         // Build a result
@@ -111,8 +111,8 @@ class Controller extends Base
                     $student,
                     $pastoralIds,
                     null,
-                    $this->request->query->get('sort', Cursor::SORT_OPTION_CREATED),
-                    $this->request->query->getInt('count', Cursor::LIMIT_DEFAULT),
+                    $this->requestQuery->get('sort', Cursor::SORT_OPTION_CREATED),
+                    $this->requestQuery->getInt('count', Cursor::LIMIT_DEFAULT),
                 ),
             ];
         }
@@ -141,7 +141,7 @@ class Controller extends Base
         $pastoralIds = $this->filterHelper->findPastoralRecordIds(
             $this->getUser(),
             new GenericCollection(User::class, [$student]),
-            $this->request->query->getArrayCopy(),
+            $this->requestQuery->getArrayCopy(),
         );
         $this->response->content->set(
             $this->buildJsonOutput(
@@ -149,9 +149,9 @@ class Controller extends Base
                     $folder,
                     $student,
                     $pastoralIds,
-                    $this->request->query->get('cursor'),
-                    $this->request->query->get('sort', Cursor::SORT_OPTION_CREATED),
-                    $this->request->query->getInt('count', Cursor::LIMIT_DEFAULT),
+                    $this->requestQuery->get('cursor'),
+                    $this->requestQuery->get('sort', Cursor::SORT_OPTION_CREATED),
+                    $this->requestQuery->getInt('count', Cursor::LIMIT_DEFAULT),
                 )
             ),
         );

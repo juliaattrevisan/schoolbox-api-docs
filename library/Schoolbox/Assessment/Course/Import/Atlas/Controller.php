@@ -67,7 +67,7 @@ class Controller extends BaseController
      */
     public function getImport(): void
     {
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL) ?? $this->getSession()->getHistory();
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ?? $this->getSession()->getHistory();
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@courseImportAtlas/import.twig',

@@ -197,7 +197,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getCreateAssessmentForm(AssessmentContext $context): void
     {
-        $type = $this->getRequest()->query->get('type');
+        $type = $this->requestQuery->get('type');
 
         // build a stub
         $assessment = AssessmentType::stringToObject($type, $context);
@@ -218,7 +218,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['markVisibility'] = $this->getConfigLoader()->get('submission_access');
 
         // Did the caller request a returnUrl?
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
 
         if ($returnUrl) {
             $data[Redirect::RETURN_URL] = $returnUrl;
@@ -261,7 +261,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              *
              * Embrace both the asynchronous and synchronous access mechanisms
              */
-            $templateId = trim((string)$this->getRequest()->query->get('lpt'));
+            $templateId = trim((string)$this->requestQuery->get('lpt'));
 
             /* Some metadata for the Lesson Plan workflow
              * This encapsulates the myriad of combinations which is really really awkward
@@ -288,7 +288,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  * Otherwise you need to load the container itself because you came here
                  * via the Course Creation process...
                  */
-                if ('' === trim((string)$this->getRequest()->query->get('part-1'))) {
+                if ('' === trim((string)$this->requestQuery->get('part-1'))) {
                     if ($this->getRequest()->isXhr()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
                             '@learningAssessment/%s/selectionContainer.twig',
@@ -369,7 +369,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
         $data['returnUrlName'] = Redirect::RETURN_URL;
-        $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
 
         /* Curriculum Codes prefilled from those associated with the assessment itself
          hide nodes with no codes
@@ -571,7 +571,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $postReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $postReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
 
         $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, "/homepage/{$folder->getId()}");
 

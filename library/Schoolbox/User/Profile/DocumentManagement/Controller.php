@@ -49,10 +49,10 @@ class Controller extends Base
          */
         $classificationCodes = $this->getRegisteredDocmanCategories();
 
-        if ($this->getRequest()->query->get(self::CLASSIFICATION) !== null) {
+        if ($this->requestQuery->get(self::CLASSIFICATION) !== null) {
             $classificationCodes = array_intersect(
                 $classificationCodes,
-                array_map('trim', explode(',', $this->getRequest()->query->get(self::CLASSIFICATION)))
+                array_map('trim', explode(',', $this->requestQuery->get(self::CLASSIFICATION)))
             );
         }
 

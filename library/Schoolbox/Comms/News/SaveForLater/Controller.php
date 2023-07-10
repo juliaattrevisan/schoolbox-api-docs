@@ -114,7 +114,7 @@ class Controller extends Base
             // TODO: there may remain viewable articles
         }
 
-        $params = new News\Querystring($this->getRequest()->query);
+        $params = new News\Querystring($this->requestQuery);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order' => ['publish_at' => 'desc']]);
         $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));

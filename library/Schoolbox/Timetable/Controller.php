@@ -90,10 +90,10 @@ class Controller extends Base
      */
     public function dateForTimetableDay()
     {
-        $campus    = $this->request->query['campus'];
-        $dayNumber = $this->request->query['day'];
-        $date      = strtotime($this->request->query['date']);
-        $previous  = $this->request->query['previous'];
+        $campus    = $this->requestQuery['campus'];
+        $dayNumber = $this->requestQuery['day'];
+        $date      = strtotime($this->requestQuery['date']);
+        $previous  = $this->requestQuery['previous'];
         $code      = 200;
         $error     = '';
         if ($date === false) {

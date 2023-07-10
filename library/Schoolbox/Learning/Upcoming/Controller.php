@@ -334,7 +334,7 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         $accessibleFolderIds = $this->getFolderIdsAccessibleToUser($student);
-        $request             = $this->request->query->get('filters', []);
+        $request             = $this->requestQuery->get('filters', []);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
@@ -359,8 +359,8 @@ class Controller extends Base
         $visibility = new Visibility($this->access);
 
         // User must have provided a start and end date: error out otherwise
-        $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-        $end   = filter_var($this->request->query->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $start = filter_var($this->requestQuery->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $end   = filter_var($this->requestQuery->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         if (!isset($start, $end)) {
             // No you don't throw any exception: only ApplicationException
             /** @noinspection PhpUnhandledExceptionInspection */

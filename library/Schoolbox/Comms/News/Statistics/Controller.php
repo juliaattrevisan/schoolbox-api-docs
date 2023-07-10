@@ -88,7 +88,7 @@ class Controller extends Base
             /* Scale selector
              */
             'scaleOptions' => News\Statistics\Scale\Factory::SCALE_OPTIONS,
-            'scale' => News\Statistics\Scale\Factory::assertScale($this->getRequest()->query->get('scale')),
+            'scale' => News\Statistics\Scale\Factory::assertScale($this->requestQuery->get('scale')),
 
             /* Historical Dailies
              * Temporarily disabled
@@ -114,7 +114,7 @@ class Controller extends Base
     public function getInteractionsVsTime(News\Model $article): void
     {
         $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
-        $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
+        $scale = News\Statistics\Scale\Factory::assertScale($this->requestQuery['scale']);
 
         $output = [
             'interactions' => $interactions->fetchOpensVsTime($article, $scale),

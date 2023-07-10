@@ -316,8 +316,8 @@ class Controller extends Assessment\Controller
             return;
         }
 
-        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         } else {
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
@@ -444,7 +444,7 @@ class Controller extends Assessment\Controller
             throw new NotFound();
         }
 
-        $userIds = $this->getRequest()->query->get('userIds');
+        $userIds = $this->requestQuery->get('userIds');
         $userIds = array_map(
             // Convert strings to integers to avoid problems later.
             static function ($v) {
@@ -463,7 +463,7 @@ class Controller extends Assessment\Controller
 
         // Return whence we came,
         // or to the assessment's status page if not specified
-        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $returnUrl        = isset($encodedReturnUrl)
             ? Redirect::decode($encodedReturnUrl)
             : $this->routeGenerator->generate(
@@ -825,8 +825,8 @@ class Controller extends Assessment\Controller
         $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
 
-        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         } else {
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }

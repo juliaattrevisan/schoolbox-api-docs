@@ -130,7 +130,7 @@ class Controller extends Web\Controller\Base
             $folder->getYearLevels()?->first()?->getName(),
         );
 
-        $roleTypeOverride = $this->request->query->get('role-type');
+        $roleTypeOverride = $this->requestQuery->get('role-type');
 
         $report = new Report(
             $this->getConfigLoader(),

@@ -561,7 +561,7 @@ class Controller extends Base
      */
     public function getComponentCallback($component)
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         //null coalesce as if this does not match any 'valid' response, it will throw an exception
         $return_type = $get['return_type'] ?? null;

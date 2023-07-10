@@ -108,7 +108,7 @@ class Controller extends AbstractController
     public function getQuizSummary($assessmentId)
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
         $this->getResponse()->redirect->to("/assess/summary/$assessId{$redirect}");
     }
@@ -126,7 +126,7 @@ class Controller extends AbstractController
     public function getQuizSectionCreate($assessmentId)
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
         $this->getResponse()->redirect->to("/assess/section/create/$assessId{$redirect}");
     }
@@ -160,7 +160,7 @@ class Controller extends AbstractController
     public function getQuizIntro($assessmentId)
     {
         $returnUrlSuffix = "?returnUrl=" .
-            ($this->getRequest()->query->get('returnUrl') ?: Redirect::encode(RequestUriParser::parseUrlPath($this->psr7Request->getServerParams())));
+            ($this->requestQuery->get('returnUrl') ?: Redirect::encode(RequestUriParser::parseUrlPath($this->psr7Request->getServerParams())));
 
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $this->getResponse()->redirect->to("/assess/intro/$assessId" . $returnUrlSuffix);
@@ -187,7 +187,7 @@ class Controller extends AbstractController
      */
     public function getExportAttempts($assessmentId)
     {
-        $format = strtolower($this->getRequest()->query->get('format'));
+        $format = strtolower($this->requestQuery->get('format'));
         if (!in_array($format, ['csv', 'xml'])) {
             throw new \InvalidArgumentException("Unsupported export format: $format");
         }
@@ -225,7 +225,7 @@ class Controller extends AbstractController
      */
     public function postQuizSubmit()
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
         $post = $this->getRequest()->post;
 
         try {

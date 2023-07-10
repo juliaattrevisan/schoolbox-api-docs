@@ -173,8 +173,8 @@ class Controller extends Assessment\Controller
             'assessmentStats'  => $assessmentStats,
             'participantStats' => $participantStats,
             'returnUrl'        =>
-                $this->getRequest()->query->get(Redirect::RETURN_URL)
-                    ? Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
+                $this->requestQuery->get(Redirect::RETURN_URL)
+                    ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
                     : $this->getSession()->getHistory(),
         ];
 

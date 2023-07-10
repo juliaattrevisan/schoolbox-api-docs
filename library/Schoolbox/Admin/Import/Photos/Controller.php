@@ -157,7 +157,7 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $surname = $this->getRequest()->query['surname'] ?? '';
+        $surname = $this->requestQuery['surname'] ?? '';
 
         /* If a letter was requested in the url, sanitise it
          */

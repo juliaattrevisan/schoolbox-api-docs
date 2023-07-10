@@ -126,7 +126,7 @@ class Controller extends Base
      */
     public function getMarkbook(Folder\Model $folder): void
     {
-        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        $queryArgs = $this->requestQuery->getArrayCopy();
         unset($queryArgs['page']);
 
         $page        = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
@@ -158,7 +158,7 @@ class Controller extends Base
         // This report may take a while
         $this->extendExecutionTime();
 
-        $queryArgs = $this->request->query->getArrayCopy();
+        $queryArgs = $this->requestQuery->getArrayCopy();
         unset($queryArgs['page']);
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $queryArgs);
 

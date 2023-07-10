@@ -68,7 +68,7 @@ class Controller extends Base
      */
     public function getCreateMail()
     {
-        $this->createMail($this->request->query);
+        $this->createMail($this->requestQuery);
     }
 
     /**

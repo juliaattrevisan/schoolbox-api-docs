@@ -158,7 +158,7 @@ class Controller extends Base
      */
     private function buildEventOutput(): array
     {
-        $qsFilters      = $this->request->query->get('filters', []);
+        $qsFilters      = $this->requestQuery->get('filters', []);
         $page           = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
         $codec          = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $user           = $this->getUser();
@@ -166,13 +166,13 @@ class Controller extends Base
         $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
 
         // Store the filters this user selected
-        if (!$this->request->query->get('inContext') || $this->request->query->get('inContext') !== 'true') {
+        if (!$this->requestQuery->get('inContext') || $this->requestQuery->get('inContext') !== 'true') {
             $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
         }
 
         // User must have provided a start and end date: error out otherwise
-        $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-        $end   = filter_var($this->request->query->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $start = filter_var($this->requestQuery->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $end   = filter_var($this->requestQuery->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         if (!isset($start, $end)) {
             // No you don't throw any exception: only ApplicationException
             /** @noinspection PhpUnhandledExceptionInspection */

@@ -86,7 +86,7 @@ class Controller extends Base
     {
         // Build the registration repository, then get a registration out of it:
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/interfaces/#registration-repository-interface
-        $registration = $this->buildRegistrationRepository()->find($this->request->query->get('registration'));
+        $registration = $this->buildRegistrationRepository()->find($this->requestQuery->get('registration'));
         if (!$registration) {
             $this->sendError('Registration not found');
         }
@@ -95,9 +95,9 @@ class Controller extends Base
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#create-the-message
         $message = (new MessageFactory($this->userMapper, $registration))
             ->build(
-                $this->request->query->get('loginHint'),
-                $this->request->query->get('messageType'),
-                $this->request->query->get('targetUrl'),
+                $this->requestQuery->get('loginHint'),
+                $this->requestQuery->get('messageType'),
+                $this->requestQuery->get('targetUrl'),
                 (string)(new Factory($this->getConfigLoader()))
                     ->buildFullyQualified()
                     ->withScheme('https')

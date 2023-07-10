@@ -67,9 +67,9 @@ class Controller extends Base
 
         // Get the list of items
         $query    = [];
-        $catId    = $this->getRequest()->query->get('category');
-        $search   = trim($this->getRequest()->query->get('search') ?? '');
-        $page     = max(intval($this->getRequest()->query->get('page')), 1);
+        $catId    = $this->requestQuery->get('category');
+        $search   = trim($this->requestQuery->get('search') ?? '');
+        $page     = max(intval($this->requestQuery->get('page')), 1);
         $category = $this->mapper->getJoinMapper('category')->createModel();
         $category->setName('All');
 
@@ -140,8 +140,8 @@ class Controller extends Base
      */
     public function search(): void
     {
-        $excludedId = $this->getRequest()->query->get('thisId');
-        $search     = trim($this->getRequest()->query->get('query'));
+        $excludedId = $this->requestQuery->get('thisId');
+        $search     = trim($this->requestQuery->get('query'));
         $data       = $this->mapper->search($search)
                            ->filter(function (Model $item) use ($excludedId) {
                                return $item->getId() != $excludedId;
@@ -193,7 +193,7 @@ class Controller extends Base
     public function read(Model $item): void
     {
         // Show a given view and date
-        $calendarDate = $this->request->query->get('date') ? DateTime::createFromFormat('d-m-Y', $this->request->query->get('date')) : null;
+        $calendarDate = $this->requestQuery->get('date') ? DateTime::createFromFormat('d-m-Y', $this->requestQuery->get('date')) : null;
         if (!($calendarDate instanceof DateTime)) {
             $calendarDate = new DateTime('now');
         }
@@ -204,7 +204,7 @@ class Controller extends Base
                     'item'         => $item,
                     'currentTerm'  => $this->termMapper->findForToday(),
                     'selectedDate' => $calendarDate->format('Y-m-d'),
-                    'calendarView' => $this->request->query->get('view') === 'day' ? 'timeGridDay' : '',
+                    'calendarView' => $this->requestQuery->get('view') === 'day' ? 'timeGridDay' : '',
                     'token'        => $this->getUser()->getKey(),
                 ],
             ]

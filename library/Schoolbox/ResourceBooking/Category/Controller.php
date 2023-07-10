@@ -55,7 +55,7 @@ class Controller extends Base
     public function browse()
     {
 
-        $page  = max(intval($this->getRequest()->query->get('page')), 1);
+        $page  = max(intval($this->requestQuery->get('page')), 1);
         $total = $this->mapper->countAll();
         $this->paginator->setTotal($total);
 
@@ -124,7 +124,7 @@ class Controller extends Base
     public function read(Model $category)
     {
         try {
-            $calendarDate = \Alaress_Date_Format::newUrlDate($this->request->query->get('date'));
+            $calendarDate = \Alaress_Date_Format::newUrlDate($this->requestQuery->get('date'));
         } catch (\Exception $e) {
             $calendarDate = \Alaress_Date_Format::now();
         }
@@ -150,7 +150,7 @@ class Controller extends Base
                     'resources'     => $resources,
                     'calendar' => [
                         'date' => $calendarDate->getDatabase(),
-                        'view' => $this->request->query->get('view', 'week'),
+                        'view' => $this->requestQuery->get('view', 'week'),
                     ],
                     'token' => $this->getUser()->getKey()
                 ],
@@ -234,13 +234,13 @@ class Controller extends Base
                 ['order' => ['name' => 'asc',]]
             ),
             true,
-            $this->getRequest()->query['status']
+            $this->requestQuery['status']
         );
         // put the results into a renderer
         $calendar = new Renderer(
             $source,
-            (int)$this->getRequest()->query->get('start'),
-            (int)$this->getRequest()->query->get('end'),
+            (int)$this->requestQuery->get('start'),
+            (int)$this->requestQuery->get('end'),
             $this->getUser(),
             $this->getAuthorizer(),
             $this->routeGenerator,
