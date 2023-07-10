@@ -6,6 +6,7 @@
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
+import type { TableOptions } from "@schoolboxVue/components/vueTables2/types/vueTables2Types";
 import { getOptions } from "./getDataTableOptions";
 import { getTemplates } from "./templates/getTemplates";
 import DataTableImage from "./templates/data-table-image.vue";
@@ -13,9 +14,10 @@ import DataTableLink from "./templates/data-table-link.vue";
 import type { ColumnConfig, ImageComponentData, LinkComponentData } from "./types/dataTableTypes";
 
 interface Props {
+    title: string; // the title of the table
     endpoint: string; // the endpoint to retrieve all the staff data from
     columnsConfig: ColumnConfig[]; // the columns to display in the table
-    tableOptions: object; // the configuration for the vue-tables-2 component
+    tableOptions: TableOptions; // the configuration for the vue-tables-2 component
 }
 const props = defineProps<Props>();
 
@@ -65,7 +67,7 @@ async function onLoaded() {
     <div class="row">
         <div class="small-12 columns">
             <loading-table v-if="isLoading" />
-            <data-load-error v-else-if="hasLoadError" data-title="Staff Directory" />
+            <data-load-error v-else-if="hasLoadError" :data-title="props.title" />
             <v-client-table :data="data" :columns="columns" :options="options" @loaded="onLoaded">
                 <template v-for="slot in templates" :key="slot.key" #[slot.key]="tableData">
                     <template v-if="slot.component === 'image'">

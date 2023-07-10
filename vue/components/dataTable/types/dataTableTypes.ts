@@ -38,7 +38,8 @@ export interface ImageComponentData {
 }
 
 /**
- * The data thats loaded into the table
+ * The json data thats loaded into the table,
+ * as this can vary, its just a key value pair of strings
  */
 export interface Data {
     [key: string]: unknown;

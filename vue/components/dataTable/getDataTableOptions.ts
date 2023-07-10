@@ -4,6 +4,7 @@
  */
 
 import getDefaultOptions from "@schoolboxVue/components/vueTables2/getDefaultOptions";
+import type { TableOptions } from "@schoolboxVue/components/vueTables2/types/vueTables2Types";
 import type { ColumnConfig } from "./types/dataTableTypes";
 
 /**
@@ -11,12 +12,12 @@ import type { ColumnConfig } from "./types/dataTableTypes";
  * @param {ColumnConfig[]} columnConfig - the configuration for the columns
  * @returns {object} the columns that have custom classes linked
  */
-function getColumnClasses(columnConfig: ColumnConfig[]) {
-    const columnClasses = columnConfig.reduce((accumulator: object, column: ColumnConfig) => {
+function getColumnsClasses(columnConfig: ColumnConfig[]) {
+    const columnsClasses = columnConfig.reduce((accumulator: object, column: ColumnConfig) => {
         accumulator[column.key] = column.class;
         return accumulator;
     }, {});
-    return { columnClasses };
+    return { columnsClasses };
 }
 
 /**
@@ -50,15 +51,15 @@ function getSortable(columnConfig: ColumnConfig[]) {
 /**
  *
  * @param {ColumnConfig} columnConfig - the configuration for the columns
- * @param {object} tableOptions - the options passed to the vue-tables-2 component
- * @returns {object} the configuration for the vue-tables-2 component
+ * @param {tableOptions} tableOptions - the options passed to the vue-tables-2 component
+ * @returns {TableOptions} the configuration for the vue-tables-2 component
  */
-export function getOptions(columnConfig: ColumnConfig[], tableOptions: object) {
+export function getOptions(columnConfig: ColumnConfig[], tableOptions: TableOptions) {
     return {
         ...getDefaultOptions(),
-        ...getColumnClasses(columnConfig),
+        ...getColumnsClasses(columnConfig),
         ...getHeadings(columnConfig),
-        ...tableOptions,
         ...getSortable(columnConfig),
+        ...tableOptions,
     };
 }
