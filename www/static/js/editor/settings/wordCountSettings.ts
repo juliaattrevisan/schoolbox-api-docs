@@ -162,15 +162,14 @@ function addListenersForDisablingSubmitButtons(
  * @param { EditorConfig } config - the CKEditor config object
  * @param { HTMLDivElement } wordCountContainer - the word count container
  */
-function updateWordCount(
+function setupOnUpdateTextEventHandler(
     sourceElement: HTMLElement,
     editor: ClassicEditor,
     config: EditorConfig,
     wordCountContainer: HTMLDivElement
 ) {
-    // if the max character count is -1 then we don't want to show the character count as the limit is disabled
-    if (config.maxCharCount === -1) {
-        return;
+    if (config.maxCharCount !== undefined || config.maxCharCount <= 0) {
+        throw new Error('No maxCharCount has been set, so this function should not have been called.');
     }
 
     const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
@@ -182,66 +181,47 @@ function updateWordCount(
      * Each time the text is updated, check whether the maxCharCount is exceeded or is no longer exceeded.
      */
     function onUpdateText() {
-        if (config.maxCharCount !== undefined && config.maxCharCount > 0) {
-            const currentByteLength = textEncoder.encode(editor.getData()).length;
-            const currentProportionOfMaxLength = currentByteLength / config.maxCharCount;
-            const currentPercentageOfMaxLength = (currentProportionOfMaxLength * 100).toFixed(2);
+        const currentByteLength = textEncoder.encode(editor.getData()).length;
+        const currentProportionOfMaxLength = currentByteLength / config.maxCharCount;
+        const currentPercentageOfMaxLength = (currentProportionOfMaxLength * 100).toFixed(2);
 
-            characterCountElement.innerText = `Size: ${currentPercentageOfMaxLength}% of limit`;
+        characterCountElement.innerText = `Size: ${currentPercentageOfMaxLength}% of limit`;
 
-            // Thresholds:
-            // if < 90% full, hide the limit notice
-            // if 90-100% full, show the limit but hide the exceeded error
-            // if > 100% full, show the limit and the exceeded error
-            if (currentProportionOfMaxLength > 0.9) {
-                characterCountElement.style.display = "block";
-                limitWarningElement.style.display = "block";
-                if (!config.showWordCount) {
-                    wordCountContainer.style.display = "flex";
-                }
-            } else {
-                characterCountElement.style.display = "none";
-                limitWarningElement.style.display = "none";
-                if (!config.showWordCount) {
-                    wordCountContainer.style.display = "none";
-                }
+        // Thresholds:
+        // if < 90% full, hide the limit notice
+        // if 90-100% full, show the limit but hide the exceeded error
+        // if > 100% full, show the limit and the exceeded error
+        if (currentProportionOfMaxLength > 0.9) {
+            characterCountElement.style.display = "block";
+            limitWarningElement.style.display = "block";
+            if (!config.showWordCount) {
+                wordCountContainer.style.display = "flex";
             }
-
-            if (currentProportionOfMaxLength > 1) {
-                limitExceededElement.style.display = "inline";
-                sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
-                wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "1");
-            } else {
-                limitExceededElement.style.display = "none";
-
-                // Remember the previous value of data-maxCharCountExceededAtLastCheck before updating the value.
-                // (We have just re-run the check, and found the max char count is no longer exceeded).
-                const prevValue = wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck");
-
-                // Update the value of data-maxCharCountExceededAtLastCheck before firing the no-longer-exceeded event.
-                wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
-
-                if (prevValue === "1") {
-                    sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
-                }
+        } else {
+            characterCountElement.style.display = "none";
+            limitWarningElement.style.display = "none";
+            if (!config.showWordCount) {
+                wordCountContainer.style.display = "none";
             }
         }
-    }
 
-    // Default event listeners should be added by default (obviously).
-    if (config.addMaxCharCountDefaultEventListeners === undefined) {
-        config.addMaxCharCountDefaultEventListeners = true;
-    }
+        if (currentProportionOfMaxLength > 1) {
+            limitExceededElement.style.display = "inline";
+            sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
+            wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "1");
+        } else {
+            limitExceededElement.style.display = "none";
 
-    if (config.addMaxCharCountDefaultEventListeners) {
-        const containingForm = sourceElement.closest("form");
-        const submitButtons: Array<HTMLButtonElement|HTMLInputElement> =
-            containingForm === null
-                ? []
-                : Array.from(containingForm.querySelectorAll("input[type=submit], button[type=submit]"));
+            // Remember the previous value of data-maxCharCountExceededAtLastCheck before updating the value.
+            // (We have just re-run the check, and found the max char count is no longer exceeded).
+            const prevValue = wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck");
 
-        if (submitButtons.length > 0) {
-            addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
+            // Update the value of data-maxCharCountExceededAtLastCheck before firing the no-longer-exceeded event.
+            wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
+
+            if (prevValue === "1") {
+                sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
+            }
         }
     }
 
@@ -320,12 +300,30 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
         wordCountContainer.style.display = "none";
     }
 
-    updateWordCount(sourceElement, editor, config, wordCountContainer);
+    // We only need to set up the maxCharCount-related event handlers if config.maxCharCount is enabled.
+    if (config.maxCharCount !== undefined && config.maxCharCount !== -1) {
+        setupOnUpdateTextEventHandler(sourceElement, editor, config, wordCountContainer);
 
-    const containingForm = sourceElement.closest('form');
+        // Default event listeners should be added by default (obviously).
+        if (config.addMaxCharCountDefaultEventListeners === undefined) {
+            config.addMaxCharCountDefaultEventListeners = true;
+        }
 
-    // If the editor is contained withing a form...
-    if (containingForm !== null) {
+        if (config.addMaxCharCountDefaultEventListeners) {
+            const containingForm = sourceElement.closest("form");
+            const submitButtons: Array<HTMLButtonElement|HTMLInputElement> =
+                containingForm === null
+                    ? []
+                    : Array.from(containingForm.querySelectorAll("input[type=submit], button[type=submit]"));
+
+            if (submitButtons.length > 0) {
+                addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
+            }
+        }
+    }
+
+    // If the editor is contained within a form...
+    if (sourceElement.closest('form') !== null) {
         // NOTE: The below line may be called multiple times (if multiple editors are added to a page), but the repeated
         //       calls will not cause the event listener to be added multiple times.  This would be different if the
         //       function was defined inside the call below.
