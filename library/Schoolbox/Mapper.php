@@ -148,6 +148,13 @@ abstract class Mapper implements IMapper
     protected IConnector $database;
 
     /**
+     * Read Only Connector
+     *
+     * @var IConnector
+     */
+    protected IConnector $databaseRead;
+
+    /**
      * @var string
      */
     protected $table;
@@ -456,6 +463,13 @@ abstract class Mapper implements IMapper
         } catch (DatabaseException $e) {
             $this->database = new NullConnector();
         }
+
+        //Read Only DB
+        try {
+            $this->databaseRead = Factory::getInstanceInternalRead();
+        } catch (DatabaseException $e) {
+            $this->databaseRead = new NullConnector();
+        }
     }
 
     /**
@@ -645,6 +659,29 @@ abstract class Mapper implements IMapper
     public function getDatabase(): IConnector
     {
         return $this->database;
+    }
+
+    /**
+     * Read Only DB
+     *
+     * @param  IConnector $database
+     *
+     * @return $this
+     */
+    public function setDatabaseRead($database)
+    {
+        $this->databaseRead = $database;
+        return $this;
+    }
+
+    /**
+     * Read Only DB
+     *
+     * @return IConnector
+     */
+    public function getDatabaseRead(): IConnector
+    {
+        return $this->databaseRead;
     }
 
     /**
@@ -2162,7 +2199,7 @@ abstract class Mapper implements IMapper
      */
     public function findByColumnList($columnList, $options = array())
     {
-        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabaseRead()->getQuoter(), $this->getTable()), $columnList, $options);
     }
 
     /**
@@ -2323,7 +2360,7 @@ abstract class Mapper implements IMapper
             'order'   => $this->getDefaultOrderByParams(),
         );
         $options      = array_merge($defaults, $options);
-        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
+        $quoted_table = $this->databaseRead->getQuoter()->quoteIdentifier($this->table);
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
@@ -2349,7 +2386,7 @@ abstract class Mapper implements IMapper
 
         // Build ORDER BY part
         if (isset($options['order']) && \is_array($options['order']) && count($options['order'])) {
-            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database->getQuoter());
+            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->databaseRead->getQuoter());
         }
 
         // Build LIMIT and OFFSET part (should bind as parameters instead)
@@ -2372,7 +2409,7 @@ abstract class Mapper implements IMapper
 
         $this->monitor->startExecuteSelectTimer($this, $predicate);
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         foreach ($params as $name => $value) {
             $statement->bindValue($name, $value);
         }
@@ -2463,7 +2500,7 @@ abstract class Mapper implements IMapper
     protected function getSelectString()
     {
         // in the core mapper this is quite trivial, but implementing classes can override
-        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
+        $quoted_table = $this->databaseRead->getQuoter()->quoteIdentifier($this->table);
         return "SELECT {$this->getColumnString()} FROM $quoted_table";
     }
 
@@ -2626,7 +2663,7 @@ abstract class Mapper implements IMapper
             $from = "FROM {$this->getTable()}";
         }
 
-        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
+        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabaseRead()->getQuoter(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
 
@@ -2826,7 +2863,7 @@ abstract class Mapper implements IMapper
     {
         $selection = implode(', ', array_map(function ($column) {
             return implode('.', array_map(function ($v) {
-                return $this->database->getQuoter()->quoteIdentifier($v);
+                return $this->databaseRead->getQuoter()->quoteIdentifier($v);
             }, [ $this->getTable(), $column ]));
         }, $columnList));
 
@@ -4156,7 +4193,7 @@ abstract class Mapper implements IMapper
         }
 
         $mappedFields = array_keys($mappedFields);
-        $stmt         = $this->getDatabase()->query("SHOW COLUMNS FROM {$this->table}");
+        $stmt         = $this->getDatabaseRead()->query("SHOW COLUMNS FROM {$this->table}");
         $knownFields  = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         return array_values(array_diff($knownFields, $mappedFields));

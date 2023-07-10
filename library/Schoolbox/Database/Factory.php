@@ -35,6 +35,13 @@ class Factory
     protected static $connectorInternal;
 
     /**
+     * Read Only DB
+     *
+     * @return IConnector
+     */
+    protected static $connectorInternalRead;
+
+    /**
      * An instance of this object
      *
      * @deprecated
@@ -93,6 +100,21 @@ class Factory
         }
 
         return self::$connectorInternal;
+    }
+
+    /**
+     * Retrieves static instance of internal Read only database connection.
+     *
+     * @return IConnector
+     * @throws DatabaseException
+     */
+    public static function getInstanceInternalRead(): IConnector
+    {
+        if (!isset(self::$connectorInternalRead)) {
+            self::$connectorInternalRead = self::getInstance()->getInternalReadDatabase();
+        }
+
+        return self::$connectorInternalRead;
     }
 
     /**
