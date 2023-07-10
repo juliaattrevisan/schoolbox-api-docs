@@ -157,7 +157,7 @@ class Controller extends Base
      */
     public function postApiTest()
     {
-        $post = $this->getRequest()->post->getArrayCopy();
+        $post = $this->requestPost->getArrayCopy();
 
         $schoolCode = $post['schoolCode'];
         $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
@@ -263,16 +263,13 @@ class Controller extends Base
      */
     public function postFolderAccessBySchool(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
-        $post = $rq->post;
-
-        if (empty($post['course'])) {
+        if (empty($this->requestPost['course'])) {
             // empty payload: do nothing
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "No 'course' parameter found");
             return;
@@ -290,7 +287,7 @@ class Controller extends Base
          *       - a list of email addresses to unenrol from that folder
          */
 
-        foreach ($post['course'] as $folderId => $enrolments) {
+        foreach ($this->requestPost['course'] as $folderId => $enrolments) {
             if (!in_array($folderId, $courseIds)) {
                 /*
                  * Business rule: A request that specifies folder IDs that do not belong to the school given returns 403
@@ -396,9 +393,7 @@ class Controller extends Base
 
 
         // process the payload
-        $post = $rq->post;
-
-        if (empty($post['user'])) {
+        if (empty($this->requestPost['user'])) {
             // empty payload: do nothing
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "No 'user' parameter provided");
             return;
@@ -406,7 +401,11 @@ class Controller extends Base
 
         $byUsername = $this->requestQuery->getBool('byUsername', false);
 
-        $failedUsers = $this->handler->postUserRegistrations($schoolCode, $byUsername, $post);
+        $failedUsers = $this->handler->postUserRegistrations(
+            $schoolCode,
+            $byUsername,
+            $this->requestPost,
+        );
 
         if (\count($failedUsers)) {
             // just blame the client :P

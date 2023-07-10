@@ -93,7 +93,7 @@ class Controller extends Base
     public function restoreFolder()
     {
         $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
-        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->folderMapper, [$this->getRequest()->post['id']]);
+        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->folderMapper, [$this->requestPost['id']]);
         $db = $this->folderMapper->getDatabase();
         $db->beginTransaction();
         try {
@@ -115,7 +115,7 @@ class Controller extends Base
     public function restoreAssessment()
     {
         $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
-        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->assessmentMapper, [$this->getRequest()->post['id']]);
+        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->assessmentMapper, [$this->requestPost['id']]);
         $db = $this->assessmentMapper->getDatabase();
         $db->beginTransaction();
         try {

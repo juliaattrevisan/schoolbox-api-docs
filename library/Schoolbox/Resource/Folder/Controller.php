@@ -384,7 +384,7 @@ class Controller extends BaseController
     public function postUpdateFolder(Model $folder): void
     {
         $errorMapper = $this->errorMapper;
-        $post        = $this->getRequest()->post->getArrayCopy();
+        $post        = $this->requestPost->getArrayCopy();
 
         /** No whitespace in the codes or year levels please **/
         $classCodes = array_filter(array_map('trim', explode(',', $post['code'] ?? '')));
@@ -413,7 +413,7 @@ class Controller extends BaseController
             if ($model->getInherit()) {
                 $newLocation = $this->getSession()->getHistory(2);
             } else {
-                $newLocation = $this->createGroup($this->getRequest()->post, $model, $this->getUser());
+                $newLocation = $this->createGroup($this->requestPost, $model, $this->getUser());
             }
 
             $this->getResponse()->redirect->afterPost($newLocation);

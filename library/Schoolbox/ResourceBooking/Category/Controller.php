@@ -104,7 +104,7 @@ class Controller extends Base
      */
     public function create()
     {
-        $post  = $this->getRequest()->post;
+        $post  = $this->requestPost;
         $model = new Model();
         $model->setName($post['name']);
         $this->getMapper()->save($model);
@@ -185,7 +185,7 @@ class Controller extends Base
      */
     public function update(Model $category): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $category->setName($post['name']);
         $this->getMapper()->save($category);
         // Return something.

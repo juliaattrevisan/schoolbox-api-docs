@@ -121,7 +121,7 @@ class Controller extends Base
     public function createRequest()
     {
         $this->validateAccess();
-        $emailAddress = $this->getRequest()->post->get('email');
+        $emailAddress = $this->requestPost->get('email');
         $sessionSegment = $this->getSessionSegment();
         $sessionSegment->setFlash('isEmailSubmitted', true);
 
@@ -150,8 +150,8 @@ class Controller extends Base
     {
         $this->validateAccess();
         $this->validateResetRequest($reset);
-        $password = $this->getRequest()->post->get('new_password', '');
-        $confirm = $this->getRequest()->post->get('confirm_password', '');
+        $password = $this->requestPost->get('new_password', '');
+        $confirm = $this->requestPost->get('confirm_password', '');
 
         // Verify that passwords match format and each other
         if ($reset->getUser() && $password === $confirm && mb_strlen($password, 'UTF-8') >= 8) {

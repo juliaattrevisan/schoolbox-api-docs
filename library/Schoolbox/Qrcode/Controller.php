@@ -88,8 +88,8 @@ class Controller extends Base
      */
     public function generate(Folder $folder): void
     {
-        $destination = $this->request->post->get('destination') ?? null;
-        $expiryMonth = $this->request->post->get('expiry') ?? null;
+        $destination = $this->requestPost->get('destination') ?? null;
+        $expiryMonth = $this->requestPost->get('expiry') ?? null;
         $showCodes   =
             in_array($destination, [self::DESTINATION_DASHBOARD, self::DESTINATION_HOMEPAGE, self::DESTINATION_PROFILE])
             && in_array($expiryMonth, [1, 3, 6]);
@@ -110,7 +110,7 @@ class Controller extends Base
             $urlBase          = null;
             $expiry           = null;
         } else {
-            $studentIds = $this->request->post->get('students') ?? [];
+            $studentIds = $this->requestPost->get('students') ?? [];
 
             $selectedStudents = $this->userMapper->findByColumn('id', array_map('intval', $studentIds))->indexBy('id');
 

@@ -251,7 +251,7 @@ class Controller extends Base
      */
     public function postAudienceTypeModify(Pastoral\Type\Model $type): void
     {
-        $this->postAudienceModify($type, null, $this->getRequest()->post);
+        $this->postAudienceModify($type, null, $this->requestPost);
     }
 
 
@@ -267,7 +267,7 @@ class Controller extends Base
      */
     public function postAudienceSubTypeModify(Pastoral\SubType\Model $subType): void
     {
-        $this->postAudienceModify($subType->getPastoralType(), $subType, $this->getRequest()->post);
+        $this->postAudienceModify($subType->getPastoralType(), $subType, $this->requestPost);
     }
 
 

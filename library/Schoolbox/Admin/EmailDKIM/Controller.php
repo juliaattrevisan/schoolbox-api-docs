@@ -98,8 +98,8 @@ class Controller extends Base
      */
     public function postDomain()
     {
-        $id     = $this->request->post->get('id');
-        $domain = trim($this->request->post->get('domain') ?? '');
+        $id     = $this->requestPost->get('id');
+        $domain = trim($this->requestPost->get('domain') ?? '');
         if (empty($domain) || (!getmxrr($domain, $temp) && !checkdnsrr($domain, 'ANY'))) {
             $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid domain name']));
             $this->getResponse()->status->setCode(404);

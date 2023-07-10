@@ -199,7 +199,7 @@ class Controller extends Base
         // This report may take a while
         $this->extendExecutionTime();
 
-        $request       = $this->request->post['filter_selection'] ?: [];
+        $request       = $this->requestPost['filter_selection'] ?: [];
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $request);
         $codec         = new Codec($this->filterMapper, $this->filterSelectionMapper);
 

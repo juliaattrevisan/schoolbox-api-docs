@@ -212,30 +212,30 @@ class Controller extends Base
             $this->getConfigLoader(),
             $this->getExternalEventMapper()
         );
-        $errors = $validation->validateBookingFromPostData($item, $this->getRequest()->post, null);
+        $errors = $validation->validateBookingFromPostData($item, $this->requestPost, null);
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
-            $event->setStartDateTime(Alaress_Date_Format::newLocal($this->getRequest()->post['startDate']));
-            $event->setEndDateTime(Alaress_Date_Format::newLocal($this->getRequest()->post['endDate']));
+            $event->setStartDateTime(Alaress_Date_Format::newLocal($this->requestPost['startDate']));
+            $event->setEndDateTime(Alaress_Date_Format::newLocal($this->requestPost['endDate']));
             $event->setTitle("Booking: " . $item->getName());
-            $event->setDetail($this->getRequest()->post['notes']);
+            $event->setDetail($this->requestPost['notes']);
 
             // Build the booking
             $booking = $this->getBookingFromEvent($item, $event);
             $booking
-                ->setName($this->request->post['name'])
-                ->setNotes($this->request->post['notes']);
+                ->setName($this->requestPost['name'])
+                ->setNotes($this->requestPost['notes']);
             $bookingList = new Collection();
             $bookingList->add($booking);
 
             // Expand into bookings for recurrence
-            if (!empty($this->request->post['repeat'])) {
+            if (!empty($this->requestPost['repeat'])) {
                 $bookingList = $this->saveBookingsForRecurrences(
                     $bookingList,
-                    $this->getRequest()->post['repeat'],
-                    Alaress_Date_Format::newLocalShort($this->getRequest()->post['repeat_until'])->getDateTimeObject(),
-                    $this->getRequest()->post['campus']
+                    $this->requestPost['repeat'],
+                    Alaress_Date_Format::newLocalShort($this->requestPost['repeat_until'])->getDateTimeObject(),
+                    $this->requestPost['campus']
                 );
             } else {
                 // Just save the event by itself.
@@ -271,8 +271,8 @@ class Controller extends Base
          */
         $returnUrl = null;
 
-        if ('' !== ($this->getRequest()->post['returnUrl'] ?? '')) {
-            $returnUrl = Redirect::decode($this->getRequest()->post['returnUrl']);
+        if ('' !== ($this->requestPost['returnUrl'] ?? '')) {
+            $returnUrl = Redirect::decode($this->requestPost['returnUrl']);
         }
 
         if ($this->getRequest()->isXhr()) {
@@ -317,19 +317,19 @@ class Controller extends Base
             $this->getConfigLoader(),
             $this->getExternalEventMapper()
         );
-        $errors = $validation->validateBookingFromPostData($item->getResource(), $this->getRequest()->post, $item);
+        $errors = $validation->validateBookingFromPostData($item->getResource(), $this->requestPost, $item);
 
         if (empty($errors)) {
             $item
-                ->setName($this->request->post['name'])
-                ->setNotes($this->request->post['notes']);
+                ->setName($this->requestPost['name'])
+                ->setNotes($this->requestPost['notes']);
             $bookingSeries = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
             $series = $bookingSeries->getUpdatedSeries(
                 $item,
-                Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
-                Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
+                Alaress_Date_Format::newLocal($this->requestPost['startDate'])->getDateTimeObject(),
+                Alaress_Date_Format::newLocal($this->requestPost['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
-                $this->request->post['efficacy'] ?? null,
+                $this->requestPost['efficacy'] ?? null,
             );
 
             // Get the date and time changes from original booking
@@ -382,10 +382,10 @@ class Controller extends Base
             // Now delete deleted series
             $deletedSeries = $bookingSeries->getDeletedSeries(
                 $item,
-                Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
-                Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
+                Alaress_Date_Format::newLocal($this->requestPost['startDate'])->getDateTimeObject(),
+                Alaress_Date_Format::newLocal($this->requestPost['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
-                $this->request->post['efficacy']
+                $this->requestPost['efficacy']
             );
             $this->bookingMapper->delete($deletedSeries);
         } else {
@@ -401,8 +401,8 @@ class Controller extends Base
          */
         $returnUrl = null;
 
-        if ($this->request->post->get('returnUrl')) {
-            $returnUrl = Redirect::decode($this->request->post->get('returnUrl'));
+        if ($this->requestPost->get('returnUrl')) {
+            $returnUrl = Redirect::decode($this->requestPost->get('returnUrl'));
         }
 
         if ($this->getRequest()->isXhr()) {
@@ -560,7 +560,7 @@ class Controller extends Base
     protected function getRelatedItemsFromForm()
     {
         $relatedItems = [];
-        foreach ($this->request->post->get('related_item') ?: [] as $relatedItem) {
+        foreach ($this->requestPost->get('related_item') ?: [] as $relatedItem) {
             if (isset($relatedItem['resource_id'])) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
@@ -617,8 +617,8 @@ class Controller extends Base
             ->setEvent($event)
             ->setResource($resource)
             ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
-            ->setName($this->getRequest()->post['name'])
-            ->setNotes($this->getRequest()->post['notes'])
+            ->setName($this->requestPost['name'])
+            ->setNotes($this->requestPost['notes'])
             ->setRelatedBookingList(new GenericCollection(Model::class));
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
@@ -871,7 +871,7 @@ class Controller extends Base
      */
     protected function getStatusChangeCallbackUrl()
     {
-        return $this->request->post->get('returnUrl') ?: $this->getSession()->getHistory();
+        return $this->requestPost->get('returnUrl') ?: $this->getSession()->getHistory();
     }
 
     /**
@@ -970,7 +970,7 @@ class Controller extends Base
     {
         if (
             $this->requestQuery->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
-            || $this->request->post->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
+            || $this->requestPost->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
         ) {
             if ($seriesId = $booking->getEvent()->getSeriesId()) {
                 return $this->getBookingMapper()->findSeriesBookings($booking->getId(), $seriesId);

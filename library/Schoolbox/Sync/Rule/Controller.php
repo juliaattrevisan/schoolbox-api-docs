@@ -62,7 +62,7 @@ class Controller extends Base
     {
         $mapper = Mapper::getInstance();
 
-        $postData = $this->getRequest()->post;
+        $postData = $this->requestPost;
 
         $roleType = $postData->get('rulesetId');
 
@@ -125,7 +125,7 @@ class Controller extends Base
      */
     public function update($params)
     {
-        $postData = $this->getRequest()->post;
+        $postData = $this->requestPost;
 
         $rule = Mapper::getInstance()
             ->findById($postData->get('ruleId'))
@@ -146,7 +146,7 @@ class Controller extends Base
      */
     public function delete($params)
     {
-        $ruleId = $this->getRequest()->post->get('ruleId');
+        $ruleId = $this->requestPost->get('ruleId');
         $deleteCount = Mapper::getInstance()->deleteByColumn('id', $ruleId);
 
         $this->getResponse()->content->set([

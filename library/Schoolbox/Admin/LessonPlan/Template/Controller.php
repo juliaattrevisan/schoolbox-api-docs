@@ -97,7 +97,7 @@ class Controller extends Base
      */
     public function postCreate(): void
     {
-        $postData = $this->getRequest()->post->getArrayCopy();
+        $postData = $this->requestPost->getArrayCopy();
         $sequence = 1;
 
         /* This didn't exist before so I guess we spawn it
@@ -187,7 +187,7 @@ class Controller extends Base
      */
     public function postUpdate(Model $lessonPlanTemplate): void
     {
-        $postData = $this->getRequest()->post->getArrayCopy();
+        $postData = $this->requestPost->getArrayCopy();
         $sequence = 1;
 
         /* Remember this list of ids that we have either updated

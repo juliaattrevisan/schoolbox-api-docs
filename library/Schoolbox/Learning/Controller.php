@@ -171,7 +171,7 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         try {
-            $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+            $postFilterSelections = $this->requestPost['filter_selection'] ?: [];
             $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $viewee, $postFilterSelections);
 
             $this->getResponse()->content->set($this->buildJsonOutput([

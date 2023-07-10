@@ -50,7 +50,7 @@ class Controller extends Base
      */
     public function postUpdateTerms(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             foreach ($post['singularForm'] as $term => $singularForm) {

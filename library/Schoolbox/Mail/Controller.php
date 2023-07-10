@@ -80,7 +80,7 @@ class Controller extends Base
      */
     public function postCreateMail()
     {
-        $this->createMail($this->request->post);
+        $this->createMail($this->requestPost);
     }
 
     /**
@@ -220,16 +220,16 @@ class Controller extends Base
      */
     public function send()
     {
-        $to      = (string)$this->request->post->get('to');
-        $cc      = (string)$this->request->post->get('cc');
-        $bcc     = (string)$this->request->post->get('bcc');
-        $subject = (string)$this->request->post->get('subject');
-        $message = (string)$this->request->post->get('message');
+        $to      = (string)$this->requestPost->get('to');
+        $cc      = (string)$this->requestPost->get('cc');
+        $bcc     = (string)$this->requestPost->get('bcc');
+        $subject = (string)$this->requestPost->get('subject');
+        $message = (string)$this->requestPost->get('message');
 
         if (empty($to) && empty($cc) && empty($bcc)) {
             $this->sendError('No recipient provided');
         }
-        $attachments = $this->request->post->get('attachment') ?? [];
+        $attachments = $this->requestPost->get('attachment') ?? [];
         $mail        = $this->emailFactory->buildSimpleEmail($subject, null);
 
         //get users email address to use in from field
@@ -340,12 +340,12 @@ class Controller extends Base
             $this->getConfigLoader()->get('recaptcha_private_api_key'),
         );
 
-        if (!$this->getSession()->getId() && !$recaptcha->verify($this->request->post->get('g-recaptcha-response'))) {
+        if (!$this->getSession()->getId() && !$recaptcha->verify($this->requestPost->get('g-recaptcha-response'))) {
             $this->sendError("The Human Checker (reCAPTCHA) failed.");
         }
 
         $name    = $this->getUser()->getFullName();
-        $email   = $this->request->post->get('email');
+        $email   = $this->requestPost->get('email');
         $replyTo = null;
         if ($email) {
             try {
@@ -355,8 +355,8 @@ class Controller extends Base
             }
         }
 
-        if ($replyTo && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $this->request->post->get('template'))) {
-            foreach ($this->request->post->getArrayCopy() as $key => $var) {
+        if ($replyTo && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $this->requestPost->get('template'))) {
+            foreach ($this->requestPost->getArrayCopy() as $key => $var) {
                 if (!$this->checkSpamHeaders($var)) {
                     $this->getResponse()->redirect->to('/');
                 }
@@ -368,7 +368,7 @@ class Controller extends Base
             $context['NAME']            = $name;
             $context['hideUnsubscribe'] = true;
 
-            $subject = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
+            $subject = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->requestPost->get('subject');
             $to      = new Address(
                 $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_NAME)

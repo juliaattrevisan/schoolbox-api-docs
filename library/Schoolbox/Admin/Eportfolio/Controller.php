@@ -135,7 +135,7 @@ class Controller extends Base
      */
     public function postDeploy()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Do the import in a detached state so it doesn't time out
 

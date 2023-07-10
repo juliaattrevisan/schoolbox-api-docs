@@ -263,8 +263,8 @@ class Controller extends BaseController
      */
     public function postExportForAssessment(IAssessable $assessment): void
     {
-        $importedImplementations     = $this->getRequest()->post->get('unitImplementation', []);
-        $importedImplementationDates = $this->getRequest()->post->get('unit', []);
+        $importedImplementations     = $this->requestPost->get('unitImplementation', []);
+        $importedImplementationDates = $this->requestPost->get('unit', []);
         // get corresponding assessment impls in the unit impls selected by the user.
         $assessmentImpls             = $this->buildImplementationsForSpecification($assessment, array_keys($importedImplementations));
         $folderWritePerms            = $this->buildFolderWritePermissionsForAssessment($assessmentImpls);

@@ -190,13 +190,13 @@ class Controller extends BaseController
 
         // Load current system options and defaults, and overlay with posted settings
         /** @var string[] $postEnabled */
-        $postEnabled = $this->getRequest()->post->get('filter_enabled');
+        $postEnabled = $this->requestPost->get('filter_enabled');
         /** @var string[] $postUserConfigurable */
-        $postUserConfigurable = $this->getRequest()->post->get('filter_user_configurable');
+        $postUserConfigurable = $this->requestPost->get('filter_user_configurable');
         /** @var string[][] $postOptions */
-        $postOptions = $this->getRequest()->post->get('filter_options');
+        $postOptions = $this->requestPost->get('filter_options');
         /** @var string[][][] $postDefaults */
-        $postDefaults = $this->getRequest()->post->get('filter_defaults');
+        $postDefaults = $this->requestPost->get('filter_defaults');
 
         /**
          * @var IDefinition $class
@@ -269,7 +269,7 @@ class Controller extends BaseController
      */
     public function postPushDefaultSelections(string $page): void
     {
-        $roleIds = $this->request->post->get('role', []);
+        $roleIds = $this->requestPost->get('role', []);
         if (!is_array($roleIds) || empty($roleIds)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }

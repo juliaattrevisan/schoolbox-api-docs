@@ -445,10 +445,10 @@ abstract class AbstractController extends BaseController
         /* Uploading an illegal file type causes the attachment key to be null
          * In that case, no files to upload
          */
-        if (null !== $this->request->post->get('attachment')) {
+        if (null !== $this->requestPost->get('attachment')) {
 
             /** @var Resource\AbstractFile[] $results */
-            $results = $factory->build($this->request->post->get('attachment'))->getAll();
+            $results = $factory->build($this->requestPost->get('attachment'))->getAll();
 
             $defaultToHidden = $this->getConfigLoader()->get('file_default_to_hidden');
 

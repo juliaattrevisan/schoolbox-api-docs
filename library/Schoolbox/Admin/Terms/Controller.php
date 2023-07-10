@@ -101,7 +101,7 @@ class Controller extends Base
     {
         $term = $this->termMapper->createModel();
         try {
-            $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
+            $term = $this->populateModelFromPostData($term, $this->requestPost);
             $this->termMapper->save($term);
 
             $this->outputPostSuccess($term);
@@ -120,7 +120,7 @@ class Controller extends Base
     public function postUpdateTerm(Term\Model $term): void
     {
         try {
-            $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
+            $term = $this->populateModelFromPostData($term, $this->requestPost);
             $this->termMapper->save($term);
 
             $this->outputPostSuccess($term);

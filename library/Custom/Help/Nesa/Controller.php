@@ -130,24 +130,24 @@ class Controller extends Base
             $this->rubricMapper,
             $this->userMapper
         ))->generate(
-            $this->getRequest()->post['state'],
-            (int)$this->getRequest()->post['unaccreditedOnly'],
-            $this->getRequest()->post['indicators']
+            $this->requestPost['state'],
+            (int)$this->requestPost['unaccreditedOnly'],
+            $this->requestPost['indicators']
         );
 
         $end = microtime(true);
 
         /* There are dupes but we only match on text content
          */
-        $indicators = array_filter(array_unique($this->getRequest()->post['indicators']));
+        $indicators = array_filter(array_unique($this->requestPost['indicators']));
 
         /* The usual output
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/report.twig', [
             'report' => $report,
             'duration' => number_format($end - $start, 2),
-            'states' => $this->getRequest()->post['state'],
-            'unaccreditedOnly' => $this->getRequest()->post['unaccreditedOnly'],
+            'states' => $this->requestPost['state'],
+            'unaccreditedOnly' => $this->requestPost['unaccreditedOnly'],
             'indicators' => $indicators
         ]));
     }
@@ -171,14 +171,14 @@ class Controller extends Base
             $this->rubricMapper,
             $this->userMapper
         ))->generate(
-            $this->getRequest()->post['state'],
-            (int)$this->getRequest()->post['unaccreditedOnly'],
-            $this->getRequest()->post['indicators']
+            $this->requestPost['state'],
+            (int)$this->requestPost['unaccreditedOnly'],
+            $this->requestPost['indicators']
         );
 
         /* There are dupes but we only match on text content
          */
-        $indicators = array_filter(array_unique($this->getRequest()->post['indicators']));
+        $indicators = array_filter(array_unique($this->requestPost['indicators']));
 
         /* Render it out
          */

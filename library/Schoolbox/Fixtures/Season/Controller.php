@@ -184,9 +184,9 @@ class Controller extends AbstractController
         try {
             $this->saveSeason(
                 $entity,
-                $this->getRequest()->post['name'],
-                Alaress_Date_Format::newLocalShort($this->getRequest()->post['start']),
-                Alaress_Date_Format::newLocalShort($this->getRequest()->post['end'])
+                $this->requestPost['name'],
+                Alaress_Date_Format::newLocalShort($this->requestPost['start']),
+                Alaress_Date_Format::newLocalShort($this->requestPost['end'])
             );
 
             $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSeason.getList'));
@@ -225,7 +225,7 @@ class Controller extends AbstractController
      */
     public function deleteEntity($entity)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // When soft-deleting a season, we must ensure any linked divisions and matches are not left in
         // an invalid state (ie pointing to a soft-deleted season). Hence, if linked entities exist, the caller

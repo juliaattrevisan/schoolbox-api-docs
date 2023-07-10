@@ -262,7 +262,7 @@ class Controller extends Base
         $model = new Model();
         $this->updateItemWithFormValues(
             $model,
-            $this->getRequest()->post
+            $this->requestPost
         );
         $this->mapper->save($model);
         // Return something.
@@ -284,7 +284,7 @@ class Controller extends Base
     {
         $this->updateItemWithFormValues(
             $item,
-            $this->getRequest()->post
+            $this->requestPost
         );
         $this->mapper->save($item);
         // Return something.

@@ -114,7 +114,7 @@ class Controller extends Base
      */
     public function postGroupsDelete()
     {
-        $groupId = $this->getRequest()->post['id'];
+        $groupId = $this->requestPost['id'];
         $group = $this->pastoralGroupMapper->findById($groupId);
         $this->pastoralGroupMapper->delete($group);
 
@@ -128,7 +128,7 @@ class Controller extends Base
      */
     public function postGroupsModify()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $memberIds = explode(",", $post['members']);
 

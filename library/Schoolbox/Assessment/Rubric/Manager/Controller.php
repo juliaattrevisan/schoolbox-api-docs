@@ -98,7 +98,7 @@ class Controller extends BaseController
         // Build a new rowset, and persist it
         $newRowSet = (new Factory($this->nodeMapper))->buildFromPostData(
             $folder,
-            $this->request->post->get('crits', [])
+            $this->requestPost->get('crits', [])
         );
 
         // Done: redirect back to homepage, or AJAX

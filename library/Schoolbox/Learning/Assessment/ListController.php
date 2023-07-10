@@ -295,7 +295,7 @@ class ListController extends Web\Controller\Base
     {
         try {
             // we need to perform some surgery on our "post" data before we send it through
-            $post = $this->getRequest()->post->getArrayCopy();
+            $post = $this->requestPost->getArrayCopy();
             $post['context'] = $context;
 
             $assessmentInfo = $this->persistAssessment($this->getUser(), $post);
@@ -303,7 +303,7 @@ class ListController extends Web\Controller\Base
             $type       = AssessmentType::objectToString($assessmentInfo['assessment']);
             $controller = $this->getDelegateController($type);
 
-            $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
+            $explicitReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
 
             /* Update project result cache when an activity is spawned in that project
              */
@@ -350,7 +350,7 @@ class ListController extends Web\Controller\Base
          */
         $allAssessments    = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
         $sortedAssessments = new GenericCollection(IAssessable::class);
-        foreach ($this->getRequest()->post->get('id', []) as $assessmentId) {
+        foreach ($this->requestPost->get('id', []) as $assessmentId) {
             if (isset($allAssessments[$assessmentId])) {
                 // Put it in $sortedAssessments in order
                 $sortedAssessments->add($allAssessments[$assessmentId]);
@@ -443,7 +443,7 @@ class ListController extends Web\Controller\Base
      */
     public function updateWeight(IAssessable $assessment): void
     {
-        $weight = (float) $this->getRequest()->post['weight'];
+        $weight = (float) $this->requestPost['weight'];
         if ($weight < 0) {
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid weight value']));
@@ -473,7 +473,7 @@ class ListController extends Web\Controller\Base
      */
     public function updateVisibility(IAssessable $assessment): void
     {
-        $visibility            = (int)$this->getRequest()->post['visibility'];
+        $visibility            = (int)$this->requestPost['visibility'];
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
         if (!in_array($visibility, $availableVisibilities)) {
             $this->getResponse()->status->setCode(500);

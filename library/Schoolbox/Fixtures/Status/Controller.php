@@ -86,7 +86,7 @@ class Controller extends AbstractController
      */
     protected function persistEntity($entity)
     {
-        $this->saveStatus($entity, $this->getRequest()->post['name']);
+        $this->saveStatus($entity, $this->requestPost['name']);
 
         if ($this->getRequest()->isXhr()) {
             $status = [

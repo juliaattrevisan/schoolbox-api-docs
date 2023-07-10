@@ -440,7 +440,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         try {
             $assessmentInfo = $this->persistAssessment(
                 $this->getUser(),
-                $this->getRequest()->post,
+                $this->requestPost,
                 $assessment
             );
         } catch (DomainException $e) {
@@ -451,7 +451,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return;
         }
 
-        $postReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
+        $postReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
         $returnUrl     = $this->determineRedirect(
             $assessmentInfo['assessment'],
             $postReturnUrl,

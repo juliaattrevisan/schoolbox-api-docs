@@ -287,7 +287,7 @@ class Controller extends Assessment\Controller
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // Did user mark (regardless of who they are) the task as incomplete ?
-        $completionStatus = $this->getRequest()->post->getInt('status');
+        $completionStatus = $this->requestPost->getInt('status');
 
         try {
             $response = $this->saveTaskResponse($completionStatus, $assessment, $student);

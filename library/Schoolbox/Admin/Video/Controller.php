@@ -75,7 +75,7 @@ class Controller extends Base
      */
     public function postSubmit()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             /** @var VideoQueue $video */

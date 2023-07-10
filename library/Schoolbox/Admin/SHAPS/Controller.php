@@ -190,8 +190,8 @@ class Controller extends Base
      */
     public function postProvision(): void
     {
-        $userIds      = $this->request->post->get('users');
-        $courses      = $this->request->post->get('courses');
+        $userIds      = $this->requestPost->get('users');
+        $courses      = $this->requestPost->get('courses');
         $responseCode = 200;
         $messages     = [];
 

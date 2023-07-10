@@ -124,7 +124,7 @@ class Controller extends Base
      */
     public function postUpdate(?int $resultSetId): void
     {
-        $postedData    = $this->request->post->getArrayCopy();
+        $postedData    = $this->requestPost->getArrayCopy();
         $indexedLabels = [];
 
         foreach ($postedData['rubricResultLabels'] as $value => $label) {

@@ -920,13 +920,14 @@ class Controller extends Assessment\Controller
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         $rq = $this->getRequest();
+        $requestPost = $this->requestPost;
         $rs = $this->getResponse();
 
         /* Set in javascript when automatically saving a draft
          * Careful the negation
          */
-        $isFinal = !$rq->post->get('saveDraft');
-        $body    = $rq->post->get('body');
+        $isFinal = !$requestPost->get('saveDraft');
+        $body    = $requestPost->get('body');
 
         /* Determine whether a finalised submission could be initialised
          * Check that you don't exceed the specified rate limit
@@ -940,9 +941,9 @@ class Controller extends Assessment\Controller
             }
         }
 
-        if ($rq->post->get('responseId')) {
+        if ($requestPost->get('responseId')) {
             // Load an existing response to update
-            $response = $this->dueWorkResponseMapper->findById($rq->post->get('responseId'));
+            $response = $this->dueWorkResponseMapper->findById($requestPost->get('responseId'));
 
             /* @var Response\Model $response */
             //check if $response has already been finalised, if so error
@@ -972,10 +973,10 @@ class Controller extends Assessment\Controller
 
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
-        if (!empty($rq->post->get('attachment'))) {
+        if (!empty($requestPost->get('attachment'))) {
             // Validate attachment list can actually be built
             try {
-                $attachments = $factory->build($rq->post->get('attachment'))->getAll();
+                $attachments = $factory->build($requestPost->get('attachment'))->getAll();
             } catch (InvalidArgumentException) {
                 $errorMessage = 'One or more files were not able to be attached';
                 $redirect     = $this->routeGenerator->generate(
@@ -1009,7 +1010,7 @@ class Controller extends Assessment\Controller
         // If we're saving the final version of the submission (i.e. not a draft) ram the current datetime in
         if ($isFinal) {
             $acceptsOnline = $assessment->getAcceptOnline();
-            $notSubmittedInPerson = !$rq->post->getBool('submitted_in_person');
+            $notSubmittedInPerson = !$requestPost->getBool('submitted_in_person');
 
             // should there be files attached? fail if we didn't get any
             if ($acceptsOnline && $notSubmittedInPerson && $response->getAllFiles()->count() === 0) {
@@ -1056,15 +1057,15 @@ class Controller extends Assessment\Controller
             // recognised yet.
             $assessment  = $this->participantMapper->loadParticipationIntoAssessment($assessment);
             $participant = $assessment->getParticipant($student);
-            $comment     = $rq->post->get('comment');
+            $comment     = $requestPost->get('comment');
             // There might not be a mark: due works may have mark type none, in which case no mark will be posted
-            $mark = $rq->post->get('mark') ?? null;
+            $mark = $requestPost->get('mark') ?? null;
             // Awful hack because feedback factory expects a string (which it immediately casts to a bool) >.<
             $publish = $isFinal ? '1' : '0';
             // This gets used to decide whether to create a new feedback, or update an existing one
             $mostRecentFeedback = $participant->findMostRecentSelfAssessedFeedback();
             // Check whether the latest feedback has rubric data set.
-            $hasRubric = isset($rq->post['rubric']);
+            $hasRubric = isset($requestPost['rubric']);
             if (
                 $mostRecentFeedback !== null
                 && $mostRecentFeedback->getAssessable() instanceof Model
@@ -1120,7 +1121,7 @@ class Controller extends Assessment\Controller
                 if ($hasRubric) {
                     $markedGrid = $factory->buildFromPostData(
                         $this->rubricMapper->retrieveMarkedGrid($feedback),
-                        $rq->post['rubric'] ?? [],
+                        $requestPost['rubric'] ?? [],
                     );
                     $this->rubricMapper->persistMarkedGrid($markedGrid);
 
@@ -1224,7 +1225,7 @@ class Controller extends Assessment\Controller
 
         /* Saving drafts from the wysiwyg
          */
-        if ($rq->isXhr()) {
+        if ($this->isXhrRequest()) {
             $result['success'] = true;
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
@@ -1241,8 +1242,8 @@ class Controller extends Assessment\Controller
                         'studentId'    => $student->getId()
                     ]
                 ) . (
-                    ($rq->post->get('returnUrl') === null) ? '' :
-                    '?returnUrl=' .  Redirect::encode($rq->post->get('returnUrl'))
+                    ($requestPost->get('returnUrl') === null) ? '' :
+                    '?returnUrl=' .  Redirect::encode($requestPost->get('returnUrl'))
                 )
             );
         }
@@ -1266,7 +1267,7 @@ class Controller extends Assessment\Controller
             if ($assessment->isOverdue() || $assessment->isPastClose()) {
                 // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
                 // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
-                $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
+                $submittedLate  = !$this->requestPost->getBool('submissionWasOnTime', false);
                 $submissionTime = ($submittedLate) ? Alaress_Date_Format::now() : $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
             } else {
                 $submittedLate  = false;
@@ -1309,7 +1310,7 @@ class Controller extends Assessment\Controller
             if ($assessment->isOverdue() || $assessment->isPastClose()) {
                 // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
                 // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
-                $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
+                $submittedLate  = !$this->requestPost->getBool('submissionWasOnTime', false);
                 $submissionTime = ($submittedLate) ? Alaress_Date_Format::now() : $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
             } else {
                 $submissionTime = Alaress_Date_Format::now();

@@ -179,7 +179,7 @@ class Controller extends Base
 
         // Default learning area and level, or a preselected one?
 
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $code = 200;
 
         // Perform necessary validations, if any.
@@ -233,7 +233,7 @@ class Controller extends Base
      */
     public function update(Node\Model $item)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $code = 200;
 
         // Perform necessary validations, if any.

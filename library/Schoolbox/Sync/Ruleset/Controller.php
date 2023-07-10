@@ -547,7 +547,7 @@ class Controller extends Base
     public function updateRuleset()
     {
         $response = [];
-        $postData = $this->getRequest()->post;
+        $postData = $this->requestPost;
         $roleType = $postData['rulesetId'];
 
         $response['config']     = $this->updateConfig($roleType, $postData['config'][$roleType]);
@@ -571,7 +571,7 @@ class Controller extends Base
     {
 
         $response = [];
-        $postData = $this->getRequest()->post;
+        $postData = $this->requestPost;
 
         foreach ($postData['rule'] as $ruleId => $ruleData) {
             $response['condition'] = $this->updateConditions($ruleId, $ruleData['condition'] ?? null);

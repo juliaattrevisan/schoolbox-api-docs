@@ -89,10 +89,10 @@ class Controller extends Base
 
         $user = $this->getUser();
 
-        $currentPassword = $this->getRequest()->post->get('current_password', '');
+        $currentPassword = $this->requestPost->get('current_password', '');
         $userPassword = $user->getPassword() ?? '';
-        $newPassword = $this->getRequest()->post->get('new_password', '');
-        $confirmPassword = $this->getRequest()->post->get('confirm_password', '');
+        $newPassword = $this->requestPost->get('new_password', '');
+        $confirmPassword = $this->requestPost->get('confirm_password', '');
 
         /* To change a password:
          * - all specification criteria must be met

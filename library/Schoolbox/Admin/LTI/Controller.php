@@ -143,7 +143,7 @@ class Controller extends ConfigController
      */
     public function postModify(): void
     {
-        $post = $this->request->post;
+        $post = $this->requestPost;
 
         if (!empty($post['id'])) {
             $provider = $this->providerMapper->findById($post['id']);
@@ -240,7 +240,7 @@ class Controller extends ConfigController
      */
     public function postConfig(): void
     {
-        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        $this->updateConfig($this->requestPost->get(), $this->buildConfigPredicate());
         $this->response->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 

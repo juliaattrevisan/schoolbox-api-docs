@@ -331,7 +331,7 @@ class Controller extends Base\Base
      */
     public function saveAssessmentSequence()
     {
-        $assessmentSequence = $this->getRequest()->post->get('sequence');
+        $assessmentSequence = $this->requestPost->get('sequence');
         $this->returnJson($this->assessmentMapper->sequenceAssessments($assessmentSequence));
     }
 
@@ -465,7 +465,7 @@ class Controller extends Base\Base
      */
     public function createCourse()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Get the default permissions to give to Course Folders
         $rolePermissions = [];
@@ -620,7 +620,7 @@ class Controller extends Base\Base
      */
     public function updateCourse(CourseSpecification $courseSpec)
     {
-        $post          = $this->getRequest()->post;
+        $post          = $this->requestPost;
         $newCourseName = trim($post->get('name', ''));
         if ($newCourseName === '') {
             $this->sendError(new Base\Exception('You need to give the course a name. ', ['Courses must have names.']));
@@ -779,7 +779,7 @@ class Controller extends Base\Base
             return;
         }
 
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $name = trim($post->get('name'));
 
         if (!$name) {

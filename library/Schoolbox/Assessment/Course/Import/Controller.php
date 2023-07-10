@@ -170,9 +170,9 @@ class Controller extends Base\Base
      */
     public function postClasses()
     {
-        $courseSpecId    = trim($this->getRequest()->post['course_spec_id']);
-        $targetFolderIds = $this->parseFolderIds($this->getRequest()->post['import_folders']);
-        $componentId     = trim($this->getRequest()->post['component_id']);
+        $courseSpecId    = trim($this->requestPost['course_spec_id']);
+        $targetFolderIds = $this->parseFolderIds($this->requestPost['import_folders']);
+        $componentId     = trim($this->requestPost['component_id']);
 
         try {
             $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
@@ -293,11 +293,11 @@ class Controller extends Base\Base
      */
     public function postUnits()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $action           = trim($post['action']);
         $courseSpecId     = trim($post['course_spec_id']);
-        $targetFolderIds  = $this->parseFolderIds($this->getRequest()->post['import_folders']);
+        $targetFolderIds  = $this->parseFolderIds($this->requestPost['import_folders']);
         $courseImplId     = trim($post['course_impl_id']);
         $componentId      = trim($post['component_id']);
         $units            = $post['unit'] ?? [];
@@ -483,7 +483,7 @@ class Controller extends Base\Base
         // Transact this entire request, rolling back if any exception is raised
         try {
             $this->unitImplementationMapper->getDatabase()->transact(function () {
-                $this->persistCourseImplementation($this->request->post);
+                $this->persistCourseImplementation($this->requestPost);
             });
         } catch (\Throwable $e) {
             $this->sendError($e->getMessage());

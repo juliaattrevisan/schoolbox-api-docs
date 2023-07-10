@@ -118,7 +118,7 @@ class Controller extends Base
     public function postMarkbookForClass(FolderModel $folder): void
     {
         try {
-            $request = $this->request->post['filter_selection'] ?? [];
+            $request = $this->requestPost['filter_selection'] ?? [];
 
             /**
              * @var null[]|Collection[]        $filters

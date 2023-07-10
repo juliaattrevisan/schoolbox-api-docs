@@ -251,7 +251,7 @@ class Controller extends Base
      */
     public function postUpcomingForStudent(User $student): void
     {
-        $request             = $this->request->post->get('filter_selection', []);
+        $request             = $this->requestPost->get('filter_selection', []);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);

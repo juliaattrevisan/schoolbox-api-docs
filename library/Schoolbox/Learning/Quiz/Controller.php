@@ -226,7 +226,7 @@ class Controller extends AbstractController
     public function postQuizSubmit()
     {
         $get = $this->requestQuery;
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             $attempt = $this->quizAttemptMapper->findById($post['attemptId']);
@@ -371,7 +371,7 @@ class Controller extends AbstractController
     public function postAttemptDelete()
     {
         try {
-            $attempt = $this->quizAttemptMapper->findById($this->getRequest()->post['attemptId']);
+            $attempt = $this->quizAttemptMapper->findById($this->requestPost['attemptId']);
             $this->quizAttemptMapper->delete($attempt);
 
             /* Invalidate project result cache if this quiz is in a project

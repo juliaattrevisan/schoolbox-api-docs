@@ -149,7 +149,7 @@ class Controller extends Base
      */
     public function postModify()
     {
-        $params  = $this->request->post;
+        $params  = $this->requestPost;
         $userIds = $params->get('users');
 
         if (!is_array($userIds) || count($userIds) === 0) {
@@ -205,7 +205,7 @@ class Controller extends Base
      */
     public function deleteUsers()
     {
-        $params  = $this->request->post;
+        $params  = $this->requestPost;
         $userIds = $params->get('users');
 
         if (!is_array($userIds) || count($userIds) === 0) {

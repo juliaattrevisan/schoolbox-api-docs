@@ -246,7 +246,7 @@ class Controller extends Base
      */
     public function postModify()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         if (!empty($post->get('id'))) {
             $item = $this->getMenuSideMapper()->findById($post->get('id'));
@@ -300,7 +300,7 @@ class Controller extends Base
      */
     public function postSectionModify($sectionId, $field)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             /** @var MenuSideSection $section */
@@ -346,7 +346,7 @@ class Controller extends Base
      */
     public function postDelete()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $this->getMenuSideMapper()->deleteByColumn("id", $post["id"]);
         $this->getResponse()->status->set(204);
         $this->getResponse()->content->set($this->buildJsonOutput([]));
@@ -360,7 +360,7 @@ class Controller extends Base
      */
     public function postOrder()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             /** @var MenuSide $item */
@@ -401,7 +401,7 @@ class Controller extends Base
      */
     public function postSectionOrder()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $orderArray = explode(",", $post['order']);
 
         $order = 1;

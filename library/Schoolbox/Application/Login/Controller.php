@@ -138,11 +138,11 @@ class Controller extends Base
      */
     public function postLogin(): void
     {
-        $username = trim($this->request->post->get('username', ''));
-        $password = $this->request->post->get('password', '');
-        $page = $this->request->post->get('page');
-        $tandc = $this->request->post->get('tandc') === '1';
-        $remember = $this->request->post->get('rememberme') === '1';
+        $username = trim($this->requestPost->get('username', ''));
+        $password = $this->requestPost->get('password', '');
+        $page = $this->requestPost->get('page');
+        $tandc = $this->requestPost->get('tandc') === '1';
+        $remember = $this->requestPost->get('rememberme') === '1';
 
         $message = '';
         if (strlen($username) && strlen($password)) {

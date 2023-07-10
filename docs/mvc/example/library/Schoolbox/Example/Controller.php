@@ -48,14 +48,14 @@ class Controller extends Base
     public function postExample(): void
     {
         try {
-            $user = $this->userMapper->findById($this->getRequest()->post['id']);
+            $user = $this->userMapper->findById($this->requestPost['id']);
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@example/submit.twig', [
             'user' => $user,
-            'var1' => $this->getRequest()->post['var1']
+            'var1' => $this->requestPost['var1']
         ])->setTitle('Example Form Output'));
     }
 }

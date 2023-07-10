@@ -130,7 +130,7 @@ class Controller extends Web\Controller\Base
      */
     public function postUploadCsv(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $rs = $this->getResponse();
 
         $responseJson = [
@@ -181,7 +181,7 @@ class Controller extends Web\Controller\Base
      */
     public function postProcess(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $rs   = $this->getResponse();
 
         $errors = [];

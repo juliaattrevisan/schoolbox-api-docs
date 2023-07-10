@@ -54,7 +54,7 @@ class Controller extends Base
      */
     public function installPackage(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $package = $this->packageMapper->findById($post['id']);
 

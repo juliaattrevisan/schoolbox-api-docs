@@ -121,13 +121,13 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            $sportId = $this->getRequest()->post['sportId'];
+            $sportId = $this->requestPost['sportId'];
             $sport   = $this->getSportMapper()->findById($sportId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
+        $this->savePosition($sport, $this->requestPost['name'], $entity);
 
         $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesPosition.getList', [
             'contextId' => $sportId

@@ -89,7 +89,7 @@ class Controller extends Base
     public function postDelete()
     {
         try {
-            $user = $this->userMapper->findByExternalId($this->getRequest()->post['id']);
+            $user = $this->userMapper->findByExternalId($this->requestPost['id']);
             $user->setPortrait(null);
 
             $this->userMapper->save($user);
@@ -110,7 +110,7 @@ class Controller extends Base
      */
     public function postUpload()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $results = [
             'success' => [],

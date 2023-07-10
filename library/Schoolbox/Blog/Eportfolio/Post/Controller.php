@@ -142,8 +142,8 @@ class Controller extends Base
     public function postModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
         // Update details and save the record
-        $blog->setBody($this->getRequest()->post->get("body"));
-        $blog->setHeading($this->getRequest()->post->get("heading"));
+        $blog->setBody($this->requestPost->get("body"));
+        $blog->setHeading($this->requestPost->get("heading"));
         $this->getEportfolioBlogMapper()->save($blog);
 
         // Update image gallery pictures
@@ -160,8 +160,8 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
-        if (is_array($this->getRequest()->post->get("attachment"))) {
-            $storages = (new CollectorFactory())->build($this->getRequest()->post->get('attachment'))->getAll();
+        if (is_array($this->requestPost->get("attachment"))) {
+            $storages = (new CollectorFactory())->build($this->requestPost->get('attachment'))->getAll();
 
             /* Dedupe files that existed concurrently - you dragged file A into the dropzone
              * then (without having saved anything yet) dragged file A and B into the dropzone
@@ -261,7 +261,7 @@ class Controller extends Base
     public function postCommentInsert(EportfolioBlogModel $blog): void
     {
         // Comments must not be empty.
-        if (strlen(trim($this->getRequest()->post['commentBody'])) === 0) {
+        if (strlen(trim($this->requestPost['commentBody'])) === 0) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -269,12 +269,12 @@ class Controller extends Base
         $comment = $this->getEportfolioBlogCommentMapper()->createModel();
         $comment->setOwner($this->getUser());
         $comment->setBlog($blog);
-        $comment->setBody($this->getRequest()->post['commentBody']);
+        $comment->setBody($this->requestPost['commentBody']);
         $comment->setCreatedAt(\Alaress_Date_Format::now());
 
         $this->getEportfolioBlogCommentMapper()->save($comment);
 
-        $returnUrlEncoded = $this->getRequest()->post['returnUrl'];
+        $returnUrlEncoded = $this->requestPost['returnUrl'];
 
         if ($returnUrlEncoded !== null) {
             $returnUrl = Redirect::decode($returnUrlEncoded);

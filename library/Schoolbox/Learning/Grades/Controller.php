@@ -288,7 +288,7 @@ class Controller extends Base
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
-        $request         = $this->request->post->get('filter_selection') ?: [];
+        $request         = $this->requestPost->get('filter_selection') ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;
 
         /* @var RosettaStone $l10n */

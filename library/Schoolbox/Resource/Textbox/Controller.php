@@ -219,7 +219,7 @@ class Controller extends Base
      */
     public function postRename(Folder\Model $folder): void
     {
-        $tuples = $this->getRequest()->post['textbox'] ?? [];
+        $tuples = $this->requestPost['textbox'] ?? [];
 
         $textboxes = $this->mapper->findByColumn('textboxID', array_keys($tuples))->indexBy('id');
 
@@ -230,7 +230,7 @@ class Controller extends Base
          * the POST payload
          */
         foreach ($textboxes as $textbox) {
-            $newHeading = trim((string)$this->getRequest()->post['textbox'][$textbox->getId()]);
+            $newHeading = trim((string)$this->requestPost['textbox'][$textbox->getId()]);
 
             /* Only save headings if they had length (ignore empties)
              */

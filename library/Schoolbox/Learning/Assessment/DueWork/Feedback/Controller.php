@@ -103,7 +103,7 @@ class Controller extends Base
     {
         $participant        = $assessment->getParticipant($student);
         $reviewRoute        = $this->determineReviewRoute($participant);
-        $post               = $this->getRequest()->post->getArrayCopy();
+        $post               = $this->requestPost->getArrayCopy();
         $isSelfAssessment   = $reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
         $mostRecentFeedback = $isSelfAssessment
             ? $participant->findMostRecentSelfAssessedFeedback()
@@ -168,7 +168,7 @@ class Controller extends Base
     public function postParticipantFeedbacks(DueWork\Model $assessment)
     {
         /** @var int[] $draftFeedbackIds */
-        $draftFeedbackIds = $this->getRequest()->post->get('drafts', []);
+        $draftFeedbackIds = $this->requestPost->get('drafts', []);
         $now              = Alaress_Date_Format::now();
         $results = [];
 
@@ -264,7 +264,7 @@ class Controller extends Base
     {
         $participant        = $assessment->getParticipant($student);
         $reviewRoute        = $this->determineReviewRoute($participant);
-        $post               = $this->getRequest()->post->getArrayCopy();
+        $post               = $this->requestPost->getArrayCopy();
         $isSelfAssessment   = $reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
         $mostRecentFeedback = $isSelfAssessment
             ? $participant->findMostRecentSelfAssessedFeedback()

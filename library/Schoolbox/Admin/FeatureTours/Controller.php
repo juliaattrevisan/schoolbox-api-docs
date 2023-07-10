@@ -61,7 +61,7 @@ class Controller extends Base
         /** @var Config $config */
         $config = ConfigMapper::getInstance()->findOneByColumn("name", "tours_enabled");
 
-        if ($this->getRequest()->post['enabled']) {
+        if ($this->requestPost['enabled']) {
             $config->setValue("1");
         } else {
             $config->setValue("0");
@@ -71,8 +71,8 @@ class Controller extends Base
 
         // Save active states for tours
         $uuids = [];
-        if (isset($this->getRequest()->post['tour-enable'])) {
-            foreach ($this->getRequest()->post['tour-enable'] as $tourID) {
+        if (isset($this->requestPost['tour-enable'])) {
+            foreach ($this->requestPost['tour-enable'] as $tourID) {
                 $uuids[] = $tourID;
             }
         }

@@ -545,7 +545,7 @@ class Controller extends Base
      */
     public function postReportModify(PastoralReport $report): void
     {
-        $post = $this->request->post;
+        $post = $this->requestPost;
 
         if (trim($post->get('name')) === '') {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -655,7 +655,7 @@ class Controller extends Base
      */
     public function postReportDashboardModify(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Create bare minimum report object
 

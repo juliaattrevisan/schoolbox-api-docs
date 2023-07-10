@@ -72,7 +72,7 @@ class Controller extends Base
     public function saveStatus()
     {
         $this->getResponse()->content->set($this->buildJsonOutput(null));
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         /** @var User $user */
         $user = $this->getUser();

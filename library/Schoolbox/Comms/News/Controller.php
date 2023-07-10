@@ -341,7 +341,7 @@ class Controller extends Base
      */
     public function postUpdate(Model $article): void
     {
-        $data = $this->getRequest()->post->getArrayCopy();
+        $data = $this->requestPost->getArrayCopy();
 
         // Update article with proposed attributes
         $this->updateArticleAttributes($article, $data);

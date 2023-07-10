@@ -158,7 +158,7 @@ class Controller extends Base
      */
     public function postComponentProvider($provider, $component)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $this->updateComponentValue(
             $component,
@@ -206,7 +206,7 @@ class Controller extends Base
      */
     public function postComponentPicker($component)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Make sure we got content items back from the provider
 

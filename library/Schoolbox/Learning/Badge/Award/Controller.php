@@ -334,14 +334,14 @@ class Controller extends Base
      */
     public function postAwardWithEvidence(): void
     {
-        $targetUserIds = $this->request->post->get('targetUserIds') ? array_map('intval', explode(',', $this->request->post->get('targetUserIds'))) : [];
+        $targetUserIds = $this->requestPost->get('targetUserIds') ? array_map('intval', explode(',', $this->requestPost->get('targetUserIds'))) : [];
         $targetUsers   = $this->userMapper->findByColumn('id', $targetUserIds);
         if (empty($targetUserIds) || !$targetUsers->count()) {
             $this->sendError('No target user provided');
         }
 
-        $reason   = trim($this->request->post->get('reason'));
-        $badgeIds = $this->request->post->get('badgeIds') ? array_map('intval', explode(',', $this->request->post->get('badgeIds'))) : [];
+        $reason   = trim($this->requestPost->get('reason'));
+        $badgeIds = $this->requestPost->get('badgeIds') ? array_map('intval', explode(',', $this->requestPost->get('badgeIds'))) : [];
         $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
         if (empty($badgeIds) || !$badges->count()) {
             $this->sendError('No badge provided');
@@ -716,7 +716,7 @@ class Controller extends Base
      */
     private function postWithdraw(Model $badge, string $status): void
     {
-        $userIds = $this->getRequest()->post['userIds'] ?? [];
+        $userIds = $this->requestPost['userIds'] ?? [];
 
         /* Empty user list; nothing to do
          */
@@ -830,7 +830,7 @@ class Controller extends Base
         // hydrate student for token replacer
         $student       = $this->userMapper->findById($award->getRecipient()->getId());
         $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-        $reason        = trim($this->request->post->get('reason') ?? '');
+        $reason        = trim($this->requestPost->get('reason') ?? '');
         $award->setReason($tokenReplacer->replace($reason, $student))
               ->setReasonedBy($this->getUser())
               ->setReasonedAt(Alaress_Date_Format::now());

@@ -674,7 +674,7 @@ class Controller extends Base
      */
     public function postCommentInsert(Model $record): void
     {
-        $post = $this->request->post;
+        $post = $this->requestPost;
         /**
          * confirm if the user can view / edit the private part of the record
          */
@@ -767,7 +767,7 @@ class Controller extends Base
      */
     public function postRecordInsert(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $studentId           = (int)$post->get('student_id');
         $duplicateStudentIds = array_filter(
@@ -827,7 +827,7 @@ class Controller extends Base
      */
     public function postRecordUpdate(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Grab the pastoral record we are updating
 
@@ -1389,8 +1389,8 @@ class Controller extends Base
      */
     public function postActionUpdate(Model $record): void
     {
-        $recordActionId = (int)$this->request->post->get('recordActionId');
-        $checked        = (bool)$this->request->post->get('checked');
+        $recordActionId = (int)$this->requestPost->get('recordActionId');
+        $checked        = (bool)$this->requestPost->get('checked');
 
         $data = [];
         try {

@@ -283,7 +283,7 @@ class Controller extends BaseController
      */
     public function saveConfig()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $postData   = isset($post['data']) ? $post['data'] : [];
 

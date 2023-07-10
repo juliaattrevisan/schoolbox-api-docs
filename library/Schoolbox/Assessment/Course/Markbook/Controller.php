@@ -203,7 +203,7 @@ class Controller extends WebController\Base
         $this->extendExecutionTime();
 
         try {
-            $request = $this->request->post['filter_selection'] ?: [];
+            $request = $this->requestPost['filter_selection'] ?: [];
 
             /**
              * @var null[]|Collection[]        $filters

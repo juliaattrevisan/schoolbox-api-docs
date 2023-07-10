@@ -292,7 +292,7 @@ class Controller extends ConfigController
      */
     public function postUpdate(Model $report): void
     {
-        $postData = $this->getRequest()->post->getArrayCopy();
+        $postData = $this->requestPost->getArrayCopy();
 
         /* This is the json-encoded payload we persist in the db
          * To avoid making millions of schema we can just serialize it

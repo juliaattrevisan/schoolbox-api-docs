@@ -157,10 +157,10 @@ class Controller extends AbstractController
         try {
             $this->saveVenue(
                 $entity,
-                $this->getRequest()->post['name'],
-                $this->getRequest()->post['latitude'],
-                $this->getRequest()->post['longitude'],
-                $this->getRequest()->post['address']
+                $this->requestPost['name'],
+                $this->requestPost['latitude'],
+                $this->requestPost['longitude'],
+                $this->requestPost['address']
             );
 
             $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));

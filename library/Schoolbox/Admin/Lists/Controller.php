@@ -67,7 +67,7 @@ class Controller extends Base
     public function postDelete()
     {
         $result = false;
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $tableData = $this->getTableData();
         $mapperName = $tableData[$post['table']]['mapper'];
@@ -109,7 +109,7 @@ class Controller extends Base
      */
     public function postSave()
     {
-        $tableKey        = $this->getRequest()->post['table'];
+        $tableKey        = $this->requestPost['table'];
         $tableData       = $this->getTableData();
 
         // Check for incorrect URLs
@@ -119,10 +119,10 @@ class Controller extends Base
         }
 
         // Reformat to rows to field -> values
-        if ($this->getRequest()->post['rows']) {
-            $fieldValues = $this->processRows($tableData[$tableKey]['fields'], $this->getRequest()->post['rows']);
+        if ($this->requestPost['rows']) {
+            $fieldValues = $this->processRows($tableData[$tableKey]['fields'], $this->requestPost['rows']);
         } else {
-            $fieldValues = $this->getRequest()->post;
+            $fieldValues = $this->requestPost;
         }
 
         $mapper_name     = $tableData[$tableKey]['mapper'];
@@ -228,7 +228,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
+        $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->requestPost["table"]);
     }
 
     /**
