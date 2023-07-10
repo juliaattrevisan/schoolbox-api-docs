@@ -18,7 +18,6 @@ use Aura\Router\Generator;
 use Aura\Router\RouterContainer;
 use Aura\Session\SegmentInterface;
 use Aura\Web\Exception\InvalidStatusCode;
-use Aura\Web\Request;
 use Aura\Web\Response;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
@@ -35,13 +34,6 @@ use Schoolbox\Url\Uri;
 
 abstract class Base
 {
-    /**
-     * Request object from Aura.Web package.
-     *
-     * @deprecated This will be replaced with a PSR-7 compliant request object
-     *             in `$this->psr7Request`.
-     */
-    protected Request $request;
 
     /**
      * A PSR-7 compliant request object, which represents the current incoming
@@ -138,28 +130,6 @@ abstract class Base
 
     /** @var bool */
     private $allowBackToTheFuture = true;
-
-    /**
-     * @deprecated use `$this->psr7Request` instead
-     *
-     * @param  Request $request
-     * @return $this
-     */
-    public function setRequest(Request $request): self
-    {
-        $this->request = $request;
-        return $this;
-    }
-
-    /**
-     * @deprecated use `$this->psr7Request` instead
-     *
-     * @return Request
-     */
-    public function getRequest(): Request
-    {
-        return $this->request;
-    }
 
     /**
      * @return ServerRequestInterface

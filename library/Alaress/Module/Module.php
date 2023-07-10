@@ -680,7 +680,6 @@ class Module
         );
 
         $controller
-            ->setRequest($container->get('webFactory')->newRequest())
             ->setResponse($container->get('webFactory')->newResponse())
             ->setPsr7Request($request)
             ->setRequestQuery($requestQuery)
