@@ -7,6 +7,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
  */
 async function loadLayout(templateSelectURL: string) {
     // Include the X-Requested-With header so the server can detect this is an AJAX request
+    console.warn(templateSelectURL);
     const response = await fetch(templateSelectURL, {
         headers: {
             "X-Requested-With": "XMLHttpRequest",
