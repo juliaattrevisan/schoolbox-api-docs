@@ -164,7 +164,7 @@ module.exports = {
         usageSpecific: "./library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js",
         emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
 
-        //Staff Directory
+        //Vue component to display data in a table
         dataTable: "./vue/components/dataTable/dataTable.ts",
 
         // Record Media Modal
