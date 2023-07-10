@@ -8,6 +8,7 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 
+use Alaress\Web\Request\Values;
 use Calendar\Event\Type\EventInterface;
 use DateTime;
 use Alaress_Date_Format;
@@ -28,7 +29,6 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
-use Aura\Web\Request;
 use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 use Calendar_Api_Config_Mapper;
 
@@ -133,10 +133,10 @@ class Validation
     /**
      * Attempts to validate the creation or update of a booking from post data.
      *
-     * @param Item\Model     $resource
-     * @param Request\Values $postData
-     * @param Booking        $existingBooking  If provided, this is the booking that is being updated.
-     *                                         Leave it out of conflict checks.
+     * @param Item\Model $resource
+     * @param Values     $postData
+     * @param Booking    $existingBooking  If provided, this is the booking that is being updated.
+     *                                     Leave it out of conflict checks.
      * @return array
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
@@ -145,7 +145,7 @@ class Validation
      */
     public function validateBookingFromPostData(
         Item\Model $resource,
-        $postData,
+        Values $postData,
         Booking $existingBooking = null
     ) {
         // Check:

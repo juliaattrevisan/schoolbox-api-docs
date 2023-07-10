@@ -10,8 +10,8 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Web\Controller as Base;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Request;
 use Component_Definition;
 use Component_Instance;
 use Component_InstanceMapper;
@@ -890,7 +890,7 @@ class Controller extends Base\Base
     /**
      * Persist a course implementation, based upon submitted form data.
      *
-     * @param Request\Values $post POST data
+     * @param Values $post POST data
      *
      * @var string   $post  ['action']                                           {'import' | 'modify'}
      * @var int      $post  ['course_spec_id']
@@ -914,7 +914,7 @@ class Controller extends Base\Base
      * @throws MapperException
      * @throws MapperException\Deleted
      */
-    private function persistCourseImplementation(Request\Values $post): void
+    private function persistCourseImplementation(Values $post): void
     {
         // Parse form data
         $action       = trim($post['action']);

@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -863,14 +863,14 @@ class Controller extends Base
      * Create/update student records
      *
      * @param int                $primaryStudentId    The primary record's student ID
-     * @param RequestValues      $post                POST parameters passed by the create/update form
+     * @param Values             $post                POST parameters passed by the create/update form
      * @param array              $duplicateStudentIds List of students the primary record should be duplicated on
      * @param PastoralModel|null $parent              Parent record (if we are updating an existing record)
      *
      * @return GenericCollection
      * @throws MapperException
      */
-    private function processPastoralRecords(int $primaryStudentId, RequestValues $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
+    private function processPastoralRecords(int $primaryStudentId, Values $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
     {
         $heading = trim((string)$post->get('heading'));
         if (empty($heading)) {
@@ -1259,11 +1259,11 @@ class Controller extends Base
     /**
      * Prepare pastoral record attachments.
      *
-     * @param RequestValues $post POST request vars
+     * @param Values $post POST request vars
      * @return Collection
      * @throws MapperException
      */
-    private function prepareAttachments(RequestValues $post): Collection
+    private function prepareAttachments(Values $post): Collection
     {
         $newAttachments = $this->pastoralAttachmentMapper->createCollection();
 
@@ -1298,11 +1298,11 @@ class Controller extends Base
 
     /**
      * Returns recordActions from post vars, indexed by luAction id
-     * @param RequestValues $post
+     * @param Values $post
      * @return Collection
      * @throws MapperException
      */
-    private function prepareRecordActions(RequestValues $post): Collection
+    private function prepareRecordActions(Values $post): Collection
     {
         $recordActions = $this->pastoralRecordActionMapper->createCollection();
         if (!$this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {

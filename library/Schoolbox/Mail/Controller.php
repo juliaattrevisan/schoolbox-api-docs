@@ -11,7 +11,7 @@ namespace Schoolbox\Mail;
 
 use Alaress\Html\ToText as Html2Text;
 use Alaress\Web\Controller\Base;
-use Aura\Web\Request\Values;
+use Alaress\Web\Request\Values;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;

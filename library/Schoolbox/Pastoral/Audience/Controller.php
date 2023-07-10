@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
-use Aura\Web\Request\Values;
+use Alaress\Web\Request\Values;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;

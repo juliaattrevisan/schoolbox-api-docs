@@ -9,8 +9,8 @@
 namespace Schoolbox\Admin\Terms;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\Values;
 use Alaress_Date_Format;
-use Aura\Web\Request;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Term;
 use Schoolbox\YearLevel;
@@ -132,12 +132,12 @@ class Controller extends Base
     /**
      * Sets a model's fields from post data.
      *
-     * @param  Term\Model     $term
-     * @param  Request\Values $postdata
+     * @param  Term\Model $term
+     * @param  Values     $postdata
      * @return Term\Model
      * @throws \Exception if dates aren't valid
      */
-    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata): Term\Model
+    protected function populateModelFromPostData(Term\Model $term, Values $postdata): Term\Model
     {
         $term->setTitle($postdata->get('title'));
         $term->setCode($postdata->get('code'));

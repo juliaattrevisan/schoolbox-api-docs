@@ -24,7 +24,6 @@ use Alaress\Web\Request\IsXhr;
 use Aura\Di\Container;
 use Aura\Router\Route;
 use Aura\Router\RouterContainer;
-use Aura\Web\Request;
 use Aura\Web\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
