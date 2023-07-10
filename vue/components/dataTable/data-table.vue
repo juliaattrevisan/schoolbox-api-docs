@@ -24,7 +24,7 @@ const props = defineProps<Props>();
 const data = window.Vue.ref([] as unknown[]); // the table data to display
 const isLoading = window.Vue.ref(true); // whether the table data has been loaded
 const hasLoadError = window.Vue.ref(false); // whether there was an error loading the table data
-const columns: string[] = props.columnsConfig.map((column: ColumnConfig) => column.key); // the columns to display in the table, retrieved by getting the data key from the columns config
+const columns = props.columnsConfig.map((column: ColumnConfig) => column.key); // the columns to display in the table, retrieved by getting the data key from the columns config
 const options = getOptions(props.columnsConfig, props.tableOptions); // the options for the vue-tables-2 component
 const templates = getTemplates(props.columnsConfig); // any columns that use templates
 

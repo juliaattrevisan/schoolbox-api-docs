@@ -26,6 +26,7 @@ module.exports = {
         tsconfigRootDir: __dirname,
     },
     plugins: [
+        "import", // for eslint to lint imports
         "@typescript-eslint",
         // for eslint to be using typescript-eslint
         "eslint-plugin-jsdoc", // to lint jsdocs
@@ -48,5 +49,15 @@ module.exports = {
         // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
+    },
+    settings: {
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts", ".tsx"],
+        },
+        "import/resolver": {
+            typescript: {
+                alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+            },
+        },
     },
 };
