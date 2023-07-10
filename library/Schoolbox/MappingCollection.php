@@ -15,7 +15,6 @@ use CallbackFilterIterator;
 use Learning\Learnosity\Mapper;
 use function array_key_exists;
 
-
 /**
  * TODO - this probably shouldn't extend Collection anymore, as many Collection methods will
  *        break this class's internals. (it relies on being indexed by property)
