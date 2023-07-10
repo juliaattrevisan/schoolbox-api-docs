@@ -105,11 +105,24 @@ abstract class Base
     /** @var IExceptionGenerator */
     private $eg;
 
-    /** @var ISpecification */
-    private $isJsonSpec;
+    /**
+     * Specification for determining if this request expects JSON data to be
+     * returned in the response.
+     */
+    private ISpecification $isJsonSpec;
 
-    /** @var ISpecification */
-    private $isXhrSpec;
+    /**
+     * Specification for determining if this request was made as an
+     * XMLHttpRequest.
+     *
+     * @deprecated This header is sent only by older async request clients
+     *             (e.g. jQuery AJAX), and should no longer be relied upon.
+     *             Requests with the `Content-Type: application/json` header get
+     *             their request body into `$this->request->getParsedBody()`,
+     *             and requests which expect JSON to be returned should use
+     *             `$this->isJsonSpec` to determine what to return.
+     */
+    private ISpecification $isXhrSpec;
 
 
     /**
@@ -347,6 +360,8 @@ abstract class Base
 
 
     /**
+     * Should this controller's response return JSON?
+     *
      * @return bool
      */
     public function isJsonRequest(): bool
@@ -356,6 +371,7 @@ abstract class Base
 
 
     /**
+     * @deprecated
      * @param ISpecification $isXhrSpec
      * @return $this
      */
@@ -367,6 +383,10 @@ abstract class Base
 
 
     /**
+     * Was this request made as an XMLHttpRequest?
+     *
+     * @deprecated
+     *
      * @return bool
      */
     public function isXhrRequest(): bool
