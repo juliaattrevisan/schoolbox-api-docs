@@ -21,14 +21,14 @@
         });
 
         const layoutId = setSelectedLayout(); // Ensure the correct layout is selected
+        // Load the selected layout and insert it into the page
         document.dispatchEvent(new CustomEvent("MASONRY__LOAD_LAYOUT", {
             detail: {
-                templateSelectURL:  "/adminv2/component/get/homepage",
-                layoutId,
+                templateSelectURL:  `/adminv2/component/get/homepage/${layoutId}`,
             }
         }));
 
-        // Initialise the masonry layout
+        // Initialise the masonry layout once the layout has been loaded
         document.addEventListener("MASONRY__LAYOUT_LOADED", () => {
             document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
                 detail: {

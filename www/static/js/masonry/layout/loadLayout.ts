@@ -2,13 +2,12 @@ import { getLoadedHTML } from "@js/util/domUtils";
 
 /**
  * Load the selected layout and insert it into the page
- * @param {string} templateSelectURL - the ID of the layout to load
- * @param {number} layoutId - the ID of the layout to load
+ * @param {string} templateSelectURL - the URL to load the layout from
  * @returns whether the layout was loaded successfully
  */
-async function loadLayout(templateSelectURL: string, layoutId: number) {
+async function loadLayout(templateSelectURL: string) {
     // Include the X-Requested-With header so the server can detect this is an AJAX request
-    const response = await fetch(`${templateSelectURL}/${layoutId}`, {
+    const response = await fetch(templateSelectURL, {
         headers: {
             "X-Requested-With": "XMLHttpRequest",
         },
@@ -20,5 +19,5 @@ async function loadLayout(templateSelectURL: string, layoutId: number) {
 }
 
 document.addEventListener("MASONRY__LOAD_LAYOUT", (event) => {
-    loadLayout(event.detail.templateSelectURL, event.detail.layoutId);
+    loadLayout(event.detail.templateSelectURL);
 });
