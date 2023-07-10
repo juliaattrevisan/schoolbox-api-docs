@@ -30,6 +30,26 @@ POST parameters can be obtained using the `$this->requestPost` array instead. To
 $this->requestPost['cat']
 ```
 
+#### 2.2.1.1 The `Values` object
+
+Both `$this->requestQuery` and `$this->requestPost` data are instances of
+`\Alaress\Web\Request\Values`: this class allows array access via its
+`ArrayObject` superclass, and also provides helpers for fetching a value with a
+given type and alternate fallback value:
+```php
+$this->requestQuery->get('cat');
+$this->requestQuery->get('cat', 'dog');
+
+$this->requestQuery->getBool('checked');
+$this->requestQuery->getBool('checked', true);
+
+$this->requestQuery->getInt('id');
+$this->requestQuery->getInt('id', 1);
+
+$this->requestQuery->getFloat('value');
+$this->requestQuery->getFloat('value', 1.50);
+```
+
 ### 2.2.2 Setting The Response for View
 When a Controller finishes processing, it needs to set up the resultant data for the View to render. This is done via the `getResponse()` method.
 
