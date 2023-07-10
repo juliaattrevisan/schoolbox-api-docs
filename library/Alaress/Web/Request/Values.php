@@ -15,6 +15,18 @@ use ArrayObject;
  * Port of `\Aura\Web\Request\Values`: ported as it provides some convenience
  * methods for fetching data of a particular type.
  *
+ * Example:
+ * ```php
+ * // From GET or POST data:
+ * $requestQuery = new Values($_GET);
+ * $requestPost  = new Values($_POST);
+ *
+ * // From a PSR-7 request:
+ * parse_str($request->getUri()->getQuery(), $queryArray);
+ * $requestQuery = new Values($queryArray);
+ * $requestPost  = new Values($request->getParsedBody());
+ * ```
+ *
  * Differences from `\Aura\Web\Request\Values`:
  * - typed `get` methods have type definitions
  * - typed `get` methods return `null` if they can't be cast to the requested
@@ -75,11 +87,11 @@ class Values extends ArrayObject
      */
     public function getFloat(string $key, ?float $alt = null): ?float
     {
-        return filter_var(
-            $this->get($key, $alt),
-            FILTER_VALIDATE_FLOAT,
-            FILTER_NULL_ON_FAILURE,
-        );
+        $val = $this->get($key, $alt);
+        if (!is_numeric($val)) {
+            return null;
+        }
+        return (float)$val;
     }
 
     /**

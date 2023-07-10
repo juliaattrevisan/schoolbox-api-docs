@@ -18,6 +18,23 @@ use PHPUnit\Framework\TestCase;
 class ValuesTest extends TestCase
 {
     /**
+     * Test values for the request values object.
+     */
+    private const TEST_VALUES = [
+        'foo'     => 'bar',
+        'true'    => true,
+        'false'   => false,
+        '1'       => 1,
+        '11'      => 11,
+        '-11'     => -11,
+        '0'       => 0,
+        '0.5'     => 0.5,
+        'truthy'  => 'y',
+        'falsy'   => 'off',
+        'neither' => '???',
+    ];
+
+    /**
      * @dataProvider getTestGetData
      * @covers \Alaress\Web\Request\Values::get
      *
@@ -39,7 +56,7 @@ class ValuesTest extends TestCase
      */
     public function getTestGetData(): iterable
     {
-        $values = new Values(['foo' => 'bar']);
+        $values = new Values(self::TEST_VALUES);
         yield 'key exists'              => [$values, 'foo', null, 'bar'];
         yield 'key exists: alt'         => [$values, 'foo', 'goop', 'bar'];
         yield 'key does not exist'      => [$values, 'baz', null, null];
@@ -68,18 +85,7 @@ class ValuesTest extends TestCase
      */
     public function getTestGetBoolData(): iterable
     {
-        $values = new Values([
-            'true'    => true,
-            'false'   => false,
-            '1'       => 1,
-            '11'      => 11,
-            '-11'     => -11,
-            '0'       => 0,
-            '0.5'     => 0.5,
-            'truthy'  => 'y',
-            'falsy'   => 'off',
-            'neither' => '???',
-        ]);
+        $values = new Values(self::TEST_VALUES);
         yield 'true'                    => [$values, 'true', null, true];
         yield 'false'                   => [$values, 'false', null, false];
         yield 'numeric 1'               => [$values, '1', null, true];
@@ -116,18 +122,7 @@ class ValuesTest extends TestCase
      */
     public function getTestGetIntData(): iterable
     {
-        $values = new Values([
-            'true'    => true,
-            'false'   => false,
-            '1'       => 1,
-            '11'      => 11,
-            '-11'     => -11,
-            '0'       => 0,
-            '0.5'     => 0.5,
-            'truthy'  => 'y',
-            'falsy'   => 'off',
-            'neither' => '???',
-        ]);
+        $values = new Values(self::TEST_VALUES);
         yield 'true'                      => [$values, 'true', null, null];
         yield 'false'                     => [$values, 'false', null, null];
         yield 'numeric 1'                 => [$values, '1', null, 1];
@@ -164,29 +159,18 @@ class ValuesTest extends TestCase
      */
     public function getTestGetFloatData(): iterable
     {
-        $values = new Values([
-            'true'    => true,
-            'false'   => false,
-            '1'       => 1,
-            '11'      => 11,
-            '-11'     => -11,
-            '0'       => 0,
-            '0.5'     => 0.5,
-            'truthy'  => 'y',
-            'falsy'   => 'off',
-            'neither' => '???',
-        ]);
+        $values = new Values(self::TEST_VALUES);
         yield 'true'                      => [$values, 'true', null, null];
         yield 'false'                     => [$values, 'false', null, null];
         yield 'numeric 1'                 => [$values, '1', null, 1];
         yield 'numeric 11'                => [$values, '11', null, 11];
         yield 'numeric -11'               => [$values, '-11', null, -11];
         yield 'numeric 0'                 => [$values, '0', null, 0];
-        yield 'numeric 0.5 (cast to int)' => [$values, '0.5', null, 0];
+        yield 'numeric 0.5'               => [$values, '0.5', null, 0.5];
         yield 'truthy'                    => [$values, 'truthy', null, null];
         yield 'falsy'                     => [$values, 'falsy', null, null];
         yield 'neither'                   => [$values, 'neither', null, null];
         yield 'key does not exist'        => [$values, 'null', null, null];
-        yield 'key does not exist: alt'   => [$values, 'null', 1, 1];
+        yield 'key does not exist: alt'   => [$values, 'null', 1.5, 1.5];
     }
 }
