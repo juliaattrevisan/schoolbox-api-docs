@@ -2360,7 +2360,16 @@ abstract class Mapper implements IMapper
             'order'   => $this->getDefaultOrderByParams(),
         );
         $options      = array_merge($defaults, $options);
-        $quoted_table = $this->databaseRead->getQuoter()->quoteIdentifier($this->table);
+
+        /**
+         * Dam transactions on the write connector means objects won't exist in the read connection when we are still within a transaction...
+         *
+         */
+        if ($options['queryWrite'] ?? false) {
+            $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
+        } else {
+            $quoted_table = $this->databaseRead->getQuoter()->quoteIdentifier($this->table);
+        }
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
@@ -2409,7 +2418,15 @@ abstract class Mapper implements IMapper
 
         $this->monitor->startExecuteSelectTimer($this, $predicate);
 
-        $statement = $this->databaseRead->prepare($query);
+        /**
+         * Dam transactions on the write connector means objects won't exist in the read connection when we are still within a transaction...
+         *
+         */
+        if ($options['queryWrite'] ?? false) {
+            $statement = $this->database->prepare($query);
+        } else {
+            $statement = $this->databaseRead->prepare($query);
+        }
         foreach ($params as $name => $value) {
             $statement->bindValue($name, $value);
         }

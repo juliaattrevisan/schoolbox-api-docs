@@ -498,7 +498,8 @@ class DataSource
         // If this exceptioned out, it was never meant to be
         $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn(
             'assessment_id',
-            $grid->getAssessment()->getId()
+            $grid->getAssessment()->getId(),
+            ['queryWrite' => true]
         );
 
         // TODO some way to wrap all this in a transaction would be nice... -_-;
