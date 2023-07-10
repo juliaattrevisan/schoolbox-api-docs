@@ -205,7 +205,6 @@ class Controller extends Base
      */
     public function getApiTestEnrolmentTable(string $schoolCode)
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
         if (!$this->isValidAuth($schoolCode)) {
@@ -230,7 +229,6 @@ class Controller extends Base
      */
     public function getFolderAccessBySchool(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
         if (!$this->isValidAuth($schoolCode)) {
@@ -373,7 +371,6 @@ class Controller extends Base
      */
     public function postUserRegistrations(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
         if (!$this->isValidAuth($schoolCode)) {
