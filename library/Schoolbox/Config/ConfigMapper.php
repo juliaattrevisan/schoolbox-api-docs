@@ -352,7 +352,7 @@ class ConfigMapper extends Mapper
     public function findAllConfigs(): array
     {
         $configs = [];
-        $query   = $this->getDatabase()->prepare("SELECT name, value, field_id FROM {$this->getTable()}");
+        $query   = $this->getDatabaseRead()->prepare("SELECT name, value, field_id FROM {$this->getTable()}");
         $query->execute();
         foreach ($query as $row) {
             $configs[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
@@ -375,7 +375,7 @@ class ConfigMapper extends Mapper
             WHERE hidden = 'false'
             ORDER BY lu_config_type.sequence
         ";
-        $statement = $this->getDatabase()->query($query);
+        $statement = $this->getDatabaseRead()->query($query);
         $result    = [];
         foreach ($statement as $row) {
             $result[] = $row['type'];

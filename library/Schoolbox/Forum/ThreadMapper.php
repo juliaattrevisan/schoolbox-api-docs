@@ -158,7 +158,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
 			WHERE thread.threadID = ?
 			ORDER BY firstPost.date ASC LIMIT 1 ";
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         $statement->execute(array($id));
 
         if (($row = $statement->fetch()) !== false) {
@@ -182,7 +182,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
      */
     public function findInvolvedUsers(Thread $thread)
     {
-        $stmt = $this->database->prepare("
+        $stmt = $this->databaseRead->prepare("
             SELECT DISTINCT p.userID
             FROM forumThread t
             LEFT JOIN forumPost p ON t.threadID = p.threadID
@@ -215,7 +215,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
         $limit = (int)$limit;
         $offset = (int)$offset;
 
-        $stmt = $this->database->prepare("
+        $stmt = $this->databaseRead->prepare("
             SELECT
                 {$this->getColumnString('t')},
                 {$this->getJoinColumnString('owner', 'o')},
@@ -273,7 +273,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
          * break up the forum query into 2 separate checks, one to check if it is on a page,
          * the other to see if it is alt sourced.
          */
-        $homepageQuery  = $this->database->prepare("SELECT ci.id FROM component_instance ci
+        $homepageQuery  = $this->databaseRead->prepare("SELECT ci.id FROM component_instance ci
         JOIN component_definition cd ON ci.`component_definition_id`=cd.`id`
         WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage'
         AND identifier = :id");
@@ -289,7 +289,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             return true;
         }
 
-        $altSourceQuery  = $this->database->prepare("
+        $altSourceQuery  = $this->databaseRead->prepare("
 SELECT
     `component_instance`.`id`, `component_instance`.`identifier`, `cci`.`value`
 FROM        `component_instance`
@@ -364,7 +364,7 @@ WHERE
             $query .= " LIMIT 0, :size";
             $params['size'] = (int)$config['size'];
         }
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         foreach ($params as $param => $value) {
             $statement->bindValue($param, $value, PDO::PARAM_INT);
         }
@@ -437,7 +437,7 @@ WHERE
      */
     public function findPostCount(Collection $threads): array
     {
-        $statement = $this->database->prepare("
+        $statement = $this->databaseRead->prepare("
             SELECT threadID, count(*) -1 as count
             FROM forumPost
             WHERE threadID in (" . implode(',', $threads->getPropertyValues('id')) . ")

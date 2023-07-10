@@ -22,9 +22,9 @@ class Component
     /**
      * Constructor - sets up database
      */
-    public function __construct()
+    public function __construct(IConnector $database)
     {
-        $this->database = Factory::getInstanceInternal();
+        $this->database = $database;
     }
 
     public function componentInstances($module = 'homepage')

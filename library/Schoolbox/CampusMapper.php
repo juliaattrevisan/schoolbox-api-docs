@@ -107,7 +107,7 @@ class CampusMapper extends Mapper
                 ORDER BY luCampus.sequence
 			";
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
 
         $statement->execute(
             [
@@ -137,7 +137,7 @@ class CampusMapper extends Mapper
     {
         $uMap = UserMapper::getInstance();
 
-        $stmt = $this->database->prepare(
+        $stmt = $this->databaseRead->prepare(
             "
             SELECT {$uMap->getColumnString('u')}
             FROM userCampus c
@@ -184,7 +184,7 @@ class CampusMapper extends Mapper
             ORDER BY c.name
         ";
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         $statement->execute(
             [
                 'name' => "%{$name}%",
@@ -219,7 +219,7 @@ class CampusMapper extends Mapper
         ";
         $query .= ' WHERE ' . implode(' AND ', $pb->getWhere());
 
-        $statement = $this->getDatabase()->query($query, $pb->getParams());
+        $statement = $this->getDatabaseRead()->query($query, $pb->getParams());
 
         $campusCollection = $this->createCollection();
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {

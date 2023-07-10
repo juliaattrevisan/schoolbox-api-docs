@@ -17,7 +17,7 @@ $months = $start->diffInMonths($end) + 1;
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;
 
-$report = new Schoolbox\Engagement\DueWork();
+$report = new Schoolbox\Engagement\DueWork($this->getDi()->get('databaseInternalRead'));
 
 $visibilityLookup = array('Staff Only','Staff and Students', 'Staff, Students and Parents');
 

@@ -573,7 +573,7 @@ class UserMapper extends Mapper
             WHERE
         " . implode(' AND ', $pb->getWhere());
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
 
         $statement->execute($pb->getParams());
 
@@ -698,7 +698,7 @@ class UserMapper extends Mapper
         if (is_array($order) && !empty($order)) {
             $order_parts = array();
             foreach ($order as $column => $direction) {
-                $order_parts[] = $this->database->getQuoter()->quoteIdentifier($column) . (strtoupper($direction) == 'DESC' ? ' DESC' : ' ASC');
+                $order_parts[] = $this->databaseRead->getQuoter()->quoteIdentifier($column) . (strtoupper($direction) == 'DESC' ? ' DESC' : ' ASC');
             }
             $query .= ' ORDER BY ' . (implode(', ', $order_parts));
         }
@@ -708,7 +708,7 @@ class UserMapper extends Mapper
         }
 
         $users = new Collection();
-        $statement = $this->getDatabase()->prepare($query);
+        $statement = $this->getDatabaseRead()->prepare($query);
         $statement->execute($params);
 
         foreach ($statement as $row) {
@@ -736,7 +736,7 @@ class UserMapper extends Mapper
      */
     public function hashPassword(#[SensitiveParameter] string $password): string
     {
-        $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
+        $statement = $this->getDatabaseRead()->prepare('SELECT PASSWORD(?)');
         $statement->execute([$password]);
         return $statement->fetchColumn();
     }
@@ -1069,7 +1069,7 @@ class UserMapper extends Mapper
     public function getCalendarView(int $userId): string
     {
         $query = "SELECT calendar_view FROM {$this->table} WHERE id = :userId";
-        return $this->database->query($query, ['userId' => $userId])->fetchColumn();
+        return $this->databaseRead->query($query, ['userId' => $userId])->fetchColumn();
     }
 
     /**

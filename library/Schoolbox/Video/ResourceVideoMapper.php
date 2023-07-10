@@ -130,7 +130,7 @@ class ResourceVideoMapper extends Mapper
             $options['mime'] = 'video';
         }
         $mime      = $options['mime'] . '/%';
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         $statement->bindParam(':cat', $category);
         $statement->bindParam(':mime', $mime);
 
@@ -212,7 +212,7 @@ class ResourceVideoMapper extends Mapper
             $query .= 'LIMIT 0,:lim';
         }
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         $statement->bindParam(':pageId', $pageId);
 
         if ($limit != false) {
@@ -250,7 +250,7 @@ class ResourceVideoMapper extends Mapper
     {
         $fileMapper = FileMapper::getInstance();
 
-        $statement = $this->database->prepare(
+        $statement = $this->databaseRead->prepare(
             "
             SELECT {$fileMapper->getColumnString('f')}, {$this->getColumnString('vq')}
                      FROM `{$this->getTable()}` vq
@@ -289,7 +289,7 @@ class ResourceVideoMapper extends Mapper
     {
         $fileMapper = MyFileMapper::getInstance();
 
-        $statement = $this->database->prepare(
+        $statement = $this->databaseRead->prepare(
             "
             SELECT
                 {$fileMapper->getColumnString('mf')},
@@ -345,7 +345,7 @@ class ResourceVideoMapper extends Mapper
                         vq.status != 'failed'
         ";
 
-        $statement = $this->database->prepare($sql);
+        $statement = $this->databaseRead->prepare($sql);
         $statement->execute([$hash]);
 
         /** @var MimetypeMapper $mimeMapper */
