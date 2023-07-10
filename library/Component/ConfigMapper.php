@@ -80,7 +80,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             AND `key` = :key
         ";
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         $statement->bindParam(':instanceId', $instanceId);
         $statement->bindParam(':key', $key);
         $statement->execute();
@@ -174,7 +174,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             $to   = $this->determineDestinationPath($instance, $access);
 
             if (isset($from)) {
-                $this->getDatabase()->query($query, ['from' => $from, 'to' => $to]);
+                $this->getDatabaseRead()->query($query, ['from' => $from, 'to' => $to]);
             }
         }
     }

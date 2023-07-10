@@ -234,7 +234,7 @@ class Result extends Base
         $foldersWithRoleBasedPermissions = [];
         $articlesWithRoleBasedPermissions = [];
 
-        $statement = $mapper->getDatabase()->query($strategyFactory->makeSimpleStrategy('folder')->getSearchSql($user));
+        $statement = $mapper->getDatabaseRead()->query($strategyFactory->makeSimpleStrategy('folder')->getSearchSql($user));
 
         /* Make a list of folders to which you have role-based read+ perms
          */
@@ -247,7 +247,7 @@ class Result extends Base
          */
         $audienceMapper = \Schoolbox\Comms\News\Audience\Simple\Mapper::getInstance();
 
-        $result = $audienceMapper->getDatabase()->query("
+        $result = $audienceMapper->getDatabaseRead()->query("
             SELECT comms_news_article_id, entity_value
             FROM {$audienceMapper->getTable()}
             WHERE entity_type = 'folder'
@@ -307,7 +307,7 @@ class Result extends Base
             LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
-        $stmt = $mapper->getDatabase()->prepare($query);
+        $stmt = $mapper->getDatabaseRead()->prepare($query);
         $stmt->execute();
 
         return $stmt->fetchAll();
