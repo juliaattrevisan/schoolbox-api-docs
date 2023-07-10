@@ -1,7 +1,7 @@
-import {ClassicEditor} from "@ckeditor/ckeditor5-build-classic";
-import {EditorConfig} from "@js/editor/types/editorTypes";
-import {EditorEvent, EditorDeletedEventInfo} from "@js/editor/event/editorEvent";
-import {insertElementAfter} from "@js/util/domUtils";
+import { ClassicEditor } from "@ckeditor/ckeditor5-build-classic";
+import { EditorConfig } from "@js/editor/types/editorTypes";
+import { EditorEvent, EditorDeletedEventInfo } from "@js/editor/event/editorEvent";
+import { insertElementAfter } from "@js/util/domUtils";
 
 /**
  * Returns the settings for the word count plugin
@@ -69,7 +69,7 @@ function getButtonText(buttonElem: Element) {
             buttonText = buttonElem.innerHTML;
             break;
         default:
-            throw new Error(`Unsupported button tag name '${  buttonTagName  }'.`);
+            throw new Error(`Unsupported button tag name '${buttonTagName}'.`);
     }
 
     return buttonText ?? "";
@@ -92,7 +92,7 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
             buttonElem.innerHTML = newText;
             break;
         default:
-            throw new Error(`Unsupported button tag name '${  buttonTagName  }'.`);
+            throw new Error(`Unsupported button tag name '${buttonTagName}'.`);
     }
 
     (buttonElem as HTMLInputElement | HTMLButtonElement).disabled = maxCharCountExceeded;
@@ -168,8 +168,8 @@ function setupOnUpdateTextEventHandler(
     config: EditorConfig,
     wordCountContainer: HTMLDivElement
 ) {
-    if (config.maxCharCount !== undefined || config.maxCharCount <= 0) {
-        throw new Error('No maxCharCount has been set, so this function should not have been called.');
+    if (config.maxCharCount === undefined || config.maxCharCount === -1) {
+        throw new Error("No maxCharCount has been set, so this function should not have been called.");
     }
 
     const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
@@ -242,7 +242,7 @@ function onEditorDeleted(event: Event) {
     const eventDetail = event.detail as EditorDeletedEventInfo;
 
     // If one submit button is disabled, they will all be disabled. Therefore, we only need to check the first.
-    const firstSubmitButton: HTMLButtonElement|HTMLInputElement = eventDetail.submitButtons[0];
+    const firstSubmitButton: HTMLButtonElement | HTMLInputElement = eventDetail.submitButtons[0];
 
     if (firstSubmitButton !== null && firstSubmitButton.disabled) {
         let oneOrMoreEditorsAreOverfilled = false;
@@ -250,13 +250,13 @@ function onEditorDeleted(event: Event) {
         // Check each CKEditor in the same form as the deleted editor to see whether its content storage limit has been exceeded.
         Object.values(window.sbProps.editors as Array<ClassicEditor>).forEach((ed) => {
             const edSourceElement = ed.sourceElement as HTMLElement;
-            const edContainingForm = edSourceElement.closest('form');
+            const edContainingForm = edSourceElement.closest("form");
 
             if (edContainingForm === null) {
                 return; // This editor does not belong to a form, so we don't need to check it.
             }
 
-            const edContainingFormId = edContainingForm.getAttribute('id');
+            const edContainingFormId = edContainingForm.getAttribute("id");
 
             if (eventDetail.containingFormId !== edContainingFormId) {
                 return; // This editor does not belong to the form specified in eventDetail.
@@ -271,8 +271,8 @@ function onEditorDeleted(event: Event) {
         if (!oneOrMoreEditorsAreOverfilled) {
             // Re-enable submit button(s) and restore the original button text.
             eventDetail.submitButtons.forEach((submitButton) => {
-                const buttonText = submitButton.getAttribute('value') ?? '';
-                const buttonTextOrig = buttonText.replace(getButtonTextDisabledDueToStorageLimitSuffix(), '');
+                const buttonText = submitButton.getAttribute("value") ?? "";
+                const buttonTextOrig = buttonText.replace(getButtonTextDisabledDueToStorageLimitSuffix(), "");
                 changeButtonState(submitButton, false, buttonTextOrig);
             });
         }
@@ -313,7 +313,7 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
 
         if (config.addMaxCharCountDefaultEventListeners) {
             const containingForm = sourceElement.closest("form");
-            const submitButtons: Array<HTMLButtonElement|HTMLInputElement> =
+            const submitButtons: Array<HTMLButtonElement | HTMLInputElement> =
                 containingForm === null
                     ? []
                     : Array.from(containingForm.querySelectorAll("input[type=submit], button[type=submit]"));
@@ -325,7 +325,7 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
     }
 
     // If the editor is contained within a form...
-    if (sourceElement.closest('form') !== null) {
+    if (sourceElement.closest("form") !== null) {
         // NOTE: The below line may be called multiple times (if multiple editors are added to a page), but the repeated
         //       calls will not cause the event listener to be added multiple times.  This would be different if the
         //       function was defined inside the call below.
