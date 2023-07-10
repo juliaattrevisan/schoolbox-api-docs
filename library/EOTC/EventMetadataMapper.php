@@ -57,7 +57,7 @@ class EventMetadataMapper extends BaseMapper
 			WHERE event_id = :eventId
 		";
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->databaseRead->prepare($query);
         $statement->execute(["eventId" => $event->getId()]);
 
         $allMetadataIds = array();
