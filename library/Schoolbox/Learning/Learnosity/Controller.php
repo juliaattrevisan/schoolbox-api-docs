@@ -23,7 +23,8 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
 
