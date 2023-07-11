@@ -1,0 +1,24 @@
+{##
+ # Modify Learnosity Quiz contents
+ #
+ # @param IAssessable $assessment    Our schoolbgox quiz instance
+ # @param string|array $initOptions  Learnosity API initialisation object
+ #}
+<script src="https://authorapi.learnosity.com/?v2023.2.LTS"></script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ assessment.title }} questions</h2>
+        <section class="content">
+
+            <div id="learnosity-author"></div>
+
+            <script>
+                let authorApp = LearnosityAuthor.init(
+                    {{ initOptions | raw }}
+                );
+            </script>
+        </section>
+    </div>
+</div>
+

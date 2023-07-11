@@ -332,7 +332,7 @@ class Controller extends Assessment\Controller
          * but send the return url with it
          */
         $quiz     = $this->getQuizForAssessmentId($assessment->getId());
-        $redirect = "/assess/section/create/{$quiz->getId()}";
+        $redirect = $this->getRouteIfAuthorized('learnosity.content', ['quizId' => $quiz->getId()]);
 
         if ($postReturnUrl) {
             $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";

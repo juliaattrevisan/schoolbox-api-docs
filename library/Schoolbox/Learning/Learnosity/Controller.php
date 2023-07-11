@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Learnosity;
 use Alaress\Web\Controller\Base;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootstrap.php';
 
@@ -23,6 +24,51 @@ class Controller extends Base
      */
     public function __construct()
     {
+    }
+
+
+    public function getContent(IAssessable $assessment): void
+    {
+        $payload = [
+            'mode' => 'activity_edit',
+
+            /* A Learnosity uuid that we arbitrarily prescribed
+             */
+            'reference' => $assessment->getLearnosityReference(),
+
+            'config' => [
+                'activity_edit' => [
+                    'back' => false,
+                ]
+            ],
+
+            'user' => [
+                /* Corresponds to a user in the Learnosity Console who will be
+                 * considered "the author" of stuff created by the school's teachers
+                 * Misconfiguring this leads to Error 10000 which has no definition
+                 */
+                'id' => (string)$this->getConfigLoader()->get('learnosity_author_id'),
+                /* These fields are superfluous and are presumably
+                 * used for auditing; we attribute an individual user's
+                 * name to a collectively-utilised author account
+                 * configured in Learnosity itself (that's the id above)
+                 */
+                'firstname' => $this->getUser()->getFirstname(),
+                'lastname' => $this->getUser()->getLastname(),
+                'email' => $this->getUser()->getEmail()
+            ]
+        ];
+
+        $api = new Api(
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->getConfigLoader()->get('logs_dir')
+        );
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/activityList.twig', [
+            'assessment' => $assessment,
+            'initOptions' => $api->initOptions('author', $payload)
+        ])->setTitle('Example Activity List'));
     }
 
 
