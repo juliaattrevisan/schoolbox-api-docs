@@ -24,6 +24,9 @@ class Factory
     /**
      * Constructor
      *
+     * TODO inject current user:
+     *      see \Alaress\Web\Controller\Base::injectCurrentUserGlobal
+     *
      * @param ResponseFactoryInterface      $responseFactory A response factory
      * @param StreamFactoryInterface        $streamFactory   A stream factory
      * @param Environment                   $twig            A Twig environment

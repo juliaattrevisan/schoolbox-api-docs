@@ -740,6 +740,7 @@ abstract class Kernel
                         );
                     }
 
+                    // TODO hand-build factories instead of discovering?
                     $psr17Factory = new Psr17Factory();
                     return new ResponseFactory(
                         $psr17Factory,
