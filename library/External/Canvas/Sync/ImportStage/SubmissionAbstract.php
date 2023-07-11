@@ -86,6 +86,12 @@ abstract class SubmissionAbstract
      */
     protected function loadParticipants(IAssessable $assessmentImpl): ?IAssessable
     {
+        /** @phpstan-ignore-next-line */
+        if (!$assessmentImpl->getContext()) {
+            // this seems to happen for past assessments in future term in canvas
+            $this->log->warning("Failed to load participant: assessment {$assessmentImpl->getId()} does not have context.");
+            return null;
+        }
         $assessmentCollection = $this->assessmentDataSource->createCollection()
                                                            ->add($assessmentImpl);
         try {
