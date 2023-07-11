@@ -231,11 +231,58 @@ function setupOnUpdateTextEventHandler(
 }
 
 /**
+ * Check for state transitions from disabled to enabled, and on those transitions, fire the WordCount plugin 'update' event.
+ * The purpose of doing this is to fix the disabled/enabled state of the form's submit button(s) if external code has
+ * enabled the submit button without checking whether any of the CKEditor textareas are overfilled.  If any are overfilled,
+ * the submit button should be disabled.
+ * @param { Array<MutationRecord> } mutationList - An array of MutationRecords provided by a MutationObserver.
+ */
+function onMutateSubmitButton(mutationList: Array<MutationRecord>) {
+    for (const mutation of mutationList) {
+        if (mutation.type !== "attributes" || mutation.attributeName !== "disabled") {
+            continue; // Skip mutations we are not interested in.
+        }
+
+        const button = mutation.target as HTMLInputElement | HTMLButtonElement;
+
+        if (button.disabled) {
+            continue; // We are only interested in transitions from disabled to enabled.
+        }
+
+        const form = button.closest("form");
+
+        if (form === null) {
+            continue; // No containing form so nothing to do.
+        }
+
+        for (const textarea of form.querySelectorAll("textarea")) {
+            const idAttr = textarea.getAttribute("id");
+            const editor = window.sbProps.editors[idAttr] as ClassicEditor;
+
+            if (editor === undefined) {
+                continue; // No editor on this textarea, so skip it.
+            }
+            console.info("textareaId: ", idAttr);
+
+            // The submit button has changed from disabled to enabled, so fire the wordcount update event.
+            // This will cause the onUpdateText() function to run, which will then re-disable the submit button
+            // if any of the CKEditor textareas are overfilled.
+            // This is done so that other code does not have to know about this file.  The other code might
+            // enable the submit button without knowing that it ought to be disabled because of overfilled
+            // CKeditor textareas, and that will be totally okay, because the mutation observer will notice,
+            // this code will be invoked to fix the situation.
+            console.info("Firing update event");
+            editor.plugins.get("WordCount").fire("update");
+        }
+    }
+}
+
+/**
  * Set up a MutationObserver to observe changes to the disabled state of the submit button.
  * @param {HTMLElement} submitButton - The submit button
  * @param {EditorConfig} config - The EditorConfig object relevant to the editor.
  */
-function setupButtonEnabledMutationObserver(submitButton: HTMLElement, config: EditorConfig) {
+function setupSubmitButtonMutationObserver(submitButton: HTMLElement) {
     const submitButtonId = submitButton.getAttribute("id");
 
     if (submitButtonId === null) {
@@ -247,47 +294,16 @@ function setupButtonEnabledMutationObserver(submitButton: HTMLElement, config: E
     }
 
     if (window.sbProps.disabledObserverIsAddedBySubmitButtonId[submitButtonId] === undefined) {
-        const observer = new MutationObserver((mutationList) => {
-            for (const mutation of mutationList) {
-                if (mutation.type !== "attributes" || mutation.attributeName !== "disabled") {
-                    continue; // Skip mutations we are not interested in.
-                }
-
-                const button = mutation.target as HTMLInputElement | HTMLButtonElement;
-
-                if (button.disabled) {
-                    continue; // We are only interested in transitions from disabled to enabled.
-                }
-
-                const form = button.closest("form");
-
-                if (form === null) {
-                    continue; // No containing form so nothing to do.
-                }
-
-                for (const textarea of form.querySelectorAll("textarea")) {
-                    const idAttr = textarea.getAttribute("id");
-                    const editor = window.sbProps.editors[idAttr];
-
-                    if (editor === undefined) {
-                        continue; // No editor on this textarea, so skip it.
-                    }
-
-                    // The submit button has changed from disabled to enabled, so fire the wordcount update event.
-                    // This will cause the onUpdateText() function to run, which will then re-disable the submit button
-                    // if any of the CKEditor textareas are overfilled.
-                    // This is done so that other code does not have to know about this file.  The other code might
-                    // enable the submit button without knowing that it ought to be disabled because of overfilled
-                    // CKeditor textareas, and that will be totally okay, because the mutation observer will notice,
-                    // this code will be invoked to fix the situation.
-                    editor.plugins.get("WordCount").fire("update");
-                }
-            }
-        });
+        const observer = new MutationObserver(onMutateSubmitButton);
 
         observer.observe(submitButton, { attributes: true });
 
+        console.info("setupSubmitButtonMutationObserver() added observer for submitButtonId ", submitButtonId);
         window.sbProps.disabledObserverIsAddedBySubmitButtonId[submitButtonId] = true; // Remember that a disabled observer has been added for this submit button.
+        console.info(
+            "setupSubmitButtonMutationObserver() disabledObserverIsAddedBySubmitButtonId: ",
+            window.sbProps.disabledObserverIsAddedBySubmitButtonId
+        );
     }
 }
 
@@ -383,7 +399,7 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
                 addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
 
                 for (const submitButton of submitButtons) {
-                    setupButtonEnabledMutationObserver(submitButton, config);
+                    setupSubmitButtonMutationObserver(submitButton);
                 }
             }
         }
