@@ -45,22 +45,11 @@
 
 <script type="text/javascript">
 $(function () {
+    // listen for any dimension changes to the tile to trigger fixTileHeightAndFontSize
     const tile = document.querySelector("#{{ componentId }}-tile-{{ tile.id }}");
-
-    let prevTileWidthPx = null; // Initial value null to force detection of change in width on initial page load.
-
     const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-            const currentTileWidthPx = entry.contentRect.width;
-
-            // After initial run on page load, run resizeTile() only if width changes.
-            if (currentTileWidthPx !== prevTileWidthPx) {
-                $(entry.target).fixTileHeightAndFontSize();
-                prevTileWidthPx = currentTileWidthPx;
-            }
-        }
+        $(tile).fixTileHeightAndFontSize();
     });
-
     resizeObserver.observe(tile);
 });
 </script>
