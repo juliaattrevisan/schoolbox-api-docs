@@ -284,7 +284,7 @@ class CreateAndVerifyCest
         $i->amGoingTo('Publish the news article and ensure the audience remains the same');
         $itemPage->modifyArticle();
         $formPage->submit();
-        $i->waitForText('Your article has been submitted for moderation',10);
+        $i->waitForText('Your article has been submitted for moderation', 10);
         $formPage->seeRoles(['1 Team & 1 House','Year 9','Inc. parents of students']);
     }
 
@@ -335,7 +335,7 @@ class CreateAndVerifyCest
         sleep(4);
         $formPage->seeRoles(['News Folder Test','Teacher','Ms Eden Reed (506) (Junior Student)']);
         $formPage->submit();
-        $i->waitForText('PUBLISHED',10);
+        $i->waitForText('PUBLISHED', 10);
         $formPage->seeRoles(['News Folder Test','Teacher','PUBLISHED']);
     }
 

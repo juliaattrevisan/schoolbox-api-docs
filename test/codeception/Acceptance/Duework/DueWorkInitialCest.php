@@ -221,7 +221,7 @@ class DueWorkInitialCest
         $i->waitForElementNotVisible('Eden');
         $i->amOnUrl($studentWeAreMarkingUrl);
         //this if-clause is due to an intermittent issue SA-14676
-        if ($i->tryToSeeElement('a.button[data-draft=publish]')){
+        if ($i->tryToSeeElement('a.button[data-draft=publish]')) {
             $i->amGoingTo('publish the feedback');
             $i->click('a.button[data-draft=publish]');
             $i->waitForElementNotVisible('Eden');
