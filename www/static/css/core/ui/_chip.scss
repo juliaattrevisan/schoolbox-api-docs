@@ -1,0 +1,78 @@
+/**
+ *  chip.scss
+ *
+ *  See: https://schoolbox.atlassian.net/browse/SA-15995
+ *  Basically, an alternative and more visual way to do checkbox selections. Read the pantry for example use cases.
+**/
+
+.sb-chips {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--whitespace-s);
+
+    li > input[type="checkbox"] {
+        display: none;
+
+        &:checked + label {
+            background-color: var(--content-ui-foreground);
+            color: var(--content-ui-background);
+            font-weight: 600;
+
+            .sb-chip__icon {
+                &::before {
+                    margin-left: 0.25rem;
+                    display: inline-block;
+                }
+
+                &::after {
+                    display: none;
+                }
+            }
+        }
+
+        & + label {
+            font-weight: 600;
+            padding: var(--whitespace-s) var(--whitespace-m);
+            color: var(--content-ui-foreground);
+            border: 2px solid var(--content-ui-foreground);
+            border-radius: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            margin: 0;
+
+            .sb-chip__icon {
+                margin-left: var(--whitespace-s);
+                color: var(--content-ui-background);
+                line-height: normal;
+
+                &::before {
+                    display: none;
+                    font-size: 12px;
+                    padding-right: 0;
+                }
+
+                &::after {
+                    display: flex;
+                    align-items: center;
+                    opacity: 0.5;
+                    content: "";
+                    width: 0.25rem;
+                    height: 0.25rem;
+                    margin-left: 0.5rem;
+                    margin-right: 0.25rem;
+                    border-radius: 2048px;
+                    background-color: var(--content-ui-foreground);
+                }
+            }
+        }
+    }
+
+    &--rounded {
+        li > input[type="checkbox"] + label {
+            border-radius: 2048px;
+        }
+    }
+}
