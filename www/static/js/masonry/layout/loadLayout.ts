@@ -1,3 +1,8 @@
+/**
+ * This is used within all Template pages to load the selected layout into the page,
+ * ensuring any JS contained within the layout is executed.
+ */
+
 import { getLoadedHTML } from "@js/util/domUtils";
 
 /**
