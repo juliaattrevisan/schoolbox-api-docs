@@ -84,8 +84,8 @@
                         var gridWidth = Math.max(
                             rules.grid_width.min,
                             Math.min(
-                                    rules.grid_width.max,
-                                    Number(form.find('input[name="grid_width"]').val())
+                                rules.grid_width.max,
+                                Number(form.find('input[name="grid_width"]').val())
                             )
                         );
                         // Grid padding: a set pixel count
@@ -103,8 +103,8 @@
                         var colCount = Math.max(
                             rules.column_count.min,
                             Math.min(
-                                    rules.column_count.max,
-                                    Number(form.find('input[name="column_count"]').val())
+                                rules.column_count.max,
+                                Number(form.find('input[name="column_count"]').val())
                             )
                         );
                         // Column padding: a % of the width of the tile is taken up with padding
@@ -117,11 +117,10 @@
                             tileList.find('[data-tile]').css({
                                 "width":          String(tileWidth)+"%",
                                 "margin":         String(tilePadding / 2)+"%",
-                                "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
+                                "padding-bottom": String(tileWidth * aspect)+"%"
                             });
                         }
                 }
-                tileList.find('.tile').resizeTileTitle({minFontSize: 0.725, maxFontSize: 1.725, unit: 'rem'});
             }
         });
 
@@ -255,7 +254,10 @@
 
         document.querySelector('a[data-add-tile]').addEventListener('click', interceptAddTile);
 
-    })
+        // Trigger change event on page load in case browser has remembered the selected option from a prior visit.
+        // (Firefox does this.  To test, select a different tile_shape option then refresh the page without saving.)
+        form.find(':input[name="tile_shape"]').change();
+    });
 })(jQuery);
 </script>
 

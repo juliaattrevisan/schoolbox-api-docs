@@ -56,3 +56,4 @@ export function appendWidth(formData) {
         document.querySelector(getMasonryConfig().editColumns.columnWidthSelector).getAttribute("data-slider")
     );
 }
+

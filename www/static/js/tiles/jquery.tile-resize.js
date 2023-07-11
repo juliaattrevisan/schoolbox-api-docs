@@ -1,45 +1,21 @@
 /**
- * Tile resizer:
- * Resizes the title within grid tiles based on the width of the tile.
- *
- * Settings:
- * * minFontSize, maxFontSize: the font size bounds for the title
- *                     Defaults to a range of 1-6 em
- * * unit:             the unit minFontSize, maxFontSize and getSize are measured in.
- *                     Defaults to em.
- * * getFontSize:      a callback for retrieving the font size
- *                     Defaults to width of the tile in px, / 120
- * * titleSelector:    a selector for getting the title from the tile.
- *                     Defaults to ".title"
+ * Fix tile height and tile text size.
+ * Designed to be called on page load and then in response to change in tile width.
  */
 (function ($) {
-    $.fn.resizeTileTitle = function (options) {
-        const defaults = {
-            minFontSize: 1,
-            maxFontSize: 6,
-            unit: "rem",
-            /**
-             * Override this function if you want the font size in a unit other than 'rem'.
-             */
-            getFontSize: function (tile, settings) {
-                const tileWidth = tile.width();
-
-                if (tileWidth === 0) {
-                    // Jquery could not calculate tile width, so we cannot calculate font size.
-                    // This happens when the tile has been collapsed (when css 'display' is 'none').
-                    return null;
-                }
-
-                return tileWidth / 120; // Units 'rem'.
-            },
-            titleSelector: ".title",
-        };
-        const settings = $.extend({}, defaults, options);
+    $.fn.fixTileHeightAndFontSize = function () {
         $(this).each(function () {
-            const tile = $(this);
-            const tileTitle = tile.find(settings.titleSelector);
+            const tile = this;
+            const $tile = $(tile);
 
-            let fontSize = settings.getFontSize(tile, settings);
+            // Using padding-bottom percentage to provide appropriate height for tiles causes display
+            // issues due to Chrome bug. Refer to: https://github.com/alaress/schoolbox/pull/28566.
+            // To resolve we need to instead set a rounded height and remove the padding-bottom.
+            // This line can be removed once the Chrome developers fix the display bug we found in SA-15725.
+            // To test whether this code can be removed, follow the STR in SA-15725.
+            $tile.css({ height: (Math.round($tile.outerWidth() * getAspectRatioForTile(tile)) + 'px'), paddingBottom: 0 });
+
+            let fontSize = getFontSize(tile);
 
             if (fontSize === null) {
                 // If we could not calculate the fontSize, there is nothing more we can do.
@@ -49,41 +25,91 @@
                 return;
             }
 
-            if (fontSize < settings.minFontSize) {
-                fontSize = settings.minFontSize;
-            }
-
-            if (fontSize > settings.maxFontSize) {
-                fontSize = settings.maxFontSize;
-            }
-
-            tileTitle.css({
-                fontSize: String(fontSize) + settings.unit,
-                padding: String(fontSize / 4) + settings.unit,
+            const $tileTitle = $tile.find('.title');
+            $tileTitle.css({
+                fontSize: String(fontSize) + 'rem',
+                padding: String(fontSize / 4) + 'rem',
             });
-            /**
-             * Using padding-bottom values such as 7.0175438596491% to provide appropriate height for
-             * tiles can lead to display issues when there's one tile per row. Refer to: SA-15725.
-             * To resolve we need to instead set a rounded height and remove the padding-bottom.
-             * We get the padding-bottom from the parent as it's the easiest way to get percentage values.
-             * Prior to setting the height, on each resize we need to first set it to auto and revert
-             * the padding-bottom to ensure we can accurately calculate the height.
-             */
-            tile.css({ height: "auto", paddingBottom: tile.parent().data("padding-bottom") });
+
             // If the title is taller than the tile:
             // reduce the tile's top and bottom padding so it fits.
-            const titleHeight = tileTitle.outerHeight();
-            const tileHeight = tile.outerHeight();
+            const titleHeight = $tileTitle.outerHeight();
+            const tileHeight = $tile.outerHeight();
             if (titleHeight > tileHeight) {
-                const heightDifference = tileHeight - tileTitle.height();
+                const heightDifference = tileHeight - $tileTitle.height();
                 const newPadding = String(heightDifference / 2) + "px";
-                tileTitle.css({
+                $tileTitle.css({
                     paddingTop: newPadding,
                     paddingBottom: newPadding,
                 });
             }
-            // Use the height to display the tile instead of padding-bottom.
-            tile.css({ height: `${Math.round(tileHeight)}px`, paddingBottom: 0 });
         });
+
+        /**
+         * @param { HTMLElement } tile
+         * @returns { Number|null } fontSize in rem based on tile width, or null if could not calculate.
+         */
+        function getFontSize(tile) {
+            const $tile = $(tile);
+            const tileWidth = $tile.width();
+
+            if (tileWidth === 0) {
+                // Jquery could not calculate tile width, so we cannot calculate font size.
+                // This happens when the tile has been collapsed (when css 'display' is 'none').
+                return null;
+            }
+
+            // Notes on typical tile widths and font sizes
+            // -------------------------------------------
+            // Typical values of tileWidth range from 200px - 1500px.
+            // So typical values of (tileWidth / 120) will range from 1.67 - 12.5.
+            // Default min and max for newly created tiles are 0.75, 1.75.
+            // So if the default settings are used, the font-size returned by this function will typically be beyond the
+            // max end of the range, and scaling of font will typically only happen at the narrowest tile widths.
+            let fontSize = tileWidth / 120; // Units 'rem'.
+            let minFontSize = $tile.attr('data-min-font-size');
+            let maxFontSize = $tile.attr('data-max-font-size');
+
+            if (minFontSize === undefined) {
+                // This should never happen because minFontSize is a required field on the Modify Tile page.
+                minFontSize = 0.75; // Same as default percentage value on Modify Tile page.
+            }
+
+            if (maxFontSize === undefined) {
+                // This should never happen because maxFontSize is a required field on the Modify Tile page.
+                maxFontSize = 1.75; // Same as default percentage value on Modify Tile page.
+            }
+
+            if (fontSize < minFontSize) {
+                fontSize = minFontSize;
+            }
+
+            if (fontSize > maxFontSize) {
+                fontSize = maxFontSize;
+            }
+
+            return fontSize;
+        }
+
+        /**
+         * @param { HTMLElement } tile
+         * @returns { Number } aspectRatio
+         */
+        function getAspectRatioForTile(tile) {
+            const $aspectRatioXInput = $('#aspect_ratio_x');
+            const $aspectRatioYInput = $('#aspect_ratio_y');
+
+            let aspectRatio = null;
+
+            if ($aspectRatioXInput.length === 1 && $aspectRatioYInput.length === 1) {
+                // The inputs will be present on the Modify Tile Layout page (route GET /tile/layout/{layoutId}).
+                aspectRatio = $aspectRatioYInput.val() / $aspectRatioXInput.val();
+            } else {
+                const $tileListUl = $(tile).parent();
+                aspectRatio = $tileListUl.attr('data-aspect-ratio');
+            }
+
+            return aspectRatio;
+        }
     };
 })(jQuery);
