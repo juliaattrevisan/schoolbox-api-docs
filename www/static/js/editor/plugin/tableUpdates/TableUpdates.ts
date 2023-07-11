@@ -107,27 +107,31 @@ export default class TableUpdates extends Plugin {
             this.editor.execute("tableBorderColor", {
                 value: "#b3b3b3",
             });
-            /**
-             * Set the default border style, width and colour for all cells in the table.
-             * This is a bit more involved than setting the table styles above, as we
-             * need to get the table element from the selection, then get all the cell
-             * elements from the table, then set the attributes on each cell.
-             */
-            const selection = this.editor.model.document.selection;
-            const table = selection.getFirstPosition().findAncestor("table");
-            // get all the cell elements from the table, first getting each row, then each cell within each row
-            const cellElements = Array.from(table.getChildren())
-                .filter((row) => row.name === "tableRow")
-                .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
-                .flat();
-            this.editor.model.change((writer) => {
-                // add the isNew attribute to the table so we can add .sb-ck-table to the table in the downcast
-                writer.setAttribute(this.isCK5Attribute, "true", table);
-                cellElements.forEach((cell) => {
-                    writer.setAttribute("tableCellBorderStyle", "solid", cell);
-                    writer.setAttribute("tableCellBorderWidth", "1px", cell);
-                    writer.setAttribute("tableCellBorderColor", "#b3b3b3", cell);
-                });
+            this.setTableCellBorders();
+        });
+    }
+
+    /**
+     * Set the default border style, width and colour for all cells in the table.
+     * This is a bit more involved than setting the table styles above, as we
+     * need to get the table element from the selection, then get all the cell
+     * elements from the table, then set the attributes on each cell.
+     */
+    setTableCellBorders() {
+        const selection = this.editor.model.document.selection;
+        const table = selection.getFirstPosition().findAncestor("table");
+        // get all the cell elements from the table, first getting each row, then each cell within each row
+        const cellElements = Array.from(table.getChildren())
+            .filter((row) => row.name === "tableRow")
+            .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
+            .flat();
+        this.editor.model.change((writer) => {
+            // add the isNew attribute to the table so we can add .sb-ck-table to the table in the downcast
+            writer.setAttribute(this.isCK5Attribute, "true", table);
+            cellElements.forEach((cell) => {
+                writer.setAttribute("tableCellBorderStyle", "solid", cell);
+                writer.setAttribute("tableCellBorderWidth", "1px", cell);
+                writer.setAttribute("tableCellBorderColor", "#b3b3b3", cell);
             });
         });
     }
