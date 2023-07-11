@@ -259,7 +259,7 @@ class ReviewCest
         $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifNotExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        $i->amGoingTo('As Louisa Smith, click into the due work');
+        $i->amGoingTo('As Louisa Smith, click into the assessment');
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
         $i->amGoingTo('Louisa Smith shouldnt see any grades');

@@ -284,6 +284,7 @@ class CreateAndVerifyCest
         $i->amGoingTo('Publish the news article and ensure the audience remains the same');
         $itemPage->modifyArticle();
         $formPage->submit();
+        $i->waitForText('Your article has been submitted for moderation',10);
         $formPage->seeRoles(['1 Team & 1 House','Year 9','Inc. parents of students']);
     }
 
@@ -292,7 +293,6 @@ class CreateAndVerifyCest
      * @param Form             $formPage
      * @param Index            $indexPage
      * @param Item             $itemPage
-     * @throws Exception
      */
     public function newsAudienceViaClassPageTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
     {
@@ -324,7 +324,7 @@ class CreateAndVerifyCest
         $formPage->selectAudienceOption('Roles', 'Teacher', []);
         $formPage->fillUsers(['Eden Reed']);
         $i->amGoingTo("Check the audience is properly presented: News Folders, Eden Reed and Teacher");
-        $formPage->seeRoles(['News Folder Test','Teacher','Eden Reed']);
+        $formPage->seeRoles(['News Folder Test','Teacher','Ms Eden Reed (506) (Junior Student)']);
         $i->amGoingTo('check the draft article presents the proper audience: News Folders and Teacher');
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Audience Article via Class Page Testing');
@@ -332,8 +332,10 @@ class CreateAndVerifyCest
         $formPage->seeRoles(['News Folder Test','Teacher']);
         $i->amGoingTo("check the modify article page presents the proper audience: News Folders, Eden Reed and Teacher");
         $itemPage->modifyArticle();
-        $formPage->seeRoles(['News Folder Test','Teacher','Eden Reed']);
+        sleep(4);
+        $formPage->seeRoles(['News Folder Test','Teacher','Ms Eden Reed (506) (Junior Student)']);
         $formPage->submit();
+        $i->waitForText('PUBLISHED',10);
         $formPage->seeRoles(['News Folder Test','Teacher','PUBLISHED']);
     }
 

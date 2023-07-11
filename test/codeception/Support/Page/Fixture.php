@@ -7,6 +7,7 @@
 
 namespace Tests\Support\Page;
 
+use Exception;
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
 
@@ -179,30 +180,43 @@ class Fixture
     /**
      * Verifies that the notification exists
      * @param $matchId
+     * @throws Exception
      */
-    public function assertNotifExists($notif)
+    public function assertNotifExists($notif): void
     {
         $i = $this->tester;
+        $i->amGoingTo('As Admin, check notification is not presented');
         $i->amOnPage('/messages');
+        $i->wait(2);
         $i->dontSee($notif);
-        $i->impersonate('Jana Reed');
+        $i->amGoingTo('As Jana Reed, check notification is presented');
+        $i->impersonateViaModifyUserPage('Jana Reed');
         $i->amOnPage('/messages');
+        $i->wait(2);
         $i->see($notif);
-        $i->impersonateAnyUser('Schoolbox Admin');
+        $i->logout();
+        $i->loginAsAdmin();
+//        $i->impersonateAnyUser('Schoolbox Admin');
     }
 
     /**
      * Verifies that the notification does not exist
      * @param $matchId
+     * @throws Exception
      */
-    public function assertNotifNotExists($notif)
+    public function assertNotifNotExists($notif): void
     {
         $i = $this->tester;
+        $i->amGoingTo('As Admin, check notification is not presented');
         $i->amOnPage('/messages');
+        $i->wait(2);
         $i->dontSee($notif);
-        $i->impersonate('Jana Reed');
+        $i->amGoingTo('As Jana Reed, check notification is not presented');
+        $i->impersonateViaModifyUserPage('Jana Reed');
         $i->amOnPage('/messages');
+        $i->wait(2);
         $i->dontSee($notif);
-        $i->impersonateAnyUser('Schoolbox Admin');
+        $i->logout();
+        $i->loginAsAdmin();
     }
 }

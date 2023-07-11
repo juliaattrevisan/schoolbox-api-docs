@@ -44,7 +44,7 @@ class NewsInitialCest
         $i->click('button.button.submit');
         sleep(5);
         $i->click("Publish news");
-        sleep(5);
+        $i->wait(2);
         $i->see('Test News Title');
     }
 
@@ -104,7 +104,8 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->see("Test News Title");
+        $i->wait(2);
+        $i->canSee("Test News Title");
     }
 
     /**

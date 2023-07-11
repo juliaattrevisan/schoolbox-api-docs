@@ -79,6 +79,7 @@ class AcceptanceTester extends Actor
         $i->checkOption(self::$rememberMe);
         $i->click(self::$loginButton);
         $i->amOnPage('/');
+        $i->waitForText('SCHOOLBOX [VAGRANT]');
 
         $i->saveSessionSnapshot($snapshotName);
         $i->skipWhatsNewTour();

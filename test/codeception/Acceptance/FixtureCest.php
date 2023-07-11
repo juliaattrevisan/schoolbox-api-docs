@@ -46,6 +46,7 @@ class FixtureCest
      * Test that match notifications are triggered properly
      *
      * @param AcceptanceTester $i
+     * @throws Exception
      */
     public function matchNotifications(AcceptanceTester $i): void
     {
