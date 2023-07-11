@@ -6,11 +6,11 @@
 **/
 
 .sb-chips {
-    list-style: none;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: var(--whitespace-s);
+    gap: var(--whitespace-xs);
+    list-style: none;
 
     li > input[type="checkbox"] {
         display: none;
@@ -22,8 +22,8 @@
 
             .sb-chip__icon {
                 &::before {
-                    margin-left: 0.25rem;
                     display: inline-block;
+                    margin-left: 0.25rem;
                 }
 
                 &::after {
@@ -33,20 +33,22 @@
         }
 
         & + label {
-            font-weight: 600;
-            padding: var(--whitespace-s) var(--whitespace-m);
-            color: var(--content-ui-foreground);
+            align-items: center;
             border: 2px solid var(--content-ui-foreground);
+            //TODO - Eventually tie this back to a global roundness custom property / variable
             border-radius: 2px;
+            color: var(--content-ui-foreground);
             cursor: pointer;
             display: flex;
-            align-items: center;
+            font-weight: 600;
             margin: 0;
+            padding: var(--whitespace-xs) var(--whitespace-m);
+            user-select: none;
 
             .sb-chip__icon {
-                margin-left: var(--whitespace-s);
                 color: var(--content-ui-background);
                 line-height: normal;
+                margin-left: var(--whitespace-s);
 
                 &::before {
                     display: none;
@@ -55,16 +57,16 @@
                 }
 
                 &::after {
-                    display: flex;
                     align-items: center;
-                    opacity: 0.5;
+                    background-color: var(--content-ui-foreground);
+                    border-radius: 2048px;
                     content: "";
-                    width: 0.25rem;
+                    display: flex;
                     height: 0.25rem;
                     margin-left: 0.5rem;
                     margin-right: 0.25rem;
-                    border-radius: 2048px;
-                    background-color: var(--content-ui-foreground);
+                    opacity: 0.5;
+                    width: 0.25rem;
                 }
             }
         }
