@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use LearnositySdk\Utils\Uuid;
 use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
@@ -201,6 +202,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // build a stub
         $assessment = AssessmentType::stringToObject($type, $context);
+
+        /* Inject a Learnosity Reference uuid if that's what we are building here
+         */
+        if (AssessmentTYpe::TYPE_QUIZ === $type) {
+            $assessment->setLearnosityReference(Uuid::generate());
+        }
 
         // create a dynamic plan on the assessment to get started
         $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));

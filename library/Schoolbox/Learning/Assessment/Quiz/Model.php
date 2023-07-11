@@ -45,6 +45,16 @@ class Model extends AbstractAssessment
      */
     const DURATION_UNLIMITED = -1;
 
+
+    /**
+     * Learnosity reference identifier, to associate our quiz
+     * with a Learnosity quiz.
+     *
+     * @var string|null
+     */
+    private ?string $learnosityReference = null;
+
+
     /**
      * What's the maximum number of attempts a participant may make on this quiz?
      *
@@ -436,6 +446,26 @@ class Model extends AbstractAssessment
     public function setExternalId(?string $externalId): self
     {
         $this->externalId = $externalId;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityReference(): ?string
+    {
+        return $this->learnosityReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityReference
+     * @return Model
+     */
+    public function setLearnosityReference(?string $learnosityReference): self
+    {
+        $this->learnosityReference = $learnosityReference;
         return $this;
     }
 }
