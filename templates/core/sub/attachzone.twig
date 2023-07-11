@@ -76,7 +76,7 @@ $data = {
             $(function () {
                 $('#{{ attachzone.id }}-zone').resourceAttach({
                     url: '/storage/asyncUpload.php',
-                    {% if attachzone.expiryDate is defined and attachzone.expiryDate is not null%}
+                    {% if attachzone.expiryDate is defined and attachzone.expiryDate is not null %}
                     expiryDate: '{{ attachzone.expiryDate | e('js') }}',
                     {% endif %}
                     paramName: 'upload',
@@ -99,6 +99,9 @@ $data = {
                     capture: {{ attachzone.capture ? 'true' : 'false' }},
                     {% if attachzone.iconClass is defined and attachzone.iconClass is not null %}iconClass: '{{ attachzone.iconClass }}',{% endif %}
                     {% if attachzone.fs is defined and attachzone.fs %}fs: '{{ attachzone.fs }}',{% endif %}
+                    {% if onUploadComplete is defined and onUploadComplete is not null %}
+                    onUploadComplete: {{ onUploadComplete }},
+                    {% endif %}
                 });
             });
         </script>

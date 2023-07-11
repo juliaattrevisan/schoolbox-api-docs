@@ -56,10 +56,10 @@ export default {
         isDisabled() {
             return (
                 this.articleId === 0 ||
-                this.$refs.newsSubmit.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') || (
+                this.$refs.newsSubmit.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck") ||
+                (this.$refs.newsPreview !== undefined &&
                     this.$refs.newsPreview !== null &&
-                    this.$refs.newsPreview.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
-                )
+                    this.$refs.newsPreview.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck"))
             );
         },
     },
@@ -101,7 +101,9 @@ export default {
             </li>
         </template>
         <li>
-            <button type="submit" class="submit" id="news-submit" ref="newsSubmit" :disabled="isDisabled">{{ submitText }}</button>
+            <button type="submit" class="submit" id="news-submit" ref="newsSubmit" :disabled="isDisabled">
+                {{ submitText }}
+            </button>
         </li>
     </ul>
 </template>
