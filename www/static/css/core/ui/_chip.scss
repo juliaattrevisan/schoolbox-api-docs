@@ -11,6 +11,8 @@
     flex-wrap: wrap;
     gap: var(--whitespace-xs);
     list-style: none;
+    // The default ul left margin is not necessary here.
+    margin-left: 0;
 
     li > input[type="checkbox"] {
         display: none;
