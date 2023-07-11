@@ -21,6 +21,7 @@ class Controller extends Base
      */
     public function getPolicy(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@policy/policy.twig', []));
+//        $this->getResponse()->content->set($this->buildHtmlOutput('@policy/policy.twig', []));
+        $this->psr7Response = $this->responseFactory->buildHtml('@policy/policy.twig', []);
     }
 }

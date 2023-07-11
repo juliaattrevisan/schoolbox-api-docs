@@ -21,6 +21,7 @@ use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Alaress\Web\Response\Outputter;
 use Aura\Di\Container;
 use Aura\Router\Route;
 use Aura\Router\RouterContainer;
@@ -360,6 +361,15 @@ class Kernel extends WebKernelAbstract
         }
 
         $method->invokeArgs($controller, $args);
+
+        // Use PSR-7 response if it's there
+        $psr7Response = $controller->getPsr7Response();
+        if ($psr7Response) {
+            $outputter = new Outputter();
+            $outputter->output($psr7Response);
+            return;
+        }
+
         $response = $controller->getResponse();
         $output   = $response->content->get();
         if (!$output instanceof OutputInterface) {
