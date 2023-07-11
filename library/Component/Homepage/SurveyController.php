@@ -46,7 +46,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         $this->setBlock($templateHandle, 'has_survey', 'has_survey_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        if (!is_array($allSurveys)) {
+        if (!count($allSurveys)) {
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 return false;
             }

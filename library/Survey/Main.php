@@ -69,9 +69,9 @@ class Survey_Main extends Evaluation_Main
      *
      * @param int|array $category_id
      * @param bool $limit
-     * @return array|bool
+     * @return array
      */
-    public function getList($category_id, $limit = false)
+    public function getList($category_id, $limit = false): array
     {
         if (is_array($category_id)) {
             $categoryIDList = implode(',', $category_id);
