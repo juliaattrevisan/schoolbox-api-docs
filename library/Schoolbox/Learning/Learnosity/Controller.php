@@ -13,8 +13,6 @@ namespace Schoolbox\Learning\Learnosity;
 use Alaress\Web\Controller\Base;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootstrap.php';
 
