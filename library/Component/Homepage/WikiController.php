@@ -10,7 +10,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_WikiController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Available sort fields for this component.
      *
