@@ -203,6 +203,7 @@ class ResultCache
      * @param MapperProxy $assessmentMapperProxy
      * @param IAssessable $assessment
      * @param User|null   $student
+     * @param bool        $queryWrite // should we hit the write DB (when creating projects they won't exist in the read db till the transaction has completed)
      * @return void
      * @throws DefinitionException
      * @throws Deleted
@@ -216,7 +217,8 @@ class ResultCache
     public function refresh(
         \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         IAssessable $assessment,
-        ?\Schoolbox\User $student = null
+        ?\Schoolbox\User $student = null,
+        bool $queryWrite = false
     ): void {
         if ($assessment instanceof Project) {
             /* Dodge the mapper cache maybe. ffs
@@ -225,7 +227,7 @@ class ResultCache
              * If you aren't careful you'll operate on a cached version of $assessment,
              * participations and all, leading to calculating wrong values
              */
-            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getId(), true, $student, ['cache' => false]);
+            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getId(), true, $student, ['cache' => false, 'queryWrite' => $queryWrite]);
         } elseif ($assessment->getContext() instanceof Project) {
             /* Dodge the mapper cache maybe. ffs
              * Take the performance hit right between the eyes
@@ -233,7 +235,7 @@ class ResultCache
              * If you aren't careful you'll operate on a cached version of $assessment's context,
              * participations and all, leading to calculating wrong values
              */
-            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getContext()->getId(), true, $student, ['cache' => false]);
+            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getContext()->getId(), true, $student, ['cache' => false, 'queryWrite' => $queryWrite]);
         } else {
             /* noop
              *

@@ -551,7 +551,8 @@ class Controller extends Base\Base
          */
         if ($assessment instanceof Project) {
             $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
-            $projectResultCache->refresh($this->assessmentMapperProxy, $assessment);
+            // we may be creating a project so ensure we hit the write db connection so we can stay within the create project transaction
+            $projectResultCache->refresh($this->assessmentMapperProxy, $assessment, queryWrite: true);
         }
     }
 
