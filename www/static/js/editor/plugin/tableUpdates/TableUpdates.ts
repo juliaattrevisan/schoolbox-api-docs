@@ -87,7 +87,7 @@ export default class TableUpdates extends Plugin {
     }
 
     /**
-     * Add the following properties as default to newly created tables
+     * Add the following properties as default to newly created tables, columns and rows
      */
     addDefaultProperties() {
         const insertTableCommand = this.editor.commands.get("insertTable");
@@ -107,7 +107,7 @@ export default class TableUpdates extends Plugin {
             this.editor.execute("tableBorderColor", {
                 value: "#b3b3b3",
             });
-            this.setTableCellBorders();
+            this.setCellBorders();
         });
         const insertColumnAndRowCommands = [
             "insertTableColumnLeft",
@@ -116,7 +116,7 @@ export default class TableUpdates extends Plugin {
             "insertTableRowBelow",
         ];
         insertColumnAndRowCommands.forEach((command) => {
-            this.editor.commands.get(command).on("execute", () => this.setTableCellBorders());
+            this.editor.commands.get(command).on("execute", () => this.setCellBorders());
         });
     }
 
@@ -126,7 +126,7 @@ export default class TableUpdates extends Plugin {
      * need to get the table element from the selection, then get all the cell
      * elements from the table, then set the attributes on each cell.
      */
-    setTableCellBorders() {
+    setCellBorders() {
         const selection = this.editor.model.document.selection;
         const table = selection.getFirstPosition().findAncestor("table");
         // get all the cell elements from the table, first getting each row, then each cell within each row
