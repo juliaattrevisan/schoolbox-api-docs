@@ -262,7 +262,6 @@ function onMutateSubmitButton(mutationList: Array<MutationRecord>) {
             if (editor === undefined) {
                 continue; // No editor on this textarea, so skip it.
             }
-            console.info("textareaId: ", idAttr);
 
             // The submit button has changed from disabled to enabled, so fire the wordcount update event.
             // This will cause the onUpdateText() function to run, which will then re-disable the submit button
@@ -271,7 +270,6 @@ function onMutateSubmitButton(mutationList: Array<MutationRecord>) {
             // enable the submit button without knowing that it ought to be disabled because of overfilled
             // CKeditor textareas, and that will be totally okay, because the mutation observer will notice,
             // this code will be invoked to fix the situation.
-            console.info("Firing update event");
             editor.plugins.get("WordCount").fire("update");
         }
     }
@@ -297,12 +295,7 @@ function setupSubmitButtonMutationObserver(submitButton: HTMLElement) {
 
         observer.observe(submitButton, { attributes: true });
 
-        console.info("setupSubmitButtonMutationObserver() added observer for submitButtonId ", submitButtonId);
         window.sbProps.disabledObserverIsAddedBySubmitButtonId[submitButtonId] = true; // Remember that a disabled observer has been added for this submit button.
-        console.info(
-            "setupSubmitButtonMutationObserver() disabledObserverIsAddedBySubmitButtonId: ",
-            window.sbProps.disabledObserverIsAddedBySubmitButtonId
-        );
     }
 }
 
