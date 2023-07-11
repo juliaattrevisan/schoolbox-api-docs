@@ -33,7 +33,6 @@ use RuntimeException;
  */
 class Pool extends EventEmitter implements PoolInterface
 {
-
     const DATA_IN   = 0;
     const DEBUG_OUT = 1;
     const DEBUG_ERR = 2;

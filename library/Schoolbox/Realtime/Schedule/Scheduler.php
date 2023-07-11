@@ -49,22 +49,12 @@ use Schoolbox\User;
  */
 class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
-    /** @var ResolutionManager */
-    private ResolutionManager $resolutionManager;
-
-    /** @var Postman */
-    private $postman;
-
     /**
      * JIT handler to take care of unexpected shutdown
      *
-     * @var ICache
+     * @var ICache|null
      */
-    private $jit;
-
-    /** @var IConfigLoader */
-    private $conf;
-
+    private ?ICache $jit = null;
 
     /**
      * @param LoopInterface             $loop
@@ -80,14 +70,11 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         DispatchStrategyInterface $dispatchStrategy,
         LoggerInterface $log,
         IClock $clock,
-        IConfigLoader $conf,
-        ResolutionManager $resolutionManager,
-        Postman $postman
+        private IConfigLoader $conf,
+        private ResolutionManager $resolutionManager,
+        private Postman $postman
     ) {
         parent::__construct($loop, $dispatchStrategy, $log, $clock);
-        $this->conf              = $conf;
-        $this->resolutionManager = $resolutionManager;
-        $this->postman           = $postman;
 
         // register signal listeners
         $this->on(SIGHUP, [ $this, 'onHangup' ]);
@@ -100,7 +87,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param ICache $jit
      * @return static
      */
-    public function setJitCache($jit)
+    public function setJitCache(ICache $jit): self
     {
         $this->jit = $jit;
         return $this;
@@ -234,7 +221,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         $this->log->debug('Invalidating config cache');
         $this->conf->dropCache();
         $this->log->debug('Releasing workers');
-        $this->getDispatcher()->releaseWorkerPool(false);
+        $this->dispatcher->releaseWorkerPool(false);
     }
 
 
@@ -256,7 +243,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     {
         $this->log->error('Cleaning up and terminating');
         // die safely
-        $this->getDispatcher()->releaseWorkerPool(false);
+        $this->dispatcher->releaseWorkerPool(false);
 
         // if possible, rescue the schedule queue from certain destruction
         $this->log->debug('Attempting save of queue');
@@ -276,8 +263,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
     /**
      * @param TriggerInterface $trigger
-     * @param IResolver        $resolver
-     * @throws InvalidArgumentException
+     * @param IResolver|null   $resolver
      */
     public function scheduleNotification(TriggerInterface $trigger, ?IResolver $resolver = null): void
     {

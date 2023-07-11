@@ -20,16 +20,6 @@ use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX
 {
-
-    /** @var UserMapper */
-    private $mapper;
-
-    /** @var QueueSorter */
-    private $sorter;
-
-    /** @var ListFactory */
-    private $listFactory;
-
     // constants to define request types
     private const TYPE_USER = 'user';
     private const TYPE_OBJECT = 'object';
@@ -46,13 +36,10 @@ class RouteTXRX implements TXRX
      * @param ListFactory|null $listFactory
      */
     private function __construct(
-        UserMapper $mapper = null,
-        QueueSorter $sorter = null,
-        ListFactory $listFactory = null
+        private ?UserMapper $mapper,
+        private ?QueueSorter $sorter,
+        private ?ListFactory $listFactory
     ) {
-        $this->mapper      = $mapper;
-        $this->sorter      = $sorter;
-        $this->listFactory = $listFactory;
     }
 
 
@@ -89,7 +76,7 @@ class RouteTXRX implements TXRX
      *
      * {@inheritDoc}
      */
-    public function send($instance, ITransaction $tx, $userIds)
+    public function send(Instance $instance, ITransaction $tx, array $userIds): void
     {
         if (null === $this->listFactory) {
             throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
@@ -105,10 +92,6 @@ class RouteTXRX implements TXRX
 
         // Is a send action
         if ($instance->isActionSend()) {
-            if (!\is_array($userIds)) {
-                throw new InvalidArgumentException('Payload must be an array of user IDs');
-            }
-
             // If event object id is set, put request to add instance to the object set
             if (!empty($instance->getEventObjectId())) {
                 $tx->put("{$key}-object", [$instance, null, self::TYPE_OBJECT]);
@@ -133,7 +116,7 @@ class RouteTXRX implements TXRX
      *
      * {@inheritDoc}
      */
-    public function receive(array $args)
+    public function receive(array $args): int
     {
         if (null === $this->mapper || null === $this->sorter) {
             throw new BadMethodCallException('Attempting to receive using the transmitter variant of RouteTXRX');

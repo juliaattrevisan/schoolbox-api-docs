@@ -9,6 +9,7 @@
 
 namespace Alaress\WorkerCrew;
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use BadMethodCallException;
 use InvalidArgumentException;
@@ -26,9 +27,9 @@ interface TXRX
      * EXECUTED DAEMON-SIDE
      * Send the work from the daemon to the worker
      *
-     * @param mixed        $identifier
+     * @param Instance     $instance
      * @param ITransaction $tx
-     * @param mixed        $payload
+     * @param array        $userIds
      * @return void
      * @throws BadMethodCallException   if not correctly configured. May happen
      *                                  if this object was constructed to allow
@@ -36,7 +37,7 @@ interface TXRX
      * @throws InvalidArgumentException if the payload is in an unacceptable
      *                                  format.
      */
-    public function send($identifier, ITransaction $tx, $payload);
+    public function send(Instance $instance, ITransaction $tx, array $userIds): void;
 
     /**
      * EXECUTED WORKER-SIDE
@@ -50,5 +51,5 @@ interface TXRX
      * @throws InvalidArgumentException if args contains something that's not
      *                                  acceptable.
      */
-    public function receive(array $args);
+    public function receive(array $args): int;
 }

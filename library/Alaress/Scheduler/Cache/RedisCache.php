@@ -91,7 +91,7 @@ class RedisCache implements ICache
 
             // Restore
             $context     = ["msg:{$this->instanceId}:"];
-            $amqpPayload = $context ? json_encode([$itemKey, $context]) : $itemKey;
+            $amqpPayload = json_encode([$itemKey, $context]);
             $mq->publish($amqpPayload, \Schoolbox\Realtime\Schedule\Broker::QUEUE, ['exchange' => '']);
             $this->log->debug(sprintf("Restoring event in key %s", $itemKey));
             ++$i;

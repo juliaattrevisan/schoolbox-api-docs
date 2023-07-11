@@ -19,27 +19,17 @@ use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var LoopInterface */
-    private $loop;
-
     /** @var array */
-    private $timers;
+    private array $timers;
 
     /** @var DispatcherInterface */
-    private $dispatcher;
-
-    /** @var IClock */
-    private $clock;
+    protected DispatcherInterface $dispatcher;
 
     /** @var int Retry time in seconds to reschedule */
     private const RETRY_TIME = 300;
@@ -52,24 +42,21 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param IClock                    $clock
      */
     public function __construct(
-        LoopInterface $loop,
+        private LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
-        LoggerInterface $log,
-        IClock $clock
+        protected LoggerInterface $log,
+        private IClock $clock
     ) {
         parent::__construct($loop);
 
-        $this->loop       = $loop;
-        $this->log        = $log;
         $this->dispatcher = new Dispatcher($loop, $this, $log, $dispatchStrategy); // TODO IoC
-        $this->clock      = $clock;
     }
 
     /**
      * Schedule a trigger for deferred execution
      *
      * @param TriggerInterface $trigger
-     * @throws InvalidArgumentException
+     * @param IResolver|null   $resolver
      * @return void
      */
     protected function scheduleNotification(TriggerInterface $trigger, ?IResolver $resolver = null): void
@@ -115,22 +102,13 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
 
     /**
-     * @return DispatcherInterface
-     */
-    public function getDispatcher()
-    {
-        return !isset($this->dispatcher) ? null : $this->dispatcher;
-    }
-
-
-    /**
      * @param TriggerInterface $trigger
      */
     protected function dispatchTrigger(TriggerInterface $trigger): void
     {
         $event = $trigger->getEvent();
         foreach ($trigger->getCallbacks() as $callback) {
-            $this->getDispatcher()->enqueue(
+            $this->dispatcher->enqueue(
                 $trigger,
                 $this->getMethod(),
                 serialize([
@@ -156,7 +134,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param null|int         $interval  in seconds
      * @return bool
      */
-    protected function schedule(TriggerInterface $trigger, callable $callable, $cancelPrevious = true, ?int $interval = null)
+    protected function schedule(TriggerInterface $trigger, callable $callable, bool $cancelPrevious = true, ?int $interval = null): bool
     {
         // can't schedule a cancel trigger
         if ($trigger instanceof CancelTrigger) {

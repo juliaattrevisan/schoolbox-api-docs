@@ -5211,11 +5211,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Scheduler.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Scheduler.php
-
-		-
 			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
