@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Redirect;
 
 require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootstrap.php';
 
@@ -72,7 +73,8 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/content.twig', [
             'assessment' => $assessment,
-            'initOptions' => $api->initOptions('author', $payload)
+            'initOptions' => $api->initOptions('author', $payload),
+            'returnUrl' => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL)),
         ])->setTitle(sprintf(
             'Modify contents of %s',
             $assessment->getTitle()

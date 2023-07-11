@@ -3,6 +3,7 @@
  #
  # @param IAssessable $assessment    Our schoolbgox quiz instance
  # @param string|array $initOptions  Learnosity API initialisation object
+ # @param string $returnUrl          A redirect back to a place from whence you came.
  #}
 <script src="https://authorapi.learnosity.com/?v2023.2.LTS"></script>
 
@@ -19,6 +20,10 @@
                 );
             </script>
         </section>
+
+        {% if returnUrl %}
+            <a href="{{ returnUrl }}" class="button">Back</a>
+        {% endif %}
     </div>
 </div>
 
