@@ -54,16 +54,13 @@ export default {
          * @returns {boolean} True if the preview button should be disabled, false otherwise.
          */
         isDisabled() {
-            const returnValue = (
+            return (
                 this.articleId === 0 ||
-                this.$refs.newsSubmit.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck') || (
-                    this.$refs.newsPreview !== undefined &&
+                this.$refs.newsSubmit.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck") ||
+                (this.$refs.newsPreview !== undefined &&
                     this.$refs.newsPreview !== null &&
-                    this.$refs.newsPreview.hasAttribute('data-ckEditorMaxCharCountExceededAtLastCheck')
-                )
+                    this.$refs.newsPreview.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck"))
             );
-
-            return returnValue;
         },
     },
 
@@ -104,7 +101,9 @@ export default {
             </li>
         </template>
         <li>
-            <button type="submit" class="submit" id="news-submit" ref="newsSubmit" :disabled="isDisabled">{{ submitText }}</button>
+            <button type="submit" class="submit" id="news-submit" ref="newsSubmit" :disabled="isDisabled">
+                {{ submitText }}
+            </button>
         </li>
     </ul>
 </template>
