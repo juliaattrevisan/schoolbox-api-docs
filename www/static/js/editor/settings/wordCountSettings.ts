@@ -286,16 +286,12 @@ function setupSubmitButtonMutationObserver(submitButton: HTMLElement) {
         throw new Error("Submit buttons to be used with wordCountSettings.ts must have an id attribute.");
     }
 
-    if (window.sbProps.disabledObserverIsAddedBySubmitButtonId === undefined) {
-        window.sbProps.disabledObserverIsAddedBySubmitButtonId = {};
-    }
-
-    if (window.sbProps.disabledObserverIsAddedBySubmitButtonId[submitButtonId] === undefined) {
+    if (window.sbProps.submitButtonObserverIsAddedBySubmitButtonId[submitButtonId] === undefined) {
         const observer = new MutationObserver(onMutateSubmitButton);
 
         observer.observe(submitButton, { attributes: true });
 
-        window.sbProps.disabledObserverIsAddedBySubmitButtonId[submitButtonId] = true; // Remember that a disabled observer has been added for this submit button.
+        window.sbProps.submitButtonObserverIsAddedBySubmitButtonId[submitButtonId] = true; // Remember that a disabled observer has been added for this submit button.
     }
 }
 
