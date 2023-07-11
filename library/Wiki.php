@@ -92,14 +92,14 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     /**
      * Get a wiki for a category
      *
-     * @deprecated use \Schoolbox\Wiki\WikiMapper::findByColumn('categoryID')
      * @param int    $categoryID
      * @param string $orderBy
      * @param string $sortDir
      * @param bool   $limit
-     * @return array|bool
-     */
-    public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false)
+     * @return array
+     *@deprecated use \Schoolbox\Wiki\WikiMapper::findByColumn('categoryID')
+          */
+    public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false): array
     {
         /* Adjust the table in which to sort -_-
          */

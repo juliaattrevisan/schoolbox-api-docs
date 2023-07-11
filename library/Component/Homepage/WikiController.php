@@ -10,7 +10,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_WikiController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Available sort fields for this component.
      *
@@ -67,7 +66,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
         $this->setVar('WIKI_CATEGORY_ID', $this->getSource()->getId());
 
-        if (!is_array($wikiList)) {
+        if (!count($wikiList)) {
             $this->setVar(
                 [
                     'has_wiki_block'    => '',

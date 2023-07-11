@@ -190,7 +190,7 @@ $this->setVar($outputPagination);
 
 $items = $chatHandler->getChatListing($filter['folder'], $filter['year'], $filter['month'], $chatIndex, $chatPerPage);
 
-if (is_array($items)) {
+if (count($items)) {
     $i = 0;
     $total = count($items);
     $userHandler = new User();
