@@ -269,7 +269,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int $month
      * @param int $index
      * @param int $limit
-     * @return array|bool
+     * @return array
      */
     public function getChatListing($categoryID, $year = 0, $month = 0, $index = 0, $limit = 0)
     {
