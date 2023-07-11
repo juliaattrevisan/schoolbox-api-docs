@@ -27,26 +27,31 @@ class Controller extends Base
     }
 
 
+    /**
+     * Edit the contents of $assessment using the Learnosity system
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
     public function getContent(IAssessable $assessment): void
     {
         $payload = [
-            'mode' => 'activity_edit',
-
-            /* A Learnosity uuid that we arbitrarily prescribed
-             */
-            'reference' => $assessment->getLearnosityReference(),
-
             'config' => [
                 'activity_edit' => [
                     'back' => false,
                 ]
             ],
-
+            'mode' => 'activity_edit',
+            /* A Learnosity uuid that we arbitrarily prescribed
+             */
+            'reference' => $assessment->getLearnosityReference(),
+            /* Corresponds to a user in the Learnosity Console who will be
+             * considered "the author" of stuff created by the school's teachers
+             * Misconfiguring this leads to Error 10000 which has no definition
+             */
             'user' => [
-                /* Corresponds to a user in the Learnosity Console who will be
-                 * considered "the author" of stuff created by the school's teachers
-                 * Misconfiguring this leads to Error 10000 which has no definition
-                 */
                 'id' => (string)$this->getConfigLoader()->get('learnosity_author_id'),
                 /* These fields are superfluous and are presumably
                  * used for auditing; we attribute an individual user's
@@ -65,10 +70,13 @@ class Controller extends Base
             $this->getConfigLoader()->get('logs_dir')
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/activityList.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/content.twig', [
             'assessment' => $assessment,
             'initOptions' => $api->initOptions('author', $payload)
-        ])->setTitle('Example Activity List'));
+        ])->setTitle(sprintf(
+            'Modify contents of %s',
+            $assessment->getTitle()
+        )));
     }
 
 
