@@ -15,7 +15,15 @@
     margin-left: 0;
 
     li > input[type="checkbox"] {
-        display: none;
+        opacity: 0;
+
+        // Bring back default focus highlights
+        &:focus + label {
+            // Firefox
+            outline: 5px auto Highlight;
+            // The rest
+            outline: 5px auto -webkit-focus-ring-color;
+        }
 
         &:checked + label {
             background-color: var(--content-ui-foreground);
