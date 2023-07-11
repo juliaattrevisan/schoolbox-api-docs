@@ -237,14 +237,6 @@
             }
         }
     });
-
-    /**
-     * Trigger an update event on the CKEditor WordCount plugin.
-     * This will cause the form's submit button to be enabled/disabled depending on whether the textarea is overfilled.
-     */
-    function fireCKEditorUpdateEvent() {
-        window.sbProps.editors['report-introduction'].plugins.get("WordCount").fire('update');
-    }
 </script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -274,7 +266,7 @@
 
                         <div class="small-12 columns">
                             <label for="report-logo">School Logo</label>
-                            {% include 'sub/attachzone.twig' with { attachzone: logoZone, onUploadComplete: 'fireCKEditorUpdateEvent' } %}
+                            {% include 'sub/attachzone.twig' with { attachzone: logoZone } %}
                         </div>
 
                         <div class="small-12 columns">

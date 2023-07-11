@@ -445,14 +445,6 @@
     var brickManager;
     /** @param {Codec} codec */
     var codec = new Codec();
-
-    /**
-     * Trigger an update event on the CKEditor WordCount plugin.
-     * This will cause the form's submit button to be enabled/disabled depending on whether the textarea is overfilled.
-     */
-    function fireCKEditorUpdateEvent() {
-        window.sbProps.editors['blurb'].plugins.get("WordCount").fire('update');
-    }
 </script>
 {% endautoescape %}
 
@@ -542,13 +534,13 @@
                     <div class="small-12 columns">
                         <label>Feature Image</label>
                         <p class="meta">Images uploaded to {{ locale.news }} are recommended to be landscape and a minimum of 750x500 pixels for a favourable viewing experience.</p>
-                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone, onUploadComplete: 'fireCKEditorUpdateEvent' } %}
+                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
                     </div>
 
                     <div class="small-12 columns">
                         <label>Attachments</label>
                         <p class="meta">Attach any related files here. Images are displayed automatically in their own gallery.</p>
-                        {% include 'sub/attachzone.twig' with { attachzone: fileZone, onUploadComplete: 'fireCKEditorUpdateEvent' } %}
+                        {% include 'sub/attachzone.twig' with { attachzone: fileZone } %}
                     </div>
                 </fieldset>
 
