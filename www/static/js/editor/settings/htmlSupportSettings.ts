@@ -163,6 +163,10 @@ export function getHTMLSupportSettings() {
                 {
                     name: "tt",
                 },
+                // "<pre>"
+                {
+                    name: "pre",
+                },
             ],
         },
     };
