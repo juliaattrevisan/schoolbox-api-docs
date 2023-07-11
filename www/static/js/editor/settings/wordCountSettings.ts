@@ -237,7 +237,7 @@ function setupOnUpdateTextEventHandler(
  * the submit button should be disabled.
  * @param { Array<MutationRecord> } mutationList - An array of MutationRecords provided by a MutationObserver.
  */
-function onMutateSubmitButton(mutationList: Array<MutationRecord>) {
+const submitButtonMutationObserver = new MutationObserver((mutationList: Array<MutationRecord>) => {
     for (const mutation of mutationList) {
         if (mutation.type !== "attributes" || mutation.attributeName !== "disabled") {
             continue; // Skip mutations we are not interested in.
@@ -273,27 +273,7 @@ function onMutateSubmitButton(mutationList: Array<MutationRecord>) {
             editor.plugins.get("WordCount").fire("update");
         }
     }
-}
-
-/**
- * Set up a MutationObserver to observe changes to the disabled state of the submit button.
- * @param {HTMLElement} submitButton - The submit button
- */
-function setupSubmitButtonMutationObserver(submitButton: HTMLElement) {
-    const submitButtonId = submitButton.getAttribute("id");
-
-    if (submitButtonId === null) {
-        throw new Error("Submit buttons to be used with wordCountSettings.ts must have an id attribute.");
-    }
-
-    if (window.sbProps.submitButtonObserverIsAddedBySubmitButtonId[submitButtonId] === undefined) {
-        const observer = new MutationObserver(onMutateSubmitButton);
-
-        observer.observe(submitButton, { attributes: true });
-
-        window.sbProps.submitButtonObserverIsAddedBySubmitButtonId[submitButtonId] = true; // Remember that a disabled observer has been added for this submit button.
-    }
-}
+});
 
 /**
  * The submit buttons may be disabled due to one or more of the CKEditor fields being overfilled.
@@ -387,7 +367,7 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
                 addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
 
                 for (const submitButton of submitButtons) {
-                    setupSubmitButtonMutationObserver(submitButton);
+                    submitButtonMutationObserver.observe(submitButton, { attributes: true });
                 }
             }
         }

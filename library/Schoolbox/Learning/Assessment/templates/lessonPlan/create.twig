@@ -167,8 +167,7 @@
     {% set action = 'Create' %}
 {% endif %}
 
-{# NOTE: 'id' attribute is required by wordCountSettings.ts #}
-<input id="submit-button" type="submit" value="{{ action }}">
+<input type="submit" value="{{ action }}">
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script>
