@@ -234,6 +234,15 @@ class Controller extends Assessment\Controller
             return;
         }
 
+        /* Temporary shim into Learnosity Prototype
+         */
+        $url = $this->router->getGenerator()->generate('learnosity.getAttempt', [
+            'assessmentId' => $assessment->getId(),
+            'userId' => $student->getId()
+        ]);
+
+        $this->response->redirect->to($url);
+
         $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
         $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);

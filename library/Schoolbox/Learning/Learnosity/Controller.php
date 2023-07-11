@@ -83,6 +83,42 @@ class Controller extends Base
 
 
     /**
+     * Let a student do an attempt in a Learnosity quiz
+     *
+     * @param IAssessable     $assessment
+     * @param \Schoolbox\User $student
+     * @return void
+     */
+    public function getAttempt(IAssessable $assessment, \Schoolbox\User $student): void
+    {
+        /* Generate a session (attempt) identifier
+         *
+         * First, see if an incomplete attempt exists; if it does,
+         * just reuse it
+         */
+
+        /* If not, make a new one arbitrarily
+         */
+
+        /* Assign that identifier to an assess_attempt
+         */
+
+        /* Initialise Learnosity Quiz player
+         *
+         * You need all the Learnosity items associated with the
+         * $assessment's Learnosity reference, apparently
+         * (how do we do this more cheapishly?)
+         */
+
+        /* Let the $student do it
+         */
+
+        /* Record the automated result somewhere (idk where)
+         */
+    }
+
+
+    /**
      * Build quiz contents
      */
     public function getActivityList(): void
