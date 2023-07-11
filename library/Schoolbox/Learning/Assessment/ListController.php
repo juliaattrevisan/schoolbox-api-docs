@@ -297,7 +297,7 @@ class ListController extends Web\Controller\Base
             $post = $this->getRequest()->post->getArrayCopy();
             $post['context'] = $context;
 
-            $assessmentInfo = $this->persistAssessment($this->getUser(), $post);
+            $assessmentInfo = $this->persistAssessment($this->getUser(), $post, createAssessment: true);
 
             $type       = AssessmentType::objectToString($assessmentInfo['assessment']);
             $controller = $this->getDelegateController($type);
@@ -307,7 +307,7 @@ class ListController extends Web\Controller\Base
             /* Update project result cache when an activity is spawned in that project
              */
             if ($context instanceof Project) {
-                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment'], queryWrite: true);
             }
 
             $this->redirect($controller->determineRedirect(
@@ -629,9 +629,10 @@ class ListController extends Web\Controller\Base
      * @param User              $user
      * @param array|Traversable $postData
      * @param IAssessable|null  $assessment
+     * @param bool              $createAssessment
      * @return array
      */
-    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
+    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null, bool $createAssessment = false): array
     {
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
@@ -681,7 +682,7 @@ class ListController extends Web\Controller\Base
             // Note: in the returned collection
             //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
             //    - any plans UPDATED by this method will be ID INDEXED
-            $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
+            $plans = $this->savePlanData($assessment, $postData['plans'] ?? [], $createAssessment);
 
             $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         } catch (\Exception $e) {
@@ -742,10 +743,11 @@ class ListController extends Web\Controller\Base
      *
      * @param IAssessable $assessment
      * @param array       $postPlans
+     * @param bool        $createAssessment
      * @return GenericCollection|PlanModel[]
      * @throws MapperException
      */
-    private function savePlanData(IAssessable $assessment, array $postPlans = [])
+    private function savePlanData(IAssessable $assessment, array $postPlans = [], bool $createAssessment = false)
     {
         $assessmentId = $assessment->getId();
         $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];
@@ -753,7 +755,7 @@ class ListController extends Web\Controller\Base
         $planMap = $this->participantDataSource->getPlanMapper();
 
         // preload the plans list
-        $plans = $planMap->findByColumnList([ 'assessment_id' => $assessmentId ])
+        $plans = $planMap->findByColumnList([ 'assessment_id' => $assessmentId ], ['queryWrite' => $createAssessment])
                          ->indexBy('id');
 
         // obtain this reference for later
