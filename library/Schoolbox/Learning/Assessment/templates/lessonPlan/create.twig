@@ -100,30 +100,11 @@
  # It implicitly constructs an attachments[] POST key which contains
  # all the hashes of the files you uploaded via the Mr Matt's Modal
  #}
-{% autoescape 'js' %}
-<script>
-    /**
-     * Trigger an update event on the CKEditor WordCount plugin for each applicable textarea.
-     * This will cause the form's submit button to be enabled/disabled depending on whether the textarea is overfilled.
-     */
-    function fireCKEditorUpdateEvents() {
-        const textareas = document.querySelectorAll('textarea');
-        const editors = window.sbProps.editors;
-
-        for (const textarea of document.querySelectorAll('textarea')) {
-            const id = textarea.getAttribute('id');
-            if (editors[id] !== undefined) {
-                editors[id].plugins.get("WordCount").fire('update');
-            }
-        }
-    }
-</script>
-{% endautoescape %}
 <fieldset>
     <div class="row">
         <div class="small-12 columns">
             <label>Attach Files</label>
-            {% include 'sub/attachzone.twig' with {attachzone: attachzone, onUploadComplete: 'fireCKEditorUpdateEvents'} %}
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone } %}
         </div>
     </div>
 
@@ -186,7 +167,8 @@
     {% set action = 'Create' %}
 {% endif %}
 
-<input type="submit" value="{{ action }}">
+{# NOTE: 'id' attribute is required by wordCountSettings.ts #}
+<input id="submit-button" type="submit" value="{{ action }}">
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script>
