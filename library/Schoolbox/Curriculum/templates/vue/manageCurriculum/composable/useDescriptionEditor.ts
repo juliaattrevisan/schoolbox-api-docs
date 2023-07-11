@@ -72,7 +72,6 @@ export function useDescriptionEditor(
                 new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: {
                         targetElements: [`#${ckeditorSelector}`],
-                        toolbar: "simple",
                         addMaxCharCountDefaultEventListeners: false,
                     },
                 })
