@@ -30,7 +30,6 @@ use Schoolbox\RoleMapper;
  */
 class DigestScheduler extends CronScheduler
 {
-
     /**
      * @var DigestTriggerFactory
      */

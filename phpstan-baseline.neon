@@ -376,19 +376,9 @@ parameters:
 			path: library/Alaress/Rules/Token/Tokenizer.php
 
 		-
-			message: "#^Property Alaress\\\\Scheduler\\\\AbstractScheduler\\:\\:\\$dispatcher \\(Alaress\\\\WorkerCrew\\\\DispatcherInterface\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/AbstractScheduler.php
-
-		-
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:transaction\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Cache/RedisCache.php
-
-		-
-			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/CronScheduler.php
 
 		-
 			message: "#^Method Alaress\\\\Scheduler\\\\Event\\\\BlankEvent\\:\\:getEffector\\(\\) should return object but returns null\\.$#"
@@ -5206,11 +5196,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Module/AbstractModuleNotifier.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Scheduler.php
-
-		-
 			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
@@ -6134,11 +6119,6 @@ parameters:
 			message: "#^Argument of an invalid type DateInterval supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: tools/mq/reset-ttls.php
-
-		-
-			message: "#^Anonymous function has an unused use \\$opts\\.$#"
-			count: 1
-			path: tools/notif/route/routed.php
 
 		-
 			message: "#^Variable \\$d might not be defined\\.$#"
