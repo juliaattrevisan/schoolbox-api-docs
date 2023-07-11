@@ -28,6 +28,7 @@ use Alaress\Twig\Filter as AlaressFilter;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
+use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Router\PathMatcher;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
@@ -48,6 +49,7 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Http\Discovery\Psr17Factory;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -669,6 +671,84 @@ abstract class Kernel
                     return $request;
                 }
             ),
+        );
+
+        // Response factory
+        $di->set(
+            'responseFactory',
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    // Copypasted data generators from elsewhere
+                    /** @var IConfigLoader $config */
+                    $config  = $di->get('config');
+
+                    /** @var Session $session */
+                    $session = $di->get('session');
+
+                    /** @var TourMapper $tourMapper */
+                    $tourMapper = $mapperFactory->get(TourMapper::class);
+
+                    /** @var StepMapper $tourStepMapper */
+                    $tourStepMapper = $mapperFactory->get(StepMapper::class);
+                    $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
+
+                    /** @var Environment $templateEngine */
+                    $templateEngine = $di->get('templateEngine');
+
+                    /** @var TopMenuMapper $topMenuMapper */
+                    $topMenuMapper = $mapperFactory->get(TopMenuMapper::class);
+
+                    /** @var SideMenuSectionMapper $sideMenuSectionMapper */
+                    $sideMenuSectionMapper = $mapperFactory->get(SideMenuSectionMapper::class);
+
+                    /** @var SideMenuMapper $sideMenuMapper */
+                    $sideMenuMapper = $mapperFactory->get(SideMenuMapper::class);
+
+                    /** @var BookmarkMapper $bookMarkMapper */
+                    $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
+
+                    /** @var Predis\ClientInterface $redisStorage */
+                    $redisStorage = $di->get('redis.storage');
+
+                    $dataGenerators = [
+                        'ws' => new Output\DataGenerator\Websocket(
+                            $config,
+                            $session->getAuthUser(),
+                            new UnreadRetriever($redisStorage),
+                            INSTANCE_ID
+                        ),
+                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER),
+                        'user' => new Output\DataGenerator\User($session->getAuthUser(), $session),
+                        'topMenu' => new Output\DataGenerator\TopMenu(
+                            $session->getAuthUser(),
+                            $topMenuMapper
+                        ),
+                        'sideMenu' => new Output\DataGenerator\SideMenu(
+                            $config,
+                            $session->getAuthUser(),
+                            $sideMenuSectionMapper,
+                            $sideMenuMapper,
+                            $bookMarkMapper,
+                        ),
+                        'scripts' => new Output\DataGenerator\Scripts($config, $_SERVER),
+                    ];
+
+                    if ($config->get('debug_mode')) {
+                        $dataGenerators['debugBar'] = new Output\DataGenerator\DebugBar(
+                            \Alaress\DebugBar\Instance::getInstance(),
+                            '/debugbar/',
+                        );
+                    }
+
+                    $psr17Factory = new Psr17Factory();
+                    return new ResponseFactory(
+                        $psr17Factory,
+                        $psr17Factory,
+                        $templateEngine,
+                        $dataGenerators
+                    );
+                }
+            )
         );
 
         // SitePage :D

@@ -14,6 +14,7 @@ use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
 use Alaress\Web\Request\Values;
+use Alaress\Web\Response\Factory as ResponseFactory;
 use Aura\Router\Generator;
 use Aura\Router\RouterContainer;
 use Aura\Session\SegmentInterface;
@@ -70,6 +71,12 @@ abstract class Base
      * from `$this->response`.
      */
     protected ?ResponseInterface $psr7Response = null;
+
+    /**
+     * A custom response factory, designed for building PSR-7 compliant response
+     * objects.
+     */
+    protected ResponseFactory $responseFactory;
 
     /**
      * @deprecated you should be injecting your dependencies from the constructor!
@@ -251,6 +258,24 @@ abstract class Base
     public function setPsr7Response(?ResponseInterface $psr7Response): void
     {
         $this->psr7Response = $psr7Response;
+    }
+
+    /**
+     * @return ResponseFactory
+     */
+    public function getResponseFactory(): ResponseFactory
+    {
+        return $this->responseFactory;
+    }
+
+    /**
+     * @param ResponseFactory $responseFactory
+     * @return $this
+     */
+    public function setResponseFactory(ResponseFactory $responseFactory): self
+    {
+        $this->responseFactory = $responseFactory;
+        return $this;
     }
 
     /**

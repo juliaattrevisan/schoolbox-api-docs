@@ -684,6 +684,7 @@ class Module
             ->setPsr7Request($request)
             ->setRequestQuery($requestQuery)
             ->setRequestPost($requestPost)
+            ->setResponseFactory($container->get('responseFactory'))
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
             ->setRouteGenerator($container->get('router.generator'))
