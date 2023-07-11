@@ -367,6 +367,10 @@ export function insertWordCount(sourceElement: HTMLElement, editor: ClassicEdito
                 addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
 
                 for (const submitButton of submitButtons) {
+                    // NOTE: The below line may be called multiple times (if multiple editors are added to a page), but the
+                    //       repeated calls will not cause the submit button to be observed multiple times.  This is because
+                    //       the same submitButtonMutationObserver is used each time, and repeated calls to observe the same
+                    //       HTMLElement will overwrite rather than add duplicates.
                     submitButtonMutationObserver.observe(submitButton, { attributes: true });
                 }
             }
