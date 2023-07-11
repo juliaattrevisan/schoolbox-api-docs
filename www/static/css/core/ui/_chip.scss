@@ -37,6 +37,7 @@
             border: 2px solid var(--content-ui-foreground);
             //TODO - Eventually tie this back to a global roundness custom property / variable
             border-radius: 2px;
+            background-color: var(--content-ui-background);
             color: var(--content-ui-foreground);
             cursor: pointer;
             display: flex;
