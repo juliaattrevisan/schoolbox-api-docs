@@ -105,10 +105,7 @@ function open(component) {
  */
 function getQueryString(component) {
     const panelForm = component.querySelector(PANEL_SELECTOR).querySelector("form");
-    const formData = Object.fromEntries(new FormData(panelForm));
-    return Object.keys(formData)
-        .map((key) => key + "=" + encodeURIComponent(formData[key]))
-        .join("&"); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
+    return new URLSearchParams(new FormData(panelForm)).toString();
 }
 
 /**
