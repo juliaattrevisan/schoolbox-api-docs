@@ -182,30 +182,20 @@ async function saveComponentSettings(component, form) {
  * @returns { Object }
  */
 function getSaveComponentSettingsParams(form) {
-    const formData = Object.fromEntries(new FormData(form));
-    const queryParams = [];
-
-    // Add existing parameters to the query params
-    for (const key in formData) {
-        queryParams.push(key + "=" + encodeURIComponent(formData[key]));
-    }
-
+    const searchParams = new URLSearchParams(new FormData(form));
     // Replace cid parameter if it is empty or not set and getMasonryConfig().pageInfo.type === "cid"
     if (
         getMasonryConfig().settings.formData.pageInfo.type === "cid" &&
-        (!queryParams.some((param) => param.startsWith("cid=")) || queryParams.some((param) => param === "cid="))
+        (!searchParams.has("cid") || searchParams.get("cid") === "")
     ) {
-        queryParams.push("cid=" + encodeURIComponent(getMasonryConfig().settings.formData.pageInfo.id));
+        searchParams.append("cid", encodeURIComponent(getMasonryConfig().settings.formData.pageInfo.id));
     }
-
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
     const context = getMasonryConfig().settings.formData.pageInfo.context;
     if (context) {
-        queryParams.push("context=" + encodeURIComponent(context));
+        searchParams.append("context", encodeURIComponent(context));
     }
-
-    const queryString = queryParams.join("&");
-    return new URLSearchParams(queryString);
+    return searchParams.toString();
 }
 /**
  * Now we have the returned response from the settings save, replace the old component with the new component
