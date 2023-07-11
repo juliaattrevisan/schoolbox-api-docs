@@ -94,7 +94,7 @@ class DeprecatedModel
     /**
      * @deprecated
      * @param string $order
-     * @return array|bool
+     * @return array
      */
     public function getAll($order = '')
     {
