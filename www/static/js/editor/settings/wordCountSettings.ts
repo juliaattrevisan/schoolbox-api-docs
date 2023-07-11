@@ -280,7 +280,6 @@ function onMutateSubmitButton(mutationList: Array<MutationRecord>) {
 /**
  * Set up a MutationObserver to observe changes to the disabled state of the submit button.
  * @param {HTMLElement} submitButton - The submit button
- * @param {EditorConfig} config - The EditorConfig object relevant to the editor.
  */
 function setupSubmitButtonMutationObserver(submitButton: HTMLElement) {
     const submitButtonId = submitButton.getAttribute("id");
