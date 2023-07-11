@@ -133,7 +133,8 @@ export default class TableUpdates extends Plugin {
         const cellElements = Array.from(table.getChildren())
             .filter((row) => row.name === "tableRow")
             .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
-            .flat();
+            .flat()
+            .filter((cell) => !cell._attrs.has("tableCellBorderStyle")); // and only those that don't already have border style set
         this.editor.model.change((writer) => {
             // add the isNew attribute to the table so we can add .sb-ck-table to the table in the downcast
             writer.setAttribute(this.isCK5Attribute, "true", table);
