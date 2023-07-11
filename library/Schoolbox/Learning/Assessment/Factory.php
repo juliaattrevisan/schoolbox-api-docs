@@ -244,6 +244,7 @@ class Factory
 
         /* Quiz needs this to instantiate correctly
          */
+        $this->setLearnosityReference((string)$post['learnosityReference']);
         $this->setDurationHours(intval($post['durationHours'] ?? 0));
         $this->setDurationMinutes(intval($post['durationMinutes'] ?? 0));
         $this->setMaxAttempts(intval($post['maxAttempts'] ?? 0));
@@ -401,6 +402,7 @@ class Factory
             );
         } elseif ($assessment instanceof Quiz) {
             $decorator = new QuizDecorator(
+                $this->getLearnosityReference(),
                 $this->getDurationHours(),
                 $this->getDurationMinutes(),
                 $this->getMaxAttempts(),

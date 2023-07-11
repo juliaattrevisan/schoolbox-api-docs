@@ -12,24 +12,23 @@ namespace Schoolbox\Learning\Assessment\Quiz\Decorator;
 
 trait QuizTrait
 {
+    /**
+     * @var int
+     */
+    protected int $durationHours;
 
     /**
      * @var int
      */
-    protected $durationHours = 0;
+    protected int $durationMinutes;
 
     /**
      * @var int
      */
-    protected $durationMinutes = 0;
-
-    /**
-     * @var int
-     */
-    protected $maxAttempts = 0;
+    protected int $maxAttempts;
 
     /** @var string */
-    protected $completionMessage;
+    protected string $completionMessage;
 
     /**
      * @return int
@@ -100,6 +99,26 @@ trait QuizTrait
     public function setCompletionMessage($completionMessage)
     {
         $this->completionMessage = $completionMessage;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityReference(): ?string
+    {
+        return $this->learnosityReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityReference
+     * @return static
+     */
+    public function setLearnosityReference(?string $learnosityReference)
+    {
+        $this->learnosityReference = $learnosityReference;
         return $this;
     }
 }
