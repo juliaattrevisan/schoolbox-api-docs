@@ -331,8 +331,7 @@ class Controller extends Assessment\Controller
          * Always go to the screen when a quiz has been created,
          * but send the return url with it
          */
-        $quiz     = $this->getQuizForAssessmentId($assessment->getId());
-        $redirect = $this->getRouteIfAuthorized('learnosity.content', ['quizId' => $quiz->getId()]);
+        $redirect = $this->getRouteIfAuthorized('learnosity.getContent', ['assessmentId' => $assessment->getId()]);
 
         if ($postReturnUrl) {
             $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
