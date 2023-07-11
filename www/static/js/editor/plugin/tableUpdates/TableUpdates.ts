@@ -109,6 +109,15 @@ export default class TableUpdates extends Plugin {
             });
             this.setTableCellBorders();
         });
+        const insertColumnAndRowCommands = [
+            "insertTableColumnLeft",
+            "insertTableColumnRight",
+            "insertTableRowAbove",
+            "insertTableRowBelow",
+        ];
+        insertColumnAndRowCommands.forEach((command) => {
+            this.editor.commands.get(command).on("execute", () => this.setTableCellBorders());
+        });
     }
 
     /**
