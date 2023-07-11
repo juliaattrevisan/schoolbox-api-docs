@@ -265,7 +265,7 @@ function setupButtonEnabledMutationObserver(submitButton: HTMLElement, config: E
                     continue; // No containing form so nothing to do.
                 }
 
-                for (const textarea of form.querySelectorAll("form")) {
+                for (const textarea of form.querySelectorAll("textarea")) {
                     const idAttr = textarea.getAttribute("id");
                     const editor = window.sbProps.editors[idAttr];
 
