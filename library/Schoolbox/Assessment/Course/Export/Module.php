@@ -42,9 +42,9 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-// Permissions:
-// * User must be able to create an assessment in the spec folder
-// * User must be an instructor of the assessment the folder is within
+        // Permissions:
+        // * User must be able to create an assessment in the spec folder
+        // * User must be an instructor of the assessment the folder is within
         $permissions = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
