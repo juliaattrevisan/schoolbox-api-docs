@@ -34,7 +34,18 @@ class Controller extends Base
     public function getActivityList(): void
     {
         $payload = [
-            'mode' => 'activity_list',
+            'mode' => 'activity_edit',
+
+            /* A Learnosity uuid that we arbitrarily prescribed
+             */
+            'reference' => 'fdf98aef-3a7c-4851-ab3a-0fd499ee3553',
+
+            'config' => [
+                'activity_edit' => [
+                    'back' => false,
+                ]
+            ],
+
             'user' => [
                 /* Corresponds to a user in the Learnosity Console who will be
                  * considered "the author" of stuff created by the school's teachers
