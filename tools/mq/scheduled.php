@@ -15,7 +15,6 @@ use Alaress\Redis\Async;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
 use Alaress\Scheduler\Cache\RedisCache;
-use Alaress\Scheduler\Stomp\ResolutionManager;
 use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -78,7 +77,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $postman = new Postman($log, $router, $transaction, $txrx, $subscriptionCache);
 
         $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler($loop, $strat, $log, new Clock(), $conf, new ResolutionManager(), $postman);
+        $scheduler = new Scheduler($loop, $strat, $log, new Clock(), $conf, $postman);
 
         // restoring from redis cache
         $jit = new RedisCache($redis, $log, INSTANCE_ID);

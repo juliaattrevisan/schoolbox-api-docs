@@ -12,6 +12,7 @@ namespace Alaress\Scheduler;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\SignalEmitter;
 use Alaress\Date\IClock;
+use Alaress\Scheduler\Cache\ICache;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
@@ -34,6 +35,12 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     /** @var int Retry time in seconds to reschedule */
     private const RETRY_TIME = 300;
 
+    /**
+     * JIT handler to take care of unexpected shutdown
+     *
+     * @var ICache|null
+     */
+    protected ?ICache $jit = null;
 
     /**
      * @param LoopInterface             $loop
@@ -63,12 +70,14 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
             $this->unschedule($trigger);
+            $resolver?->acknowledge();
             return;
         }
 
         if ($trigger->getTimestamp() < 0) {
             $this->log->info("[AbstractScheduler] Trigger with negative timestamp received: {$trigger->getEventObjectId()} {$trigger->getLabel()}"); // FIREFIGHT
             $this->unschedule($trigger);
+            $resolver?->acknowledge();
             return;
         }
 
@@ -80,7 +89,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', ['char' => '-']);
 
             $this->dispatchTrigger($trigger);
-
+            $resolver?->acknowledge();
             return;
         }
 
@@ -118,6 +127,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
                     $event->getDiff()
                 ])
             );
+            // remove from backup
+            if ($this->jit instanceof \Alaress\Scheduler\Cache\RedisCache) {
+                $this->jit->removeCache($trigger);
+            }
         }
         if (count($trigger->getCallbacks()) === 0) {
             $this->log->warning("Trigger for '{$trigger->getEventObjectId()} {$trigger->getLabel()}' has no callbacks");
@@ -153,6 +166,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $interval = $interval ?: ($trigger->getTimestamp() - $this->clock->time());
         $timer = $this->loop->addTimer($interval, $callable);
         $this->putTimer($model, $label, $timer);
+        // Backup
+        if ($this->jit instanceof \Alaress\Scheduler\Cache\RedisCache) {
+            $this->jit->storeCache($trigger);
+        }
 
         $this->log->info(
             sprintf(
@@ -190,6 +207,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
                 $this->log->debug("[AbstractScheduler] Timer is not set properly for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", array('char' => '-'));
             }
             $this->removeTimer($model, $label);
+            // Backup
+            if ($this->jit instanceof \Alaress\Scheduler\Cache\RedisCache) {
+                $this->jit->removeCache($trigger);
+            }
             return true;
         }
 

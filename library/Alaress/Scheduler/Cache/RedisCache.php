@@ -9,7 +9,6 @@
 
 namespace Alaress\Scheduler\Cache;
 
-use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Predis;
 use Predis\ClientInterface;
@@ -76,14 +75,14 @@ class RedisCache implements ICache
             }
 
             // Unserialize
-            $event = unserialize($uncompressedValue, []);
-            if (!$event instanceof TriggerInterface) {
+            $trigger = unserialize($uncompressedValue, []);
+            if (!$trigger instanceof TriggerInterface) {
                 $this->log->warning(
                     sprintf(
                         "Error unserializing data in key %s (expected %s, received %s): cannot restore",
                         $itemKey,
                         CrudEventInterface::class,
-                        is_object($event) ? get_class($event) : 'non-object',
+                        is_object($trigger) ? get_class($trigger) : 'non-object',
                     )
                 );
                 continue;
@@ -104,51 +103,6 @@ class RedisCache implements ICache
 
 
     /**
-     * Save the schedule held by the given ResolutionManager
-     *
-     * @param ResolutionManager $resolvers
-     * @return bool
-     */
-    public function saveSchedule(ResolutionManager $resolvers): bool
-    {
-        $i = 0;
-
-        $resolvers = $resolvers->getAllResolvers();
-
-        if (!$resolvers->count()) {
-            // nothing to save; that's a success
-            return true;
-        }
-
-        // clear the cache
-        $this->clearCacheSet();
-
-        foreach ($resolvers as $resolver) {
-            foreach ($resolvers->offsetGet($resolver) as $trigger) {
-                /** @var TriggerInterface $trigger */
-
-                $timestamp = date('Y-m-d H:i:s', $trigger->getTimestamp());
-                $name      = "{$trigger->getEventObjectId()} - {$trigger->getLabel()} ({$timestamp})";
-
-                // store this compressed data
-                $stored = $this->storeCache($trigger);
-
-                if ($stored) {
-                    $this->log->debug("Cached $name");
-                    $i++;
-                } else {
-                    $this->log->notice("Event $name already exists in cache, skipping", ['char' => '-']);
-                }
-            }
-        }
-
-        $this->log->debug("Cached $i events");
-
-        return (bool)$i;
-    }
-
-
-    /**
      * @return array
      */
     protected function fetchItemKeys(): array
@@ -158,46 +112,12 @@ class RedisCache implements ICache
 
 
     /**
-     * Delete the existing cache of data
-     */
-    protected function clearCacheSet(): void
-    {
-        $this->log->notice("Clearing existing {$this->getNamespacedKey('')} from redis");
-
-        $itemKeys = $this->fetchItemKeys();
-
-        if (!count($itemKeys)) {
-            $this->log->debug("No data to delete");
-            // nothing to delete
-            return;
-        }
-
-        $i = 0;
-
-        // delete all items
-        foreach ($itemKeys as $itemKey) {
-            $deleted = $this->redis->srem($this->getNamespacedKey('index'), $itemKey);
-
-            if ($deleted) {
-                ++$i;
-            } else {
-                $this->log->notice("Redis error: unable to delete $itemKey", ['char' => '?']);
-            }
-        }
-
-        $this->log->debug("$i items deleted");
-
-        // clear the index
-        $this->redis->del($this->getNamespacedKey('index'));
-    }
-
-
-    /**
      * @param TriggerInterface $trigger
      * @return bool
      */
-    protected function storeCache(TriggerInterface $trigger): bool
+    public function storeCache(TriggerInterface $trigger): bool
     {
+        // TODO: method to get key name
         $compressedData = gzcompress(serialize($trigger), 9);
         $hash           = sha1($compressedData);
         $itemKey        = "msg:{$this->instanceId}:s:$hash";
@@ -223,6 +143,26 @@ class RedisCache implements ICache
         return (bool)$isset;
     }
 
+    /**
+     * @param TriggerInterface $trigger
+     * @return bool
+     */
+    public function removeCache(TriggerInterface $trigger): bool
+    {
+        // TODO: method to get key name
+        $compressedData = gzcompress(serialize($trigger), 9);
+        $hash           = sha1($compressedData);
+        $itemKey        = "msg:{$this->instanceId}:s:$hash";
+        $isset = 0;
+
+        // it should already
+        $existingData = $this->redis->get($itemKey);
+        if ($existingData) {
+            $this->log->debug("Adding existing key $itemKey");
+            $isset = $this->redis->srem($this->getNamespacedKey('index'), [$itemKey]);
+        }
+        return (bool)$isset;
+    }
 
     /**
      * Return the given key with a full Redis namespace
