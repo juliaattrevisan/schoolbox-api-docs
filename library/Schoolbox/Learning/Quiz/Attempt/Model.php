@@ -78,6 +78,11 @@ class Model implements ISoftDeletable
     private ?float $max_mark = null;
 
     /**
+     * @var string|null
+     */
+    private ?string $learnosityReference = null;
+
+    /**
      * Is this deleted?
      *
      * @return bool
@@ -317,5 +322,25 @@ class Model implements ISoftDeletable
             }
         }
         return $totalMark;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityReference(): ?string
+    {
+        return $this->learnosityReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityReference
+     * @return Model
+     */
+    public function setLearnosityReference(?string $learnosityReference): self
+    {
+        $this->learnosityReference = $learnosityReference;
+        return $this;
     }
 }

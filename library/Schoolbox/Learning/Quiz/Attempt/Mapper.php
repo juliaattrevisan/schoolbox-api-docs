@@ -74,6 +74,8 @@ class Mapper extends BaseMapper
             'other_key' => 'attempt_id',
         ));
 
+        $this->uses('learnosity_reference', self::TYPE_STRING);
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);

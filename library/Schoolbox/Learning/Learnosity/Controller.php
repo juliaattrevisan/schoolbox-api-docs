@@ -13,13 +13,23 @@ namespace Schoolbox\Learning\Learnosity;
 use Alaress\Web\Controller\Base;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 
 require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootstrap.php';
 
 class Controller extends Base
 {
+    /**
+     * TODO Inject this later
+     * @var \Schoolbox\Learning\Quiz\Mapper
+     */
+    private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
+
+
     /**
      * TODO Inject this later
      * @var \Schoolbox\Learning\Quiz\Attempt\Mapper
@@ -32,6 +42,7 @@ class Controller extends Base
      */
     public function __construct()
     {
+        $this->quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
         $this->attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
     }
 
@@ -476,5 +487,25 @@ class Controller extends Base
             ],
             'Example Session List'
         );
+    }
+
+    /**
+     * TODO Literally copypasta'd
+     *
+     * Converts an assessment_id to a Quiz
+     *
+     * @param int $assessmentId
+     * @return Quiz
+     * @throws Exception
+     */
+    protected function getQuizForAssessmentId($assessmentId): Quiz
+    {
+        /** @var Quiz $quiz */
+        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
+
+        if (Quiz::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+        return $quiz;
     }
 }
