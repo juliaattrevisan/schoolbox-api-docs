@@ -331,6 +331,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/report.twig', [
             'initOptions' => $api->initOptions('reports', $payload),
             'assessment' => $assessment,
+            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ])->setTitle("Result for {$assessment->getTitle()}"));
     }
 

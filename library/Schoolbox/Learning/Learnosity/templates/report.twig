@@ -12,6 +12,10 @@
         <section class="content">
             <div id="schoolbox-result-2"></div>
         </section>
+
+        {% if returnUrl %}
+            <a href="{{ returnUrl }}" class="button">Back to homepage</a>
+        {% endif %}
     </div>
 </div>
 
