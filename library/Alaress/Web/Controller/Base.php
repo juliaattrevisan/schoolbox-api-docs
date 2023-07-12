@@ -639,20 +639,7 @@ abstract class Base
     /**
      * Factory method for loading a file output object.
      *
-     * @param  string $filename
-     * @return Output\File
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildFileOutputFromFilename($filename)
-    {
-        /** @var Output\File $output */
-        $output = $this->getDi()->get('webOutput:file');
-        return $output->setFile($filename);
-    }
-
-    /**
-     * Factory method for loading a file output object.
+     * @deprecated use `buildResponse` to build an output for file contents
      *
      * @param  string $fileContents
      * @return Output\File
