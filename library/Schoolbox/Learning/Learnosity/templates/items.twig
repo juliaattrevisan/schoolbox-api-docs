@@ -12,9 +12,23 @@
             <div id="learnosity_assess"></div>
 
             <script>
-                let itemsApp = LearnosityItems.init(
-                    {{ initOptions | raw }}
-                );
+                let callbacks = {
+                    readyListener: function () {
+                        itemsApp.submit({
+                            success: function (response_ids) {
+                                console.log("Submit was successful", response_ids);
+
+                                /* Async attempt completion
+                                 */
+
+                                /* Redirect to...somewhere else
+                                 */
+                            },
+                        });
+                    }
+                };
+
+                let itemsApp = LearnosityItems.init({{ initOptions | raw }}, callbacks);
             </script>
         </section>
     </div>
