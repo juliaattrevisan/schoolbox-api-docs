@@ -21,16 +21,13 @@ class Controller extends Base
      */
     public function getRobots(): void
     {
-        $robotAllow = "User-Agent: *\nAllow: /\nDisallow: /feedback\nDisallow: /passwordReset\n";
-        $robotDeny = "User-Agent: *\nDisallow: /\n";
-
-        $this->getResponse()->headers->set('Content-Type', 'text/plain; charset=utf-8');
-
         // Are we blocking web crawlers, or allowing them? if not Prod, always block
-        if ($this->getConfigLoader()->get('web_crawlers_enabled')) {
-            $this->getResponse()->content->set($this->buildFileOutputFromString($robotAllow));
-        } else {
-            $this->getResponse()->content->set($this->buildFileOutputFromString($robotDeny));
-        }
+        $this->psr7Response = $this->responseFactory
+            ->buildFromContent(
+                $this->getConfigLoader()->get('web_crawlers_enabled')
+                    ? "User-Agent: *\nAllow: /\nDisallow: /feedback\nDisallow: /passwordReset\n"
+                    : "User-Agent: *\nDisallow: /\n"
+            )
+            ->withHeader('Content-Type', 'text/plain; charset=utf-8');
     }
 }
