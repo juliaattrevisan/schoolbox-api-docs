@@ -182,6 +182,7 @@ class Controller extends BaseController
                 return strnatcasecmp($a->getFolder()->getTitle(), $b->getFolder()->getTitle());
             });
         }
+
         $data = [
             'unitSpec'                          => $unitSpec,
             'returnUrl'                         => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
@@ -190,7 +191,12 @@ class Controller extends BaseController
             'courseImplsInWhichUnitImported'    => $courseImplsInWhichUnitImported,
             'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
             'enableReimport'                    => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
-            'breadcrumbs'                       => [],
+            'breadcrumbs'                       => [
+                ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
+                [$unitSpec->getTitle(), '/homepage/' . $unitSpec->getFolder()->getId()],
+                ['Export', '#']
+            ]
+
         ];
 
         $template = '@learningAssessmentExporter/export_unit.twig';
