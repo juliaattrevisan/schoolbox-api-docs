@@ -375,17 +375,17 @@ class Controller extends Base
         }
 
         // This works in all browsers, but means we need to stream the file through schoolbox as a proxy.
-        $response->status->setCode(200);
-        $filename = $kami->getStudentSubmissionFile()->getBasename();
-        $guzzleResponse = (new Client())->get($export->getFileUrl());
-        $response->headers->set('Content-Description', 'File Transfer');
-        $response->headers->set('Content-Type', 'application/octet-stream');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"');
-        $response->headers->set('Expires', '0');
-        $response->headers->set('Cache-Control', 'must-revalidate');
-        $response->headers->set('Pragma', 'public');
-        $response->headers->set('Content-Length', $guzzleResponse->getHeader('Content-Length')[0]);
-        $response->content->set($this->buildFileOutputFromString($guzzleResponse->getBody()));
+        $filename           = $kami->getStudentSubmissionFile()->getBasename();
+        $guzzleResponse     = (new Client())->get($export->getFileUrl());
+        $this->psr7Response = $this->buildResponse($guzzleResponse->getBody())
+            ->withHeader('Content-Description', 'File Transfer')
+            ->withHeader('Content-Type', 'application/octet-stream')
+            ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"')
+            ->withHeader('Expires', '0')
+            ->withHeader('Cache-Control', 'must-revalidate')
+            ->withHeader('Pragma', 'public')
+            ->withHeader('Content-Length', $guzzleResponse->getHeader('Content-Length')[0])
+        ;
     }
 
 

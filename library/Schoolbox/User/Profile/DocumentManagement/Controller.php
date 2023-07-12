@@ -119,17 +119,13 @@ class Controller extends Base
 
         //Santise the filename leaving only words, spaces, numbers and a few punctation characters
         $filename = mb_ereg_replace("([^\w\s\d\-_~,;'()\[\]\.])", '', $report['filename']);
-
-        $headers = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', $mimeType->getMime());
-        $headers->set('Content-Length', $report['filesize']);
-        $headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-
-        $this->getResponse()->content->set(
-            $this->buildFileOutputFromString($report['blob'])
-        );
+        $this->psr7Response = $this->buildResponse($report['blob'])
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', $mimeType->getMime())
+            ->withHeader('Content-Length', $report['filesize'])
+            ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+        ;
     }
 
     /**

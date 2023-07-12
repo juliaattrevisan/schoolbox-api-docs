@@ -183,13 +183,10 @@ class Controller extends Base
                 $this->getRouteIfAuthorized('helpCourseParticipation.getApiTest')
             );
         } catch (BadResponseException $e) {
-            $response = $e->getResponse();
-
-            $content = $this->buildFileOutputFromString($response->getBody()->getContents());
-
-            $this->getResponse()->status->set($response->getStatusCode());
-            $this->getResponse()->content->set($content);
-            $this->getResponse()->headers->set('Content-Type', 'text/html');
+            $response           = $e->getResponse();
+            $this->psr7Response = $this->buildResponse($response->getBody()->getContents())
+                ->withStatus($response->getStatusCode())
+                ->withHeader('content-type', 'text/html');
         }
     }
 
