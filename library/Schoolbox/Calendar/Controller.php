@@ -99,7 +99,7 @@ class Controller extends Base
      */
     public function getOwnCalendar(?string $selectedDate): void
     {
-        $this->buildResponse($this->getUser(), $this->generateSelectedDate($selectedDate));
+        $this->buildResponseForUser($this->getUser(), $this->generateSelectedDate($selectedDate));
     }
 
     /**
@@ -109,7 +109,7 @@ class Controller extends Base
      */
     public function getCalendar(?string $selectedDate, User $user): void
     {
-        $this->buildResponse($user, $this->generateSelectedDate($selectedDate));
+        $this->buildResponseForUser($user, $this->generateSelectedDate($selectedDate));
     }
 
     /**
@@ -155,7 +155,7 @@ class Controller extends Base
      * @param User        $user
      * @param string|null $selectedDate
      */
-    private function buildResponse(User $user, ?string $selectedDate): void
+    private function buildResponseForUser(User $user, ?string $selectedDate): void
     {
         $groups       = (new Group($user, $this->folderMapper))->generate();
         $campus       = (new Campus($user, $this->campusMapper))->generate();

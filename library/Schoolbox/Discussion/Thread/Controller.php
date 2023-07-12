@@ -107,7 +107,7 @@ class Controller extends BaseController
      */
     public function getThread(Model $thread, IThreadLocation $context): void
     {
-        $this->buildResponse($thread, $context, true);
+        $this->buildResponseForThread($thread, $context, true);
     }
 
 
@@ -135,7 +135,7 @@ class Controller extends BaseController
              */
             $this->context->associate($thread, $context);
 
-            $this->buildResponse($thread, $context, false);
+            $this->buildResponseForThread($thread, $context, false);
         } catch (\UnexpectedValueException $e) {
             /* UnexpectedValueException thrown when you're in a conflicting scenario
              * trying to associate threads to objects, results in http 409 Conflict
@@ -321,7 +321,7 @@ class Controller extends BaseController
      * @param IThreadLocation $context
      * @param bool     $loadChildren
      */
-    private function buildResponse(Model $thread, IThreadLocation $context, bool $loadChildren): void
+    private function buildResponseForThread(Model $thread, IThreadLocation $context, bool $loadChildren): void
     {
         $responseData             = $this->decoratorFactory->build($thread, $context)->jsonSerialize(
             $this->retrieveJsonDecorator(),
