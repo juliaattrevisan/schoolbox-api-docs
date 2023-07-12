@@ -27,9 +27,10 @@
      # with a Learnosity quiz, kinda like a guid. We just specify one here, arbitrarily;
      # if it doesn't exist in Learnosity, a Learnosity quiz will be created using the
      # reference we provided. Otherwise, it'll load it from Learnosity
+     # TODO Make this a hidden input field when you're ready
      #}
     <label for="learnosity-reference">Learnosity Reference</label>
-    <input type="text" name="learnosityReference" id="learnosity-reference" value="{{ assessment.learnosityReference }}" maxlength="255"/>
+    <input type="text" name="learnosityReference" id="learnosity-reference" value="{{ assessment.learnosityReference }}" maxlength="255" readonly />
 
     {# ----------------------------------------------------------- #}
     {# Title #}
