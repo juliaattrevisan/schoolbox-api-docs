@@ -87,6 +87,15 @@ export default class TableUpdates extends Plugin {
     }
 
     /**
+     * Get the currently selected table
+     */
+    getSelectedTable() {
+        const selection = this.editor.model.document.selection;
+        const table = selection.getFirstPosition().findAncestor("table");
+        return table;
+    }
+
+    /**
      * Add the following properties as default to newly created tables, columns and rows
      */
     addDefaultProperties() {
@@ -108,10 +117,10 @@ export default class TableUpdates extends Plugin {
                 value: "#b3b3b3",
             });
             this.setCellBorders();
-            const selection = this.editor.model.document.selection;
-            const table = selection.getFirstPosition().findAncestor("table");
             // add the isNew attribute to the table so we can add .sb-ck-table to the table in the downcast
-            this.editor.model.change((writer) => writer.setAttribute(this.isCK5Attribute, "true", table));
+            this.editor.model.change((writer) => {
+                writer.setAttribute(this.isCK5Attribute, "true", this.getSelectedTable());
+            });
         });
         const insertColumnAndRowCommands = [
             "insertTableColumnLeft",
@@ -140,9 +149,7 @@ export default class TableUpdates extends Plugin {
      * @returns {Array} An array of all the cell elements in the table
      */
     getCellElements() {
-        const selection = this.editor.model.document.selection;
-        const table = selection.getFirstPosition().findAncestor("table");
-        const cellElements = Array.from(table.getChildren())
+        const cellElements = Array.from(this.getSelectedTable().getChildren())
             .filter((row) => row.name === "tableRow")
             .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
             .flat();
@@ -174,10 +181,8 @@ export default class TableUpdates extends Plugin {
     markAlignedTables() {
         const tableAlignmentCommand = this.editor.commands.get("tableAlignment");
         tableAlignmentCommand.on("execute", () => {
-            const selection = this.editor.model.document.selection;
-            const table = selection.getFirstPosition().findAncestor("table");
             this.editor.model.change((writer) => {
-                writer.setAttribute(this.isCK5Attribute, "true", table);
+                writer.setAttribute(this.isCK5Attribute, "true", this.getSelectedTable());
             });
         });
     }
