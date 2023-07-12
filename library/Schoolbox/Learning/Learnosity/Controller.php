@@ -21,10 +21,18 @@ require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootst
 class Controller extends Base
 {
     /**
+     * TODO Inject this later
+     * @var \Schoolbox\Learning\Quiz\Attempt\Mapper
+     */
+    private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper;
+
+
+    /**
      * Controller constructor.
      */
     public function __construct()
     {
+        $this->attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
     }
 
 
@@ -96,12 +104,45 @@ class Controller extends Base
          * First, see if an incomplete attempt exists; if it does,
          * just reuse it
          */
+        $query = "
+            SELECT attempt_id
+            FROM assess_attempt
+            INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
+            WHERE assess.assessment_id = :assessmentId
+            AND assess_attempt.user_id = :userId
+            AND assess_attempt.finish IS NULL
+            AND assess_attempt.deleted_at IS NULL
+            LIMIT 1
+        ";
 
-        /* If not, make a new one arbitrarily
-         */
+        $result = $this->attemptMapper->getDatabase()->executeQuery($query, [
+            'assessmentId' => $assessment->getId(),
+            'userId'       => $student->getId()
+        ]);
 
-        /* Assign that identifier to an assess_attempt
-         */
+        $existingId = $result->fetch()['attempt_id'] ?? null;
+
+        if ($existingId) {
+            /* Found an incomplete attempt; resume it
+             */
+            $attempt = $this->attemptMapper->findById($existingId);
+        } else {
+            /* If not, make a new one arbitrarily
+             */
+            $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+            /* Assign that Learnosity identifier to an assess_attempt
+             */
+            $learnosityReference = Uuid::generate();
+
+            $attempt = $this->attemptMapper->createModel()
+                ->setStart(\Alaress_Date_Format::now())
+                ->setQuiz($quiz)
+                ->setUser($student)
+                ->setLearnosityReference($learnosityReference);
+
+            $this->attemptMapper->save($attempt);
+        }
 
         /* Initialise Learnosity Quiz player
          *
