@@ -27,8 +27,8 @@
 
         &:checked + label {
             background-color: var(--content-ui-foreground);
-            color: var(--content-ui-background);
-            font-weight: 600;
+            color: var(--content-ui-foreground-contrast);
+            font-weight: 400;
 
             .sb-chip__icon {
                 &::before {
@@ -44,20 +44,20 @@
 
         & + label {
             align-items: center;
-            border: 2px solid var(--content-ui-foreground);
+            border: 1px solid var(--content-ui-foreground);
             //TODO - Eventually tie this back to a global roundness custom property / variable
-            border-radius: 2px;
+            border-radius: 1px;
             background-color: var(--content-ui-background);
             color: var(--content-ui-foreground);
             cursor: pointer;
             display: flex;
-            font-weight: 600;
+            font-weight: 400;
             margin: 0;
             padding: var(--whitespace-xs) var(--whitespace-m);
             user-select: none;
 
             .sb-chip__icon {
-                color: var(--content-ui-background);
+                color: var(--content-ui-foreground-contrast);
                 line-height: normal;
                 margin-left: var(--whitespace-s);
 
