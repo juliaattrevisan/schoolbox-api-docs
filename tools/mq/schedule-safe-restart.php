@@ -9,7 +9,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\Stomp\IAckResolver;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Async\Stomp\IFrame;
@@ -30,7 +29,6 @@ use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Schedule Safe Restart');
@@ -282,7 +280,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 
         $amqp  = $di->get('amqp');
 
-        $splitter = new Splitter(new NotifierInflector(new Configurator($di)), new TriggerFactoryFactory(true));
+        $splitter = new Splitter(new NotifierInflector(new Configurator($di)));
 
         $instanceId = INSTANCE_ID;
 

@@ -12,26 +12,9 @@ namespace Schoolbox\Realtime\Schedule\Trigger\Compressed;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 
 class CompressedTriggerBundle extends TriggerBundle
 {
-
-    /** @var int */
-    protected $level;
-
-    /**
-     * @param TriggerFactory $factory
-     * @param string         $method
-     * @param int            $level
-     */
-    public function __construct($factory, $method, $level)
-    {
-        parent::__construct($factory, $method);
-        $this->level = $level;
-    }
-
-
     /**
      * @return TriggerInterface[]
      */
@@ -43,7 +26,7 @@ class CompressedTriggerBundle extends TriggerBundle
             if ($t instanceof CancelTrigger) {
                 $triggers[] = $t;
             } else {
-                $triggers[] = new CompressedTrigger($t, $this->level);
+                $triggers[] = new CompressedTrigger($t);
             }
         }
 

@@ -16,13 +16,10 @@ use ErrorException;
 use InvalidArgumentException;
 use Predis\Client;
 use Predis\ClientInterface;
-use Predis\Collection\Iterator\Keyspace;
 use Predis\Transaction\MultiExec;
 
 abstract class RedisQueue implements QueueInterface
 {
-
-
     /** @var Client */
     protected $redis;
 
@@ -79,7 +76,7 @@ abstract class RedisQueue implements QueueInterface
     public function push(Instance $instance)
     {
         $id    = $this->getRedisMsgKey($instance);
-        $data  = $this->deflate($instance);
+        $data  = self::deflate($instance);
 
         $this->redis->transaction(function (MultiExec $tx) use ($id, $data, $instance) {
             $ttl = $instance->getTTL() > 0 ? $instance->getTTL() : Instance::DEFAULT_TTL;
@@ -126,7 +123,7 @@ abstract class RedisQueue implements QueueInterface
             $data = $result[$i];
 
             try {
-                $instances[] = $this->inflate($data);
+                $instances[] = self::inflate($data);
             } catch (InvalidArgumentException $e) {
                 // the thing we're pointing at doesn't exist or payload invalid? remove the reference
                 $this->redis->srem($this->getRedisSetKey(), $key);

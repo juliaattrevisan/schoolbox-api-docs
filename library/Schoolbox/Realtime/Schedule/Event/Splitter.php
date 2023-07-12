@@ -12,7 +12,7 @@ namespace Schoolbox\Realtime\Schedule\Event;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use ReflectionException;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 
 /**
  * Class responsible for splitting a CRUD event into an array of triggers, ready for scheduling.
@@ -21,21 +21,11 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
  */
 class Splitter
 {
-    /** @var TriggerFactoryFactory */
-    private $factory;
-
-    /** @var NotifierInflector */
-    private $inflector;
-
-
     /**
      * @param NotifierInflector     $inflector
-     * @param TriggerFactoryFactory $factory
      */
-    public function __construct(NotifierInflector $inflector, TriggerFactoryFactory $factory)
+    public function __construct(private NotifierInflector $inflector)
     {
-        $this->factory  = $factory;
-        $this->inflector = $inflector;
     }
 
 
@@ -50,8 +40,7 @@ class Splitter
         $eventModule = $this->inflector->getModule($event);
 
         if ($eventModule instanceof ModuleNotifierInterface) {
-            return $this->factory
-                ->spawn($eventModule, $event)
+            return (new TriggerFactory($eventModule, $event))
                 ->buildTriggers($event->getAction())
                 ->getTriggers();
         }

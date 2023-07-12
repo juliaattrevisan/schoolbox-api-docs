@@ -45,8 +45,6 @@ use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
-use Serializable;
 use Traversable;
 use TypeError;
 use UnderflowException;
@@ -715,7 +713,6 @@ abstract class Mapper implements IMapper
                             new NotifierInflector(
                                 new Configurator($this->getDi()),
                             ),
-                            new TriggerFactoryFactory(true),
                         ),
                         new Broker(
                             INSTANCE_ID,

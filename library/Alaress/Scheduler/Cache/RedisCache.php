@@ -117,8 +117,7 @@ class RedisCache implements ICache
      */
     public function storeCache(TriggerInterface $trigger): bool
     {
-        // TODO: method to get key name
-        $compressedData = gzcompress(serialize($trigger), 9);
+        $compressedData = self::compress($trigger);
         $hash           = sha1($compressedData);
         $itemKey        = "msg:{$this->instanceId}:s:$hash";
 
@@ -149,8 +148,7 @@ class RedisCache implements ICache
      */
     public function removeCache(TriggerInterface $trigger): bool
     {
-        // TODO: method to get key name
-        $compressedData = gzcompress(serialize($trigger), 9);
+        $compressedData = self::compress($trigger);
         $hash           = sha1($compressedData);
         $itemKey        = "msg:{$this->instanceId}:s:$hash";
         $isset = 0;
@@ -184,5 +182,14 @@ class RedisCache implements ICache
     protected function implodeFiltered(string $glue, array $array): string
     {
         return implode($glue, array_filter($array));
+    }
+
+    /**
+     * @param TriggerInterface $trigger
+     * @return string
+     */
+    static private function compress(TriggerInterface $trigger): string
+    {
+        return gzcompress(serialize($trigger), 9);
     }
 }

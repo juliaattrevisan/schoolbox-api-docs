@@ -10,51 +10,19 @@
 namespace Schoolbox\Realtime\Schedule\Trigger\Compressed;
 
 use Alaress\Scheduler\Event\EventInterface;
-use RuntimeException;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\InstantTriggerInterface;
 
 class CompressedTrigger implements InstantTriggerInterface
 {
-
-    /** @var string */
-    protected $serial;
-
-    /** @var InstantTriggerInterface */
-    protected $trigger;
+    // This is required for serializer
+    protected ?string $serial;
 
     /**
-     * @param InstantTriggerInterface $instantTrigger
-     * @param int $compression
+     * @param InstantTriggerInterface $trigger
      */
-    public function __construct($instantTrigger, $compression)
+    public function __construct(private InstantTriggerInterface $trigger)
     {
-        $this->serial = gzcompress(serialize($instantTrigger), $compression);
-        $this->deflate();
-    }
-
-
-    /**
-     * Remove cached expansion
-     */
-    public function deflate()
-    {
-        $this->trigger = null;
-    }
-
-
-    /**
-     * Inflate and cache the result
-     *
-     * @throws RuntimeException
-     * @return InstantTriggerInterface
-     */
-    public function extractTrigger()
-    {
-        if (empty($this->trigger)) {
-            $this->trigger = unserialize(gzuncompress($this->serial));
-        }
-        return $this->trigger;
     }
 
 
@@ -63,7 +31,7 @@ class CompressedTrigger implements InstantTriggerInterface
      */
     public function getModuleNotifier()
     {
-        return $this->extractTrigger()->getModuleNotifier();
+        return $this->trigger->getModuleNotifier();
     }
 
 
@@ -74,7 +42,7 @@ class CompressedTrigger implements InstantTriggerInterface
      */
     public function getTimestamp()
     {
-        return $this->extractTrigger()->getTimestamp();
+        return $this->trigger->getTimestamp();
     }
 
 
@@ -85,7 +53,7 @@ class CompressedTrigger implements InstantTriggerInterface
      */
     public function getCallbacks()
     {
-        return $this->extractTrigger()->getCallbacks();
+        return $this->trigger->getCallbacks();
     }
 
 
@@ -96,7 +64,7 @@ class CompressedTrigger implements InstantTriggerInterface
      */
     public function getLabel()
     {
-        return $this->extractTrigger()->getLabel();
+        return $this->trigger->getLabel();
     }
 
 
@@ -107,7 +75,7 @@ class CompressedTrigger implements InstantTriggerInterface
      */
     public function getEvent()
     {
-        return $this->extractTrigger()->getEvent();
+        return $this->trigger->getEvent();
     }
 
 
