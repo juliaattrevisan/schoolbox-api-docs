@@ -31,6 +31,11 @@ trait QuizTrait
     protected string $completionMessage;
 
     /**
+     * @var string
+     */
+    private string $learnosityReference;
+
+    /**
      * @return int
      */
     public function getDurationHours()
