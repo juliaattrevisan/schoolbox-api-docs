@@ -538,6 +538,8 @@ abstract class Base
     /**
      * Factory method for loading a JSON output object.
      *
+     * @deprecated use `buildJsonResponse` to build an output
+     *
      * @param  mixed $data
      * @return Output\Json
      * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
@@ -551,7 +553,20 @@ abstract class Base
     }
 
     /**
+     * Build a JSON response from `$data`.
+     *
+     * @param object|array $data
+     * @return ResponseInterface
+     */
+    protected function buildJsonResponse(object|array $data): ResponseInterface
+    {
+        return $this->responseFactory->buildJson($data);
+    }
+
+    /**
      * Factory method for loading a chromeless HTML output object.
+     *
+     * @deprecated use `buildUnthemedHtmlResponse` to build an output
      *
      * @param  string $template A Twig template
      * @param  mixed  $data
@@ -583,6 +598,8 @@ abstract class Base
     /**
      * Factory method for loading an xml output object
      *
+     * @deprecated use `buildUnthemedHtmlResponse` to build an output
+     *
      * @param string $template
      * @param string|array $data
      * @return mixed
@@ -599,6 +616,8 @@ abstract class Base
 
     /**
      * Factory method for loading a chromed HTML output object.
+     *
+     * @deprecated use `buildHtmlResponse` to build an output
      *
      * @param  string $template A Twig template
      * @param  mixed  $data
