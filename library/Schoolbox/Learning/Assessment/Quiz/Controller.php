@@ -238,10 +238,11 @@ class Controller extends Assessment\Controller
          */
         $url = $this->router->getGenerator()->generate('learnosity.getAttempt', [
             'assessmentId' => $assessment->getId(),
-            'userId' => $student->getId()
+            'studentId' => $student->getId()
         ]);
 
         $this->response->redirect->to($url);
+        return;
 
         $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
         $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
