@@ -170,11 +170,18 @@ class Controller extends Base
             /* Our internal Quiz implementation id, it seems?
              */
             'activity_id' => (string)$assessment->getId(),
+            /* The quiz and its questions
+             */
+            'activity_template_id' => $quiz->getLearnosityReference(),
             "config" => [
                 "configuration" => [
                     "idle_timeout" => [
                         "interval" => 300
-                    ]
+                    ],
+                    /* TODO Choose where you go after you complete an attempt
+                     *  There might be some kind of autocalculated result screen I haven't found yet
+                     */
+                    'onsubmit_redirect_url' => "/homepage/{$assessment->getContext()->getId()}"
                 ],
                 "navigation" => [
                     "auto_save" => [
@@ -206,7 +213,6 @@ class Controller extends Base
             /* A uniquely-identifying string for us, I think
              */
             'user_id' => (string)$this->getUser()->getId(),
-            'activity_template_id' => $quiz->getLearnosityReference()
         ];
 
         /* Let the $student do it
@@ -225,7 +231,7 @@ class Controller extends Base
                 'assessmentId' => $assessment->getId(),
                 'studentId' => $student->getId(),
             ]),
-            'learnosityReference' => $attempt->getLearnosityReference()
+            'learnosityReference' => $attempt->getLearnosityReference(),
         ])->setTitle("Attempt {$assessment->getTitle()}"));
 
         /* TODO Record the automated result somewhere (idk where)
