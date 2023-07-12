@@ -405,8 +405,8 @@ class Controller extends BaseController
             $unitImplToInsert->setCourse($courseImpl);
             $unitImplToInsert->setTitle($unitSpec->getFolder()->getTitle());
             $unitImplToInsert->setSpecification($unitSpec);
-            $unitImplToInsert->setOpenDate(new Alaress_Date_Format($unitDates['open'] . ' 12:00am', Alaress_Date_Format::FORMAT_DATE_PICKER));
-            $unitImplToInsert->setDueDate(new Alaress_Date_Format($unitDates['close'] . ' 12:00am', Alaress_Date_Format::FORMAT_DATE_PICKER));
+            $unitImplToInsert->setOpenDate(Alaress_Date_Format::newLocalShort($unitDates['open']));
+            $unitImplToInsert->setDueDate(Alaress_Date_Format::newLocalShort($unitDates['close']));
             $this->unitImplementationMapper->save($unitImplToInsert);
         }
 
