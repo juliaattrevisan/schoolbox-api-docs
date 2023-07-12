@@ -219,11 +219,12 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
             'initOptions' => $api->initOptions('items', $payload),
+            'assessment' => $assessment,
+            'attemptId' => $attempt->getId(),
             'completionUrl' => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
                 'assessmentId' => $assessment->getId(),
                 'studentId' => $student->getId(),
             ]),
-            'attemptId' => $attempt->getId(),
             'learnosityReference' => $attempt->getLearnosityReference()
         ])->setTitle("Attempt {$assessment->getTitle()}"));
 
