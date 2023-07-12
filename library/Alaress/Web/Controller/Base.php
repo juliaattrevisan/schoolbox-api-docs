@@ -686,6 +686,9 @@ abstract class Base
      * This relies upon the PSR-7 response's `getBody` method returning a
      * rewindable stream.
      *
+     * @deprecated no longer required as controllers can now return PSR-7
+     *             responses directly
+     *
      * @param ResponseInterface $response A PSR-7 HTTP response object.
      */
     protected function populateResponseFromPsr7Response(ResponseInterface $response): void

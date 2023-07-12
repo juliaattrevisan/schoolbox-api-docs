@@ -293,9 +293,9 @@ class Controller extends BaseController
                 $this->userCodec,
             ),
         );
-        $handler = new MembershipServiceServerRequestHandler($builder);
-        $server  = new ServiceServer($validator, $handler);
-        $this->populateResponseFromPsr7Response($server->handle($request));
+        $handler            = new MembershipServiceServerRequestHandler($builder);
+        $server             = new ServiceServer($validator, $handler);
+        $this->psr7Response = $server->handle($request);
     }
 
     /**

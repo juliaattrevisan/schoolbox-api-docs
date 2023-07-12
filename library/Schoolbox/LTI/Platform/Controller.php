@@ -140,15 +140,12 @@ class Controller extends Base
         );
 
         // Build the access token response
-        $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
-        $response  = $generator->generate(
+        $generator          = new AccessTokenResponseGenerator($this->keyChains, $factory);
+        $this->psr7Response = $generator->generate(
             $this->psr7Request,
             (new ResponseFactory())->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
-
-        // Convert that response into something Aura understands, and output it
-        $this->populateResponseFromPsr7Response($response);
     }
 
     /**
