@@ -336,10 +336,16 @@ class Controller extends BaseController
      */
     public function postExportForUnit(UnitSpecification\Model $unitSpec): void
     {
+        $fallbackReturnUrl = $this->routeGenerator->generate(
+            'course.modifyCourse',
+            ['id' => $unitSpec->getCourse()->getId()]
+        ) . "#{$unitSpec->getId()}";
+
         $courseImplIds = array_keys($this->getRequest()->post->get('courseImplementationIds', []));
 
         if (count($courseImplIds) === 0) {
             // If empty form submitted, do nothing.
+            $this->redirectToReturnUrlIfSetOrFallbackUrl($fallbackReturnUrl);
             return;
         }
 
@@ -405,12 +411,7 @@ class Controller extends BaseController
             $this->unitImplementationMapper->save($unitImplToInsert);
         }
 
-        $this->redirectToReturnUrlIfSetOrFallbackUrl(
-            $this->routeGenerator->generate(
-                'course.modifyCourse',
-                ['id' => $unitSpec->getCourse()->getId()]
-            ) . "#{$unitSpec->getId()}"
-        );
+        $this->redirectToReturnUrlIfSetOrFallbackUrl($fallbackReturnUrl);
     }
 
 
