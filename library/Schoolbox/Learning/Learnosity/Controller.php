@@ -18,6 +18,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\User;
 
 require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootstrap.php';
 
@@ -104,12 +106,18 @@ class Controller extends Base
     /**
      * Let a student do an attempt in a Learnosity quiz
      *
-     * @param IAssessable     $assessment
-     * @param \Schoolbox\User $student
+     * @param IAssessable $assessment
+     * @param User        $student
      * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws Deleted
      */
     public function getAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
         /* Generate a session (attempt) identifier
          *
          * First, see if an incomplete attempt exists; if it does,
@@ -138,10 +146,6 @@ class Controller extends Base
              */
             $attempt = $this->attemptMapper->findById($existingId);
         } else {
-            /* If not, make a new one arbitrarily
-             */
-            $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
             /* Assign that Learnosity identifier to an assess_attempt
              */
             $learnosityReference = Uuid::generate();
@@ -161,11 +165,62 @@ class Controller extends Base
          * $assessment's Learnosity reference, apparently
          * (how do we do this more cheapishly?)
          */
+        $payload = [
+            /* Our internal Quiz implementation id, it seems?
+             */
+            'activity_id' => (string)$assessment->getId(),
+            "config" => [
+                "configuration" => [
+                    "idle_timeout" => [
+                        "interval" => 300
+                    ]
+                ],
+                "navigation" => [
+                    "auto_save" => [
+                        "save_interval_duration" => 300
+                    ],
+                    "show_intro" => false,
+                    "show_outro" => false
+                ],
+                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
+                 */
+                'regions' => 'main',
+                /* This is our Quiz title, I guess
+                 */
+                "title" => $assessment->getTitle(),
+                "subtitle" => ''
+            ],
+            /* This is our Quiz title, I guess
+             */
+            'name' => $assessment->getTitle(),
+            'rendering_type' => 'assess',
+            /* An "attempt identifier", I think
+             */
+            'session_id' => $attempt->getLearnosityReference(),
+            /* This saves attempt results into Learnosity servers, enabling reporting etc.
+             * You can use 'local_practice' to preview a quiz.
+             * You can use 'feedback' to grade an attempt with feedback etc.
+             */
+            'type' => 'submit_practice',
+            /* A uniquely-identifying string for us, I think
+             */
+            'user_id' => (string)$this->getUser()->getId(),
+            'activity_template_id' => $quiz->getLearnosityReference()
+        ];
 
         /* Let the $student do it
          */
+        $api = new Api(
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->getConfigLoader()->get('logs_dir')
+        );
 
-        /* Record the automated result somewhere (idk where)
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
+            'initOptions' => $api->initOptions('items', $payload)
+        ])->setTitle("Attempt {$assessment->getTitle()}"));
+
+        /* TODO Record the automated result somewhere (idk where)
          */
     }
 
