@@ -23,7 +23,7 @@ class Controller extends Base
     {
         // Are we blocking web crawlers, or allowing them? if not Prod, always block
         $this->psr7Response = $this
-            ->buildResponse(
+            ->responseFromContent(
                 $this->getConfigLoader()->get('web_crawlers_enabled')
                     ? "User-Agent: *\nAllow: /\nDisallow: /feedback\nDisallow: /passwordReset\n"
                     : "User-Agent: *\nDisallow: /\n"

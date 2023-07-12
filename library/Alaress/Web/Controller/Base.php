@@ -539,7 +539,7 @@ abstract class Base
     /**
      * Factory method for loading a JSON output object.
      *
-     * @deprecated use `buildJsonResponse` to build an output
+     * @deprecated use `responseAsJson` to build a response object
      *
      * @param  mixed $data
      * @return Output\Json
@@ -559,7 +559,7 @@ abstract class Base
      * @param object|array $data
      * @return ResponseInterface
      */
-    protected function buildJsonResponse(object|array $data): ResponseInterface
+    protected function responseAsJson(object|array $data): ResponseInterface
     {
         return $this->responseFactory->buildJson($data);
     }
@@ -567,7 +567,7 @@ abstract class Base
     /**
      * Factory method for loading a chromeless HTML output object.
      *
-     * @deprecated use `buildUnthemedHtmlResponse` to build an output
+     * @deprecated use `responseFromTemplateUnthemed` to build a response object
      *
      * @param  string $template A Twig template
      * @param  mixed  $data
@@ -591,7 +591,7 @@ abstract class Base
      * @return ResponseInterface
      * @throws TwigError if something goes wrong when rendering the template
      */
-    protected function buildUnthemedHtmlResponse(string $template, array $data): ResponseInterface
+    protected function responseFromTemplateUnthemed(string $template, array $data): ResponseInterface
     {
         return $this->responseFactory->buildUnthemedHtml($template, $data, $this->user);
     }
@@ -599,7 +599,8 @@ abstract class Base
     /**
      * Factory method for loading an xml output object
      *
-     * @deprecated use `buildUnthemedHtmlResponse` to build an output
+     * @deprecated use `responseFromTemplateUnthemed` to build a response object
+     *             and then apply an XML-specific "content-type" header
      *
      * @param string $template
      * @param string|array $data
@@ -618,7 +619,7 @@ abstract class Base
     /**
      * Factory method for loading a chromed HTML output object.
      *
-     * @deprecated use `buildHtmlResponse` to build an output
+     * @deprecated use `responseFromTemplate` to build a response object
      *
      * @param  string $template A Twig template
      * @param  mixed  $data
@@ -659,7 +660,7 @@ abstract class Base
      * @return ResponseInterface
      * @throws TwigError if something goes wrong when rendering the template
      */
-    protected function buildHtmlResponse(
+    protected function responseFromTemplate(
         string $template,
         array $data,
         string $title = '',
@@ -671,7 +672,7 @@ abstract class Base
     /**
      * Factory method for loading a file output object.
      *
-     * @deprecated use `buildResponse` to build an output for file contents
+     * @deprecated use `responseFromContent` to build a response object
      *
      * @param  string $fileContents
      * @return Output\File
@@ -741,7 +742,7 @@ abstract class Base
      * @param string $content
      * @return ResponseInterface
      */
-    protected function buildResponse(string $content): ResponseInterface
+    protected function responseFromContent(string $content): ResponseInterface
     {
         return $this->responseFactory->buildFromContent($content);
     }
@@ -773,16 +774,16 @@ abstract class Base
     ): ResponseInterface {
         if ($this->isJsonRequest()) {
             // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
-            return $this->buildJsonResponse($data);
+            return $this->responseAsJson($data);
         }
 
         if ($this->isXhrRequest()) {
             // if the request is AJAX, don't return the chrome
-            return $this->buildUnthemedHtmlResponse($template, $data);
+            return $this->responseFromTemplateUnthemed($template, $data);
         }
 
         // full synchronous page
-        return $this->buildHtmlResponse($template, $data, $title, $tab);
+        return $this->responseFromTemplate($template, $data, $title, $tab);
     }
 
     /**

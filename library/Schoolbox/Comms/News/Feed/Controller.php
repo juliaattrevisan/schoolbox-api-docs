@@ -161,7 +161,7 @@ class Controller extends Base
             'articles'   => $articles,
         ];
         $this->psr7Response = $this
-            ->buildUnthemedHtmlResponse('@commsNewsFeed/rss.twig', $data)
+            ->responseFromTemplateUnthemed('@commsNewsFeed/rss.twig', $data)
             ->withHeader('Content-Type', 'application/rss+xml; charset=UTF-8');
     }
 }

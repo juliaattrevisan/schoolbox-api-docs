@@ -119,7 +119,7 @@ class Controller extends Base
 
         //Santise the filename leaving only words, spaces, numbers and a few punctation characters
         $filename = mb_ereg_replace("([^\w\s\d\-_~,;'()\[\]\.])", '', $report['filename']);
-        $this->psr7Response = $this->buildResponse($report['blob'])
+        $this->psr7Response = $this->responseFromContent($report['blob'])
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', $mimeType->getMime())

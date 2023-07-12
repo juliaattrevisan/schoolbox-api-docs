@@ -184,7 +184,7 @@ class Controller extends Base
             );
         } catch (BadResponseException $e) {
             $response           = $e->getResponse();
-            $this->psr7Response = $this->buildResponse($response->getBody()->getContents())
+            $this->psr7Response = $this->responseFromContent($response->getBody()->getContents())
                 ->withStatus($response->getStatusCode())
                 ->withHeader('content-type', 'text/html');
         }

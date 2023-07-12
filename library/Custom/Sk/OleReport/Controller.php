@@ -139,7 +139,7 @@ class Controller extends Base
         $content  = $row['Document'];
         $fileName = "{$row['Description']}.pdf";
 
-        $this->psr7Response = $this->buildResponse($content)
+        $this->psr7Response = $this->responseFromContent($content)
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'application/pdf')

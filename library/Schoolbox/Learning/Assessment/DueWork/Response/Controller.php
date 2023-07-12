@@ -377,7 +377,7 @@ class Controller extends Base
         // This works in all browsers, but means we need to stream the file through schoolbox as a proxy.
         $filename           = $kami->getStudentSubmissionFile()->getBasename();
         $guzzleResponse     = (new Client())->get($export->getFileUrl());
-        $this->psr7Response = $this->buildResponse($guzzleResponse->getBody())
+        $this->psr7Response = $this->responseFromContent($guzzleResponse->getBody())
             ->withHeader('Content-Description', 'File Transfer')
             ->withHeader('Content-Type', 'application/octet-stream')
             ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"')

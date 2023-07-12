@@ -109,7 +109,7 @@ class Controller extends Base
          * build the whole thing
          */
         $output = (new User\Translator\ModelToArray())($user, $groupsArr);
-        $this->psr7Response = $this->buildJsonResponse($output);
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -147,7 +147,7 @@ class Controller extends Base
             $problem = (new ApiProblem('Unable to update a user at this endpoint.'))
                 ->setStatus(404)
                 ->asArray();
-            $this->psr7Response = $this->buildJsonResponse($problem)
+            $this->psr7Response = $this->responseAsJson($problem)
                 ->withStatus(404);
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
@@ -403,7 +403,7 @@ class Controller extends Base
          * build the whole thing
          */
         $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
-        $this->psr7Response = $this->buildJsonResponse($output);
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -459,7 +459,7 @@ class Controller extends Base
              */
             $output[] = (new User\Translator\ModelToArray())($user, $groupsArr);
         }
-        $this->psr7Response = $this->buildJsonResponse(
+        $this->psr7Response = $this->responseAsJson(
             [
                 'data'  =>  $output,
                 'metadata'  => [
