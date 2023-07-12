@@ -57,11 +57,7 @@ class Factory
         // Aura.Web did this, I believe that the reason for that is to ensure
         // the new location gets fetched afresh.
         if ($statusCode === Response::HTTP_SEE_OTHER) {
-            $response = $response
-                ->withHeader('cache-control', 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate')
-                ->withoutHeader('etag')
-                ->withoutHeader('last-modified')
-                ->withoutHeader('vary');
+            $response = $this->disableCaching($response);
         }
 
         return $response;
@@ -165,6 +161,22 @@ class Factory
         return $this->responseFactory
             ->createResponse()
             ->withBody($this->streamFactory->createStream($content));
+    }
+
+    /**
+     * Helper method for disabling caching on a response.
+     *
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    public function disableCaching(ResponseInterface $response): ResponseInterface
+    {
+        return $response
+            ->withoutHeader('cache-control')
+            ->withHeader('cache-control', 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate')
+            ->withoutHeader('etag')
+            ->withoutHeader('last-modified')
+            ->withoutHeader('vary');
     }
 
     /**
