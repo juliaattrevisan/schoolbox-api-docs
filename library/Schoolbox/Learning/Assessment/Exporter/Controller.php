@@ -115,7 +115,7 @@ class Controller extends BaseController
             'returnUrlName'    => Redirect::RETURN_URL,
             'unImported'       => $notImported,
             'imported'         => $imported,
-            'folderWritePerms' => $this->buildFolderWritePermissions($assessmentImpls),
+            'folderWritePerms' => $this->buildFolderWritePermissionsForAssessment($assessmentImpls),
             'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
             'breadcrumbs'      => $breadcrumbs,
             'responseCounts'   => $responseCounts,
@@ -188,7 +188,7 @@ class Controller extends BaseController
             'returnUrlName'                     => Redirect::RETURN_URL,
             'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
             'courseImplsInWhichUnitImported'    => $courseImplsInWhichUnitImported,
-            'folderWritePerms'                  => $this->buildFolderWritePermissions($courseImpls),
+            'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
             'enableReimport'                    => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
             'breadcrumbs'                       => [],
         ];
@@ -199,13 +199,31 @@ class Controller extends BaseController
 
 
     /**
-     * Determine whether the current user has WRITE+ perm to the assessments' folders.
+     * Determine whether the current user has WRITE+ perm to the assessment's folders.
+     *
+     * @param GenericCollection $assessmentImpls
+     * @return bool[] Indexed by folder.id
+     * @throws MapperException
+     */
+    private function buildFolderWritePermissionsForAssessment(GenericCollection $assessmentImpls): array
+    {
+        $folderWritePerms = [];
+        foreach ($assessmentImpls as $assessmentImpl) {
+            $folder                             = $assessmentImpl->getContext()->getFolder();
+            $folderWritePerms[$folder->getId()] = $this->access->isInstructor($this->getUser(), $folder);
+        }
+        return $folderWritePerms;
+    }
+
+
+    /**
+     * Determine whether the current user has WRITE+ perm to the unit's folders.
      *
      * @param GenericCollection $items Collection of objects each having a getFolder() method.
      * @return bool[] Indexed by folder.id
      * @throws MapperException
      */
-    private function buildFolderWritePermissions(GenericCollection $items): array
+    private function buildFolderWritePermissionsForUnit(GenericCollection $items): array
     {
         $folderWritePerms = [];
         foreach ($items as $item) {
@@ -243,7 +261,7 @@ class Controller extends BaseController
         $importedImplementationDates = $this->getRequest()->post->get('unit', []);
         // get corresponding assessment impls in the unit impls selected by the user.
         $assessmentImpls             = $this->buildImplementationsForSpecification($assessment, array_keys($importedImplementations));
-        $folderWritePerms            = $this->buildFolderWritePermissions($assessmentImpls);
+        $folderWritePerms            = $this->buildFolderWritePermissionsForAssessment($assessmentImpls);
 
         // Check all permissions before making any changes to system
         $errors = [];
@@ -358,7 +376,7 @@ class Controller extends BaseController
             $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
         }
 
-        $folderWritePerms = $this->buildFolderWritePermissions($courseImpls);
+        $folderWritePerms = $this->buildFolderWritePermissionsForUnit($courseImpls);
 
         // Check all permissions before making any changes to system
         $errors = [];
