@@ -692,7 +692,7 @@ abstract class Base
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
      */
-    protected function buildMovedPermanentlyResponse(string $location): ResponseInterface
+    protected function redirectMovedPermanently(string $location): ResponseInterface
     {
         return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_MOVED_PERMANENTLY);
     }
@@ -703,7 +703,7 @@ abstract class Base
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
      */
-    protected function buildRedirectResponse(string $location): ResponseInterface
+    protected function redirectFound(string $location): ResponseInterface
     {
         return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_FOUND);
     }
@@ -719,7 +719,7 @@ abstract class Base
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
      */
-    protected function buildSeeOtherResponse(string $location): ResponseInterface
+    protected function redirectSeeOther(string $location): ResponseInterface
     {
         return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_SEE_OTHER);
     }
@@ -730,9 +730,20 @@ abstract class Base
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
      */
-    protected function buildTemporaryRedirectResponse(string $location): ResponseInterface
+    protected function redirectTemporary(string $location): ResponseInterface
     {
         return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_TEMPORARY_REDIRECT);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "308 Permanent Redirect" response.
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectPermanent(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_PERMANENTLY_REDIRECT);
     }
 
     /**
