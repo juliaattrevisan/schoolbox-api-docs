@@ -59,8 +59,6 @@ class Factory
         if ($statusCode === Response::HTTP_SEE_OTHER) {
             $response = $response
                 ->withHeader('cache-control', 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate')
-                ->withHeader('pragma', 'no-cache')
-                ->withHeader('expires', 'Mon, 01 Jan 0001 00:00:00 GMT')
                 ->withoutHeader('etag')
                 ->withoutHeader('last-modified')
                 ->withoutHeader('vary');
