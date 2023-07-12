@@ -393,8 +393,7 @@ class Controller extends BaseController
 
             if ($unitToOverwrite !== null) {
                 if ($reimportIsEnabled) {
-                    $unitToOverwrite->setDeletedAt(new Alaress_Date_Format(time(), Alaress_Date_Format::TIMESTAMP));
-                    $this->unitImplementationMapper->save($unitToOverwrite);
+                    $this->unitImplementationMapper->delete($unitToOverwrite);
                 } else {
                     continue; // We cannot overwrite the existing unit, so skip this course implementation.
                 }
