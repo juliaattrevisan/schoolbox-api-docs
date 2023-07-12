@@ -13,6 +13,7 @@ use Alaress\Web\Output\DataGenerator\IDataGenerator;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Schoolbox\User;
 use Twig\Environment;
 use Twig\Error\Error as TwigError;
 
@@ -89,16 +90,22 @@ class Factory
      * Builds a response by rendering a Twig template with a data set within the
      * site chrome.
      *
-     * @param string $template A Twig template to render.
-     * @param array  $data     Data to inject into the template.
-     * @param string $title    If not empty: use this as the title of the page.
-     * @param string $tab      If not empty: use this as the currently selected
-     *                         navigation tab.
+     * @param string $template    A Twig template to render.
+     * @param array  $data        Data to inject into the template.
+     * @param User   $currentUser The currently authenticated user.
+     * @param string $title       If not empty: use this as the page title.
+     * @param string $tab         If not empty: use this as the selected
+     *                            navigation tab.
      * @return ResponseInterface
      * @throws TwigError if something goes wrong when rendering the template
      */
-    public function buildHtml(string $template, array $data, string $title = '', string $tab = ''): ResponseInterface
-    {
+    public function buildHtml(
+        string $template,
+        array $data,
+        User $currentUser,
+        string $title = '',
+        string $tab = '',
+    ): ResponseInterface {
 //        if (empty($template)) {
 //            $code = $this->getResponse()->status->getCode();
 //            if ($code === 404) {
@@ -126,6 +133,8 @@ class Factory
         foreach ($this->dataGenerators as $key => $generator) {
             $data[$key] = $generator->generate($chromeData);
         }
+
+        $this->twig->addGlobal('USER', $currentUser);
 
         // Render it all out
         return $this->buildFromContent($this->twig->render('include/chrome.twig', $data));
