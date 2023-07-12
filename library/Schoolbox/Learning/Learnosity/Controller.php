@@ -45,7 +45,7 @@ class Controller extends Base
      */
     public function __construct()
     {
-        $this->quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
+        $this->quizMapper    = \Schoolbox\Learning\Quiz\Mapper::getInstance();
         $this->attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
     }
 
@@ -61,12 +61,12 @@ class Controller extends Base
     public function getContent(IAssessable $assessment): void
     {
         $payload = [
-            'config' => [
+            'config'    => [
                 'activity_edit' => [
                     'back' => false,
                 ]
             ],
-            'mode' => 'activity_edit',
+            'mode'      => 'activity_edit',
             /* A Learnosity uuid that we arbitrarily prescribed
              */
             'reference' => $assessment->getLearnosityReference(),
@@ -74,16 +74,16 @@ class Controller extends Base
              * considered "the author" of stuff created by the school's teachers
              * Misconfiguring this leads to Error 10000 which has no definition
              */
-            'user' => [
-                'id' => (string)$this->getConfigLoader()->get('learnosity_author_id'),
+            'user'      => [
+                'id'        => (string)$this->getConfigLoader()->get('learnosity_author_id'),
                 /* These fields are superfluous and are presumably
                  * used for auditing; we attribute an individual user's
                  * name to a collectively-utilised author account
                  * configured in Learnosity itself (that's the id above)
                  */
                 'firstname' => $this->getUser()->getFirstname(),
-                'lastname' => $this->getUser()->getLastname(),
-                'email' => $this->getUser()->getEmail()
+                'lastname'  => $this->getUser()->getLastname(),
+                'email'     => $this->getUser()->getEmail()
             ]
         ];
 
@@ -93,14 +93,18 @@ class Controller extends Base
             $this->getConfigLoader()->get('logs_dir')
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/content.twig', [
-            'assessment' => $assessment,
-            'initOptions' => $api->initOptions('author', $payload),
-            'returnUrl' => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL) ?? ''),
-        ])->setTitle(sprintf(
-            'Modify contents of %s',
-            $assessment->getTitle()
-        )));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learnosity/content.twig', [
+                'assessment'  => $assessment,
+                'initOptions' => $api->initOptions('author', $payload),
+                'returnUrl'   => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL) ?? ''),
+            ])->setTitle(
+                sprintf(
+                    'Modify contents of %s',
+                    $assessment->getTitle()
+                )
+            )
+        );
     }
 
 
@@ -169,22 +173,25 @@ class Controller extends Base
         $payload = [
             /* Our internal Quiz implementation id, it seems?
              */
-            'activity_id' => (string)$assessment->getId(),
+            'activity_id'          => (string)$assessment->getId(),
             /* The quiz and its questions
              */
             'activity_template_id' => $quiz->getLearnosityReference(),
-            "config" => [
+            "config"               => [
                 "configuration" => [
-                    "idle_timeout" => [
+                    "idle_timeout"          => [
                         "interval" => 300
                     ],
-                    /* TODO Choose where you go after you complete an attempt
-                     *  There might be some kind of autocalculated result screen I haven't found yet
+                    /* Go to a nice report screen when you're done, for now
                      */
-                    'onsubmit_redirect_url' => "/homepage/{$assessment->getContext()->getId()}"
+                    'onsubmit_redirect_url' => $this->router->getGenerator()->generate('learnosity.getReport', [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId' => $student->getId(),
+                        'learnosityReference' => $attempt->getLearnosityReference()
+                    ])
                 ],
-                "navigation" => [
-                    "auto_save" => [
+                "navigation"    => [
+                    "auto_save"  => [
                         "save_interval_duration" => 300
                     ],
                     "show_intro" => false,
@@ -192,27 +199,27 @@ class Controller extends Base
                 ],
                 /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
                  */
-                'regions' => 'main',
+                'regions'       => 'main',
                 /* This is our Quiz title, I guess
                  */
-                "title" => $assessment->getTitle(),
-                "subtitle" => ''
+                "title"         => $assessment->getTitle(),
+                "subtitle"      => ''
             ],
             /* This is our Quiz title, I guess
              */
-            'name' => $assessment->getTitle(),
-            'rendering_type' => 'assess',
+            'name'                 => $assessment->getTitle(),
+            'rendering_type'       => 'assess',
             /* An "attempt identifier", I think
              */
-            'session_id' => $attempt->getLearnosityReference(),
+            'session_id'           => $attempt->getLearnosityReference(),
             /* This saves attempt results into Learnosity servers, enabling reporting etc.
              * You can use 'local_practice' to preview a quiz.
              * You can use 'feedback' to grade an attempt with feedback etc.
              */
-            'type' => 'submit_practice',
+            'type'                 => 'submit_practice',
             /* A uniquely-identifying string for us, I think
              */
-            'user_id' => (string)$this->getUser()->getId(),
+            'user_id'              => (string)$this->getUser()->getId(),
         ];
 
         /* Let the $student do it
@@ -223,17 +230,18 @@ class Controller extends Base
             $this->getConfigLoader()->get('logs_dir')
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
-            'initOptions' => $api->initOptions('items', $payload),
-            'assessment' => $assessment,
-            'attemptId' => $attempt->getId(),
-            'completionUrl' => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
-                'assessmentId' => $assessment->getId(),
-                'studentId' => $student->getId(),
-            ]),
-            'learnosityReference' => $attempt->getLearnosityReference(),
-        ])->setTitle("Attempt {$assessment->getTitle()}"));
-
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learnosity/items.twig', [
+                'initOptions'         => $api->initOptions('items', $payload),
+                'assessment'          => $assessment,
+                'attemptId'           => $attempt->getId(),
+                'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
+                    'assessmentId' => $assessment->getId(),
+                    'studentId'    => $student->getId(),
+                ]),
+                'learnosityReference' => $attempt->getLearnosityReference(),
+            ])->setTitle("Attempt {$assessment->getTitle()}")
+        );
         /* TODO Record the automated result somewhere (idk where)
          */
     }
@@ -256,14 +264,28 @@ class Controller extends Base
     public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
         $existingAttempt = $this->attemptMapper->findOneByColumnList([
-            'attempt_id' => $this->request->post['attemptId'],
+            'attempt_id'           => $this->request->post['attemptId'],
             'learnosity_reference' => $this->request->post['learnosityReference'],
-            'user_id' => $student->getId()
+            'user_id'              => $student->getId()
         ]);
 
         $existingAttempt->setFinish(\Alaress_Date_Format::now());
 
         $this->attemptMapper->save($existingAttempt);
+    }
+
+
+    /**
+     * Show some basic stats about your attempt
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     */
+    public function getReport(IAssessable $assessment, \Schoolbox\User $student): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/report.twig', [
+        ])->setTitle("Result for {$assessment->getTitle()}"));
     }
 
 

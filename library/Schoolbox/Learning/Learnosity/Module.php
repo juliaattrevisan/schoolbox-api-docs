@@ -57,17 +57,26 @@ class Module extends BaseModule
             return $this->preloadAssessmentAndStudent($params);
         };
 
+        $preloadAttempt = function ($params) {
+            return $this->preloadAttempt($params);
+        };
+
         /* Modify Learnosity contents for a given schoolbox quiz id
          */
         $this->register('GET', '/{assessmentId}/content', 'getContent', $instructorPerms, $preloadAssessment);
 
-        /* Complete an attempt
+        /* Async complete an attempt (set finished datetime)
          */
         $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerPerms, $preloadParticipant);
 
         /* Start a new attempt
          */
         $this->register('GET', '/{assessmentId}/attempt/{studentId}', 'getAttempt', $learnerPerms, $preloadParticipant);
+
+        /* Generic report screen you see after completing an attempt
+         * This is a Learnosity redirect upon submit
+         */
+        $this->register('GET', '/{assessmentId}/report/{studentId}/{learnosityReference}', 'getReport', $learnerPerms, $preloadAttempt);
 
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
         $this->register('GET', '/items', 'getItems', $instructorPerms, null);
@@ -177,6 +186,36 @@ class Module extends BaseModule
 
 
     /**
+     * Preloads an attempt via its learnosity reference identifier
+     *
+     * @param array $params
+     * @return array
+     */
+    protected function preloadAttempt(array $params): array
+    {
+        $participantPreload = $this->preloadAssessmentAndStudent($params);
+
+        try {
+            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnosityReference']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new NotFound();
+        }
+
+        /* Make sure you own it
+         * TODO (or that you're a staff/other perms)
+         */
+        $student = $participantPreload['student'];
+
+        if ((int)$student->getId() !== (int)$attempt->getUser()->getId()) {
+            throw new NotFound();
+        }
+
+        return array_merge($participantPreload, [
+            'attempt' => $attempt
+        ]);
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildController(): Base
@@ -211,6 +250,16 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+
+    /**
+     * @return Mapper|\Schoolbox\Learning\Quiz\Attempt\Mapper
+     * @throws InvalidArgumentException
+     */
+    protected function getAttemptMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class);
     }
 
 
