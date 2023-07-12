@@ -109,11 +109,7 @@ class Controller extends Base
          * build the whole thing
          */
         $output = (new User\Translator\ModelToArray())($user, $groupsArr);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->psr7Response = $this->buildJsonResponse($output);
     }
 
     /**
@@ -151,8 +147,8 @@ class Controller extends Base
             $problem = (new ApiProblem('Unable to update a user at this endpoint.'))
                 ->setStatus(404)
                 ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->buildJsonResponse($problem)
+                ->withStatus(404);
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
 
@@ -407,11 +403,7 @@ class Controller extends Base
          * build the whole thing
          */
         $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->psr7Response = $this->buildJsonResponse($output);
     }
 
     /**
@@ -467,16 +459,14 @@ class Controller extends Base
              */
             $output[] = (new User\Translator\ModelToArray())($user, $groupsArr);
         }
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'data'  =>  $output,
-                    'metadata'  => [
-                        'count' => $userHelper->ajaxSearchCount($search, $filter),
-                        'cursor' => end($output)['id'] ?? null
-                    ]
+        $this->psr7Response = $this->buildJsonResponse(
+            [
+                'data'  =>  $output,
+                'metadata'  => [
+                    'count' => $userHelper->ajaxSearchCount($search, $filter),
+                    'cursor' => end($output)['id'] ?? null
                 ]
-            )
+            ]
         );
     }
 }
