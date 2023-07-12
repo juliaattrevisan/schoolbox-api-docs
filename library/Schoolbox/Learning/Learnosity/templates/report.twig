@@ -1,1 +1,17 @@
-end attempt
+<script src="https://reports.learnosity.com/?v2023.2.LTS"></script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Results for {{ assessment.title }}</h2>
+        <section class="content">
+            <div id="schoolbox-result"></div>
+
+            <script>
+                let reportsApp = LearnosityReports.init(
+                    {{ initOptions | raw }}
+                );
+            </script>
+        </section>
+    </div>
+</div>
+

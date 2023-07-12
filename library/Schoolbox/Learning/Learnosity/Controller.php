@@ -282,9 +282,38 @@ class Controller extends Base
      * @param User        $student
      * @return void
      */
-    public function getReport(IAssessable $assessment, \Schoolbox\User $student): void
-    {
+    public function getReport(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $api = new Api(
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->getConfigLoader()->get('logs_dir')
+        );
+
+        $payload = [
+            'user_id' => (string)$attempt->getUser()->getId(),
+            'reports' => [
+                [
+                    /* DOM element id, where this goes in
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
+                    'id' => 'schoolbox-result',
+                    'type' => 'sessions-summary',
+                    'session_ids' => [
+                        $attempt->getLearnosityReference()
+                    ]
+                ]
+            ],
+        ];
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/report.twig', [
+            'initOptions' => $api->initOptions('reports', $payload),
+            'assessment' => $assessment,
         ])->setTitle("Result for {$assessment->getTitle()}"));
     }
 
