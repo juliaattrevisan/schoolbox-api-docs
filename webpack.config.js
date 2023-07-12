@@ -97,9 +97,7 @@ module.exports = {
             "./www/static/js/global/sbProps.js",
         ],
         masonry: {
-            import: [
-                "./www/static/js/masonry/masonry.js",
-            ],
+            import: ["./www/static/js/masonry/masonry.js"],
             dependOn: "main", // ensures jQuery is loaded prior
         },
         mage: {
@@ -165,6 +163,7 @@ module.exports = {
         usageGlobal: "./library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js",
         usageSpecific: "./library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js",
         emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
+        loadLayout: "./www/static/js/masonry/layout/loadLayout.ts",
 
         // Record Media Modal
         recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.js",

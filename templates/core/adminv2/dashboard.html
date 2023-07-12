@@ -1,27 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/loadLayout.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
-    TEMPLATE_SELECT_URL = "/adminv2/component/get/dashboard"
-
-    // Load the selected layout and insert it into the page
-    async function loadLayout(layoutId) {
-        if (!layoutId) {
-            // We need a layout ID to load the layout, if there is none, we won't continue so that the user only sees the template selector
-            return false;
-        }
-
-        // Include the X-Requested-With header so the server can detect this is an AJAX request
-        const response = await fetch(TEMPLATE_SELECT_URL + "/" + layoutId, {
-            headers: {
-                'X-Requested-With' : 'XMLHttpRequest'
-            }
-        });
-        const responseData = await response.text();
-
-        document.getElementById("layoutContainer").innerHTML = responseData;
-        return true;
-    }
-
     // Set the selected layout in the template selector if a URL hash is present
     function setSelectedLayout() {
         if (window.location.hash) {
@@ -41,10 +21,15 @@
         });
 
         const layoutId = setSelectedLayout(); // Ensure the correct layout is selected
-        const layoutLoaded = await loadLayout(layoutId);
+        // Load the selected layout and insert it into the page
+        document.dispatchEvent(new CustomEvent("MASONRY__LOAD_LAYOUT", {
+            detail: {
+                templateSelectURL:  "/adminv2/component/get/dashboard/" + layoutId,
+            }
+        }));
 
-        // Initialise the masonry layout
-        if (layoutLoaded) {
+        // Initialise the masonry layout once the layout has been loaded
+        document.addEventListener("MASONRY__LAYOUT_LOADED", () => {
             document.dispatchEvent(new CustomEvent("MASONRY__CREATE", {
                 detail: {
                     settings: {
@@ -64,7 +49,7 @@
                     },
                 }
             }));
-        }
+        });
     });
 </script>
 <!-- END custom_head -->
