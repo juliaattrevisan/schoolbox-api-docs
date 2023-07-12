@@ -25,6 +25,13 @@ class CompressedTrigger implements InstantTriggerInterface
     {
     }
 
+    /**
+     * @return InstantTriggerInterface
+     */
+    public function extractTrigger(): InstantTriggerInterface
+    {
+        return $this->trigger;
+    }
 
     /**
      * @return AbstractModuleNotifier

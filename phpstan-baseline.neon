@@ -5196,16 +5196,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Module/AbstractModuleNotifier.php
 
 		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
-
-		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
-
-		-
 			message: "#^Dead catch \\- BadMethodCallException is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Trigger/Timetable/TimetableTrigger.php
@@ -6104,11 +6094,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: tools/mq/list-redis.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: tools/mq/remove-old-triggers.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"

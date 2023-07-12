@@ -188,7 +188,7 @@ class RedisCache implements ICache
      * @param TriggerInterface $trigger
      * @return string
      */
-    static private function compress(TriggerInterface $trigger): string
+    private static function compress(TriggerInterface $trigger): string
     {
         return gzcompress(serialize($trigger), 9);
     }
