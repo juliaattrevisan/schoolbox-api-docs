@@ -697,6 +697,45 @@ abstract class Base
     }
 
     /**
+     * Convenience method for building a response, depending on what the request
+     * specifies it accepts.
+     * - JSON requests (accept: application/json) will have a JSON request made
+     *   from `$data`
+     * - XHR requests (x-requested-with: xmlhttprequest) will have an unthemed
+     *   HTML response, rendered from `$template` with `$data`
+     * - all other requests will have a chromed HTML response
+     *
+     * @param string $template A Twig template to render (if not JSON)
+     * @param array  $data     Data to render directly (if JSON) or inject into
+     *                         the template (if not JSON).
+     * @param string $title    If not empty: use this as the page title (if not
+     *                         JSON or XHR).
+     * @param string $tab      If not empty: use this as the selected navigation
+     *                         tab (if not JSON or XHR).
+     * @return ResponseInterface
+     * @throws TwigError if something goes wrong when rendering the template
+     */
+    protected function buildRequestDependentResponse(
+        string $template,
+        array $data,
+        string $title = '',
+        string $tab = '',
+    ): ResponseInterface {
+        if ($this->isJsonRequest()) {
+            // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
+            return $this->buildJsonResponse($data);
+        }
+
+        if ($this->isXhrRequest()) {
+            // if the request is AJAX, don't return the chrome
+            return $this->buildUnthemedHtmlResponse($template, $data);
+        }
+
+        // full synchronous page
+        return $this->buildHtmlResponse($template, $data, $title, $tab);
+    }
+
+    /**
      * Parses a PSR-7 response into this controller's Aura response: this sets
      * the status code, headers and body from the PSR-7 response into the Aura
      * response.
