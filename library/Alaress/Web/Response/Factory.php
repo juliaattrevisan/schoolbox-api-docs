@@ -14,6 +14,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Schoolbox\User;
+use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 use Twig\Error\Error as TwigError;
 
@@ -42,15 +43,24 @@ class Factory
     /**
      * Builds a redirect response.
      *
-     * @param string $location
-     * @param int    $statusCode
+     * @param string $location   The URL to redirect to.
+     * @param int    $statusCode The status code to redirect with.
      * @return ResponseInterface
      */
-    public function buildRedirect(string $location, int $statusCode = 302): ResponseInterface
+    public function buildRedirect(string $location, int $statusCode = Response::HTTP_FOUND): ResponseInterface
     {
-        return $this->responseFactory
+        $response = $this->responseFactory
             ->createResponse($statusCode)
             ->withHeader('location', $location);
+
+        // Disable caching for HTTP 303:
+        // Aura.Web did this, I believe that the reason for that is to ensure
+        // the new location gets fetched afresh.
+        if ($statusCode === Response::HTTP_SEE_OTHER) {
+            $response = $response->withHeader('cache-control', 'no-cache');
+        }
+
+        return $response;
     }
 
     /**
