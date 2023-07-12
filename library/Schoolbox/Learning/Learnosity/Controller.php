@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -280,7 +281,10 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @param User        $student
+     * @param Model       $attempt
      * @return void
+     * @throws ValidationException
+     * @throws \JsonException
      */
     public function getReport(
         IAssessable $assessment,
@@ -303,7 +307,7 @@ class Controller extends Base
                      * Author and Items api
                      */
                     'id' => 'schoolbox-result',
-                    'type' => 'sessions-summary',
+                    'type' => 'sessions-summary-by-question',
                     'session_ids' => [
                         $attempt->getLearnosityReference()
                     ]
