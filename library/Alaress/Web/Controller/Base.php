@@ -567,6 +567,18 @@ abstract class Base
         return $output->setTemplate($template)->setData($data);
     }
 
+    /**
+     * Shortcut method for building a chromeless HTML response.
+     *
+     * @param string $template A Twig template to render.
+     * @param array  $data     Data to inject into the template.
+     * @return ResponseInterface
+     * @throws TwigError if something goes wrong when rendering the template
+     */
+    protected function buildUnthemedHtmlResponse(string $template, array $data): ResponseInterface
+    {
+        return $this->responseFactory->buildUnthemedHtml($template, $data, $this->user);
+    }
 
     /**
      * Factory method for loading an xml output object

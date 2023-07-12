@@ -147,7 +147,7 @@ class Controller extends Base
             'publish_at' => 'DESC'
         ]]);
 
-        $this->getResponse()->content->set($this->buildXmlOutput('@commsNewsFeed/rss.twig', [
+        $data = [
             'folder'     => $folder,
             'title'      => $this->getConfigLoader()->get('title'),
             'schoolName' => $this->getConfigLoader()->get('school_name'),
@@ -159,6 +159,9 @@ class Controller extends Base
             'url'        => $this->psr7Request->getUri()->__toString(),
             'referrer'   => News\Statistics\Mapper::REFERRER_RSS,
             'articles'   => $articles,
-        ]));
+        ];
+        $this->psr7Response = $this
+            ->buildUnthemedHtmlResponse('@commsNewsFeed/rss.twig', $data)
+            ->withHeader('Content-Type', 'application/rss+xml; charset=UTF-8');
     }
 }
