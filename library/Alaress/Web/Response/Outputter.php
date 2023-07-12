@@ -43,7 +43,7 @@ class Outputter
         } else {
             header(
                 sprintf(
-                    '%s %d %s',
+                    'HTTP/%s %d %s',
                     $response->getProtocolVersion(),
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
