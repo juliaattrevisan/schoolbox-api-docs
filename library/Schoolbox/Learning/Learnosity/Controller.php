@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
 require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootstrap.php';
@@ -217,11 +218,45 @@ class Controller extends Base
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
-            'initOptions' => $api->initOptions('items', $payload)
+            'initOptions' => $api->initOptions('items', $payload),
+            'completionUrl' => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+            ]),
+            'attemptId' => $attempt->getId(),
+            'learnosityReference' => $attempt->getLearnosityReference()
         ])->setTitle("Attempt {$assessment->getTitle()}"));
 
         /* TODO Record the automated result somewhere (idk where)
          */
+    }
+
+
+    /**
+     * Complete an attempt by setting a finish date.
+     *
+     * Uses the (learnosityReference, attemptId) tuple so you can't
+     * randomly shut down some other dude's attempt; knowing their
+     * learnosityReference should not be easily guessed
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws Deleted
+     * @throws NotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
+    {
+        $existingAttempt = $this->attemptMapper->findOneByColumnList([
+            'attempt_id' => $this->request->post['attemptId'],
+            'learnosity_reference' => $this->request->post['learnosityReference'],
+            'user_id' => $student->getId()
+        ]);
+
+        $existingAttempt->setFinish(\Alaress_Date_Format::now());
+
+        $this->attemptMapper->save($existingAttempt);
     }
 
 

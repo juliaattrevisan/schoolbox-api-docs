@@ -3,7 +3,6 @@
 
 <script src="https://items.learnosity.com/?v2023.2.LTS"></script>
 
-
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Learnosity Test</h2>
@@ -12,23 +11,23 @@
             <div id="learnosity_assess"></div>
 
             <script>
-                let callbacks = {
-                    readyListener: function () {
-                        itemsApp.submit({
-                            success: function (response_ids) {
-                                console.log("Submit was successful", response_ids);
+                let itemsApp = LearnosityItems.init({{ initOptions | raw }});
 
-                                /* Async attempt completion
-                                 */
+                /* Async attempt completion
+                 */
+                itemsApp.on('test:submit:success', function() {
+                    let payload = new FormData();
+                    payload.append('attemptId', '{{ attemptId }}');
+                    payload.append('learnosityReference','{{ learnosityReference }}');
 
-                                /* Redirect to...somewhere else
-                                 */
-                            },
-                        });
-                    }
-                };
+                    const response = fetch('{{ completionUrl }}', {
+                        method: 'POST',
+                        body: payload
+                    });
 
-                let itemsApp = LearnosityItems.init({{ initOptions | raw }}, callbacks);
+                    /* Redirect to...somewhere else
+                     */
+                });
             </script>
         </section>
     </div>

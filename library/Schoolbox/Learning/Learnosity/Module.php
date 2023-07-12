@@ -60,6 +60,13 @@ class Module extends BaseModule
         /* Modify Learnosity contents for a given schoolbox quiz id
          */
         $this->register('GET', '/{assessmentId}/content', 'getContent', $instructorPerms, $preloadAssessment);
+
+        /* Complete an attempt
+         */
+        $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerPerms, $preloadParticipant);
+
+        /* Start a new attempt
+         */
         $this->register('GET', '/{assessmentId}/attempt/{studentId}', 'getAttempt', $learnerPerms, $preloadParticipant);
 
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
