@@ -222,7 +222,7 @@ class Module extends BaseModule
      * @return CourseImplementationMapper|Mapper
      * @throws \InvalidArgumentException
      */
-    protected function getCourseImplementationMapper()
+    protected function getCourseImplementationMapper(): CourseImplementationMapper|Mapper
     {
         return $this->getMapperFactory()->get(CourseImplementationMapper::class);
     }
