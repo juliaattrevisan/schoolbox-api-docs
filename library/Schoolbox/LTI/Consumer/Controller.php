@@ -128,9 +128,6 @@ class Controller extends Base
     /** @var string */
     private $baseUrl;
 
-    /** @var User */
-    private $user;
-
     /**
      * Controller constructor
      */
@@ -384,8 +381,6 @@ class Controller extends Base
 
             return;
         }
-
-        $this->user = $this->getUser();
 
         switch ($provider->getLaunchType()) {
             case Provider::LAUNCH_TYPE_PICKER:
