@@ -57,7 +57,13 @@ class Factory
         // Aura.Web did this, I believe that the reason for that is to ensure
         // the new location gets fetched afresh.
         if ($statusCode === Response::HTTP_SEE_OTHER) {
-            $response = $response->withHeader('cache-control', 'no-cache');
+            $response = $response
+                ->withHeader('cache-control', 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate')
+                ->withHeader('pragma', 'no-cache')
+                ->withHeader('expires', 'Mon, 01 Jan 0001 00:00:00 GMT')
+                ->withoutHeader('etag')
+                ->withoutHeader('last-modified')
+                ->withoutHeader('vary');
         }
 
         return $response;
