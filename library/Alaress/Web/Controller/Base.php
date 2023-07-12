@@ -689,6 +689,18 @@ abstract class Base
     /**
      * Shortcut method for building a HTTP "301 Moved Permanently" response.
      *
+     * The only difference between a 301 and 308 is that:
+     * - a 301 response may be changed from POST to GET by a user agent
+     *   (e.g. a browser)
+     * - a 308 response may not have its verb changed
+     * This difference should be irrelevant in practice, because redirects after
+     * a POST will nearly always be a 303 See Other.
+     *
+     * @deprecated IMO 308 (`$this->redirectPermanent()`) should be used instead
+     *             due to the user agent behavior mentioned above.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301
+     *
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
      */
@@ -700,6 +712,18 @@ abstract class Base
     /**
      * Shortcut method for building a HTTP "302 Found" response.
      *
+     * As with 301 vs. 308, the only difference between a 302 and 307 is that:
+     * - a 302 response may be changed from POST to GET by a user agent
+     *   (e.g. a browser)
+     * - a 307 response may not have its verb changed
+     * This difference should be irrelevant in practice, because redirects after
+     * a POST will nearly always be a 303 See Other.
+     *
+     * @deprecated IMO 307 (`$this->redirectTemporary()`) should be used instead
+     *             due to the user agent behavior mentioned above.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302
+     *
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
      */
@@ -709,12 +733,28 @@ abstract class Base
     }
 
     /**
+     * Alias for `redirectSeeOther`, named so that it is apparent that it should
+     * be used as the redirect after a POST request is processed.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectAfterPost(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_SEE_OTHER);
+    }
+
+    /**
      * Shortcut method for building a HTTP "303 See Other" response.
      *
      * This response should not be cached: thus, the 'cache-control: none'
      * header will be set.
      *
-     * This should be used as the redirect method after a `POST` request
+     * This should be used as the redirect method after a `POST` request.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
      *
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
@@ -727,6 +767,8 @@ abstract class Base
     /**
      * Shortcut method for building a HTTP "307 Temporary Redirect" response.
      *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307
+     *
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
      */
@@ -737,6 +779,8 @@ abstract class Base
 
     /**
      * Shortcut method for building a HTTP "308 Permanent Redirect" response.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308
      *
      * @param string $location The URL to redirect to.
      * @return ResponseInterface
