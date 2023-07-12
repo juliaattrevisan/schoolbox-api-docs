@@ -30,6 +30,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Twig\Error\Error as TwigError;
@@ -682,6 +683,55 @@ abstract class Base
         /** @var Output\File $output */
         $output = $this->getDi()->get('webOutput:base');
         return $output->setData($fileContents);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "301 Moved Permanently" response.
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function buildMovedPermanentlyResponse(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_MOVED_PERMANENTLY);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "302 Found" response.
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function buildRedirectResponse(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_FOUND);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "303 See Other" response.
+     *
+     * This response should not be cached: thus, the 'cache-control: none'
+     * header will be set.
+     *
+     * This should be used as the redirect method after a `POST` request
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function buildSeeOtherResponse(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "307 Temporary Redirect" response.
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function buildTemporaryRedirectResponse(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_TEMPORARY_REDIRECT);
     }
 
     /**

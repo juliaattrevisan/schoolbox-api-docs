@@ -54,10 +54,9 @@ class Controller extends Base
      */
     public function getLogin($error = null, $page = null): void
     {
-
         // If you try to access the login screen but you are already logged in, just go home
         if ($this->getSession()->getAuthUser() instanceof User && $this->getSession()->getAuthUser()->getId()) {
-            $this->getResponse()->redirect->to('/');
+            $this->psr7Response = $this->buildSeeOtherResponse('/');
         }
 
         $samlAuth = $this->requestQuery->get('samlAuth');
@@ -85,7 +84,7 @@ class Controller extends Base
             if ($pageUri && $pageUri->isAbsolutePath()) {
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
             }
-            $this->getResponse()->redirect->to($redirectUrl, 303);
+            $this->psr7Response = $this->buildSeeOtherResponse($redirectUrl);
             return;
         }
 
@@ -188,9 +187,9 @@ class Controller extends Base
                         && $page !== '/login/'
                     ) {
                         $page = rawurldecode($page);
-                        $this->getResponse()->redirect->to($page, 303);
+                        $this->psr7Response = $this->buildSeeOtherResponse($page);
                     } else {
-                        $this->getResponse()->redirect->to('/', 303);
+                        $this->psr7Response = $this->buildSeeOtherResponse('/');
                     }
                 } else {
                     //get rid of session started earlier to stop it conflicting with next login
