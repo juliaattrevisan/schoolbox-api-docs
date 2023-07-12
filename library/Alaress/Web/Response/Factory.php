@@ -25,9 +25,6 @@ class Factory
     /**
      * Constructor
      *
-     * TODO inject current user:
-     *      see \Alaress\Web\Controller\Base::injectCurrentUserGlobal
-     *
      * @param ResponseFactoryInterface      $responseFactory A response factory
      * @param StreamFactoryInterface        $streamFactory   A stream factory
      * @param Environment                   $twig            A Twig environment
@@ -76,13 +73,15 @@ class Factory
      * This will simply render the template as-is: it will not apply the site
      * chrome.
      *
-     * @param string $template A Twig template to render.
-     * @param array  $data     Data to inject into the template.
+     * @param string $template    A Twig template to render.
+     * @param array  $data        Data to inject into the template.
+     * @param User   $currentUser The currently authenticated user.
      * @return ResponseInterface
      * @throws TwigError if something goes wrong when rendering the template
      */
-    public function buildUnthemedHtml(string $template, array $data): ResponseInterface
+    public function buildUnthemedHtml(string $template, array $data, User $currentUser): ResponseInterface
     {
+        $this->injectCurrentUserGlobal($currentUser);
         return $this->buildFromContent($this->twig->render($template, $data));
     }
 
@@ -106,6 +105,7 @@ class Factory
         string $title = '',
         string $tab = '',
     ): ResponseInterface {
+        // Don't need to handle these cases, surely?
 //        if (empty($template)) {
 //            $code = $this->getResponse()->status->getCode();
 //            if ($code === 404) {
@@ -134,7 +134,7 @@ class Factory
             $data[$key] = $generator->generate($chromeData);
         }
 
-        $this->twig->addGlobal('USER', $currentUser);
+        $this->injectCurrentUserGlobal($currentUser);
 
         // Render it all out
         return $this->buildFromContent($this->twig->render('include/chrome.twig', $data));
@@ -151,5 +151,17 @@ class Factory
         return $this->responseFactory
             ->createResponse()
             ->withBody($this->streamFactory->createStream($content));
+    }
+
+    /**
+     * Inject a user object into the Twig environment as a global variable.
+     *
+     * This overrides any previous value which the global might have had.
+     *
+     * @param User $currentUser The currently authenticated user.
+     */
+    private function injectCurrentUserGlobal(User $currentUser): void
+    {
+        $this->twig->addGlobal('USER', $currentUser);
     }
 }
