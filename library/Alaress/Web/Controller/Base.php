@@ -137,7 +137,7 @@ abstract class Base
      *
      * @var User
      */
-    private $user;
+    protected $user;
 
 
     /**
