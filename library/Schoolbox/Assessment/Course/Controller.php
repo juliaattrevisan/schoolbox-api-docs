@@ -54,6 +54,11 @@ use Schoolbox\YearLevel;
  */
 class Controller extends Base\Base
 {
+    /**
+     * Selected tab for this controller.
+     */
+    private const TAB = 'course';
+
     /** @var FolderMapper */
     private $folderMapper;
 
@@ -412,14 +417,18 @@ class Controller extends Base\Base
             $encodedReturnUrls[$unitSpecId] = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
         }
 
-        $this->courseTpl('course', [
-            'courseSpec'        => $courseSpec,
-            'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-            'folderAccess'      => $folderAccess,
-            'encodedReturnUrls' => $encodedReturnUrls,
-            'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
-            'curriculumCodes'   => $courseSpec->getFolder()->getViewableCurriculumNodes()->reindex(),
-        ]);
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/course.twig',
+            [
+                'courseSpec'        => $courseSpec,
+                'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'folderAccess'      => $folderAccess,
+                'encodedReturnUrls' => $encodedReturnUrls,
+                'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+                'curriculumCodes'   => $courseSpec->getFolder()->getViewableCurriculumNodes()->reindex(),
+            ],
+            self::TAB,
+        );
     }
 
 
@@ -433,12 +442,17 @@ class Controller extends Base\Base
      */
     public function newCourse(?string $name): void
     {
-        $this->courseTpl('course', [
-            'courseSpec'         => null,
-            'courseName'         => $name ? urldecode($name) : null,
-            'curriculumEnabled'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-            'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
-        ]);
+
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/course.twig',
+            [
+                'courseSpec'         => null,
+                'courseName'         => $name ? urldecode($name) : null,
+                'curriculumEnabled'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+            ],
+            self::TAB,
+        );
     }
 
 
@@ -831,7 +845,12 @@ class Controller extends Base\Base
                 '_expanded'        => true,
                 'toastSelector'    => '[data-relation="ajax-response"]',
             ];
-            $this->courseTpl('unit', $data);
+
+            $this->psr7Response = $this->buildRequestDependentResponse(
+                '@course/unit.twig',
+                $data,
+                self::TAB,
+            );
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             // quite simple not able to find things we need. bye bye.
             $this->sendError('Could not save because of an internal error.', [], 500);
@@ -967,7 +986,11 @@ class Controller extends Base\Base
             ];
         }
 
-        $this->courseTpl('courseList', array_merge($data, $options));
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/courseList.twig',
+            array_merge($data, $options),
+            self::TAB,
+        );
     }
 
 
@@ -1018,7 +1041,11 @@ class Controller extends Base\Base
             'encodedReturnUrl' => $query->get('encodedReturnUrl'),
         ];
 
-        $this->courseTpl('courseListResults', array_merge($data, $options));
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/courseListResults.twig',
+            array_merge($data, $options),
+            self::TAB,
+        );
     }
 
 
@@ -1188,7 +1215,7 @@ class Controller extends Base\Base
             'folderId' => $folderId
         ];
 
-        $this->courseTpl('picker', $data);
+        $this->psr7Response = $this->buildRequestDependentResponse('@course/picker.twig', $data, self::TAB);
     }
 
 
