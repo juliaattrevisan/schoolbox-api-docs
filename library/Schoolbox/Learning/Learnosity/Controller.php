@@ -306,10 +306,23 @@ class Controller extends Base
                      * It's configurable by us, unlike the other anchors for
                      * Author and Items api
                      */
-                    'id' => 'schoolbox-result',
+                    'id' => 'schoolbox-result-1',
                     'type' => 'sessions-summary-by-question',
                     'session_ids' => [
                         $attempt->getLearnosityReference()
+                    ]
+                ],
+                [
+                    /* DOM element id, where this goes in
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
+                    'id' => 'schoolbox-result-2',
+                    'type' => 'session-detail-by-item',
+                    'session_id' => $attempt->getLearnosityReference(),
+                    'questions_api_init_options' => [
+                        'showCorrectAnswers' => false
                     ]
                 ]
             ],

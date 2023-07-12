@@ -2,16 +2,21 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Results for {{ assessment.title }}</h2>
-        <section class="content">
-            <div id="schoolbox-result"></div>
+        <h1>Result Summary for {{ assessment.title }}</h1>
 
-            <script>
-                let reportsApp = LearnosityReports.init(
-                    {{ initOptions | raw }}
-                );
-            </script>
+        <section class="content">
+            <div id="schoolbox-result-1"></div>
+        </section>
+
+        <h2 class="subheader">Response breakdown</h2>
+        <section class="content">
+            <div id="schoolbox-result-2"></div>
         </section>
     </div>
 </div>
 
+<script>
+    let reportsApp = LearnosityReports.init(
+        {{ initOptions | raw }}
+    );
+</script>
