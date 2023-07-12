@@ -310,25 +310,14 @@ class Controller extends BaseController
             );
         }
 
-        // Decode the return URL, if it was set
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
-        if ($encodedReturnUrl) {
-            $returnUrl = Redirect::decode($encodedReturnUrl);
-        } else {
-            /** @var UnitSpecification\Model $unitSpec */
-            $unitSpec  = $assessment->getBaseContext();
-            $returnUrl = $this->routeGenerator->generate(
+        /** @var UnitSpecification\Model $unitSpec */
+        $unitSpec = $assessment->getBaseContext();
+        $this->redirectToReturnUrlIfSetOrFallbackUrl(
+            $this->routeGenerator->generate(
                 'course.modifyCourse',
                 ['id' => $unitSpec->getCourse()->getId(),]
-            ) . "#{$unitSpec->getId()}";
-        }
-
-        // Redir back to the return URL (if set) or the course page if not
-        if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
-        } else {
-            $this->getResponse()->redirect->afterPost($returnUrl);
-        }
+            ) . "#{$unitSpec->getId()}"
+        );
     }
 
 
@@ -416,23 +405,12 @@ class Controller extends BaseController
             $this->unitImplementationMapper->save($unitImplToInsert);
         }
 
-        // Decode the return URL, if it was set
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
-        if ($encodedReturnUrl) {
-            $returnUrl = Redirect::decode($encodedReturnUrl);
-        } else {
-            $returnUrl = $this->routeGenerator->generate(
+        $this->redirectToReturnUrlIfSetOrFallbackUrl(
+            $this->routeGenerator->generate(
                 'course.modifyCourse',
                 ['id' => $unitSpec->getCourse()->getId()]
-            ) . "#{$unitSpec->getId()}";
-        }
-
-        // Redir back to the return URL (if set) or the course page if not
-        if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
-        } else {
-            $this->getResponse()->redirect->afterPost($returnUrl);
-        }
+            ) . "#{$unitSpec->getId()}"
+        );
     }
 
 
@@ -635,6 +613,30 @@ class Controller extends BaseController
                     },
                 ],
             ]);
+        }
+    }
+
+    /**
+     * Redirect to either:
+     *  - the return URL (if set in the URL parameters), OR
+     *  - the fallback URL.
+     * @param $fallbackUrl
+     * @return void
+     */
+    private function redirectToReturnUrlIfSetOrFallbackUrl($fallbackUrl): void
+    {
+        // Decode the return URL, if it was set
+        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
+        if ($encodedReturnUrl) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $fallbackUrl;
+        }
+
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
+        } else {
+            $this->getResponse()->redirect->afterPost($returnUrl);
         }
     }
 }
