@@ -274,7 +274,7 @@ class ListController extends Web\Controller\Base
             '_is_xhr'         => $this->isXhrRequest(),
         ];
 
-        $this->tpl('learningAssessment', 'component', $data);
+        $this->psr7Response = $this->buildRequestDependentResponse('@learningAssessment/component.twig', $data);
     }
 
 

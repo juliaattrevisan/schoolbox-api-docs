@@ -148,7 +148,7 @@ class Controller extends Base\Base
             ]);
         }
 
-        $this->tpl('course', 'import', $data);
+        $this->psr7Response = $this->buildRequestDependentResponse('@course/import.twig', $data);
     }
 
 
@@ -207,20 +207,23 @@ class Controller extends Base\Base
         $exists = (bool)\count(array_intersect($existingInFolderIds, $targetFolderIds));
 
         // respond with stage 2: units
-        $this->tpl('course', 'unitImportForm', [
-            'action'           => 'import',
-            'courseSpecId'     => $courseSpecId,
-            'folderIds'        => $targetFolderIds,
-            'componentId'      => $componentId,
-            'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
-            'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/unitImportForm.twig',
+            [
+                'action'           => 'import',
+                'courseSpecId'     => $courseSpecId,
+                'folderIds'        => $targetFolderIds,
+                'componentId'      => $componentId,
+                'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
+                'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
 
-            /* Go to the redirect destination if you've already imported this course
-             * and you chose to cancel what you were doing
-             */
-            'importedAlready' => $exists,
-            'importedAlreadyRedirect' => $this->getRouteIfAuthorized('course.courseList'),
-        ]);
+                /* Go to the redirect destination if you've already imported this course
+                 * and you chose to cancel what you were doing
+                 */
+                'importedAlready' => $exists,
+                'importedAlreadyRedirect' => $this->getRouteIfAuthorized('course.courseList'),
+            ]
+        );
     }
 
 
@@ -437,17 +440,20 @@ class Controller extends Base\Base
         }
 
         // respond with stage 4: coursework list
-        $this->tpl('course', 'unitImportResults', [
-            'action'              => $action,
-            'canReadCourseSpec'   => $canReadCourseSpec,
-            'canReadUnitSpecs'    => $canReadUnitSpecs,
-            'componentId'         => $componentId,
-            'courseImplId'        => $courseImplId,
-            'courseSpecId'        => $courseSpecId,
-            'dto'                 => $dto,
-            'folderIds'           => $targetFolderIds,
-            'unitDefaultDueDates' => $unitDefaultDueDates,
-        ]);
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/unitImportResults.twig',
+            [
+                'action'              => $action,
+                'canReadCourseSpec'   => $canReadCourseSpec,
+                'canReadUnitSpecs'    => $canReadUnitSpecs,
+                'componentId'         => $componentId,
+                'courseImplId'        => $courseImplId,
+                'courseSpecId'        => $courseSpecId,
+                'dto'                 => $dto,
+                'folderIds'           => $targetFolderIds,
+                'unitDefaultDueDates' => $unitDefaultDueDates,
+            ]
+        );
     }
 
 
@@ -592,30 +598,32 @@ class Controller extends Base\Base
         $orderedUnits = $courseImpl->getUnits()->sortBy('title', 'ASC');
         $courseImpl->setUnits($orderedUnits);
 
-        $this->tpl('course', 'import', [
-            'action'           => 'modify',
-            'initialStage'     => self::IMPORT_STAGE_UNITS,
-            'courseSpec'       => $courseSpec,
-            'courseSpecId'     => $courseSpec->getId(),
-            'courseImpl'       => $courseImpl,
-            'folderIds'        => [$courseImpl->getFolder()->getId()],
-            'destinations'     => [
-                'id'   => $courseImpl->getFolder()->getId(),
-                'name' => $courseImpl->getFolder()->getTitle(),
-            ],
-            'unitsImpls'       => $courseImpl->getUnits(),
-            'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => $this->requestQuery->get(Redirect::RETURN_URL),
-            'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/import.twig',
+            [
+                'action'           => 'modify',
+                'initialStage'     => self::IMPORT_STAGE_UNITS,
+                'courseSpec'       => $courseSpec,
+                'courseSpecId'     => $courseSpec->getId(),
+                'courseImpl'       => $courseImpl,
+                'folderIds'        => [$courseImpl->getFolder()->getId()],
+                'destinations'     => [
+                    'id'   => $courseImpl->getFolder()->getId(),
+                    'name' => $courseImpl->getFolder()->getTitle(),
+                ],
+                'unitsImpls'       => $courseImpl->getUnits(),
+                'returnUrlName'    => Redirect::RETURN_URL,
+                'encodedReturnUrl' => $this->requestQuery->get(Redirect::RETURN_URL),
+                'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
 
-            /* You're modifying an already-imported course so don't worry about this warning
-             * You can turn it off by pretending it was never imported already (the Import
-             * and Modify Import share the same twig fragments...)
-             */
-            'importedAlready' => false,
-            'importedAlreadyRedirect' => null,
-
-        ]);
+                /* You're modifying an already-imported course so don't worry about this warning
+                 * You can turn it off by pretending it was never imported already (the Import
+                 * and Modify Import share the same twig fragments...)
+                 */
+                'importedAlready' => false,
+                'importedAlreadyRedirect' => null,
+            ]
+        );
     }
 
 
@@ -736,14 +744,17 @@ class Controller extends Base\Base
             $folderAncestry[$courseImplId] = array_reverse($folderAncestry[$courseImplId]);
         }
 
-        $this->tpl('course', 'management', [
-            'folder'           => $folder,
-            'courseImpls'      => $courseImpls,
-            'componentNames'   => $componentNames,
-            'folderAncestry'   => $folderAncestry,
-            'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => Redirect::encode($this->routeGenerator->generate('courseImport.getManagement', ['folderId' => $folder->getId()])),
-        ]);
+        $this->psr7Response = $this->buildRequestDependentResponse(
+            '@course/management.twig',
+            [
+                'folder'           => $folder,
+                'courseImpls'      => $courseImpls,
+                'componentNames'   => $componentNames,
+                'folderAncestry'   => $folderAncestry,
+                'returnUrlName'    => Redirect::RETURN_URL,
+                'encodedReturnUrl' => Redirect::encode($this->routeGenerator->generate('courseImport.getManagement', ['folderId' => $folder->getId()])),
+            ]
+        );
     }
 
 
