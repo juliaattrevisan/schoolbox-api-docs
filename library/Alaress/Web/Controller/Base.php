@@ -762,27 +762,6 @@ abstract class Base
         );
     }
 
-    /**
-     * Just a raw template render
-     *
-     * @deprecated Use `buildHtmlOutput` or `buildUnthemedHtmlOuptut` instead
-     *
-     * @param string $namespace
-     * @param string $template
-     * @param array  $data
-     * @param string $tab
-     */
-    protected function tpl($namespace, $template, $data = [], $tab = '')
-    {
-        $content = $this->buildContent("@$namespace/$template.twig", $data);
-
-        if ($content instanceof Output\ThemedHtml) {
-            $content->setTab($tab);
-        }
-
-        $this->getResponse()->content->set($content);
-    }
-
 
     /**
      * @deprecated Use one of the `build*Output` methods instead, to build

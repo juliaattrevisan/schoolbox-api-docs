@@ -342,18 +342,6 @@ class Controller extends Base\Base
 
 
     /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array $data
-     */
-    protected function courseTpl($template, array $data = [])
-    {
-        $this->tpl('course', $template, $data, 'course');
-    }
-
-
-    /**
      * Form to create/modify a course specification
      *
      * Course.id will be null if it is a create.
