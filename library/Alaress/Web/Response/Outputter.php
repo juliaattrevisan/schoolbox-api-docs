@@ -24,10 +24,11 @@ class Outputter
      */
     public function output(ResponseInterface $response): void
     {
-        // Add puppet header
-        // TODO middleware?
-        // TODO add cookies
-        $response = $response->withHeader('X-Puppet-Cert-Name', getenv('puppet_cert_name'));
+        // Add puppet header, if it's there
+        $certName = getenv('puppet_cert_name');
+        if (is_string($certName)) {
+            $response = $response->withHeader('X-Puppet-Cert-Name', getenv('puppet_cert_name'));
+        }
 
         // Output headers
         foreach ($response->getHeaders() as $name => $values) {
