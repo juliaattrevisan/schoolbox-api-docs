@@ -616,6 +616,26 @@ abstract class Base
     }
 
     /**
+     * Factory method for building a chromed HTML response.
+     *
+     * @param  string $template A Twig template
+     * @param  mixed  $data
+     * @param string  $title
+     * @param string  $tab
+     * @return Output\ThemedHtml
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
+     */
+    protected function buildHtmlResponse(
+        string $template,
+        array $data,
+        string $title = '',
+        string $tab = '',
+    ): ResponseInterface {
+        return $this->responseFactory->buildHtml($template, $data, $this->user, $title, $tab);
+    }
+
+    /**
      * Factory method for loading a file output object.
      *
      * @param  string $filename

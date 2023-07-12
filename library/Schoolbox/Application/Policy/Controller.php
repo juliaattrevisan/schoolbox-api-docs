@@ -16,12 +16,9 @@ class Controller extends Base
      * Schoolbox policy page, can be accessed with and without a session
      * @api   GET /policy
      * @since 18.2
-     *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getPolicy(): void
     {
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@policy/policy.twig', []));
-        $this->psr7Response = $this->responseFactory->buildHtml('@policy/policy.twig', [], $this->user);
+        $this->psr7Response = $this->buildHtmlResponse('@policy/policy.twig', []);
     }
 }
