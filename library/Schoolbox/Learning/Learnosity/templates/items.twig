@@ -12,26 +12,24 @@
     <div class="small-12 island">
         <h2 class="subheader">Attempt {{ assessment.title }}</h2>
         <section class="content">
-
             <div id="learnosity_assess"></div>
-
-            <script>
-                let itemsApp = LearnosityItems.init({{ initOptions | raw }});
-
-                /* Async attempt completion
-                 */
-                itemsApp.on('test:submit:success', function() {
-                    let payload = new FormData();
-                    payload.append('attemptId', '{{ attemptId }}');
-                    payload.append('learnosityReference','{{ learnosityReference }}');
-
-                    const response = fetch('{{ completionUrl }}', {
-                        method: 'POST',
-                        body: payload
-                    });
-                });
-            </script>
         </section>
     </div>
 </div>
 
+<script>
+    let itemsApp = LearnosityItems.init({{ initOptions | raw }});
+
+    /* Async attempt completion
+     */
+    itemsApp.on('test:submit:success', function() {
+        let payload = new FormData();
+        payload.append('attemptId', '{{ attemptId }}');
+        payload.append('learnosityReference','{{ learnosityReference }}');
+
+        const response = fetch('{{ completionUrl }}', {
+            method: 'POST',
+            body: payload
+        });
+    });
+</script>
