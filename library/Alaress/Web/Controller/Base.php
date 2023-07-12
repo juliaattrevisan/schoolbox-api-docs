@@ -32,6 +32,7 @@ use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Throwable;
 use Schoolbox\Url\Uri;
+use Twig\Error\Error as TwigError;
 
 abstract class Base
 {
@@ -616,15 +617,15 @@ abstract class Base
     }
 
     /**
-     * Factory method for building a chromed HTML response.
+     * Shortcut method for building a chromed HTML response.
      *
-     * @param  string $template A Twig template
-     * @param  mixed  $data
-     * @param string  $title
-     * @param string  $tab
-     * @return Output\ThemedHtml
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
+     * @param string $template A Twig template to render.
+     * @param array  $data     Data to inject into the template.
+     * @param string $title    If not empty: use this as the page title.
+     * @param string $tab      If not empty: use this as the selected navigation
+     *                         tab.
+     * @return ResponseInterface
+     * @throws TwigError if something goes wrong when rendering the template
      */
     protected function buildHtmlResponse(
         string $template,
@@ -663,6 +664,18 @@ abstract class Base
         /** @var Output\File $output */
         $output = $this->getDi()->get('webOutput:base');
         return $output->setData($fileContents);
+    }
+
+    /**
+     * Shortcut method for building a generic response from the content of a
+     * string.
+     *
+     * @param string $content
+     * @return ResponseInterface
+     */
+    protected function buildResponse(string $content): ResponseInterface
+    {
+        return $this->responseFactory->buildFromContent($content);
     }
 
     /**

@@ -22,8 +22,8 @@ class Controller extends Base
     public function getRobots(): void
     {
         // Are we blocking web crawlers, or allowing them? if not Prod, always block
-        $this->psr7Response = $this->responseFactory
-            ->buildFromContent(
+        $this->psr7Response = $this
+            ->buildResponse(
                 $this->getConfigLoader()->get('web_crawlers_enabled')
                     ? "User-Agent: *\nAllow: /\nDisallow: /feedback\nDisallow: /passwordReset\n"
                     : "User-Agent: *\nDisallow: /\n"
