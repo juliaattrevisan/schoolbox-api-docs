@@ -25,12 +25,4 @@ interface OutputInterface
      * @param Response $response
      */
     public function output(Response $response);
-
-    /**
-     * Sets post-output callbacks into this output.
-     *
-     * @param array<callable> $postOutputCallbacks
-     * @return $this
-     */
-    public function setPostOutputCallbacks(array $postOutputCallbacks): self;
 }

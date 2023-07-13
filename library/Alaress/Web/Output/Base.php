@@ -31,13 +31,6 @@ class Base implements OutputInterface
     protected $data = null;
 
     /**
-     * Temporary home for post-output callbacks.
-     *
-     * @var array<callable>
-     */
-    private array $postOutputCallbacks = [];
-
-    /**
      * Outputs a response and its headers in the most basic fashion.
      *
      * Copied from https://github.com/auraphp/Aura.Web/blob/develop-2/README-RESPONSE.md
@@ -51,18 +44,7 @@ class Base implements OutputInterface
         $this->outputResponseCode();
         $this->outputHeaders();
         $this->outputCookies();
-
-        // Is there a post-output callback?
-        // Buffer response body and output it later
-        if ($this->hasPostOutputCallbacks()) {
-            ob_start();
-        }
-
         $this->outputResponseBody();
-
-        if ($this->hasPostOutputCallbacks()) {
-            $this->runPostOutputCallbacks(ob_get_clean());
-        }
     }
 
     /**
@@ -132,63 +114,6 @@ class Base implements OutputInterface
             echo $data;
         } else {
             echo $this->getResponse()->content->get();
-        }
-    }
-
-    /**
-     * @param array<callable> $postOutputCallbacks
-     * @return $this
-     */
-    public function setPostOutputCallbacks(array $postOutputCallbacks): self
-    {
-        $this->postOutputCallbacks = $postOutputCallbacks;
-        return $this;
-    }
-
-    /**
-     * Does this have any post-output callbacks?
-     *
-     * @return bool
-     */
-    protected function hasPostOutputCallbacks()
-    {
-        return count($this->postOutputCallbacks) > 0;
-    }
-
-    /**
-     * Runs post-output callbacks, but not before sending output to the client.
-     *
-     * Processing of callbacks will run in the background.
-     *
-     * @param string $output
-     */
-    protected function runPostOutputCallbacks($output = '')
-    {
-        if ($this->hasPostOutputCallbacks()) {
-            // Output now
-            // No content encoding because gzip interferes with content length
-            // TODO determine if this is even necessary?
-            header('Content-Encoding: none');
-            header("Content-Length: " . strlen($output));
-            echo $output;
-
-            // Finish the request
-            fastcgi_finish_request();
-
-            // Allow the process however long it needs to finish:
-            // 30 minutes should be more than enough.
-            set_time_limit(60 * 30);
-
-            // Callbacks
-            foreach ($this->postOutputCallbacks as $callback) {
-                if (is_callable($callback)) {
-                    $callback();
-                }
-            }
-
-            // Close session once done
-            // (actions in post-output may require session data)
-            session_write_close();
         }
     }
 

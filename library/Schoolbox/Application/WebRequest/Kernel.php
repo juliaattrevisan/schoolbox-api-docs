@@ -401,7 +401,6 @@ class Kernel extends WebKernelAbstract
                     $auraWebOutput = $this->di->get("webOutput:base");
                 }
             }
-//            $auraWebOutput->setPostOutputCallbacks($controller->getPostOutputCallbacks());
 
             $redirect = $controller->getResponse()->headers->get('location');
             $isJson   = $auraWebOutput instanceof Json;
@@ -448,6 +447,13 @@ class Kernel extends WebKernelAbstract
         // Output post-output callbacks
         $postOutputCallbacks = $controller->getPostOutputCallbacks();
         if (count($postOutputCallbacks)) {
+            // Earlier implementations used to buffer output so that
+            // "Content-Length" could be set.
+            // I don't think this is necessary; at least I've seen no difference
+            // if it's enabled or not.
+//            header('Content-Encoding: none');
+//            header("Content-Length: " . strlen($output));
+
             // Finish the request
             fastcgi_finish_request();
 
