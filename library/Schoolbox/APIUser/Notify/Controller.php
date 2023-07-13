@@ -48,7 +48,7 @@ class Controller extends Base
                 ->setStatus(400)
                 ->asArray();
             $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->responseAsJson($problem);
             return; //exit early the message field is not set...
         }
         try {
@@ -72,7 +72,7 @@ class Controller extends Base
                 ->setStatus(500)
                 ->asArray();
             $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->responseAsJson($problem);
             return;
         }
     }

@@ -94,7 +94,7 @@ class Controller extends BaseController
      */
     public function getCurriculumList(): void
     {
-        $this->getResponse()->content->set($this->buildJsonOutput($this->apiBridge->getCurriculumList()));
+        $this->psr7Response = $this->responseAsJson($this->apiBridge->getCurriculumList());
     }
 
 
@@ -106,10 +106,8 @@ class Controller extends BaseController
      */
     public function getCurriculum(int $curriculumId): void
     {
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                $this->apiBridge->getCurriculum($curriculumId, Module::ENABLE_ATTACHMENT_IMPORT)
-            )
+        $this->psr7Response = $this->responseAsJson(
+            $this->apiBridge->getCurriculum($curriculumId, Module::ENABLE_ATTACHMENT_IMPORT)
         );
     }
 
@@ -261,16 +259,14 @@ class Controller extends BaseController
                 $baseFolder,
                 $unit
             );
-            $this->response->content->set($this->buildJsonOutput([]));
+            $this->psr7Response = $this->responseAsJson([]);
             // SHUP.
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(204);
         } catch (SchoolboxException $e) {
             if ($this->isXhrRequest()) {
                 $this->response->status->set(400);
-                $this->response->content->set(
-                    $this->buildJsonOutput($e->getMessage())
-                );
+                $this->psr7Response = $this->responseAsJson($e->getMessage());
             } else {
                 throw $e;
             }

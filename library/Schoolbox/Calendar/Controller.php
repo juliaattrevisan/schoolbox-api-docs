@@ -230,6 +230,6 @@ class Controller extends Base
         $this->userMapper->updateCalendarView($this->getUser()->getId(), $storedView);
 
         // We no longer store calendarView in session, as it doesn't work as expected
-        $this->getResponse()->content->set($this->buildJsonOutput([]));
+        $this->psr7Response = $this->responseAsJson([]);
     }
 }

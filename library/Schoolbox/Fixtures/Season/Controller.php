@@ -91,7 +91,7 @@ class Controller extends AbstractController
                 }
             );
 
-            $this->getResponse()->content->set($this->buildJsonOutput($seasons));
+            $this->psr7Response = $this->responseAsJson($seasons);
 
             return;
         }
@@ -270,9 +270,9 @@ class Controller extends AbstractController
         // Either season now has no linked divisions/matches, or caller specified to cascade the delete
         try {
             $this->getMapper()->delete($entity);
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'status' => 200,
-            ]));
+            ]);
         } catch (Exception $e) {
             $this->outputPostError($entity, $e);
         }
@@ -358,7 +358,7 @@ class Controller extends AbstractController
         if ($this->isXhrRequest()) {
             // Dump out an AJAX error
             $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set($this->buildJsonOutput($e->getMessage()));
+            $this->psr7Response = $this->responseAsJson($e->getMessage());
         } else {
             throw $e;
         }

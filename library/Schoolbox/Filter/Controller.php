@@ -255,7 +255,7 @@ class Controller extends BaseController
             ->notIn('role_type', Page\Model::getPageRoleTypes()[$page]);
         $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
 
-        $this->response->content->set($this->buildJsonOutput(['status' => 200]));
+        $this->psr7Response = $this->responseAsJson(['status' => 200]);
     }
 
 
@@ -274,7 +274,7 @@ class Controller extends BaseController
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
         $this->selectionMapper->deleteSelectionsForRoleIds($roleIds, $page);
-        $this->response->content->set($this->buildJsonOutput(['status' => 200]));
+        $this->psr7Response = $this->responseAsJson(['status' => 200]);
     }
 
 

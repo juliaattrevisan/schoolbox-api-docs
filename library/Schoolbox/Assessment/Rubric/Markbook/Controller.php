@@ -210,7 +210,7 @@ class Controller extends Base
             $overallMarks
         ] = $this->buildMarkbookData($folder, $request, $assessmentIds);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed(
                 '@rubricMarkbook/markbookInner.twig',
@@ -230,7 +230,7 @@ class Controller extends Base
                     ),
                 ]
             )->getBody()->getContents(),
-        ]));
+        ]);
     }
 
 

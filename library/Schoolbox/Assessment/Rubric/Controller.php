@@ -367,7 +367,7 @@ class Controller extends BaseController
             'fragment' => $fragment,
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->psr7Response = $this->responseAsJson($payload);
     }
 
     /**
@@ -512,7 +512,7 @@ class Controller extends BaseController
         // Response code is always 200:
         // this is a valid request even if marks would've been invalidated.
         $this->response->status->setCode(200);
-        $this->response->content->set($this->buildJsonOutput($response));
+        $this->psr7Response = $this->responseAsJson($response);
     }
 
 

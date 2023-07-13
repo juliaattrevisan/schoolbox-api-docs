@@ -105,17 +105,15 @@ class Controller extends Base
             $badgeTranslator
         );
 
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $hydrator->hydrateResults($data),
-                'metadata' => [
-                    'count' => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->current($data),
-                        'next'    => $cursor->next($data),
-                    ],
+        $this->psr7Response = $this->responseAsJson([
+            'data'     => $hydrator->hydrateResults($data),
+            'metadata' => [
+                'count' => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->current($data),
+                    'next'    => $cursor->next($data),
                 ],
-            ]),
-        );
+            ],
+        ]);
     }
 }

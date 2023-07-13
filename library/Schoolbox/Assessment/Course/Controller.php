@@ -304,7 +304,7 @@ class Controller extends Base\Base
         $this->unitSpecificationMapper->save($unit);
         $response['unit'] = $unit->getId();
 
-        $this->getResponse()->content->set($this->buildJsonOutput($response));
+        $this->psr7Response = $this->responseAsJson($response);
     }
 
 
@@ -319,7 +319,7 @@ class Controller extends Base\Base
         $this->getResponse()->status->set($code);
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($message));
+            $this->psr7Response = $this->responseAsJson($message);
         } else {
             die(json_encode($message));
         }
@@ -512,11 +512,11 @@ class Controller extends Base\Base
 
         if ($this->isXhrRequest()) {
             // respond to XHR with JSON
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'id'              => $courseSpec->getId(),
                 'urlModifyCourse' => $this->routeGenerator->generate('course.updateCourse', ['id' => $courseSpec->getId()]),
                 'urlNewUnit'      => $this->routeGenerator->generate('course.newUnit', ['id' => $courseSpec->getId()]),
-            ]));
+            ]);
         } else {
             // respond to synchronous POST with redirect
             $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
@@ -729,9 +729,9 @@ class Controller extends Base\Base
 
         if ($this->isXhrRequest()) {
             // respond to XHR with JSON
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'id' => $courseSpec->getId(),
-            ]));
+            ]);
         } else {
             // respond to synchronous POST with redirect
             $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
@@ -1236,10 +1236,10 @@ class Controller extends Base\Base
             $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'id'     => $courseSpec->getId(),
             'result' => 'success',
-        ]));
+        ]);
     }
 
 
@@ -1271,9 +1271,9 @@ class Controller extends Base\Base
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitSpecificationMapper->delete($unitSpec);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'id' => $unitSpec->getId(),
-        ]));
+        ]);
     }
 
 
@@ -1305,9 +1305,9 @@ class Controller extends Base\Base
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitImplementationMapper->delete($unitImpl);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'id' => $unitImpl->getId(),
-        ]));
+        ]);
     }
 
 

@@ -65,7 +65,7 @@ class Controller extends Base
 
         // Don't output login screen if XHR request
         if ($this->isJsonRequest() || $this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Unauthenticated']));
+            $this->psr7Response = $this->responseAsJson(['error' => 'Unauthenticated']);
             $this->getResponse()->headers->set('Unauthenticated', 401);
             exit;
         }

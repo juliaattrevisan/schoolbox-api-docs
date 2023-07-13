@@ -267,7 +267,7 @@ class Controller extends Base\Base
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 
@@ -505,7 +505,7 @@ class Controller extends Base\Base
         } else {
             $redirect = $this->getSession()->getHistory(2);
         }
-        $this->getResponse()->content->set($this->buildJsonOutput(['redirect' => $redirect]));
+        $this->psr7Response = $this->responseAsJson(['redirect' => $redirect]);
     }
 
 
@@ -795,7 +795,7 @@ class Controller extends Base\Base
             });
             $this->componentInstanceMapper->delete($componentsForCourse);
 
-            $this->getResponse()->content->set($this->buildJsonOutput(['data' => true]));
+            $this->psr7Response = $this->responseAsJson(['data' => true]);
         } catch (\Exception $e) {
             $this->sendError($e->getMessage(), [], 500);
             return;
@@ -819,10 +819,10 @@ class Controller extends Base\Base
     {
         $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($courseImpl->getFolder()->getId());
         $componentName     = $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
-        $this->getResponse()->content->set($this->buildJsonOutput([
-                'result'        => 'success',
-                'componentName' => $componentName,
-            ]));
+        $this->psr7Response = $this->responseAsJson([
+            'result'        => 'success',
+            'componentName' => $componentName,
+        ]);
     }
 
 

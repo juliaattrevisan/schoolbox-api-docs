@@ -464,17 +464,10 @@ class Controller extends Base
                 }
             }
 
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => $this->buildJsonOutput($result)
-            ]);
+            $this->psr7Response = $this->responseAsJson($result);
         } catch (MapperException $e) {
             // Requested import didn't exist,
-
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => []
-            ]);
+            $this->psr7Response = $this->responseAsJson([]);
         }
     }
 }

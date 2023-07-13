@@ -88,7 +88,7 @@ class Controller extends Base
     {
         $data = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 

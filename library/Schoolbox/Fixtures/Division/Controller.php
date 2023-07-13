@@ -193,9 +193,7 @@ class Controller extends AbstractController
 
         if ($this->isXhrRequest()) {
             // Output as XHR data model
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($dataModel)
-            );
+            $this->psr7Response = $this->responseAsJson($dataModel);
         } else {
             // Create file upload zone
             $zone = new Zone("uploadZone");
@@ -492,9 +490,7 @@ class Controller extends AbstractController
 
             $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
             $dataModel['html'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getBody()->getContents()->getContents();
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($dataModel)
-            );
+            $this->psr7Response = $this->responseAsJson($dataModel);
         } else {
             // Redirect back to lobby
             $this->psr7Response = $this->redirectAfterPost(

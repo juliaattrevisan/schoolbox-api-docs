@@ -87,7 +87,7 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             // this is for turning on saved icon in news feed
             // this may contain non-accessible article ids, but should not be a problem
-            $this->getResponse()->content->set($this->buildJsonOutput($savedArticleIds));
+            $this->psr7Response = $this->responseAsJson($savedArticleIds);
             return;
         }
 
@@ -173,8 +173,7 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([]));
-            return;
+            $this->psr7Response = $this->responseAsJson([]);
         }
     }
 
@@ -198,8 +197,7 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([]));
-            return;
+            $this->psr7Response = $this->responseAsJson([]);
         }
     }
 

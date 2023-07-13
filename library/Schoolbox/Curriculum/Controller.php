@@ -110,7 +110,7 @@ class Controller extends Base
             'parent',
             'children',
         );
-        $this->response->content->set($this->buildJsonOutput($tree));
+        $this->psr7Response = $this->responseAsJson($tree);
     }
 
     /**

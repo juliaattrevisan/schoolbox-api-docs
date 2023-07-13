@@ -134,7 +134,7 @@ class Controller extends Base
 
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
-        $this->getResponse()->content->set($this->buildJsonOutput($manifest));
+        $this->psr7Response = $this->responseAsJson($manifest);
     }
 
     /**

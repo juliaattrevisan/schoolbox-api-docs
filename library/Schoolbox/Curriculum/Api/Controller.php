@@ -107,7 +107,7 @@ class Controller extends Base
             )
         );
 
-        $this->response->content->set($this->buildJsonOutput($translatedResults));
+        $this->psr7Response = $this->responseAsJson($translatedResults);
     }
 
     /**
@@ -123,19 +123,17 @@ class Controller extends Base
             'parent',
             'children',
         );
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $tree->map(
-                    new ModelToArray(
-                        $this->routeGenerator,
-                        $this->authorizer,
-                        $this->getUser(),
-                        0,
-                        self::MAX_DESCENDANTS,
-                        null,
-                    )
+        $this->psr7Response = $this->responseAsJson(
+            $tree->map(
+                new ModelToArray(
+                    $this->routeGenerator,
+                    $this->authorizer,
+                    $this->getUser(),
+                    0,
+                    self::MAX_DESCENDANTS,
+                    null,
                 )
-            ),
+            )
         );
     }
 
@@ -245,9 +243,7 @@ class Controller extends Base
             $descendantCount,
             $this->counter->findUsageCounts($this->extractIdsFromNode($node)),
         );
-        $this->response->content->set(
-            $this->buildJsonOutput($translator($node))
-        );
+        $this->psr7Response = $this->responseAsJson($translator($node));
     }
 
     /**

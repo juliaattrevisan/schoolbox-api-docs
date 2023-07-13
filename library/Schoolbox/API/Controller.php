@@ -108,13 +108,9 @@ class Controller extends Base
 
         // check the provider is valid
         if (!in_array($provider, $providers, true)) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set(
-                $this->buildJsonOutput(
-                    "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
-                )
-            );
+            $this->psr7Response = $this->responseAsJson(
+                "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
+            )->withStatus(400);
             return;
         }
 
@@ -160,9 +156,7 @@ class Controller extends Base
                             $registry->setDeviceId($deviceId);
                         }
                     } catch (MapperException $e) {
-                        /** @noinspection PhpUnhandledExceptionInspection */
-                        $this->response->status->setCode(400);
-                        $this->response->content->set($this->buildJsonOutput('Invalid app ID given'));
+                        $this->psr7Response = $this->responseAsJson('Invalid app ID given')->withStatus(400);
                         return;
                     }
                 }
@@ -282,9 +276,7 @@ class Controller extends Base
             $status   = 400;
         }
 
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode($status);
-        $this->response->content->set($this->buildJsonOutput($response));
+        $this->psr7Response = $this->responseAsJson($response)->withStatus($status);
         return null;
     }
 

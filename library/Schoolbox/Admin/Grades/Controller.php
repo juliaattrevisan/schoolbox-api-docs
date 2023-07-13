@@ -154,9 +154,7 @@ class Controller extends Base
             $this->gradeLevelMapper->save($gradeLevelGroup->getGradeLevels());
         }
 
-        $this->response->content->set(
-            $this->buildJsonOutput($this->retrieveAllGradeGroups())
-        );
+        $this->psr7Response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**

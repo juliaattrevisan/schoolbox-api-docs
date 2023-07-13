@@ -825,9 +825,9 @@ class Controller extends Base
                 $redirect = $this->routeGenerator->generate('calendar.getOwnCalendar');
             }
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'callbackUrl' => $redirect
-            ]));
+            ]);
         } else {
             $this->psr7Response = $this->redirectFound($redirect);
         }

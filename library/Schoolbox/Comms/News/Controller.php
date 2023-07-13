@@ -359,10 +359,10 @@ class Controller extends Base
             $this->validateArticleAndAudience($article);
         } catch (UnsatisfiedException $e) {
             $this->getResponse()->status->set(400);
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ]));
+            ]);
 
             return;
         }
@@ -404,7 +404,7 @@ class Controller extends Base
                 $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
             }
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'success'      => true,
                 'articleId'    => $article->getId(),
                 'url'          => $url,
@@ -412,7 +412,7 @@ class Controller extends Base
                 'updateRoute'  => $updateRoute,
                 'submitRoute'  => $submitRoute,
                 'approveRoute' => $approveRoute
-            ]));
+            ]);
         } else {
             /* Otherwise, you're the creator and you're editing this thing normally
              * Go to the detail screen to see the outcome of your changes
@@ -474,20 +474,20 @@ class Controller extends Base
             }
 
             if ($this->isXhrRequest()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->psr7Response = $this->responseAsJson([
                     'success' => true,
                     'redirect' => $nextStep
-                ]));
+                ]);
             } else {
                 $this->psr7Response = $this->redirectFound($nextStep);
             }
         } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
             if ($this->isXhrRequest()) {
                 $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->psr7Response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage()
-                ]));
+                ]);
 
                 return;
             }
@@ -505,7 +505,7 @@ class Controller extends Base
      */
     public function getTopics(): void
     {
-        $this->getResponse()->content->set($this->buildJsonOutput($this->topicMapper->findAll()));
+        $this->psr7Response = $this->responseAsJson($this->topicMapper->findAll());
     }
 
 
@@ -638,16 +638,16 @@ class Controller extends Base
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->response->content->set($this->buildJsonOutput($partialData['articles']));
+            $this->psr7Response = $this->responseAsJson($partialData['articles']);
             return;
         }
 
         $content = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'success' => true,
             'fragment' => $content
-        ]));
+        ]);
     }
 
 
@@ -884,7 +884,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($articles));
+        $this->psr7Response = $this->responseAsJson($articles);
     }
 
 
@@ -1102,9 +1102,9 @@ class Controller extends Base
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->response->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'articles' => $partialData['articles']
-            ]));
+            ]);
 
             return;
         }
@@ -1112,14 +1112,14 @@ class Controller extends Base
         $content     = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
         $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'success' => true,
             'title' => $this->getDi()->get('l10n')->translate('news', false, true),
             'url' => $partialData['currentUrl'],
             'fragment' => $content,
             'slug' => $params->getSlug(),
             'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
-        ]));
+        ]);
     }
 
 
@@ -1214,7 +1214,7 @@ class Controller extends Base
             )
         );
 
-        $this->getResponse()->content->set($this->buildJsonOutput($articles));
+        $this->psr7Response = $this->responseAsJson($articles);
     }
 
 

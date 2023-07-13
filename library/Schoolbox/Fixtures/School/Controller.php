@@ -56,7 +56,7 @@ class Controller extends Base
                 ])
             ];
 
-            $this->getResponse()->content->set($this->buildJsonOutput($status));
+            $this->psr7Response = $this->responseAsJson($status);
             return;
         }
 
@@ -92,7 +92,7 @@ class Controller extends Base
                 ])
             ];
 
-            $this->getResponse()->content->set($this->buildJsonOutput($status));
+            $this->psr7Response = $this->responseAsJson($status);
             return;
         }
 

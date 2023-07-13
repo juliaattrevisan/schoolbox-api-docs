@@ -64,12 +64,10 @@ class Controller extends Base
         $newAssessment = $this->copyAssessmentToContext($assessment, $unitSpec);
 
         // TODO return the same format as the assessment API?
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'id'    => $newAssessment->getId(),
-                'title' => $newAssessment->getTitle(),
-            ]),
-        );
+        $this->psr7Response = $this->responseAsJson([
+            'id'    => $newAssessment->getId(),
+            'title' => $newAssessment->getTitle(),
+        ]);
     }
 
 

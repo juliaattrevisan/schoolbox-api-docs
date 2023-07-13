@@ -102,23 +102,19 @@ class Controller extends BaseController
                 $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
                 $this->response->status->setCode(200);
-                $this->response->content->set(
-                    $this->buildJsonOutput([
-                        'status' => $this->response->status->getCode(),
-                        'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
-                        'redirect' => '/homepage/' . $folder->getId()
-                    ])
-                );
+                $this->psr7Response = $this->responseAsJson([
+                    'status' => $this->response->status->getCode(),
+                    'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
+                    'redirect' => '/homepage/' . $folder->getId()
+                ]);
             } catch (\Exception | \UnexpectedValueException $e) {
                 $this->response->status->setCode(400);
-                $this->response->content->set(
-                    $this->buildJsonOutput([
-                        'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
-                        'status' => $this->response->status->getCode(),
-                        'detail' => $e->getMessage(),
-                        'instance' => $this->psr7Request->getUri()->__toString(),
-                    ])
-                );
+                $this->psr7Response = $this->responseAsJson([
+                    'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
+                    'status' => $this->response->status->getCode(),
+                    'detail' => $e->getMessage(),
+                    'instance' => $this->psr7Request->getUri()->__toString(),
+                ]);
             }
         }
     }

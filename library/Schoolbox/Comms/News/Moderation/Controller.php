@@ -351,6 +351,6 @@ class Controller extends Base
         }
 
         $this->getResponse()->status->set($httpCode);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 }

@@ -120,7 +120,7 @@ class Controller extends Base
             'interactions' => $interactions->fetchOpensVsTime($article, $scale),
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
 
@@ -148,7 +148,7 @@ class Controller extends Base
         $payload = (new Visitation\Payload\Top10($this->statisticsMapper, $this->userMapper))
             ->generate($article);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->psr7Response = $this->responseAsJson($payload);
     }
 
 
@@ -170,6 +170,6 @@ class Controller extends Base
         $payload = (new Visitation\Payload\Full($this->statisticsMapper, $this->userResolver, $this->userMapper))
             ->generate($article);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->psr7Response = $this->responseAsJson($payload);
     }
 }
