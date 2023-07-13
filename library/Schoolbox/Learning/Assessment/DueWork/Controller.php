@@ -887,7 +887,7 @@ class Controller extends Assessment\Controller
             $result['message'] = $errorMessage;
 
             $rs->status->setCode($errorCode);
-            $rs->content->set($this->buildJsonOutput($result));
+            $this->psr7Response = $this->responseAsJson($result);
         } else {
             // Show some error message?
             $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
@@ -1222,7 +1222,7 @@ class Controller extends Assessment\Controller
             $result['id']      = $response->getId();
 
             $rs->status->setCode(200);
-            $rs->content->set($this->buildJsonOutput($result));
+            $this->psr7Response = $this->responseAsJson($result);
         } else {
             // Redirect after saving to Due Work Summary for particular student.
             $this->psr7Response = $this->redirectFound(
@@ -1280,7 +1280,7 @@ class Controller extends Assessment\Controller
             $code = 403;
         }
         $this->getResponse()->status->set($code);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 
@@ -1396,7 +1396,7 @@ class Controller extends Assessment\Controller
             $code = 403;
         }
         $this->getResponse()->status->set($code);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 
@@ -1572,7 +1572,7 @@ class Controller extends Assessment\Controller
         }
 
         $this->getResponse()->status->setCode(204);
-        $this->getResponse()->content->set($this->buildJsonOutput(null));
+        $this->psr7Response = $this->responseAsJson(null);
     }
 
 
@@ -1692,6 +1692,6 @@ class Controller extends Assessment\Controller
         $payload = (new Turnitin\SimilarityReportPayload($this->turnitinFileMapper, $this->getUserMapper(), $this->routeGenerator))
             ->generate($assessment);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->psr7Response = $this->responseAsJson($payload);
     }
 }

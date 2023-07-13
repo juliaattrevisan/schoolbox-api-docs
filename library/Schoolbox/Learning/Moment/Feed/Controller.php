@@ -127,19 +127,17 @@ class Controller extends Base
                                ->map($translator)
                                ->reindex();
 
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'data'     => $mappedData,
-                    'metadata' => [
-                        'count'  => $cursor->retrieveResultCount(),
-                        'cursor' => [
-                            'current' => $encodedCursor ?? $cursor->current($data),
-                            'next'    => $cursor->next($data),
-                        ],
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'data'     => $mappedData,
+                'metadata' => [
+                    'count'  => $cursor->retrieveResultCount(),
+                    'cursor' => [
+                        'current' => $encodedCursor ?? $cursor->current($data),
+                        'next'    => $cursor->next($data),
                     ],
-                ]
-            )
+                ],
+            ]
         );
     }
 }

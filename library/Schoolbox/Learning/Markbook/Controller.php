@@ -133,7 +133,7 @@ class Controller extends Base
              */
             $rank = $markbook->getRanking();
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'status'  => 200,
                 'content' => $this->responseFromTemplateUnthemed('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
@@ -144,7 +144,7 @@ class Controller extends Base
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
                 ])->getBody()->getContents(),
-            ]));
+            ]);
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);
             $data = [
@@ -159,7 +159,7 @@ class Controller extends Base
                     'file'    => $e->getFile(),
                 ]);
             }
-            $this->getResponse()->content->set($this->buildJsonOutput($data));
+            $this->psr7Response = $this->responseAsJson($data);
         } catch (\Throwable $e) {
             $this->captureException($e);
             $this->returnJsonError($e);
@@ -382,7 +382,7 @@ class Controller extends Base
                 'file'    => $e->getFile(),
             ]);
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 

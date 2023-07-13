@@ -182,18 +182,16 @@ class Controller extends Base
             ->map($this->buildTranslatorWithComments(2))
             ->reindex();
 
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $mappedData,
-                'metadata' => [
-                    'count'  => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->current($data),
-                        'next'    => $cursor->next($data),
-                    ],
+        $this->psr7Response = $this->responseAsJson([
+            'data'     => $mappedData,
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->current($data),
+                    'next'    => $cursor->next($data),
                 ],
-            ])
-        );
+            ],
+        ]);
     }
 
 
@@ -263,15 +261,13 @@ class Controller extends Base
             $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $evidenceCollection->map(
-                    new Translator\ModelToArray\Base(
-                        new User\Translator\Author\ModelToArray(),
-                        new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-                        new ScrubAdapter(),
-                    ),
-                )
+        $this->psr7Response = $this->responseAsJson(
+            $evidenceCollection->map(
+                new Translator\ModelToArray\Base(
+                    new User\Translator\Author\ModelToArray(),
+                    new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+                    new ScrubAdapter(),
+                ),
             )
         );
     }
@@ -338,11 +334,7 @@ class Controller extends Base
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $responseTranslator($evidence)
-            )
-        );
+        $this->psr7Response = $this->responseAsJson($responseTranslator($evidence));
     }
 
 
@@ -381,7 +373,7 @@ class Controller extends Base
                 'name' => $tag->getName(),
             ];
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
 

@@ -298,10 +298,10 @@ class Controller extends Base
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningUpcoming/upcomingInner.twig', $data)->getBody()->getContents(),
-        ]));
+        ]);
     }
 
     /**
@@ -380,9 +380,9 @@ class Controller extends Base
             $this->getUser()
         );
 
-        $this->response->content->set($this->buildJsonOutput(
+        $this->psr7Response = $this->responseAsJson(
             array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
-        ));
+        );
     }
 
     /**

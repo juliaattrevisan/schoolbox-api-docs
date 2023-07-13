@@ -190,18 +190,16 @@ class Controller extends Base
             $next    = null;
             $current = null;
         }
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $data,
-                'metadata' => [
-                    'count'  => $count,
-                    'cursor' => [
-                        'next'    => $next,
-                        'current' => $current,
-                    ],
+        $this->psr7Response = $this->responseAsJson([
+            'data'     => $data,
+            'metadata' => [
+                'count'  => $count,
+                'cursor' => [
+                    'next'    => $next,
+                    'current' => $current,
                 ],
-            ])
-        );
+            ],
+        ]);
     }
 
 
@@ -332,10 +330,8 @@ class Controller extends Base
         $this->mapper->save($model);
 
         // Return the badge just created
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $this->buildModelToArrayTranslator()($model)
-            )
+        $this->psr7Response = $this->responseAsJson(
+            $this->buildModelToArrayTranslator()($model)
         );
     }
 

@@ -38,7 +38,7 @@ class Controller extends Base
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->responseAsJson($problem);
             return;
         }
 
@@ -50,18 +50,14 @@ class Controller extends Base
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->responseAsJson($problem);
             return;
         }
 
         /**
          * build the whole thing
          */
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -88,7 +84,7 @@ class Controller extends Base
                 ->setStatus(401)
                 ->asArray();
             $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->responseAsJson($problem);
             return; //exit early there is a malformed keyword for search
         }
 
@@ -105,16 +101,14 @@ class Controller extends Base
          * now we have the user id's that match the search result, create the standard user array with hydration.
          */
 
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'data'  =>  $output,
-                    'metadata'  => [
-                        'count' => $count,
-                        'cursor' => end($output)['id'] ?? null
-                    ]
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'data'  =>  $output,
+                'metadata'  => [
+                    'count' => $count,
+                    'cursor' => end($output)['id'] ?? null
                 ]
-            )
+            ]
         );
     }
 }

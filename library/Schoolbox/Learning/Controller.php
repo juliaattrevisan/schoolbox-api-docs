@@ -172,10 +172,10 @@ class Controller extends Base
             $postFilterSelections = $this->requestPost['filter_selection'] ?: [];
             $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $viewee, $postFilterSelections);
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->psr7Response = $this->responseAsJson([
                 'status'  => 200,
                 'content' => $content,
-            ]));
+            ]);
         } catch (Exception $e) {
             // TODO - can remove this block when we abandon PHP 5 support
             $this->returnJsonError($e);
@@ -279,13 +279,13 @@ class Controller extends Base
      */
     protected function returnJsonError(Throwable $e): void
     {
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'status'  => 500,
             'code'    => $e->getCode(),
             'message' => $e->getMessage(),
             'line'    => $e->getLine(),
             'file'    => $e->getFile(),
-        ]));
+        ]);
     }
 
     /**
@@ -357,7 +357,7 @@ class Controller extends Base
             $this->rosettaStone
         ))->getStudentLists();
 
-        $this->getResponse()->content->set($this->buildJsonOutput($students));
+        $this->psr7Response = $this->responseAsJson($students);
     }
 
     /**

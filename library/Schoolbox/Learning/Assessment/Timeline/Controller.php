@@ -52,8 +52,6 @@ class Controller extends Base
             $stack = (new FullWithViews($participant, $this->assessmentViewMapper))->getForTeacher($assessment, $student);
         }
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($stack)
-        );
+        $this->psr7Response = $this->responseAsJson($stack);
     }
 }

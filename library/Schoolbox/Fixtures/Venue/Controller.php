@@ -64,7 +64,7 @@ class Controller extends AbstractController
                 // noop
             }
 
-            $this->getResponse()->content->set($this->buildJsonOutput($venues));
+            $this->psr7Response = $this->responseAsJson($venues);
         } else {
             try {
                 $allVenues = $this->mapper->findAll(

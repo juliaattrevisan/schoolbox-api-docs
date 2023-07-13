@@ -290,12 +290,12 @@ class Controller extends Assessment\Controller
             $this->getResponse()->status->setCode(200);
 
             if ($this->isXhrRequest()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->psr7Response = $this->responseAsJson([
                     'success' => true,
                     'message' => 'OK',
                     'id'      => $response->getId(),
                     'status'  => $completionStatus,
-                ]));
+                ]);
             } else {
                 // redirect after saving to Task Summary for particular Student
                 $this->psr7Response = $this->redirectFound(
@@ -317,11 +317,11 @@ class Controller extends Assessment\Controller
             $this->getResponse()->status->setCode(400);
 
             if ($this->isXhrRequest()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->psr7Response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage(),
                     'id'      => null,
-                ]));
+                ]);
             } else {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, $e, $e->getMessage());
             }

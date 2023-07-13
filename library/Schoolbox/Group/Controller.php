@@ -132,16 +132,14 @@ class Controller extends BaseController
             //save group object
             $this->userAccessMapper->save($userGroup);
 
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput([
-                                           'group'             => $groupFolderId,
-                                           'user'              => $user->getId(),
-                                           'isFavourite'       => $userGroup->getFavourite(),
-                                           'isNotificationsOn' => $this->groupsHelper->groupNotificationEnabled($groupFolderId),
-                                           //notifications default to on, you have to opt out in a separate request
-                                           'enrolmentStatus'   => $this->groupsHelper->getEnrollmentText($userGroup),
-                                       ])
-            );
+            $this->psr7Response = $this->responseAsJson([
+                'group'             => $groupFolderId,
+                'user'              => $user->getId(),
+                'isFavourite'       => $userGroup->getFavourite(),
+                'isNotificationsOn' => $this->groupsHelper->groupNotificationEnabled($groupFolderId),
+                //notifications default to on, you have to opt out in a separate request
+                'enrolmentStatus'   => $this->groupsHelper->getEnrollmentText($userGroup),
+            ]);
         }
     }
 
@@ -178,14 +176,12 @@ class Controller extends BaseController
          */
         $this->groupsHelper->setNotification($groupFolderId, $user, true);
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput([
-                                       'user'            => $user->getId(),
-                                       'group'           => $groupFolderId,
-                                       'action'          => 'delete',
-                                       'enrolmentStatus' => GroupsHelper::NOTENROLED,
-                                   ])
-        );
+        $this->psr7Response = $this->responseAsJson([
+            'user'            => $user->getId(),
+            'group'           => $groupFolderId,
+            'action'          => 'delete',
+            'enrolmentStatus' => GroupsHelper::NOTENROLED,
+        ]);
     }
 
     /**
@@ -223,14 +219,12 @@ class Controller extends BaseController
         //update the notification to what the user sets.
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $isNotificationOn);
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput([
-                                       'group'             => $groupFolderId,
-                                       'user'              => $user->getId(),
-                                       'isNotificationsOn' => $isNotificationOn,
-                                       'enrolmentStatus'   => $this->groupsHelper->getEnrollmentText($userGroup),
-                                   ])
-        );
+        $this->psr7Response = $this->responseAsJson([
+            'group'             => $groupFolderId,
+            'user'              => $user->getId(),
+            'isNotificationsOn' => $isNotificationOn,
+            'enrolmentStatus'   => $this->groupsHelper->getEnrollmentText($userGroup),
+        ]);
     }
 
     /**
@@ -261,14 +255,12 @@ class Controller extends BaseController
         //save group object
         $this->userAccessMapper->save($userGroup);
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput([
-                                       'group'           => $groupFolderId,
-                                       'user'            => $user->getId(),
-                                       'isFavourite'     => $userGroup->getFavourite(),
-                                       'enrolmentStatus' => $this->groupsHelper->getEnrollmentText($userGroup),
-                                   ])
-        );
+        $this->psr7Response = $this->responseAsJson([
+            'group'           => $groupFolderId,
+            'user'            => $user->getId(),
+            'isFavourite'     => $userGroup->getFavourite(),
+            'enrolmentStatus' => $this->groupsHelper->getEnrollmentText($userGroup),
+        ]);
     }
 
     /**

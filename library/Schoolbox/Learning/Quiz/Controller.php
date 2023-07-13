@@ -237,7 +237,7 @@ class Controller extends AbstractController
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput(['status' => 200]));
+            $this->psr7Response = $this->responseAsJson(['status' => 200]);
         } elseif (isset($get['returnUrl'])) {
             $this->psr7Response = $this->redirectFound(Redirect::decode($get['returnUrl']));
         } else {

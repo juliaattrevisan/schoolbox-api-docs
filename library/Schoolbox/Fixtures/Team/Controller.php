@@ -318,9 +318,7 @@ class Controller extends AbstractController
             $dataModel['divisionLobby'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $divisionLobby)->getBody()->getContents();
 
 
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($dataModel)
-            );
+            $this->psr7Response = $this->responseAsJson($dataModel);
         } else {
             // Redirect back to lobby
             $this->psr7Response = $this->redirectAfterPost(
@@ -354,7 +352,8 @@ class Controller extends AbstractController
                 $problem = new ApiProblem('Empty Search');
                 $problem->setStatus(400);
                 $this->getResponse()->status->setCode(400);
-                return $this->getResponse()->content->set($this->buildJsonOutput($problem->asArray()));
+                $this->psr7Response = $this->responseAsJson($problem->asArray());
+                return;
             }
             $database = $this->getMapper()->getDatabase();
             $queryLike = "%{$database->getQuoter()->escapeForLike($query)}%";
@@ -418,7 +417,7 @@ class Controller extends AbstractController
             });
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($teams));
+        $this->psr7Response = $this->responseAsJson($teams);
     }
 
 

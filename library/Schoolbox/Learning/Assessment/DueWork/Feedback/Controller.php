@@ -195,9 +195,7 @@ class Controller extends Base
             $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
         }
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($results)
-        );
+        $this->psr7Response = $this->responseAsJson($results);
     }
 
     /**

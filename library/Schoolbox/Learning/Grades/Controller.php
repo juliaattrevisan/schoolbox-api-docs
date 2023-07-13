@@ -500,7 +500,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
                 'student'               => $viewee,
@@ -515,7 +515,7 @@ class Controller extends Base
                 'rubricAssessmentList'  => $rubricAssessmentList,
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getBody()->getContents(),
-        ]));
+        ]);
     }
 
     /**

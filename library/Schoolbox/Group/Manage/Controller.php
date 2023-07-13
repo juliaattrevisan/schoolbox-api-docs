@@ -126,9 +126,7 @@ class Controller extends Base
             'members'   => $members,
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($data)
-        );
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
     /**
@@ -193,16 +191,14 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'members' => $userAccesses->map(function ($userAccess) {
-                        $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
-                        $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
-                        return $array;
-                    }),
-                ]
-            )
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'members' => $userAccesses->map(function ($userAccess) {
+                    $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
+                    $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
+                    return $array;
+                }),
+            ]
         );
     }
 
@@ -255,16 +251,14 @@ class Controller extends Base
             $this->userAccessMapper->save($newAccesses);
         }
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'newMembers' => $newAccesses->map(function ($userAccess) {
-                        $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
-                        $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
-                        return $array;
-                    }),
-                ]
-            )
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'newMembers' => $newAccesses->map(function ($userAccess) {
+                    $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
+                    $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
+                    return $array;
+                }),
+            ]
         );
     }
 
@@ -292,9 +286,7 @@ class Controller extends Base
             !$folder->getGroup()->getNotificationDisabled()
         );
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(['success' => true])
-        );
+        $this->psr7Response = $this->responseAsJson(['success' => true]);
         $data = [
             'settings' => [
                 'new'                    => $this->requestQuery->get('new') ?? 0,
@@ -303,9 +295,7 @@ class Controller extends Base
                 'isForceFollow'          => $group->getForceFollow(),
             ],
         ];
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($data)
-        );
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
     /**
@@ -350,9 +340,7 @@ class Controller extends Base
                 'id'   => $group->getId(),
             ];
         }
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($return)
-        );
+        $this->psr7Response = $this->responseAsJson($return);
     }
 
     /**
@@ -371,9 +359,7 @@ class Controller extends Base
                 'id'   => $role->getId(),
             ];
         }
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($return)
-        );
+        $this->psr7Response = $this->responseAsJson($return);
     }
 
     /**
@@ -442,9 +428,7 @@ class Controller extends Base
                 'external_id' => $user->getExternalId(),
             ];
         }
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($return)
-        );
+        $this->psr7Response = $this->responseAsJson($return);
     }
 
     /**

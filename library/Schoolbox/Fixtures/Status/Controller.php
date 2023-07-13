@@ -97,7 +97,7 @@ class Controller extends AbstractController
                 ])
             ];
 
-            $this->getResponse()->content->set($this->buildJsonOutput($status));
+            $this->psr7Response = $this->responseAsJson($status);
         }
     }
 

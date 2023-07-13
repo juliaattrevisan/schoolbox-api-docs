@@ -74,11 +74,7 @@ class Controller extends Base
         //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
         $output->reindex();
 
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -97,11 +93,7 @@ class Controller extends Base
             return;
         }
         $output = (new ModelToArray())($userAccess);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -207,11 +199,7 @@ class Controller extends Base
             }
         }
         $output = (new ModelToArray())($newAccess);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**

@@ -460,7 +460,7 @@ class Controller extends Base
             $stack['categories'][$categoryId]['awards'][$badgeId]['count']++;
         }
 
-        $this->response->content->set($this->buildJsonOutput($stack));
+        $this->psr7Response = $this->responseAsJson($stack);
     }
 
 
@@ -523,9 +523,7 @@ class Controller extends Base
 
         // Return what was just created
         $translator = $this->buildBadgeAwardModelToArrayTranslator();
-        $this->response->content->set(
-            $this->buildJsonOutput($collection->map($translator))
-        );
+        $this->psr7Response = $this->responseAsJson($collection->map($translator));
     }
 
 
@@ -619,9 +617,7 @@ class Controller extends Base
 
         $translator = $this->buildBadgeAwardModelToArrayTranslator();
 
-        $this->response->content->set(
-            $this->buildJsonOutput($translator($award))
-        );
+        $this->psr7Response = $this->responseAsJson($translator($award));
     }
 
 
@@ -644,7 +640,7 @@ class Controller extends Base
         $yearPrefix = $this->l10n->translate('year', false, true);
         $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, Role::STUDENT, $yearPrefix);
 
-        $this->response->content->set($this->buildJsonOutput($users));
+        $this->psr7Response = $this->responseAsJson($users);
     }
 
 
@@ -667,7 +663,7 @@ class Controller extends Base
         $yearPrefix = $this->l10n->translate('year', false, true);
         $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, Role::STUDENT, $yearPrefix);
 
-        $this->response->content->set($this->buildJsonOutput($users));
+        $this->psr7Response = $this->responseAsJson($users);
     }
 
 
@@ -732,7 +728,7 @@ class Controller extends Base
                 ->asArray();
 
             $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->responseAsJson($problem);
         }
     }
 
@@ -886,9 +882,7 @@ class Controller extends Base
             'awardId' => $achievement->getId(),
         ]);
         $this->response->status->setCode(201);
-        $this->response->content->set(
-            $this->buildJsonOutput(array_merge($translator($achievement), $data))
-        );
+        $this->psr7Response = $this->responseAsJson(array_merge($translator($achievement), $data));
     }
 
 
@@ -1017,6 +1011,6 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['data' => $data]));
+        $this->psr7Response = $this->responseAsJson(['data' => $data]);
     }
 }

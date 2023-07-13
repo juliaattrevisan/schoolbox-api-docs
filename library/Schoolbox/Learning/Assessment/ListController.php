@@ -446,7 +446,7 @@ class ListController extends Web\Controller\Base
         $weight = (float) $this->requestPost['weight'];
         if ($weight < 0) {
             $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid weight value']));
+            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid weight value']);
             return;
         }
         $assessment->setWeight($weight);
@@ -477,7 +477,7 @@ class ListController extends Web\Controller\Base
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
         if (!in_array($visibility, $availableVisibilities)) {
             $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid visibility']));
+            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid visibility']);
             return;
         }
 
@@ -488,7 +488,7 @@ class ListController extends Web\Controller\Base
         // triggering notification explicitly, to notify marked, if necessary
         $this->getAssessmentMapper()->getNotifier()->notify($assessment, $this->getUser(), $previous);
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Loaded successfully']));
+        $this->psr7Response = $this->responseAsJson(['message' => 'Loaded successfully']);
     }
 
     /**
@@ -851,7 +851,7 @@ class ListController extends Web\Controller\Base
     protected function redirect($url)
     {
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $url ]));
+            $this->psr7Response = $this->responseAsJson([ Redirect::RETURN_URL => $url ]);
         } else {
             $this->psr7Response = $this->redirectAfterPost($url);
         }
@@ -968,9 +968,7 @@ class ListController extends Web\Controller\Base
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($problem->asArray())
-            );
+            $this->psr7Response = $this->responseAsJson($problem->asArray());
         }
     }
 
@@ -998,9 +996,7 @@ class ListController extends Web\Controller\Base
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($problem->asArray())
-            );
+            $this->psr7Response = $this->responseAsJson($problem->asArray());
         }
     }
 
