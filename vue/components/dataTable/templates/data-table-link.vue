@@ -18,7 +18,7 @@ const href = window.Vue.computed(() => {
     if (props.componentData.prependHref) {
         return `${props.componentData.prependHref}${props.rowData[props.componentData.text] as string}`;
     }
-    return props.rowData[props.componentData.text];
+    return props.rowData[props.componentData.href];
 });
 </script>
 
