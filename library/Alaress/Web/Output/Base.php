@@ -167,6 +167,7 @@ class Base implements OutputInterface
         if ($this->hasPostOutputCallbacks()) {
             // Output now
             // No content encoding because gzip interferes with content length
+            // TODO determine if this is even necessary?
             header('Content-Encoding: none');
             header("Content-Length: " . strlen($output));
             echo $output;

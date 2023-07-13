@@ -362,51 +362,53 @@ class Kernel extends WebKernelAbstract
 
         $method->invokeArgs($controller, $args);
 
-        // Use PSR-7 response if it's there
+        // Process the response: using the PSR-7 response if there is one,
+        // otherwise the output in the old response content.
         $psr7Response = $controller->getPsr7Response();
+        /** @var ?Response $auraWebResponse */
+        $auraWebResponse = null;
+        /** @var ?OutputInterface $auraWebOutput */
+        $auraWebOutput = null;
         if ($psr7Response) {
-            // TODO something with post-output callbacks
-            $outputter = new Outputter();
-            $outputter->output($psr7Response);
-            return;
-        }
-
-        $response = $controller->getResponse();
-        $output   = $response->content->get();
-        if (!$output instanceof OutputInterface) {
-            if (is_array($output)) {
-                // Figure out output type.
-                // In order of preference, output type is:
-                // * set in the response content
-                // * set in route
-                // * default to 'html'
-                $format = $output['format'] ?? null;
-                if (empty($format)) {
-                    // Strip leading . from format
-                    $format = preg_replace('/^\\./', '', $params['format'] ?? '');
+            $redirect  = $psr7Response->getHeader('location');
+            $isJson    = str_contains($psr7Response->getHeaderLine('content-type'), 'application/json');
+        } else {
+            $auraWebResponse = $controller->getResponse();
+            $auraWebOutput   = $auraWebResponse->content->get();
+            if (!$auraWebOutput instanceof OutputInterface) {
+                if (is_array($auraWebOutput)) {
+                    // Figure out output type.
+                    // In order of preference, output type is:
+                    // * set in the response content
+                    // * set in route
+                    // * default to 'html'
+                    $format = $auraWebOutput['format'] ?? null;
                     if (empty($format)) {
-                        $format = 'html';
+                        // Strip leading . from format
+                        $format = preg_replace('/^\\./', '', $params['format'] ?? '');
+                        if (empty($format)) {
+                            $format = 'html';
+                        }
                     }
+                    // Create a different output type (Sitepage, JSON, whatever) based on a
+                    // route param, defaulting to HTML
+                    $auraWebOutput = $this->di->get("webOutput:$format");
+                } elseif (null === $auraWebOutput) {
+                    $auraWebOutput = $this->di->get("webOutput:noContent");
+                } else {
+                    // Maybe it has a __toString method, or it IS actually a string.
+                    // Ram it into the base output type.
+                    $auraWebOutput = $this->di->get("webOutput:base");
                 }
-                // Create a different output type (Sitepage, JSON, whatever) based on a
-                // route param, defaulting to HTML
-                $output = $this->di->get("webOutput:$format");
-            } elseif (null === $output) {
-                $output = $this->di->get("webOutput:noContent");
-            } else {
-                // Maybe it has a __toString method, or it IS actually a string.
-                // Ram it into the base output type.
-                $output = $this->di->get("webOutput:base");
             }
+            $auraWebOutput->setPostOutputCallbacks($controller->getPostOutputCallbacks());
+
+            $redirect = $controller->getResponse()->headers->get('location');
+            $isJson   = $auraWebOutput instanceof Json;
         }
-        $output->setPostOutputCallbacks($controller->getPostOutputCallbacks());
 
         // Post-processing: if this is a HTML request and not a redirect,
         // store this request in history.
-        $isXhr                = $controller->isXhrRequest();
-        $redirect             = $controller->getResponse()->headers->get('location');
-        $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
-        $isJson               = $output instanceof Json;
 
         /* Push the current url into the session history stack
          * pushHistory() is a more recent version of saveHistory() which exists in sitepage
@@ -424,11 +426,25 @@ class Kernel extends WebKernelAbstract
          *
          * ...to potentially overwrite $output into a new var somewhat pseudo-polymorphically
          */
-        if ($session && !($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
+        if (
+            $session && !(
+                $controller->isXhrRequest()
+                || $redirect
+                || !$controller->getAllowBackToTheFuture()
+                || $isJson
+            )
+        ) {
             $session->pushHistory($_SERVER['REQUEST_URI']);
         }
 
-        $output->output($response);
+        // Output whatever kind of response we have
+        if ($psr7Response) {
+            // TODO do something with post-output callbacks
+            $outputter = new Outputter();
+            $outputter->output($psr7Response);
+        } elseif ($auraWebOutput && $auraWebResponse) {
+            $auraWebOutput->output($auraWebResponse);
+        }
     }
 
 
