@@ -49,7 +49,6 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Http\Discovery\Psr17Factory;
-use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -657,11 +656,12 @@ abstract class Kernel
                     // This will be a ServerRequestInterface,
                     // but of a discovered rather than defined type.
                     // That should be fine: they all obey the same interface.
+                    // TODO hand-build instead of relying upon discovery?
                     $request = (new Psr17Factory())->createServerRequestFromGlobals();
 
                     // If the request is JSON:
                     // set the parsed body appropriately
-                    // TODO move to spec pattern?
+                    // TODO move to spec pattern or middleware?
                     if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
                         $request->getBody()->rewind();
                         $content = $request->getBody()->getContents();

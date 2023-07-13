@@ -21,6 +21,7 @@ use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Alaress\Web\Response\Factory;
 use Alaress\Web\Response\Outputter;
 use Aura\Di\Container;
 use Aura\Router\Route;
@@ -153,9 +154,7 @@ class Kernel extends WebKernelAbstract
             $uri = (new Uri($path))->appendQueryParameters($queryParams);
 
             // Start constructing a response
-            /** @var Response $response */
-            $response = $this->di->get('webFactory')->newResponse();
-            $code     = 401;
+            $code = 401;
 
             // Request was JSON: just let outputError build an ApiProblem response
             if ((new IsJson())->isSatisfiedBy($request)) {
@@ -163,47 +162,45 @@ class Kernel extends WebKernelAbstract
                 return;
             }
 
+            /** @var Factory $responseFactory */
+            $responseFactory = $this->di->get('responseFactory');
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
                 // In fact, get rid of IsXhr completely: modern HTTP clients don't set X-Requested-With
-                $response->status->setCode($code);
-                $response->content->set([
-                    'format' => 'json',
-                    'data'   => ['error' => 'Unauthenticated'],
-                ]);
-                $output = $this->di->get("webOutput:json");
+                $psr7Response = $responseFactory
+                    ->buildJson(['error' => 'Unauthenticated'])
+                    ->withStatus($code);
             } else {
                 /** @var \Alaress\Session\Session $session */
                 $session = $this->di->get('session');
                 $session
                     ->getSegment(LoginController::class)
                     ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
-                $output = $this->di->get("webOutput:noContent");
-                $response->redirect->to($router->getGenerator()->generate('login.getLogin') . '?page=' . urlencode($uri));
+                $psr7Response = $responseFactory->buildRedirect(
+                    $router->getGenerator()->generate('login.getLogin') . '?page=' . urlencode($uri)
+                );
             }
-            $output->output($response);
+            (new Outputter())->output($psr7Response);
         } catch (\Schoolbox\Mapper\Exception\NotFound | Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
             // Output something plain
-            /** @var Response $response */
-            $response = $this->di->get('webFactory')->newResponse();
-            $code     = $e instanceof Deleted ? 410 : 404;
+            $code = $e instanceof Deleted ? 410 : 404;
             if ((new IsJson())->isSatisfiedBy($request)) {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
                 return;
             }
 
+            /** @var Factory $responseFactory */
+            $responseFactory = $this->di->get('responseFactory');
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
-                $response->status->setCode($code);
-                $response->content->set([
-                    'format' => 'json',
-                    'data'   => ['error' => $e->getMessage()],
-                ]);
-                $output = $this->di->get("webOutput:json");
-                $output->output($response);
+                (new Outputter())->output(
+                    $responseFactory
+                        ->buildJson(['error' => 'Unauthenticated'])
+                        ->withStatus($code)
+                );
             } else {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
             }

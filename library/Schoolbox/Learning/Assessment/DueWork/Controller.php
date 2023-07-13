@@ -897,7 +897,7 @@ class Controller extends Assessment\Controller
         } else {
             // Show some error message?
             $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
-            $rs->redirect->to($redirectTo);
+            $this->psr7Response = $this->redirectFound($redirectTo);
         }
     }
 
@@ -1231,7 +1231,7 @@ class Controller extends Assessment\Controller
             $rs->content->set($this->buildJsonOutput($result));
         } else {
             // Redirect after saving to Due Work Summary for particular student.
-            $rs->redirect->to(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'learningAssessment.getSummary',
                     [
