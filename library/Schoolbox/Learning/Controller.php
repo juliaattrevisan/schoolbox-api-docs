@@ -334,7 +334,7 @@ class Controller extends Base
             'hideTimetable' => $hideTimetable,
         ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData)->setTab('classes'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData, null, 'classes'));
     }
 
     /**

@@ -181,7 +181,7 @@ class Controller extends Base
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'currentUser'      => $this->getUser(),
             'yearUrl'          => $this->getYearUrl($viewee->getId())
-        ])->setTab('grade'));
+        ], null, 'grade'));
     }
 
     /**

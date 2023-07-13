@@ -117,6 +117,6 @@ class Controller extends Base
             'user'          => $user,
             'courseList'    => $courseList,
             'homepageUrls' => $homepageUrls,
-            ])->setTab('classes'));
+            ], null, 'classes'));
     }
 }
