@@ -550,6 +550,10 @@
                     $('#mass-download').bulky({
                         includeSelectAllCheckbox: true,
                         invalidOptionText: 'nothing to download',
+
+                        // Prevent multiple download requests by clicking the download button multiple times...
+                        downloadRequested: false,
+
                         /**
                          * @param len - the number of enabled checkboxes that are checked.
                          * @param all - the number of enabled checkboxes.
@@ -588,20 +592,23 @@
                                     </p>
                                     `,
                                 confirmEvent: function () {
-                                    let userIdsString = '';
-                                    for (let elem of toSubmit) {
-                                        let userId = $(elem).attr('data-action-bar')
-                                        userIdsString += '&userIds[]=' + userId;
+                                    if (!this.downloadRequested) {
+                                        this.downloadRequested = true;
+                                        let userIdsString = '';
+                                        for (let elem of toSubmit) {
+                                            let userId = $(elem).attr('data-action-bar')
+                                            userIdsString += '&userIds[]=' + userId;
+                                        }
+
+                                        let url = (
+                                                "{{ routeLookup('learningAssessment.downloadSubmissions', {
+                                                    assessmentId: assessment.id,
+                                                    assessment: assessment
+                                                }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" + userIdsString
+                                        );
+
+                                        window.location.replace(url);
                                     }
-
-                                    let url = (
-                                        "{{ routeLookup('learningAssessment.downloadSubmissions', {
-                                            assessmentId: assessment.id,
-                                            assessment: assessment
-                                        }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" + userIdsString
-                                    );
-
-                                    window.location.replace(url);
                                 }
                             });
                         },
