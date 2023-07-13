@@ -27,7 +27,6 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use ErrorException;
 use InvalidArgumentException;
-use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -280,9 +279,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     {
         $this->log->notice("Received worker response to handle: '$command'");
 
-        // detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
-        $this->processCompletedTrigger($trigger);
-
         // will throw RuntimeException if unserialization fails
         $bundle = unserialize($data[0]);
 
@@ -322,27 +318,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         $this->log->info(sprintf('%s message%s broadcast', $count, $count === 1 ? '' : 's'), [ 'char' => '<' ]);
     }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     * @return void
-     */
-    protected function processCompletedTrigger(TriggerInterface $trigger): void
-    {
-        // this is in the future; reschedule that!
-        if ($trigger->getTimestamp() > $this->getClock()->time()) {
-            $this->log->info('Trigger not complete, rescheduling');
-
-            try {
-                $this->schedule($trigger, $this->timerCallback($trigger), false);
-            } catch (OutOfBoundsException $e) {
-                // resolver was already detached; this isn't good, since a scheduler restart would lose state
-                $this->log->warning("Resolver was already detached for trigger '{$trigger->getIdString()}'");
-            }
-        }
-    }
-
 
     /**
      * @return string
