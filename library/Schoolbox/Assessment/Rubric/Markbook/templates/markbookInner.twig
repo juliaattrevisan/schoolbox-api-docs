@@ -97,9 +97,18 @@
         leverage styling, but doesn not use DataTables, so need to undo DataTables specific rules */
         padding-right: 0 !important;
     }
+    [data-draft-mark] {
+        display: none;
+    }
 </style>
 
 <div id="report_actions" class="actions-small-1 row">
+    <div class="checklist">
+        <input type="checkbox" id="show-drafts">
+        <label for="show-drafts">
+            Show Drafts
+        </label>
+    </div>
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
@@ -195,11 +204,21 @@
                                             {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
                                             {% set summaryLink              = student.assessments[assessmentId].summaryLink %}
                                             {% set gradientClass            = urgency.marks(normalisedCapabilityMark) %}
+                                            {# Latest Marks #}
+                                            {% set latestCapabilityMark           = student.assessments[assessmentId].capabilities[capabilityId].draftHumanReadableMark ?? capabilityMark %}
+                                            {% set latestNormalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark ?? normalisedCapabilityMark %}
+                                            {% set latestGradientClass                  = urgency.marks(latestNormalisedCapabilityMark) %}
                                             <td class="mark">
                                                 <a
                                                         href="{{ summaryLink }}"
+                                                        data-actual-mark
                                                         class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"
                                                 >{{ capabilityMark|default('–') }}</a>
+                                                <a
+                                                        href="{{ summaryLink }}"
+                                                        data-draft-mark
+                                                        class="{{ latestGradientClass }} {% if latestCapabilityMark is null %}no-mark{% endif %}"
+                                                >{{ latestCapabilityMark|default('–') }}</a>
                                             </td>
                                         {% endif %}
                                     {% endfor %}
@@ -219,12 +238,23 @@
                                                 {% set summaryLink             = student.assessments[assessmentId].summaryLink %}
                                                 {% set gradientClass           = urgency.marks(normalisedIndicatorMark) %}
                                                 {% set renderedIndicatorMark   = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}
+                                                {# Latest Marks #}
+                                                {% set latestIndicatorMark           = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].draftHumanReadableMark ?? indicatorMark %}
+                                                {% set latestNormalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].draftNormalisedMark ?? normalisedIndicatorMark %}
+                                                {% set latestGradientClass           = urgency.marks(latestNormalisedIndicatorMark) %}
+                                                {% set latestRenderedIndicatorMark   = descriptorText ? latestIndicatorMark|default('✓') : latestIndicatorMark|default('–') %}
 
                                                 <td class="mark"{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
                                                     <a
                                                             href="{{ summaryLink }}"
+                                                            data-actual-mark
                                                             class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}"
                                                     >{{ renderedIndicatorMark }}</a>
+                                                    <a
+                                                            href="{{ summaryLink }}"
+                                                            data-draft-mark
+                                                            class={{ latestGradientClass }} {% if latestIndicatorMark is null %}no-mark{% endif %}"
+                                                    >{{ latestRenderedIndicatorMark }}</a>
                                                 </td>
                                             {% endif %}
                                         {% endfor %}
