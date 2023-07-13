@@ -613,6 +613,190 @@ class Controller extends Base
         return $students;
     }
 
+    /**
+     * Find each student in a folder and their latest (including draft) marks (if extant), and return an array indexed by student ID
+     *
+     * dupe of retrieveDatabaseMarks
+     *
+     * @param array<int,array> $assessments
+     * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @return array
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function retrieveDatabaseAllMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
+    {
+        $students = [];
+
+        // Don't load marks if no assessments.
+        if (!count($assessments)) {
+            return $students;
+        }
+
+        // Is the rubric usage filter enabled for the page?
+        $filteringByRubricUsage = is_array($selectedCapabilities) || is_array($selectedIndicators);
+
+        // If enabled, but nothing selected? (probably because no options available)
+        if ($filteringByRubricUsage && !count($selectedCapabilities) && !count($selectedIndicators)) {
+            return $assessments;
+        }
+
+        $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
+            ->isNull('sr.deleted_at')
+            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->in('sb.assessment_id', array_keys($assessments));
+
+        $innerWhere = implode(' AND ', $innerPb->getWhere());
+
+        $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
+            ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+
+        if ($filteringByRubricUsage) {
+            $usagePb = new Database\Predicate\Builder($this->internalDb->getQuoter(), '');
+            if (is_array($selectedCapabilities) && count($selectedCapabilities)) {
+                $usagePb->in('vrm.capability_id', $selectedCapabilities);
+            }
+            if (is_array($selectedCapabilities) && count($selectedIndicators)) {
+                $usagePb->in('vrm.indicator_id', $selectedIndicators);
+            }
+            $outerPb->any($usagePb);
+        }
+
+        $outerWhere = implode(' AND ', $outerPb->getWhere());
+
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
+            "
+                SELECT
+                    vrm.assessment_id                  AS assessment_id,
+                    vrm.student_id                     AS student_id,
+                    u.firstname                        AS student_firstname,
+                    u.preferred_name                   AS student_preferred_name,
+                    u.lastname                         AS student_lastname,
+                    vrm.capability_id                  AS capability_id,
+                    vrm.capability_mark                AS capability_mark,
+                    vrm.capability_human_readable_mark AS capability_human_readable_mark,
+                    vrm.capability_max_value           AS capability_max_value,
+                    vrm.capability_mark_type_id        AS capability_mark_type_id,
+                    vrm.capability_grade_group_id      AS capability_grade_group_id,
+                    vrm.descriptor_name                AS descriptor_name,
+                    vrm.indicator_id                   AS indicator_id,
+                    vrm.indicator_mark                 AS indicator_mark,
+                    vrm.indicator_max_value            AS indicator_max_value,
+                    vrm.feedback_date                  AS feedback_date
+                FROM (
+                    SELECT
+                        sb.assessment_id,
+                        sr.owner,
+                        MAX(sr.updated_at) AS max_updated_at
+                    FROM submission_return sr
+                    INNER JOIN submission_box sb on sr.box_id = sb.id
+                    WHERE {$innerWhere}
+                    GROUP BY sb.assessment_id, sr.owner
+                ) latest_feedback
+                INNER JOIN v_most_recent_rubric_mark vrm ON
+                    vrm.updated_date = latest_feedback.max_updated_at AND
+                    vrm.assessment_id = latest_feedback.assessment_id AND
+                    vrm.student_id    = latest_feedback.owner
+                INNER JOIN user u ON vrm.student_id = u.id
+                WHERE {$outerWhere}
+                ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
+            ",
+            array_merge($innerPb->getParams(), $outerPb->getParams()),
+        );
+
+        $assessmentsForStudent = [];
+        $capabilityMarks       = [];
+        $indicatorMarks        = [];
+
+        $lastObservedAssessmentId = null;
+        $lastObservedCapabilityId = null;
+        $lastObservedStudentId    = null;
+
+        foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
+            if ($lastObservedStudentId !== $row['student_id']) {
+                // Has the student we're looking at changed? Reset the list of assessments for them
+                $assessmentsForStudent = [];
+            }
+
+            if ($lastObservedAssessmentId !== $row['assessment_id']) {
+                // Has the assessment we're looking at changed? Reset the capabilities
+                $capabilityMarks = [];
+            }
+
+            if ($lastObservedCapabilityId !== $row['capability_id']) {
+                // Has the capability we're looking at changed? Reset the indicators
+                $indicatorMarks = [];
+            }
+
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                if ($row['feedback_date']) {
+                    // Published mark
+                    $indicatorMarks[$row['indicator_id']] = [
+                        'databaseMark'           => $row['indicator_mark'],
+                        'maxMark'                => $row['indicator_max_value'],
+                        'selectedDescriptorText' => $row['descriptor_name'],
+                    ];
+                } else {
+                    // Draft mark
+                    $indicatorMarks[$row['indicator_id']] = [
+                        'draftDatabaseMark'           => $row['indicator_mark'],
+                        'draftMaxMark'                => $row['indicator_max_value'],
+                        'draftSelectedDescriptorText' => $row['descriptor_name'],
+                    ];
+                }
+            }
+
+            $capData = [
+                'indicators' => $indicatorMarks,
+            ];
+            $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
+            if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
+                if ($row['feedback_date']) {
+                    $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
+                    $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
+                    $capData['maxMark']           = $row['capability_max_value'];
+
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to
+                     * their Assessments' Mark Type and Grade Group
+                     */
+                    $capData['capabilityMarkTypeId']   = $row['capability_mark_type_id'];
+                    $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
+                } else {
+                    $capData['draftDatabaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
+                    $capData['draftHumanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
+                    $capData['draftMaxMark']           = $row['capability_max_value'];
+
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to
+                     * their Assessments' Mark Type and Grade Group
+                     */
+                    $capData['draftCapabilityMarkTypeId']   = $row['capability_mark_type_id'];
+                    $capData['draftCapabilityGradeGroupId'] = $row['capability_grade_group_id'];
+                }
+            }
+            $capabilityMarks[$row['capability_id']] = $capData;
+
+            $assessmentsForStudent[$row['assessment_id']] = [
+                'capabilities' => $capabilityMarks,
+            ];
+
+            // Stuff everything about the students marks into an array
+            $students[$row['student_id']] = [
+                'firstname'      => $row['student_firstname'],
+                'preferred_name' => $row['student_preferred_name'],
+                'lastname'       => $row['student_lastname'],
+                'assessments'    => $assessmentsForStudent,
+                'profileLink'    => '/search/user/' . $row['student_id'],
+            ];
+
+            $lastObservedAssessmentId = $row['assessment_id'];
+            $lastObservedCapabilityId = $row['capability_id'];
+            $lastObservedStudentId    = $row['student_id'];
+        }
+        return $students;
+    }
+
 
     /**
      * Work out the human readable marks from the raw marks and insert them into the student marks array
@@ -973,7 +1157,8 @@ class Controller extends Base
     {
         [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
         $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
+//        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
+        $databaseMarks = $this->retrieveDatabaseAllMarks($assessments, $selectedCapabilities, $selectedIndicators);
         $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);
