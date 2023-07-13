@@ -38,12 +38,10 @@ class Controller extends ConfigController
             'configContext' => $configContext,
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@adminOauth/admin.twig',
-                $data,
-                "oAuth Provider Configuration"
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminOauth/admin.twig',
+            $data,
+            "oAuth Provider Configuration"
         );
     }
 

@@ -142,13 +142,16 @@ class Controller extends Base
 
         /* The usual output
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/report.twig', [
-            'report' => $report,
-            'duration' => number_format($end - $start, 2),
-            'states' => $this->requestPost['state'],
-            'unaccreditedOnly' => $this->requestPost['unaccreditedOnly'],
-            'indicators' => $indicators
-        ]));
+        $this->psr7Response = $this->responseFromTemplate(
+            '@helpNesa/report.twig',
+            [
+                'report' => $report,
+                'duration' => number_format($end - $start, 2),
+                'states' => $this->requestPost['state'],
+                'unaccreditedOnly' => $this->requestPost['unaccreditedOnly'],
+                'indicators' => $indicators
+            ]
+        );
     }
 
     /**

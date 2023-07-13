@@ -179,22 +179,20 @@ class Controller extends Base
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->userMapper->getCalendarView($this->getUser()->getId())]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@calendar/calendar.twig',
-                [
-                    'user'         => $user->getId() === null ? $this->getUser() : $user,
-                    'canInvite'    => (new ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
-                    'groups'       => $groups,
-                    'sources'      => $sourceList,
-                    'campuses'     => $campus,
-                    'eventTypes'   => $eventType,
-                    'calendarView' => $calendarView,
-                    'filters'      => $filters,
-                    'selectedDate' => $selectedDate ?? Alaress_Date_Format::now(),
-                    'exportOptions' => $exportOptions,
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@calendar/calendar.twig',
+            [
+                'user'         => $user->getId() === null ? $this->getUser() : $user,
+                'canInvite'    => (new ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
+                'groups'       => $groups,
+                'sources'      => $sourceList,
+                'campuses'     => $campus,
+                'eventTypes'   => $eventType,
+                'calendarView' => $calendarView,
+                'filters'      => $filters,
+                'selectedDate' => $selectedDate ?? Alaress_Date_Format::now(),
+                'exportOptions' => $exportOptions,
+            ]
         );
     }
 

@@ -44,9 +44,7 @@ class Controller extends Base
             'tours' => $this->tourMapper->findAll()
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@featureTours/index.twig", $twigData)
-        );
+        $this->psr7Response = $this->responseFromTemplate("@featureTours/index.twig", $twigData);
     }
 
 

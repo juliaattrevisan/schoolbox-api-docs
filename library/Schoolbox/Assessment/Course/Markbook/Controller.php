@@ -158,14 +158,15 @@ class Controller extends WebController\Base
         $route       = $this->routeGenerator->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@courseMarkbook/courseMarkbookOuter.twig', [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@courseMarkbook/courseMarkbookOuter.twig',
+            [
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
-                                   'submission')
+            'submission'
         );
     }
 

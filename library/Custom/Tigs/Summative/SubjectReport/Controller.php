@@ -159,8 +159,6 @@ class Controller extends Web\Controller\Base
                 'isEnabled'          => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             ]);
 
-        $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
-
-        $this->getResponse()->content->set($output);
+        $this->psr7Response = $this->responseFromTemplate('@tigsSubjectReport/subject.twig', $data, "Subject Report");
     }
 }

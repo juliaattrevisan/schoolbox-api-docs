@@ -155,27 +155,31 @@ class Controller extends ConfigController
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
-            'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
-            'allNavigation'  => (new SchoolData())->buildNavigation($this->routeGenerator)->getAllNodes(),
-            'dataSource' => $dataSource,
-            'configContext' => $configContext,
-            'hasIndicator' => $hasIndicator,
-            'statusIndicatorRoute' => $this->routeGenerator->generate('adminImportIndex.getStatusIndicator'),
-            'importLogs' => $this->importLogMapper->findLogsWithDuration(),
-            /* Decide if the Perform Live Sync is available based on the current
-             * data source selected (you can't do it if you're using No Data Source
-             * or if you're using CSV Files)
-             */
-            'canPerformUpdate' => $canPerformUpdate,
-            /* A flash message to tell users to w8
-             */
-            'hasPerformUpdate' => $hasPerformUpdate,
-            /* Decide if the current suds selection uses the cyclic grid
-             */
-            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource)
-        ], 'School Data Import'));
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportIndex/schoolData/index.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
+                'allNavigation'  => (new SchoolData())->buildNavigation($this->routeGenerator)->getAllNodes(),
+                'dataSource' => $dataSource,
+                'configContext' => $configContext,
+                'hasIndicator' => $hasIndicator,
+                'statusIndicatorRoute' => $this->routeGenerator->generate('adminImportIndex.getStatusIndicator'),
+                'importLogs' => $this->importLogMapper->findLogsWithDuration(),
+                /* Decide if the Perform Live Sync is available based on the current
+                 * data source selected (you can't do it if you're using No Data Source
+                 * or if you're using CSV Files)
+                 */
+                'canPerformUpdate' => $canPerformUpdate,
+                /* A flash message to tell users to w8
+                 */
+                'hasPerformUpdate' => $hasPerformUpdate,
+                /* Decide if the current suds selection uses the cyclic grid
+                 */
+                'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource)
+            ],
+            'School Data Import'
+        );
     }
 
 
@@ -284,14 +288,17 @@ class Controller extends ConfigController
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
-            'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
-            'report' => \is_array($report) ? $report : [[
-                'message' => $message,
-                'reason' => '',
-                'status' => ISpecification::STATUS_ERROR
-            ]]
-        ]));
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportIndex/schoolData/statusReport.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
+                'report' => \is_array($report) ? $report : [[
+                    'message' => $message,
+                    'reason' => '',
+                    'status' => ISpecification::STATUS_ERROR
+                ]]
+            ]
+        );
     }
 
 

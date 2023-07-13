@@ -167,18 +167,17 @@ class Controller extends Base
             $errors[] = $this->getReasonPhrase($e);
         }
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@shaps/index.twig',
-                [
-                    'pageCurrent'    => $this->routeGenerator->generate('shaps.getAll'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('shaps.getAll')),
-                    'campuses'       => $campuses,
-                    'roles'          => $roles,
-                    'courses'        => $courses,
-                    'errors'         => $errors,
-                ]
-            , $title)
+        $this->psr7Response = $this->responseFromTemplate(
+            '@shaps/index.twig',
+            [
+                'pageCurrent'    => $this->routeGenerator->generate('shaps.getAll'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('shaps.getAll')),
+                'campuses'       => $campuses,
+                'roles'          => $roles,
+                'courses'        => $courses,
+                'errors'         => $errors,
+            ],
+            $title
         );
     }
 

@@ -147,7 +147,7 @@ class Controller extends Base
 
         $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@calendarEvent/event.twig', [
             'event' => $event,
             'level' => $helper->getEventLevel($event),
             'campusCollection' => $helper->getCampusCollection($event),
@@ -172,7 +172,7 @@ class Controller extends Base
                     'current' => $event->getAttendance(),
                 ],
             ],
-        ], $event->getTitle()));
+        ], $event->getTitle());
     }
 
 
@@ -236,7 +236,7 @@ class Controller extends Base
          */
         $event->setShowAttendees(true);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
@@ -281,7 +281,7 @@ class Controller extends Base
 
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
-        ], 'Create event'));
+        ], 'Create event');
     }
 
 

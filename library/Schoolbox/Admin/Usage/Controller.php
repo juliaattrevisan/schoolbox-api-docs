@@ -46,11 +46,11 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/global.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@adminUsage/global.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex')),
             'isS3Adapter' => $this->isS3Adapter(),
-        ]));
+        ]);
     }
 
 
@@ -77,12 +77,12 @@ class Controller extends Base
         $crumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex'));
         $crumbs[] = [$user->getFullName(), ''];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/specificUser.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@adminUsage/specificUser.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminUsage.getIndex'),
             'allBreadcrumbs' => $crumbs,
             'isS3Adapter' => $this->isS3Adapter(),
             'user' => $user
-        ]));
+        ]);
     }
 
 

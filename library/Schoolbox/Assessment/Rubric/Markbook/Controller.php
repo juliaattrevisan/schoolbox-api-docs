@@ -133,17 +133,14 @@ class Controller extends Base
         $route       = $this->routeGenerator->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@rubricMarkbook/markbookOuter.twig',
-                [
-                    'folder'      => $folder,
-                    'filterPanel' => $filterPanel,
-                ]
-            ,
-                'Rubric Markbook for ' . $folder->getName(),
-                'submission'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@rubricMarkbook/markbookOuter.twig',
+            [
+                'folder'      => $folder,
+                'filterPanel' => $filterPanel,
+            ],
+            'Rubric Markbook for ' . $folder->getName(),
+            'submission'
         );
     }
 

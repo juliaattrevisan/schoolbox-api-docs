@@ -59,19 +59,17 @@ class Controller extends Base
         // Alpha-sort route summaries
         ksort($routeSummaries);
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@adminRouteSummary/index.twig',
-                [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminRouteSummary.getRouteList'),
-                    'allBreadcrumbs' => [
-                        ['Administration', '/adminv2/home'],
-                        ['Route Summary', '/adminv2/routes'],
-                    ],
-                    'routes' => $routeSummaries
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminRouteSummary/index.twig',
+            [
+                'pageCurrent'    => $this->routeGenerator->generate('adminRouteSummary.getRouteList'),
+                'allBreadcrumbs' => [
+                    ['Administration', '/adminv2/home'],
+                    ['Route Summary', '/adminv2/routes'],
                 ],
-                'Routes'
-            )
+                'routes' => $routeSummaries
+            ],
+            'Routes'
         );
     }
 }

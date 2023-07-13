@@ -46,15 +46,13 @@ class Controller extends Base
     public function getIndex(): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@adminGrades/index.twig',
-                [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminGrades.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminGrades.getIndex')),
-                    'gradeGroups'    => $this->retrieveAllGradeGroups(),
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminGrades/index.twig',
+            [
+                'pageCurrent'    => $this->routeGenerator->generate('adminGrades.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminGrades.getIndex')),
+                'gradeGroups'    => $this->retrieveAllGradeGroups(),
+            ]
         );
     }
 

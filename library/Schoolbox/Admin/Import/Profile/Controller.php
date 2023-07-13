@@ -106,26 +106,30 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
-            'pageCurrent' => $this->routeGenerator->generate('adminImportProfile.getIndex'),
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
-            'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
-            'attachzone' => [
-                Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
-                Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
-                Mapping::CSV_RELATIONSHIP => $this->getAttachZone(Mapping::CSV_RELATIONSHIP, 'Upload Relationship CSV file'),
-                Mapping::CSV_STAFF => $this->getAttachZone(Mapping::CSV_STAFF, 'Upload Staff CSV file'),
-            ],
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportProfile/index.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminImportProfile.getIndex'),
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
+                'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
+                'attachzone' => [
+                    Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
+                    Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
+                    Mapping::CSV_RELATIONSHIP => $this->getAttachZone(Mapping::CSV_RELATIONSHIP, 'Upload Relationship CSV file'),
+                    Mapping::CSV_STAFF => $this->getAttachZone(Mapping::CSV_STAFF, 'Upload Staff CSV file'),
+                ],
 
-            /* Check which tables have data; if there is any content, link to the exporter
-             */
-            'profiles' => [
-                'numParents' => $this->parentProfileMapper->countAll(),
-                'numStaff' => $this->staffProfileMapper->countAll(),
-                'numStudents' => $this->studentProfileMapper->countAll(),
-                'numRelationships' => $this->relationshipMapper->countAll()
-            ]
-        ], 'Import User Profile'));
+                /* Check which tables have data; if there is any content, link to the exporter
+                 */
+                'profiles' => [
+                    'numParents' => $this->parentProfileMapper->countAll(),
+                    'numStaff' => $this->staffProfileMapper->countAll(),
+                    'numStudents' => $this->studentProfileMapper->countAll(),
+                    'numRelationships' => $this->relationshipMapper->countAll()
+                ]
+            ],
+            'Import User Profile'
+        );
     }
 
 
@@ -220,15 +224,19 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
-            'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
-            'attachment' => $this->requestPost['attachment'] ?? null,
-            'errors' => $errors,
-            'logs' => $logs,
-            'file' => $this->requestPost['file'],
-            'perform' => (bool)$this->requestQuery->get('perform')
-        ], 'Import User Profile'));
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportProfile/log.twig',
+            [
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
+                'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
+                'attachment' => $this->requestPost['attachment'] ?? null,
+                'errors' => $errors,
+                'logs' => $logs,
+                'file' => $this->requestPost['file'],
+                'perform' => (bool)$this->requestQuery->get('perform')
+            ],
+            'Import User Profile'
+        );
     }
 
 

@@ -25,12 +25,14 @@ class Controller extends Web\Controller\Base
      */
     public function getDeanComments(int $roleId, string $termSlug): void
     {
-        $this
-            ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeComment/yearLevel.twig', [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@tigsSummativeComment/yearLevel.twig',
+            [
                 'roleId'   => $roleId,
                 'termSlug' => $termSlug,
-            ], "TIGS Summative Reporting  - Dean Comments"));
+            ],
+            "TIGS Summative Reporting  - Dean Comments"
+        );
     }
 
 
@@ -45,11 +47,13 @@ class Controller extends Web\Controller\Base
      */
     public function getTeacherComments(int $folderId, string $termSlug): void
     {
-        $this
-            ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeComment/folder.twig', [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@tigsSummativeComment/folder.twig',
+            [
                 'folderId' => $folderId,
                 'termSlug' => $termSlug,
-            ], "TIGS Summative Reporting  - Teacher Comments"));
+            ],
+            "TIGS Summative Reporting  - Teacher Comments"
+        );
     }
 }

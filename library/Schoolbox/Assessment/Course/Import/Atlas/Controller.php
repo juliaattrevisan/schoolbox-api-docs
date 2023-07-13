@@ -68,23 +68,21 @@ class Controller extends BaseController
     public function getImport(): void
     {
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ?? $this->getSession()->getHistory();
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@courseImportAtlas/import.twig',
-                [
-                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
-                    'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
-                    'returnUrl'              => [
-                        'key'   => Redirect::RETURN_URL,
-                        'value' => [
-                            'raw'     => Redirect::decode($returnUrl),
-                            'encoded' => $returnUrl,
-                        ],
+        $this->psr7Response = $this->responseFromTemplate(
+            '@courseImportAtlas/import.twig',
+            [
+                'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
+                'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                'returnUrl'              => [
+                    'key'   => Redirect::RETURN_URL,
+                    'value' => [
+                        'raw'     => Redirect::decode($returnUrl),
+                        'encoded' => $returnUrl,
                     ],
                 ],
-                'Atlas Import',
-                'course'
-            )
+            ],
+            'Atlas Import',
+            'course'
         );
     }
 

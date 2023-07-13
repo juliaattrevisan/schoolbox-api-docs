@@ -67,17 +67,14 @@ class Controller extends BaseController
      */
     public function getForm(FolderModel $folder): void
     {
-        $this->getResponse()->content->set(
-            $this
-                ->buildHtmlOutput(
-                    '@rubricManager/form.twig',
-                    $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true)),
-                    sprintf(
-                        'Manage Rubric %s for %s',
-                        $this->rosettaStone->translate('rubricGroup', true, true),
-                        $folder->getName()
-                    )
-                )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@rubricManager/form.twig',
+            $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true)),
+            sprintf(
+                'Manage Rubric %s for %s',
+                $this->rosettaStone->translate('rubricGroup', true, true),
+                $folder->getName()
+            )
         );
     }
 
