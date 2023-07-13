@@ -424,19 +424,28 @@ class Controller extends BaseController
             }
 
             $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
+            $openDateAlaress = Alaress_Date_Format::newLocalShort($unitDates['open']);
+            $closeDateAlaress = Alaress_Date_Format::newLocalShort($unitDates['close']);
 
             $unitImplNew = new UnitImplementation\Model();
             $unitImplNew->setCourse($courseImpl);
             $unitImplNew->setTitle($unitSpec->getFolder()->getTitle());
             $unitImplNew->setSpecification($unitSpec);
-            $unitImplNew->setOpenDate(Alaress_Date_Format::newLocalShort($unitDates['open']));
-            $unitImplNew->setDueDate(Alaress_Date_Format::newLocalShort($unitDates['close']));
+            $unitImplNew->setOpenDate($openDateAlaress);
+            $unitImplNew->setDueDate($closeDateAlaress);
             $this->unitImplementationMapper->save($unitImplNew);
 
-            // TODO:
-            // For each assessement linked to $unitSpec via assessment_course_unit_specification,
-            //  * Create a new assessment (probably use $this->exportToNewContext())
-            //  * Link the new assessment to $unitImplNew via assessment_course_unit_implementation.
+            foreach ($this->assessmentDataSource->findAllByUnitSpecificationId($unitSpec->getId()) as $unitSpecAssessment) {
+                $this->exportToNewContext(
+                    $unitSpecAssessment,
+                    $unitImplNew,
+                    null,
+                    $openDateAlaress,
+                    $openDateAlaress,
+                    $closeDateAlaress,
+                    $closeDateAlaress
+                );
+            }
         }
 
         $this->redirectToReturnUrlIfSetOrFallbackUrl($fallbackReturnUrl);
