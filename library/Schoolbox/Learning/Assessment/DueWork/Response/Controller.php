@@ -364,8 +364,10 @@ class Controller extends Base
         // Let the browser know that the synchronous request has finished (either success or failure)
         $response = $this->getResponse();
         $token    = $this->requestQuery->get('token');
-        $response->cookies->set('kamiExportToken', $token, null, '/', null, null, false);
-        $response->cookies->set('kamiExportStatus', $export->getStatus(), null, '/', null, null, false);
+
+        // TODO consider adding cookie setting method in response factory
+        setcookie('kamiExportToken', $token, null, '/', null, null, false);
+        setcookie('kamiExportStatus', $export->getStatus(), null, '/', null, null, false);
 
         // Unable to generate the export? (either due to error or timeout)
         if (!$export->isStatusDone()) {
