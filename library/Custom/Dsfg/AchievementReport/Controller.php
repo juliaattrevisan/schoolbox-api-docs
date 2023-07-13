@@ -88,7 +88,7 @@ class Controller extends Base
          */
         switch ($report) {
             case NavigationSelector::SCHOOLGRADES_KEY:
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getSchoolGrades', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -98,7 +98,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::IB_KEY:
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getIb', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -108,7 +108,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::NCEA_KEY:
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getNcea', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -118,7 +118,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::COMMENTS_KEY:
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getComments', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -128,7 +128,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::STANDARDISEDTEST_KEY:
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getStandardisedTests', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -138,7 +138,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::COCURRICULAR_KEY:
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getCoCurricular', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -148,7 +148,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::MYP_KEY:
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getMyp', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year'           => $year,
@@ -189,7 +189,7 @@ class Controller extends Base
          * PAT, STAR, Reading, Writing, Mathematics, Literacy/Numeracy
          */
 
-        $this->getResponse()->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate('achievementreport.getStandardisedTestsPAT', [
                 'externalUserId' => $externalUser['StudentID'],
                 'year' => $year
@@ -604,7 +604,7 @@ class Controller extends Base
         /* If $year wasn't provided, go with the most recent year we have
          */
         if (null === $year && \count($allYears)) {
-            $this->getResponse()->redirect->to(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate('achievementreport.getIb', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]
@@ -785,7 +785,7 @@ class Controller extends Base
         /* If $year wasn't provided, go with the most recent year we have
          */
         if (null === $year && \count($allYears)) {
-            $this->getResponse()->redirect->to(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate('achievementreport.getComments', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]

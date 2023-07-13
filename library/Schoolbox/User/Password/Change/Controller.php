@@ -57,7 +57,7 @@ class Controller extends Base
         */
         $userPassword = $this->getUser()->getPassword() ?? '';
         if ($userPassword === '') {
-            $this->getResponse()->redirect->to(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } else {
@@ -113,7 +113,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate('passwordChange.getChangePassword')
         );
     }

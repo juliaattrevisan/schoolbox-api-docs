@@ -429,13 +429,13 @@ class Controller extends Base
                 $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
                 if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
                     // I have picked something: just go there
-                    $this->response->redirect->to($embedUrl);
+                    $this->psr7Response = $this->redirectFound($embedUrl);
                     return;
                 }
             } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
                 // Is this content which has actually been picked?
                 // Maintain current behaviour (for fear of breaking any existing integrations)
-                $this->response->redirect->to($embedUrl);
+                $this->psr7Response = $this->redirectFound($embedUrl);
                 return;
             } else {
                 // This component is a picker, and content has been selected:

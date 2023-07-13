@@ -227,7 +227,7 @@ class Controller extends Base
         $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
         $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
 
-        $this->response->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate('commsNews.getCreate') . '?' . $params
         );
     }
@@ -479,7 +479,7 @@ class Controller extends Base
                     'redirect' => $nextStep
                 ]));
             } else {
-                $this->getResponse()->redirect->to($nextStep);
+                $this->psr7Response = $this->redirectFound($nextStep);
             }
         } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
             if ($this->isXhrRequest()) {

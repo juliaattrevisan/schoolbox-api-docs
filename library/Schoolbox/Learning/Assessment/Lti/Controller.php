@@ -219,7 +219,7 @@ class Controller extends Assessment\Controller
             ]
         );
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->response->redirect->to($sebDownload);
+            $this->psr7Response = $this->redirectFound($sebDownload);
             return;
         }
 

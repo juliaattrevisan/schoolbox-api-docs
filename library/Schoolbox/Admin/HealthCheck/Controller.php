@@ -183,7 +183,7 @@ class Controller extends Base
         $this->taskDHelper->sendToTaskD('HealthCheck', $this->getUser());
 
         //redirect home
-        $this->getResponse()->redirect->found('/');
+        $this->psr7Response = $this->redirectFound('/');
     }
 
     /**

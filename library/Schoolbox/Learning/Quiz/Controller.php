@@ -92,7 +92,7 @@ class Controller extends AbstractController
     public function getQuizResponseFirstSection($assessmentId, $firstSectionId, $responseId)
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->getResponse()->redirect->to("/assess/review/$assessId/$firstSectionId/$responseId");
+        $this->psr7Response = $this->redirectFound("/assess/review/$assessId/$firstSectionId/$responseId");
     }
 
     /**
@@ -110,7 +110,7 @@ class Controller extends AbstractController
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
-        $this->getResponse()->redirect->to("/assess/summary/$assessId{$redirect}");
+        $this->psr7Response = $this->redirectFound("/assess/summary/$assessId{$redirect}");
     }
 
     /**
@@ -128,7 +128,7 @@ class Controller extends AbstractController
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
-        $this->getResponse()->redirect->to("/assess/section/create/$assessId{$redirect}");
+        $this->psr7Response = $this->redirectFound("/assess/section/create/$assessId{$redirect}");
     }
 
     /**
@@ -144,7 +144,7 @@ class Controller extends AbstractController
     public function getQuizReviewHorizontal($assessmentId)
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->getResponse()->redirect->to("/assess/reviewHorizontal/$assessId");
+        $this->psr7Response = $this->redirectFound("/assess/reviewHorizontal/$assessId");
     }
 
     /**
@@ -163,7 +163,7 @@ class Controller extends AbstractController
             ($this->requestQuery->get('returnUrl') ?: Redirect::encode(RequestUriParser::parseUrlPath($this->psr7Request->getServerParams())));
 
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->getResponse()->redirect->to("/assess/intro/$assessId" . $returnUrlSuffix);
+        $this->psr7Response = $this->redirectFound("/assess/intro/$assessId" . $returnUrlSuffix);
     }
 
     /**
@@ -174,7 +174,7 @@ class Controller extends AbstractController
     public function getQuizAttemptsByUser($assessmentId, $userId)
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->getResponse()->redirect->to("/assess/attempts/$assessId/$userId");
+        $this->psr7Response = $this->redirectFound("/assess/attempts/$assessId/$userId");
     }
     /**
      * Exports all answers given to the specified quiz
@@ -192,7 +192,7 @@ class Controller extends AbstractController
             throw new \InvalidArgumentException("Unsupported export format: $format");
         }
         $quiz = $this->getQuizForAssessmentId($assessmentId);
-        $this->getResponse()->redirect->to("/assess/export/$format/{$quiz->getId()}");
+        $this->psr7Response = $this->redirectFound("/assess/export/$format/{$quiz->getId()}");
     }
 
 
@@ -239,9 +239,9 @@ class Controller extends AbstractController
         if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput(['status' => 200]));
         } elseif (isset($get['returnUrl'])) {
-            $this->getResponse()->redirect->to(Redirect::decode($get['returnUrl']));
+            $this->psr7Response = $this->redirectFound(Redirect::decode($get['returnUrl']));
         } else {
-            $this->getResponse()->redirect->to($this->getSession()->getHistory());
+            $this->psr7Response = $this->redirectFound($this->getSession()->getHistory());
         }
     }
 

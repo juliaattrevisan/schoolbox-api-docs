@@ -78,7 +78,7 @@ class Controller extends Base
         if (!$firstClassCode instanceof ClassCode) {
             throw new NotFound();
         }
-        $this->response->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'intellischool.getClassCodeAnalytics',
                 ['folderId' => $folder->getId(), 'classCode' => $firstClassCode->getCode()],

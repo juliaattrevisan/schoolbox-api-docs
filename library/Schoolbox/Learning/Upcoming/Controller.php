@@ -101,7 +101,7 @@ class Controller extends Base
      */
     public function getUpcoming(): void
     {
-        $this->getResponse()->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'learningUpcoming.getUpcomingForStudent',
                 ['studentId' => $this->getUser()->getId(),]

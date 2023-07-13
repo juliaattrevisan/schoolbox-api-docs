@@ -316,7 +316,7 @@ class Controller extends ConfigController
         }
 
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
 
         /* Spawn a logger out of darkness
          * Was there a particular way to do this?

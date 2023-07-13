@@ -289,7 +289,7 @@ class Controller extends AbstractController
          * All match pages are on a per-team basis
          */
 
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('sportsfixtures.getLanding', []));
+        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('sportsfixtures.getLanding', []));
     }
 
     /**

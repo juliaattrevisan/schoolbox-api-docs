@@ -65,7 +65,7 @@ class Controller extends Base
      */
     public function redirectToCreateForm(): void
     {
-        $this->response->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',

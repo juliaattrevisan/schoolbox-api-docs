@@ -64,7 +64,7 @@ class Controller extends Base
         /* Redirect upon successful save
          */
         if ($result) {
-            $this->getResponse()->redirect->to("/search/user/{$user->getId()}");
+            $this->psr7Response = $this->redirectFound("/search/user/{$user->getId()}");
             return;
         }
 

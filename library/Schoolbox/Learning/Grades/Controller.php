@@ -88,7 +88,7 @@ class Controller extends Base
             $termCode = $this->termMapper->findForToday()->getCode();
         }
 
-        $this->getResponse()->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'learningGrades.getGrades',
                 [

@@ -102,13 +102,13 @@ class Controller extends Base
     {
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
-            $this->getResponse()->redirect->to($this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', [
+            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', [
                 'studentId' => $this->getUser()->getId(),
             ]));
         }
 
         // If no staff explicitly requested, redirect to current user
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('learning.getPendingAssessmentsForUser', [
+        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('learning.getPendingAssessmentsForUser', [
             'userId' => $this->getUser()->getId(),
             'viewee' => $this->getUser(),
         ]));

@@ -118,7 +118,7 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->getResponse()->redirect->to($this->routeGenerator->generate("{$this->basename}.getUpload"));
+            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }
@@ -150,7 +150,7 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->getResponse()->redirect->to($this->routeGenerator->generate("{$this->basename}.getUpload"));
+            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }

@@ -176,7 +176,7 @@ class Controller extends Assessment\Controller
         );
 
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->getResponse()->redirect->to($sebDownload);
+            $this->psr7Response = $this->redirectFound($sebDownload);
             return;
         }
 
@@ -302,7 +302,7 @@ class Controller extends Assessment\Controller
                 ]));
             } else {
                 // redirect after saving to Task Summary for particular Student
-                $this->getResponse()->redirect->to(
+                $this->psr7Response = $this->redirectFound(
                     $this->routeGenerator->generate(
                         'learningAssessment.getSummary',
                         [

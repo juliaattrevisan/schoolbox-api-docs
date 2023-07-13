@@ -129,7 +129,7 @@ class Controller extends WebController\Base
 
         $route = $this->routeGenerator->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
 
-        $this->getResponse()->redirect->to("{$route}{$getArgString}");
+        $this->psr7Response = $this->redirectFound("{$route}{$getArgString}");
     }
 
 

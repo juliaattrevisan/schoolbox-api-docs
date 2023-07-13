@@ -701,7 +701,7 @@ class Controller extends ConfigController
 
         /* Show waiting screen for the result payload associated with this report generation
          */
-        $this->response->redirect->to($this->routeGenerator->generate('adminSummativeReport.getStatus', [
+        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminSummativeReport.getStatus', [
             'reportId' => $report->getId(),
             'key' => $key
         ]));
@@ -1046,7 +1046,7 @@ class Controller extends ConfigController
         } else {
             //if reports exist.
             //redirect user to report preview
-            $this->getResponse()->redirect->to($reports[0]['url']);
+            $this->psr7Response = $this->redirectFound($reports[0]['url']);
         }
     }
 

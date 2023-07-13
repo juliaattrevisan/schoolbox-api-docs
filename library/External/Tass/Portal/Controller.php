@@ -93,7 +93,7 @@ class Controller extends Alaress\Web\Controller\Base
         if ((int)$this->getConfigLoader()->get('external_tass_sso_token_generation_strategy') === SSO::SSO_STRATEGY_V3_SAML) {
             // Redirect to SAML supporting TASS url
             $samlDeepLink = json_encode(array_merge($deepLinkV2, ['prod_menu' => $prodMenu ? 'Y' : 'N']));
-            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?go={$samlDeepLink}");
+            $this->psr7Response = $this->redirectFound("{$this->portalHost}{$productPath}?go={$samlDeepLink}");
             return;
         }
 
@@ -113,7 +113,7 @@ class Controller extends Alaress\Web\Controller\Base
 
         // If we successfully got a token, redirect the user to the Tass product URL
         if ($token) {
-            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?sso_token={$token}");
+            $this->psr7Response = $this->redirectFound("{$this->portalHost}{$productPath}?sso_token={$token}");
         } else {
             $this->getResponse()->status->setCode(404);
         }

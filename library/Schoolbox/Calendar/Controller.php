@@ -148,7 +148,7 @@ class Controller extends Base
             $route .= '?s=1';
         }
 
-        $this->response->redirect->to($route);
+        $this->psr7Response = $this->redirectFound($route);
     }
 
     /**

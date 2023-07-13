@@ -230,7 +230,7 @@ class Controller extends Base
                 'data'     => ['term' => $term,]
             ]);
         } else {
-            $this->getResponse()->redirect->to($this->routeGenerator->generate('adminTerms.getIndex'));
+            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminTerms.getIndex'));
         }
     }
 

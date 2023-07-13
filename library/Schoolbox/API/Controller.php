@@ -352,9 +352,9 @@ class Controller extends Base
         $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
         // Redirect somewhere (locally only)
         if ($page && (new Uri($page))->isAbsolutePath()) {
-            $this->response->redirect->to($page);
+            $this->psr7Response = $this->redirectFound($page);
         } else {
-            $this->response->redirect->to('/');
+            $this->psr7Response = $this->redirectFound('/');
         }
         $this->response->content->set([
             'format' => 'noContent',

@@ -727,7 +727,7 @@ class Controller extends Base
 
         /* Apply redirect - go back to the place from whence you came
          */
-        $this->response->redirect->to(Redirect::decode($returnUrl));
+        $this->psr7Response = $this->redirectFound(Redirect::decode($returnUrl));
     }
 
 
@@ -830,7 +830,7 @@ class Controller extends Base
                 'callbackUrl' => $redirect
             ]));
         } else {
-            $this->response->redirect->to($redirect);
+            $this->psr7Response = $this->redirectFound($redirect);
         }
     }
 }

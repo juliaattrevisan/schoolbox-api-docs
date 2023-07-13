@@ -235,7 +235,7 @@ abstract class AbstractController extends BaseController
         if ($folderId) {
             $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
-            $this->getResponse()->redirect->to(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate("{$this->namespace}.browse", array())
             );
             return;

@@ -358,7 +358,7 @@ class Controller extends Base
         if ($replyTo && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $this->requestPost->get('template'))) {
             foreach ($this->requestPost->getArrayCopy() as $key => $var) {
                 if (!$this->checkSpamHeaders($var)) {
-                    $this->getResponse()->redirect->to('/');
+                    $this->psr7Response = $this->redirectFound('/');
                 }
                 $key = strtoupper($key);
 
@@ -387,9 +387,9 @@ class Controller extends Base
         }
 
         if (preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation'])) {
-            $this->getResponse()->redirect->to($_POST['confirmation']);
+            $this->psr7Response = $this->redirectFound($_POST['confirmation']);
         } else {
-            $this->getResponse()->redirect->to('/feedback/thank-you');
+            $this->psr7Response = $this->redirectFound('/feedback/thank-you');
         }
     }
 

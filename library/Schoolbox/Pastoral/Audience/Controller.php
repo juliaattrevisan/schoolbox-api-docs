@@ -81,7 +81,7 @@ class Controller extends Base
                     /* Find the first available subtype
                      * and redirect to its modify screen
                      */
-                    $this->getResponse()->redirect->to(
+                    $this->psr7Response = $this->redirectFound(
                         $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
                             'subtypeId' => $subtype->getId(),
                         ])
@@ -94,7 +94,7 @@ class Controller extends Base
             /* If there aren't any subtypes, find the first available type
              * and redirect to its modify screen
              */
-            $this->getResponse()->redirect->to(
+            $this->psr7Response = $this->redirectFound(
                 $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
                     'typeId' => $type->getId(),
                     'type' => $type,
@@ -383,7 +383,7 @@ class Controller extends Base
          *
          * TODO Possibly replace this with an async toast
          */
-        $this->response->redirect->to($redirect);
+        $this->psr7Response = $this->redirectFound($redirect);
     }
 
 

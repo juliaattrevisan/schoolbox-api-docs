@@ -213,7 +213,7 @@ class Controller extends Base
         // No:  Create a layout, and redirect to it
         try {
             $layout = $this->findLayoutForComponent($component);
-            $this->response->redirect->found(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'tile.add',
                     ['layoutId' => $layout->getId()]
@@ -221,7 +221,7 @@ class Controller extends Base
             );
         } catch (MapperException $e) {
             $layout = $this->buildLayoutForComponent($component);
-            $this->response->redirect->found(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $layout->getId()]

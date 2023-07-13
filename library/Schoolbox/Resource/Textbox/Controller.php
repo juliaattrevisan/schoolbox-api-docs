@@ -243,7 +243,7 @@ class Controller extends Base
 
         /* I guess you go back to the homepage instead of the Textbox Usage index...?
          */
-        $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
+        $this->psr7Response = $this->redirectFound("/homepage/{$folder->getId()}");
     }
 
     /**

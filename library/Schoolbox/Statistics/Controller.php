@@ -155,7 +155,7 @@ class Controller extends Base
         }
 
         $redirect = $this->getRouteIfAuthorized('statistics.' . $get['pageRoute'], $chunks);
-        $this->getResponse()->redirect->to($redirect);
+        $this->psr7Response = $this->redirectFound($redirect);
     }
 
 

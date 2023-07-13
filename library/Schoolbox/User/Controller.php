@@ -73,7 +73,7 @@ class Controller extends Base
         } else {
             $_SESSION = $previous; //Recover old session
         }
-        $this->getResponse()->redirect->found('/');
+        $this->psr7Response = $this->redirectFound('/');
     }
 
 
@@ -87,7 +87,7 @@ class Controller extends Base
         if (array_key_exists('previous', $_SESSION)) {
             $_SESSION = $_SESSION['previous'];
         }
-        $this->getResponse()->redirect->found('/');
+        $this->psr7Response = $this->redirectFound('/');
     }
 
 

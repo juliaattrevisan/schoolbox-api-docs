@@ -118,7 +118,7 @@ class Controller extends Base
      */
     public function redirectToAwardAsAchievementForm(): void
     {
-        $this->response->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningBadgeAward.getAwardAsAchievementForm',
@@ -158,7 +158,7 @@ class Controller extends Base
      */
     public function redirectToSetAsGoalForm(): void
     {
-        $this->response->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningBadgeAward.getSetAsGoalForm',
@@ -849,7 +849,7 @@ class Controller extends Base
         if (null !== $this->requestQuery->get(Redirect::RETURN_URL)) {
             $redirectUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         }
-        $this->response->redirect->to($redirectUrl);
+        $this->psr7Response = $this->redirectFound($redirectUrl);
     }
 
 

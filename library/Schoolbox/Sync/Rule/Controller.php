@@ -77,7 +77,7 @@ class Controller extends Base
 
         $mapper->create($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/ups/$roleType#rule-{$rule->getId()}");
+        $this->psr7Response = $this->redirectFound("/adminv2/ups/$roleType#rule-{$rule->getId()}");
     }
 
 
@@ -135,7 +135,7 @@ class Controller extends Base
 
         Mapper::getInstance()->save($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
+        $this->psr7Response = $this->redirectFound("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
     }
 
 

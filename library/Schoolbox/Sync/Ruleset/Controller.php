@@ -312,7 +312,7 @@ class Controller extends Base
                     'data'   => $e->getMessage()
                 ]);
             } else {
-                $this->getResponse()->redirect->to($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
+                $this->psr7Response = $this->redirectFound($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
             }
         }
     }
@@ -475,7 +475,7 @@ class Controller extends Base
     {
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
-        $this->getResponse()->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]
@@ -502,7 +502,7 @@ class Controller extends Base
     {
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasPerformUpdate', true);
-        $this->getResponse()->redirect->to(
+        $this->psr7Response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]

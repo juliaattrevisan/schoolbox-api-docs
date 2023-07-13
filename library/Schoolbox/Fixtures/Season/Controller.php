@@ -343,7 +343,7 @@ class Controller extends AbstractController
                 ]
             ]);
         } else {
-            $this->getResponse()->redirect->to($this->routeGenerator->generate('sportsfixturesSeason.getList'));
+            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('sportsfixturesSeason.getList'));
         }
     }
 

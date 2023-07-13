@@ -177,7 +177,7 @@ class Controller extends Base
             if ($this->isXhrRequest()) {
                 $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
             } else {
-                $this->getResponse()->redirect->to($route);
+                $this->psr7Response = $this->redirectFound($route);
             }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
@@ -251,7 +251,7 @@ class Controller extends Base
             if ($this->isXhrRequest()) {
                 $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
             } else {
-                $this->getResponse()->redirect->to($route);
+                $this->psr7Response = $this->redirectFound($route);
             }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);

@@ -137,6 +137,6 @@ class Controller extends Base
 
         $this->mapper->saveSet($resultSetId, $indexedLabels); // If $resultSetId is null, a new set will be created.
 
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('adminRubricResultSet.getList'));
+        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminRubricResultSet.getList'));
     }
 }

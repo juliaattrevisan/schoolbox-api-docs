@@ -202,7 +202,7 @@ class Controller extends AbstractController
             /* No Results for this Match?
              * Prompt to spawn one
              */
-            $this->getResponse()->redirect->to(
+            $this->psr7Response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'sportsfixturesResult.getCreateForm',
                     [

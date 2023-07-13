@@ -220,7 +220,7 @@ class Controller extends Base
         $codec        = new Codec(Filter\Mapper::getInstance(), Filter\Selection\Mapper::getInstance());
         $getArgString = $codec->convertSelectionsToQueryString($selections);
 
-        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
+        $this->psr7Response = $this->redirectFound("{$route}?{$getArgString}");
     }
 
 
