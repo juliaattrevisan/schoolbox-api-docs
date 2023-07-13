@@ -282,8 +282,12 @@ class Profile implements IStrategy
 
                 /* Dig out a campus name, using null as default if broken data
                  */
-                $campusId = (int)$student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'];
-                $campusName = $campuses[$campusId] ?? null;
+                $campusId = $student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'] ?? null;
+                $campusName = null;
+
+                if (null !== $campusId) {
+                    $campusName = $campuses[$campusId] ?? null;
+                }
 
                 $comments = '';
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
