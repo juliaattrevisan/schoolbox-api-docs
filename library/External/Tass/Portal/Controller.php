@@ -115,7 +115,7 @@ class Controller extends Alaress\Web\Controller\Base
         if ($token) {
             $this->psr7Response = $this->redirectFound("{$this->portalHost}{$productPath}?sso_token={$token}");
         } else {
-            $this->getResponse()->status->setCode(404);
+            $this->psr7Response = $this->responseEmpty(404);
         }
     }
 

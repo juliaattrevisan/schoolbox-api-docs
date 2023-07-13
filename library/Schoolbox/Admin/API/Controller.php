@@ -181,14 +181,10 @@ class Controller extends Web\Controller\Base
      */
     public function postProcess(): void
     {
-        $post = $this->requestPost;
-        $rs   = $this->getResponse();
-
-        $errors = [];
-
-        $responseJson = [
-            'success' => false
-        ];
+        $post         = $this->requestPost;
+        $errors       = [];
+        $responseJson = ['success' => false];
+        $statusCode   = 200;
 
         try {
             // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
@@ -234,12 +230,12 @@ class Controller extends Web\Controller\Base
              */
             if (!\count($files)) {
                 $responseJson['error'] = 'No files supplied.';
-                $rs->status->set(400);
+                $statusCode = 400;
             } elseif (\count($errors)) {
                 /* Some other error occurred during processing
                  */
                 $responseJson['error'] = $errors;
-                $rs->status->set(400);
+                $statusCode = 400;
             } else {
                 // valid files found and loaded, we're good to attempt processing
 
@@ -284,15 +280,15 @@ class Controller extends Web\Controller\Base
                 } catch (\Exception $e) {
                     // one of those times where you really need to catch EVERYTHING
                     $responseJson['error'] = $e->getMessage();
-                    $rs->status->setCode(500);
+                    $statusCode = 500;
                 }
             }
         } catch (InvalidArgumentException $e) {
             $responseJson['error'] = $e->getMessage();
-            $rs->status->setCode($e->getCode());
+            $statusCode = $e->getCode();
         }
 
-        $rs->content->set($this->buildJsonOutput($responseJson));
+        $this->psr7Response = $this->responseAsJson($responseJson)->withStatus($statusCode);
     }
 
 
