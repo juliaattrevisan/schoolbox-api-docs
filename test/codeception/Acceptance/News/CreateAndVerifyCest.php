@@ -325,6 +325,7 @@ class CreateAndVerifyCest
         $formPage->fillUsers(['Eden Reed']);
         $i->amGoingTo("Check the audience is properly presented: News Folders, Eden Reed and Teacher");
         $formPage->seeRoles(['News Folder Test','Teacher','Ms Eden Reed (506) (Junior Student)']);
+        $i->wait(4);
         $i->amGoingTo('check the draft article presents the proper audience: News Folders and Teacher');
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Audience Article via Class Page Testing');
@@ -332,11 +333,11 @@ class CreateAndVerifyCest
         $formPage->seeRoles(['News Folder Test','Teacher']);
         $i->amGoingTo("check the modify article page presents the proper audience: News Folders, Eden Reed and Teacher");
         $itemPage->modifyArticle();
-        sleep(4);
+        $i->wait(4);
         $formPage->seeRoles(['News Folder Test','Teacher','Ms Eden Reed (506) (Junior Student)']);
         $formPage->submit();
         $i->waitForText('PUBLISHED', 10);
-        $formPage->seeRoles(['News Folder Test','Teacher','PUBLISHED']);
+        $formPage->seeRoles(['News Folder Test','Teacher']);
     }
 
 

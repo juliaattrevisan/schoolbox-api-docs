@@ -44,8 +44,8 @@ class NewsInitialCest
         $i->click('button.button.submit');
         sleep(5);
         $i->click("Publish news");
-        $i->wait(2);
-        $i->see('Test News Title');
+        $i->waitForText('News Feed');
+        $i->canSee('Test News Title', '//a');
     }
 
     /**
