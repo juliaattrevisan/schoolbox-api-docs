@@ -35,8 +35,9 @@ export default {
          */
         animateBadgeImage() {
             const badgeImage = this.$refs.badgeImage;
-            clearCanvas();
-            init(badgeImage);
+            const awardCanvas = this.$refs.awardCanvas;
+            clearCanvas(awardCanvas);
+            init(badgeImage, awardCanvas);
         },
     },
 };
@@ -46,7 +47,7 @@ export default {
     <div>
         <div class="badge-img-container" ref="badgeImgContainer">
             <div class="badge-img-container__background">
-                <canvas :width="canvasWidth" :height="canvasHeight" data-badge-award-canvas></canvas>
+                <canvas :width="canvasWidth" :height="canvasHeight" ref="awardCanvas" data-badge-award-canvas></canvas>
             </div>
             <div class="badge-img-container__foreground">
                 <img src="../../assets/badge-award-sample.svg" ref="badgeImage" alt="badge sample" />

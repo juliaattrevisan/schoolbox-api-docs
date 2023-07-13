@@ -13,20 +13,20 @@ const CANVAS_SELECTOR = "[data-badge-award-canvas]";
  *
  * @param { DOMElement }
  */
-export function animateBadgeImage(badgeImage) {
-    clearCanvas();
+export function animateBadgeImage(badgeImage, awardCanvas) {
+    clearCanvas(awardCanvas);
     // const animationList = [initSpinIn]; //to test just one animation
     const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
     const initRandomAnimation = animationList[Math.floor(Math.random() * animationList.length)];
-    initRandomAnimation(badgeImage);
+    initRandomAnimation(badgeImage, awardCanvas);
 }
 
 /**
  * Ensure there's no left over animation if user is moving through the new rewards quickly
  */
-export function clearCanvas() {
-    const canvasDimensions = getCanvasDimensions();
-    const context = getContext();
+export function clearCanvas(canvas) {
+    const canvasDimensions = getCanvasDimensions(canvas);
+    const context = getContext(canvas);
     context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
 }
 
@@ -35,8 +35,8 @@ export function clearCanvas() {
  *
  * @return { Number, Number }
  */
-export function getCanvasDimensions() {
-    const canvas = document.querySelector(CANVAS_SELECTOR);
+export function getCanvasDimensions(canvas) {
+    // const canvas = document.querySelector(CANVAS_SELECTOR);
     return {
         width: canvas.width,
         height: canvas.height,
@@ -49,8 +49,8 @@ export function getCanvasDimensions() {
  *
  * @return { CanvasRenderingContext2D }
  */
-export function getContext() {
-    const canvas = document.querySelector(CANVAS_SELECTOR);
+export function getContext(canvas) {
+    // const canvas = document.querySelector(CANVAS_SELECTOR);
     return canvas.getContext("2d");
 }
 
@@ -61,7 +61,7 @@ export function getContext() {
  *
  * @return { Number }
  */
-export function getStarCount() {
-    const currentCanvasDimensions = getCanvasDimensions();
+export function getStarCount(canvas) {
+    const currentCanvasDimensions = getCanvasDimensions(canvas);
     return Math.round(currentCanvasDimensions.width * 0.62);
 }
