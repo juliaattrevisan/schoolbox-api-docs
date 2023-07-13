@@ -41,12 +41,21 @@ export default {
 
     computed: {
         /**
-         * The text within the comment prompt button, will change to loading when selected to notify
+         * The text within the comment prompt button will change when the CKEditor is loading.
          * @returns { string } The text within the comment prompt button.
          */
         getAddCommentButtonText() {
-            if (this.isCKEditorLoading) return "Loading";
-            else return "Add a comment";
+            return this.isCKEditorLoading ? "Loading" : "Add a comment";
+        },
+
+        /**
+         * The text within the comment save button will change if the button becomes disabled.
+         * @returns { string } The text within the comment prompt button.
+         */
+        getPostCommentButtonText() {
+            return this.isOverStorageLimit
+                ? "Post comment (disabled because maximum character count exceeded)"
+                : "Post comment";
         },
 
         /**
@@ -131,13 +140,11 @@ export default {
             // Arrow function syntax ensures 'this' can be used inside event handler.
             sourceElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
                 this.isOverStorageLimit = true;
-                submitButton.innerHTML = submitButtonTextOrig + " (disabled because maximum character count exceeded)";
             });
 
             // Arrow function syntax ensures 'this' can be used inside event handler.
             sourceElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
                 this.isOverStorageLimit = false;
-                submitButton.setAttribute("value", submitButtonTextOrig);
             });
 
             this.editor.editing.view.focus();
@@ -171,7 +178,7 @@ export default {
                 @click="postComment"
                 :disabled="isPostCommentDisabled"
             >
-                Post comment
+                {{ getPostCommentButtonText }}
             </button>
         </div>
     </div>
