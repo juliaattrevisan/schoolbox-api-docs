@@ -316,7 +316,8 @@ class Scrub
                 );
                 // figure element, attribute is added to new tables (with CKEditor5 assigning table attributes to parent figure element)
                 $def->addAttribute('figure', 'data-is-ckeditor5-table', 'Text');
-
+                // allow to track if a new table inserted by CKEditor5 has had its default border set
+                $def->addAttribute('td', 'data-was-default-border-set', 'Text');
                 //
                 // Definition of customised elements, copied directly out of modules.
                 $embed = $def->addElement(
