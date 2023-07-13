@@ -100,7 +100,7 @@ class HomepageInitialCest
         $i->click(['css' => 'a[href=\#tabs-sub-1]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
         $i->click("//*[@id='tabs-sub-1']/li[6]");
-        sleep(2);
+        sleep(3);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
     }
 
@@ -162,6 +162,7 @@ class HomepageInitialCest
      * @depends useElement
      * @param AcceptanceTester $i
      * @throws \Codeception\Exception\ModuleException
+     * @throws \Exception
      */
     public function viewElement(AcceptanceTester $i): void
     {
@@ -174,7 +175,8 @@ class HomepageInitialCest
         sleep(1);
         $i->click("a.icon-home");
         $home_page_url = $i->getCurrentUrl();
-        $i->impersonate("Ms Jana Reed");
+        $i->impersonateViaModifyUserPage('Jana Reed');
+//        $i->impersonate("Ms Jana Reed");
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
         sleep(2);

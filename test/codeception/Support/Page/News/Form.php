@@ -89,6 +89,7 @@ class Form
      */
     public function submit(): self
     {
+        $this->tester->waitForElementVisible(self::FORM_SAVE);
         $this->tester->click(self::FORM_SAVE);
         return $this;
     }

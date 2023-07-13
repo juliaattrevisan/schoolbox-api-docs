@@ -2,6 +2,7 @@
 
 namespace Tests\Acceptance\Duework;
 
+use Exception;
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
 
@@ -13,6 +14,7 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
+     * @throws Exception
      */
     public function _before(AcceptanceTester $i)
     {
@@ -23,12 +25,13 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function create2Assessments(AcceptanceTester $i)
+    public function create2Assessments(AcceptanceTester $i): void
     {
         $teacher = 'Jack Coles';
         $student = 'Eden Reed';
+        $i->amGoingTo('Create a homepage');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/0/create");
         $i->selectOption("template", "Blank");
         $this->folderName = 'Test Class Homepage ' . $i->getUuid();
@@ -40,7 +43,7 @@ class DueWorkInitialCest
         $i->click(['css' => 'label[class=radio-label][for=groupRead5]']);
         $i->click(['css' => 'input[type=submit]']);
 
-        // Navigate to the new folder, store its location for later tests
+        $i->amGoingTo('Navigate to the new folder, store its location for later tests');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee($this->folderName);
         $i->click($this->folderName);
@@ -48,6 +51,7 @@ class DueWorkInitialCest
         $i->click("Homepage");
         $this->homepageUrl = $i->getCurrentUrl();
 
+        $i->amGoingTo('Add few members into the homepage');
         $i->click('a#all-actions.icon-more');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $i->waitForText("Manage Group", 5);
@@ -64,6 +68,7 @@ class DueWorkInitialCest
         $i->selectOption('tr.VueTables__row:first-child select', 'admin');
         sleep(5);
         $i->amOnUrl($this->homepageUrl);
+        $i->amGoingTo('Add a due work component into the homepage');
         $i->click(['css' => 'label[for=component-lock-toggle]']);
         $i->canSeeElement(['css' => 'span[class=icon-unlocked]']);
         $i->click(['css' => 'a#add-component']);
@@ -71,10 +76,10 @@ class DueWorkInitialCest
         $i->canSeeElement(['css' => 'div#tabs-1']);
         $i->click(['css' => 'a[href=\#tabs-sub-3]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-3']);
-        //add due work component into the homepage
         $i->click("//*[@id='tabs-sub-3']/li[7]");
         sleep(5);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]']);
+        $i->amGoingTo('As a teacher, I will create 2 due work');
         $i->impersonate($teacher);
         $i->amOnUrl($this->homepageUrl);
         $i->waitForElementVisible(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
@@ -105,11 +110,13 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends create2Assessments
      */
-    public function deleteAssessment(AcceptanceTester $i)
+    public function deleteAssessment(AcceptanceTester $i): void
     {
         $teacher = 'Jack Coles';
+        $i->amGoingTo('As a teacher, I will delete a due work');
         $i->impersonate($teacher);
         $i->amOnUrl($this->homepageUrl);
         $i->click('Test Due Work2');
@@ -125,11 +132,13 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends create2Assessments
      */
-    public function viewClassWork(AcceptanceTester $i)
+    public function viewClassWork(AcceptanceTester $i): void
     {
         $student = 'Eden Reed';
+        $i->amGoingTo('As a student, I will view the due work');
         $i->impersonate($student);
         $i->amOnUrl($this->homepageUrl);
         $i->canSee('Test Due Work');
@@ -140,11 +149,13 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends create2Assessments
      */
-    public function submitWorkInPersonByStudent(AcceptanceTester $i)
+    public function submitWorkInPersonByStudent(AcceptanceTester $i): void
     {
         $student = 'Eden Reed';
+        $i->amGoingTo('As a student, I will submit a due work');
         $i->impersonate($student);
         $i->amOnUrl($this->homepageUrl);
         $i->waitForText('Test Due Work', 5);
@@ -160,11 +171,13 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends submitWorkInPersonByStudent
      */
-    public function viewSubmission(AcceptanceTester $i)
+    public function viewSubmission(AcceptanceTester $i): void
     {
         $teacher = 'Jack Coles';
+        $i->amGoingTo('As a teacher, I will view the due work submission');
         $i->impersonate($teacher);
         $i->amOnUrl($this->homepageUrl);
         $i->click('Test Due Work');
@@ -182,13 +195,15 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends submitWorkInPersonByStudent
      */
-    public function markSubmission(AcceptanceTester $i)
+    public function markSubmission(AcceptanceTester $i): void
     {
         $teacher = 'Jack Coles';
         $i->impersonate($teacher);
         $i->amOnUrl($this->homepageUrl);
+        $i->amGoingTo('As a teacher, I will navigate to the due work status page for Eden Reed');
         $i->click('Test Due Work');
         $currentURL = $i->getCurrentUrl();
         $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
@@ -201,21 +216,32 @@ class DueWorkInitialCest
         $i->fillField('input[name=mark]', '65');
         $i->wait(3);
         $studentWeAreMarkingUrl = $i->getCurrentUrl();
+        $i->amGoingTo('publish the feedback');
         $i->click('a.button[data-draft=publish]');
         $i->waitForElementNotVisible('Eden');
         $i->amOnUrl($studentWeAreMarkingUrl);
+        //this if-clause is due to an intermittent issue SA-14676
+        if ($i->tryToSeeElement('a.button[data-draft=publish]')) {
+            $i->amGoingTo('publish the feedback');
+            $i->click('a.button[data-draft=publish]');
+            $i->waitForElementNotVisible('Eden');
+            $i->amOnUrl($studentWeAreMarkingUrl);
+        }
+        $i->amGoingTo('check if the assessment status is reviewed');
         $i->canSee('Reviewed');
     }
 
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends markSubmission
      */
-    public function viewMarkedSubmission(AcceptanceTester $i)
+    public function viewMarkedSubmission(AcceptanceTester $i): void
     {
         $student = 'Eden Reed';
         $i->impersonate($student);
+        $i->amGoingTo('As a student, I will view the marked submission');
         $i->amOnPage('learning/grades/6');
         $linkMarksClassTest = Locator::contains('a.flex-grade.link-row', $this->folderName);
         $i->click($linkMarksClassTest);
@@ -235,12 +261,14 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends create2Assessments
      */
-    public function submitWorkTypingSomethingByTeacher(AcceptanceTester $i)
+    public function submitWorkTypingSomethingByTeacher(AcceptanceTester $i): void
     {
         $teacher = 'Jack Coles';
         $i->impersonate($teacher);
+        $i->amGoingTo('As a teacher, I will submit a due work');
         $i->amOnUrl($this->homepageUrl);
         $i->waitForText('Test Due Work', 5);
         $i->click('Test Due Work');
@@ -255,11 +283,13 @@ class DueWorkInitialCest
     /**
      * @param AcceptanceTester $i
      * @return void
-     * @throws \Exception
+     * @throws Exception
+     * @depends create2Assessments
      */
-    public function submitWorkTypingSomethingByAdmin(AcceptanceTester $i)
+    public function submitWorkTypingSomethingByAdmin(AcceptanceTester $i): void
     {
         $i->amOnUrl($this->homepageUrl);
+        $i->amGoingTo('As admin, I will submit a due work');
         $i->waitForText('Test Due Work', 5);
         $i->click('Test Due Work');
         $i->waitForText('Test Due Work', 5);

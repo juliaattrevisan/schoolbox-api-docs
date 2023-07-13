@@ -90,6 +90,7 @@ class Item
      */
     public function modifyArticle(): void
     {
+        $this->tester->waitForElementVisible(self::DOT_MENU);
         $this->tester->click(self::DOT_MENU);
         $this->tester->click(self::LINK_MODIFY);
     }

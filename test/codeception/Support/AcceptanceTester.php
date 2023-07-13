@@ -53,6 +53,7 @@ class AcceptanceTester extends Actor
     public function loginAsAdmin(): void
     {
         $this->login('alaress', 'alaress');
+        $this->waitForElementVisible(['css' => 'a[title=Schoolbox\ Admin]']);
     }
 
     /**
@@ -78,6 +79,7 @@ class AcceptanceTester extends Actor
         $i->checkOption(self::$rememberMe);
         $i->click(self::$loginButton);
         $i->amOnPage('/');
+        $i->waitForText('SCHOOLBOX [VAGRANT]');
 
         $i->saveSessionSnapshot($snapshotName);
         $i->skipWhatsNewTour();

@@ -54,7 +54,7 @@ class FeedbackCest
         $filename = __DIR__ . '/../News/upload/test.jpg';
 
 
-        // As Jack Coles, create a due work
+        $i->amGoingTo('As Jack Coles, create a due work');
         $i->impersonate($teacher);
         $dueworkForm = new AssessmentForm($i);
         $dueworkForm->openCreate($classId);
@@ -67,32 +67,32 @@ class FeedbackCest
             ->setMarkType(AssessmentForm::MARK_TYPE_PERCENTAGE)
             ->create();
 
-        // As Louisa Smith, check notification
+        $i->amGoingTo('As Louisa Smith, check notification');
         $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists('Assessment Task ' . $dueworkTitle1 . ' opened in ' . $className);
 
-        // Goto submit page
+        $i->amGoingTo('Go to submit page');
         // TODO: need something nicer
         $i->click($dueworkTitle1, '#content');
         $i->waitForText('Create submission');
         $i->click('Create submission', '#content');
         $i->waitForText($dueworkTitle1);
 
-        // create submission
+        $i->amGoingTo('create submission');
         $submitForm = new SubmitForm($i);
         $submitForm->setContents(Common::gentext(200))
             ->setAttachment($filename)
             ->submit();
 
-        // As Zane, check notification .. this requires SA-7050 fix to success.
+        $i->amGoingTo('As Jack Coles, check the notification');
         $i->impersonate($teacher);
         $i->assertNotifExists($student . ' submitted work to ' . $dueworkTitle1 . ' in ' . $className);
 
-        // As Jack Coles, click into the due work
+        $i->amGoingTo('As Jack Coles, click into the due work');
         $i->click($dueworkTitle1, '#content');
         $i->waitForText('SUBMISSION HISTORY');
 
-        // As Zane, click to the student's submission page
+        $i->amGoingTo('As Jack Coles, click to the students submission page');
         $dueworkPage = new AssessmentPage($i);
         $feedbackForm = $dueworkPage->openInlineGrader($student, $dueworkTitle1);
 
@@ -100,11 +100,11 @@ class FeedbackCest
             ->setComment(Common::gentext(200))
             ->publish();
 
-        // As Louisa Smith, check notification
+        $i->amGoingTo('As Louisa Smith, check notification');
         $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists($teacher . ' has marked your work for ' . $dueworkTitle1 . ' in ' . $className);
 
-        // As Louisa Smith, click into the due work
+        $i->amGoingTo('As Louisa Smith, click into the due work');
         $i->click($dueworkTitle1, '#content');
         $i->canSee('GRADING');
     }
@@ -122,7 +122,7 @@ class FeedbackCest
         $teacher = Common::USER_JACKCOLES;
         $dueworkTitle2 = 'Cest Two ' . Common::gentext(6);
 
-        // As Jack Coles, create a due work
+        $i->amGoingTo('As Jack Coles, create a due work');
         $i->impersonate($teacher);
 
         $dueworkForm = new AssessmentForm($i);
@@ -136,43 +136,43 @@ class FeedbackCest
             ->setMarkType(AssessmentForm::MARK_TYPE_PERCENTAGE)
             ->create();
 
-        // As Louisa Smith, check notification
+        $i->amGoingTo('As Louisa Smith, check notification');
         $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists('Assessment Task ' . $dueworkTitle2 . ' opened in ' . $className);
 
-        // Goto submit page
+        $i->amGoingTo('go to submit page');
         // TODO: need something nicer
         $i->click($dueworkTitle2, '#content');
         $i->waitForText('Create submission');
         $i->click('Create submission', '#content');
         $i->waitForText($dueworkTitle2);
 
-        // create submission
+        $i->amGoingTo('create submission');
         $submitForm = new SubmitForm($i);
         $submitForm->setContents(Common::gentext(200))
             ->submit();
 
-        // As Jack Coles, check notification
+        $i->amGoingTo('As Jack Coles, check notification');
         $i->impersonate($teacher);
         $i->assertNotifExists($student . ' submitted work to ' . $dueworkTitle2 . ' in ' . $className);
 
-        // As Zane, click into the due work
+        $i->amGoingTo('As Jack Coles, click into the due work');
         $i->click($dueworkTitle2, '#content');
         $i->waitForText('SUBMISSION HISTORY');
 
-        // Now go to duework status page
+        $i->amGoingTo('Now go to duework status page');
         $dueworkPage = new AssessmentPage($i);
         $statusPage = $dueworkPage->openStatusPage();
         $statusPage->gradeSubmission($studentId, rand(50, 100), Common::gentext(200));
 
-        // find Louisa's submission and enter feed back
+        $i->amGoingTo('find Louisas submission and enter feed back');
         $i->canSee('Reviewed', StatusPage::getStatusSelector($studentId, ''));
 
-        // As Louisa, check notification
+        $i->amGoingTo('As Louisa, check notification');
         $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists($teacher . ' has marked your work for ' . $dueworkTitle2 . ' in ' . $className);
 
-        // As Louisa, click into the due work
+        $i->amGoingTo('As Louisa, click into the due work');
         $i->click($dueworkTitle2, '#content');
         $i->canSee('GRADING');
     }
