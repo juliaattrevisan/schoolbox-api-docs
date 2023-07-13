@@ -642,7 +642,7 @@ class Controller extends Base
             return;
         }
 
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $content = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
@@ -943,7 +943,7 @@ class Controller extends Base
             $year = array_keys($availableYearsAndMonths)[0];
         }
 
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $content = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
 
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
@@ -1109,7 +1109,7 @@ class Controller extends Base
             return;
         }
 
-        $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $content     = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
         $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
         $this->getResponse()->content->set($this->buildJsonOutput([

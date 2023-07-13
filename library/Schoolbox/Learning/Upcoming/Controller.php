@@ -300,7 +300,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
-            'content' => $this->buildUnthemedHtmlOutput('@learningUpcoming/upcomingInner.twig', $data)->getAsString(),
+            'content' => $this->responseFromTemplateUnthemed('@learningUpcoming/upcomingInner.twig', $data)->getBody()->getContents(),
         ]));
     }
 

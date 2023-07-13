@@ -135,7 +135,7 @@ class Controller extends Base
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
-                'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
+                'content' => $this->responseFromTemplateUnthemed('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
                     'folder'                => $folder,
                     'rank'                  => $rank,
@@ -143,7 +143,7 @@ class Controller extends Base
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
-                ])->getAsString(),
+                ])->getBody()->getContents(),
             ]));
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);

@@ -304,7 +304,7 @@ class Controller extends AbstractController
 
             // Output a XHR data model + HTML output
             $dataModel = $this->getTeamTranslator()->translateTeam($team);
-            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/teamPlayerList.twig', $dataModel)->getAsString();
+            $dataModel['html'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/teamPlayerList.twig', $dataModel)->getBody()->getContents();
 
 
             /* this is stupid
@@ -315,7 +315,7 @@ class Controller extends AbstractController
             $divisionCollector->collectPlayers($team->getDivision());
             $divisionCollector->collectTeams($team->getDivision());
             $divisionLobby = $divisionTranslator->translateDivision($team->getDivision());
-            $dataModel['divisionLobby'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $divisionLobby)->getAsString();
+            $dataModel['divisionLobby'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $divisionLobby)->getBody()->getContents();
 
 
             $this->getResponse()->content->set(

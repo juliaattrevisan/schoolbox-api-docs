@@ -502,7 +502,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
-            'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
+            'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
                 'student'               => $viewee,
                 'markbook'              => $filteredMarkbook,
                 'tree'                  => $tree,
@@ -514,7 +514,7 @@ class Controller extends Base
                 'showRubricPoints'      => $showRubricPoints,
                 'rubricAssessmentList'  => $rubricAssessmentList,
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
-            ])->getAsString(),
+            ])->getBody()->getContents(),
         ]));
     }
 

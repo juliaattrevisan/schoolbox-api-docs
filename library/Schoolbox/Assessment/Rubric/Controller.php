@@ -341,11 +341,11 @@ class Controller extends BaseController
          *
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
-        $fragment = $this->buildUnthemedHtmlOutput('@rubric/grid-editable.twig', $context = [
+        $fragment = $this->responseFromTemplateUnthemed('@rubric/grid-editable.twig', $context = [
             'formField'  => $post->get('formField', 'rb'),
             'rubricGrid' => $assessment->getRubricGrid(),
             'levelLimit' => $maxLevels,
-        ])->getAsString();
+        ])->getBody()->getContents();
 
         $payload = [
 

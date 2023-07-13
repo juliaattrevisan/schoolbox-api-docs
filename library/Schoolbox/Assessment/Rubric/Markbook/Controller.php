@@ -212,7 +212,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
-            'content' => $this->buildUnthemedHtmlOutput(
+            'content' => $this->responseFromTemplateUnthemed(
                 '@rubricMarkbook/markbookInner.twig',
                 [
                     'folder'      => $folder,
@@ -229,7 +229,7 @@ class Controller extends Base
                         )
                     ),
                 ]
-            )->getAsString(),
+            )->getBody()->getContents(),
         ]));
     }
 

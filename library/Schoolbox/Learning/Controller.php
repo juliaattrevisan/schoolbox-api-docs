@@ -262,14 +262,14 @@ class Controller extends Base
         }
         $assessmentsToChase->sortBy('dueAt', 'asc', null, true);
 
-        return $this->buildUnthemedHtmlOutput('@learning/pendingAssessmentsContent.twig', [
+        return $this->responseFromTemplateUnthemed('@learning/pendingAssessmentsContent.twig', [
             'statistics'                => $assessmentStatistics,
             'totalAssessmentsToMark'    => $totalAssessmentsToMark,
             'totalAssessmentsToChase'   => $totalAssessmentsToChase,
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
-        ])->getAsString();
+        ])->getBody()->getContents();
     }
 
     /**

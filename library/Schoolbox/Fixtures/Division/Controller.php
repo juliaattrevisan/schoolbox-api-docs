@@ -491,7 +491,7 @@ class Controller extends AbstractController
             $dataModel = $this->getDivisionTranslator()->translateDivision($division);
 
             $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
-            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
+            $dataModel['html'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getBody()->getContents()->getContents();
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($dataModel)
             );

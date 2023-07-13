@@ -197,7 +197,7 @@ class Controller extends Assessment\Controller
              * It manifests under the file list
              */
             if ($previewFragment['type'] === 'inline') {
-                $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
+                $previewFragment['fragment'] = $this->responseFromTemplateUnthemed($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getBody()->getContents();
             }
 
             /* Otherwise, just go to the Summary screen and show all these pieces:

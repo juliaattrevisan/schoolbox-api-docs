@@ -98,8 +98,8 @@ class Controller extends Base
         $previewFragment = (new Factory($translator))->urlFragment($params['encodedUrl']);
 
         if ($previewFragment['type'] === 'inline') {
-            $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])
-                                                ->getAsString();
+            $previewFragment['fragment'] = $this->responseFromTemplateUnthemed($previewFragment['twig']['template'], $previewFragment['twig']['data'])
+                                                ->getBody()->getContents();
         }
 
         //Not required by preview.js
