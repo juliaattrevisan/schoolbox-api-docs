@@ -140,7 +140,7 @@ class Controller extends Base
             $selected['yearLevelId'] ? [(int)$selected['yearLevelId']] : [UserBulkMapper::ANY],
             (int)$selected['token']
         );
-        $this->getResponse()->content->set($this->buildJsonOutput($userList));
+        $this->psr7Response = $this->responseAsJson($userList);
     }
 
     /**
@@ -184,8 +184,7 @@ class Controller extends Base
             $problem = (new ApiProblem('Campus has been deleted or does not exist'))
                 ->setStatus(501)
                 ->asArray();
-            $this->getResponse()->status->setCode(501);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->psr7Response = $this->responseAsJson($problem)->withStatus(501);
             return;
         }
 
@@ -196,7 +195,7 @@ class Controller extends Base
             \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+        $this->psr7Response = $this->responseAsJson($jsonPayload);
     }
 
     /**
@@ -224,6 +223,6 @@ class Controller extends Base
             \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+        $this->psr7Response = $this->responseAsJson($jsonPayload);
     }
 }

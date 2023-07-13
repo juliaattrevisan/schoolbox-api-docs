@@ -88,9 +88,7 @@ class Controller extends Base
         $this->gradeLevelMapper->delete($gradeGroup->getGradeLevels());
         $this->gradeLevelGroupMapper->delete($gradeGroup);
 
-        $this->response->content->set(
-            $this->buildJsonOutput($this->retrieveAllGradeGroups())
-        );
+        $this->psr7Response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**
@@ -110,9 +108,7 @@ class Controller extends Base
 
         $this->gradeLevelMapper->delete($gradeLevel);
 
-        $this->response->content->set(
-            $this->buildJsonOutput($this->retrieveAllGradeGroups())
-        );
+        $this->psr7Response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**

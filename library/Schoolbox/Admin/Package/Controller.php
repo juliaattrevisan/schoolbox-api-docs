@@ -59,6 +59,6 @@ class Controller extends Base
         $packageInstaller = new Installer($this->packageMapper);
         $packageInstaller->installPackage($package, $this->getUser());
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
+        $this->psr7Response = $this->responseAsJson(['success' => true]);
     }
 }

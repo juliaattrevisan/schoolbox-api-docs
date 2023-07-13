@@ -472,7 +472,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
 
@@ -495,7 +495,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
 
@@ -516,7 +516,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
 
@@ -538,7 +538,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
 

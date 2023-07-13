@@ -131,12 +131,12 @@ class Controller extends Web\Controller\Base
     public function postUploadCsv(): void
     {
         $post = $this->requestPost;
-        $rs = $this->getResponse();
 
         $responseJson = [
             'success' => false
         ];
 
+        $statusCode = null;
         try {
             // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
             $this->authenticate((string)$post->get('key'));
@@ -163,10 +163,13 @@ class Controller extends Web\Controller\Base
             $responseJson['file'] = $storage->getHash();
         } catch (InvalidArgumentException $e) {
             $responseJson['error'] = $e->getMessage();
-            $rs->status->setCode($e->getCode());
+            $statusCode = $e->getCode();
         }
 
-        $rs->content->set($this->buildJsonOutput($responseJson));
+        $this->psr7Response = $this->responseAsJson($responseJson);
+        if (isset($statusCode)) {
+            $this->psr7Response = $this->psr7Response->withStatus($statusCode);
+        }
     }
 
 

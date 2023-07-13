@@ -100,15 +100,12 @@ class Controller extends Base
         $configDismissUpgradeReminder->setValue($latestVersionMajor);
         $this->configMapper->save($configDismissUpgradeReminder);
 
-        $this->response->status->set(200);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'success'  => true,
-                    'messages' => []
-                ]
-            )
-        );
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'success'  => true,
+                'messages' => []
+            ]
+        )->withStatus(200);
     }
 
     /**

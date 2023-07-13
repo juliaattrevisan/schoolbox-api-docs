@@ -78,8 +78,7 @@ class Controller extends Base
             }
         } catch (GuzzleException $e) {
             $message = $this->getReasonPhrase($e);
-            $this->response->status->set($e->getCode());
-            $this->response->content->set($this->buildJsonOutput(['error' => $message]));
+            $this->psr7Response = $this->responseAsJson(['error' => $message])->withStatus($e->getCode());
             return;
         }
         // All the staff in our Schoolbox instance
@@ -122,7 +121,7 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($userList));
+        $this->psr7Response = $this->responseAsJson($userList);
     }
 
     /**
@@ -237,14 +236,11 @@ class Controller extends Base
         }
 
         // Build response
-        $this->response->status->set($responseCode);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'data' => $messages,
-                ]
-            )
-        );
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'data' => $messages,
+            ]
+        )->withStatus($responseCode);
     }
 
     /**

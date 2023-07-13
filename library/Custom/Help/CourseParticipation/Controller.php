@@ -144,10 +144,10 @@ class Controller extends Base
 
         $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'ts'    => $now->getUnixTimeStamp(),
             'digest' => $digest
-        ]));
+        ]);
     }
 
     /**
@@ -223,18 +223,14 @@ class Controller extends Base
      */
     public function getFolderAccessBySchool(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
         // ok, if you're here, you can see the thing.
         try {
-            $rs->content->set(
-                $this->buildJsonOutput(
-                    $this->handler->getFolderAccessBySchool($schoolCode)
-                )
+            $this->psr7Response = $this->responseAsJson(
+                $this->handler->getFolderAccessBySchool($schoolCode)
             );
         } catch (Mapper\Exception $e) {
             $this->sendGenericStatus(self::STATUS_NOT_FOUND, "No course area found for school: {$schoolCode}");
@@ -337,8 +333,6 @@ class Controller extends Base
      */
     public function getUsersBySchool(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
@@ -352,7 +346,7 @@ class Controller extends Base
             return;
         }
 
-        $rs->content->set($this->buildJsonOutput($users));
+        $this->psr7Response = $this->responseAsJson($users);
     }
 
 
@@ -366,8 +360,6 @@ class Controller extends Base
      */
     public function postUserRegistrations(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
@@ -402,7 +394,7 @@ class Controller extends Base
         if (\count($failedUsers)) {
             // just blame the client :P
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST);
-            $rs->content->set($this->buildJsonOutput($failedUsers));
+            $this->psr7Response = $this->responseAsJson($failedUsers);
         } else {
             // everything went fine, nothing to respond with
             $this->sendGenericStatus(self::STATUS_NO_CONTENT);

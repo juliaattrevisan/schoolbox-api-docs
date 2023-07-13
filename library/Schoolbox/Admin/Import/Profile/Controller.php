@@ -215,12 +215,9 @@ class Controller extends Base
         }
 
         if ($this->isJsonRequest()) {
-            if (!empty($errors)) {
-                $this->response->status->setCode(400);
-            } else {
-                $this->response->status->setCode(200);
-            }
-            $this->response->content->set($this->buildJsonOutput([$errors, $logs]));
+            $this->psr7Response = $this->responseAsJson([$errors, $logs])->withStatus(
+                !empty($errors) ? 400 : 200
+            );
             return;
         }
 

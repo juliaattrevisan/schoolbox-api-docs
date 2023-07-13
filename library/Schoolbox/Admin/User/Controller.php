@@ -443,7 +443,7 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+        $this->psr7Response = $this->responseAsJson($jsonPayload);
     }
 
     /**

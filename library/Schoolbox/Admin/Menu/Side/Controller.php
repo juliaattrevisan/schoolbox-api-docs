@@ -348,8 +348,7 @@ class Controller extends Base
     {
         $post = $this->requestPost;
         $this->getMenuSideMapper()->deleteByColumn("id", $post["id"]);
-        $this->getResponse()->status->set(204);
-        $this->getResponse()->content->set($this->buildJsonOutput([]));
+        $this->psr7Response = $this->responseAsJson([])->withStatus(204);
     }
 
     /**
@@ -387,10 +386,10 @@ class Controller extends Base
                 $this->getMenuSideMapper()->save($node);
             }
         } catch (\Exception $e) {
-            return $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'Error']));
+            $this->psr7Response = $this->responseAsJson(['result' => 'Error']);
         }
 
-        return $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'OK']));
+        $this->psr7Response = $this->responseAsJson(['result' => 'OK']);
     }
 
     /**

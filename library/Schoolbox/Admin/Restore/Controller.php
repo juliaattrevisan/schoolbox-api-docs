@@ -104,7 +104,7 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
+        $this->psr7Response = $this->responseAsJson(['success' => true]);
     }
 
     /**
@@ -126,6 +126,6 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
+        $this->psr7Response = $this->responseAsJson(['success' => true]);
     }
 }

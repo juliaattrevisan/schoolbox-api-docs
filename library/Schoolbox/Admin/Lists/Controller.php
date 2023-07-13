@@ -218,12 +218,10 @@ class Controller extends Base
             }
         }
         if (!empty($newIds)) {
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    [
-                        'newRowIdList' => $newIds,
-                    ]
-                )
+            $this->psr7Response = $this->responseAsJson(
+                [
+                    'newRowIdList' => $newIds,
+                ]
             );
             return;
         }
@@ -1351,22 +1349,20 @@ class Controller extends Base
 
         if ($json) {
             $currentTable = $tables[$table];
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    [
-                        'hasDBid'       => $currentTable['showId'] ?? false,
-                        'canDelete'     => $currentTable['delete'] ?? false,
-                        'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
-                        'deleteRoute'   => $this->routeGenerator->generate('adminLists.postDelete'),
-                        'deleteWarning' => $currentTable['deleteWarning'] ?? '',
-                        'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
-                        'isSortable'    => $currentTable['sortable'] ?? false,
-                        'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
-                        'rows'          => $this->reformatForJson($records, true),
-                        'saveRoute'     => $this->routeGenerator->generate('adminLists.postSave'),
-                        'title'         => $currentTable['title'],
-                    ]
-                )
+            $this->psr7Response = $this->responseAsJson(
+                [
+                    'hasDBid'       => $currentTable['showId'] ?? false,
+                    'canDelete'     => $currentTable['delete'] ?? false,
+                    'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
+                    'deleteRoute'   => $this->routeGenerator->generate('adminLists.postDelete'),
+                    'deleteWarning' => $currentTable['deleteWarning'] ?? '',
+                    'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
+                    'isSortable'    => $currentTable['sortable'] ?? false,
+                    'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
+                    'rows'          => $this->reformatForJson($records, true),
+                    'saveRoute'     => $this->routeGenerator->generate('adminLists.postSave'),
+                    'title'         => $currentTable['title'],
+                ]
             );
         } else {
             // Render this thing out
