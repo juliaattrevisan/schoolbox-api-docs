@@ -11,21 +11,28 @@ namespace Alaress\Async\Notification;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
+use Alaress\Routing\Dictionary\SubscriptionDictionary;
+use Alaress\Routing\Router;
+use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\Transaction\DispatchTransaction;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\RouteTXRX;
-use Schoolbox\Realtime\Routing\Subscription\Resolver;
+use Schoolbox\Realtime\Routing\Subscription\Resolver as SubscriptionResolver;
 use Schoolbox\Realtime\Routing;
 
 class Postman
 {
-    private Resolver                                            $resolver;
-    private RouteTXRX                                           $txrx;
-    private \Alaress\WorkerCrew\Transaction\DispatchTransaction $transaction;
-    private \Alaress\Routing\Router                             $router;
+    private SubscriptionResolver $subscriptionResolver;
+
+    private RouteTXRX $txrx;
+
+    private DispatchTransaction $transaction;
+
+    private Router $router;
 
     /**
      * @param LoggerInterface $log
@@ -44,12 +51,12 @@ class Postman
         ClientInterface $redis
     ) {
         // the route broker for sending
-        $this->router = new \Alaress\Routing\Router(new \Alaress\Routing\Dictionary\SubscriptionDictionary('.'));
+        $this->router = new Router(new SubscriptionDictionary('.'));
         $this->txrx   = RouteTXRX::buildTransmitter(new ListFactory($instanceId, $redis));
 
-        $this->transaction = new \Alaress\WorkerCrew\Transaction\DispatchTransaction(
+        $this->transaction = new DispatchTransaction(
             $loop,
-            new \Alaress\WorkerCrew\Dispatcher(
+            new Dispatcher(
                 $loop,
                 new Routing\DispatchResponder($log),
                 $log,
@@ -67,7 +74,7 @@ class Postman
     public function reloadRouter()
     {
         $this->subscriptionCache->readIntoRouter(INSTANCE_ID, $this->router);
-        $this->resolver = new Resolver($this->router);
+        $this->subscriptionResolver = new SubscriptionResolver($this->router);
     }
 
     /**
@@ -151,7 +158,7 @@ class Postman
                     $userIds = [];
                 } else {
                     $msgType   = 'send';
-                    $userIds   = $this->resolver->getSubscribedUserIds($topic);
+                    $userIds   = $this->subscriptionResolver->getSubscribedUserIds($topic);
                     $userCount = \count($userIds);
                     if ($userCount === 0) {
                         $this->log->info("Nobody is subscribed to '$topic', dropping message");
