@@ -613,26 +613,6 @@ abstract class Base
     }
 
     /**
-     * Factory method for loading an xml output object
-     *
-     * @deprecated use `responseFromTemplateUnthemed` to build a response object
-     *             and then apply an XML-specific "content-type" header
-     *
-     * @param string $template
-     * @param string|array $data
-     * @return mixed
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildXmlOutput($template, $data)
-    {
-        /** @var Output\Xml $output */
-        $output = $this->getDi()->get('webOutput:xml');
-        $output = $this->injectCurrentUserGlobal($output);
-        return $output->setTemplate($template)->setData($data);
-    }
-
-    /**
      * Factory method for loading a chromed HTML output object.
      *
      * @deprecated use `responseFromTemplate` to build a response object
