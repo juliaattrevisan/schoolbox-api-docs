@@ -5726,11 +5726,6 @@ parameters:
 			path: library/Schoolbox/Statistics/DataSource.php
 
 		-
-			message: "#^Method Schoolbox\\\\Survey\\\\Controller\\:\\:getSelectize\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Survey/Controller.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Survey/Mapper.php

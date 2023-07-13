@@ -28,8 +28,6 @@ class Controller extends Base
 
     /**
      * Perform an AJAX search for surveys
-     *
-     * @return string
      */
     public function getSelectize()
     {

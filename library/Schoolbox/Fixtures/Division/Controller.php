@@ -489,7 +489,7 @@ class Controller extends AbstractController
             $dataModel = $this->getDivisionTranslator()->translateDivision($division);
 
             $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
-            $dataModel['html'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getBody()->getContents()->getContents();
+            $dataModel['html'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getBody()->getContents();
             $this->psr7Response = $this->responseAsJson($dataModel);
         } else {
             // Redirect back to lobby
