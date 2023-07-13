@@ -396,8 +396,7 @@ class Controller extends Base
      */
     protected function respond($template, $data, $responseCode = 200)
     {
-        $this->getResponse()->status->set($responseCode);
-        $this->getResponse()->content->set($this->buildContent($template, $data));
+        $this->psr7Response = $this->responseDependentOnRequest($template, $data)->withStatus($responseCode);
     }
 
 

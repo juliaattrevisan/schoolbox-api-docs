@@ -61,15 +61,16 @@ class Controller extends ConfigController
         $pageCurrent = $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
         $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
 
-        $this->getResponse()->content->set(
-            $this->buildContent('@settings/settings.twig', [
+        $this->psr7Response = $this->responseDependentOnRequest(
+            '@settings/settings.twig',
+            [
                 'pageCurrent'    => $pageCurrent,
                 'allBreadcrumbs' => $allBreadcrumbs,
                 'settingsTabs'   => $settingsTabs,
                 'configContext'  => $configContext,
                 'isLocalisation' => $typeLabel === 'Localisation',  // TODO replace string literals with enums
                 'isSkinConfig'   => $typeLabel === 'Skin Config',   // TODO replace string literals with enums
-            ])
+            ]
         );
     }
 

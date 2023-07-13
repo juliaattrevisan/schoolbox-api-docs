@@ -601,14 +601,12 @@ class Controller extends Base
             ];
         }
 
-        $output = $this->buildContent('@commsNews/detail.twig', $data);
-
-        if ($output instanceof ThemedHtml) {
-            $output->setTitle($article->getTitle())
-                   ->setTab('news');
-        }
-
-        $this->response->content->set($output);
+        $this->psr7Response = $this->responseDependentOnRequest(
+            '@commsNews/detail.twig',
+            $data,
+            $article->getTitle(),
+            'news',
+        );
     }
 
 

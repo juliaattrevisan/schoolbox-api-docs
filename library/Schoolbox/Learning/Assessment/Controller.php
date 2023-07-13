@@ -505,14 +505,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $unitProjects->offsetSet($unitSpec->getId(), $projects);
             }
         }
-        $this->getResponse()->content->set($this->buildContent(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@learningAssessment/fragments/assessmentLocationList.twig',
             [
                 'units'        => $allUnitSpecs,
                 'unitProjects' => $unitProjects,
                 'current'      => $assessment->getContext()->getLocationId()
             ]
-        ));
+        );
     }
 
 

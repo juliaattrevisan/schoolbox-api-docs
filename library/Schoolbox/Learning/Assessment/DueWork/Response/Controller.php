@@ -460,18 +460,12 @@ class Controller extends Base
      */
     public function deleteParticularResponse(IAssessable $assessment, Model $response)
     {
-        $code = 204;
-        $data = [];
-
         try {
             $this->responseDataSource->delete($response);
+            $this->psr7Response = $this->responseEmpty();
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $code = 400;
-            $data = $e->getMessage();
+            $this->psr7Response = $this->responseFromContent($e->getMessage())->withStatus(400);
         }
-
-        $this->getResponse()->status->set($code);
-        $this->getResponse()->content->set($this->buildContent('', $data));
     }
 
 
