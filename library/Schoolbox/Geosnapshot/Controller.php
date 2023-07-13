@@ -71,7 +71,7 @@ class Controller extends Base
 
         /* Otherwise show the gallery
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput(
+        $this->psr7Response = $this->responseFromTemplate(
             '@geosnapshotApi/studentPhotos.twig',
             [
                 'allBreadcrumbs' => [
@@ -85,6 +85,6 @@ class Controller extends Base
                  */
                  // 'payload' => $api->getLastPayload()
             ]
-        ));
+        );
     }
 }

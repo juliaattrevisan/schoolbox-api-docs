@@ -99,14 +99,14 @@ class Controller extends BaseController
     {
         $filtersPerPage = $this->findAvailableFiltersPerPage();
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@filters/index.twig', [
             'filtersPerPage'     => $filtersPerPage,
             'pageLabels'         => $this->buildFilteredPageLabels(),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => $this->routeGenerator->generate('filters.getIndex'),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getIndex')),
-        ], 'Filterable pages'));
+        ], 'Filterable pages');
     }
 
 
@@ -147,7 +147,7 @@ class Controller extends BaseController
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@filters/settings.twig', [
             'page'               => $page,
             'pageCurrent'        => $this->routeGenerator->generate('filters.getPageSettings', ['page' => $page]),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getPageSettings', ['page' => $page])),
@@ -156,7 +156,7 @@ class Controller extends BaseController
             'roleTypes'          => $roleTypes,
             'rolesForFilter'     => $rolesForFilter,
             'pageLabels'         => $this->buildFilteredPageLabels(),
-        ], ucfirst($page) . ' filters'));
+        ], ucfirst($page) . ' filters');
     }
 
 

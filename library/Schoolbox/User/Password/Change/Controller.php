@@ -61,14 +61,13 @@ class Controller extends Base
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } else {
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput(
-                    '@passwordChange/index.twig',
-                    [
-                        'isRequestMade'   => $this->getSessionSegment()->getFlash('isRequestMade'),
-                        'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
-                    ]
-                , 'Change Password')
+            $this->psr7Response = $this->responseFromTemplate(
+                '@passwordChange/index.twig',
+                [
+                    'isRequestMade'   => $this->getSessionSegment()->getFlash('isRequestMade'),
+                    'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
+                ],
+                'Change Password'
             );
         }
     }

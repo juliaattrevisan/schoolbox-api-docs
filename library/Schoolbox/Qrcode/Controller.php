@@ -66,14 +66,12 @@ class Controller extends Base
      */
     public function getListPage(Folder $folder): void
     {
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@qrcode/list.twig',
-                [
-                    'folder' => $folder,
-                ],
-                'QR Codes'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@qrcode/list.twig',
+            [
+                'folder' => $folder,
+            ],
+            'QR Codes'
         );
     }
 

@@ -119,10 +119,10 @@ class Controller extends AbstractController
     {
         $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/entity.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesDivision/entity.twig', [
             'sport'    => $sport,
             'division' => $entity
-        ]));
+        ]);
     }
 
     /**
@@ -139,10 +139,10 @@ class Controller extends AbstractController
                 ]
             ]);
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/list.twig', [
+            $this->psr7Response = $this->responseFromTemplate('@sportsfixturesDivision/list.twig', [
                 'sport'        => $context,
                 'allDivisions' => $allDivisions
-            ]));
+            ]);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
@@ -160,12 +160,12 @@ class Controller extends AbstractController
         }
         $entity->setSport($context);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesDivision/create.twig', [
             'division' => $entity,
             'sport'    => $context,
             'action'   => $entity->getId() ? 'Modify' : 'Create',
             'referer'  => base64_encode($this->psr7Request->getHeaderLine('Referer'))
-        ]));
+        ]);
     }
 
     /**
@@ -202,9 +202,7 @@ class Controller extends AbstractController
             $zone->setAttachPrompt('upload a list of players');
             $dataModel['user']       = $this->getUser();
             $dataModel['uploadZone'] = $zone;
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
-            );
+            $this->psr7Response = $this->responseFromTemplate('@sportsfixturesDivision/lobby.twig', $dataModel);
         }
     }
 

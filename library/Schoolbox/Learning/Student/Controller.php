@@ -113,10 +113,10 @@ class Controller extends Base
         }, true);
 
         //render the things
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningStudentCourses/courses.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learningStudentCourses/courses.twig', [
             'user'          => $user,
             'courseList'    => $courseList,
             'homepageUrls' => $homepageUrls,
-            ], null, 'classes'));
+            ], '', 'classes');
     }
 }

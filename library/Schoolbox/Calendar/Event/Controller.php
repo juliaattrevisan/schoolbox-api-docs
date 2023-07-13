@@ -298,7 +298,6 @@ class Controller extends Base
      */
     public function getModify(Event $event): void
     {
-
         /*
          * if the publish date is null, then set to the event start date
          */
@@ -329,7 +328,7 @@ class Controller extends Base
             ? $this->campusMapper->findAll()
             : $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
@@ -374,7 +373,7 @@ class Controller extends Base
 
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
-        ], "Modify {$event->getTitle()}"));
+        ], "Modify {$event->getTitle()}");
     }
 
 

@@ -134,14 +134,14 @@ class ListController extends Web\Controller\Base
      */
     public function getSebDownload(IAssessable $assessment): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/sebDownload.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learningAssessment/sebDownload.twig', [
             'assessmentId' => $assessment->getId(),
             'assessment' => $assessment,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
                 '',
             ]),
-        ]));
+        ]);
     }
 
 
@@ -616,7 +616,7 @@ class ListController extends Web\Controller\Base
             ];
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
+        $this->psr7Response = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
     }
 
 

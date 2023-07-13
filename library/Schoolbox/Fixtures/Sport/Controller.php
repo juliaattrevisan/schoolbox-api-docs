@@ -67,9 +67,9 @@ class Controller extends AbstractController
             ]
         ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/list.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSport/list.twig', [
             'allSports' => $allSports
-        ]));
+        ]);
     }
 
     /**
@@ -79,10 +79,10 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSport/create.twig', [
             'sport'  => $entity,
             'action' => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        ]);
     }
 
 
@@ -109,10 +109,10 @@ class Controller extends AbstractController
             $division->setTeams($teams);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/entity.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSport/entity.twig', [
             'sport'     => $entity,
             'divisions' => $divisions
-        ]));
+        ]);
     }
 
     /**

@@ -269,18 +269,16 @@ class Controller extends Base
         $returnUrl  = $requestUri . '?' . http_build_query($queryArgs);
 
         $translator = new User\Translator\Author\ModelToArray();
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                $template,
-                [
-                    'settingForSelf' => $settingForSelf,
-                    'users'          => $targetUsers->map($translator),
-                    'otherUsers'     => $otherUsers->map($translator),
-                    'filterPanel'    => $filterPanel,
-                    'returnUrl'      => Redirect::encode($returnUrl),
-                ],
-                $title
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            $template,
+            [
+                'settingForSelf' => $settingForSelf,
+                'users'          => $targetUsers->map($translator),
+                'otherUsers'     => $otherUsers->map($translator),
+                'filterPanel'    => $filterPanel,
+                'returnUrl'      => Redirect::encode($returnUrl),
+            ],
+            $title
         );
     }
 
@@ -307,20 +305,18 @@ class Controller extends Base
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
         $userTranslator  = new User\Translator\Author\ModelToArray();
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadgeAward/awardWithEvidenceForm.twig',
-                [
-                    'isGoal'        => false,
-                    'badges'        => $badges->map($badgeTranslator),
-                    'badgeIds'      => implode(',', $badges->getPropertyValues('id')),
-                    'targetUsers'   => $users->map($userTranslator),
-                    'targetUserIds' => implode(',', $users->getPropertyValues('id')),
-                    'returnUrl'     => $returnUrl,
-                    'cancelUrl'     => $cancelUrl,
-                ],
-                'Award Achievement'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningBadgeAward/awardWithEvidenceForm.twig',
+            [
+                'isGoal'        => false,
+                'badges'        => $badges->map($badgeTranslator),
+                'badgeIds'      => implode(',', $badges->getPropertyValues('id')),
+                'targetUsers'   => $users->map($userTranslator),
+                'targetUserIds' => implode(',', $users->getPropertyValues('id')),
+                'returnUrl'     => $returnUrl,
+                'cancelUrl'     => $cancelUrl,
+            ],
+            'Award Achievement'
         );
     }
 
@@ -376,17 +372,15 @@ class Controller extends Base
                 'user'   => $award->getRecipient(),
             ]);
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadgeAward/awardWithEvidence.twig',
-                [
-                    'badges'    => $badges->map($badgeTranslator),
-                    'award'     => $award,
-                    'returnUrl' => Redirect::encode($returnUrl),
-                    'cancelUrl' => $cancelUrl,
-                ],
-                'View Evidence'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningBadgeAward/awardWithEvidence.twig',
+            [
+                'badges'    => $badges->map($badgeTranslator),
+                'award'     => $award,
+                'returnUrl' => Redirect::encode($returnUrl),
+                'cancelUrl' => $cancelUrl,
+            ],
+            'View Evidence'
         );
     }
 
@@ -799,17 +793,15 @@ class Controller extends Base
             );
         }
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadgeAward/awardUpdate.twig',
-                [
-                    'badges'    => $badges->map($badgeTranslator),
-                    'award'     => $award,
-                    'returnUrl' => $returnUrl,
-                    'cancelUrl' => Redirect::decode($returnUrl),
-                ],
-                'Edit award'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningBadgeAward/awardUpdate.twig',
+            [
+                'badges'    => $badges->map($badgeTranslator),
+                'award'     => $award,
+                'returnUrl' => $returnUrl,
+                'cancelUrl' => Redirect::decode($returnUrl),
+            ],
+            'Edit award'
         );
     }
 
@@ -957,14 +949,14 @@ class Controller extends Base
             [],
             $this->requestQuery->getArrayCopy(),
         );
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadgeAward/list.twig',
-                [
-                    'filterPanel' => $filterPanel,
-                    'folder'      => $folder,
-                ]
-            , $folder->getName(), 'classes')
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningBadgeAward/list.twig',
+            [
+                'filterPanel' => $filterPanel,
+                'folder'      => $folder,
+            ],
+            $folder->getName(),
+            'classes'
         );
     }
 

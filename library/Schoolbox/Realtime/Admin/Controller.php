@@ -215,7 +215,7 @@ class Controller extends BaseController
             ],
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps'));
+        $this->psr7Response = $this->responseFromTemplate('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps');
     }
 
 

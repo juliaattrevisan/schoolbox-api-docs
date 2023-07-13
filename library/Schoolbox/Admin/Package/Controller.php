@@ -33,15 +33,13 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@adminPackage/index.twig',
-                [
-                    'pageCurrent' => $this->routeGenerator->generate('adminPackage.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminPackage.getIndex')),
-                    'packages'    => $this->packageMapper->findAvailablePackages(),
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminPackage/index.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminPackage.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminPackage.getIndex')),
+                'packages'    => $this->packageMapper->findAvailablePackages(),
+            ]
         );
     }
 

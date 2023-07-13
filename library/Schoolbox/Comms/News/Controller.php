@@ -193,7 +193,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Create',
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
@@ -204,7 +204,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news'));
+        ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
 
@@ -303,7 +303,7 @@ class Controller extends Base
             $fileZone->attachFiles($article->getAttachedFiles()->indexBy('hash')->keys());
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Update',
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
@@ -314,7 +314,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ], "Update {$article->getTitle()}", 'news'));
+        ], "Update {$article->getTitle()}", 'news');
     }
 
 
@@ -766,9 +766,7 @@ class Controller extends Base
 
         $data = array_merge($data, $sidebar->generate());
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/index.twig', $data, 'News Feed', 'news')
-        );
+        $this->psr7Response = $this->responseFromTemplate('@commsNews/index.twig', $data, 'News Feed', 'news');
     }
 
 
@@ -985,8 +983,8 @@ class Controller extends Base
 
         $data = array_merge($data, $sidebar->generate());
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/archive.twig', $data, $pageTitle, 'news')
+        $this->psr7Response = $this->responseFromTemplate(
+            '@commsNews/archive.twig', $data, $pageTitle, 'news'
         );
     }
 
@@ -1147,8 +1145,8 @@ class Controller extends Base
             'status' => $status,
         ], $sidebar->generate());
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/authored.twig', $data, 'My News', 'news')
+        $this->psr7Response = $this->responseFromTemplate(
+            '@commsNews/authored.twig', $data, 'My News', 'news'
         );
     }
 

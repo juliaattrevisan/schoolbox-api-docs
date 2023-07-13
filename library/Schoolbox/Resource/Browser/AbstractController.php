@@ -264,9 +264,7 @@ abstract class AbstractController extends BaseController
 
         $data['attachzone'] = $this->getFolderAttachzoneData();
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@resourceBrowser/browse.twig', $data, null, $this->tab)
-        );
+        $this->psr7Response = $this->responseFromTemplate('@resourceBrowser/browse.twig', $data, null, $this->tab);
     }
 
 

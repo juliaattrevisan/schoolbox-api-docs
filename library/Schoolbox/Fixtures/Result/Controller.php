@@ -135,19 +135,17 @@ class Controller extends AbstractController
         } catch (MapperException $e) {
         }
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesResult/create.twig',
-                [
-                    'sport'    => $sport,
-                    'statuses' => $this->getStatusMapper()->findAll(),
-                    'division' => $division,
-                    'match'    => $context,
-                    'team'     => $team,
-                    'result'   => $entity,
-                    'action'   => $entity->getId() ? 'Modify' : 'Create'
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@sportsfixturesResult/create.twig',
+            [
+                'sport'    => $sport,
+                'statuses' => $this->getStatusMapper()->findAll(),
+                'division' => $division,
+                'match'    => $context,
+                'team'     => $team,
+                'result'   => $entity,
+                'action'   => $entity->getId() ? 'Modify' : 'Create'
+            ]
         );
     }
 
@@ -187,16 +185,14 @@ class Controller extends AbstractController
         try {
             $allResults = $this->getMapper()->findByColumn('match_id', $context->getId());
 
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput(
-                    '@sportsfixturesResult/list.twig',
-                    [
-                        'sport'      => $sport,
-                        'division'   => $division,
-                        'match'      => $context,
-                        'allResults' => $allResults
-                    ]
-                )
+            $this->psr7Response = $this->responseFromTemplate(
+                '@sportsfixturesResult/list.twig',
+                [
+                    'sport'      => $sport,
+                    'division'   => $division,
+                    'match'      => $context,
+                    'allResults' => $allResults
+                ]
             );
         } catch (MapperException $e) {
             /* No Results for this Match?
@@ -312,22 +308,20 @@ class Controller extends AbstractController
          */
         $hasMatchModify = $this->hasMatchModify($teamMetadata->getCoaches()->getOffset($team->getId()));
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesResult/team.twig',
-                [
-                    'sport'          => $sport,
-                    'division'       => $division,
-                    'match'          => $matchup,
-                    'schoolMapper'   => $this->getSchoolTagCloudMapper(),
-                    'team'           => $team,
-                    'teamMetadata'   => $teamMetadata,
-                    'result'         => $context,
-                    'googleApiKey'   => $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEAPPS_API_KEY),
-                    'forecast'       => $forecast,
-                    'hasMatchModify' => $hasMatchModify
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@sportsfixturesResult/team.twig',
+            [
+                'sport'          => $sport,
+                'division'       => $division,
+                'match'          => $matchup,
+                'schoolMapper'   => $this->getSchoolTagCloudMapper(),
+                'team'           => $team,
+                'teamMetadata'   => $teamMetadata,
+                'result'         => $context,
+                'googleApiKey'   => $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEAPPS_API_KEY),
+                'forecast'       => $forecast,
+                'hasMatchModify' => $hasMatchModify
+            ]
         );
     }
 

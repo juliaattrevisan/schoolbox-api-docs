@@ -97,11 +97,10 @@ class Controller extends Base
 
         $pageTitle = 'Class Markbook';
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
-            ], $pageTitle, 'submission')
+            ], $pageTitle, 'submission'
         );
     }
 

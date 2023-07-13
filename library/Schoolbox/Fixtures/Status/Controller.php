@@ -48,13 +48,11 @@ class Controller extends AbstractController
             ]
         );
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesStatus/list.twig',
-                [
-                    'allStatus' => $allStatus
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@sportsfixturesStatus/list.twig',
+            [
+                'allStatus' => $allStatus
+            ]
         );
     }
 

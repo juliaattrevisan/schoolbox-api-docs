@@ -227,9 +227,7 @@ class Controller extends Base
         ];
 
         $namespace = Module::BASENAME;
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@$namespace/upcomingOuter.twig", $data, "Upcoming Due Work", 'submission')
-        );
+        $this->psr7Response = $this->responseFromTemplate("@$namespace/upcomingOuter.twig", $data, "Upcoming Due Work", 'submission');
     }
 
     /** @noinspection PhpUnused */

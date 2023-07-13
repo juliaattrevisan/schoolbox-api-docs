@@ -182,20 +182,18 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/status.twig',
-                [
-                    'type'        => Assessment\AssessmentType::objectToString($assessment),
-                    'assessment'  => $assessment,
-                    'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                                                       ->add([ $assessment->getTitle(), '' ]),
-                    'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
-                    'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
-                ],
-                "Status of {$assessment->getTitle()}",
-                'submission'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/lti/status.twig',
+            [
+                'type'        => Assessment\AssessmentType::objectToString($assessment),
+                'assessment'  => $assessment,
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                                                   ->add([ $assessment->getTitle(), '' ]),
+                'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
+                'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
+            ],
+            "Status of {$assessment->getTitle()}",
+            'submission'
         );
     }
 
@@ -244,24 +242,22 @@ class Controller extends Assessment\Controller
         );
         $lastView->addNewView($assessment, $student, $this->getUser());
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/summary.twig',
-                [
-                    'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
-                    'breadcrumbs'  => $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                                   ->add([ $assessment->getTitle(), '' ]),
-                    'assessment'   => $assessment,
-                    'participant'  => $participant,
-                    'student'      => $student,
-                    'timeline'     => $timeline,
-                    'returnUrl'    => $this->requestQuery->get(Assessment\Redirect::RETURN_URL),
-                    'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
-                    'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
-                ],
-                "Status of {$assessment->getTitle()}",
-                'submission'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/lti/summary.twig',
+            [
+                'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
+                'breadcrumbs'  => $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                               ->add([ $assessment->getTitle(), '' ]),
+                'assessment'   => $assessment,
+                'participant'  => $participant,
+                'student'      => $student,
+                'timeline'     => $timeline,
+                'returnUrl'    => $this->requestQuery->get(Assessment\Redirect::RETURN_URL),
+                'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
+                'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
+            ],
+            "Status of {$assessment->getTitle()}",
+            'submission'
         );
     }
 
@@ -383,14 +379,12 @@ class Controller extends Assessment\Controller
                 )
             ])
             ->add(['View in LTI Tool', '']);
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/ltiStatus.twig',
-                [
-                    'assessment'  => $assessment,
-                    'breadcrumbs' => $breadcrumbs,
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/lti/ltiStatus.twig',
+            [
+                'assessment'  => $assessment,
+                'breadcrumbs' => $breadcrumbs,
+            ]
         );
     }
 
@@ -456,15 +450,13 @@ class Controller extends Assessment\Controller
                 )
             ])
             ->add(['Create Response for ' . $assessment->getTitle(), '']);
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/ltiCreateResponse.twig',
-                [
-                    'assessment'  => $assessment,
-                    'student'     => $student,
-                    'breadcrumbs' => $breadcrumbs,
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/lti/ltiCreateResponse.twig',
+            [
+                'assessment'  => $assessment,
+                'student'     => $student,
+                'breadcrumbs' => $breadcrumbs,
+            ]
         );
     }
 

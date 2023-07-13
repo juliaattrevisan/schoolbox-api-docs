@@ -293,7 +293,7 @@ class Controller extends Base
             $selfAssessmentFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback));
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
+        $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);
     }
 
     /**
@@ -327,11 +327,11 @@ class Controller extends Base
             $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/kamiView.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/kamiView.twig', [
             'kami'     => $kami,
             'session'  => $session,
             'response' => $response
-        ]));
+        ]);
     }
 
 
@@ -500,7 +500,7 @@ class Controller extends Base
                     ->add(['Similarity Check', '']),
             ];
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
+            $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/turnitin/iframe.twig', $data);
         }
 
         /* TODO You might error out here when json_decode returns null
@@ -526,7 +526,7 @@ class Controller extends Base
             'interactiveAvailable' => false
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/plagscan/iframe.twig', $data));
+        $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/plagscan/iframe.twig', $data);
     }
 
     /**

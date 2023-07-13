@@ -938,11 +938,11 @@ class Controller extends BaseController
             $folderList->add($folder);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@folder/groups.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@folder/groups.twig', [
             'groupList'           => $folderList->sortByCallback(function ($a, $b) {
                 return strnatcasecmp($a->getName(), $b->getName());
             }),
             'userAccess'          => $userAccess
-        ]));
+        ]);
     }
 }

@@ -79,17 +79,15 @@ class Controller extends Base
         $l10n = $this->getDi()->get('l10n');
 
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@profileDocumentManagement/index.twig',
-                [
-                    'student' => $student,
-                    'reports' => $reports,
-                    'icons'   => $icons,
-                    'wysiwyg_content' => $wysiwyg_value
-                ],
-                $l10n->translate('reports', true, true) . ' for ' . $student->formatName()
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@profileDocumentManagement/index.twig',
+            [
+                'student' => $student,
+                'reports' => $reports,
+                'icons'   => $icons,
+                'wysiwyg_content' => $wysiwyg_value
+            ],
+            $l10n->translate('reports', true, true) . ' for ' . $student->formatName()
         );
     }
 

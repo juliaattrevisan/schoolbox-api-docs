@@ -263,13 +263,11 @@ class Controller extends Assessment\Controller
             ))->getFirstUrl(),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/dueWork/status.twig',
-                $twigData,
-                "Status of {$assessment->getTitle()}",
-                'submission'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/status.twig',
+            $twigData,
+            "Status of {$assessment->getTitle()}",
+            'submission'
         );
     }
 
@@ -416,13 +414,11 @@ class Controller extends Assessment\Controller
             $twigData['acknowledgementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
         }
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/dueWork/summary/student.twig',
-                $twigData,
-                "{$assessment->getTitle()} - {$student->getFullName()}",
-                'submission'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/summary/student.twig',
+            $twigData,
+            "{$assessment->getTitle()} - {$student->getFullName()}",
+            'submission'
         );
     }
 
@@ -867,11 +863,9 @@ class Controller extends Assessment\Controller
             'showRubricTotal'     => $selfAssess
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/dueWork/createSubmission.twig',
-                $data
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/createSubmission.twig',
+            $data
         );
     }
 
@@ -1671,7 +1665,7 @@ class Controller extends Assessment\Controller
      */
     public function getSimilarityReport(IAssessable $assessment): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/dueWork/similarityReport.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learningAssessment/dueWork/similarityReport.twig', [
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
                 $this->getRouteIfAuthorized('learningAssessment.getStatus', [
@@ -1687,7 +1681,7 @@ class Controller extends Assessment\Controller
                 'assessment' => $assessment,
                 'assessmentId' => $assessment->getId()
             ])
-        ], "{$assessment->getTitle()} Similarity Report"));
+        ], "{$assessment->getTitle()} Similarity Report");
     }
 
 

@@ -52,14 +52,14 @@ class Controller extends Base
          */
         $weekends = 'false';
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@timetable/timetableCalendar.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
             'user' => $user,
             'selectedDate' => $selectedDate,
             'weekends' => $weekends
         ], sprintf(
             'Timetable Calendar for %s',
             $user->getFullName()
-        )));
+        ));
     }
 
 

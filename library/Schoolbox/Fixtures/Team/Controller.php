@@ -112,11 +112,11 @@ class Controller extends AbstractController
         // Load coaches into entity
         $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesTeam/entity.twig', [
             'sport'    => $sport,
             'division' => $division,
             'team'     => $entity
-        ]));
+        ]);
     }
 
     /**
@@ -162,12 +162,12 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesTeam/create.twig', [
             'sport'    => $sport,
             'division' => $context,
             'team'     => $entity,
             'action'   => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        ]);
     }
 
     /**
@@ -446,15 +446,13 @@ class Controller extends AbstractController
             ]
         );
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesTeam/list.twig',
-                [
-                    'sport'    => $sport,
-                    'division' => $context,
-                    'allTeams' => $allTeams,
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@sportsfixturesTeam/list.twig',
+            [
+                'sport'    => $sport,
+                'division' => $context,
+                'allTeams' => $allTeams,
+            ]
         );
     }
 

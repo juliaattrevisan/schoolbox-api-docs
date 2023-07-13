@@ -224,12 +224,10 @@ class Controller extends Base
             $this->requestQuery->getArrayCopy(),
         );
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadge/list.twig',
-                ['filterPanel' => $filterPanel,],
-                'Badges'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningBadge/list.twig',
+            ['filterPanel' => $filterPanel,],
+            'Badges'
         );
     }
 
@@ -262,24 +260,22 @@ class Controller extends Base
             }
         );
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadge/createUpdateForm.twig',
-                [
-                    'badge' => [],
-                    'curriculumCodes' => [],
-                    'attachzone' => $attachzone->getTwigContext(),
-                    'categories' => $this->categoryMapper->findAll(),
-                    'expiries' => self::EXPIRY_OPTION_VALUES,
-                    'yearLevels' => $yearLevels,
-                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-                    'iconRegistry' => [
-                        'registry' => $iconRegistry->getRegistry(),
-                        'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
-                    ]
-                ],
-                'Create Badge'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningBadge/createUpdateForm.twig',
+            [
+                'badge' => [],
+                'curriculumCodes' => [],
+                'attachzone' => $attachzone->getTwigContext(),
+                'categories' => $this->categoryMapper->findAll(),
+                'expiries' => self::EXPIRY_OPTION_VALUES,
+                'yearLevels' => $yearLevels,
+                'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'iconRegistry' => [
+                    'registry' => $iconRegistry->getRegistry(),
+                    'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
+                ]
+            ],
+            'Create Badge'
         );
     }
 
@@ -374,7 +370,7 @@ class Controller extends Base
         );
 
         $curriculumCodes = $badge->getViewableCurriculumNodes()?->reindex();
-        $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learningBadge/createUpdateForm.twig', [
             'badge' => $badge,
             'curriculumCodes' => $curriculumCodes,
             'attachzone' => $attachzone->getTwigContext(),
@@ -386,7 +382,7 @@ class Controller extends Base
                 'registry' => $iconRegistry->getRegistry(),
                 'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
             ]
-        ], 'Modify Badge'));
+        ], 'Modify Badge');
     }
 
 

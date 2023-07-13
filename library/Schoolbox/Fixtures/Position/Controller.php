@@ -57,14 +57,12 @@ class Controller extends AbstractController
                 ]
             );
 
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput(
-                    '@sportsfixturesPosition/list.twig',
-                    [
-                        'sport'        => $context,
-                        'allPositions' => $allPositions
-                    ]
-                )
+            $this->psr7Response = $this->responseFromTemplate(
+                '@sportsfixturesPosition/list.twig',
+                [
+                    'sport'        => $context,
+                    'allPositions' => $allPositions
+                ]
             );
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
@@ -84,10 +82,10 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/entity.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesPosition/entity.twig', [
             'sport'    => $sport,
             'position' => $entity
-        ]));
+        ]);
     }
 
     /**
@@ -106,11 +104,11 @@ class Controller extends AbstractController
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesPosition/create.twig', [
             'position' => $entity,
             'sport'    => $context,
             'action'   => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        ]);
     }
 
     /**

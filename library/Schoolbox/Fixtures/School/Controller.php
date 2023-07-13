@@ -33,11 +33,9 @@ class Controller extends Base
      */
     public function getList()
     {
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@sportsfixturesSchool/list.twig', [
-                'schools' => $this->getSchoolTagCloudMapper()->findAll()
-            ])
-        );
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSchool/list.twig', [
+            'schools' => $this->getSchoolTagCloudMapper()->findAll()
+        ]);
     }
 
     /**

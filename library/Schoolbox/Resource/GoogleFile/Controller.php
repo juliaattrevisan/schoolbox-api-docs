@@ -107,17 +107,15 @@ class Controller extends Base
     {
         $folder = $this->folderMapper->findById($googleFile->getFolderId());
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@googleFile/detail.twig',
-                [
-                    'googleFile' => $googleFile,
-                    'googleAccessToken' => $_SESSION['googleAccessToken'] ?? '',
-                    'googleAccessTokenType' => $_SESSION['googleAccessTokenType'] ?? '',
-                    'folder' => $folder,
-                ],
-                'Google File'
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@googleFile/detail.twig',
+            [
+                'googleFile' => $googleFile,
+                'googleAccessToken' => $_SESSION['googleAccessToken'] ?? '',
+                'googleAccessTokenType' => $_SESSION['googleAccessTokenType'] ?? '',
+                'folder' => $folder,
+            ],
+            'Google File'
         );
     }
 

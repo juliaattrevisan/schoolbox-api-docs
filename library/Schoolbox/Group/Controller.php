@@ -69,15 +69,16 @@ class Controller extends BaseController
             return strnatcasecmp($a['name'], $b['name']);
         });
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@groups/groups.twig', [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@groups/groups.twig',
+            [
                 'groupList'         => $possibleGroups,
                 //send all the endpoint routes, to make it easier for frontend.
                 'endpointAdd'       => $this->routeGenerator->generate('groups.postMyGroupAdd'),
                 'endpointDelete'    => $this->routeGenerator->generate('groups.postMyGroupDelete'),
                 'endpointNotify'    => $this->routeGenerator->generate('groups.postMyGroupNotify'),
                 'endpointFavourite' => $this->routeGenerator->generate('groups.postMyGroupFavourite'),
-            ])
+            ]
         );
     }
 

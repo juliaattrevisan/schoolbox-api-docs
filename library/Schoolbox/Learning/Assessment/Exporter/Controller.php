@@ -200,7 +200,7 @@ class Controller extends BaseController
         ];
 
         $template = '@learningAssessmentExporter/export_unit.twig';
-        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        $this->psr7Response = $this->responseFromTemplate($template, $data);
     }
 
 

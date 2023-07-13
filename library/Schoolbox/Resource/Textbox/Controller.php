@@ -162,10 +162,10 @@ class Controller extends Base
             ['Text Boxes', null]
         ];
 
-        $this->response->content->set($this->buildHtmlOutput('@textbox/index.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@textbox/index.twig', [
             'folder'         => $folder,
             'allBreadcrumbs' => $allBreadcrumbs,
-        ]));
+        ]);
     }
 
 

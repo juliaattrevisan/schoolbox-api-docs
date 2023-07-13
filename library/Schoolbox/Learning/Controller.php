@@ -143,11 +143,10 @@ class Controller extends Base
             $title .= " for {$viewee->getFullName()}";
         }
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learning/pendingAssessmentsOuter.twig', [
                 'viewee'      => $viewee,
                 'filterPanel' => $filterPanel,
-            ], $title, 'submission')
+            ], $title, 'submission'
         );
     }
 
@@ -334,7 +333,7 @@ class Controller extends Base
             'hideTimetable' => $hideTimetable,
         ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData, null, 'classes'));
+        $this->psr7Response = $this->responseFromTemplate('@learning/classes.twig', $gridData, null, 'classes');
     }
 
     /**
@@ -367,8 +366,7 @@ class Controller extends Base
      */
     public function getClassListPage(Folder\Model $folder): void
     {
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learning/classLists.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learning/classLists.twig', [
                 'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess(),
@@ -382,7 +380,7 @@ class Controller extends Base
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
-            ], $folder->getName(), 'classes')
+            ], $folder->getName(), 'classes'
         );
     }
 

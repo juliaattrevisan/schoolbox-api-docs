@@ -150,7 +150,7 @@ class Controller extends Base
             ],
             $sidebar->generate()
         );
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', $data, 'Saved For Later', 'news'));
+        $this->psr7Response = $this->responseFromTemplate('@commsNewsSaveForLater/index.twig', $data, 'Saved For Later', 'news');
     }
 
 

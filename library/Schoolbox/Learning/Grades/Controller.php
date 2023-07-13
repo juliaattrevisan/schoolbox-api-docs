@@ -170,7 +170,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
             'year'             => ($termIsWholeYear ? $term->getStart()->getYear() : null),
@@ -181,7 +181,7 @@ class Controller extends Base
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'currentUser'      => $this->getUser(),
             'yearUrl'          => $this->getYearUrl($viewee->getId())
-        ], null, 'grade'));
+        ], null, 'grade');
     }
 
     /**
@@ -258,8 +258,9 @@ class Controller extends Base
         $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $yearUrl = $this->getYearUrl($viewee->getId());
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learningGrades/gradesOuter.twig', [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningGrades/gradesOuter.twig',
+            [
                 'student'            => $viewee,
                 'filterPanel'        => $filterPanel,
                 'term'               => $term,
@@ -269,7 +270,9 @@ class Controller extends Base
                 'markbook'           => $markbook,
                 'conversation'       => $conversation,
                 'yearUrl'            => $yearUrl,
-            ], "Grades for {$subject->getTitle()}", 'grade')
+            ],
+            "Grades for {$subject->getTitle()}",
+            'grade'
         );
     }
 

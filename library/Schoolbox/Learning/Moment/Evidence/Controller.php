@@ -115,9 +115,7 @@ class Controller extends Base
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
         ];
 
-        $this->response->content->set(
-            $this->buildHtmlOutput($template, $params)
-        );
+        $this->psr7Response = $this->responseFromTemplate($template, $params);
     }
 
 
@@ -145,15 +143,13 @@ class Controller extends Base
             || ($this->getUser()->getRole()->isParent() && $this->getConfigLoader()->get('evidence_parent_comment'))
         );
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningMomentEvidence/detail.twig',
-                [
-                    'evidence'                 => $item,
-                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-                    'learningMomentCanComment' => $learningMomentCanComment,
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningMomentEvidence/detail.twig',
+            [
+                'evidence'                 => $item,
+                'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'learningMomentCanComment' => $learningMomentCanComment,
+            ]
         );
     }
 
@@ -312,11 +308,9 @@ class Controller extends Base
         $params['zone']     = $zone->getTwigContext();
         $params['evidence'] = $evidence;
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                $template,
-                $params
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            $template,
+            $params
         );
     }
 

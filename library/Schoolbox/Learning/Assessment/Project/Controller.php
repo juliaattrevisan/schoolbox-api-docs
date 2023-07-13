@@ -178,11 +178,9 @@ class Controller extends Assessment\Controller
                     : $this->getSession()->getHistory(),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/project/status/staff.twig',
-                $twigData
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/project/status/staff.twig',
+            $twigData
         );
     }
 
@@ -259,11 +257,9 @@ class Controller extends Assessment\Controller
             'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->psr7Request->getUri()->getPath()),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/project/summary/student.twig',
-                $twigData
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/project/summary/student.twig',
+            $twigData
         );
     }
 

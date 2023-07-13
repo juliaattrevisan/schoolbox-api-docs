@@ -298,9 +298,9 @@ class Controller extends Base
      */
     public function getUpload()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesImport/upload.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesImport/upload.twig', [
             'attachzone' => $this->getAttachZone()
-        ]));
+        ]);
     }
 
     /**

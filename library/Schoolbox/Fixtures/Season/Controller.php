@@ -115,15 +115,13 @@ class Controller extends AbstractController
                 }
             }
 
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput(
-                    '@sportsfixturesSeason/list.twig',
-                    [
-                        'allSeasons'     => $allSeasons,
-                        'divisionCounts' => $divisionCounts,
-                        'matchCounts'    => $matchCounts,
-                    ]
-                )
+            $this->psr7Response = $this->responseFromTemplate(
+                '@sportsfixturesSeason/list.twig',
+                [
+                    'allSeasons'     => $allSeasons,
+                    'divisionCounts' => $divisionCounts,
+                    'matchCounts'    => $matchCounts,
+                ]
             );
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
@@ -140,9 +138,9 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSeason/entity.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSeason/entity.twig', [
             'season' => $entity
-        ]));
+        ]);
     }
 
     /**
@@ -167,7 +165,7 @@ class Controller extends AbstractController
             'action' => $entity->getId() ? 'Modify' : 'Create',
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSeason/create.twig', $data));
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSeason/create.twig', $data);
     }
 
     /**

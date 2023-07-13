@@ -91,12 +91,12 @@ class Controller extends AbstractController
             ]
         ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/list.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesItineraryItem/list.twig', [
             'sport'             => $sport,
             'division'          => $division,
             'match'             => $context,
             'allItineraryItems' => $allItineraryItems
-        ]));
+        ]);
     }
 
 
@@ -127,12 +127,12 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/entity.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesItineraryItem/entity.twig', [
             'sport'         => $sport,
             'division'      => $division,
             'match'         => $matchup,
             'itineraryItem' => $entity
-        ]));
+        ]);
     }
 
 
@@ -166,13 +166,13 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/create.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesItineraryItem/create.twig', [
             'sport'         => $sport,
             'division'      => $division,
             'match'         => $context,
             'itineraryItem' => $entity,
             'action'        => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        ]);
     }
 
 
