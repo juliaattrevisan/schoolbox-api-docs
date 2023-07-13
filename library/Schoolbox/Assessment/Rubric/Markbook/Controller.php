@@ -1080,6 +1080,8 @@ class Controller extends Base
                         $normalised = $sumNormalised / $sumWeight;
                         $overallMarks[$capabilityId]['marks'][$studentId]['normalised'] = $normalised;
                         $overallMarks[$capabilityId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                        $overallMarks[$capabilityId]['marks'][$studentId]['draftNormalised'] = $normalised;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['draftHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
                     }
                     if ($draftSumWeight) {
                         $draftNormalised                                  = $draftSumNormalised / $draftSumWeight;
@@ -1104,6 +1106,8 @@ class Controller extends Base
                             $normalised = $sumNormalised / $sumWeight;
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['normalised'] = $normalised;
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftNormalised'] = $normalised;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
                         }
                         if ($draftSumWeight) {
                             $draftNormalised = $draftSumNormalised / $draftSumWeight;
@@ -1162,6 +1166,8 @@ class Controller extends Base
                         if ($capabilityMark !== null) {
                             $overallMarks[$capabilityId]['marks'][$studentId]['sumNormalised'] += $capabilityMark * $assessmentWeight;
                             $overallMarks[$capabilityId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                            $overallMarks[$capabilityId]['marks'][$studentId]['draftSumNormalised'] += $capabilityMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['marks'][$studentId]['draftSumWeight']     += $assessmentWeight;
                         }
                         // Draft Marks
                         $draftCapabilityMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['draftNormalisedMark'] ?? null;
@@ -1200,6 +1206,8 @@ class Controller extends Base
                         if ($indicatorMark !== null) {
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumNormalised'] += $indicatorMark * $assessmentWeight;
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftSumNormalised'] += $indicatorMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftSumWeight']     += $assessmentWeight;
                         }
                         // Draft Marks
                         $draftIndicatorMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['draftNormalisedMark'] ?? null;
