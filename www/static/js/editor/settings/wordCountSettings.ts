@@ -136,10 +136,15 @@ function addListenersForDisablingSubmitButtons(
     for (const button of submitButtons) {
         // Now we know we have a button, assign it to a const.
         const submitButton: HTMLElement = button;
-        const buttonTextOriginal: string = getButtonText(submitButton);
+
+        // Get the original text of the submit button.  Note that if a new textarea is being added to a form that
+        // already contains an overfilled textarea, the submit button will already have the buttonDisabledSuffix.  We
+        // replace that suffix with blank to get the original text.
+        const buttonDisabledSuffix = getButtonTextDisabledDueToStorageLimitSuffix();
+        const buttonTextOriginal: string = getButtonText(submitButton).replace(buttonDisabledSuffix, "");
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
-            changeButtonState(submitButton, true, buttonTextOriginal + getButtonTextDisabledDueToStorageLimitSuffix());
+            changeButtonState(submitButton, true, buttonTextOriginal + buttonDisabledSuffix);
         });
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
