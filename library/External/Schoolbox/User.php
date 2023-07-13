@@ -431,7 +431,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         /* Staff Category blacklist
          */
-        $staffCategorySql = $this->buildRestrictionSql('staffCategory', (string)$config->get('staff_dir_category_restrict'));
+        $staffCategorySql = $this->buildRestrictionSql('staffCategory', ',', (string)$config->get('staff_dir_category_restrict'));
 
         if (null !== $staffCategorySql) {
             $params = array_merge($staffCategorySql['bindings'], $params);
@@ -444,7 +444,7 @@ class External_Schoolbox_User implements External_UserInterface
         /* Staff Position Title blacklist
          * Note: this is only from the sis tables, *not* user account's Position Title
          */
-        $staffPositionTitleSql = $this->buildRestrictionSql('staffPositionTitle', (string)$config->get('staff_dir_position_title_restrict'));
+        $staffPositionTitleSql = $this->buildRestrictionSql('staffPositionTitle', "\n", (string)$config->get('staff_dir_position_title_restrict'));
 
         if (null !== $staffPositionTitleSql) {
             $params = array_merge($staffPositionTitleSql['bindings'], $params);
@@ -463,10 +463,11 @@ class External_Schoolbox_User implements External_UserInterface
      * out of the config fields' csv strings.
      *
      * @param string $name
+     * @param string $separator
      * @param string $csv
      * @return array|null
      */
-    private function buildRestrictionSql(string $name, string $csv): ?array
+    private function buildRestrictionSql(string $name, string $separator, string $csv): ?array
     {
         /* Exit early if csv is an empty string
          */
@@ -474,7 +475,7 @@ class External_Schoolbox_User implements External_UserInterface
             return null;
         }
 
-        $blacklist = array_map('trim', explode(',', $csv));
+        $blacklist = array_map('trim', explode($separator, $csv));
 
         return Builder::getArrayBindings($blacklist, $name);
     }

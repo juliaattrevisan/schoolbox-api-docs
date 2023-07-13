@@ -22,7 +22,7 @@ VALUES (
     'staff_dir_position_title_restrict',
     'Staff Directory Position Title Restriction',
     'Insert the staff position titles that will be excluded from the Staff Directory.',
-    (SELECT id FROM lu_config_field WHERE field = 'input'),
+    (SELECT id FROM lu_config_field WHERE field = 'textarea'),
     (SELECT id FROM lu_config_type WHERE type = 'External DB'),
     'true',
     'false',
