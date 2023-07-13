@@ -113,6 +113,7 @@ class RouteTXRX implements TXRX
     /**
      * EXECUTED WORKER-SIDE
      * Receive and process the work sent from the daemon
+     * @see Worker::process()
      *
      * {@inheritDoc}
      */

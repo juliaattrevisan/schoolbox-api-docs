@@ -11,31 +11,52 @@ namespace Alaress\Async\Notification;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
-use Alaress\Routing\Router;
-use Alaress\WorkerCrew\Transaction\ITransaction;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription\Resolver;
+use Schoolbox\Realtime\Routing;
 
 class Postman
 {
-    private Resolver $resolver;
+    private Resolver                                            $resolver;
+    private RouteTXRX                                           $txrx;
+    private \Alaress\WorkerCrew\Transaction\DispatchTransaction $transaction;
+    private \Alaress\Routing\Router                             $router;
 
     /**
      * @param LoggerInterface $log
-     * @param Router          $router
-     * @param ITransaction    $transaction
-     * @param RouteTXRX       $txrx
      * @param ReadCache       $subscriptionCache
+     * @param LoopInterface   $loop
+     * @param string          $flags
+     * @param string          $instanceId
+     * @param ClientInterface $redis
      */
     public function __construct(
         private LoggerInterface $log,
-        private Router $router,
-        private ITransaction $transaction,
-        private RouteTXRX $txrx,
-        private ReadCache $subscriptionCache
+        private ReadCache $subscriptionCache,
+        LoopInterface $loop,
+        string $flags,
+        string $instanceId,
+        ClientInterface $redis
     ) {
+        // the route broker for sending
+        $this->router = new \Alaress\Routing\Router(new \Alaress\Routing\Dictionary\SubscriptionDictionary('.'));
+        $this->txrx   = RouteTXRX::buildTransmitter(new ListFactory($instanceId, $redis));
+
+        $this->transaction = new \Alaress\WorkerCrew\Transaction\DispatchTransaction(
+            $loop,
+            new \Alaress\WorkerCrew\Dispatcher(
+                $loop,
+                new Routing\DispatchResponder($log),
+                $log,
+                new Routing\DispatchStrategy($flags)
+            ),
+            Routing\DispatchStrategy::TASK_ROUTE
+        );
         $this->subscriptionCache->setLog($log);
         $this->reloadRouter();
     }
@@ -61,7 +82,7 @@ class Postman
         $i = 0;
 
         // expecting event object id to be detected and attached in the context
-        $eventObjectId = isset($appendContext[Instance::EVENT_OBJECT_ID]) ? $appendContext[Instance::EVENT_OBJECT_ID] : '';
+        $eventObjectId = $appendContext[Instance::EVENT_OBJECT_ID] ?? '';
 
         foreach ($bundle->getAll() as $routeKey => $instance) {
             // Set event object id where available.

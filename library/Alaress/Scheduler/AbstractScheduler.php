@@ -66,7 +66,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param IResolver|null   $resolver
      * @return void
      */
-    protected function scheduleNotification(TriggerInterface $trigger, ?IResolver $resolver = null): void
+    protected function scheduleNotification(TriggerInterface $trigger, ?IResolver $resolver): void
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
             $this->unschedule($trigger);

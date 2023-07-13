@@ -22,9 +22,7 @@ use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Schedule;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
@@ -57,24 +55,11 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
         // we'll be using the schedule broker for receiving...
         $scheduleBroker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
-        $dispatcher     = new \Alaress\WorkerCrew\Dispatcher(
-            $loop,
-            new Routing\DispatchResponder($log),
-            $log,
-            new Routing\DispatchStrategy($flags)
-        );
 
-        // ...and the route broker for sending
-        $router      = new \Alaress\Routing\Router(new \Alaress\Routing\Dictionary\SubscriptionDictionary('.'));
         /** @var Routing\Cache\Redis\ReadCache $subscriptionCache */
         $subscriptionCache = $di->get('subscriptionCache.readonly');
-        $transaction = new \Alaress\WorkerCrew\Transaction\DispatchTransaction(
-            $loop,
-            $dispatcher,
-            Routing\DispatchStrategy::TASK_ROUTE
-        );
-        $txrx = RouteTXRX::buildTransmitter(new ListFactory(INSTANCE_ID, $redis));
-        $postman = new Postman($log, $router, $transaction, $txrx, $subscriptionCache);
+
+        $postman = new Postman($log, $subscriptionCache, $loop, $flags, INSTANCE_ID, $redis);
 
         $strat     = new DefaultDispatchStrategy($flags);
         $scheduler = new Scheduler($loop, $strat, $log, new Clock(), $conf, $postman);
