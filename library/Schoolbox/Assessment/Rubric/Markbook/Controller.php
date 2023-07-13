@@ -27,6 +27,7 @@ use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage;
 use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\MarkScheme;
+use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -785,15 +786,16 @@ class Controller extends Base
      *
      * @param array $assessments
      * @param array $linkedMarks
+     * @param Folder\Model $folder
      * @return array
      * @throws InvalidArgumentException
      * @throws RangeException
      */
-    private function buildOverallMarks(array $assessments, array $linkedMarks): array
+    private function buildOverallMarks(array $assessments, array $linkedMarks, Folder\Model $folder): array
     {
         $overallMarks = $this->aggregateMarks($assessments, $linkedMarks);
 
-        $summated = $this->summateAggregatedMarks($overallMarks);
+        $summated = $this->summateAggregatedMarks($overallMarks, $folder);
 
         foreach ($summated as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
@@ -819,14 +821,22 @@ class Controller extends Base
      * Resolves the aggregated counts to summate final capability/indicator marks
      *
      * @param array $overallMarks
+     * @param Folder\Model $folder
      * @return array
      * @throws InvalidArgumentException
      * @throws RangeException
      */
-    private function summateAggregatedMarks(array $overallMarks): array
+    private function summateAggregatedMarks(array $overallMarks, Folder\Model $folder): array
     {
-
-        $markScheme = new MarkScheme\Percentage();
+        /**
+         * Logic for the mark scheme...
+         *
+         * If there is no year level on the class page, we should default back to the system default.
+         * If there are multiple year levels on the class page, and they agree (we should use their grade group)
+         * If there are multiple year levels on the class page, and they do NOT agree (all different grade groups), we should fall back to the system default grade group.
+         */
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $markScheme = $markSchemeFactory->spawnForFolder($folder, true);
 
         foreach ($overallMarks as $capabilityId => $capabilityMarks) {
             foreach ($capabilityMarks['marks'] as $studentId => $sums) {
@@ -968,7 +978,7 @@ class Controller extends Base
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);
         $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
-        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks);
+        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
         return [$assessments, $exclusions, $linkedMarks, $overallMarks];
     }
 }
