@@ -1066,30 +1066,50 @@ class Controller extends Base
 
         foreach ($overallMarks as $capabilityId => $capabilityMarks) {
             foreach ($capabilityMarks['marks'] as $studentId => $sums) {
-                $sumNormalised = $sums['sumNormalised'];
-                $sumWeight     = $sums['sumWeight'];
-                if (!$sumWeight) {
+                $sumNormalised      = $sums['sumNormalised'];
+                $sumWeight          = $sums['sumWeight'];
+                $draftSumNormalised = $sums['draftSumNormalised'];
+                $draftSumWeight     = $sums['draftSumWeight'];
+                if (!$sumWeight && !$draftSumWeight) {
+                    // nothing exists, so remove this...
                     unset($overallMarks[$capabilityId]['marks'][$studentId]);
                 } else {
-                    $normalised                                       = $sumNormalised / $sumWeight;
-                    $overallMarks[$capabilityId]['marks'][$studentId] = [
-                        'normalised'    => $normalised,
-                        'humanReadable' => $markScheme->getHumanReadableMark($normalised),
-                    ];
+                    // only dump things into the array that actually exist...
+                    $overallMarks[$capabilityId]['marks'][$studentId] = [];
+                    if ($sumWeight) {
+                        $normalised = $sumNormalised / $sumWeight;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['normalised'] = $normalised;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                    }
+                    if ($draftSumWeight) {
+                        $draftNormalised                                  = $draftSumNormalised / $draftSumWeight;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['draftNormalised'] = $draftNormalised;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['draftHumanReadable'] = $markScheme->getHumanReadableMark($draftNormalised);
+                    }
                 }
             }
             foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
                 foreach ($indicatorMarks['marks'] as $studentId => $sums) {
                     $sumNormalised = $sums['sumNormalised'];
                     $sumWeight     = $sums['sumWeight'];
-                    if (!$sumWeight) {
+                    $draftSumNormalised = $sums['draftSumNormalised'];
+                    $draftSumWeight     = $sums['draftSumWeight'];
+                    if (!$sumWeight && !$draftSumWeight) {
+                        // nothing exists, so remove this...
                         unset($overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]);
                     } else {
-                        $normalised                                                                   = $sumNormalised / $sumWeight;
-                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
-                            'normalised'    => $normalised,
-                            'humanReadable' => $markScheme->getHumanReadableMark($normalised),
-                        ];
+                        // only dump things into the array that actually exist...
+                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [];
+                        if ($sumWeight) {
+                            $normalised = $sumNormalised / $sumWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['normalised'] = $normalised;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                        }
+                        if ($draftSumWeight) {
+                            $draftNormalised = $draftSumNormalised / $draftSumWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftNormalised'] = $draftNormalised;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftHumanReadable'] = $markScheme->getHumanReadableMark($draftNormalised);
+                        }
                     }
                 }
             }
