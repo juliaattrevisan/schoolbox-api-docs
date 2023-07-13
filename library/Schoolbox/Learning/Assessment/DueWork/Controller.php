@@ -1212,9 +1212,7 @@ class Controller extends Assessment\Controller
         ];
 
         if (null !== $detachedFunction) {
-            $output['postOutput'] = [
-                $detachedFunction
-            ];
+            $this->postOutputCallbacks[] = $detachedFunction;
         }
 
         /* Asynchronously shove it into plagscan, so we don't make the user wait ages

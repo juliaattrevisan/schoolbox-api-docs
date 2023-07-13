@@ -211,12 +211,10 @@ class Controller extends ConfigController
             }
         }
         if ($rebuildModules) {
+            $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
             $this->getResponse()->content->set([
-                'format'     => 'noContent',
-                'postOutput' => [
-                    $this->buildRebuildModuleCacheCallback(),
-                ],
+                'format' => 'noContent',
             ]);
         }
 

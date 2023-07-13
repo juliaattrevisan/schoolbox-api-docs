@@ -81,6 +81,14 @@ abstract class Base
     protected ResponseFactory $responseFactory;
 
     /**
+     * A list of callbacks to be called after output has been sent to the
+     * browser.
+     *
+     * @var array<callable>
+     */
+    protected array $postOutputCallbacks = [];
+
+    /**
      * @deprecated you should be injecting your dependencies from the constructor!
      */
     protected ContainerInterface $di;

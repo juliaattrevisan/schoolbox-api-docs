@@ -137,6 +137,9 @@ class Controller extends Base
         $sessionUser = $this->getUser();
 
         // Do the import in a detached state so it doesn't time out
+        $this->postOutputCallbacks[] = function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords) {
+            $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
+        };
         $this->getResponse()->content->set([
             'template'   => '@adminImportPastoral/log.twig',
             'data'       => [
@@ -145,11 +148,6 @@ class Controller extends Base
                 'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
                 'message'        => true,
-            ],
-            'postOutput' => [
-                function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords) {
-                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
-                },
             ],
         ]);
     }

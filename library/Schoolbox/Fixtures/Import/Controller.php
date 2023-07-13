@@ -434,64 +434,60 @@ class Controller extends Base
 
             $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import started");
 
+            $this->postOutputCallbacks[] = function () use ($post) {
+                // Get all uploaded files
+
+                $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
+
+                // Create blank arrays to hold everything
+
+                // Begin the import looking for entities that aren't dependent on others
+
+                try {
+                    /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                    foreach ($attachmentObjects as $storageObject) {
+                        $this->loadSports($storageObject);
+                        $this->loadSeasons($storageObject);
+                        $this->loadVenues($storageObject);
+                        $this->loadSchools($storageObject);
+                        $this->loadStatuses($storageObject);
+                    }
+
+                    // Now we can load positions and division
+
+                    /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                    foreach ($attachmentObjects as $storageObject) {
+                        $this->loadPositions($storageObject);
+                    }
+
+                    // Now we can load teams
+
+                    /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                    foreach ($attachmentObjects as $storageObject) {
+                        $this->loadTeams($storageObject);
+                    }
+
+                    // Now we can load coaches
+
+                    /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                    foreach ($attachmentObjects as $storageObject) {
+                        $this->loadCoaches($storageObject);
+                        $this->loadFixtures($storageObject);
+                    }
+
+                    // Success, update the status
+
+                    $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import completed", Controller::STATUS_COMPLETED);
+                } catch (\Exception $e) {
+                    // Failed, record the error message
+
+                    $this->updateLog(Controller::RESULT_ERROR, null, 0, 0, "Import failed - {$e->getMessage()} {$e->getTraceAsString()}", Controller::STATUS_FAILED);
+                }
+
+                // All done!
+            };
             $this->getResponse()->content->set([
                 'format' => 'noContent',
-                'postOutput' => [
-
-                    function () use ($post) {
-
-                        // Get all uploaded files
-
-                        $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
-
-                        // Create blank arrays to hold everything
-
-                        // Begin the import looking for entities that aren't dependent on others
-
-                        try {
-                            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-                            foreach ($attachmentObjects as $storageObject) {
-                                $this->loadSports($storageObject);
-                                $this->loadSeasons($storageObject);
-                                $this->loadVenues($storageObject);
-                                $this->loadSchools($storageObject);
-                                $this->loadStatuses($storageObject);
-                            }
-
-                            // Now we can load positions and division
-
-                            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-                            foreach ($attachmentObjects as $storageObject) {
-                                $this->loadPositions($storageObject);
-                            }
-
-                            // Now we can load teams
-
-                            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-                            foreach ($attachmentObjects as $storageObject) {
-                                $this->loadTeams($storageObject);
-                            }
-
-                            // Now we can load coaches
-
-                            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-                            foreach ($attachmentObjects as $storageObject) {
-                                $this->loadCoaches($storageObject);
-                                $this->loadFixtures($storageObject);
-                            }
-
-                            // Success, update the status
-
-                            $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import completed", Controller::STATUS_COMPLETED);
-                        } catch (\Exception $e) {
-                            // Failed, record the error message
-
-                            $this->updateLog(Controller::RESULT_ERROR, null, 0, 0, "Import failed - {$e->getMessage()} {$e->getTraceAsString()}", Controller::STATUS_FAILED);
-                        }
-
-                        // All done!
-                    }
-                ],
             ]);
 
             $this->getResponse()->redirect->afterPost("/fixtures/import/{$this->import->getId()}");

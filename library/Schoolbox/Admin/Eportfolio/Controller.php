@@ -144,6 +144,9 @@ class Controller extends Base
         $this->eportfolioImportMapper->save($eportfolioImport);
         $id = $eportfolioImport->getId();
 
+        $this->postOutputCallbacks[] = function () use ($post, $id) {
+            $this->deployCallback($post, $id);
+        };
         $this->getResponse()->content->set([
             'template' => '@adminEportfolio/importResults.twig',
             'data' => array(
@@ -151,11 +154,6 @@ class Controller extends Base
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
                 'id' => $id
             ),
-            'postOutput' => [
-                function () use ($post, $id) {
-                    $this->deployCallback($post, $id);
-                }
-            ],
         ]);
     }
 

@@ -329,6 +329,7 @@ class Controller extends Base
      */
     private function assignJsonResponseForAuthenticatedUser(User $user): void
     {
+        $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
         $this->response->headers->set('Content-Type', 'application/json');
         $this->response->content->set([
             'format' => 'json',
@@ -338,7 +339,6 @@ class Controller extends Base
                 'role'     => $user->getRole()->getType(),
                 'username' => $user->getUsername(),
             ],
-            'postOutput' => [fn () => $this->shortenSessionLifetime()],
         ]);
     }
 
@@ -349,6 +349,7 @@ class Controller extends Base
      */
     private function assignRedirectResponseForAuthenticatedUser(string $page): void
     {
+        $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
         // Redirect somewhere (locally only)
         if ($page && (new Uri($page))->isAbsolutePath()) {
             $this->response->redirect->to($page);
@@ -356,8 +357,7 @@ class Controller extends Base
             $this->response->redirect->to('/');
         }
         $this->response->content->set([
-            'format'     => 'noContent',
-            'postOutput' => [fn () => $this->shortenSessionLifetime()],
+            'format' => 'noContent',
         ]);
     }
 

@@ -640,16 +640,14 @@ class Controller extends BaseController
             $headers->set('Pragma', 'public');
             $headers->set('Content-Length', filesize($filename));
 
+            $this->postOutputCallbacks[] = function () use ($filename) {
+                /* Delete the temp file
+                 */
+                unlink($filename);
+            };
             $this->getResponse()->content->set([
-                'format'     => 'file',
-                'file'       => $filename,
-                'postOutput' => [
-                    function () use ($filename) {
-                        /* Delete the temp file
-                         */
-                        unlink($filename);
-                    },
-                ],
+                'format' => 'file',
+                'file'   => $filename,
             ]);
         }
     }
