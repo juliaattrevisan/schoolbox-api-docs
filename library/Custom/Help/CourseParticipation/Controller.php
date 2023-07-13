@@ -320,8 +320,9 @@ class Controller extends Base
         }
 
         if ($failures) {
-            $rs->status->setCode(self::STATUS_MULTI_STATUS);
-            $rs->content->set($this->buildJsonOutput(array_keys($failures)));
+            $this->psr7Response = $this
+                ->responseAsJson(array_keys($failures))
+                ->withStatus(self::STATUS_MULTI_STATUS);
             return;
         }
 
@@ -497,17 +498,10 @@ class Controller extends Base
      */
     private function sendGenericStatus(int $code, ?string $reason = null): void
     {
-        $r = $reason
-            ? new Response($code, [], null, '1.1', $reason)
-            : new Response($code);
-
-        $this->getResponse()->status->set($r->getStatusCode());
-
-        $content = $code === self::STATUS_NO_CONTENT
-            ? null
-            : $this->buildJsonOutput($r->getReasonPhrase());
-
-        $this->getResponse()->content->set($content);
+        $this->psr7Response = $code === self::STATUS_NO_CONTENT
+            ? $this->responseEmpty()->withStatus($code)
+            : $this->responseAsJson($reason ?? '')->withStatus($code, $reason)
+        ;
     }
 
 
