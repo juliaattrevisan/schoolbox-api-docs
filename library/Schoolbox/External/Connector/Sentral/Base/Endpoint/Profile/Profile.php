@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
-use External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Campus;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -279,16 +278,7 @@ class Profile implements IStrategy
 
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
-
-                /* Dig out a campus name, using null as default if broken data
-                 */
-                $campusId = $student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'] ?? null;
-                $campusName = null;
-
-                if (null !== $campusId) {
-                    $campusName = $campuses[(int)$campusId] ?? null;
-                }
-
+                $campusName = $this->findCampusName($student);
                 $comments = '';
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
                 $email = (string)$student['relationships']['person']['data']['attributes']['email'];
@@ -653,6 +643,34 @@ class Profile implements IStrategy
     private function isParent(array $contact): bool
     {
         return '' === trim((string)$contact['attributes']['isEmergencyContact']);
+    }
+
+
+    /**
+     * Find campus name
+     *
+     * Assign campuses if they exist in the mapping
+     * Otherwise quietly disregard bad data
+     *
+     * @phpstan-ignore-next-line: this will eventually return a string
+     * @param array $student
+     * @return string|null
+     */
+    private function findCampusName(array $student): ?string
+    {
+        $campusId = $student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'] ?? null;
+        $campusName = null;
+
+        if (null !== $campusId) {
+            $campusName = $this->campuses[(int)$campusId] ?? null;
+
+            $this->log->debug(sprintf(
+                'Assigning campus name %s',
+                $campusName
+            ));
+        }
+
+        return $campusName;
     }
 
 
