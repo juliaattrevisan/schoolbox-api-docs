@@ -165,6 +165,9 @@ module.exports = {
         emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
         loadLayout: "./www/static/js/masonry/layout/loadLayout.ts",
 
+        //Vue component to display data in a table
+        dataTable: "./vue/components/dataTable/dataTable.ts",
+
         // Record Media Modal
         recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.js",
 

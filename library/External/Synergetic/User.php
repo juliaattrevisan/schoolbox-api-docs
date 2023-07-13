@@ -1015,7 +1015,7 @@ class External_Synergetic_User implements External_UserInterface
     {
         // Restrict staff categories to provided list
 
-        $staffCategory = explode(',', $this->config->get('synergetic_staff_dir_restrict'));
+        $staffCategory = explode(',', $this->config->get('staff_dir_category_restrict'));
 
         $filter = '';
         $bindings = [];

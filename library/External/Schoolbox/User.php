@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
@@ -397,28 +398,86 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaffContactListExtended(): array
     {
-        return $this->internalDatabase->executeQuery(
-            "SELECT
-                      external_id AS StaffID,
-                      username AS NetworkLogin,
-                      '' AS ActiveFlag,
-                      title AS StaffTitle,
-                      firstname AS StaffPreferredName,
-                      lastname AS StaffSurname,
-                      email AS StaffOccupEmail,
-                      '' AS DefaultEmailCode,
-                      building AS StaffBuilding,
-                      room AS StaffRoom,
-                      position_title AS JobPositionDescription,
-                      phone AS StaffOccupPhone,
-                      '' AS StaffExtension,
-                      campus_name AS StaffCampusDescription,
-                      category AS StaffCategory,
-                      department AS StaffDepartment
-            FROM      `sis_user_profile` sup
-            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
-        "
-        )->fetchAll();
+        $query = "
+            SELECT
+                external_id AS StaffID,
+                username AS NetworkLogin,
+                '' AS ActiveFlag,
+                title AS StaffTitle,
+                firstname AS StaffPreferredName,
+                lastname AS StaffSurname,
+                email AS StaffOccupEmail,
+                '' AS DefaultEmailCode,
+                building AS StaffBuilding,
+                room AS StaffRoom,
+                position_title AS JobPositionDescription,
+                phone AS StaffOccupPhone,
+                '' AS StaffExtension,
+                campus_name AS StaffCampusDescription,
+                category AS StaffCategory,
+                department AS StaffDepartment
+            FROM `sis_user_profile` sup
+            JOIN `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+            WHERE 1=1
+        ";
+
+        /* Apply any restrictions that were specified in admin
+         * Filter out any meaningless values
+         *
+         * Do I not have a configLoader here...?
+         */
+        $config = \Schoolbox\Config\Loader::getInstance();
+        $params = [];
+
+        /* Staff Category blacklist
+         */
+        $staffCategorySql = $this->buildRestrictionSql('staffCategory', ',', (string)$config->get('staff_dir_category_restrict'));
+
+        if (null !== $staffCategorySql) {
+            $params = array_merge($staffCategorySql['bindings'], $params);
+
+            $query .= "
+                AND (sups.category IS NULL OR sups.category NOT IN ({$staffCategorySql['placeholders']}))
+            ";
+        }
+
+        /* Staff Position Title blacklist
+         * Note: this is only from the sis tables, *not* user account's Position Title
+         */
+        $staffPositionTitleSql = $this->buildRestrictionSql('staffPositionTitle', "\n", (string)$config->get('staff_dir_position_title_restrict'));
+
+        if (null !== $staffPositionTitleSql) {
+            $params = array_merge($staffPositionTitleSql['bindings'], $params);
+
+            $query .= "
+                AND (sups.position_title IS NULL OR sups.position_title NOT IN ({$staffPositionTitleSql['placeholders']}))
+            ";
+        }
+
+        return $this->internalDatabase->executeQuery($query, $params)->fetchAll();
+    }
+
+
+    /**
+     * Build sql fragments for staff directory restrictions, compiling them
+     * out of the config fields' csv strings.
+     *
+     * @param string $name
+     * @param string $separator
+     * @param string $csv
+     * @return array|null
+     */
+    private function buildRestrictionSql(string $name, string $separator, string $csv): ?array
+    {
+        /* Exit early if csv is an empty string
+         */
+        if ('' === trim($csv)) {
+            return null;
+        }
+
+        $blacklist = array_map('trim', explode($separator, $csv));
+
+        return Builder::getArrayBindings($blacklist, $name);
     }
 
 
