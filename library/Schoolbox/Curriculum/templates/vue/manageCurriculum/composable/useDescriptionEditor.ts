@@ -72,6 +72,7 @@ export function useDescriptionEditor(
                 new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: {
                         targetElements: [`#${ckeditorSelector}`],
+                        removeFromToolbar: ["mediaEmbed"],
                         addMaxCharCountDefaultEventListeners: false,
                     },
                 })

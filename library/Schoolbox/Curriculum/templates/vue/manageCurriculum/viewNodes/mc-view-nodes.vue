@@ -50,7 +50,7 @@ window.Vue.watch(
                 Clear search
             </button>
         </div>
-        <ul v-else ref="nodesContainerEl">
+        <div v-else ref="nodesContainerEl">
             <mc-view-node
                 v-for="node in viewNodesStore.nodes"
                 :key="node.id"
@@ -58,13 +58,6 @@ window.Vue.watch(
                 :depth="depth"
                 data-test-view-node
             />
-        </ul>
+        </div>
     </div>
 </template>
-
-<style lang="scss" scoped>
-ul {
-    list-style: none;
-    margin: 0 0 1rem 0;
-}
-</style>

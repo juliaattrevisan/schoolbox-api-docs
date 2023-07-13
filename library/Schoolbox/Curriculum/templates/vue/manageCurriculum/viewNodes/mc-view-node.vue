@@ -239,7 +239,7 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
 
 <template>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-        <li v-if="showNode" ref="viewNodeEl" data-test-node>
+        <div v-if="showNode" ref="viewNodeEl" data-test-node>
             <div
                 class="container"
                 :data-enabled="props.node.enabled"
@@ -285,7 +285,7 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-update-node v-if="isUpdating" :depth="props.depth" />
             </Transition>
-            <ul v-if="showChildren">
+            <div v-if="showChildren">
                 <mc-view-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
@@ -293,8 +293,8 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
                     :depth="props.depth + 1"
                     data-test-view-node
                 />
-            </ul>
-        </li>
+            </div>
+        </div>
     </Transition>
 </template>
 
@@ -360,11 +360,6 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
     100% {
         background-color: white;
     }
-}
-
-ul {
-    list-style: none; //don't use any dots
-    margin: 0; //and spacing is controlled by props.depth
 }
 
 @import "../style/mcStyle";
