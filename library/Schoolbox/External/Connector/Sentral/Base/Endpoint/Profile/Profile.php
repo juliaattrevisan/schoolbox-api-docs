@@ -286,7 +286,7 @@ class Profile implements IStrategy
                 $campusName = null;
 
                 if (null !== $campusId) {
-                    $campusName = $campuses[$campusId] ?? null;
+                    $campusName = $campuses[(int)$campusId] ?? null;
                 }
 
                 $comments = '';
