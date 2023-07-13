@@ -5,8 +5,6 @@ import { init as initSwingDown } from "./animations/swingDown";
 import { init as initCoinSpin } from "./animations/coinSpin";
 import { init as initSpinIn } from "./animations/spinIn";
 
-const CANVAS_SELECTOR = "[data-badge-award-canvas]";
-
 /**
  * Animate the badge, acheievements should be celebrated a little!
  * Put the list of animations in an array so one can be randomly chosen and played
@@ -23,6 +21,7 @@ export function animateBadgeImage(badgeImage, awardCanvas) {
 
 /**
  * Ensure there's no left over animation if user is moving through the new rewards quickly
+ * @param DOMElement canvas
  */
 export function clearCanvas(canvas) {
     const canvasDimensions = getCanvasDimensions(canvas);
@@ -32,11 +31,10 @@ export function clearCanvas(canvas) {
 
 /**
  * Get the dimensions of the canvas, which can change depending on screen dimensions
- *
  * @return { Number, Number }
+ * @param DOMElement
  */
 export function getCanvasDimensions(canvas) {
-    // const canvas = document.querySelector(CANVAS_SELECTOR);
     return {
         width: canvas.width,
         height: canvas.height,
@@ -48,9 +46,9 @@ export function getCanvasDimensions(canvas) {
  * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
  *
  * @return { CanvasRenderingContext2D }
+ * @param DOMElement
  */
 export function getContext(canvas) {
-    // const canvas = document.querySelector(CANVAS_SELECTOR);
     return canvas.getContext("2d");
 }
 
@@ -60,6 +58,7 @@ export function getContext(canvas) {
  * which is an iPhone 5, a pretty small screen.
  *
  * @return { Number }
+ * @param DOMElement
  */
 export function getStarCount(canvas) {
     const currentCanvasDimensions = getCanvasDimensions(canvas);

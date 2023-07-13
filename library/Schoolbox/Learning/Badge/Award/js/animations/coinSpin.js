@@ -12,6 +12,7 @@ gsap.registerPlugin(Physics2DPlugin);
  * Set up both the badge and the stars animations
  *
  * @param { DOMElement }
+ * @param DOMElement
  */
 export async function init(badgeImage, awardCanvas) {
     animateBadge(badgeImage);
@@ -32,6 +33,7 @@ function animateBadge(badgeImage) {
 
 /**
  * Get all the stars, add an animation to the gsap.timeline for each and ensure the Canvas is redrawn on each update.
+ * @param DOMElement
  */
 function animateStars(awardCanvas) {
     const stars = getStars(awardCanvas);
@@ -51,6 +53,7 @@ function animateStars(awardCanvas) {
  * Put them in the centre width of the Canvas and spread them along the vertical axis a bit so they can 'flick' out
  *
  * @return { Array }
+ * @param DOMElement
  */
 function getStars(canvas) {
     const stars = [];
