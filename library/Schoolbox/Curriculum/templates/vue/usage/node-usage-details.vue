@@ -7,6 +7,7 @@ import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import NodeUsageDetailsDescription from "./node-usage-details-description.vue";
 import NodeUsageDetailsItem from "./node-usage-details-item.vue";
 
 interface Props {
@@ -106,7 +107,7 @@ const activeUsages = window.Vue.computed(() => {
         </section>
         <section v-else>
             <fieldset class="content">
-                <div v-html="props.node.description"></div>
+                <node-usage-details-description :node="props.node" />
                 <div v-if="hasUsage" class="usage-list-container">
                     <div v-for="activeUsage in activeUsages">
                         <h4>{{ activeUsage.title }} ({{ activeUsage.count }})</h4>
