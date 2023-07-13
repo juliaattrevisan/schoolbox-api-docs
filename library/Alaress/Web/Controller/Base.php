@@ -572,10 +572,10 @@ abstract class Base
     /**
      * Build a JSON response from `$data`.
      *
-     * @param object|array $data
+     * @param mixed $data
      * @return ResponseInterface
      */
-    protected function responseAsJson(object|array $data): ResponseInterface
+    protected function responseAsJson(mixed $data): ResponseInterface
     {
         return $this->responseFactory->buildJson($data);
     }

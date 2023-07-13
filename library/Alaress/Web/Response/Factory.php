@@ -77,10 +77,10 @@ class Factory
     /**
      * Builds a JSON response.
      *
-     * @param object|array $data
+     * @param mixed $data
      * @return ResponseInterface
      */
-    public function buildJson(object|array $data): ResponseInterface
+    public function buildJson(mixed $data): ResponseInterface
     {
         return $this->responseFactory
             ->createResponse()
