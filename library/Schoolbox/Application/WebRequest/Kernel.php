@@ -401,7 +401,7 @@ class Kernel extends WebKernelAbstract
                     $auraWebOutput = $this->di->get("webOutput:base");
                 }
             }
-            $auraWebOutput->setPostOutputCallbacks($controller->getPostOutputCallbacks());
+//            $auraWebOutput->setPostOutputCallbacks($controller->getPostOutputCallbacks());
 
             $redirect = $controller->getResponse()->headers->get('location');
             $isJson   = $auraWebOutput instanceof Json;
@@ -439,11 +439,32 @@ class Kernel extends WebKernelAbstract
 
         // Output whatever kind of response we have
         if ($psr7Response) {
-            // TODO do something with post-output callbacks
             $outputter = new Outputter();
             $outputter->output($psr7Response);
         } elseif ($auraWebOutput && $auraWebResponse) {
             $auraWebOutput->output($auraWebResponse);
+        }
+
+        // Output post-output callbacks
+        $postOutputCallbacks = $controller->getPostOutputCallbacks();
+        if (count($postOutputCallbacks)) {
+            // Finish the request
+            fastcgi_finish_request();
+
+            // Allow the process however long it needs to finish:
+            // 30 minutes should be more than enough.
+            set_time_limit(60 * 30);
+
+            // Callbacks
+            foreach ($postOutputCallbacks as $callback) {
+                if (is_callable($callback)) {
+                    $callback();
+                }
+            }
+
+            // Close session once done
+            // (actions in post-output may require session data)
+            session_write_close();
         }
     }
 
