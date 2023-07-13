@@ -257,9 +257,9 @@ class Controller extends ConfigController
             }
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@adminImportIndex/schoolData/status.twig', [
             'isReachable' => $isReachable
-        ]));
+        ]);
     }
 
 

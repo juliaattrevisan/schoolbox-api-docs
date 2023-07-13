@@ -163,16 +163,14 @@ class Controller extends BaseController
 
         $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-1']);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@courseImportAtlas/import/plan.twig',
-                [
-                    'curriculum'             => $curriculumPlan,
-                    'previousPost'           => $previousPost,
-                    'attachmentDefaults'     => $this->importer->buildDefaultSettingsForAttachments($curriculumPlan),
-                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@courseImportAtlas/import/plan.twig',
+            [
+                'curriculum'             => $curriculumPlan,
+                'previousPost'           => $previousPost,
+                'attachmentDefaults'     => $this->importer->buildDefaultSettingsForAttachments($curriculumPlan),
+                'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
+            ]
         );
     }
 
@@ -207,16 +205,14 @@ class Controller extends BaseController
 
         $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-2']);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@courseImportAtlas/import/facultySelector.twig',
-                [
-                    'curriculum'             => $curriculumPlan,
-                    'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
-                    'previousPost'           => $previousPost,
-                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
-                ]
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@courseImportAtlas/import/facultySelector.twig',
+            [
+                'curriculum'             => $curriculumPlan,
+                'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                'previousPost'           => $previousPost,
+                'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
+            ]
         );
     }
 
@@ -287,11 +283,8 @@ class Controller extends BaseController
      */
     private function throwNotSelectedError(string $message): void
     {
-        // SHUP.
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode(400);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
+        $this->psr7Response = $this
+            ->responseFromTemplateUnthemed(
                 'sub/mage-error.twig',
                 [
                     'error' => [
@@ -299,7 +292,7 @@ class Controller extends BaseController
                     ],
                 ]
             )
-        );
+            ->withStatus(400);
     }
 
 
@@ -326,11 +319,8 @@ class Controller extends BaseController
         }
 
 
-        // SHUP.
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode($e->getCode() ?: 400);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
+        $this->psr7Response = $this
+            ->responseFromTemplateUnthemed(
                 'sub/mage-error.twig',
                 [
                     'error' => [
@@ -338,6 +328,6 @@ class Controller extends BaseController
                     ],
                 ]
             )
-        );
+            ->withStatus($e->getCode() ?: 400);
     }
 }

@@ -224,9 +224,9 @@ class Controller extends WebController\Base
              */
             $rank = $courseMarkbook->getRanking();
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'status'  => 200,
-                'content' => $this->buildUnthemedHtmlOutput('@courseMarkbook/courseMarkbookInner.twig', [
+            $contentResponse = $this->responseFromTemplateUnthemed(
+                '@courseMarkbook/courseMarkbookInner.twig',
+                [
                     'rank'                    => $rank,
                     'rankEnabled'             => (bool)$this->getConfigLoader()->get('view_rank'),
                     'courseSpec'              => $courseSpec,
@@ -244,10 +244,14 @@ class Controller extends WebController\Base
                     'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
                     'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
                     'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                ])->getAsString(),
-            ]));
+                ]
+            );
+            $this->psr7Response = $this->responseAsJson([
+                'status'  => 200,
+                'content' => $contentResponse->getBody()->getContents(),
+            ]);
         } catch (Filter\BrokenFilterException $e) {
-            $this->captureException($e);
+            // For some reason: this never actually set status 500
             $data = [
                 'status'  => 500,
                 'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
@@ -260,7 +264,7 @@ class Controller extends WebController\Base
                     'file'    => $e->getFile(),
                 ]);
             }
-            $this->getResponse()->content->set($this->buildJsonOutput($data));
+            $this->psr7Response = $this->responseAsJson($data);
         } catch (Throwable $e) {
             $this->captureException($e);
             $this->returnJsonError($e);
@@ -378,6 +382,6 @@ class Controller extends WebController\Base
                 'file'    => $e->getFile(),
             ]);
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 }

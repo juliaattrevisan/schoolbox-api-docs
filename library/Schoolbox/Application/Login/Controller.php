@@ -121,7 +121,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@login/login.twig', $data));
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@login/login.twig', $data);
     }
 
 

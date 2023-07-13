@@ -967,9 +967,7 @@ class Controller extends ConfigController
             'customReportStyle'          => (new CustomStyleExtractor())->extract((string)$this->getConfigLoader()->get('skin_custom_css'))
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildUnthemedHtmlOutput('@adminSummativeReport/studentReport.twig', $data)
-        );
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@adminSummativeReport/studentReport.twig', $data);
     }
 
 

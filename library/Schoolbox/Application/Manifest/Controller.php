@@ -146,7 +146,7 @@ class Controller extends Base
      */
     public function getOffline(): void
     {
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/offline.twig', []));
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@manifest/offline.twig', []);
     }
 
     /**
@@ -166,7 +166,9 @@ class Controller extends Base
     {
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
-        $this->getResponse()->headers->set('Content-Type', 'application/javascript');
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/service-worker.js', ['debug' => (bool)$this->getConfigLoader()->get('debug_mode')]));
+        $this->psr7Response = $this
+            ->responseFromTemplateUnthemed('@manifest/service-worker.js', ['debug' => (bool)$this->getConfigLoader()->get('debug_mode')])
+            ->withHeader('Content-Type', 'application/javascript')
+        ;
     }
 }

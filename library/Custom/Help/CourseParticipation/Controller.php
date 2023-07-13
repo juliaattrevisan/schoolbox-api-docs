@@ -201,8 +201,6 @@ class Controller extends Base
      */
     public function getApiTestEnrolmentTable(string $schoolCode)
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
@@ -211,10 +209,10 @@ class Controller extends Base
 
         $enrolments = $this->handler->getFolderAccessBySchool($schoolCode);
 
-        $rs->content->set($this->buildUnthemedHtmlOutput('@helpCourseParticipation/apitest-usertable.twig', [
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@helpCourseParticipation/apitest-usertable.twig', [
             'courses' => $enrolments,
             'users'   => $registeredUsers
-        ]));
+        ]);
     }
 
 

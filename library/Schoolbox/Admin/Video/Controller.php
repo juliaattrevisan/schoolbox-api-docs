@@ -62,12 +62,12 @@ class Controller extends Base
      */
     public function getLog($queue)
     {
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput(
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
             '@adminVideo/log.twig',
             [
                 'log' => $queue,
             ]
-        ));
+        );
     }
 
     /**
