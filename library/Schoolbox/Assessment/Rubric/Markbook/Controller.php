@@ -1118,8 +1118,10 @@ class Controller extends Base
                         // First time we've see this student for this capability?
                         if (!array_key_exists($studentId, $overallMarks[$capabilityId]['marks'])) {
                             $overallMarks[$capabilityId]['marks'][$studentId] = [
-                                'sumNormalised' => null,
-                                'sumWeight'     => null,
+                                'sumNormalised'      => null,
+                                'sumWeight'          => null,
+                                'draftSumNormalised' => null,
+                                'draftSumWeight'     => null,
                             ];
                         }
                         // Does student have a mark for this capability for this assessment?
@@ -1127,6 +1129,12 @@ class Controller extends Base
                         if ($capabilityMark !== null) {
                             $overallMarks[$capabilityId]['marks'][$studentId]['sumNormalised'] += $capabilityMark * $assessmentWeight;
                             $overallMarks[$capabilityId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                        }
+                        // Draft Marks
+                        $draftCapabilityMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['draftNormalisedMark'] ?? null;
+                        if ($draftCapabilityMark !== null) {
+                            $overallMarks[$capabilityId]['marks'][$studentId]['draftSumNormalised'] += $draftCapabilityMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['marks'][$studentId]['draftSumWeight']     += $assessmentWeight;
                         }
                     }
                 }
@@ -1148,8 +1156,10 @@ class Controller extends Base
                         // First time we've see this student for this indicator?
                         if (!array_key_exists($studentId, $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'])) {
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
-                                'sumNormalised' => null,
-                                'sumWeight'     => null,
+                                'sumNormalised'      => null,
+                                'sumWeight'          => null,
+                                'draftSumNormalised' => null,
+                                'draftSumWeight'     => null,
                             ];
                         }
                         // Does student have a mark for this indicator for this assessment?
@@ -1157,6 +1167,12 @@ class Controller extends Base
                         if ($indicatorMark !== null) {
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumNormalised'] += $indicatorMark * $assessmentWeight;
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                        }
+                        // Draft Marks
+                        $draftIndicatorMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['draftNormalisedMark'] ?? null;
+                        if ($draftIndicatorMark !== null) {
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftSumNormalised'] += $draftIndicatorMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['draftSumWeight']     += $assessmentWeight;
                         }
                     }
                 }
