@@ -848,7 +848,7 @@ abstract class Base
      * @return ResponseInterface
      * @throws TwigError if something goes wrong when rendering the template
      */
-    protected function buildRequestDependentResponse(
+    protected function responseDependentOnRequest(
         string $template,
         array $data,
         string $title = '',

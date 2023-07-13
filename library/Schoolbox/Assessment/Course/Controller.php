@@ -405,7 +405,7 @@ class Controller extends Base\Base
             $encodedReturnUrls[$unitSpecId] = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
         }
 
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
                 'courseSpec'        => $courseSpec,
@@ -431,7 +431,7 @@ class Controller extends Base\Base
     public function newCourse(?string $name): void
     {
 
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
                 'courseSpec'         => null,
@@ -834,7 +834,7 @@ class Controller extends Base\Base
                 'toastSelector'    => '[data-relation="ajax-response"]',
             ];
 
-            $this->psr7Response = $this->buildRequestDependentResponse(
+            $this->psr7Response = $this->responseDependentOnRequest(
                 '@course/unit.twig',
                 $data,
                 self::TAB,
@@ -974,7 +974,7 @@ class Controller extends Base\Base
             ];
         }
 
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/courseList.twig',
             array_merge($data, $options),
             self::TAB,
@@ -1029,7 +1029,7 @@ class Controller extends Base\Base
             'encodedReturnUrl' => $query->get('encodedReturnUrl'),
         ];
 
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/courseListResults.twig',
             array_merge($data, $options),
             self::TAB,
@@ -1203,7 +1203,7 @@ class Controller extends Base\Base
             'folderId' => $folderId
         ];
 
-        $this->psr7Response = $this->buildRequestDependentResponse('@course/picker.twig', $data, self::TAB);
+        $this->psr7Response = $this->responseDependentOnRequest('@course/picker.twig', $data, self::TAB);
     }
 
 

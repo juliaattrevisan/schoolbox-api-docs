@@ -148,7 +148,7 @@ class Controller extends Base\Base
             ]);
         }
 
-        $this->psr7Response = $this->buildRequestDependentResponse('@course/import.twig', $data);
+        $this->psr7Response = $this->responseDependentOnRequest('@course/import.twig', $data);
     }
 
 
@@ -207,7 +207,7 @@ class Controller extends Base\Base
         $exists = (bool)\count(array_intersect($existingInFolderIds, $targetFolderIds));
 
         // respond with stage 2: units
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/unitImportForm.twig',
             [
                 'action'           => 'import',
@@ -440,7 +440,7 @@ class Controller extends Base\Base
         }
 
         // respond with stage 4: coursework list
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/unitImportResults.twig',
             [
                 'action'              => $action,
@@ -598,7 +598,7 @@ class Controller extends Base\Base
         $orderedUnits = $courseImpl->getUnits()->sortBy('title', 'ASC');
         $courseImpl->setUnits($orderedUnits);
 
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/import.twig',
             [
                 'action'           => 'modify',
@@ -744,7 +744,7 @@ class Controller extends Base\Base
             $folderAncestry[$courseImplId] = array_reverse($folderAncestry[$courseImplId]);
         }
 
-        $this->psr7Response = $this->buildRequestDependentResponse(
+        $this->psr7Response = $this->responseDependentOnRequest(
             '@course/management.twig',
             [
                 'folder'           => $folder,
