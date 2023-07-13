@@ -23,7 +23,6 @@ use Schoolbox\GenericCollection;
  */
 abstract class ConfigController extends Base
 {
-
     /** @var ConfigMapper */
     private $configMapper;
 
