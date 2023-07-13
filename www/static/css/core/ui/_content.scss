@@ -33,7 +33,9 @@
         color: $aluminum;
     }
     p,
-    a {
+    a,
+    li,
+    button {
         font-size: 0.875rem;
         font-weight: 400;
         margin-bottom: 0;
@@ -52,10 +54,15 @@
     }
     button {
         background: none;
-        font-size: 0.875rem;
+        min-height: auto;
+        padding: 0;
+        vertical-align: baseline;
         &:hover {
             background: none;
         }
+    }
+    ul {
+        list-style-position: inside;
     }
 }
 
