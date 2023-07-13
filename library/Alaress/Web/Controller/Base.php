@@ -759,7 +759,7 @@ abstract class Base
      */
     protected function redirectAfterPost(string $location): ResponseInterface
     {
-        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_SEE_OTHER);
+        return $this->redirectSeeOther($location);
     }
 
     /**

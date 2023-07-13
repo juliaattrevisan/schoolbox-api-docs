@@ -103,7 +103,7 @@ class Controller extends Base
                 ]
             );
 
-        $this->response->redirect->seeOther($url);
+        $this->psr7Response = $this->redirectSeeOther($url->__toString());
     }
 
     /**
@@ -185,7 +185,7 @@ class Controller extends Base
      */
     private function redirectToPage(string $page): void
     {
-        $this->response->redirect->seeOther($page);
+        $this->psr7Response = $this->redirectSeeOther($page);
     }
 
     /**
@@ -199,6 +199,6 @@ class Controller extends Base
     {
         $loginUrl = (new Uri($this->routeGenerator->generate('login.getLogin')))
             ->appendQueryParameters(['page' => $page]);
-        $this->response->redirect->seeOther($loginUrl);
+        $this->psr7Response = $this->redirectSeeOther($loginUrl->__toString());
     }
 }

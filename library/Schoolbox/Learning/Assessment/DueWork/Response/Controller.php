@@ -575,7 +575,7 @@ class Controller extends Base
 
         // Is this file not editable inline? Just show in storage
         if (!$file->getEditableInline()) {
-            $this->response->redirect->permanentRedirect(
+            $this->psr7Response = $this->redirectPermanent(
                 (new Uri('/storage/fetch.php'))
                     ->appendQueryParameters($this->requestQuery->getArrayCopy())
                     ->__toString()
