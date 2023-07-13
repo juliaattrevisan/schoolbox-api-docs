@@ -65,6 +65,10 @@ class Campus
 
                 $this->lookup[$id] = $name;
             }
+
+            /* Prepare for next page if it exists
+             */
+            $nextUrl = $payload['links']['next'] ?? null;
         }
 
         return $this->lookup;

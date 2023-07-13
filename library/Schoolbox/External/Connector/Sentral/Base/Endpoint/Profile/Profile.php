@@ -652,7 +652,6 @@ class Profile implements IStrategy
      * Assign campuses if they exist in the mapping
      * Otherwise quietly disregard bad data
      *
-     * @phpstan-ignore-next-line: this will eventually return a string
      * @param array $student
      * @return string|null
      */
