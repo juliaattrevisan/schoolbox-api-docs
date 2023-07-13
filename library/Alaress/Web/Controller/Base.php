@@ -869,34 +869,6 @@ abstract class Base
     }
 
     /**
-     * Parses a PSR-7 response into this controller's Aura response: this sets
-     * the status code, headers and body from the PSR-7 response into the Aura
-     * response.
-     *
-     * This relies upon the PSR-7 response's `getBody` method returning a
-     * rewindable stream.
-     *
-     * @deprecated no longer required as controllers can now return PSR-7
-     *             responses directly
-     *
-     * @param ResponseInterface $response A PSR-7 HTTP response object.
-     */
-    protected function populateResponseFromPsr7Response(ResponseInterface $response): void
-    {
-        $this->response->status->set($response->getStatusCode());
-        foreach ($response->getHeaders() as $name => $values) {
-            foreach ($values as $value) {
-                $this->response->headers->add($name, $value);
-            }
-        }
-        $response->getBody()->rewind();
-        $this->response->content->set(
-            $this->buildFileOutputFromString($response->getBody()->getContents())
-        );
-    }
-
-
-    /**
      * @deprecated Use one of the `build*Output` methods instead, to build
      *             exactly the type of content you specify
      *
