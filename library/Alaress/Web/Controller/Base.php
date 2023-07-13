@@ -910,23 +910,22 @@ abstract class Base
             $problem = $problem->getMessage();
         }
 
-        $this->getResponse()->status->set($statusCode);
-
         // if this isn't XHR, let the kernel and SitePage take care of
         if (!$this->isXhrRequest()) {
             throw $this->generateException($errorCode, null, $problem . implode(', ', $resolutions));
         }
 
-        $this->getResponse()->content->set([
-            'template' => 'sub/mage-error.twig',
-            'format' => 'nochrome',
-            'data' => [
-                'error' => [
-                    'problem' => $problem,
-                    'reasons' => $resolutions
+        $this->psr7Response = $this
+            ->responseFromTemplateUnthemed(
+                'sub/mage-error.twig',
+                [
+                    'error' => [
+                        'problem' => $problem,
+                        'reasons' => $resolutions
+                    ]
                 ]
-            ]
-        ]);
+            )
+            ->withStatus($statusCode);
     }
 
     /**
@@ -939,12 +938,9 @@ abstract class Base
         $problem = (new ApiProblem($message))
             ->setStatus($code)
             ->asArray();
-        try {
-            $this->getResponse()->status->setCode($code);
-        } catch (InvalidStatusCode $e) {
-            // noop
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($problem));
+        $this->psr7Response = $this
+            ->responseAsJson($problem)
+            ->withStatus($code);
     }
 
     /**
