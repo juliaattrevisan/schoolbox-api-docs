@@ -365,6 +365,7 @@ class Kernel extends WebKernelAbstract
         // Use PSR-7 response if it's there
         $psr7Response = $controller->getPsr7Response();
         if ($psr7Response) {
+            // TODO something with post-output callbacks
             $outputter = new Outputter();
             $outputter->output($psr7Response);
             return;
@@ -398,6 +399,7 @@ class Kernel extends WebKernelAbstract
                 $output = $this->di->get("webOutput:base");
             }
         }
+        $output->setPostOutputCallbacks($controller->getPostOutputCallbacks());
 
         // Post-processing: if this is a HTML request and not a redirect,
         // store this request in history.

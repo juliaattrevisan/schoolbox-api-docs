@@ -289,6 +289,14 @@ abstract class Base
     }
 
     /**
+     * @return array
+     */
+    public function getPostOutputCallbacks(): array
+    {
+        return $this->postOutputCallbacks;
+    }
+
+    /**
      * @deprecated you should be injecting your dependencies from the constructor!
      *
      * @param  ContainerInterface $di

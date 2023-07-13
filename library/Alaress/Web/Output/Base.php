@@ -31,6 +31,13 @@ class Base implements OutputInterface
     protected $data = null;
 
     /**
+     * Temporary home for post-output callbacks.
+     *
+     * @var array<callable>
+     */
+    private array $postOutputCallbacks = [];
+
+    /**
      * Outputs a response and its headers in the most basic fashion.
      *
      * Copied from https://github.com/auraphp/Aura.Web/blob/develop-2/README-RESPONSE.md
@@ -129,21 +136,13 @@ class Base implements OutputInterface
     }
 
     /**
-     * Gets post-output callbacks out of the response content.
-     *
-     * @todo put them somewhere else, as they don't belong in content.
-     *
-     * @return array
+     * @param array<callable> $postOutputCallbacks
+     * @return $this
      */
-    protected function getPostOutputCallbacks()
+    public function setPostOutputCallbacks(array $postOutputCallbacks): self
     {
-        $content = $this->getResponse()->content->get();
-
-        if (is_array($content) && isset($content['postOutput'])) {
-            return $content['postOutput'];
-        }
-
-        return [];
+        $this->postOutputCallbacks = $postOutputCallbacks;
+        return $this;
     }
 
     /**
@@ -153,7 +152,7 @@ class Base implements OutputInterface
      */
     protected function hasPostOutputCallbacks()
     {
-        return count($this->getPostOutputCallbacks()) > 0;
+        return count($this->postOutputCallbacks) > 0;
     }
 
     /**
@@ -165,9 +164,7 @@ class Base implements OutputInterface
      */
     protected function runPostOutputCallbacks($output = '')
     {
-        $callbacks = $this->getPostOutputCallbacks();
-
-        if (!empty($callbacks)) {
+        if ($this->hasPostOutputCallbacks()) {
             // Output now
             // No content encoding because gzip interferes with content length
             header('Content-Encoding: none');
@@ -182,7 +179,7 @@ class Base implements OutputInterface
             set_time_limit(60 * 30);
 
             // Callbacks
-            foreach ($callbacks as $callback) {
+            foreach ($this->postOutputCallbacks as $callback) {
                 if (is_callable($callback)) {
                     $callback();
                 }
