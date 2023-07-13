@@ -826,6 +826,19 @@ class Controller extends Base
                     }
                     $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
                     $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
+                    // Draft marks
+                    $draftCapabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['draftDatabaseMark'] ?? null);
+                    $draftCapabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['draftMaxMark'] ?? null);
+                    $draftHumanReadableCapabilityMark = null;
+                    $draftNormalisedCapabilityMark    = null;
+                    if ($draftCapabilityMaxMark) {
+                        $draftNormalisedCapabilityMark = $draftCapabilityDatabaseMark !== null
+                            ? ($draftCapabilityDatabaseMark / $draftCapabilityMaxMark) * 100
+                            : null;
+                        $draftHumanReadableCapabilityMark = $capabilityMarks['draftHumanReadableMark'] ?? null;
+                    }
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['draftHumanReadableMark'] = $draftHumanReadableCapabilityMark;
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['draftNormalisedMark']    = $draftNormalisedCapabilityMark;
 
                     foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
                         $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark'] ?? null);
@@ -842,6 +855,22 @@ class Controller extends Base
 
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
+
+                        // Draft Marks
+                        $draftIndicatorDatabaseMark      = $decimalHydrator->hydrate($draftIndicatorMarks['draftDatabaseMark'] ?? null);
+                        $draftIndicatorMaxMark           = $decimalHydrator->hydrate($draftIndicatorMarks['draftMaxMark'] ?? null);
+                        $draftHumanReadableIndicatorMark = null;
+                        $draftNormalisedIndicatorMark    = null;
+
+                        if ($draftIndicatorMaxMark) {
+                            $draftNormalisedIndicatorMark    = $draftIndicatorDatabaseMark !== null
+                                ? ($draftIndicatorDatabaseMark / $draftIndicatorMaxMark) * 100
+                                : null;
+                            $draftHumanReadableIndicatorMark = $totalMarkScheme->setTotalMark($draftIndicatorMaxMark)->getHumanReadableMark($draftNormalisedIndicatorMark);
+                        }
+
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['draftHumanReadableMark'] = $draftHumanReadableIndicatorMark;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['draftNormalisedMark']    = $draftNormalisedIndicatorMark;
                     }
                 }
             }
