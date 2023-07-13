@@ -1,0 +1,91 @@
+/**
+ *  chip.scss
+ *
+ *  See: https://schoolbox.atlassian.net/browse/SA-15995
+ *  Basically, an alternative and more visual way to do checkbox selections. Read the pantry for example use cases.
+**/
+
+.sb-chips {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--whitespace-xs);
+    list-style: none;
+    // The default ul left margin is not necessary here.
+    margin-left: 0;
+
+    li > input[type="checkbox"] {
+        opacity: 0;
+
+        // Bring back default focus highlights
+        &:focus + label {
+            // Firefox
+            outline: 5px auto Highlight;
+            // The rest
+            outline: 5px auto -webkit-focus-ring-color;
+        }
+
+        &:checked + label {
+            background-color: var(--content-ui-foreground);
+            color: var(--content-ui-foreground-contrast);
+            font-weight: 400;
+
+            .sb-chip__icon {
+                &::before {
+                    display: inline-block;
+                    margin-left: 0.25rem;
+                }
+
+                &::after {
+                    display: none;
+                }
+            }
+        }
+
+        & + label {
+            align-items: center;
+            border: 1px solid var(--content-ui-foreground);
+            //TODO - Eventually tie this back to a global roundness custom property / variable
+            border-radius: 1px;
+            background-color: var(--content-ui-background);
+            color: var(--content-ui-foreground);
+            cursor: pointer;
+            display: flex;
+            font-weight: 400;
+            margin: 0;
+            padding: var(--whitespace-xs) var(--whitespace-m);
+            user-select: none;
+
+            .sb-chip__icon {
+                color: var(--content-ui-foreground-contrast);
+                line-height: normal;
+                margin-left: var(--whitespace-s);
+
+                &::before {
+                    display: none;
+                    font-size: 12px;
+                    padding-right: 0;
+                }
+
+                &::after {
+                    align-items: center;
+                    background-color: var(--content-ui-foreground);
+                    border-radius: 2048px;
+                    content: "";
+                    display: flex;
+                    height: 0.25rem;
+                    margin-left: 0.5rem;
+                    margin-right: 0.25rem;
+                    opacity: 0.5;
+                    width: 0.25rem;
+                }
+            }
+        }
+    }
+
+    &--rounded {
+        li > input[type="checkbox"] + label {
+            border-radius: 2048px;
+        }
+    }
+}
