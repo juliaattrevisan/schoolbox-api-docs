@@ -125,7 +125,7 @@ class Controller extends Base
                 'numStudents' => $this->studentProfileMapper->countAll(),
                 'numRelationships' => $this->relationshipMapper->countAll()
             ]
-        ])->setTitle('Import User Profile'));
+        ], 'Import User Profile'));
     }
 
 
@@ -228,7 +228,7 @@ class Controller extends Base
             'logs' => $logs,
             'file' => $this->requestPost['file'],
             'perform' => (bool)$this->requestQuery->get('perform')
-        ])->setTitle('Import User Profile'));
+        ], 'Import User Profile'));
     }
 
 

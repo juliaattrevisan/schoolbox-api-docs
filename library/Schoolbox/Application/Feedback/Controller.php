@@ -45,8 +45,7 @@ class Controller extends Base
 
         $data['types'] = explode(',', $this->getConfigLoader()->get('site_feedback_types'));
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@feedback/feedback.twig', $data)
-                                                ->setTitle($this->getConfigLoader()->get('feedback_text')));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@feedback/feedback.twig', $data, $this->getConfigLoader()->get('feedback_text')));
     }
 
     /**
@@ -58,7 +57,6 @@ class Controller extends Base
      */
     public function getFeedbackReceipt()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@feedback/feedback-thankyou.twig', [])
-                                                ->setTitle('Message Delivered'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@feedback/feedback-thankyou.twig', [], 'Message Delivered'));
     }
 }

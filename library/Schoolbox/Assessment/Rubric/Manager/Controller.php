@@ -71,9 +71,7 @@ class Controller extends BaseController
             $this
                 ->buildHtmlOutput(
                     '@rubricManager/form.twig',
-                    $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true))
-                )
-                ->setTitle(
+                    $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true)),
                     sprintf(
                         'Manage Rubric %s for %s',
                         $this->rosettaStone->translate('rubricGroup', true, true),

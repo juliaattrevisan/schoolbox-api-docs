@@ -85,7 +85,7 @@ class Controller extends Base
         ], $sidebar->generate());
 
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', $data)->setTitle('Requiring Moderation')->setTab('news'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', $data, 'Requiring Moderation', 'news'));
     }
 
     /**

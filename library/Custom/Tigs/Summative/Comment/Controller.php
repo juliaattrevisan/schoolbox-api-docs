@@ -30,8 +30,7 @@ class Controller extends Web\Controller\Base
             ->set($this->buildHtmlOutput('@tigsSummativeComment/yearLevel.twig', [
                 'roleId'   => $roleId,
                 'termSlug' => $termSlug,
-            ])
-            ->setTitle("TIGS Summative Reporting  - Dean Comments"));
+            ], "TIGS Summative Reporting  - Dean Comments"));
     }
 
 
@@ -51,7 +50,6 @@ class Controller extends Web\Controller\Base
             ->set($this->buildHtmlOutput('@tigsSummativeComment/folder.twig', [
                 'folderId' => $folderId,
                 'termSlug' => $termSlug,
-            ])
-            ->setTitle("TIGS Summative Reporting  - Teacher Comments"));
+            ], "TIGS Summative Reporting  - Teacher Comments"));
     }
 }

@@ -77,7 +77,7 @@ class Controller extends ConfigController
             'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->indexBy('id'),
             'configContext' => $configContext,
             'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
-        ])->setTitle('Comms Policies'));
+        ], 'Comms Policies'));
     }
 
 

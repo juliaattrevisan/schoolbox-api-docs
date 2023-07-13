@@ -269,7 +269,7 @@ class Controller extends Base
                 'markbook'           => $markbook,
                 'conversation'       => $conversation,
                 'yearUrl'            => $yearUrl,
-            ])->setTab('grade')->setTitle("Grades for {$subject->getTitle()}")
+            ], "Grades for {$subject->getTitle()}", 'grade')
         );
     }
 

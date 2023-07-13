@@ -964,7 +964,7 @@ class Controller extends Base
                     'filterPanel' => $filterPanel,
                     'folder'      => $folder,
                 ]
-            )->setTab('classes')->setTitle($folder->getName())
+            , $folder->getName(), 'classes')
         );
     }
 

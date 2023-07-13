@@ -101,7 +101,7 @@ class Controller extends Base
             $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
-            ])->setTab('submission')->setTitle($pageTitle)
+            ], $pageTitle, 'submission')
         );
     }
 

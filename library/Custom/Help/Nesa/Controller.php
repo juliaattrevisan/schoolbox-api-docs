@@ -104,11 +104,11 @@ class Controller extends Base
             RubricDescriptorMapper::getInstance()
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/selector.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@helpNesa/selector.twig', [
             'course' => $courseSpecification,
             'states' => $this->pdMapper->getAvailableStates(),
             'descriptors' => $selector->generate()
-        ]));
+        ]);
     }
 
     /**

@@ -118,15 +118,13 @@ class Controller extends Base
             }
         }
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@customMeridenPastoral/printableReport.twig',
-                [
-                    'baseReport'     => $baseReportData,
-                    'subjectReports' => $subjectReportDataList,
-                ],
-                'School Report - ' . $year . ' - ' . $student->formatName()
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@customMeridenPastoral/printableReport.twig',
+            [
+                'baseReport'     => $baseReportData,
+                'subjectReports' => $subjectReportDataList,
+            ],
+            'School Report - ' . $year . ' - ' . $student->formatName()
         );
     }
 

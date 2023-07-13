@@ -228,9 +228,7 @@ class Controller extends Base
 
         $namespace = Module::BASENAME;
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@$namespace/upcomingOuter.twig", $data)
-                 ->setTitle("Upcoming Due Work")
-                 ->setTab('submission') // ¯\_(ツ)_/¯
+            $this->buildHtmlOutput("@$namespace/upcomingOuter.twig", $data, "Upcoming Due Work", 'submission')
         );
     }
 

@@ -46,6 +46,6 @@ class Controller extends Base
             'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
             'jwt'         => $this->jwtFactory->buildForAdminView($this->getUser()),
             'title' => 'Intellischool - Admin Console'
-        ])->setTitle('Intellischool - Admin Console'));
+        ], 'Intellischool - Admin Console'));
     }
 }

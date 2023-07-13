@@ -147,7 +147,7 @@ class Controller extends Base
             $this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
                 'viewee'      => $viewee,
                 'filterPanel' => $filterPanel,
-            ])->setTab('submission')->setTitle($title)
+            ], $title, 'submission')
         );
     }
 
@@ -382,7 +382,7 @@ class Controller extends Base
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
-            ])->setTab('classes')->setTitle($folder->getName())
+            ], $folder->getName(), 'classes')
         );
     }
 

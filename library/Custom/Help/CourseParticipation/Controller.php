@@ -120,7 +120,7 @@ class Controller extends Base
             $data['hashes'][$school] = $this->handler->computeAuthDigest($now->getUnixTimeStamp(), $school, $code->getAccessToken());
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
+        $this->psr7Response = $this->responseFromTemplate('@helpCourseParticipation/apitest.twig', $data);
     }
 
 

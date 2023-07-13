@@ -68,7 +68,7 @@ class Controller extends Base
                         'isRequestMade'   => $this->getSessionSegment()->getFlash('isRequestMade'),
                         'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
                     ]
-                )->setTitle('Change Password')
+                , 'Change Password')
             );
         }
     }

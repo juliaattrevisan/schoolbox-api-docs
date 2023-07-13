@@ -178,7 +178,7 @@ class Controller extends Base
                     'courses'        => $courses,
                     'errors'         => $errors,
                 ]
-            )->setTitle($title)
+            , $title)
         );
     }
 

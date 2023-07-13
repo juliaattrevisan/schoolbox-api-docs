@@ -163,7 +163,9 @@ class Controller extends WebController\Base
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
-            ])->setTab('submission')->setTitle("Course Markbook: {$courseSpec->getTitle()}")
+            ],
+            "Course Markbook: {$courseSpec->getTitle()}",
+                                   'submission')
         );
     }
 

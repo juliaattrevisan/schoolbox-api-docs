@@ -150,7 +150,7 @@ class Controller extends Base
             ],
             $sidebar->generate()
         );
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', $data)->setTitle('Saved For Later')->setTab('news'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', $data, 'Saved For Later', 'news'));
     }
 
 

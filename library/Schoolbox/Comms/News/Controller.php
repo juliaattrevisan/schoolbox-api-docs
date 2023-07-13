@@ -204,7 +204,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
+        ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news'));
     }
 
 
@@ -314,7 +314,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
+        ], "Update {$article->getTitle()}", 'news'));
     }
 
 
@@ -767,9 +767,7 @@ class Controller extends Base
         $data = array_merge($data, $sidebar->generate());
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/index.twig', $data)
-                ->setTitle('News Feed')
-                ->setTab('news')
+            $this->buildHtmlOutput('@commsNews/index.twig', $data, 'News Feed', 'news')
         );
     }
 
@@ -988,9 +986,7 @@ class Controller extends Base
         $data = array_merge($data, $sidebar->generate());
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/archive.twig', $data)
-                ->setTab('news')
-                ->setTitle($pageTitle)
+            $this->buildHtmlOutput('@commsNews/archive.twig', $data, $pageTitle, 'news')
         );
     }
 
@@ -1152,9 +1148,7 @@ class Controller extends Base
         ], $sidebar->generate());
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/authored.twig', $data)
-                ->setTab('news')
-            ->setTitle('My News')
+            $this->buildHtmlOutput('@commsNews/authored.twig', $data, 'My News', 'news')
         );
     }
 

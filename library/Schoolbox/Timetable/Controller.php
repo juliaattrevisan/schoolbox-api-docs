@@ -56,7 +56,7 @@ class Controller extends Base
             'user' => $user,
             'selectedDate' => $selectedDate,
             'weekends' => $weekends
-        ])->setTitle(sprintf(
+        ], sprintf(
             'Timetable Calendar for %s',
             $user->getFullName()
         )));

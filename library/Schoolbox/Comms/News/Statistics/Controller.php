@@ -98,7 +98,7 @@ class Controller extends Base
             /* Recent Visitors to this article
              */
             'recentVisitors' => (new Visitation\Payload\Top10($this->statisticsMapper, $this->userMapper))->generate($article)
-        ])->setTitle("Statistics for {$article->getTitle()}"));
+        ], "Statistics for {$article->getTitle()}"));
     }
 
 
@@ -131,7 +131,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
-        ])->setTitle("Visitors for {$article->getTitle()}"));
+        ], "Visitors for {$article->getTitle()}"));
     }
 
 

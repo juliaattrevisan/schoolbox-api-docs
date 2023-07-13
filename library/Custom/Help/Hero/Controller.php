@@ -101,10 +101,10 @@ class Controller extends Base
 
         /* Presentation
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
+        $this->psr7Response = $this->responseFromTemplate('@helpHero/hero.twig', [
             'course' => $courseSpecification,
             'duration' => number_format($end - $start, 2),
             'aggregatedData' => $aggregatedData
-        ]));
+        ]);
     }
 }

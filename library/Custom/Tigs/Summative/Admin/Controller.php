@@ -61,7 +61,7 @@ class Controller extends ConfigController
 
         $data = ['configContext' => $configContext,];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@tigsSummativeAdmin/admin.twig', $data, "TIGS Summative Reporting Admin"));
+        $this->psr7Response = $this->responseFromTemplate('@tigsSummativeAdmin/admin.twig', $data, "TIGS Summative Reporting Admin");
     }
 
 

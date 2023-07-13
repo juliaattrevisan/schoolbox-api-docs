@@ -36,9 +36,7 @@ class Controller extends Base
      */
     public function getExample(User $user): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@example/index.twig', [
-            'user' => $user
-        ])->setTitle('Example'));
+        $this->psr7Response = $this->responseFromTemplate('@example/index.twig', ['user' => $user], 'Example');
     }
 
 
@@ -53,9 +51,13 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@example/submit.twig', [
-            'user' => $user,
-            'var1' => $this->requestPost['var1']
-        ])->setTitle('Example Form Output'));
+        $this->psr7Response = $this->responseFromTemplate(
+            '@example/submit.twig',
+            [
+                'user' => $user,
+                'var1' => $this->requestPost['var1'],
+            ],
+            'Example Form Output',
+        );
     }
 }
