@@ -133,9 +133,6 @@ export default {
             });
 
             const sourceElement = event.detail.sourceElement;
-            const commentId = sourceElement.getAttribute("id");
-            const submitButton = document.querySelector("button.submit[id=submit-for-" + commentId + "]");
-            const submitButtonTextOrig = submitButton.innerHTML;
 
             // Arrow function syntax ensures 'this' can be used inside event handler.
             sourceElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
