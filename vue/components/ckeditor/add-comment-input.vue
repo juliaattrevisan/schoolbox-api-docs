@@ -7,6 +7,7 @@
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
 
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 
@@ -39,30 +40,28 @@ export default {
         };
     },
 
-    created() {
-        if (this.presetUniqueId === "") {
-            this.uniqueId = __uniqueId.toString();
-            __uniqueId += 1;
-        } else {
-            this.uniqueId = this.presetUniqueId;
-        }
-    },
-
     computed: {
         /**
-         * The text within the comment prompt button, will change to loading when selected to notify
-         *
-         * @returns { String }
+         * The text within the comment prompt button will change when the CKEditor is loading.
+         * @returns { string } The text within the comment prompt button.
          */
         getAddCommentButtonText() {
-            if (this.isCKEditorLoading) return "Loading";
-            else return "Add a comment";
+            return this.isCKEditorLoading ? "Loading" : "Add a comment";
+        },
+
+        /**
+         * The text within the comment save button will change if the button becomes disabled.
+         * @returns { string } The text within the comment prompt button.
+         */
+        getPostCommentButtonText() {
+            return this.isOverStorageLimit
+                ? `Post comment ${getButtonTextDisabledDueToStorageLimitSuffix()}`
+                : "Post comment";
         },
 
         /**
          * startupFocus: true on the CKEditor was not working when hiding by more practical display none means...
-         *
-         * @returns { Object }
+         * @returns { object } CSS style string for the button container div.
          */
         getStyles() {
             return this.isCKEditorLoaded ? { position: "static" } : { position: "absolute", left: "-9999px" };
@@ -70,16 +69,20 @@ export default {
 
         /**
          * Ensure there's something (anything) in the comment and that the form is not already processing
-         *
-         * @returns {Boolean}
+         * @returns {boolean} True if the post comment button should be disabled, false otherwise.
          */
         isPostCommentDisabled() {
-            if (this.newComment.trim() === "" || this.isProcessing || this.isOverStorageLimit) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.newComment.trim() === "" || this.isProcessing || this.isOverStorageLimit;
         },
+    },
+
+    created() {
+        if (this.presetUniqueId === "") {
+            this.uniqueId = __uniqueId.toString();
+            __uniqueId += 1;
+        } else {
+            this.uniqueId = this.presetUniqueId;
+        }
     },
 
     methods: {
@@ -122,7 +125,6 @@ export default {
         /**
          * Once the CKEditor has been created, we track any data input changes to keep
          * the comment in sync and assign focus so the user can start typing
-         *
          * @param { CustomEvent } event - the event object, containing the editor instance
          */
         onEditorCreated(event) {
@@ -132,20 +134,15 @@ export default {
             });
 
             const sourceElement = event.detail.sourceElement;
-            const commentId = sourceElement.getAttribute("id");
-            const submitButton = document.querySelector("button.submit[id=submit-for-" + commentId + "]");
-            const submitButtonTextOrig = submitButton.innerHTML;
 
             // Arrow function syntax ensures 'this' can be used inside event handler.
             sourceElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
                 this.isOverStorageLimit = true;
-                submitButton.innerHTML = submitButtonTextOrig + " (disabled because maximum character count exceeded)";
             });
 
             // Arrow function syntax ensures 'this' can be used inside event handler.
             sourceElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
                 this.isOverStorageLimit = false;
-                submitButton.setAttribute("value", submitButtonTextOrig);
             });
 
             this.editor.editing.view.focus();
@@ -167,7 +164,7 @@ export default {
 </script>
 
 <template>
-    <div class="add-commment-input">
+    <div class="add-comment-input">
         <button class="show-ckeditor-button" v-show="!isCKEditorLoaded" @click.once="onAddCommentSelected">
             {{ getAddCommentButtonText }}
         </button>
@@ -179,14 +176,14 @@ export default {
                 @click="postComment"
                 :disabled="isPostCommentDisabled"
             >
-                Post comment
+                {{ getPostCommentButtonText }}
             </button>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.add-commment-input {
+.add-comment-input {
     margin-bottom: 1rem;
 }
 </style>
