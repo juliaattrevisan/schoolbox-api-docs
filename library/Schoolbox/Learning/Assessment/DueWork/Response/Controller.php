@@ -362,8 +362,7 @@ class Controller extends Base
         }
 
         // Let the browser know that the synchronous request has finished (either success or failure)
-        $response = $this->getResponse();
-        $token    = $this->requestQuery->get('token');
+        $token = $this->requestQuery->get('token');
 
         // TODO consider adding cookie setting method in response factory
         setcookie('kamiExportToken', $token, null, '/', null, null, false);
@@ -372,7 +371,7 @@ class Controller extends Base
         // Unable to generate the export? (either due to error or timeout)
         if (!$export->isStatusDone()) {
             // Don't change browser viewport
-            $response->status->setCode(204);
+            $this->psr7Response = $this->responseEmpty();
             return;
         }
 

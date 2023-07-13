@@ -41,6 +41,17 @@ class Factory
     }
 
     /**
+     * Build an empty response.
+     *
+     * @param int $statusCode
+     * @return ResponseInterface
+     */
+    public function build(int $statusCode): ResponseInterface
+    {
+        return $this->responseFactory->createResponse($statusCode);
+    }
+
+    /**
      * Builds a redirect response.
      *
      * @param string $location   The URL to redirect to.

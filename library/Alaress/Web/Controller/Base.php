@@ -791,6 +791,17 @@ abstract class Base
     }
 
     /**
+     * Shortcut method for building an empty response.
+     *
+     * @param int $statusCode Defaults to 204 for a No Content response.
+     * @return ResponseInterface
+     */
+    protected function responseEmpty(int $statusCode = HttpResponse::HTTP_NO_CONTENT): ResponseInterface
+    {
+        return $this->responseFactory->build($statusCode);
+    }
+
+    /**
      * Shortcut method for building a generic response from the content of a
      * string.
      *
