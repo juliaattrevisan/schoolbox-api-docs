@@ -737,6 +737,9 @@ class Controller extends Base
                         'databaseMark'           => $row['indicator_mark'],
                         'maxMark'                => $row['indicator_max_value'],
                         'selectedDescriptorText' => $row['descriptor_name'],
+                        'draftDatabaseMark'           => $row['indicator_mark'],
+                        'draftMaxMark'                => $row['indicator_max_value'],
+                        'draftSelectedDescriptorText' => $row['descriptor_name'],
                     ];
                 } else {
                     // Draft mark
@@ -763,6 +766,16 @@ class Controller extends Base
                      */
                     $capData['capabilityMarkTypeId']   = $row['capability_mark_type_id'];
                     $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
+
+                    $capData['draftDatabaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
+                    $capData['draftHumanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
+                    $capData['draftMaxMark']           = $row['capability_max_value'];
+
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to
+                     * their Assessments' Mark Type and Grade Group
+                     */
+                    $capData['draftCapabilityMarkTypeId']   = $row['capability_mark_type_id'];
+                    $capData['draftCapabilityGradeGroupId'] = $row['capability_grade_group_id'];
                 } else {
                     $capData['draftDatabaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
                     $capData['draftHumanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
