@@ -14,7 +14,6 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
-
     /**
      * @var SingleFile\Mapper
      */

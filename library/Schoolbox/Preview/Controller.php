@@ -18,7 +18,6 @@ use Schoolbox\Cyberhound\Url\Translator;
  */
 class Controller extends Base
 {
-
     /**
      * A list of test urls to try
      * Can delete this later
