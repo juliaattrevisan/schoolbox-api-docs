@@ -550,7 +550,7 @@ class Controller extends Base
         $response['sequence']   = $this->updateRuleSequence(($postData['sequence']));
         $response['customRule'] = $this->updateCustomRules($roleType, $postData['customRule'] ?? null);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($response));
+        $this->psr7Response = $this->responseAsJson($response);
     }
 
 
@@ -574,7 +574,7 @@ class Controller extends Base
             $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect'] ?? null);
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($response));
+        $this->psr7Response = $this->responseAsJson($response);
     }
 
     /**

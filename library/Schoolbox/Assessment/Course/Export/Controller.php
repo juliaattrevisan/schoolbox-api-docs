@@ -96,12 +96,10 @@ class Controller extends Base
         );
 
         // TODO return the same format as the assessment API?
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'id'    => $updatedSpecAssessment->getId(),
-                'title' => $updatedSpecAssessment->getTitle(),
-            ]),
-        );
+        $this->psr7Response = $this->responseAsJson([
+            'id'    => $updatedSpecAssessment->getId(),
+            'title' => $updatedSpecAssessment->getTitle(),
+        ]);
     }
 
     /**

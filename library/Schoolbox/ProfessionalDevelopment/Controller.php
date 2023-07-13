@@ -96,9 +96,9 @@ class Controller extends Base
             $status = self::ACCREDIT_FAIL;
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'userId' => $userId,
             'status' => $status
-        ]));
+        ]);
     }
 }

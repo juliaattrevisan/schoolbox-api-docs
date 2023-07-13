@@ -233,7 +233,7 @@ class Controller extends Base
             return min(count($v), 5) * 20;
         }, $heat);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($heat));
+        $this->psr7Response = $this->responseAsJson($heat);
     }
 
 

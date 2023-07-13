@@ -385,9 +385,7 @@ abstract class AbstractController extends BaseController
             'filesize' => $file->getSize(),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($data)
-        );
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 

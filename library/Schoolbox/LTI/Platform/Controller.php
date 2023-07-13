@@ -166,9 +166,7 @@ class Controller extends Base
     public function getJsonWebKeySet(): void
     {
         $jwksExporter = new JwksExporter($this->keyChains);
-        $this->response->content->set(
-            $this->buildJsonOutput($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME))
-        );
+        $this->psr7Response = $this->responseAsJson($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME));
     }
 
     /**

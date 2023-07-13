@@ -83,13 +83,11 @@ class Controller extends Base
         }
 
         $this->getResponse()->status->set(200);
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'success' => $success,
-                    'message' => $message
-                ]
-            )
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'success' => $success,
+                'message' => $message
+            ]
         );
     }
 
@@ -234,13 +232,11 @@ class Controller extends Base
         }
 
         $this->getResponse()->status->set(200);
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'success'  => true,
-                    'messages' => $errors,
-                ]
-            )
+        $this->psr7Response = $this->responseAsJson(
+            [
+                'success'  => true,
+                'messages' => $errors,
+            ]
         );
     }
 

@@ -201,7 +201,7 @@ class Controller extends Base
             $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD))
         );
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -700,11 +700,7 @@ class Controller extends Base
             $pastoralExternal->createComment($comment);
 
             // Post a JSON response
-            $this->response->content->set(
-                $this->buildJsonOutput(
-                    call_user_func($this->pastoralCommentTranslator, $comment)
-                )
-            );
+            $this->psr7Response = $this->responseAsJson(call_user_func($this->pastoralCommentTranslator, $comment));
         } else {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -800,11 +796,7 @@ class Controller extends Base
 
         if ($this->isJsonRequest()) {
             $this->response->status->setCode(201);
-            $this->response->content->set(
-                $this->buildJsonOutput(
-                    $records->map($this->pastoralTranslator)
-                )
-            );
+            $this->psr7Response = $this->responseAsJson($records->map($this->pastoralTranslator));
             return;
         }
 
@@ -1378,7 +1370,7 @@ class Controller extends Base
                 'default' => $action->getDefault(),
             ];
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -1404,7 +1396,7 @@ class Controller extends Base
             $data['error'] = $e->getMessage();
             $this->getResponse()->status->setCode(400);
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
     /**
@@ -1421,7 +1413,7 @@ class Controller extends Base
                 'name' => $tag->getName(),
             ];
         });
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 }
 

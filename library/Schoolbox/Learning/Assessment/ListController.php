@@ -459,7 +459,7 @@ class ListController extends Web\Controller\Base
             (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Successfully updated weighting']));
+        $this->psr7Response = $this->responseAsJson(['message' => 'Successfully updated weighting']);
     }
 
     /**

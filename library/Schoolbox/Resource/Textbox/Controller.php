@@ -59,7 +59,7 @@ class Controller extends Base
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
-        $this->response->content->set($this->buildJsonOutput($model));
+        $this->psr7Response = $this->responseAsJson($model);
     }
 
 
@@ -95,7 +95,7 @@ class Controller extends Base
 
 
         // Render the textbox
-        $this->response->content->set($this->buildJsonOutput($model));
+        $this->psr7Response = $this->responseAsJson($model);
     }
 
 
@@ -111,7 +111,7 @@ class Controller extends Base
     {
         $textbox = $this->persistTextbox($textbox);
         $this->mapper->save($textbox);
-        $this->response->content->set($this->buildJsonOutput($textbox));
+        $this->psr7Response = $this->responseAsJson($textbox);
     }
 
 
@@ -203,9 +203,7 @@ class Controller extends Base
             ];
         }
 
-        $this->response->content->set(
-            $this->buildJsonOutput($usages)
-        );
+        $this->psr7Response = $this->responseAsJson($usages);
     }
 
 

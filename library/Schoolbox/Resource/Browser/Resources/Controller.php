@@ -298,8 +298,6 @@ class Controller extends AbstractController
             'hidden'        => $file->isHidden(),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($data)
-        );
+        $this->psr7Response = $this->responseAsJson($data);
     }
 }

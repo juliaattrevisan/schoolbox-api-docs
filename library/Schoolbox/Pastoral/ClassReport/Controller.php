@@ -117,12 +117,10 @@ class Controller extends Base
             ];
         }
 
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $result,
-                'metadata' => null,
-            ]),
-        );
+        $this->psr7Response = $this->responseAsJson([
+            'data'     => $result,
+            'metadata' => null,
+        ]);
     }
 
     /**
@@ -143,17 +141,15 @@ class Controller extends Base
             new GenericCollection(User::class, [$student]),
             $this->requestQuery->getArrayCopy(),
         );
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $this->retrieveCursoredRecords(
-                    $folder,
-                    $student,
-                    $pastoralIds,
-                    $this->requestQuery->get('cursor'),
-                    $this->requestQuery->get('sort', Cursor::SORT_OPTION_CREATED),
-                    $this->requestQuery->getInt('count', Cursor::LIMIT_DEFAULT),
-                )
-            ),
+        $this->psr7Response = $this->responseAsJson(
+            $this->retrieveCursoredRecords(
+                $folder,
+                $student,
+                $pastoralIds,
+                $this->requestQuery->get('cursor'),
+                $this->requestQuery->get('sort', Cursor::SORT_OPTION_CREATED),
+                $this->requestQuery->getInt('count', Cursor::LIMIT_DEFAULT),
+            )
         );
     }
 

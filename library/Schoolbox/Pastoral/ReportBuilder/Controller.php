@@ -663,15 +663,10 @@ class Controller extends Base
 
         $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
-        $this->getResponse()->content->set(
-            [
-                'format' => 'json',
-                'data'   => $this->buildJsonOutput([
-                                                       'status' => 'OK',
-                                                       'result' => $result,
-                                                   ]),
-            ]
-        );
+        $this->psr7Response = $this->responseAsJson([
+            'status' => 'OK',
+            'result' => $result,
+        ]);
     }
 
     /**

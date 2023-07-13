@@ -346,7 +346,7 @@ class Controller extends BaseController
 
         if ($this->isXhrRequest()) {
             // respond with an empty 200 OK
-            $this->getResponse()->content->set($this->buildJsonOutput(null));
+            $this->psr7Response = $this->responseAsJson(null);
             return;
         }
 
@@ -627,8 +627,8 @@ class Controller extends BaseController
         //set deleted in app registries
         $registryMapper->deleteByColumn('app_id', $service->getId());
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->psr7Response = $this->responseAsJson([
             'id' => $service->getId(),
-        ]));
+        ]);
     }
 }

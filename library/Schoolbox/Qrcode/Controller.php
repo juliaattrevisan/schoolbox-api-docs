@@ -183,6 +183,6 @@ class Controller extends Base
             'expiry'   => $expiry?->getLocalShort(),
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->psr7Response = $this->responseAsJson($payload);
     }
 }

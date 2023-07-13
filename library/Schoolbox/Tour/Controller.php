@@ -61,7 +61,7 @@ class Controller extends Base
 
         // Return results in JSON
         $this->getResponse()->status->set(200);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 
@@ -70,7 +70,7 @@ class Controller extends Base
      */
     public function saveStatus()
     {
-        $this->getResponse()->content->set($this->buildJsonOutput(null));
+        $this->psr7Response = $this->responseAsJson(null);
         $post = $this->requestPost;
 
         /** @var User $user */
@@ -90,7 +90,7 @@ class Controller extends Base
             $this->getResponse()->status->set(204);
         } catch (Mapper\Exception $e) {
             //Attempted to save invalid data
-            $this->getResponse()->content->set($this->buildJsonOutput('Invalid status data. Did not save status.'));
+            $this->psr7Response = $this->responseAsJson('Invalid status data. Did not save status.');
             $this->getResponse()->status->set(400);
         }
     }
@@ -103,7 +103,7 @@ class Controller extends Base
      */
     public function tourStatus(string $tour_uuid)
     {
-        $this->getResponse()->content->set($this->buildJsonOutput(null));
+        $this->psr7Response = $this->responseAsJson(null);
 
         /** @var User $user */
         $user = $this->getUser();
@@ -112,7 +112,7 @@ class Controller extends Base
         try {
             $status     = $this->tourStatusMapper->findOneByColumnList(["tour_uuid" => $tour_uuid, "user_id" => $user->getId()]);
             $serialized = $status->jsonSerialize();
-            $this->getResponse()->content->set($this->buildJsonOutput($serialized));
+            $this->psr7Response = $this->responseAsJson($serialized);
         } catch (Mapper\Exception $e) {
             //No status for any of the steps - we are taking the tour for the first time;
             return;
