@@ -33,7 +33,7 @@ class Outputter
         // Output headers
         foreach ($response->getHeaders() as $name => $values) {
             foreach ($values as $value) {
-                header(sprintf('%s: %s', $name, $value), false);
+                header(sprintf('%s: %s', $name, $value));
             }
         }
 
