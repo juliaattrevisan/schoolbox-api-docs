@@ -1,6 +1,128 @@
 /**
  *  sb-card.scss
+ *
+ *  Modern styling rework of our card layouts.
+ *  TODO - Add modern design variants of our card classes (round and drop shadow EVERYTHING).
 */
 
 .sb-card {
+    background-color: white;
+
+    &__primary-img {
+        display: flex;
+        // Center any icons that we're containing
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 64px;
+        width: 64px;
+        height: 64px;
+        margin-inline-end: var(--whitespace-m);
+
+        // Peel off inherited styles for icons.
+        & > .icon:before {
+            padding: 0;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+    }
+
+    &__top {
+        display: flex;
+        flex-direction: row;
+
+        &-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+
+            & span,
+            p,
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                overflow-x: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+
+        &-actions {
+            display: flex;
+            //align-items: center;
+            flex: 0;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        span {
+            margin-block-end: 0;
+        }
+    }
+
+    &__content {
+        padding: var(--whitespace-m);
+    }
+
+    &__actions {
+        min-inline-size: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+
+        a {
+            text-transform: uppercase;
+            margin-bottom: 0;
+            padding: var(--whitespace-s) var(--whitespace-m);
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+
+            &:hover {
+                background-color: var(--content-ui-hover);
+            }
+        }
+    }
+
+    /* MODIFIERS / VARIANTS */
+    // Add start border and grey background to card.
+    &--subitem {
+        border-inline-start: var(--whitespace-s) solid #aaaaaa;
+        padding: var(--whitespace-s);
+        background-color: #f6f6f6;
+
+        .sb-card {
+            &__primary-img {
+                flex: 0 0 40px;
+                width: 40px;
+                height: 40px;
+
+                // Increase icon size
+                & > .icon:before {
+                    font-size: 1.5rem;
+                }
+            }
+        }
+    }
+
+    // Disable ellipsis behaviour inside top content for important content that can't overflow
+    &--overflow {
+        .sb-card__top-content {
+        }
+    }
+}
+
+/* A list to contain all these cards */
+.sb-card-list {
+    .sb-card {
+        border-block-end: 1px solid rgba(0, 0, 0, 0.2);
+    }
 }
