@@ -39,20 +39,10 @@ export default {
         };
     },
 
-    created() {
-        if (this.presetUniqueId === "") {
-            this.uniqueId = __uniqueId.toString();
-            __uniqueId += 1;
-        } else {
-            this.uniqueId = this.presetUniqueId;
-        }
-    },
-
     computed: {
         /**
          * The text within the comment prompt button, will change to loading when selected to notify
-         *
-         * @returns { String }
+         * @returns { string } The text within the comment prompt button.
          */
         getAddCommentButtonText() {
             if (this.isCKEditorLoading) return "Loading";
@@ -61,8 +51,7 @@ export default {
 
         /**
          * startupFocus: true on the CKEditor was not working when hiding by more practical display none means...
-         *
-         * @returns { Object }
+         * @returns { object } CSS style string for the button container div.
          */
         getStyles() {
             return this.isCKEditorLoaded ? { position: "static" } : { position: "absolute", left: "-9999px" };
@@ -70,16 +59,20 @@ export default {
 
         /**
          * Ensure there's something (anything) in the comment and that the form is not already processing
-         *
-         * @returns {Boolean}
+         * @returns {boolean} True if the post comment button should be disabled, false otherwise.
          */
         isPostCommentDisabled() {
-            if (this.newComment.trim() === "" || this.isProcessing || this.isOverStorageLimit) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.newComment.trim() === "" || this.isProcessing || this.isOverStorageLimit;
         },
+    },
+
+    created() {
+        if (this.presetUniqueId === "") {
+            this.uniqueId = __uniqueId.toString();
+            __uniqueId += 1;
+        } else {
+            this.uniqueId = this.presetUniqueId;
+        }
     },
 
     methods: {
@@ -122,7 +115,6 @@ export default {
         /**
          * Once the CKEditor has been created, we track any data input changes to keep
          * the comment in sync and assign focus so the user can start typing
-         *
          * @param { CustomEvent } event - the event object, containing the editor instance
          */
         onEditorCreated(event) {
@@ -167,7 +159,7 @@ export default {
 </script>
 
 <template>
-    <div class="add-commment-input">
+    <div class="add-comment-input">
         <button class="show-ckeditor-button" v-show="!isCKEditorLoaded" @click.once="onAddCommentSelected">
             {{ getAddCommentButtonText }}
         </button>
@@ -186,7 +178,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.add-commment-input {
+.add-comment-input {
     margin-bottom: 1rem;
 }
 </style>
