@@ -173,10 +173,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]
         );
         $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => '']);
-        $content    = $this->buildUnthemedHtmlOutput('@learningAssessment/seb.twig', [
+        $content    = $this->responseFromTemplateUnthemed('@learningAssessment/seb.twig', [
             'url' => $defaultUrl,
         ]);
-        $this->getResponse()->content->set($content);
+        $this->psr7Response = $content;
     }
 
 

@@ -163,14 +163,14 @@ class Controller extends BaseController
             $responseData['data'][$key]['content'] = Scrub::html($data['content']);
         }
 
-        $this->response->content->set(
+        $this->psr7Response =
             $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput(
+                ? $this->responseAsJson($responseData)
+                : $this->responseFromTemplateUnthemed(
                     '@discussionComments/list.twig',
                     ['list' => $responseData, 'thread' => $thread]
                 )
-        );
+        ;
     }
 
 
@@ -204,11 +204,11 @@ class Controller extends BaseController
         // Clean-up content before returning the result
         $responseData['content'] = Scrub::html($responseData['content']);
 
-        $this->response->content->set(
+        $this->psr7Response =
             $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionComments/item.twig', ['item' => $responseData])
-        );
+                ? $this->responseAsJson($responseData)
+                : $this->responseFromTemplateUnthemed('@discussionComments/item.twig', ['item' => $responseData])
+        ;
     }
 
     /**
@@ -330,10 +330,10 @@ class Controller extends BaseController
         $responseData['children'] = $loadChildren
             ? $this->retrieveCommentList($thread, $context, null)
             : [];
-        $this->response->content->set(
+        $this->psr7Response =
             $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
-        );
+                ? $this->responseAsJson($responseData)
+                : $this->responseFromTemplateUnthemed('@discussionThreads/item.twig', ['item' => $responseData])
+        ;
     }
 }

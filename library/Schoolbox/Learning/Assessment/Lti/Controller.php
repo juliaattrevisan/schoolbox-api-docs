@@ -402,11 +402,9 @@ class Controller extends Assessment\Controller
         $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $this->getUser());
 
         // And send message to template, where it's POSTed
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningAssessment/lti/messageForm.twig',
-                ['message' => $message]
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/lti/messageForm.twig',
+            ['message' => $message]
         );
     }
 
@@ -475,11 +473,9 @@ class Controller extends Assessment\Controller
         $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $student);
 
         // And send message to template, where it's POSTed
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningAssessment/lti/messageForm.twig',
-                ['message' => $message]
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/lti/messageForm.twig',
+            ['message' => $message]
         );
     }
 

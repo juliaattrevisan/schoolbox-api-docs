@@ -256,8 +256,8 @@ class Controller extends Base
      */
     public function getTextbox(Model $textbox): void
     {
-        $this->response->content->set($this->buildUnthemedHtmlOutput('@textbox/blank.twig', [
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@textbox/blank.twig', [
             'textbox'         => $textbox,
-        ]));
+        ]);
     }
 }

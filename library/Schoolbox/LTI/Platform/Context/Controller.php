@@ -182,11 +182,9 @@ class Controller extends BaseController
         );
 
         // Send the request
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/messageForm.twig',
-                ['message' => $message],
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/messageForm.twig',
+            ['message' => $message],
         );
     }
 
@@ -240,11 +238,9 @@ class Controller extends BaseController
         );
 
         // Build a DL request to this tool
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/messageForm.twig',
-                ['message' => $message],
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/messageForm.twig',
+            ['message' => $message],
         );
     }
 

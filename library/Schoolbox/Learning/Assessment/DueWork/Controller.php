@@ -1309,28 +1309,25 @@ class Controller extends Assessment\Controller
 
             $this->persistAcknowledgementResponse($assessment, $student, $submissionTime);
             $participant = $assessment->getParticipant($student);
-            $this->getResponse()->content->set(
-                $this->buildUnthemedHtmlOutput(
-                    '@learning/fragments/toMarkParticipant.twig',
-                    [
-                        'participant' => $participant,
-                        'assessment'  => $participant->getAssessable(),
-                    ]
-                )
+
+            $this->psr7Response = $this->responseFromTemplateUnthemed(
+                '@learning/fragments/toMarkParticipant.twig',
+                [
+                    'participant' => $participant,
+                    'assessment'  => $participant->getAssessable(),
+                ]
             );
             $code = 200;
         } catch (PDOException $e) {
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    [
-                        'success' => false,
-                        'message' => $e->getMessage(),
-                    ]
-                )
+            $this->psr7Response = $this->responseAsJson(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ]
             );
             $code = 403;
         }
-        $this->getResponse()->status->set($code);
+        $this->psr7Response = $this->psr7Response->withStatus($code);
     }
 
 

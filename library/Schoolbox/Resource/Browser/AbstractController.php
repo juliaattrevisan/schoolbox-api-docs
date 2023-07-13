@@ -197,8 +197,7 @@ abstract class AbstractController extends BaseController
         $data['source_slug'] = $sourceSlug;
         $data['mime'] = $mime;
 
-        $html = $this->buildUnthemedHtmlOutput('@resourceBrowser/picker.twig', $data);
-        $this->getResponse()->content->set($html);
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@resourceBrowser/picker.twig', $data);
     }
 
     /**

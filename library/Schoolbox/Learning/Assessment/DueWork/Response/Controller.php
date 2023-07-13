@@ -545,7 +545,7 @@ class Controller extends Base
             'html' => $this->filesystemProxy->read($plagscan->getStorage()),
         ];
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
+        $this->psr7Response = $this->responseFromTemplateUnthemed('@learningDueWorkResponse/plagscan/contents.twig', $data);
     }
 
     /**
@@ -585,14 +585,12 @@ class Controller extends Base
                 sprintf('attachment; filename="%s"', $file->getBasename()),
             );
         }
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningDueWorkResponse/responseFileInline.twig',
-                [
-                    'file'        => $file,
-                    'fileContent' => $this->filesystemProxy->read($file),
-                ],
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@learningDueWorkResponse/responseFileInline.twig',
+            [
+                'file'        => $file,
+                'fileContent' => $this->filesystemProxy->read($file),
+            ],
         );
     }
 

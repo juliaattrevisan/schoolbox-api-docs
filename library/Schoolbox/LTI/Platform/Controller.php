@@ -96,11 +96,9 @@ class Controller extends Base
             $this->userAuthenticator,
         ))->build($this->psr7Request);
 
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/messageForm.twig',
-                ['message' => $message,]
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/messageForm.twig',
+            ['message' => $message,]
         );
     }
 
@@ -202,16 +200,14 @@ class Controller extends Base
 
         // The end recipient of the resource link will need to know about the
         // tool which created the link, so it can launch the link later.
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/receiveDeepLinkingResponse.twig',
-                [
-                    'context'       => $this->requestQuery->get('context'),
-                    'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
-                    'tool'          => $tool,
-                    'resourceLinks' => $resourceLinks,
-                ],
-            )
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/receiveDeepLinkingResponse.twig',
+            [
+                'context'       => $this->requestQuery->get('context'),
+                'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+                'tool'          => $tool,
+                'resourceLinks' => $resourceLinks,
+            ],
         );
     }
 

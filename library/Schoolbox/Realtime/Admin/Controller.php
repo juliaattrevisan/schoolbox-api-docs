@@ -247,7 +247,7 @@ class Controller extends BaseController
                 return;
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput($template, $data));
+        $this->psr7Response = $this->responseFromTemplateUnthemed($template, $data);
     }
 
 
