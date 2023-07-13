@@ -100,8 +100,7 @@ class Controller extends Base
         $this->psr7Response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
-            ], $pageTitle, 'submission'
-        );
+            ], $pageTitle, 'submission');
     }
 
 

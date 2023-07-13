@@ -984,7 +984,10 @@ class Controller extends Base
         $data = array_merge($data, $sidebar->generate());
 
         $this->psr7Response = $this->responseFromTemplate(
-            '@commsNews/archive.twig', $data, $pageTitle, 'news'
+            '@commsNews/archive.twig',
+            $data,
+            $pageTitle,
+            'news'
         );
     }
 
@@ -1146,7 +1149,10 @@ class Controller extends Base
         ], $sidebar->generate());
 
         $this->psr7Response = $this->responseFromTemplate(
-            '@commsNews/authored.twig', $data, 'My News', 'news'
+            '@commsNews/authored.twig',
+            $data,
+            'My News',
+            'news'
         );
     }
 

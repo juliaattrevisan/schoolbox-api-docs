@@ -24,7 +24,6 @@ use function ini_set;
 
 class Controller extends Base
 {
-
     /**
      * @var Error\Mapper
      */

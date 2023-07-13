@@ -13,7 +13,6 @@ use Alaress\Web;
 
 class Controller extends Web\Controller\Base
 {
-
     /**
      * Displays a form where a Staff member (eg the Dean) can give comments across all
      * users in a selected student role

@@ -14,7 +14,6 @@ use Schoolbox\Permission\Access;
 
 class Controller extends Base
 {
-
     /**
      * @var \Schoolbox\Error\Mapper
      */

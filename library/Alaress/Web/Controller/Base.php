@@ -18,7 +18,6 @@ use Alaress\Web\Response\Factory as ResponseFactory;
 use Aura\Router\Generator;
 use Aura\Router\RouterContainer;
 use Aura\Session\SegmentInterface;
-use Aura\Web\Exception\InvalidStatusCode;
 use Aura\Web\Response;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
