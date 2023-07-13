@@ -758,7 +758,7 @@ class Controller extends Base
         // Set view on, only the viewer is the recipient and viewed on has not been set
         if (
             $this->getUser()->getId() !== $award->getRecipient()->getId()
-            || !$award->getViewedOn()
+            || $award->getViewedOn()
         ) {
             return;
         }
