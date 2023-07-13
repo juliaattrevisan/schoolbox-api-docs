@@ -7,6 +7,7 @@
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
 
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 
@@ -54,7 +55,7 @@ export default {
          */
         getPostCommentButtonText() {
             return this.isOverStorageLimit
-                ? "Post comment (disabled because maximum character count exceeded)"
+                ? `Post comment ${getButtonTextDisabledDueToStorageLimitSuffix()}`
                 : "Post comment";
         },
 
