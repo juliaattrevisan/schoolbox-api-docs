@@ -1,16 +1,14 @@
-import SbCard from "../../vue/components/card/sb-card.vue";
-import SbCardList from "../../vue/components/card/sb-card-list.vue";
+import StorybookSlot from "../../vue/components/storybook-slot";
 
 export default {
     title: "Cards/SbCard",
-    component: SbCard,
-    SbCardList,
+    component: StorybookSlot,
 };
 
 const DefaultTemplate = (args, { argTypes }) => ({
-    components: { SbCard },
+    components: { StorybookSlot },
     template: `
-        <sb-card>
+        <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img">
                     <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
@@ -44,14 +42,14 @@ const DefaultTemplate = (args, { argTypes }) => ({
                 <a>READ MORE</a>
                 <a>ANOTHER ACTION</a>
             </div>
-        </sb-card>
+        </div>
     `,
 });
 
 const SubItemTemplate = (args, { argTypes }) => ({
-    components: { SbCard },
+    components: { StorybookSlot },
     template: `
-        <sb-card class="sb-card--subitem">
+        <div class="sb-card sb-card--subitem">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img">
                     <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
@@ -61,15 +59,15 @@ const SubItemTemplate = (args, { argTypes }) => ({
                     <span class="meta">Last updated 3 weeks ago</span>
                 </div>
             </div>
-        </sb-card>
+        </div>
     `,
 });
 
 const CardListTemplate = (args, { argTypes }) => ({
-    components: { SbCard, SbCardList },
+    components: { StorybookSlot },
     template: `
-        <sb-card class="sb-card-list">
-            <sb-card>
+        <div class="sb-card-list">
+            <div class="sb-card">
                 <div class="sb-card__top">
                     <div class="sb-card__primary-img">
                         <div class="icon icon-folder"></div>
@@ -79,39 +77,88 @@ const CardListTemplate = (args, { argTypes }) => ({
                         <span class="meta">Resources > Science > Year 11</span>
                     </div>
                 </div>
-            </sb-card>
-            <sb-card class="sb-card--subitem">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img">
-                        <div class="icon icon-link"></div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6 class="">Ted Talk - The importance of Biology in the modern world</h6></a>
-                    </div>
-                </div>
-            </sb-card>
-            <sb-card class="sb-card--subitem">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img">
-                        <img class="mime" src="https://vagrant.dev.schoolbox.cloud/static/images/mime/application-pdf.svg" alt="PDF Document" />
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6 class="">Biology for Dummies</h6></a>
+            </div>
+
+            <div class="sb-card-list">
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img">
+                            <div class="icon icon-link"></div>
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">Ted Talk - The importance of Biology in the modern world</h6></a>
+                        </div>
                     </div>
                 </div>
-            </sb-card>
-            <sb-card class="sb-card--subitem">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img">
-                        <img src="https://placedog.net/40/40" alt="Placedog 40 by 40 image" />
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6 class="">How cool is this dog?</h6></a>
-                        <span class="meta">Last updated 3 weeks ago</span>
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img">
+                            <img class="mime" src="https://vagrant.dev.schoolbox.cloud/static/images/mime/application-pdf.svg" alt="PDF Document" />
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">Biology for Dummies</h6></a>
+                        </div>
                     </div>
                 </div>
-            </sb-card>
-        </sb-card>
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img">
+                            <img src="https://placedog.net/40/40" alt="Placedog 40 by 40 image" />
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">How cool is this dog?</h6></a>
+                            <span class="meta">Last updated 3 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sb-card">
+                <div class="sb-card__top">
+                    <div class="sb-card__primary-img">
+                        <div class="icon icon-folder"></div>
+                    </div>
+                    <div class="sb-card__top-content">
+                        <a href=""><h3 class="">Advanced Biology (BIO12)</h3></a>
+                        <span class="meta">Resources > Science > Year 12</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sb-card-list">
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img">
+                            <div class="icon icon-link"></div>
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">Ted Talk - The importance of Biology in the modern world</h6></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img">
+                            <img class="mime" src="https://vagrant.dev.schoolbox.cloud/static/images/mime/application-pdf.svg" alt="PDF Document" />
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">Biology for Dummies</h6></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img">
+                            <img src="https://placedog.net/40/40" alt="Placedog 40 by 40 image" />
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">How cool is this dog?</h6></a>
+                            <span class="meta">Last updated 3 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     `,
 });
 
