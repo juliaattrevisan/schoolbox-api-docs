@@ -148,7 +148,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminImportPhotos.getIndex'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportPhotos.getIndex'));
     }
 
 

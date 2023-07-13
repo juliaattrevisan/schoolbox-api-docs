@@ -228,7 +228,7 @@ class Controller extends AbstractController
                 ]);
             }
 
-            $this->getResponse()->redirect->afterPost($return);
+            $this->psr7Response = $this->redirectAfterPost($return);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
@@ -347,7 +347,7 @@ class Controller extends AbstractController
                 'division_id' => $division->getId(),
             ])
         );
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'sportsfixturesDivision.getLobby',
                 ['entityId' => $division->getId(),]
@@ -450,7 +450,7 @@ class Controller extends AbstractController
 
         // Return to lobby
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'sportsfixturesDivision.getLobby',
                 ['entityId' => $entityId]
@@ -499,7 +499,7 @@ class Controller extends AbstractController
             );
         } else {
             // Redirect back to lobby
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(
                     'sportsfixturesDivision.getLobby',
                     ['entityId' => $division->getId(),]

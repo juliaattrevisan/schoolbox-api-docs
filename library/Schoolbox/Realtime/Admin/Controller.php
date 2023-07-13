@@ -350,7 +350,7 @@ class Controller extends BaseController
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
+        $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
     }
 
 

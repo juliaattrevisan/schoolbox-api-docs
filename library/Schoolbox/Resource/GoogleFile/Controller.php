@@ -148,7 +148,7 @@ class Controller extends Base
     {
         $googleIdString = $this->requestPost->get('googleIds');
         if (!$googleIdString) {
-            $this->getResponse()->redirect->afterPost('/homepage/' . $folder->getId());
+            $this->psr7Response = $this->redirectAfterPost('/homepage/' . $folder->getId());
             return;
         }
 
@@ -156,7 +156,7 @@ class Controller extends Base
         $editAccessLevel    = is_numeric($this->requestPost->get('gfileEdit')) ? (int)$this->requestPost->get('gfileEdit') : null;
         $commentAccessLevel = is_numeric($this->requestPost->get('gfileComment')) ? (int)$this->requestPost->get('gfileComment') : null;
         if (!$editAccessLevel || !$commentAccessLevel) {
-            $this->getResponse()->redirect->afterPost('/homepage/' . $folder->getId());
+            $this->psr7Response = $this->redirectAfterPost('/homepage/' . $folder->getId());
             return;
         }
 

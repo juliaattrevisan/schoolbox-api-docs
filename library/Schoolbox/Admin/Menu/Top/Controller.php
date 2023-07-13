@@ -277,7 +277,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/menu-top");
+        $this->psr7Response = $this->redirectAfterPost("/adminv2/menu-top");
     }
 
     /** Here be mappers and stuff */

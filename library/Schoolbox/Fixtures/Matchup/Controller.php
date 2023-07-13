@@ -359,7 +359,7 @@ class Controller extends AbstractController
 
         $this->saveMatch($entity, $division, $name, $season, $startAt, $finishAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesMatch.getList', [
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesMatch.getList', [
             'contextId' => $division->getId()
         ]));
     }

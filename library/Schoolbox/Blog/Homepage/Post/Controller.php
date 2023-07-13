@@ -216,7 +216,7 @@ class Controller extends Base
 
         // Redirect user page to blog detail page
 
-        $this->getResponse()->redirect->afterPost("/blog/{$blog->getId()}");
+        $this->psr7Response = $this->redirectAfterPost("/blog/{$blog->getId()}");
     }
 
     /**
@@ -303,7 +303,7 @@ class Controller extends Base
             $returnUrl = $this->routeGenerator->generate('blog.getItem', ['id' => $blog->getId()]);
         }
 
-        $this->getResponse()->redirect->afterPost($returnUrl);
+        $this->psr7Response = $this->redirectAfterPost($returnUrl);
     }
 
     /**

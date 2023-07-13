@@ -84,7 +84,7 @@ class Controller extends Base
             if ($post['videoAction'] == 'resubmit') {
                 $video->setStatus(VideoQueueMapper::STATUS_PENDING);
                 $this->getVideoQueueMapper()->save($video);
-                $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminVideo.getIndex'));
+                $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminVideo.getIndex'));
             } else if ($post['videoAction'] == 'delete') {
                 $this->getVideoQueueMapper()->delete($video);
             }

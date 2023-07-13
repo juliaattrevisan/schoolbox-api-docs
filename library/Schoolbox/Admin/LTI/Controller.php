@@ -132,7 +132,7 @@ class Controller extends ConfigController
     public function postDelete(Provider $provider): void
     {
         $this->providerMapper->delete($provider);
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**
@@ -229,7 +229,7 @@ class Controller extends ConfigController
 
         $this->providerMapper->save($provider);
 
-        $this->response->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**
@@ -241,7 +241,7 @@ class Controller extends ConfigController
     public function postConfig(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->response->redirect->afterPost($this->routeGenerator->generate('adminLti.getIndex'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**

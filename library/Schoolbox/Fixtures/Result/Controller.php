@@ -460,7 +460,7 @@ class Controller extends AbstractController
 
         $this->saveResult($matchup, $team, $status, $this->requestPost['description'], $entity);
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'sportsfixturesResult.getResultForTeam',
                 [

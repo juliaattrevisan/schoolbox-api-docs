@@ -305,7 +305,7 @@ class Controller extends Base
 
         try {
             $mail->send();
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $this->getSession()->getHistory(2)
             );
         } catch (TransportExceptionInterface $e) {

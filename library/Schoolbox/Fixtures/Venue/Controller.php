@@ -163,7 +163,7 @@ class Controller extends AbstractController
                 $this->requestPost['address']
             );
 
-            $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));
+            $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }

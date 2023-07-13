@@ -213,7 +213,7 @@ class Controller extends ConfigController
         $this->updateConfig($postData, $this->buildConfigPredicate());
         /* Go back to the place from whence you came
          */
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
     }
 
 

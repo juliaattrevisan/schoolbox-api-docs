@@ -219,7 +219,7 @@ class Controller extends ConfigController
         }
 
         $route = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
-        $this->getResponse()->redirect->afterPost($route);
+        $this->psr7Response = $this->redirectAfterPost($route);
     }
 
 

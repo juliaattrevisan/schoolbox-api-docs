@@ -181,6 +181,6 @@ class Controller extends Base
 
         // Send them back to the admin page
 
-        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
+        $this->psr7Response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
     }
 }

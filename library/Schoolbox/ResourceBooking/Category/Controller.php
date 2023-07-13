@@ -111,7 +111,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -191,7 +191,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -213,7 +213,7 @@ class Controller extends Base
             $this->getMapper()->delete($category);
         }
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }

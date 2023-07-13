@@ -340,7 +340,7 @@ class Controller extends Assessment\Controller
 
         // Then redir to the return URL, or the assessment's folder
         $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
-        $this->response->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             isset($encodedReturnUrl)
                 ? Redirect::decode($encodedReturnUrl)
                 : ('/homepage' . $assessment->getBaseContext()->getFolder()->getId()),

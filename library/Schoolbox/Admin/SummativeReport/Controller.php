@@ -342,7 +342,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -569,7 +569,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -586,7 +586,7 @@ class Controller extends ConfigController
     {
         $this->reportMapper->delete($report);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 

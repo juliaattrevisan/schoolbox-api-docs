@@ -62,7 +62,7 @@ class Controller extends ConfigController
     public function postAdmin(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminOauth.getAdmin'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminOauth.getAdmin'));
     }
 
 

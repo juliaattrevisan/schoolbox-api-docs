@@ -509,7 +509,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#groups");
+        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#groups");
     }
 
     /**
@@ -532,7 +532,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#permissions");
+        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#permissions");
     }
 
     /**
@@ -556,7 +556,7 @@ class Controller extends Base
         } catch (MapperException $e) {
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#linked");
+        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#linked");
     }
 
     /**
@@ -797,7 +797,7 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify");
+        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify");
     }
 
     /**
@@ -864,7 +864,7 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$userId}/modify");
+        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$userId}/modify");
     }
 
     /**

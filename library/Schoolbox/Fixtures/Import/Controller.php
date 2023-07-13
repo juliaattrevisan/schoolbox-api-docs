@@ -490,11 +490,11 @@ class Controller extends Base
                 'format' => 'noContent',
             ]);
 
-            $this->getResponse()->redirect->afterPost("/fixtures/import/{$this->import->getId()}");
+            $this->psr7Response = $this->redirectAfterPost("/fixtures/import/{$this->import->getId()}");
         } else {
             // Nothing was attached, not much to do but stare at our navels
 
-            $this->getResponse()->redirect->afterPost("/fixtures/upload");
+            $this->psr7Response = $this->redirectAfterPost("/fixtures/upload");
         }
     }
 

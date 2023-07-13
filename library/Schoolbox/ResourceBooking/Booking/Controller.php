@@ -291,7 +291,7 @@ class Controller extends Base
         } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
-            $this->getResponse()->redirect->afterPost($returnUrl ?? $this->getSession()->getHistory());
+            $this->psr7Response = $this->redirectAfterPost($returnUrl ?? $this->getSession()->getHistory());
         }
     }
 
@@ -421,7 +421,7 @@ class Controller extends Base
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             // Consider storing redirect URL in form or GET?
-            $this->getResponse()->redirect->afterPost($returnUrl ?? $this->getSession()->getHistory(2));
+            $this->psr7Response = $this->redirectAfterPost($returnUrl ?? $this->getSession()->getHistory(2));
         }
     }
 
@@ -1003,7 +1003,7 @@ class Controller extends Base
             );
         } else {
             // Is there a previous location to redirect to? if so use that.
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $callbackUrl ?: $this->getSession()->getHistory()
             );
         }

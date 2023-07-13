@@ -853,7 +853,7 @@ class ListController extends Web\Controller\Base
         if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $url ]));
         } else {
-            $this->getResponse()->redirect->afterPost($url);
+            $this->psr7Response = $this->redirectAfterPost($url);
         }
     }
 

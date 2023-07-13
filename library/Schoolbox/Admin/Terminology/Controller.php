@@ -66,6 +66,6 @@ class Controller extends Base
             // noop, I guess? skip unknown terminologies
         }
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminTerminology.getIndex'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminTerminology.getIndex'));
     }
 }

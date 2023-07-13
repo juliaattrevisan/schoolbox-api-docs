@@ -189,7 +189,7 @@ class Controller extends AbstractController
                 Alaress_Date_Format::newLocalShort($this->requestPost['end'])
             );
 
-            $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSeason.getList'));
+            $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSeason.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }

@@ -129,7 +129,7 @@ class Controller extends AbstractController
 
             $this->saveSport($entity, $post['name'], $post['url'], $positions);
 
-            $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSport.getList'));
+            $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSport.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }

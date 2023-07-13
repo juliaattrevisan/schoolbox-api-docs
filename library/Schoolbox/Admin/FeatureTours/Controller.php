@@ -83,6 +83,6 @@ class Controller extends Base
         $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
 
         // Redirect back to the same page
-        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('featureTours.render'));
+        $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('featureTours.render'));
     }
 }

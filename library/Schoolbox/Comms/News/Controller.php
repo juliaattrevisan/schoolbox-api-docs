@@ -426,7 +426,7 @@ class Controller extends Base
                     $nextStep .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
                 }
             }
-            $this->getResponse()->redirect->afterPost($nextStep);
+            $this->psr7Response = $this->redirectAfterPost($nextStep);
             return;
         }
     }

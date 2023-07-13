@@ -350,7 +350,7 @@ class Controller extends Base
             $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
         }
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
-        $this->response->redirect->afterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
+        $this->psr7Response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 
     /**

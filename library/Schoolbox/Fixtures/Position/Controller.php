@@ -129,7 +129,7 @@ class Controller extends AbstractController
 
         $this->savePosition($sport, $this->requestPost['name'], $entity);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesPosition.getList', [
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesPosition.getList', [
             'contextId' => $sportId
         ]));
     }

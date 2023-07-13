@@ -333,6 +333,6 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost('/adminv2/profile-button');
+        $this->psr7Response = $this->redirectAfterPost('/adminv2/profile-button');
     }
 }

@@ -179,7 +179,7 @@ class Controller extends Base
                 'form_params' => $post
             ]);
 
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $this->getRouteIfAuthorized('helpCourseParticipation.getApiTest')
             );
         } catch (BadResponseException $e) {

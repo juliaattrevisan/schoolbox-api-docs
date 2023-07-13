@@ -118,7 +118,7 @@ class Controller extends Base
         $group = $this->pastoralGroupMapper->findById($groupId);
         $this->pastoralGroupMapper->delete($group);
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoralManagement.getGroups')
         );
     }
@@ -210,7 +210,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoralManagement.getGroups')
         );
     }

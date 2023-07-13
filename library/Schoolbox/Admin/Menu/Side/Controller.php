@@ -285,7 +285,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/menu-side");
+        $this->psr7Response = $this->redirectAfterPost("/adminv2/menu-side");
     }
 
 

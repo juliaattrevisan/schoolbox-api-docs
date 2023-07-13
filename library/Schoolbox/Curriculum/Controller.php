@@ -220,7 +220,7 @@ class Controller extends Base
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }
@@ -273,7 +273,7 @@ class Controller extends Base
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }
@@ -307,7 +307,7 @@ class Controller extends Base
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }

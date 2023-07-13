@@ -416,7 +416,7 @@ class Controller extends BaseController
                 $newLocation = $this->createGroup($this->requestPost, $model, $this->getUser());
             }
 
-            $this->getResponse()->redirect->afterPost($newLocation);
+            $this->psr7Response = $this->redirectAfterPost($newLocation);
         } catch (RangeException $e) {
             // not enough info submitted to the form
             throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING, $e);

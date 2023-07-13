@@ -62,7 +62,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
     }
 
     /**
@@ -98,7 +98,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
     }
 
     /**

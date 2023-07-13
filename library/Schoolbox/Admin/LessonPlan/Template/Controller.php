@@ -143,7 +143,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 
@@ -257,7 +257,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
+        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 

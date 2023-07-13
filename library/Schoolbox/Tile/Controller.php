@@ -174,7 +174,7 @@ class Controller extends Base
             // Should never happen
             $href = '#';
         }
-        $this->getResponse()->redirect->afterPost($href);
+        $this->psr7Response = $this->redirectAfterPost($href);
     }
 
     /**
@@ -250,7 +250,7 @@ class Controller extends Base
         $item->setTileLayout($layout);
 
         $this->mapper->save($item);
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $layout->getId()]
@@ -291,7 +291,7 @@ class Controller extends Base
         );
 
         $this->mapper->save($item);
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $item->getTileLayout()->getId()]
@@ -319,7 +319,7 @@ class Controller extends Base
                 ]
             );
         } else {
-            $this->getResponse()->redirect->afterPost(
+            $this->psr7Response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $item->getTileLayout()->getId()]

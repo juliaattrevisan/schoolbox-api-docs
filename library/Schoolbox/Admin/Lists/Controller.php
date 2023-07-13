@@ -228,7 +228,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->requestPost["table"]);
+        $this->psr7Response = $this->redirectAfterPost('/adminv2/lists/' . $this->requestPost["table"]);
     }
 
     /**

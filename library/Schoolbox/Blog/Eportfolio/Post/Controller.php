@@ -211,7 +211,7 @@ class Controller extends Base
 
         // Send them back to the item detail page
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'eportfolioBlog.getItem',
                 ['pageId' => $page->getPageId(), 'id' => $blog->getId(),]
@@ -287,7 +287,7 @@ class Controller extends Base
             );
         }
 
-        $this->getResponse()->redirect->afterPost($returnUrl);
+        $this->psr7Response = $this->redirectAfterPost($returnUrl);
     }
 
     /**

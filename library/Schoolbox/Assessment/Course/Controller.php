@@ -519,7 +519,7 @@ class Controller extends Base\Base
             ]));
         } else {
             // respond to synchronous POST with redirect
-            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.courseList'));
+            $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
         }
     }
 
@@ -734,7 +734,7 @@ class Controller extends Base\Base
             ]));
         } else {
             // respond to synchronous POST with redirect
-            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.courseList'));
+            $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
         }
     }
 

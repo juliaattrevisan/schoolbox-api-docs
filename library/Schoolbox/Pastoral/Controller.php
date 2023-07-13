@@ -815,7 +815,7 @@ class Controller extends Base
         } else {
             $returnUrl = $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,]);
         }
-        $this->getResponse()->redirect->afterPost($returnUrl);
+        $this->psr7Response = $this->redirectAfterPost($returnUrl);
     }
 
     /**
@@ -854,7 +854,7 @@ class Controller extends Base
 
         // Go back to students pastoral record
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,])
         );
     }
@@ -1177,7 +1177,7 @@ class Controller extends Base
             $pastoralExternal->deletePastoral($record);
         }
 
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,])
         );
     }

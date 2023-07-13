@@ -268,7 +268,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.read', ['id' => $model->getId(), 'format' => ''])
         );
     }
@@ -290,7 +290,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.read', ['id' => $item->getId(), 'format' => ''])
         );
     }
@@ -305,7 +305,7 @@ class Controller extends Base
     public function delete(Model $item): void
     {
         $this->mapper->delete($item);
-        $this->getResponse()->redirect->afterPost(
+        $this->psr7Response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.browse', ['format' => ''])
         );
     }
