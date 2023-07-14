@@ -1,7 +1,7 @@
-import SearchBar from "./search-bar";
+import HeaderSearch from "./header-search";
 
 window.Vue.createApp({
     components: {
-        SearchBar,
+        HeaderSearch,
     },
 }).mount("#hybrid-bar");
