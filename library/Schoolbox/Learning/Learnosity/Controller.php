@@ -135,29 +135,9 @@ class Controller extends Base
          * First, see if an incomplete attempt exists; if it does,
          * just reuse it
          */
-        $query = "
-            SELECT attempt_id
-            FROM assess_attempt
-            INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
-            WHERE assess.assessment_id = :assessmentId
-            AND assess_attempt.user_id = :userId
-            AND assess_attempt.finish IS NULL
-            AND assess_attempt.deleted_at IS NULL
-            LIMIT 1
-        ";
+        $attempt = $this->attemptMapper->findExistingUnfinished($assessment->getId(), $student->getId());
 
-        $result = $this->attemptMapper->getDatabase()->executeQuery($query, [
-            'assessmentId' => $assessment->getId(),
-            'userId'       => $student->getId()
-        ]);
-
-        $existingId = $result->fetch()['attempt_id'] ?? null;
-
-        if ($existingId) {
-            /* Found an incomplete attempt; resume it
-             */
-            $attempt = $this->attemptMapper->findById($existingId);
-        } else {
+        if (null === $attempt) {
             /* Assign that Learnosity identifier to an assess_attempt
              */
             $learnosityReference = Uuid::generate();
