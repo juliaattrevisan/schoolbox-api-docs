@@ -3,11 +3,6 @@
  * The search input display, currently used in both the header search and on the search page
  */
 
-// interface Props {
-//     endpoint: string; // the search api endpoint
-// }
-// const props = defineProps<Props>();
-
 const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "click", "focusOver", "focusOut"]);
 
 /**
