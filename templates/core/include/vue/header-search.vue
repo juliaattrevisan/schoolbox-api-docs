@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce";
-import SearchInput from "./search-input.vue";
+import SearchInput from "@schoolboxVue/components/search/search-input.vue";
 import HeaderSearchResultMeta from "./header-search-result-meta.vue";
 
 interface Result {
