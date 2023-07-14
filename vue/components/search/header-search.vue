@@ -108,7 +108,7 @@ function onEnter() {
  * Submit the form, heading to the search page
  */
 function onClicked() {
-    (formElement.value as HTMLFormElement).submit();
+    // (formElement.value as HTMLFormElement).submit();
 }
 
 /**

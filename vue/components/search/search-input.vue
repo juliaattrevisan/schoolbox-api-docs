@@ -3,7 +3,21 @@
  * The search input display, currently used in both the header search and on the search page
  */
 
-const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "click", "focusOver", "focusOut"]);
+interface Props {
+    input: string; // to prefill the input with something or keep it updated with any modications
+}
+const props = defineProps<Props>();
+
+// const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "click", "focusOver", "focusOut"]);
+const emit = defineEmits<{
+    input: [event: string];
+    keyDown: [];
+    keyUp: [];
+    keyEnter: [];
+    click: [];
+    focusOver: [event: Event];
+    focusOut: [];
+}>();
 
 /**
  * Input added
