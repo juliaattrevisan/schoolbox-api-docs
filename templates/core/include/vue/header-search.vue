@@ -58,7 +58,7 @@ function onArrowUp() {
 }
 
 /**
- * Submit the current query, using underscore.js _debounce to accommodate for key presses
+ * Submit the current query, using _debounce to accommodate for key presses
  * so not sending on every key press
  */
 const filterResults = debounce(() => {
@@ -76,6 +76,9 @@ const filterResults = debounce(() => {
         });
 }, 500);
 
+/**
+ * Only start searching once the keyword length is greater than the minimum
+ */
 window.Vue.watch(keyword, () => {
     if (keyword.value.length >= minKeywordLength) {
         isOpen.value = true;
@@ -86,7 +89,7 @@ window.Vue.watch(keyword, () => {
 });
 
 /**
- * To a new browser page
+ * Go to a new browser page
  * @param {string} path - The path to go to
  */
 function goToPath(path: string) {
@@ -94,7 +97,7 @@ function goToPath(path: string) {
 }
 
 /**
- * Navigate to the chosen result
+ * Navigate to the chosen result or submit the form to go to the search page
  */
 function onEnter() {
     if (arrowCounter.value > 0) {
@@ -112,7 +115,7 @@ function onClicked() {
 }
 
 /**
- * Display the search results
+ * Focus the search input
  * @param { Event } event - The event object
  */
 function onFocusOver(event: Event) {

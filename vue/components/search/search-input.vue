@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The search input display, currently used in both the header search and on the search page
+ * To display the search input field, accompanied by a search button
  */
 
 interface Props {
@@ -22,7 +22,7 @@ const currentInput = window.Vue.ref<string>((props.initialInput as string) ?? ""
 const inputElement = window.Vue.ref<HTMLInputElement | null>(null);
 
 /**
- * Input added, update internall and dispatch emit
+ * Input updated, update internaly and dispatch emit
  * @param {Event} event - The event object
  */
 function onInput(event: Event) {
@@ -71,7 +71,7 @@ function onFocusOver(event: Event) {
 }
 
 /**
- * Focus over input
+ * Focus out input
  */
 function onFocusOut() {
     emit("focusOut");
