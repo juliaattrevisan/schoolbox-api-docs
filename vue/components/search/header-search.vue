@@ -1,9 +1,11 @@
 <script>
-import ResultMeta from "./search-bar-results-meta";
 import debounce from "lodash/debounce";
+import SearchInput from "./search-input";
+import ResultMeta from "./search-bar-results-meta";
 
 export default {
     components: {
+        SearchInput,
         ResultMeta,
     },
 
@@ -38,6 +40,14 @@ export default {
     },
 
     methods: {
+        /**
+         * Input added
+         * @param {string} value - The input value
+         */
+        onInput(value) {
+            this.keyword = value;
+        },
+
         /**
          * Arrow pressed down, moving to next result
          */
@@ -146,7 +156,14 @@ export default {
 
 <template>
     <form id="search" class="global-search" action="/search" :class="{ focus: isFocused }">
-        <input
+        <search-input
+            @input="onInput"
+            @key-down="onArrowDown"
+            @key-up="onArrowUp"
+            @key-enter="onEnter"
+            @focused="onFocusOver"
+        />
+        <!-- <input
             id="search-field"
             type="text"
             name="keyword"
@@ -162,7 +179,7 @@ export default {
             @blur="isFocused = false"
             @focusout="isFocused = false"
             maxlength="2048"
-        />
+        /> -->
         <ul class="results information-list" v-show="isFocused && isOpen && keyword.length >= minKeywordLength">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
