@@ -1,7 +1,7 @@
 <script>
-export default {
-    name: "result-meta",
-};
+/**
+ * A slot to display the search result meta
+ */
 </script>
 
 <template>

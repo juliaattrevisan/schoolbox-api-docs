@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce";
 import SearchInput from "./search-input.vue";
-import ResultMeta from "./search-bar-results-meta.vue";
+import HeaderSearchResultMeta from "./header-search-results-meta.vue";
 
 interface Result {
     id: string;
@@ -163,7 +163,9 @@ function formatPortrait(id: string) {
         />
         <ul v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results information-list">
             <li v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
-                <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
+                <header-search-result-meta
+                    >Showing {{ results.length }} of {{ totalCount }} matching users</header-search-result-meta
+                >
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
                 <a
@@ -182,17 +184,17 @@ function formatPortrait(id: string) {
                 </a>
             </li>
             <li v-if="isLoading" class="result-meta">
-                <result-meta><div class="loader"></div></result-meta>
+                <header-search-result-meta><div class="loader"></div></header-search-result-meta>
             </li>
             <li
                 v-if="results.length && totalCount > results.length"
                 class="result-meta with-bg"
                 @mousedown.left="goToPath(paths.searchPage + keyword + '#user')"
             >
-                <result-meta> View all {{ totalCount }} users </result-meta>
+                <header-search-result-meta> View all {{ totalCount }} users </header-search-result-meta>
             </li>
             <li v-if="!isLoading && !results.length" class="result-meta">
-                <result-meta>No users were found matching "{{ keyword }}"</result-meta>
+                <header-search-result-meta>No users were found matching "{{ keyword }}"</header-search-result-meta>
             </li>
             <li
                 v-if="!isLoading && !results.length"
@@ -200,7 +202,7 @@ function formatPortrait(id: string) {
                 @click="goToPath(paths.searchPage + keyword + '#all')"
                 @mousedown.left="goToPath(paths.searchPage + keyword + '#all')"
             >
-                <result-meta> Search everything for "{{ keyword }}" </result-meta>
+                <header-search-result-meta> Search everything for "{{ keyword }}" </header-search-result-meta>
             </li>
         </ul>
     </form>
