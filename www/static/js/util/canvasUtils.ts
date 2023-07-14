@@ -1,4 +1,8 @@
 /**
+ * HTML canvas util methods to ge the object, size and clear once used.
+ */
+
+/**
  * Get the dimensions of the canvas, which can change depending on screen dimensions
  * @param canvas { HTMLCanvasElement }
  * @return { Number, Number }
