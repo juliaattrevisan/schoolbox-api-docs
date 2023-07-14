@@ -2368,7 +2368,7 @@ abstract class Mapper implements IMapper
         if ($options['queryWrite'] ?? false) {
             $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
         } else {
-            $quoted_table = $this->databaseRead->getQuoter()->quoteIdentifier($this->table);
+            $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
         }
 
         // filter on soft-deletions if this mapper supports them
@@ -2395,7 +2395,7 @@ abstract class Mapper implements IMapper
 
         // Build ORDER BY part
         if (isset($options['order']) && \is_array($options['order']) && count($options['order'])) {
-            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->databaseRead->getQuoter());
+            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database->getQuoter());
         }
 
         // Build LIMIT and OFFSET part (should bind as parameters instead)
@@ -2422,7 +2422,7 @@ abstract class Mapper implements IMapper
          * Dam transactions on the write connector means objects won't exist in the read connection when we are still within a transaction...
          *
          */
-        if ($options['queryWrite'] ?? false) {
+        if ($this->database->inTransaction() || $this->database->lastInsertId()) {
             $statement = $this->database->prepare($query);
         } else {
             $statement = $this->databaseRead->prepare($query);
@@ -2517,7 +2517,7 @@ abstract class Mapper implements IMapper
     protected function getSelectString()
     {
         // in the core mapper this is quite trivial, but implementing classes can override
-        $quoted_table = $this->databaseRead->getQuoter()->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
         return "SELECT {$this->getColumnString()} FROM $quoted_table";
     }
 
@@ -2880,7 +2880,7 @@ abstract class Mapper implements IMapper
     {
         $selection = implode(', ', array_map(function ($column) {
             return implode('.', array_map(function ($v) {
-                return $this->databaseRead->getQuoter()->quoteIdentifier($v);
+                return $this->database->getQuoter()->quoteIdentifier($v);
             }, [ $this->getTable(), $column ]));
         }, $columnList));
 
