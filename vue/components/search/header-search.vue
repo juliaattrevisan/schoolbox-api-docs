@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce";
-import SearchInput from "./search-input";
-import ResultMeta from "./search-bar-results-meta";
+import SearchInput from "./search-input.vue";
+import ResultMeta from "./search-bar-results-meta.vue";
+
+interface Result {
+    id: string;
+    formattedName: string;
+    metadata: string;
+}
+
+interface AllResults {
+    totalCount: number;
+    results: Result[];
+}
 
 const isFocused = window.Vue.ref(false);
 const keyword = window.Vue.ref("");
-const results = window.Vue.ref([]);
+const results = window.Vue.ref<Result[]>([]);
 const isOpen = window.Vue.ref(false);
 const isLoading = window.Vue.ref(true);
+const hasLoadError = window.Vue.ref(false);
 const totalCount = window.Vue.ref(0);
 const arrowCounter = window.Vue.ref(-1); // Want to automatically select the first result? set this to 0
 const formElement = window.Vue.ref<HTMLFormElement | null>(null);
@@ -52,15 +64,15 @@ function onArrowUp() {
 const filterResults = debounce(() => {
     fetch(`${paths.searchEndpoint}${keyword.value}`)
         .then((response) => response.json())
-        .then((data) => {
+        .then((data: AllResults) => {
             totalCount.value = data.totalCount;
             results.value = data.results;
         })
         .finally(() => {
             isLoading.value = false;
         })
-        .catch((error) => {
-            console.warn(error);
+        .catch(() => {
+            hasLoadError.value = true;
         });
 }, 500);
 
