@@ -8,7 +8,7 @@
 // }
 // const props = defineProps<Props>();
 
-const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "focusOver", "focusOut"]);
+const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "click", "focusOver", "focusOut"]);
 
 /**
  * Input added
@@ -37,6 +37,13 @@ function onKeyUp() {
  */
 function onKeyEnter() {
     emit("keyEnter");
+}
+
+/**
+ * Search button clicked
+ */
+function onClicked() {
+    emit("click");
 }
 
 /**
@@ -72,6 +79,7 @@ function onFocusOut() {
         @blur="onFocusOut"
         @focusout="onFocusOut"
     />
+    <button for="search-field" class="icon-search no-text" title="Search" @click.prevent="onClicked"></button>
 </template>
 
 <style scoped></style>

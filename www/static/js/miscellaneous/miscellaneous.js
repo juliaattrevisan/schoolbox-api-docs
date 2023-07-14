@@ -15,13 +15,6 @@ $(function () {
             },
         });
 
-    var s = $("#search");
-    s.on("click", "[data-jsubmit]", function () {
-        if (s.find("input").val()) {
-            s.submit();
-        }
-    });
-
     /* Replace all editor video/audio placeholders
      */
     $.fn.schoolboxResource_ProxyReplacement("#content");

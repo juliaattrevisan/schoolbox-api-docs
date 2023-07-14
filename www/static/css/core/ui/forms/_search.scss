@@ -34,12 +34,18 @@
     /* Search icon in its idle state
      */
     .icon-search {
-        position: absolute;
-        top: 0;
-        right: 28px;
-        transition: all 0.3s ease-in;
+        align-items: center;
+        background: none;
+        display: flex;
+        justify-content: center;
         line-height: inherit;
         margin: 0;
+        padding: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        transition: all 0.3s ease-in;
+        width: 5rem;
         z-index: 1;
         &:before {
             color: $navigation-foreground;
@@ -63,10 +69,7 @@
     [type="text"]:focus + .icon-search,
     [type="text"]:active + .icon-search,
     &:hover .icon-search {
-        position: absolute;
-        top: 0;
-        right: 16px;
-
+        width: 3rem;
         /* Search icon when Search feature is activated
         */
         &:before {

@@ -73,8 +73,15 @@ export default {
             if (this.arrowCounter > 0) {
                 this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
             } else {
-                document.getElementById("search").submit();
+                this.$refs.form.submit();
             }
+        },
+
+        /**
+         * Submit the form, heading to the search page
+         */
+        onClicked() {
+            this.$refs.form.submit();
         },
 
         /**
@@ -106,8 +113,6 @@ export default {
              *
              * Since we don't have the whole chrome in VueJS yet, for now, we'll need to do this in a not so elegant
              * way as this component doesn't have the ability to communicate with the rest of the chrome elements yet.
-             *
-             * TODO: Convert the whole chrome to VueJS to prevent/minimise this kinds of implementation
              */
             document.querySelector("#menu-toggle").classList.add("search-is-active");
         },
@@ -155,7 +160,7 @@ export default {
 </script>
 
 <template>
-    <form id="search" class="global-search" action="/search" :class="{ focus: isFocused }">
+    <form id="search" ref="form" class="global-search" action="/search" :class="{ focus: isFocused }">
         <search-input
             @input="onInput"
             @key-down="onArrowDown"
@@ -163,6 +168,7 @@ export default {
             @key-enter="onEnter"
             @focus-over="onFocusOver"
             @focus-out="isFocused = false"
+            @click="onClicked"
         />
         <ul class="results information-list" v-show="isFocused && isOpen && keyword.length >= minKeywordLength">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
@@ -206,7 +212,6 @@ export default {
                 <result-meta> Search everything for "{{ keyword }}" </result-meta>
             </li>
         </ul>
-        <label data-jsubmit for="search-field" class="icon-search no-text"></label>
     </form>
 </template>
 
