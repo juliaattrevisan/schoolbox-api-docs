@@ -221,6 +221,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            $this->getConfig()->get('learnosity_consumer_key'),
+            $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getErrorMapper(),
             $this->getQuizMapper(),
             $this->getAttemptMapper()

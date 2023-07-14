@@ -39,6 +39,8 @@ class Controller extends Base
      * Controller constructor.
      */
     public function __construct(
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
@@ -49,8 +51,8 @@ class Controller extends Base
          */
         $this->api = new Api(
             $_SERVER['SERVER_NAME'],
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
     }
