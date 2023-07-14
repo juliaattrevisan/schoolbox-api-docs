@@ -493,7 +493,7 @@ class DataSource
      * @throws \UnexpectedValueException If a capability or indicator that should not be deleted has been
      * @throws \InvalidArgumentException If an undocumented error occurred whilst persisting
      */
-    public function persistGrid(Grid $grid, ?Grid $originalGrid, $submissionBox): void
+    public function persistGrid(Grid $grid, ?Grid $originalGrid, SubmissionBox $submissionBox): void
     {
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
