@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
+use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
@@ -91,7 +92,7 @@ class Controller extends Base
         $api = new Api(
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
         $this->getResponse()->content->set(
@@ -228,7 +229,7 @@ class Controller extends Base
         $api = new Api(
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
         $this->getResponse()->content->set(
@@ -294,7 +295,7 @@ class Controller extends Base
         $api = new Api(
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
         $payload = [
@@ -374,7 +375,7 @@ class Controller extends Base
         $api = new Api(
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
         $this->response = $this->responseFromTemplate(
@@ -501,7 +502,7 @@ class Controller extends Base
         $api = new Api(
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
         $this->response = $this->responseFromTemplate(
@@ -592,7 +593,7 @@ class Controller extends Base
         $api = new Api(
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
         $this->response = $this->responseFromTemplate(
@@ -620,7 +621,7 @@ class Controller extends Base
         $api = new Api(
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
         $payload = [

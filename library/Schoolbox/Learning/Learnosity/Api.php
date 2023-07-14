@@ -23,22 +23,16 @@ use LearnositySdk\Request\Init;
 class Api
 {
     /**
-     * Payloads logged here
-     */
-    private const LOG_FILE = 'learnosity.log';
-
-
-    /**
      * Constructor.
      *
      * @param string      $consumerKey
      * @param string      $consumerSecret
-     * @param string|null $logDir
+     * @param Logger|null $logger
      */
     public function __construct(
         #[\SensitiveParameter] private string $consumerKey,
         #[\SensitiveParameter] private string $consumerSecret,
-        private ?string $logDir = null
+        private ?Logger $logger = null
     ) {
     }
 
@@ -68,15 +62,11 @@ class Api
     {
         /* Optionally log our payloads to learnosity
          */
-        if (null !== $this->logDir) {
-            $logger = $this->spawnLogger();
-
-            $logger->debug(sprintf(
-                'Accessed service %s with payload %s',
-                $service,
-                json_encode($payload, JSON_THROW_ON_ERROR)
-            ));
-        }
+        $this->logger?->debug(sprintf(
+            'Accessed service %s with payload %s',
+            $service,
+            json_encode($payload, JSON_THROW_ON_ERROR)
+        ));
 
         return (new Init(
             $service,
@@ -87,24 +77,5 @@ class Api
             $this->consumerSecret,
             $payload
         ))->generate();
-    }
-
-
-    /**
-     * Spawn a Logger instance, for the lock mechanism
-     *
-     * @return Logger
-     */
-    private function spawnLogger(): Logger
-    {
-        $logFile = sprintf(
-            '%s/%s',
-            $this->logDir,
-            self::LOG_FILE
-        );
-
-        $fp = fopen($logFile, 'a+');
-
-        return new Logger($fp, $fp, \Monolog\Logger::DEBUG, [], true);
     }
 }
