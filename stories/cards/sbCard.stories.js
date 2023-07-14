@@ -10,8 +10,10 @@ const DefaultTemplate = (args, { argTypes }) => ({
     template: `
         <div class="sb-card">
             <div class="sb-card__top">
-                <div class="sb-card__primary-img">
-                    <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                <div class="sb-card__primary-img img">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                    </div>
                 </div>
                 <div class="sb-card__top-content">
                     <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
@@ -46,13 +48,388 @@ const DefaultTemplate = (args, { argTypes }) => ({
     `,
 });
 
+const NavActionsTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <nav class="sb-nav-actions">
+                <a class="icon-modify no-text" href="" title="Modify"></a>
+                <a class="icon-modify no-text" href="" title="Modify"></a>
+                <a class="icon-more no-text" href="" title="Actions"></a>
+            </nav>
+        </div>
+    `,
+});
+
+const DummyTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+
+    `,
+});
+
+const CardActionsTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__actions">
+                <a>READ MORE</a>
+                <a>ANOTHER ACTION</a>
+            </div>
+        </div>
+    `,
+});
+
+const TopSectionTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const TopSectionMultiMetaTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const TopSectionNavActionsVerticalAlignTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                </div>
+                <nav class="sb-nav-actions sb-flex--center">
+                    <a class="icon-modify no-text" href="" title="Modify"></a>
+                    <a class="icon-modify no-text" href="" title="Modify"></a>
+                    <a class="icon-more no-text" href="" title="Actions"></a>
+                </nav>
+            </div>
+        </div>
+    `,
+});
+
+const TopSectionIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const RoundedImageTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-m img--round">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                    <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const XSImageTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-xs">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6>This is some text here</h6></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const SImageTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-s">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6>This is some text here</h6></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const MImageTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-m">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6>This is some text here</h6></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const LImageTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-l">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6>This is some text here</h6></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const XLImageTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-xl">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6>This is some text here</h6></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const XSIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-xs">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">This is some text here</h3></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const SIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-s">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">This is some text here</h3></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const MIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-m">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">This is some text here</h3></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const LIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-l">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">What is updog?</h3></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const XLIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-xl">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h3 class="">This is some text here</h3></a>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
 const SubItemTemplate = (args, { argTypes }) => ({
     components: { StorybookSlot },
     template: `
         <div class="sb-card sb-card--subitem">
             <div class="sb-card__top">
-                <div class="sb-card__primary-img">
-                    <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
+                <div class="sb-card__primary-img img">
+                    <div class="img__affector">
+                        <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6 class="">How cool is this dog?</h6></a>
+                    <span class="meta">Last updated 3 weeks ago</span>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const SubItemIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card sb-card--subitem">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6 class="">How cool is this dog?</h6></a>
+                    <span class="meta">Last updated 3 weeks ago</span>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const SubItemSIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card sb-card--subitem">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-s">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
+                </div>
+                <div class="sb-card__top-content">
+                    <a href=""><h6 class="">How cool is this dog?</h6></a>
+                    <span class="meta">Last updated 3 weeks ago</span>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+const SubItemLIconTemplate = (args, { argTypes }) => ({
+    components: { StorybookSlot },
+    template: `
+        <div class="sb-card sb-card--subitem">
+            <div class="sb-card__top">
+                <div class="sb-card__primary-img img img-l">
+                    <div class="img__affector">
+                        <div class="icon icon-calendar"></div>
+                    </div>
                 </div>
                 <div class="sb-card__top-content">
                     <a href=""><h6 class="">How cool is this dog?</h6></a>
@@ -67,97 +444,7 @@ const CardListTemplate = (args, { argTypes }) => ({
     components: { StorybookSlot },
     template: `
         <div class="sb-card-list">
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img">
-                        <div class="icon icon-folder"></div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h3 class="">Introductory Biology (BIO11)</h3></a>
-                        <span class="meta">Resources > Science > Year 11</span>
-                    </div>
-                </div>
-            </div>
 
-            <div class="sb-card-list">
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img">
-                            <div class="icon icon-link"></div>
-                        </div>
-                        <div class="sb-card__top-content">
-                            <a href=""><h6 class="">Ted Talk - The importance of Biology in the modern world</h6></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img">
-                            <img class="mime" src="https://vagrant.dev.schoolbox.cloud/static/images/mime/application-pdf.svg" alt="PDF Document" />
-                        </div>
-                        <div class="sb-card__top-content">
-                            <a href=""><h6 class="">Biology for Dummies</h6></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img">
-                            <img src="https://placedog.net/40/40" alt="Placedog 40 by 40 image" />
-                        </div>
-                        <div class="sb-card__top-content">
-                            <a href=""><h6 class="">How cool is this dog?</h6></a>
-                            <span class="meta">Last updated 3 weeks ago</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img">
-                        <div class="icon icon-folder"></div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h3 class="">Advanced Biology (BIO12)</h3></a>
-                        <span class="meta">Resources > Science > Year 12</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sb-card-list">
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img">
-                            <div class="icon icon-link"></div>
-                        </div>
-                        <div class="sb-card__top-content">
-                            <a href=""><h6 class="">Ted Talk - The importance of Biology in the modern world</h6></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img">
-                            <img class="mime" src="https://vagrant.dev.schoolbox.cloud/static/images/mime/application-pdf.svg" alt="PDF Document" />
-                        </div>
-                        <div class="sb-card__top-content">
-                            <a href=""><h6 class="">Biology for Dummies</h6></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img">
-                            <img src="https://placedog.net/40/40" alt="Placedog 40 by 40 image" />
-                        </div>
-                        <div class="sb-card__top-content">
-                            <a href=""><h6 class="">How cool is this dog?</h6></a>
-                            <span class="meta">Last updated 3 weeks ago</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     `,
 });
@@ -167,8 +454,108 @@ Default.parameters = {
     controls: { hideNoControlsWarning: true },
 };
 
+export const NavActions = NavActionsTemplate.bind({});
+NavActions.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const CardActions = CardActionsTemplate.bind({});
+CardActions.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const TopSection = TopSectionTemplate.bind({});
+TopSection.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const TopSectionMultiMeta = TopSectionMultiMetaTemplate.bind({});
+TopSectionMultiMeta.parameters = {
+    controls: { hideControlsWarning: true },
+};
+
+export const TopSectionNavActionsVerticalAlign = TopSectionNavActionsVerticalAlignTemplate.bind({});
+TopSectionNavActionsVerticalAlign.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const TopSectionIcon = TopSectionIconTemplate.bind({});
+TopSectionIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const RoundedImage = RoundedImageTemplate.bind({});
+RoundedImage.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const XSImage = XSImageTemplate.bind({});
+XSImage.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const SImage = SImageTemplate.bind({});
+SImage.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const MImage = MImageTemplate.bind({});
+MImage.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const LImage = LImageTemplate.bind({});
+LImage.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const XLImage = XLImageTemplate.bind({});
+XLImage.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const XSIcon = XSIconTemplate.bind({});
+XSIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const SIcon = SIconTemplate.bind({});
+SIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const MIcon = MIconTemplate.bind({});
+MIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const LIcon = LIconTemplate.bind({});
+LIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const XLIcon = XLIconTemplate.bind({});
+XLIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
 export const SubItem = SubItemTemplate.bind({});
 SubItem.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const SubItemIcon = SubItemIconTemplate.bind({});
+SubItemIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const SubItemSIcon = SubItemSIconTemplate.bind({});
+SubItemSIcon.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
+
+export const SubItemLIcon = SubItemLIconTemplate.bind({});
+SubItemLIcon.parameters = {
     controls: { hideNoControlsWarning: true },
 };
 

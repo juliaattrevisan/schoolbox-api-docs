@@ -10,19 +10,15 @@
 
     &__primary-img {
         display: flex;
-        // Center any icons that we're containing
-        align-items: center;
-        justify-content: center;
-        flex: 0 0 64px;
-        width: 64px;
-        height: 64px;
+        overflow: hidden;
         margin-inline-end: var(--whitespace-m);
 
         // Peel off inherited styles for icons.
-        & > .icon:before {
+        & .icon:before {
             padding: 0;
             margin: 0;
             font-size: 2.5rem;
+            line-height: normal;
         }
     }
 
@@ -36,8 +32,8 @@
             flex-direction: column;
             justify-content: center;
             overflow: hidden;
-            padding-block-start: var(--whitespace-s);
-            padding-block-end: var(--whitespace-s);
+            padding-block-start: var(--whitespace-xs);
+            padding-block-end: var(--whitespace-xs);
 
             & span,
             p,
@@ -77,7 +73,7 @@
     &__actions {
         min-inline-size: 100%;
         display: flex;
-        flex-direction: row-reverse;
+        flex-direction: row;
         justify-content: flex-start;
 
         a {
@@ -103,12 +99,16 @@
 
         .sb-card {
             &__primary-img {
-                flex: 0 0 40px;
-                width: 40px;
-                height: 40px;
+                &.img {
+                    .img__affector {
+                        flex: 0 0 40px;
+                        width: 40px;
+                        height: 40px;
+                    }
+                }
 
                 // Increase icon size
-                & > .icon:before {
+                & .icon:before {
                     font-size: 1.5rem;
                 }
             }
@@ -125,6 +125,114 @@
         .sb-card__top-content {
         }
     }
+
+    // At the end so these rules clobber some of the variant rules above. We do this to avoid having to set higher specificity on these rules.
+    // Once these rules are in their own stylesheet we won't have to do this.
+    &__primary-img {
+        //TODO - Move these into a specific image class. That image class should support the default colour + letter icon for no avatars, etc.
+        //Icons are weird. Because they rely on font scaling, we have to include that here too, but we never want icons to go full bleed...
+        --icon-size-reduction: 12px;
+
+        &.img {
+            // Move these too.
+            display: flex;
+
+            .icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            & img {
+                object-fit: cover;
+                min-width: 100%;
+                min-height: 100%;
+            }
+
+            .img__affector {
+                flex: 0 0 64px;
+                width: 64px;
+                height: 64px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            &-xs {
+                .img__affector,
+                .icon {
+                    flex: 0 0 40px;
+                    width: 40px;
+                    height: 40px;
+                }
+
+                & .icon:before {
+                    font-size: calc(40px - var(--icon-size-reduction));
+                }
+            }
+            &-s {
+                .img__affector,
+                .icon {
+                    flex: 0 0 48px;
+                    width: 48px;
+                    height: 48px;
+                }
+
+                & .icon:before {
+                    font-size: calc(48px - var(--icon-size-reduction));
+                }
+            }
+            &-m {
+                .img__affector,
+                .icon {
+                    flex: 0 0 64px;
+                    width: 64px;
+                    height: 64px;
+                }
+
+                & > .icon:before {
+                    font-size: calc(64px - var(--icon-size-reduction));
+                }
+            }
+            &-l {
+                .img__affector,
+                .icon {
+                    flex: 0 0 72px;
+                    width: 72px;
+                    height: 72px;
+                }
+
+                & .icon:before {
+                    font-size: calc(72px - var(--icon-size-reduction));
+                }
+            }
+            &-xl {
+                .img__affector,
+                .icon {
+                    flex: 0 0 96px;
+                    width: 96px;
+                    height: 96px;
+                }
+
+                & .icon:before {
+                    font-size: calc(96px - 16px);
+                }
+            }
+
+            // The affector basically exists to handle image overflow, positioning and rounding
+            &--round {
+                padding: var(--whitespace-xs);
+
+                .img__affector {
+                    border-radius: 50%;
+                    overflow: hidden;
+                    // Very subtly make the image stand out from the background if there is no background contrast
+                    border: 1px solid rgba(0, 0, 0, 0.05);
+                }
+            }
+        }
+    }
 }
 
 /* A list to contain all these cards */
@@ -136,8 +244,4 @@
     .sb-card {
         border-block-end: 1px solid rgba(0, 0, 0, 0.2);
     }
-
-    /*.sb-card:last-child {
-        border-block-end: 0;
-    } */
 }
