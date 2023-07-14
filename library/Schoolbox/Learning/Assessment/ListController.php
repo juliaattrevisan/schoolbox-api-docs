@@ -307,7 +307,7 @@ class ListController extends Web\Controller\Base
             /* Update project result cache when an activity is spawned in that project
              */
             if ($context instanceof Project) {
-                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment'], queryWrite: true);
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
             }
 
             $this->redirect($controller->determineRedirect(
