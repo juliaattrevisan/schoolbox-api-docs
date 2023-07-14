@@ -154,6 +154,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var array
+     */
+    private array $campuses;
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -201,6 +207,10 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
+        /* Grab a list of campuses
+         */
+        $this->campuses = (new Lookup\Campus($this->api))->generate();
+
         /* Import students' profile data
          * Import their specific parents' profile data
          */
@@ -268,7 +278,7 @@ class Profile implements IStrategy
 
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
-                $campusName = '';
+                $campusName = $this->findCampusName($student);
                 $comments = '';
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
                 $email = (string)$student['relationships']['person']['data']['attributes']['email'];
@@ -372,10 +382,6 @@ class Profile implements IStrategy
                 /* Fish out medical alerts
                  */
                 $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $student));
-
-                /* Fish out campus name
-                 */
-                $campusName = $this->findCampusName();
 
                 /* Emergency Contacts
                  */
@@ -588,21 +594,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Find campus name
-     *
-     * Assign campuses if they exist in the mapping
-     * Otherwise quietly disregard bad data
-     *
-     * @phpstan-ignore-next-line: this will eventually return a string
-     * @return string|null
-     */
-    private function findCampusName(): ?string
-    {
-        return null;
-    }
-
-
-    /**
      * Find comments info for a given student
      *
      * @return string
@@ -652,6 +643,33 @@ class Profile implements IStrategy
     private function isParent(array $contact): bool
     {
         return '' === trim((string)$contact['attributes']['isEmergencyContact']);
+    }
+
+
+    /**
+     * Find campus name
+     *
+     * Assign campuses if they exist in the mapping
+     * Otherwise quietly disregard bad data
+     *
+     * @param array $student
+     * @return string|null
+     */
+    private function findCampusName(array $student): ?string
+    {
+        $campusId = $student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'] ?? null;
+        $campusName = null;
+
+        if (null !== $campusId) {
+            $campusName = $this->campuses[(int)$campusId] ?? null;
+
+            $this->log->debug(sprintf(
+                'Assigning campus name %s',
+                $campusName
+            ));
+        }
+
+        return $campusName;
     }
 
 
