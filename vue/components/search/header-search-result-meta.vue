@@ -1,4 +1,4 @@
-<script>
+<script setup lang="ts">
 /**
  * A slot to display the search result meta
  */

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce";
 import SearchInput from "./search-input.vue";
-import HeaderSearchResultMeta from "./header-search-results-meta.vue";
+import HeaderSearchResultMeta from "./header-search-result-meta.vue";
 
 interface Result {
     id: string;
