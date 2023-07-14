@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import debounce from "lodash/debounce";
 import SearchInput from "./search-input";
 import ResultMeta from "./search-bar-results-meta";
@@ -44,7 +44,7 @@ export default {
          * Input added
          * @param {string} value - The input value
          */
-        onInput(value) {
+        onInput(value: string) {
             this.keyword = value;
         },
 
@@ -53,7 +53,7 @@ export default {
          */
         onArrowDown() {
             if (this.arrowCounter < this.results.length - 1) {
-                this.arrowCounter = this.arrowCounter + 1;
+                this.arrowCounter += 1;
             }
         },
 
@@ -62,7 +62,7 @@ export default {
          */
         onArrowUp() {
             if (this.arrowCounter > -1) {
-                this.arrowCounter = this.arrowCounter - 1;
+                this.arrowCounter -= 1;
             }
         },
 
@@ -73,7 +73,7 @@ export default {
             if (this.arrowCounter > 0) {
                 this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
             } else {
-                this.$refs.form.submit();
+                (this.$refs.form as HTMLFormElement).submit();
             }
         },
 
@@ -81,26 +81,22 @@ export default {
          * Submit the form, heading to the search page
          */
         onClicked() {
-            this.$refs.form.submit();
+            (this.$refs.form as HTMLFormElement).submit();
         },
 
         /**
          * Display the search results
-         *
-         * @param { Event }
+         * @param { Event } event - The event object
          */
-        onFocusOver(event) {
+        onFocusOver(event: Event) {
             if (event.type === "focus") {
-                var offCanvasWrap = document.getElementById("off-canvas-wrap");
-
+                const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
                 // If left nav is unpinned and currently open, close it
                 if (offCanvasWrap.classList.contains("move-right")) {
                     offCanvasWrap.classList.remove("move-right");
                 }
-
                 this.isFocused = true;
             }
-
             /**
              * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
              * the user does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the
@@ -114,15 +110,14 @@ export default {
              * Since we don't have the whole chrome in VueJS yet, for now, we'll need to do this in a not so elegant
              * way as this component doesn't have the ability to communicate with the rest of the chrome elements yet.
              */
-            document.querySelector("#menu-toggle").classList.add("search-is-active");
+            document.querySelector("#menu-toggle")?.classList.add("search-is-active");
         },
 
         /**
          * To a new browser page
-         *
-         * @param { String }
+         * @param {string} path - The path to go to
          */
-        goToPath(path) {
+        goToPath(path: string) {
             window.location.href = path;
         },
 
@@ -147,13 +142,11 @@ export default {
 
         /**
          * To display the users portrait image
-         *
-         * @param { String }
-         *
-         * @returns { String }
+         * @param {string} id - The user id
+         * @returns {string} - The path to the image
          */
-        formatPortrait(id) {
-            return this.paths.portrait + id + "&size=square64";
+        formatPortrait(id: string) {
+            return `${this.paths.portrait}${id}&size=square64`;
         },
     },
 };
@@ -177,9 +170,9 @@ export default {
             <li v-for="(result, i) in results" :key="i" class="result">
                 <a
                     class="link-row"
+                    :class="{ 'is-active': i === arrowCounter }"
                     @click="goToPath(paths.userPage + result.id)"
                     @mousedown.left="goToPath(paths.userPage + result.id)"
-                    :class="{ 'is-active': i === arrowCounter }"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
@@ -190,22 +183,22 @@ export default {
                     </div>
                 </a>
             </li>
-            <li class="result-meta" v-if="isLoading">
+            <li v-if="isLoading" class="result-meta">
                 <result-meta><div class="loader"></div></result-meta>
             </li>
             <li
-                class="result-meta with-bg"
                 v-if="results.length && totalCount > results.length"
+                class="result-meta with-bg"
                 @mousedown.left="goToPath(paths.searchPage + keyword + '#user')"
             >
                 <result-meta> View all {{ totalCount }} users </result-meta>
             </li>
-            <li class="result-meta" v-if="!isLoading && !results.length">
+            <li v-if="!isLoading && !results.length" class="result-meta">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
             <li
-                class="result-meta with-bg"
                 v-if="!isLoading && !results.length"
+                class="result-meta with-bg"
                 @click="goToPath(paths.searchPage + keyword + '#all')"
                 @mousedown.left="goToPath(paths.searchPage + keyword + '#all')"
             >
