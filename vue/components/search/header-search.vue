@@ -161,25 +161,9 @@ export default {
             @key-down="onArrowDown"
             @key-up="onArrowUp"
             @key-enter="onEnter"
-            @focused="onFocusOver"
+            @focus-over="onFocusOver"
+            @focus-out="isFocused = false"
         />
-        <!-- <input
-            id="search-field"
-            type="text"
-            name="keyword"
-            placeholder="Search"
-            autocomplete="off"
-            :value="keyword"
-            @input="keyword = $event.target.value"
-            @keydown.down="onArrowDown"
-            @keydown.up="onArrowUp"
-            @keydown.enter.prevent="onEnter"
-            @focus="onFocusOver"
-            @mouseover="onFocusOver"
-            @blur="isFocused = false"
-            @focusout="isFocused = false"
-            maxlength="2048"
-        /> -->
         <ul class="results information-list" v-show="isFocused && isOpen && keyword.length >= minKeywordLength">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>

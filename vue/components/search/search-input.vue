@@ -8,7 +8,7 @@
 // }
 // const props = defineProps<Props>();
 
-const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "focused"]);
+const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "focusOver", "focusOut"]);
 
 /**
  * Input added
@@ -44,7 +44,14 @@ function onKeyEnter() {
  * @param {Event} event - The event object
  */
 function onFocusOver(event: Event) {
-    emit("focused", event);
+    emit("focusOver", event);
+}
+
+/**
+ * Focus over input
+ */
+function onFocusOut() {
+    emit("focusOut");
 }
 </script>
 
@@ -62,11 +69,9 @@ function onFocusOver(event: Event) {
         @keydown.enter.prevent="onKeyEnter"
         @focus="onFocusOver"
         @mouseover="onFocusOver"
+        @blur="onFocusOut"
+        @focusout="onFocusOut"
     />
-    <!--
-        @blur="isFocused = false"
-        @focusout="isFocused = false"
-    -->
 </template>
 
 <style scoped></style>
