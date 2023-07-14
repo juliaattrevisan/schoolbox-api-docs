@@ -4,11 +4,10 @@
  */
 
 interface Props {
-    input: string; // to prefill the input with something or keep it updated with any modications
+    initialInput?: string; // to prefill the input
 }
 const props = defineProps<Props>();
 
-// const emit = defineEmits(["input", "keyDown", "keyUp", "keyEnter", "click", "focusOver", "focusOut"]);
 const emit = defineEmits<{
     input: [event: string];
     keyDown: [];
@@ -19,12 +18,16 @@ const emit = defineEmits<{
     focusOut: [];
 }>();
 
+const currentInput = window.Vue.ref<string>((props.initialInput as string) ?? "");
+const inputElement = window.Vue.ref<HTMLInputElement | null>(null);
+
 /**
- * Input added
+ * Input added, update internall and dispatch emit
  * @param {Event} event - The event object
  */
 function onInput(event: Event) {
-    emit("input", (event.target as HTMLInputElement).value);
+    currentInput.value = (event.target as HTMLInputElement).value;
+    emit("input", currentInput.value);
 }
 
 /**
@@ -49,10 +52,14 @@ function onKeyEnter() {
 }
 
 /**
- * Search button clicked
+ * If the input is empty, focus over input, otherwise emit click
  */
 function onClicked() {
-    emit("click");
+    if (currentInput.value.length > 0) {
+        emit("click");
+    } else {
+        inputElement.value?.focus();
+    }
 }
 
 /**
@@ -74,11 +81,13 @@ function onFocusOut() {
 <template>
     <input
         id="search-field"
+        ref="inputElement"
         type="text"
         name="keyword"
         placeholder="Search"
         maxlength="2048"
         autocomplete="off"
+        :value="currentInput"
         @input="onInput"
         @keydown.down="onKeyDown"
         @keydown.up="onKeyUp"
@@ -88,7 +97,13 @@ function onFocusOut() {
         @blur="onFocusOut"
         @focusout="onFocusOut"
     />
-    <button for="search-field" class="icon-search no-text" title="Search" @click.prevent="onClicked"></button>
+    <button
+        for="search-field"
+        class="icon-search no-text"
+        title="Search"
+        @mouseover="onFocusOver"
+        @click.prevent="onClicked"
+    ></button>
 </template>
 
 <style scoped></style>
