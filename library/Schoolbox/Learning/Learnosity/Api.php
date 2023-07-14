@@ -25,11 +25,13 @@ class Api
     /**
      * Constructor.
      *
+     * @param string      $serverName
      * @param string      $consumerKey
      * @param string      $consumerSecret
      * @param Logger|null $logger
      */
     public function __construct(
+        private string $serverName,
         #[\SensitiveParameter] private string $consumerKey,
         #[\SensitiveParameter] private string $consumerSecret,
         private ?Logger $logger = null
@@ -71,7 +73,7 @@ class Api
         return (new Init(
             $service,
             [
-                'domain'       => $_SERVER['SERVER_NAME'],
+                'domain'       => $this->serverName,
                 'consumer_key' => $this->consumerKey
             ],
             $this->consumerSecret,

@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
@@ -68,6 +69,7 @@ class Controller extends Base
          * I want to avoid dumping Yet Another Thing into the kernel
          */
         $this->api = new Api(
+            $this->request->server['SERVER_NAME'],
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
@@ -133,10 +135,15 @@ class Controller extends Base
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
-     * @throws ValidationException
-     * @throws \JsonException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws Deleted
+     * @throws Exception
+     * @throws ValidationException
+     * @throws \Alaress\Database\Exception
+     * @throws RouteNotFound
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function getAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
@@ -270,7 +277,9 @@ class Controller extends Base
      * @return void
      * @throws Deleted
      * @throws NotFound
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
