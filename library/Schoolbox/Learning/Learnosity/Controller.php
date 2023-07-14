@@ -28,6 +28,13 @@ class Controller extends Base
 {
     /**
      * TODO Inject this later
+     * @var ErrorMapper
+     */
+    private \Schoolbox\Error\Mapper $errorMapper;
+
+
+    /**
+     * TODO Inject this later
      * @var \Schoolbox\Learning\Quiz\Mapper
      */
     private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
@@ -45,6 +52,7 @@ class Controller extends Base
      */
     public function __construct()
     {
+        $this->errorMapper   = \Schoolbox\Error\Mapper::getInstance();
         $this->quizMapper    = \Schoolbox\Learning\Quiz\Mapper::getInstance();
         $this->attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
     }
@@ -663,13 +671,13 @@ class Controller extends Base
      * @return Quiz
      * @throws Exception
      */
-    protected function getQuizForAssessmentId($assessmentId): Quiz
+    protected function getQuizForAssessmentId(int $assessmentId): Quiz
     {
         /** @var Quiz $quiz */
         $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
 
-        if (Quiz::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        if (Quiz::AVAILABILITY_ASSESS !== $quiz->getAvailability()) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
         return $quiz;
     }
