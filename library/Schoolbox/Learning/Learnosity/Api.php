@@ -36,10 +36,22 @@ class Api
      * @param string|null $logDir
      */
     public function __construct(
-        private string $consumerKey,
-        private string $consumerSecret,
+        #[\SensitiveParameter] private string $consumerKey,
+        #[\SensitiveParameter] private string $consumerSecret,
         private ?string $logDir = null
     ) {
+    }
+
+
+    /**
+     * This class contains sensitive information: therefore, its debug
+     * info should be cleared.
+     *
+     * @return array
+     */
+    public function __debugInfo(): array
+    {
+        return [];
     }
 
 
