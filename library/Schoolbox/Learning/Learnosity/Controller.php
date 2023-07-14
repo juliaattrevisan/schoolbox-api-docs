@@ -67,9 +67,10 @@ class Controller extends Base
 
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
+         * I don't have a convenient means to access SERVER_NAME except like this, sadly
          */
         $this->api = new Api(
-            $this->request->server['SERVER_NAME'],
+            $_SERVER['SERVER_NAME'],
             $this->getConfigLoader()->get('learnosity_consumer_key'),
             $this->getConfigLoader()->get('learnosity_consumer_secret'),
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
