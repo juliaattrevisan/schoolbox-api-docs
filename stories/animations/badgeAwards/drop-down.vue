@@ -3,7 +3,7 @@
  * Pop-up badge award animation component used within Storybook only
  */
 
-import { clearCanvas } from "../../../library/Schoolbox/Learning/Badge/Award/js/animateBadgeImage";
+import { clearCanvas } from "@js/util/canvasUtils";
 import { init } from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/dropDown";
 
 export default {
