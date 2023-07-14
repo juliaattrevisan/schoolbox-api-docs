@@ -28,27 +28,6 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
-     * TODO Inject this later
-     * @var ErrorMapper
-     */
-    private \Schoolbox\Error\Mapper $errorMapper;
-
-
-    /**
-     * TODO Inject this later
-     * @var \Schoolbox\Learning\Quiz\Mapper
-     */
-    private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
-
-
-    /**
-     * TODO Inject this later
-     * @var \Schoolbox\Learning\Quiz\Attempt\Mapper
-     */
-    private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper;
-
-
-    /**
      * Learnosity API instance is the same for everything afaict
      *
      * @var Api
@@ -59,12 +38,11 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct()
-    {
-        $this->errorMapper   = \Schoolbox\Error\Mapper::getInstance();
-        $this->quizMapper    = \Schoolbox\Learning\Quiz\Mapper::getInstance();
-        $this->attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
-
+    public function __construct(
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+    ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
          * I don't have a convenient means to access SERVER_NAME except like this, sadly

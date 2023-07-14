@@ -220,7 +220,11 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getErrorMapper(),
+            $this->getQuizMapper(),
+            $this->getAttemptMapper()
+        );
     }
 
 
@@ -250,6 +254,16 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+
+    /**
+     * @return Mapper|\Schoolbox\Learning\Quiz\Mapper
+     * @throws InvalidArgumentException
+     */
+    protected function getQuizMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class);
     }
 
 
