@@ -25,19 +25,6 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class QueueSorter implements FilterInterface
 {
-    /** @var FilterInterface */
-    private $filter;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var RoutePermissionMapper */
-    private $permMapper;
-
-    /** @var MessageList\IPublicationFactory */
-    private $listFactory;
-
-
     /**
      * @param FilterInterface                 $filter
      * @param LoggerInterface                 $log
@@ -45,15 +32,11 @@ class QueueSorter implements FilterInterface
      * @param RoutePermissionMapper           $permMapper
      */
     public function __construct(
-        FilterInterface $filter,
-        LoggerInterface $log,
-        MessageList\IPublicationFactory $listFactory,
-        RoutePermissionMapper $permMapper
+        private FilterInterface $filter,
+        private LoggerInterface $log,
+        private MessageList\IPublicationFactory $listFactory,
+        private RoutePermissionMapper $permMapper
     ) {
-        $this->filter      = $filter;
-        $this->log         = $log;
-        $this->listFactory = $listFactory;
-        $this->permMapper  = $permMapper;
     }
 
 
@@ -86,75 +69,77 @@ class QueueSorter implements FilterInterface
      * @throws PDOException
      * @throws InvalidArgumentException
      */
-    public function process(User $user, Instance $instance)
+    public function process(User $user, Instance $instance): bool
     {
         $userId = $user->getId();
+        $this->validate($instance, $user);
 
-        try {
-            $this->validate($instance, $user);
+        $outputLevels = $this->getReroutedLevel($user, $instance);
+        if ($this->permMapper->isMuted($outputLevels)) {
+            throw new FilterException('Reroute level is zero');
+        }
 
-            $outputLevels = $this->getReroutedLevel($user, $instance);
+        $this->log->info(
+            sprintf(
+                'SEND %s:%s -> user %d @ %s',
+                $instance->getBaseHash(),
+                $instance->getParamHash(),
+                $userId,
+                json_encode($outputLevels)
+            )
+        );
 
-            if ($this->permMapper->isMuted($outputLevels)) {
-                throw new FilterException('Reroute level is zero');
-            }
+        // set true, if any of levels is processed
+        $processed = false;
 
-            $this->log->info(
-                sprintf(
-                    'SEND %s:%s -> user %d @ %s',
-                    $instance->getBaseHash(),
-                    $instance->getParamHash(),
-                    $userId,
-                    json_encode($outputLevels)
-                )
-            );
-
-            // push for each output level
-            foreach ($outputLevels as $level) {
+        // push for each output level
+        foreach ($outputLevels as $level) {
+            try {
                 switch ($level) {
                     case RoutePermission::DIGEST:
                         $this->listFactory->digest($userId)->push($instance);
+                        $processed = true;
                         break;
 
                     case RoutePermission::INSTANT:
                         $this->listFactory->instant($userId)->push($instance);
+                        $processed = true;
                         break;
 
                     case RoutePermission::PUSH:
                         $this->listFactory->mobile($userId)->push($instance);
+                        $processed = true;
                         break;
 
                     case RoutePermission::EMAIL:
                         $this->listFactory->email($userId)->push($instance);
+                        $processed = true;
                         break;
 
                     default:
                         $this->log->warning("Unable to SEND: could not map priority '$level'");
                         break;
                 }
+            } catch (FilterException $e) {
+                $this->log->notice(
+                    sprintf(
+                        'DROP %s:%s -> user %d: %s',
+                        $instance->getBaseHash(),
+                        $instance->getParamHash(),
+                        $userId,
+                        $e->getMessage()
+                    )
+                );
+            } catch (RfcComplianceException $e) {
+                $this->log->warning($e->getMessage());
+            } catch (PDOException $e) {
+                // this needs to be escalated
+                throw $e;
+            } catch (Exception $e) {
+                $this->log->error(get_class($e) . ' occurred during rerouting: ' . $e->getMessage(), ['exception' => $e]);
             }
-            return true;
-        } catch (FilterException $e) {
-            $this->log->notice(
-                sprintf(
-                    'DROP %s:%s -> user %d: %s',
-                    $instance->getBaseHash(),
-                    $instance->getParamHash(),
-                    $userId,
-                    $e->getMessage()
-                )
-            );
-            return true;
-        } catch (RfcComplianceException $e) {
-            $this->log->warning($e->getMessage());
-        } catch (PDOException $e) {
-            // this needs to be escalated
-            throw $e;
-        } catch (Exception $e) {
-            $this->log->error(get_class($e) . ' occurred during rerouting: ' . $e->getMessage(), ['exception' => $e]);
         }
-
-        return false;
+        return $processed;
     }
 
 
@@ -234,7 +219,7 @@ class QueueSorter implements FilterInterface
     {
         // For now just process the first topic.
         // Could foreach over the list of topics if we wanted to?
-        $topic  = $instance->getTopics()[0];
+        $topic = $instance->getTopics()[0];
         try {
             $intent = $this->permMapper->findRouteLevels(
                 $topic,
