@@ -129,6 +129,10 @@ class Bulk_Folder
         // Parse Header Row
         $headerRow = fgetcsv($this->fp, 1000, ",");
 
+        if ($headerRow === false) {
+            throw new UnexpectedValueException("Could not read CSV file.");
+        }
+
         // Determine column semantics from header values
         $parentColumn       = $this->determineColumnIndex($headerRow, 'parent');
         $folderNameColumn   = $this->determineColumnIndex($headerRow, 'name');
@@ -167,21 +171,19 @@ class Bulk_Folder
     /**
      * Process a single row from the CSV and returns an array describing the processing results.
      *
-     * @param int                                 $rowIdx
-     * @param array                               $row
-     * @param int                                 $parentColumnIndex
-     * @param int                                 $folderNameColumnIndex
-     * @param int                                 $folderColourColumnIndex
-     * @param int                                 $folderImageColumnIndex
-     * @param int[]                               $folderCodeColumnIndexes
-     * @param int[]                               $yearLevelColumnIndexes
-     * @param GenericCollection|YearLevel\Model[] $yearLevels Indexed by yearLevel.name
-     * @param bool                                $perform
+     * @param int               $rowIdx
+     * @param array             $row
+     * @param int               $parentColumnIndex
+     * @param int               $folderNameColumnIndex
+     * @param int               $folderColourColumnIndex
+     * @param int               $folderImageColumnIndex
+     * @param int[]             $folderCodeColumnIndexes
+     * @param int[]             $yearLevelColumnIndexes
+     * @param GenericCollection $yearLevels Indexed by yearLevel.name
+     * @param bool              $perform
+     * @param int               $templateColumnIndex
      * @return array
-     * @throws DefinitionException
-     * @throws InvalidColumnException
      * @throws MapperException
-     * @throws PDOException
      * @throws UnexpectedValueException
      */
     private function processCsvRow(
@@ -218,6 +220,14 @@ class Bulk_Folder
 
         //set template id to default
         $templateId = $this->templateID;
+
+        // NOTE: $templateColumnIndex is the rightmost column index.
+        if ($templateColumnIndex !== count($row) - 1) {
+            throw new UnexpectedValueException(
+                "The number of columns in data row " . ($rowIdx - 1) . " does not match the number of column headings."
+            );
+        }
+
         //if template has been set in the csv
         if ($templateColumnIndex >= 0 && '' !== trim($row[$templateColumnIndex])) {
             //if template name is 'No template' then set to default 0, else check db list
@@ -520,8 +530,11 @@ class Bulk_Folder
             return -1;
         }
 
-        $headerRowValues = implode(',', $headerRow);
-        throw new UnexpectedValueException("Unable to locate unique '$search' column from headers: '$headerRowValues'");
+        throw new UnexpectedValueException(
+            "Unable to find unique column heading containing '$search'.\n" .
+            "Column headings found: '" . implode("', '", $headerRow) . "'.\n" .
+            "Please ensure the column headings match those in the template CSV file."
+        );
     }
 
 
