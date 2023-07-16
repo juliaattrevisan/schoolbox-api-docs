@@ -482,7 +482,6 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
             $this->syncCallback($rulesetId, $provisioner, false);
         };
-        $this->psr7Response = $this->responseEmpty();
     }
 
 
@@ -507,7 +506,6 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
             $this->syncCallback($rulesetId, $provisioner, true);
         };
-        $this->psr7Response = $this->responseEmpty();
     }
 
 
