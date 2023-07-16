@@ -145,49 +145,46 @@ class Controller extends Base
             $booking->getEvent()->setEndDateTime(new Alaress_Date_Format($endDate));
         }
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceBooking/book.twig',
             [
-                'template' => '@resourceBooking/book.twig',
-                'data'     => [
-
-                    /* Confusingly, 'item' refers to a Booking/Model, and a 'resource'
-                     * is the Item/Model itself. Trying to rename it snaps a bunch of
-                     * other unrelated stuff
-                     */
-                    'resource'          => $item,
-                    'item'              => $booking,
-                    'select'            => 'radio',
-                    'campusList'        => $this->getCampusList(),
-                    'returnUrl'         => $this->requestQuery->get('returnUrl'),
-                    'cancelReturnUrl'   => $this->session->getHistory(),
-                    'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
-                    'currentTerm'       => $this->getTermMapper()->findForToday(),
-                    'validationData'    => [
-                                            'start' => Validation::START_DATETIME,
-                                            'end' => Validation::END_DATETIME,
-                                            ],
-                    'validationErrors'  => [
-                                            'invalid' => Validation::ERROR_INVALID,
-                                            'beforeStart' => Validation::ERROR_BEFORE_START,
-                                            'inPast' => Validation::ERROR_IN_PAST,
-                                            'tooEarly' => Validation::ERROR_TOO_EARLY,
-                                            'tooShort' => Validation::ERROR_TOO_SHORT,
-                                            'tooLong' => Validation::ERROR_TOO_LONG,
-                                            'conflict' => Validation::ERROR_CONFLICT,
-                                            'timetabledClass' => Validation::ERROR_TIMETABLED_CLASS,
-                                            'currentTerm' => Validation::ERROR_CURRENT_TERM,
-                                            ],
-                    'recurrence'        => [
-                                            Recurrence::RECURRENCE_DAILY => 'Daily',
-                                            Recurrence::RECURRENCE_WEEKLY => 'Weekly',
-                                            Recurrence::RECURRENCE_FORTNIGHTLY => 'Fortnightly',
-                                            Recurrence::RECURRENCE_MONTHLY => 'Monthly',
-                                            Recurrence::RECURRENCE_TIMETABLE => 'Timetable Based'
-                                            ],
-                    'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
-                    'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
-                ],
-            ]
+                /* Confusingly, 'item' refers to a Booking/Model, and a 'resource'
+                 * is the Item/Model itself. Trying to rename it snaps a bunch of
+                 * other unrelated stuff
+                 */
+                'resource'          => $item,
+                'item'              => $booking,
+                'select'            => 'radio',
+                'campusList'        => $this->getCampusList(),
+                'returnUrl'         => $this->requestQuery->get('returnUrl'),
+                'cancelReturnUrl'   => $this->session->getHistory(),
+                'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
+                'currentTerm'       => $this->getTermMapper()->findForToday(),
+                'validationData'    => [
+                                        'start' => Validation::START_DATETIME,
+                                        'end' => Validation::END_DATETIME,
+                                        ],
+                'validationErrors'  => [
+                                        'invalid' => Validation::ERROR_INVALID,
+                                        'beforeStart' => Validation::ERROR_BEFORE_START,
+                                        'inPast' => Validation::ERROR_IN_PAST,
+                                        'tooEarly' => Validation::ERROR_TOO_EARLY,
+                                        'tooShort' => Validation::ERROR_TOO_SHORT,
+                                        'tooLong' => Validation::ERROR_TOO_LONG,
+                                        'conflict' => Validation::ERROR_CONFLICT,
+                                        'timetabledClass' => Validation::ERROR_TIMETABLED_CLASS,
+                                        'currentTerm' => Validation::ERROR_CURRENT_TERM,
+                                        ],
+                'recurrence'        => [
+                                        Recurrence::RECURRENCE_DAILY => 'Daily',
+                                        Recurrence::RECURRENCE_WEEKLY => 'Weekly',
+                                        Recurrence::RECURRENCE_FORTNIGHTLY => 'Fortnightly',
+                                        Recurrence::RECURRENCE_MONTHLY => 'Monthly',
+                                        Recurrence::RECURRENCE_TIMETABLE => 'Timetable Based'
+                                        ],
+                'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
+                'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
+            ],
         );
     }
 
@@ -278,15 +275,12 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
 
-            $this->getResponse()->content->set(
+            $this->psr7Response = $this->responseAsJson(
                 [
-                    'format' => 'json',
-                    'data'   => [
-                        'item'      => $bookingList,
-                        'errors'    => $errors,
-                        'returnUrl' => (string)$returnUrl,
-                    ],
-                ]
+                    'item'      => $bookingList,
+                    'errors'    => $errors,
+                    'returnUrl' => (string)$returnUrl,
+                ],
             );
         } else {
             // Redirect back to previous page, or read page if not set.
@@ -407,15 +401,12 @@ class Controller extends Base
 
         if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set(
+            $this->psr7Response = $this->responseAsJson(
                 [
-                    'format' => 'json',
-                    'data'   => [
-                        'item'      => $item,
-                        'errors'    => $errors,
-                        'returnUrl' => $returnUrl,
-                    ],
-                ]
+                    'item'      => $item,
+                    'errors'    => $errors,
+                    'returnUrl' => $returnUrl,
+                ],
             );
         } else {
             // Redirect back to previous page, or read page if not set.
@@ -734,12 +725,7 @@ class Controller extends Base
 
         $output = json_decode('[' . \implode(',', $output) . ']');
 
-        $this->getResponse()->content->set(
-            [
-                'format' => 'json',
-                'data'   => $output,
-            ]
-        );
+        $this->psr7Response = $this->responseAsJson($output);
     }
 
     /**
@@ -764,37 +750,35 @@ class Controller extends Base
         $item->getResource()->setCategory($category);
 
         // Cancel callback URL: point to the last page if it wasn't set.
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceBooking/book.twig',
             [
-                'template' => '@resourceBooking/book.twig',
-                'data'     => [
-                    'item'              => $item,
-                    'resource'          => $item->getResource(),
-                    'campusList'        => $this->getCampusList(),
-                    'returnUrl'         => $this->requestQuery->get('returnUrl'),
-                    'cancelReturnUrl'   => $this->session->getHistory(),
-                    'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
-                    'currentTerm'       => $this->getTermMapper()->findForToday(),
-                    'validationData'    => [
-                        'start' => Validation::START_DATETIME,
-                        'end' => Validation::END_DATETIME,
-                    ],
-                    'validationErrors'  => [
-                        'invalid' => Validation::ERROR_INVALID,
-                        'beforeStart' => Validation::ERROR_BEFORE_START,
-                        'inPast' => Validation::ERROR_IN_PAST,
-                        'tooEarly' => Validation::ERROR_TOO_EARLY,
-                        'tooShort' => Validation::ERROR_TOO_SHORT,
-                        'tooLong' => Validation::ERROR_TOO_LONG,
-                        'conflict' => Validation::ERROR_CONFLICT,
-                        'timetabledClass' => Validation::ERROR_TIMETABLED_CLASS,
-                        'currentTerm' => Validation::ERROR_CURRENT_TERM,
-                    ],
-                    'recurrence'        => $recurrence,
-                    'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
-                    'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES
+                'item'              => $item,
+                'resource'          => $item->getResource(),
+                'campusList'        => $this->getCampusList(),
+                'returnUrl'         => $this->requestQuery->get('returnUrl'),
+                'cancelReturnUrl'   => $this->session->getHistory(),
+                'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
+                'currentTerm'       => $this->getTermMapper()->findForToday(),
+                'validationData'    => [
+                    'start' => Validation::START_DATETIME,
+                    'end' => Validation::END_DATETIME,
                 ],
-            ]
+                'validationErrors'  => [
+                    'invalid' => Validation::ERROR_INVALID,
+                    'beforeStart' => Validation::ERROR_BEFORE_START,
+                    'inPast' => Validation::ERROR_IN_PAST,
+                    'tooEarly' => Validation::ERROR_TOO_EARLY,
+                    'tooShort' => Validation::ERROR_TOO_SHORT,
+                    'tooLong' => Validation::ERROR_TOO_LONG,
+                    'conflict' => Validation::ERROR_CONFLICT,
+                    'timetabledClass' => Validation::ERROR_TIMETABLED_CLASS,
+                    'currentTerm' => Validation::ERROR_CURRENT_TERM,
+                ],
+                'recurrence'        => $recurrence,
+                'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
+                'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES
+            ],
         );
     }
 
@@ -991,15 +975,12 @@ class Controller extends Base
     {
         if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode(empty($errors) ? 200 : 400);
-            $this->getResponse()->content->set(
+            $this->psr7Response = $this->responseAsJson(
                 [
-                    'format' => 'json',
-                    'data'   => [
-                        'item'        => $booking,
-                        'callbackUrl' => $callbackUrl,
-                        'errors'      => $errors,
-                    ],
-                ]
+                    'item'        => $booking,
+                    'callbackUrl' => $callbackUrl,
+                    'errors'      => $errors,
+                ],
             );
         } else {
             // Is there a previous location to redirect to? if so use that.

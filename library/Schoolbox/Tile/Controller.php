@@ -82,15 +82,13 @@ class Controller extends Base
     public function layout(Layout\Model $layout)
     {
         // Load layout
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@tile/layout.twig',
             [
-                'title'    => 'Tile Component Layout',
-                'template' => '@tile/layout.twig',
-                'data'     => [
-                    'item' => $layout,
-                    'maxPaddingPercentage' => Layout\Model::MAX_PADDING_PERCENTAGE
-                ],
-            ]
+                'item' => $layout,
+                'maxPaddingPercentage' => Layout\Model::MAX_PADDING_PERCENTAGE
+            ],
+            'Tile Component Layout',
         );
     }
 
@@ -150,12 +148,7 @@ class Controller extends Base
 
         // XHR: return a simple JSON response
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set(
-                [
-                    'format' => 'json',
-                    'data'   => $layout,
-                ]
-            );
+            $this->psr7Response = $this->responseAsJson($layout);
             $this->getResponse()->status->setCode($code);
             return;
         }
@@ -187,16 +180,14 @@ class Controller extends Base
     {
         /** @var Model $model */
         $model = $this->mapper->createModel();
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@tile/modify.twig',
             [
-                'title'    => 'Add Tile',
-                'template' => '@tile/modify.twig',
-                'data'     => [
-                    'item'       => $model,
-                    'layout'     => $layout,
-                    'attachzone' => $this->getAttachZoneData($model),
-                ],
-            ]
+                'item'       => $model,
+                'layout'     => $layout,
+                'attachzone' => $this->getAttachZoneData($model),
+            ],
+            'Add Tile',
         );
     }
 
@@ -265,16 +256,14 @@ class Controller extends Base
      */
     public function edit(Model $item)
     {
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@tile/modify.twig',
             [
-                'title'    => 'Add Tile',
-                'template' => '@tile/modify.twig',
-                'data'     => [
-                    'item'       => $item,
-                    'layout'     => $item->getTileLayout(),
-                    'attachzone' => $this->getAttachZoneData($item),
-                ],
-            ]
+                'item'       => $item,
+                'layout'     => $item->getTileLayout(),
+                'attachzone' => $this->getAttachZoneData($item),
+            ],
+            'Add Tile',
         );
     }
 
@@ -312,12 +301,7 @@ class Controller extends Base
         }
         if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set(
-                [
-                    'format' => 'json',
-                    'data'   => [],
-                ]
-            );
+            $this->psr7Response = $this->responseAsJson([]);
         } else {
             $this->psr7Response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(

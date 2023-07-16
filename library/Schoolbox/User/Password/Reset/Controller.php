@@ -67,16 +67,16 @@ class Controller extends Base
     {
         $this->validateAccess();
         $sessionSegment = $this->getSessionSegment();
-        $this->getResponse()->content->set([
-            'title' => 'Reset Password',
-            'template' => '@userPasswordReset/createRequestForm.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@userPasswordReset/createRequestForm.twig',
+            [
                 'email' => $sessionSegment->getFlash('email', ''),
                 'isEmailValid' => $sessionSegment->getFlash('isEmailValid', true),
                 'isEmailSubmitted' => $sessionSegment->getFlash('isEmailSubmitted', false),
                 'isResetExpired' => $sessionSegment->getFlash('isResetExpired', false),
             ],
-        ]);
+            'Reset Password',
+        );
     }
 
     /**
@@ -89,15 +89,15 @@ class Controller extends Base
         $this->validateAccess();
         $this->validateResetRequest($reset);
         $sessionSegment = $this->getSessionSegment();
-        $this->getResponse()->content->set([
-            'title' => 'Reset Password',
-            'template' => '@userPasswordReset/resetForm.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+             '@userPasswordReset/resetForm.twig',
+            [
                 'reset' => $reset,
                 'isPasswordSubmitted' => $sessionSegment->getFlash('isPasswordSubmitted', false),
                 'isPasswordValid' => $sessionSegment->getFlash('isPasswordValid', true),
             ],
-        ]);
+            'Reset Password',
+        );
     }
 
     /**
@@ -105,13 +105,13 @@ class Controller extends Base
      */
     public function displaySuccessMessage()
     {
-        $this->getResponse()->content->set([
-            'title' => 'Password Reset Successful',
-            'template' => '@userPasswordReset/successMessage.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@userPasswordReset/successMessage.twig',
+            [
                 'isCommunityPortalPasswordSet' => $this->getSessionSegment()->getFlash('isCommunityPortalPasswordSet', true),
             ],
-        ]);
+            'Password Reset Successful',
+        );
     }
 
     /**

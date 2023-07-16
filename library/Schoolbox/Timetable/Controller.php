@@ -141,12 +141,7 @@ class Controller extends Base
             }
         }
         $this->response->status->setCode($code);
-        $this->response->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $data,
-            )
-        );
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
     /**

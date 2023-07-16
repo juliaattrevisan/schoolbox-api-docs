@@ -135,9 +135,9 @@ class Controller extends Base
             )
         );
 
-        $this->getResponse()->content->set([
-            'template' => '@resourceBookingReport/index.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceBookingReport/index.twig',
+            [
                 'categoryList' => $categoryList,
                 'eventList'    => $this->getApi()->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp()),
                 'search'       => [
@@ -147,7 +147,7 @@ class Controller extends Base
                     'classes'  => $showClasses,
                 ],
             ],
-        ]);
+        );
     }
 
     /**

@@ -87,9 +87,9 @@ class Controller extends Base
 
         /* Twig data
          */
-        $this->getResponse()->content->set([
-            'template' => '@upsRuleset/intro.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@upsRuleset/intro.twig',
+            [
                 'pageCurrent'    => $this->routeGenerator->generate('upsRuleset.intro'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'allNavigation'  => $allNavigation->getAllNodes(),
@@ -137,10 +137,10 @@ class Controller extends Base
         $twigData['pageCurrent'] = $this->routeGenerator->generate('upsRuleset.intro');
         $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
 
-        $this->getResponse()->content->set([
-            'template' => '@upsRuleset/ruleset.twig',
-            'data'     => $twigData,
-        ]);
+        $this->psr7Response = $this->responseFromTemplate(
+            '@upsRuleset/ruleset.twig',
+            $twigData,
+        );
     }
 
 
@@ -188,14 +188,14 @@ class Controller extends Base
      */
     public function logs()
     {
-        $this->getResponse()->content->set([
-            'template' => '@upsRuleset/log/list.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@upsRuleset/log/list.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('upsRuleset.intro'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'logs'           => $this->findLogs()
             ]
-        ]);
+        );
     }
 
 
@@ -307,10 +307,7 @@ class Controller extends Base
             if ($this->isXhrRequest()) {
                 // just tell them they're naughty, that will be enough
                 $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set([
-                    'format' => 'json',
-                    'data'   => $e->getMessage()
-                ]);
+                $this->psr7Response = $this->responseAsJson($e->getMessage());
             } else {
                 $this->psr7Response = $this->redirectFound($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
             }
@@ -485,9 +482,7 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
             $this->syncCallback($rulesetId, $provisioner, false);
         };
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-        ]);
+        $this->psr7Response = $this->responseEmpty();
     }
 
 
@@ -512,9 +507,7 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
             $this->syncCallback($rulesetId, $provisioner, true);
         };
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-        ]);
+        $this->psr7Response = $this->responseEmpty();
     }
 
 

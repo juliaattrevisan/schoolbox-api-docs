@@ -113,23 +113,21 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceItem/browse.twig',
             [
-                'template' => '@resourceItem/browse.twig',
-                'data'     => [
-                    'list'         => $list->sortByCallback(static function (Model $a, Model $b) {
-                        return strnatcasecmp($a->getName(), $b->getName());
-                    }),
-                    'categoryId'   => $catId,
-                    'category'     => $category,
-                    'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',],
-                    ]),
-                    'search'       => $search,
-                    'paginator'    => $this->paginator,
-                    'page'         => $page,
-                ],
-            ]
+                'list'         => $list->sortByCallback(static function (Model $a, Model $b) {
+                    return strnatcasecmp($a->getName(), $b->getName());
+                }),
+                'categoryId'   => $catId,
+                'category'     => $category,
+                'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
+                    'order' => ['name' => 'asc',],
+                ]),
+                'search'       => $search,
+                'paginator'    => $this->paginator,
+                'page'         => $page,
+            ],
         );
     }
 
@@ -153,12 +151,7 @@ class Controller extends Base
                                ];
                            });
         $data->reindex();
-        $this->getResponse()->content->set(
-            [
-                'format' => 'json',
-                'data'   => $data,
-            ]
-        );
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
     /**
@@ -167,21 +160,19 @@ class Controller extends Base
      */
     public function add(): void
     {
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceItem/edit.twig',
             [
-                'template' => '@resourceItem/edit.twig',
-                'data'     => [
-                    'item'            => new Model(),
-                    'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',],
-                    ]),
-                    'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
-                    'moderatorList'   => [],
-                    'relatedItemList' => [],
-                    'roleList'        => $this->roleMapper->findAll(),
-                    'attachzone'      => $this->getAttachZoneData($this->mapper->createModel()),
-                ],
-            ]
+                'item'            => new Model(),
+                'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
+                    'order' => ['name' => 'asc',],
+                ]),
+                'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
+                'moderatorList'   => [],
+                'relatedItemList' => [],
+                'roleList'        => $this->roleMapper->findAll(),
+                'attachzone'      => $this->getAttachZoneData($this->mapper->createModel()),
+            ],
         );
     }
 
@@ -197,17 +188,15 @@ class Controller extends Base
         if (!($calendarDate instanceof DateTime)) {
             $calendarDate = new DateTime('now');
         }
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceItem/read.twig',
             [
-                'template' => '@resourceItem/read.twig',
-                'data'     => [
-                    'item'         => $item,
-                    'currentTerm'  => $this->termMapper->findForToday(),
-                    'selectedDate' => $calendarDate->format('Y-m-d'),
-                    'calendarView' => $this->requestQuery->get('view') === 'day' ? 'timeGridDay' : '',
-                    'token'        => $this->getUser()->getKey(),
-                ],
-            ]
+                'item'         => $item,
+                'currentTerm'  => $this->termMapper->findForToday(),
+                'selectedDate' => $calendarDate->format('Y-m-d'),
+                'calendarView' => $this->requestQuery->get('view') === 'day' ? 'timeGridDay' : '',
+                'token'        => $this->getUser()->getKey(),
+            ],
         );
     }
 
@@ -234,21 +223,19 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceItem/edit.twig',
             [
-                'template' => '@resourceItem/edit.twig',
-                'data'     => [
-                    'item'            => $item,
-                    'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',],
-                    ]),
-                    'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
-                    'moderatorList'   => $moderatorList,
-                    'relatedItemList' => $relatedItemList,
-                    'roleList'        => $this->roleMapper->findAll(),
-                    'attachzone'      => $this->getAttachZoneData($item),
-                ],
-            ]
+                'item'            => $item,
+                'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
+                    'order' => ['name' => 'asc',],
+                ]),
+                'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
+                'moderatorList'   => $moderatorList,
+                'relatedItemList' => $relatedItemList,
+                'roleList'        => $this->roleMapper->findAll(),
+                'attachzone'      => $this->getAttachZoneData($item),
+            ],
         );
     }
 

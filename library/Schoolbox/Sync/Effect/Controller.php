@@ -108,11 +108,10 @@ class Controller extends Base
             ]
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@upsEffect/container.twig',
-            'data'     => $data,
-            'format'   => 'nochrome'
-        ]);
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@upsEffect/container.twig',
+            $data,
+        );
     }
 
 
@@ -166,11 +165,10 @@ class Controller extends Base
             'currentEffect' => $newEffect,
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@upsEffect/container-skip.twig',
-            'data'     => $data,
-            'format'   => 'nochrome'
-        ]);
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@upsEffect/container-skip.twig',
+            $data,
+        );
     }
 
 
@@ -216,11 +214,10 @@ class Controller extends Base
             ]
         ];
 
-        $this->getResponse()->content->set([
-            'template' => $fragment->getFilename(),
-            'data' => $data,
-            'format' => 'nochrome'
-        ]);
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            $fragment->getFilename(),
+            $data,
+        );
     }
 
 
@@ -234,10 +231,7 @@ class Controller extends Base
         $effectId = $this->requestPost->get('effectId');
         $deleteCount = Effect\Mapper::getInstance()->deleteByColumn('id', $effectId);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $deleteCount > 0
-        ]);
+        $this->psr7Response = $this->responseAsJson($deleteCount > 0);
 
         return true;
     }
@@ -291,10 +285,9 @@ class Controller extends Base
             'preselected' => '',
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@upsEffect/map-row.twig',
-            'data'     => $data,
-            'format'   => 'nochrome'
-        ]);
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@upsEffect/map-row.twig',
+            $data,
+        );
     }
 }

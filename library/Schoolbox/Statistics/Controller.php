@@ -220,42 +220,40 @@ class Controller extends Base
         /**
          * Send view
          */
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@statistics/index.twig',
             [
-                'template' => '@statistics/index.twig',
-                'data'     => [
-                    'pageRoute'         => 'getIndex',
-                    'folder'            => $folder,
-                    'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
-                    'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
-                    'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roleTypes,
-                    'roleFilter'        => $roleFilter,
+                'pageRoute'         => 'getIndex',
+                'folder'            => $folder,
+                'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
+                'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
+                'filterDateOptions' => $this->filterDateOptions,
+                'roles'             => $this->roleTypes,
+                'roleFilter'        => $roleFilter,
 
-                    'graphColours' => $colours,
-                    'graphXMin'    => $this->getStartDate()->getUnixTimeStamp() * 1000,
-                    'graphXMax'    => $this->getEndDate()->getUnixTimeStamp() * 1000,
-                    'graphData'    => $graphData,
+                'graphColours' => $colours,
+                'graphXMin'    => $this->getStartDate()->getUnixTimeStamp() * 1000,
+                'graphXMax'    => $this->getEndDate()->getUnixTimeStamp() * 1000,
+                'graphData'    => $graphData,
 
-                    'maxTopVisitors'  => self::MAX_TOP_VISITORS,
-                    'topVisitors'     => $topVisitors,
-                    'topVisitorInfo'  => $topVisitors->first(),
+                'maxTopVisitors'  => self::MAX_TOP_VISITORS,
+                'topVisitors'     => $topVisitors,
+                'topVisitorInfo'  => $topVisitors->first(),
 
-                    'topFiles'     => $topFiles,
-                    'topFileInfo'  => $topFileInfo,
-                    'topFilesMore' => $topFilesMore,
+                'topFiles'     => $topFiles,
+                'topFileInfo'  => $topFileInfo,
+                'topFilesMore' => $topFilesMore,
 
-                    'recentVisitors' => $recentVisitors,
+                'recentVisitors' => $recentVisitors,
 
-                    'yetToVisit'     => $yetToVisitors,
-                    'yetToVisitMore' => $yetToVisitMore,
+                'yetToVisit'     => $yetToVisitors,
+                'yetToVisitMore' => $yetToVisitMore,
 
-                    'topLinks'     => $topLinks,
-                    'topLinkInfo'  => $topLinkInfo,
-                    'topLinksMore' => $topLinksMore,
+                'topLinks'     => $topLinks,
+                'topLinkInfo'  => $topLinkInfo,
+                'topLinksMore' => $topLinksMore,
 
-                ],
-            ]
+            ],
         );
     }
 
@@ -285,21 +283,19 @@ class Controller extends Base
 
         $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC');
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@statistics/topVisitors.twig',
             [
-                'template' => '@statistics/topVisitors.twig',
-                'data'     => [
-                    'pageRoute'         => 'getTopVisitors',
-                    'folder'            => $folder,
-                    'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
-                    'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
-                    'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roleTypes,
-                    'roleFilter'        => $roleFilter,
-                    'topVisitors'       => $topVisitors,
-                    'topVisitorInfo'    => $topVisitors->first(),
-                ],
-            ]
+                'pageRoute'         => 'getTopVisitors',
+                'folder'            => $folder,
+                'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
+                'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
+                'filterDateOptions' => $this->filterDateOptions,
+                'roles'             => $this->roleTypes,
+                'roleFilter'        => $roleFilter,
+                'topVisitors'       => $topVisitors,
+                'topVisitorInfo'    => $topVisitors->first(),
+            ],
         );
     }
 
@@ -331,20 +327,18 @@ class Controller extends Base
 
         $topFiles = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@statistics/topFiles.twig',
             [
-                'template' => '@statistics/topFiles.twig',
-                'data'     => [
-                    'pageRoute'         => 'getTopFiles',
-                    'folder'            => $folder,
-                    'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
-                    'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
-                    'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roleTypes,
-                    'roleFilter'        => $roleFilter,
-                    'topFiles'          => $topFiles,
-                ],
-            ]
+                'pageRoute'         => 'getTopFiles',
+                'folder'            => $folder,
+                'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
+                'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
+                'filterDateOptions' => $this->filterDateOptions,
+                'roles'             => $this->roleTypes,
+                'roleFilter'        => $roleFilter,
+                'topFiles'          => $topFiles,
+            ],
         );
     }
 
@@ -374,20 +368,18 @@ class Controller extends Base
 
         $recentVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'datetime DESC');
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@statistics/recentVisitors.twig',
             [
-                'template' => '@statistics/recentVisitors.twig',
-                'data'     => [
-                    'pageRoute'         => 'getRecentVisitors',
-                    'folder'            => $folder,
-                    'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
-                    'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
-                    'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roleTypes,
-                    'roleFilter'        => $roleFilter,
-                    'recentVisitors'    => $recentVisitors,
-                ],
-            ]
+                'pageRoute'         => 'getRecentVisitors',
+                'folder'            => $folder,
+                'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
+                'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
+                'filterDateOptions' => $this->filterDateOptions,
+                'roles'             => $this->roleTypes,
+                'roleFilter'        => $roleFilter,
+                'recentVisitors'    => $recentVisitors,
+            ],
         );
     }
 
@@ -418,20 +410,18 @@ class Controller extends Base
 
         $yetToVisitors = $dataSource->getYetToVisit($folder, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@statistics/yetToVisit.twig',
             [
-                'template' => '@statistics/yetToVisit.twig',
-                'data'     => [
-                    'pageRoute'         => 'getYetToVisit',
-                    'folder'            => $folder,
-                    'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
-                    'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
-                    'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roleTypes,
-                    'roleFilter'        => $roleFilter,
-                    'yetToVisitors'     => $yetToVisitors,
-                ],
-            ]
+                'pageRoute'         => 'getYetToVisit',
+                'folder'            => $folder,
+                'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
+                'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
+                'filterDateOptions' => $this->filterDateOptions,
+                'roles'             => $this->roleTypes,
+                'roleFilter'        => $roleFilter,
+                'yetToVisitors'     => $yetToVisitors,
+            ],
         );
     }
 
@@ -463,20 +453,18 @@ class Controller extends Base
 
         $topLinks = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_LINK, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@statistics/topLinks.twig',
             [
-                'template' => '@statistics/topLinks.twig',
-                'data'     => [
-                    'pageRoute'         => 'getTopLinks',
-                    'folder'            => $folder,
-                    'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
-                    'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
-                    'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roleTypes,
-                    'roleFilter'        => $roleFilter,
-                    'topLinks'          => $topLinks,
-                ],
-            ]
+                'pageRoute'         => 'getTopLinks',
+                'folder'            => $folder,
+                'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
+                'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
+                'filterDateOptions' => $this->filterDateOptions,
+                'roles'             => $this->roleTypes,
+                'roleFilter'        => $roleFilter,
+                'topLinks'          => $topLinks,
+            ],
         );
     }
 
