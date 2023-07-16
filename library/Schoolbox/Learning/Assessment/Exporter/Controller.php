@@ -645,10 +645,8 @@ class Controller extends BaseController
                  */
                 unlink($filename);
             };
-            $this->getResponse()->content->set([
-                'format' => 'file',
-                'file'   => $filename,
-            ]);
+
+            $this->psr7Response = $this->responseFromContent(file_get_contents($filename));
         }
     }
 

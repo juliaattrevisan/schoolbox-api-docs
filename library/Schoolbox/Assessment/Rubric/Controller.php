@@ -264,11 +264,10 @@ class Controller extends BaseController
         }
 
 
-        $this->getResponse()->content->set([
-            'data'     => $context,
-            'format'   => 'nochrome',
-            'template' => "@rubric/$template.twig"
-        ]);
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            "@rubric/$template.twig",
+            $context
+        );
     }
 
     /**
@@ -280,10 +279,7 @@ class Controller extends BaseController
     protected function sendJSONError($data, $statusCode = 400)
     {
         $this->getResponse()->status->set($statusCode);
-        $this->getResponse()->content->set([
-            'data'     => $data,
-            'format'   => 'json',
-        ]);
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
 
@@ -330,10 +326,7 @@ class Controller extends BaseController
             $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
         } catch (\Exception $e) {
             $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data'   => $e->getMessage()
-            ]);
+            $this->psr7Response = $this->responseAsJson($e->getMessage());
             return;
         }
 
@@ -433,10 +426,7 @@ class Controller extends BaseController
         $headers->set('Content-Length', strlen($content));
         $headers->set('Content-Disposition', "attachment; filename=\"$basename-rubric.csv\"");
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->psr7Response = $this->responseFromContent($content);
     }
 
 

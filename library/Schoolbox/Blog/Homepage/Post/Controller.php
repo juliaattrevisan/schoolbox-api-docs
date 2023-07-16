@@ -259,16 +259,14 @@ class Controller extends Base
 
         // Lets get the party started...
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@blog/item.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'record'            => $blog,
-                    'comments'          => $comments,
-                    'images'            => $images,
-                ),
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@blog/item.twig',
+            [
+                'session'           => $_SESSION,
+                'record'            => $blog,
+                'comments'          => $comments,
+                'images'            => $images,
+            ],
         );
     }
 
@@ -338,18 +336,16 @@ class Controller extends Base
         $blog->setFolder($this->getFolderMapper()->findById($blog->getFolder()->getId()));
 
         // Lets get the party started...
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@blog/modify.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'record'            => $blog,
-                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
-                    'attachzone'        => $this->getAttachZone($this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
-                ),
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@blog/modify.twig',
+            [
+                'session'           => $_SESSION,
+                'record'            => $blog,
+                'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
+                'attachzone'        => $this->getAttachZone($this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
+            ],
         );
     }
 
@@ -361,18 +357,16 @@ class Controller extends Base
     public function getInsert(FolderModel $folder)
     {
         // Lets get the party started...
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@blog/modify.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'folder'            => $folder,
-                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
-                    'attachzone'        => $this->getAttachZone(),
-                ),
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@blog/modify.twig',
+            [
+                'session'           => $_SESSION,
+                'folder'            => $folder,
+                'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
+                'attachzone'        => $this->getAttachZone(),
+            ],
         );
     }
 
@@ -424,22 +418,20 @@ class Controller extends Base
 
         // Lets get the party started...
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@blog/archive.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'folder'            => $folder,
-                    'blogs'             => $blogsSelectedMonth,
-                    'blogImages'        => $blogImages,
-                    'blogComments'      => $blogComments,
-                    'dateSelectorArray' => $dateSelectorArray,
-                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
-                    'attachzone'        => $this->getAttachZone(),
-                ),
-            )
+        $this->psr7Response = $this->responseFromTemplate(
+            '@blog/archive.twig',
+            [
+                'session'           => $_SESSION,
+                'folder'            => $folder,
+                'blogs'             => $blogsSelectedMonth,
+                'blogImages'        => $blogImages,
+                'blogComments'      => $blogComments,
+                'dateSelectorArray' => $dateSelectorArray,
+                'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
+                'attachzone'        => $this->getAttachZone(),
+            ],
         );
     }
 

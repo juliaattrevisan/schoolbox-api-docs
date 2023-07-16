@@ -69,19 +69,17 @@ class Controller extends Base
      */
     public function getModify(Folder $folder)
     {
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@group/modify.twig',
             [
-                'template' => '@group/modify.twig',
-                'title'    => 'Manage Group',
-                'data'     => [
-                    'folder'      => $folder,
-                    'showSetting' => (bool)$this->requestQuery->get('new'),
-                    'breadcrumbs' => [
-                        [$folder->getTitle(), "/homepage/{$folder->getId()}"],
-                        ['Manage Group'],
-                    ],
+                'folder'      => $folder,
+                'showSetting' => (bool)$this->requestQuery->get('new'),
+                'breadcrumbs' => [
+                    [$folder->getTitle(), "/homepage/{$folder->getId()}"],
+                    ['Manage Group'],
                 ],
-            ]
+            ],
+        'Manage Group',
         );
     }
 

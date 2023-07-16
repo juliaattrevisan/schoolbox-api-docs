@@ -392,12 +392,12 @@ class Controller extends Base
      */
     public function getImport($id)
     {
-        $this->getResponse()->content->set([
-            'template' => '@sportsfixturesImport/importing.twig',
-            'data' => array(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@sportsfixturesImport/importing.twig',
+            [
                 'id' => $id
-            )
-        ]);
+            ]
+        );
     }
 
     /**
@@ -479,10 +479,6 @@ class Controller extends Base
 
                 // All done!
             };
-            $this->getResponse()->content->set([
-                'format' => 'noContent',
-            ]);
-
             $this->psr7Response = $this->redirectAfterPost("/fixtures/import/{$this->import->getId()}");
         } else {
             // Nothing was attached, not much to do but stare at our navels

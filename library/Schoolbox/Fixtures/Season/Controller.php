@@ -331,15 +331,14 @@ class Controller extends AbstractController
                 $matchCounts[$season->getId()] = 0;
             }
 
-            $this->getResponse()->content->set([
-                'template' => "@sportsfixturesSeason/listItem.twig",
-                'format'   => 'nochrome',
-                'data'     => [
+            $this->psr7Response = $this->responseFromTemplateUnthemed(
+        "@sportsfixturesSeason/listItem.twig",
+                [
                     'currentSeason'  => $season,
                     'divisionCounts' => $divisionCounts,
                     'matchCounts'    => $matchCounts,
                 ]
-            ]);
+            );
         } else {
             $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('sportsfixturesSeason.getList'));
         }

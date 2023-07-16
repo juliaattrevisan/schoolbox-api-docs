@@ -1340,9 +1340,8 @@ class Controller extends Base\Base
         // Don't show children if this is an invalid location
         $showChildren = $treeBuilder->isValidCourseLocation($folderId);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
-        ]);
+        $this->psr7Response = $this->responseAsJson(
+            $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
+        );
     }
 }

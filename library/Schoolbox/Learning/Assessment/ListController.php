@@ -171,10 +171,7 @@ class ListController extends Web\Controller\Base
         $headers->set('Content-Length', strlen($contents));
         $headers->set('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"");
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $contents,
-        ]);
+        $this->psr7Response = $this->responseFromContent($contents);
     }
 
 

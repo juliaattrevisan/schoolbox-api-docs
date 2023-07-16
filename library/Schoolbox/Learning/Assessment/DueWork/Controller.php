@@ -519,12 +519,10 @@ class Controller extends Assessment\Controller
             );
         }
 
-        $this->getResponse()->content->set(
-            [
-                'title'    => 'Rubric Report',
-                'template' => '@learningAssessment/dueWork/overview.twig',
-                'data'     => $data,
-            ]
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/overview.twig',
+            $data,
+            'Rubric Report'
         );
     }
 
@@ -563,12 +561,7 @@ class Controller extends Assessment\Controller
 
         $headers->set('Content-Disposition', "attachment; filename=\"$basename-results.csv\"");
 
-        $this->getResponse()->content->set(
-            [
-                'format' => 'file',
-                'data'   => $content,
-            ]
-        );
+        $this->psr7Response = $this->responseFromContent($content);
     }
 
 
@@ -1201,10 +1194,6 @@ class Controller extends Assessment\Controller
             }
         }
 
-        $output = [
-            'format' => 'noContent',
-        ];
-
         if (null !== $detachedFunction) {
             $this->postOutputCallbacks[] = $detachedFunction;
         }
@@ -1212,7 +1201,6 @@ class Controller extends Assessment\Controller
         /* Asynchronously shove it into plagscan, so we don't make the user wait ages
          * for it to read 1 byte at a time >_<
          */
-        $this->getResponse()->content->set($output);
 
         /* Saving drafts from the wysiwyg
          */

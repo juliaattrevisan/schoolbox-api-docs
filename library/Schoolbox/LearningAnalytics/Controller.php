@@ -418,9 +418,9 @@ class Controller extends Base
             'termsWithResults'    => $termsWithResults,
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@learningAnalytics/course.twig',
-            'data'     => $data,
-        ]);
+        $this->psr7Response = $this->responseFromTemplate(
+            '@learningAnalytics/course.twig',
+            $data,
+        );
     }
 }

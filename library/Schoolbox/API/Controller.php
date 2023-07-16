@@ -322,15 +322,12 @@ class Controller extends Base
     private function assignJsonResponseForAuthenticatedUser(User $user): void
     {
         $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
-        $this->response->headers->set('Content-Type', 'application/json');
-        $this->response->content->set([
-            'format' => 'json',
-            'data'   => [
-                'id'       => $user->getId(),
-                'key'      => $user->getKey(),
-                'role'     => $user->getRole()->getType(),
-                'username' => $user->getUsername(),
-            ],
+
+        $this->psr7Response = $this->responseAsJson([
+            'id'       => $user->getId(),
+            'key'      => $user->getKey(),
+            'role'     => $user->getRole()->getType(),
+            'username' => $user->getUsername(),
         ]);
     }
 
@@ -348,9 +345,7 @@ class Controller extends Base
         } else {
             $this->psr7Response = $this->redirectFound('/');
         }
-        $this->response->content->set([
-            'format' => 'noContent',
-        ]);
+        $this->psr7Response = $this->responseEmpty();
     }
 
     /**
