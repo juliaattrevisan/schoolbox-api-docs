@@ -90,12 +90,12 @@ class Controller extends Base
         $this->validateResetRequest($reset);
         $sessionSegment = $this->getSessionSegment();
         $this->psr7Response = $this->responseFromTemplate(
-             '@userPasswordReset/resetForm.twig',
+            '@userPasswordReset/resetForm.twig',
             [
                 'reset' => $reset,
                 'isPasswordSubmitted' => $sessionSegment->getFlash('isPasswordSubmitted', false),
                 'isPasswordValid' => $sessionSegment->getFlash('isPasswordValid', true),
-            ],
+             ],
             'Reset Password',
         );
     }

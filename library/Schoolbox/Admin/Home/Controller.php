@@ -176,7 +176,7 @@ class Controller extends Base
                 'major_site_version'   => $version->getMajor(),
                 'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
                 'disk_used' => $disk_used,
-        //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+            //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                 'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
                 'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
                 'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),

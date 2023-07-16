@@ -79,7 +79,7 @@ class Controller extends Base
                     ['Manage Group'],
                 ],
             ],
-        'Manage Group',
+            'Manage Group',
         );
     }
 

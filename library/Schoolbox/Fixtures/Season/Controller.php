@@ -332,7 +332,7 @@ class Controller extends AbstractController
             }
 
             $this->psr7Response = $this->responseFromTemplateUnthemed(
-        "@sportsfixturesSeason/listItem.twig",
+                "@sportsfixturesSeason/listItem.twig",
                 [
                     'currentSeason'  => $season,
                     'divisionCounts' => $divisionCounts,
