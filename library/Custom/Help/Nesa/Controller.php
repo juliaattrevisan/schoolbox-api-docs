@@ -194,9 +194,6 @@ class Controller extends Base
         $headers->set('Content-Length', \strlen($content));
         $headers->set('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"");
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->psr7Response = $this->responseFromContent($content);
     }
 }

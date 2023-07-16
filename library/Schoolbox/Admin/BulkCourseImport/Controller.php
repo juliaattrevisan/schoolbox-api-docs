@@ -85,15 +85,13 @@ class Controller extends Base
     public function getIndex(): void
     {
         // Render this thing out
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminBulkCourseImport/index.twig',
             [
-                'template' => '@adminBulkCourseImport/index.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
-                    'attachzone'     => $this->getAttachZone(),
-                ],
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
+                'attachzone'     => $this->getAttachZone(),
+            ],
         );
     }
 
@@ -132,16 +130,14 @@ class Controller extends Base
         ))->import($this->filesystemProxy->readStream($csvFile), $defaultDueTime, $performMode);
 
         // Render this thing out
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminBulkCourseImport/importResults.twig',
             [
-                'template' => '@adminBulkCourseImport/importResults.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
-                    'results'        => $imported,
-                    'perform'        => $performMode,
-                ],
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
+                'results'        => $imported,
+                'perform'        => $performMode,
+            ],
         );
     }
 

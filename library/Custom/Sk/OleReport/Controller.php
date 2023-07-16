@@ -92,14 +92,13 @@ class Controller extends Base
             $reports[$year][$semester][$reportId] = ['description' => $description];
         }
 
-        $this->getResponse()->content->set([
-            'format'   => 'html',
-            'template' => '@customStkOleReport/list.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@customStkOleReport/list.twig',
+            [
                 'student' => $student,
                 'reports' => $reports,
             ],
-        ]);
+        );
     }
 
     /**

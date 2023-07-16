@@ -115,9 +115,7 @@ abstract class ConfigController extends Base
 
         if ($rebuildModules) {
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
-            $this->response->content->set([
-                'format' => 'noContent',
-            ]);
+            $this->psr7Response = $this->responseEmpty();
         }
     }
 

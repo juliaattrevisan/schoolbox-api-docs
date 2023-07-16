@@ -103,11 +103,8 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => [
-                'pages' => $options
-            ]
+        $this->psr7Response = $this->responseAsJson([
+            'pages' => $options
         ]);
     }
 
@@ -117,17 +114,16 @@ class Controller extends Base
     public function getDeploy()
     {
         // Render this thing out
-
-        $this->getResponse()->content->set([
-            'template' => '@adminEportfolio/index.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminEportfolio/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
                 'roles' => $this->roleMapper->findAll(['order' => ['name' => 'asc']]),
                 'campuses' => $this->campusMapper->findAll(['order' => ['name' => 'asc']])
             ],
-            'title' => 'Admin - Eportfolio'
-        ]);
+            'Admin - Eportfolio'
+        );
     }
 
     /**
@@ -147,14 +143,14 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($post, $id) {
             $this->deployCallback($post, $id);
         };
-        $this->getResponse()->content->set([
-            'template' => '@adminEportfolio/importResults.twig',
-            'data' => array(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminEportfolio/importResults.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
                 'id' => $id
-            ),
-        ]);
+            ],
+        );
     }
 
     /**

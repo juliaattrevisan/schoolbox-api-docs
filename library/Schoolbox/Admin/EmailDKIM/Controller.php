@@ -47,13 +47,11 @@ class Controller extends Base
      */
     public function getDomainListPage()
     {
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@emailDKIM/index.twig',
             [
-                'template' => '@emailDKIM/index.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('emailDKIM.getDomainListPage'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('emailDKIM.getDomainListPage')),
-                ],
+                'pageCurrent'    => $this->routeGenerator->generate('emailDKIM.getDomainListPage'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('emailDKIM.getDomainListPage')),
             ]
         );
     }
