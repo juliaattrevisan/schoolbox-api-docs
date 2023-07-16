@@ -14,6 +14,7 @@ use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\PayloadBrokenException;
 use Alaress\Async\Broker\PayloadMissingException;
+use Alaress\Async\Queue\RedisQueue;
 use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IAckResolver;
 use Alaress\Async\Stomp\IClient;
@@ -45,10 +46,10 @@ abstract class Broker implements IBroker
      * @param string          $queue   the name of the queue to deposit into in AMQP
      * @param AMQPInterface   $amqp    an instance of the AMQP client interface
      * @param ClientInterface $redis   an instance of the Predis client interface
-     * @param IClient         $stomp   an instanceof the STOMP client interface
+     * @param IClient|null    $stomp   an instanceof the STOMP client interface
      *                                 (only needs to be supplied if attaching a consumer, otherwise can be omitted)
      */
-    public function __construct($queue, AMQPInterface $amqp, ClientInterface $redis, IClient $stomp = null)
+    public function __construct(string $queue, AMQPInterface $amqp, ClientInterface $redis, IClient $stomp = null)
     {
         $this->queue = $queue;
         $this->redis = $redis;
@@ -124,15 +125,15 @@ abstract class Broker implements IBroker
 
 
     /**
-     * @param mixed $serializable anything that can be serialized
-     * @param array $context
-     * @param int $ttl
+     * @param mixed      $serializable anything that can be serialized
+     * @param array|null $context
+     * @param int|null   $ttl
      * @return void
      */
     public function publish($serializable, array $context = null, int $ttl = null)
     {
         $serial = serialize($serializable);
-        $gzip   = gzcompress($serial, 9);
+        $gzip   = gzcompress($serial, RedisQueue::COMPRESSION_LEVEL);
         $hash   = sha1($gzip);
 
         $storageKey = $this->getStorageKey($serializable, $hash);

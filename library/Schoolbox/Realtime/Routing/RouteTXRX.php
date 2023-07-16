@@ -35,7 +35,7 @@ class RouteTXRX implements TXRX
      * @param QueueSorter|null $sorter
      * @param ListFactory|null $listFactory
      */
-    private function __construct(
+    final private function __construct(
         private ?UserMapper $mapper,
         private ?QueueSorter $sorter,
         private ?ListFactory $listFactory

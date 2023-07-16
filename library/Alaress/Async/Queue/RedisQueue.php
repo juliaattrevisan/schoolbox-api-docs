@@ -23,6 +23,9 @@ abstract class RedisQueue implements QueueInterface
     /** @var Client */
     protected $redis;
 
+    public const TTL_EXPIRED = -2;
+
+    public const COMPRESSION_LEVEL = 9; // 9 is max, 6 is default, -1 is none
 
     /**
      * @param ClientInterface $redis
@@ -200,7 +203,7 @@ abstract class RedisQueue implements QueueInterface
      */
     private function deflate(Instance $instance)
     {
-        return gzcompress(serialize($instance), 9);
+        return gzcompress(serialize($instance), self::COMPRESSION_LEVEL);
     }
 
 

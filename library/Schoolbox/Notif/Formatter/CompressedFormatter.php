@@ -9,14 +9,12 @@
 
 namespace Schoolbox\Notif\Formatter;
 
+use Alaress\Async\Queue\RedisQueue;
 use ErrorException;
 use Monolog\Formatter\FormatterInterface;
 
 class CompressedFormatter implements FormatterInterface
 {
-
-    const COMPRESSION_LEVEL = 9; // 9 is max, 6 is default, -1 is none
-
     /**
      * Formats a log record.
      *
@@ -50,7 +48,7 @@ class CompressedFormatter implements FormatterInterface
         $uncompressed = serialize($data);
 
         // compress the resultant string
-        $compressed = gzcompress($uncompressed, self::COMPRESSION_LEVEL);
+        $compressed = gzcompress($uncompressed, RedisQueue::COMPRESSION_LEVEL);
 
         // base64 encode so it survives transport
         $encoded = base64_encode($compressed);

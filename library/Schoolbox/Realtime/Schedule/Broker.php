@@ -26,9 +26,9 @@ class Broker extends StompRedis\Broker
      * @param string          $instanceId
      * @param AMQPInterface   $amqp
      * @param ClientInterface $redis
-     * @param IClient         $stomp
+     * @param IClient|null    $stomp
      */
-    public function __construct($instanceId, AMQPInterface $amqp, ClientInterface $redis, IClient $stomp = null)
+    public function __construct(string $instanceId, AMQPInterface $amqp, ClientInterface $redis, IClient $stomp = null)
     {
         parent::__construct(self::QUEUE, $amqp, $redis, $stomp);
         $this->instanceId = $instanceId;

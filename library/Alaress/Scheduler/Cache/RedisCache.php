@@ -9,6 +9,7 @@
 
 namespace Alaress\Scheduler\Cache;
 
+use Alaress\Async\Queue\RedisQueue;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Predis;
 use Predis\ClientInterface;
@@ -34,8 +35,8 @@ class RedisCache implements ICache
     }
 
     /**
-     * @param Connector   $mq
-     * @param string      $queueName
+     * @param Connector $mq
+     * @param string    $queueName
      * @return bool
      */
     public function restoreSchedule(Connector $mq, string $queueName): bool
@@ -62,8 +63,9 @@ class RedisCache implements ICache
 
             // Fetch from Redis
             $value = $this->redis->get($itemKey);
-            if (!isset($value)) {
-                $this->log->warning(sprintf("Key %s does not exist: cannot restore", $itemKey));
+            if (!$value || ($this->redis->ttl($itemKey) === RedisQueue::TTL_EXPIRED)) {
+                $this->log->warning(sprintf("Key %s is no longer valid, removing ", $itemKey));
+                $this->redis->srem($this->getNamespacedKey('index'), $itemKey);
                 continue;
             }
 
@@ -158,7 +160,7 @@ class RedisCache implements ICache
         $compressedData = self::compress($trigger);
         $hash           = sha1($compressedData);
         $itemKey        = "msg:{$this->instanceId}:s:$hash";
-        $isset = 0;
+        $isset          = 0;
 
         // it should already
         $existingData = $this->redis->get($itemKey);
@@ -197,6 +199,6 @@ class RedisCache implements ICache
      */
     private static function compress(TriggerInterface $trigger): string
     {
-        return gzcompress(serialize($trigger), 9);
+        return gzcompress(serialize($trigger), RedisQueue::COMPRESSION_LEVEL);
     }
 }
