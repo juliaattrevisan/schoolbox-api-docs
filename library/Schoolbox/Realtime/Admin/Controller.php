@@ -416,10 +416,9 @@ class Controller extends BaseController
 
         //Filtering out $config display further in Twig. Is there a more elegant solution?
 
-        $this->getResponse()->content->set([
-            'title'    => 'Global Message Configuration',
-            'template' => '@adminMessages/configure.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminMessages/configure.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminMessages.configure'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.configure')),
                 'filters' => $filters,
@@ -429,7 +428,8 @@ class Controller extends BaseController
                 'perms'   => $this->getConfig()->getPermissionList(),
                 'msgConfig'  => $this->getConfig()->find($rolec->getPropertyValues('id')),
             ],
-        ]);
+            'Global Message Configuration',
+        );
     }
 
     /**
@@ -463,9 +463,9 @@ class Controller extends BaseController
         /** @var NS $ns */
         $ns = $this->getNsMapper()->findById($source->getNamespace()->getId());
 
-        $this->getResponse()->content->set([
-            'template' => '@adminMessages/custom-config.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@adminMessages/custom-config.twig',
+            [
                 'ns'        => [$ns->getId() => $ns],
                 'namespace' => ['id' => $ns->getId()],
                 'sources'   => [$source->getId() => $source],
@@ -474,8 +474,7 @@ class Controller extends BaseController
                 'perms'     => $this->getConfig()->getPermissionList(),
                 'roletype'  => $q['roletype'] ?? '',
             ],
-            'format'   => 'nochrome',
-        ]);
+        );
     }
 
 
@@ -523,10 +522,7 @@ class Controller extends BaseController
             }
         }
 
-        $this->getResponse()->content->set([
-            'data'   => $conf,
-            'format' => 'json',
-        ]);
+        $this->psr7Response = $this->responseAsJson($conf);
     }
 
 
@@ -588,7 +584,10 @@ class Controller extends BaseController
 
         $content['data']['logs'] = array_filter(explode("\n", trim(stream_get_contents($write))));
 
-        $this->getResponse()->content->set($content);
+        $this->psr7Response = $this->responseFromTemplate(
+            $content['template'],
+            $content['data'],
+        );
     }
 
     /**

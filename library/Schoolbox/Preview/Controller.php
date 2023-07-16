@@ -68,12 +68,12 @@ class Controller extends Base
             ['External Generic url' => "http://www.google.com.au/search?q=taylor+swift&oq=taylor+swift&aqs=chrome..69i57j69i65j69i60l4.1253j0j4&sourceid=chrome&es_sm=93&ie=UTF-8"],
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@preview/Index.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@preview/Index.twig',
+            [
                 'allUrls' => $testUrls,
             ],
-        ]);
+        );
     }
 
 

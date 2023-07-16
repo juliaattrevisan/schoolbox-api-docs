@@ -96,11 +96,10 @@ class Controller extends AbstractController
             'namespace'  => $this->namespace,
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@resourceBrowser/showLinkInfo.twig',
-            'format'   => 'nochrome',
-            'data'     => $data,
-        ]);
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@resourceBrowser/showLinkInfo.twig',
+            $data,
+        );
     }
 
     /**
@@ -182,24 +181,22 @@ class Controller extends AbstractController
         }
         //just dump the lot to the page for front end use.
         //output results
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@resourceBrowser/viewAll.twig',
             [
-                'template' => '@resourceBrowser/viewAll.twig',
-                'title'    => $title,
-                'data'     => [
-                    'referrer'       => $referrer,
-                    'canEdit'        => $accessSource >= UserAccess::ACCESS_WRITE,
-                    'homepage'       => $homepage,
-                    'filter'         => $filter,
-                    'files'          => $files,
-                    'breadcrumb'     => $breadcrumb,
-                    'title'          => $title,
-                    'sortDir'        => $sortDirection,
-                    'sortBy'         => $sortBy,
-                    'componentID'    => $componentID,
-                    'sourceFolderID' => $sourceFolder->getId(),
-                ],
-            ]
+                'referrer'       => $referrer,
+                'canEdit'        => $accessSource >= UserAccess::ACCESS_WRITE,
+                'homepage'       => $homepage,
+                'filter'         => $filter,
+                'files'          => $files,
+                'breadcrumb'     => $breadcrumb,
+                'title'          => $title,
+                'sortDir'        => $sortDirection,
+                'sortBy'         => $sortBy,
+                'componentID'    => $componentID,
+                'sourceFolderID' => $sourceFolder->getId(),
+            ],
+            $title,
         );
     }
 

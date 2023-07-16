@@ -267,34 +267,32 @@ class Controller extends BaseController
 
         $canChangeClassCodes = $this->getUser()->isSuperuser() || $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS) === UserAccess::ACCESS_FULL;
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@folder/modify.twig',
             [
-                'template' => '@folder/modify.twig',
-                'data'     => [
-                    'user'                => $this->getUser(),
-                    'breadcrumbs'         => $breadcrumbs,
-                    'formAction'          => $formAction,
-                    'folder'              => $folder,
-                    'parent'              => $folder->getParent(),
-                    'templates'           => $homepageTemplates,
-                    'templateId'          => $templateId,
-                    'roles'               => $this->roleMapper->findAll(),
-                    'rolePermissions'     => $rolePermissions,
-                    'database'            => ucfirst($this->getConfigLoader()->get('external_type')),
-                    'curriculumTagging'   => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-                    'userAccess'          => $this->access->getFolderAccess($this->getUser(), $permissionFolder),
-                    'canChangeClassCodes' => $canChangeClassCodes,
-                    'deny'                => UserAccess::ACCESS_DENY,
-                    'read'                => UserAccess::ACCESS_READ,
-                    'write'               => UserAccess::ACCESS_WRITE,
-                    'moderate'            => UserAccess::ACCESS_FULL,
-                    'coverImageZone'      => $zone->getTwigContext(),
-                    'editYearLevelUsage'  => $canChangeClassCodes,
-                    'yearLevelOptions'    => $yearLevelOptions,
-                    'yearLevelValues'     => $yearLevelValues,
-                    'curriculumCodes'     => $folder->getViewableCurriculumNodes()->reindex()
-                ],
-            ]
+                'user'                => $this->getUser(),
+                'breadcrumbs'         => $breadcrumbs,
+                'formAction'          => $formAction,
+                'folder'              => $folder,
+                'parent'              => $folder->getParent(),
+                'templates'           => $homepageTemplates,
+                'templateId'          => $templateId,
+                'roles'               => $this->roleMapper->findAll(),
+                'rolePermissions'     => $rolePermissions,
+                'database'            => ucfirst($this->getConfigLoader()->get('external_type')),
+                'curriculumTagging'   => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'userAccess'          => $this->access->getFolderAccess($this->getUser(), $permissionFolder),
+                'canChangeClassCodes' => $canChangeClassCodes,
+                'deny'                => UserAccess::ACCESS_DENY,
+                'read'                => UserAccess::ACCESS_READ,
+                'write'               => UserAccess::ACCESS_WRITE,
+                'moderate'            => UserAccess::ACCESS_FULL,
+                'coverImageZone'      => $zone->getTwigContext(),
+                'editYearLevelUsage'  => $canChangeClassCodes,
+                'yearLevelOptions'    => $yearLevelOptions,
+                'yearLevelValues'     => $yearLevelValues,
+                'curriculumCodes'     => $folder->getViewableCurriculumNodes()->reindex()
+            ],
         );
     }
 
@@ -310,10 +308,9 @@ class Controller extends BaseController
     {
         $this->recursiveDelete($folder->getId(), $this->getUser());
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => json_encode(['result' => 'success'])
-        ]);
+        $this->psr7Response = $this->responseAsJson(
+            json_encode(['result' => 'success'])
+        );
     }
 
 
@@ -336,10 +333,9 @@ class Controller extends BaseController
 
         $this->folderMapper->moveFolder($folder->getId(), $newParent->getId(), $this->getUser());
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => json_encode(['result' => 'success'])
-        ]);
+        $this->psr7Response = $this->responseAsJson(
+            json_encode(['result' => 'success'])
+        );
     }
 
 
@@ -865,10 +861,9 @@ class Controller extends BaseController
 
         $this->getSession()->set('resourcesID', $folder->getParent()->getId());
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => json_encode(['result' => 'success'])
-        ]);
+        $this->psr7Response = $this->responseAsJson(
+            json_encode(['result' => 'success'])
+        );
     }
 
 
@@ -904,10 +899,9 @@ class Controller extends BaseController
             $linkMapper->delete($currentLink);
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => json_encode(['result' => 'success'])
-        ]);
+        $this->psr7Response = $this->responseAsJson(
+            json_encode(['result' => 'success'])
+        );
     }
 
     /**

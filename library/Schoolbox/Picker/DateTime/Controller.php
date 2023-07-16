@@ -179,10 +179,9 @@ class Controller extends Base
         $displayFormatDate = $this->getConfigLoader()->get('date_local');
         $displayFormatTime = $displayFormatDate . ' ' . $this->getConfigLoader()->get('date_time');
 
-        $this->getResponse()->content->set([
-            'template' => '@pickerDatetime/picker.twig',
-            'format' => 'nochrome',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@pickerDatetime/picker.twig',
+            [
                 'id' => $id,
                 'value' => $date->toIso8601String(),
                 'element' => $element,
@@ -197,7 +196,7 @@ class Controller extends Base
                 'timetable' => $timetable,
                 'timetableVars' => $timetableVars
             ]
-        ]);
+        );
     }
 
 
@@ -385,12 +384,9 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => [
-                'appointments' => $appointments,
-                'date' => $date->toIso8601String()
-            ]
+        $this->psr7Response = $this->responseAsJson([
+            'appointments' => $appointments,
+            'date' => $date->toIso8601String()
         ]);
     }
 
@@ -407,10 +403,7 @@ class Controller extends Base
     {
         // Don't show other students' due work to anyone but staff
         if (!$this->getUser()->getRole()->isStaff()) {
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => []
-            ]);
+            $this->psr7Response = $this->responseAsJson([]);
 
             return;
         }
@@ -421,12 +414,9 @@ class Controller extends Base
         $end = $end->endOfDay();
 
         // Spit this out in a JSON array
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => [
-                'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
-                'date' => $date->toIso8601String()
-            ]
+        $this->psr7Response = $this->responseAsJson([
+            'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
+            'date' => $date->toIso8601String()
         ]);
     }
 
