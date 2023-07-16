@@ -97,7 +97,7 @@ class Controller extends Base
                 'upsCronTime'    => $this->getConfigLoader()->get('ups_cron_run_time'),
                 'timezone'       => $this->getConfigLoader()->get('date_timezone'),
             ]
-        ]);
+        );
     }
 
 
