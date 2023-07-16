@@ -104,8 +104,6 @@ class Controller extends Base
         //Not required by preview.js
         unset($previewFragment['twig']);
 
-        $this->getResponse()->content->set([
-            'data' => $previewFragment,
-        ]);
+        $this->psr7Response = $this->responseAsJson($previewFragment);
     }
 }
