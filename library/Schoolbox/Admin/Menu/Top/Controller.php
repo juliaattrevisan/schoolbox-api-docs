@@ -67,15 +67,15 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminMenuTop/index.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminMenuTop/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
                 'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => BaseMapper::SORT_ORDER_ASC]])
             ],
-            'title' => 'Admin - Top Menu'
-        ]);
+            'Admin - Top Menu'
+        );
     }
 
     /**
@@ -108,9 +108,9 @@ class Controller extends Base
             $campusesSelected[$selection->getCampusId()] = true;
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@adminMenuTop/modify.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminMenuTop/modify.twig',
+            [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
                 'allBreadcrumbs' => array_merge(
@@ -124,8 +124,8 @@ class Controller extends Base
                 'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
                 'campusesSelected' => $campusesSelected
             ],
-            'title' => 'Admin - Top Menu'
-        ]);
+            'Admin - Top Menu'
+        );
     }
 
     /**
@@ -137,9 +137,9 @@ class Controller extends Base
      */
     public function getCreate()
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminMenuTop/modify.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminMenuTop/modify.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
@@ -149,8 +149,8 @@ class Controller extends Base
                 'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
                 'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]])
             ],
-            'title' => 'Admin - Top Menu'
-        ]);
+            'Admin - Top Menu'
+        );
     }
 
     /**

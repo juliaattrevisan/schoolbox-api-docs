@@ -334,9 +334,7 @@ class Controller extends ConfigController
         $this->postOutputCallbacks[] = function () use ($logger) {
             $this->syncCallback($logger);
         };
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-        ]);
+        $this->psr7Response = $this->responseEmpty();
     }
 
 
@@ -585,10 +583,7 @@ class Controller extends ConfigController
         $headers->set('Content-Length', \strlen($content));
         $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"");
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->psr7Response = $this->responseFromContent($content);
     }
 
 
@@ -610,9 +605,6 @@ class Controller extends ConfigController
         $headers->set('Content-Length', \strlen($content));
         $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"");
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->psr7Response = $this->responseFromContent($content);
     }
 }

@@ -108,10 +108,9 @@ class Controller extends Base
         $sections = $this->getMenuSideSectionMapper()->findAll()->sortBy('sortOrder', 'asc');
 
         // Render this thing out
-
-        $this->getResponse()->content->set([
-            'template' => '@adminMenuSide/index.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminMenuSide/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
                 'tree' => $treeList,
@@ -119,8 +118,8 @@ class Controller extends Base
                 'configTitle' => $this->getConfigLoader()->get('title'),
                 'sectionName' => MenuSideSectionMapper::getSectionNameDefaults()
             ],
-            'title' => 'Admin - Side Menu'
-        ]);
+            'Admin - Side Menu'
+        );
     }
 
     /**
@@ -194,10 +193,9 @@ class Controller extends Base
         }
 
         // Render this mess out
-
-        $this->getResponse()->content->set([
-            'template' => '@adminMenuSide/modify.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminMenuSide/modify.twig',
+            [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
                 'allBreadcrumbs' => array_merge(
@@ -210,8 +208,8 @@ class Controller extends Base
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
                 'campusesSelected' => $campusesSelected
             ],
-            'title' => 'Admin - Side Menu'
-        ]);
+            'Admin - Side Menu'
+        );
     }
 
     /**
@@ -222,9 +220,9 @@ class Controller extends Base
      */
     public function getCreate()
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminMenuSide/modify.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminMenuSide/modify.twig',
+            [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
                 'allBreadcrumbs' => array_merge(
@@ -234,8 +232,8 @@ class Controller extends Base
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
-            'title' => 'Admin - Side Menu'
-        ]);
+            'Admin - Side Menu',
+        );
     }
 
     /**
@@ -321,19 +319,13 @@ class Controller extends Base
             $this->getMenuSideSectionMapper()->save($section);
 
             $this->getResponse()->status->setCode(200);
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data'   => [
-                    'result' => 'OK'
-                ],
+            $this->psr7Response = $this->responseAsJson([
+                'result' => 'OK'
             ]);
         } catch (MapperException $e) {
             $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data'   => [
-                    'result' => 'Error updating record'
-                ],
+            $this->psr7Response = $this->responseAsJson([
+                'result' => 'Error updating record'
             ]);
         }
     }

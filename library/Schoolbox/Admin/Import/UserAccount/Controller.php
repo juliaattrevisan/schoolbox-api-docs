@@ -77,13 +77,13 @@ class Controller extends Base
      */
     public function getUpload()
     {
-        $this->getResponse()->content->set([
-            'template' => "@{$this->basename}/upload.twig",
-            'data' => $this->getBaseData() + [
+        $this->psr7Response = $this->responseFromTemplate(
+            "@{$this->basename}/upload.twig",
+            $this->getBaseData() + [
                 'attachzone' => $this->getAttachzone()->getTwigContext(),
                 'uploadMissing' => $this->getSession()->getSegment(static::class)->getFlash('uploadMissing', false)
             ],
-        ]);
+        );
     }
 
 
@@ -125,15 +125,15 @@ class Controller extends Base
 
         $this->buildImporter($reader, $logger)->save();
 
-        $this->getResponse()->content->set([
-            'template' => "@{$this->basename}/preview.twig",
-            'data' => $this->getBaseData() + [
+        $this->psr7Response = $this->responseFromTemplate(
+            "@{$this->basename}/preview.twig",
+            $this->getBaseData() + [
                 'log' => [
                     'lines' => $this->parseLogLines($logger, true),
                 ],
                 'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
-        ]);
+        );
     }
 
 
@@ -157,14 +157,14 @@ class Controller extends Base
 
         $this->buildImporter($reader, $logger, true)->save();
 
-        $this->getResponse()->content->set([
-            'template' => "@{$this->basename}/import.twig",
-            'data' => $this->getBaseData() + [
+        $this->psr7Response = $this->responseFromTemplate(
+            "@{$this->basename}/import.twig",
+            $this->getBaseData() + [
                 'log' => [
                     'lines' => $this->parseLogLines($logger, false)
                 ],
             ],
-        ]);
+        );
     }
 
 

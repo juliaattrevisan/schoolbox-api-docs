@@ -97,18 +97,16 @@ class Controller extends Base
     public function getIndex(): void
     {
         // Render this thing out
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportFolder/index.twig',
             [
-                'template' => '@adminImportFolder/index.twig',
-                'data' => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
-                    'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportFolder')->getAllNodes(),
-                    'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
-                    'roles' => $this->roleMapper->findAll(),
-                    'attachzone' => $this->getAttachZone(),
-                ],
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
+                'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportFolder')->getAllNodes(),
+                'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
+                'roles' => $this->roleMapper->findAll(),
+                'attachzone' => $this->getAttachZone(),
+            ],
         );
     }
 
@@ -159,17 +157,15 @@ class Controller extends Base
         }
 
         // Render this thing out
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportFolder/importResults.twig',
             [
-                'template' => '@adminImportFolder/importResults.twig',
-                'data' => [
-                    'errorMessage'   => $csvFileFormatErrorMessage,
-                    'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
-                    'results'        => $allFolders,
-                    'perform'        => $performMode,
-                ],
-            ]
+                'errorMessage'   => $csvFileFormatErrorMessage,
+                'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
+                'results'        => $allFolders,
+                'perform'        => $performMode,
+            ],
         );
     }
 

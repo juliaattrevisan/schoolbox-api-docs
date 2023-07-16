@@ -96,10 +96,7 @@ class Controller extends Base
             $responseData['message'] = $tableData[$post['table']]['deleteFailMsg'];
         }
 
-        $this->getResponse()->content->set([
-            'data'   => $responseData,
-            'format' => 'json'
-        ]);
+        $this->psr7Response = $this->responseAsJson($responseData);
     }
 
     /**
@@ -1366,17 +1363,15 @@ class Controller extends Base
             );
         } else {
             // Render this thing out
-            $this->getResponse()->content->set(
+            $this->psr7Response = $this->responseFromTemplate(
+                '@adminLists/index.twig',
                 [
-                    'template' => '@adminLists/index.twig',
-                    'data'     => [
-                        'pageCurrent'    => $this->routeGenerator->generate('adminLists.getIndex') . "/{$table}",
-                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLists.getIndex') . "/{$table}"),
-                        'tables'         => $tables,
-                        'table'          => $table,
-                        'records'        => $records,
-                    ],
-                ]
+                    'pageCurrent'    => $this->routeGenerator->generate('adminLists.getIndex') . "/{$table}",
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLists.getIndex') . "/{$table}"),
+                    'tables'         => $tables,
+                    'table'          => $table,
+                    'records'        => $records,
+                ],
             );
         }
     }

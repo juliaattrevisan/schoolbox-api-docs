@@ -67,16 +67,14 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportPastoral/index.twig',
             [
-                'template' => '@adminImportPastoral/index.twig',
-                'data'     => [
-                    'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
-                    'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
-                    'allNavigation'   => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
-                    'externalEnabled' => $this->getConfigLoader()->get("external_pastoral"),
-                ],
-            ]
+                'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
+                'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
+                'allNavigation'   => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
+                'externalEnabled' => $this->getConfigLoader()->get("external_pastoral"),
+            ],
         );
     }
 
@@ -85,16 +83,16 @@ class Controller extends Base
      */
     public function getLog()
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminImportPastoral/log.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportPastoral/log.twig',
+            [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
                 'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
                 'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
                 'message'        => false,
             ],
-        ]);
+        );
     }
 
     /**
@@ -104,16 +102,16 @@ class Controller extends Base
      */
     public function getLogDetail($log)
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminImportPastoral/logDetail.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportPastoral/logDetail.twig',
+            [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
                 'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
                 'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                 'log'            => $log,
                 'message'        => false,
             ],
-        ]);
+        );
     }
 
     /**
@@ -140,16 +138,16 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords) {
             $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
         };
-        $this->getResponse()->content->set([
-            'template'   => '@adminImportPastoral/log.twig',
-            'data'       => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportPastoral/log.twig',
+            [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
                 'allBreadcrumbs'  => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPastoral.getIndex')),
                 'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
                 'message'        => true,
             ],
-        ]);
+        );
     }
 
     /**

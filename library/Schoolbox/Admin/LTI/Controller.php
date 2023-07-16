@@ -55,15 +55,12 @@ class Controller extends ConfigController
     public function getInsert()
     {
         // Render this thing out
-
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminLti/modify.twig',
             [
-                'template' => '@adminLti/modify.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
-                ],
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
+            ],
         );
     }
 
@@ -80,24 +77,22 @@ class Controller extends ConfigController
         );
 
         $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminLti/index.twig',
             [
-                'template' => '@adminLti/index.twig',
-                'data'     => [
-                    'pageCurrent'           => $this->routeGenerator->generate('adminLti.getIndex'),
-                    'allBreadcrumbs'        => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
-                    'providers'             => $this->providerMapper->findAll(),
-                    'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
-                    'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
-                    'providerTargetIframe'  => Provider::TARGET_IFRAME,
-                    'providerTargetWindow'  => Provider::TARGET_WINDOW,
-                    'configContext'         => $configContext,
-                    'issuer'                => (string)$baseUrl,
-                    'oidcAuthenticationUrl' => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getOidcAuthenticationRequest')),
-                    'oauthAccessTokenUrl'   => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getOauthAccessTokenRequest')),
-                    'jsonWebKeySetUrl'      => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getJsonWebKeySet')),
-                ],
-            ]
+                'pageCurrent'           => $this->routeGenerator->generate('adminLti.getIndex'),
+                'allBreadcrumbs'        => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
+                'providers'             => $this->providerMapper->findAll(),
+                'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
+                'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
+                'providerTargetIframe'  => Provider::TARGET_IFRAME,
+                'providerTargetWindow'  => Provider::TARGET_WINDOW,
+                'configContext'         => $configContext,
+                'issuer'                => (string)$baseUrl,
+                'oidcAuthenticationUrl' => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getOidcAuthenticationRequest')),
+                'oauthAccessTokenUrl'   => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getOauthAccessTokenRequest')),
+                'jsonWebKeySetUrl'      => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getJsonWebKeySet')),
+            ],
         );
     }
 
@@ -110,15 +105,13 @@ class Controller extends ConfigController
     public function getModify(Provider $provider): void
     {
         // Render this thing out
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminLti/modify.twig',
             [
-                'template' => '@adminLti/modify.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
-                    'provider'       => $provider,
-                ],
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
+                'provider'       => $provider,
+            ],
         );
     }
 

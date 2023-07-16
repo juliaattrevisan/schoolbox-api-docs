@@ -185,9 +185,9 @@ class Controller extends Base
             ]
         ]);
 
-        $this->getResponse()->content->set([
-            'template' => '@adminImportPhotos/index.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminImportPhotos/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportPhotos.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPhotos.getIndex')),
                 'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPhotos')->getAllNodes(),
@@ -195,6 +195,6 @@ class Controller extends Base
                 'users' => $users,
                 'surname' => $surname
             ],
-        ]);
+        );
     }
 }

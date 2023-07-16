@@ -167,9 +167,6 @@ class Controller extends UserAccount\Controller
         $headers->set('Content-Length', strlen($contents));
         $headers->set('Content-Disposition', "attachment; filename=\"timetable.csv\"");
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $contents,
-        ]);
+        $this->psr7Response = $this->responseFromContent($contents);
     }
 }
