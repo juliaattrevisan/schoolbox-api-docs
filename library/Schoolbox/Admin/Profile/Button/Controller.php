@@ -112,9 +112,9 @@ class Controller extends Base
             $campusVisibilitySelected[$button->getId()] = array_fill_keys($campusVisibilitySelections->indexBy('campusId')->keys(), true);
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@adminProfileButton/index.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminProfileButton/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
                 'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
@@ -126,8 +126,8 @@ class Controller extends Base
                 'roleVisibilitySelected' => $roleVisibilitySelected,
                 'campusVisibilitySelected' => $campusVisibilitySelected
             ],
-            'title' => 'Admin - Profile Buttons'
-        ]);
+            'Admin - Profile Buttons'
+        );
     }
 
 
@@ -158,9 +158,9 @@ class Controller extends Base
         $campusVisibilitySelections = $this->campusVisibilityMapper->findByColumn('profile_button_id', $id);
         $campusVisibilitySelected = array_fill_keys($campusVisibilitySelections->indexBy('campusId')->keys(), true);
 
-        $this->getResponse()->content->set([
-            'template' => '@adminProfileButton/modify.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminProfileButton/modify.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
@@ -176,8 +176,8 @@ class Controller extends Base
                 'roleVisibilitySelected' => $roleVisibilitySelected,
                 'campusVisibilitySelected' => $campusVisibilitySelected,
             ],
-            'title' => 'Admin - Modify Profile Button'
-        ]);
+            'Admin - Modify Profile Button'
+        );
     }
 
     /**
@@ -189,9 +189,9 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminProfileButton/modify.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminProfileButton/modify.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
@@ -201,8 +201,8 @@ class Controller extends Base
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')
             ],
-            'title' => 'Admin - Create Profile Button'
-        ]);
+            'Admin - Create Profile Button'
+        );
     }
 
     /**

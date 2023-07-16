@@ -214,9 +214,7 @@ class Controller extends ConfigController
         if ($rebuildModules) {
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
-            $this->getResponse()->content->set([
-                'format' => 'noContent',
-            ]);
+            $this->psr7Response = $this->responseEmpty();
         }
 
         $route = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));

@@ -105,22 +105,20 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminUserBulkModify/bulkModify.twig',
             [
-                'template' => '@adminUserBulkModify/bulkModify.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminUserBulkModify.getModify'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                        $this->routeGenerator->generate('adminUserBulkModify.getModify'),
-                        'Bulk Modify'
-                    ),
-                    'campuses'       => $campuses,
-                    'roles'          => $roles,
-                    'yearLevels'     => $yearLevels,
-                    'houses'         => $houses,
-                ],
-                'title'    => 'Admin - User Management',
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminUserBulkModify.getModify'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
+                    $this->routeGenerator->generate('adminUserBulkModify.getModify'),
+                    'Bulk Modify'
+                ),
+                'campuses'       => $campuses,
+                'roles'          => $roles,
+                'yearLevels'     => $yearLevels,
+                'houses'         => $houses,
+            ],
+            'Admin - User Management',
         );
     }
 

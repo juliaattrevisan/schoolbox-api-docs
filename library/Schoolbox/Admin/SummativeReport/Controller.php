@@ -167,14 +167,14 @@ class Controller extends ConfigController
             ]
         ]);
 
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/list.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminSummativeReport/list.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'reports' => $reports
             ]
-        ]);
+        );
     }
 
 
@@ -198,9 +198,9 @@ class Controller extends ConfigController
 
         $report = $this->reportMapper->createModel();
         $report->setFileName(Model::DEFAULT_FILENAME);
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/create.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminSummativeReport/create.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'report' => $report,
@@ -208,7 +208,7 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext()
             ]
-        ]);
+        );
     }
 
 
@@ -258,9 +258,9 @@ class Controller extends ConfigController
             $logoZone->attachFiles([$report->getLogo()]);
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/create.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminSummativeReport/create.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
@@ -271,7 +271,7 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext()
             ]
-        ]);
+        );
     }
 
 
@@ -735,9 +735,9 @@ class Controller extends ConfigController
             throw new NotFound();
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/result.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminSummativeReport/result.twig',
+            [
                 'pageCurrent'    => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
                     $this->routeGenerator->generate('adminSummativeReport.getList')
@@ -745,7 +745,7 @@ class Controller extends ConfigController
                 'reportCount'    => $statusPayload['numReports'],
                 'warnings'       => $statusPayload['warnings'],
             ]
-        ]);
+        );
     }
 
 

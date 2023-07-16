@@ -41,16 +41,16 @@ class Controller extends Base
 
         $queueItems = $this->getVideoQueueMapper()->findByStatus($statuses, ['order' => ['createdOn' => 'desc']]);
 
-        $this->getResponse()->content->set([
-            'template' => '@adminVideo/index.twig',
-            'data' => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@adminVideo/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminVideo.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminVideo.getIndex')),
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],
-            'title' => 'Admin - Video Queue'
-        ]);
+            'Admin - Video Queue'
+        );
     }
 
     /**
@@ -99,12 +99,7 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $data
-            )
-        );
+        $this->psr7Response = $this->responseAsJson($data);
     }
 
     /** Here be mappers and stuff */
