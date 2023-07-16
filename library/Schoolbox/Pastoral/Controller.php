@@ -136,18 +136,16 @@ class Controller extends Base
             }
         );
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoral/index.twig',
             [
-                'template' => '@pastoral/index.twig',
-                'data'     => [
-                    'user'             => $user,
-                    'recentStudents'   => $this->pastoralAuditMapper->findRecentlyViewedStudentsForUser($user),
-                    'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($user),
-                    'reportsDashboard' => $this->pastoralReportMapper->findForUser($user, dashboardOnly: true),
-                    'groups'           => $groupsMemberships,
-                ],
-                'title'    => 'Dashboard',
-            ]
+                'user'             => $user,
+                'recentStudents'   => $this->pastoralAuditMapper->findRecentlyViewedStudentsForUser($user),
+                'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($user),
+                'reportsDashboard' => $this->pastoralReportMapper->findForUser($user, dashboardOnly: true),
+                'groups'           => $groupsMemberships,
+            ],
+            'Dashboard',
         );
     }
 
@@ -160,17 +158,15 @@ class Controller extends Base
     {
         $get = $this->requestQuery;
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoral/search.twig',
             [
-                'template' => '@pastoral/search.twig',
-                'data'     => [
-                    'search'              => trim($get['keyword']),
-                    'results'             => $this->pastoralDataSource->getSearchResults($this->getUser(), $get['keyword']),
-                    'students'            => $this->userMapper->findStudents($get['keyword']),
-                    'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
-                ],
-                'title'    => 'Search',
-            ]
+                'search'              => trim($get['keyword']),
+                'results'             => $this->pastoralDataSource->getSearchResults($this->getUser(), $get['keyword']),
+                'students'            => $this->userMapper->findStudents($get['keyword']),
+                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+            ],
+            'Search',
         );
     }
 
@@ -258,28 +254,26 @@ class Controller extends Base
         );
         $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student, $pastoralCountHelper->getStartDate($pastoralCountHelper::COUNT_PERIOD_12MONTHS));
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoral/student.twig',
             [
-                'template' => '@pastoral/student.twig',
-                'data'     => [
-                    'user'                => $user,
-                    'recordCount'         => $recordCount,
-                    'records'             => $pageRecords,
-                    'student'             => $student,
-                    'pageCurrent'         => $pageCurrent,
-                    'types'               => $this->pastoralTypeMapper->findAll(),
-                    'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
-                    'countSummaryByMonth' => [
-                        'recordCount' => count($countSummaryByMonth),
-                        'series'      => $pastoralCountHelper->buildMonthlyBarChart($countSummaryByMonth),
-                    ],
-                    'typeSelected'        => $typeId,
-                    'subtypeSelected'     => $subtypeId,
-                    'resultsPerPage'      => $resultsPerPage,
-                    'pagesToDisplay'      => $maxPage,
+                'user'                => $user,
+                'recordCount'         => $recordCount,
+                'records'             => $pageRecords,
+                'student'             => $student,
+                'pageCurrent'         => $pageCurrent,
+                'types'               => $this->pastoralTypeMapper->findAll(),
+                'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
+                'countSummaryByMonth' => [
+                    'recordCount' => count($countSummaryByMonth),
+                    'series'      => $pastoralCountHelper->buildMonthlyBarChart($countSummaryByMonth),
                 ],
-                'title'    => $student->getFullName(),
-            ]
+                'typeSelected'        => $typeId,
+                'subtypeSelected'     => $subtypeId,
+                'resultsPerPage'      => $resultsPerPage,
+                'pagesToDisplay'      => $maxPage,
+            ],
+            $student->getFullName(),
         );
     }
 
@@ -339,27 +333,25 @@ class Controller extends Base
         // populate related records
         $pageRecords = $this->pastoralDataSource->findRecords($this->getUser(), $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, $linkedStudent->getId());
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoral/student_linked.twig',
             [
-                'template' => '@pastoral/student_linked.twig',
-                'data'     => [
-                    'user'                => $this->getUser(),
-                    'recordCount'         => $recordCount,
-                    'records'             => $pageRecords,
-                    'student'             => $student,
-                    'linkedStudent'       => $linkedStudent,
-                    'pageCurrent'         => $pageCurrent,
-                    'types'               => $this->pastoralTypeMapper->findAll(),
-                    'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
-                    'linkedStudents'      => $linkedCounts,
-                    'typeSelected'        => $typeId,
-                    'subtypeSelected'     => $subtypeId,
-                    'resultsPerPage'      => $resultsPerPage,
-                    'pagesToDisplay'      => $maxPage,
-                    'countSummaryByMonth' => ['recordCount' => 0],
-                ],
-                'title'    => 'Linked Records',
-            ]
+                'user'                => $this->getUser(),
+                'recordCount'         => $recordCount,
+                'records'             => $pageRecords,
+                'student'             => $student,
+                'linkedStudent'       => $linkedStudent,
+                'pageCurrent'         => $pageCurrent,
+                'types'               => $this->pastoralTypeMapper->findAll(),
+                'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
+                'linkedStudents'      => $linkedCounts,
+                'typeSelected'        => $typeId,
+                'subtypeSelected'     => $subtypeId,
+                'resultsPerPage'      => $resultsPerPage,
+                'pagesToDisplay'      => $maxPage,
+                'countSummaryByMonth' => ['recordCount' => 0],
+            ],
+            'Linked Records',
         );
     }
 
@@ -425,24 +417,22 @@ class Controller extends Base
 
         // Lets render this thing
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoral/record.twig',
             [
-                'template' => '@pastoral/record.twig',
-                'data'     => [
-                    'record'             => $record,
-                    'attachmentsPublic'  => $attachmentsPublic,
-                    'attachmentsPrivate' => $attachmentsPrivate,
-                    'commentsPublic'     => $commentsPublic->map($this->pastoralCommentTranslator)->reindex(),
-                    'commentsPrivate'    => $commentsPrivate->map($this->pastoralCommentTranslator)->reindex(),
-                    'moderator'          => $moderator,
-                    'user'               => $this->getUser(),
-                    'showSeverity'       => $showSeverity,
-                    'severityColor'      => $severityForegroundColor,
-                    'access'             => $access,
-                    'linkedStudents'     => [],
-                ],
-                'title'    => $record->getHeading(),
-            ]
+                'record'             => $record,
+                'attachmentsPublic'  => $attachmentsPublic,
+                'attachmentsPrivate' => $attachmentsPrivate,
+                'commentsPublic'     => $commentsPublic->map($this->pastoralCommentTranslator)->reindex(),
+                'commentsPrivate'    => $commentsPrivate->map($this->pastoralCommentTranslator)->reindex(),
+                'moderator'          => $moderator,
+                'user'               => $this->getUser(),
+                'showSeverity'       => $showSeverity,
+                'severityColor'      => $severityForegroundColor,
+                'access'             => $access,
+                'linkedStudents'     => [],
+            ],
+            $record->getHeading(),
         );
     }
 
@@ -611,38 +601,36 @@ class Controller extends Base
 
         // Render this thing out
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoral/modify.twig',
             [
-                'template' => '@pastoral/modify.twig',
-                'data'     => [
-                    'record'            => $record,
-                    'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
-                    'allowIndividual'   => $this->config->get('pastoral_individual_access'),
-                    'allowParents'      => $allowParents,
-                    'allowStudents'     => $allowStudents,
-                    'types'             => $types,
-                    'typesIndexPrivate' => $typesIndexPrivate,
-                    'typesIndex'        => $typesIndex,
-                    'subTypes'          => $subtypes,
-                    'subtypesIndexPrivate'  => $subtypesIndexPrivate,
-                    'subtypesIndex'     => $subtypesIndex,
-                    'severities'        => $severities,
-                    'roles'             => $roles,
-                    'roleTypes'         => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
-                    'roleUserCounts'    => $roleUserCounts,
-                    'rolesWithUsers'    => $rolesWithUsers,
-                    'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
-                    'moderator'         => $moderator,
-                    'moderatorIds'      => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
-                    'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
-                    'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
-                    'audiences'         => $audienceDefaults,
-                    'students'          => json_encode($students),
-                    'returnUrlName'     => Redirect::RETURN_URL,
-                    'encodedReturnUrl'  => $this->requestQuery->get(Redirect::RETURN_URL),
-                ],
-                'title'    => 'Pastoral Record',
-            ]
+                'record'            => $record,
+                'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
+                'allowIndividual'   => $this->config->get('pastoral_individual_access'),
+                'allowParents'      => $allowParents,
+                'allowStudents'     => $allowStudents,
+                'types'             => $types,
+                'typesIndexPrivate' => $typesIndexPrivate,
+                'typesIndex'        => $typesIndex,
+                'subTypes'          => $subtypes,
+                'subtypesIndexPrivate'  => $subtypesIndexPrivate,
+                'subtypesIndex'     => $subtypesIndex,
+                'severities'        => $severities,
+                'roles'             => $roles,
+                'roleTypes'         => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
+                'roleUserCounts'    => $roleUserCounts,
+                'rolesWithUsers'    => $rolesWithUsers,
+                'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
+                'moderator'         => $moderator,
+                'moderatorIds'      => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
+                'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
+                'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
+                'audiences'         => $audienceDefaults,
+                'students'          => json_encode($students),
+                'returnUrlName'     => Redirect::RETURN_URL,
+                'encodedReturnUrl'  => $this->requestQuery->get(Redirect::RETURN_URL),
+            ],
+            'Pastoral Record',
         );
     }
 

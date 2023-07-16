@@ -183,13 +183,10 @@ class Controller extends Base
             );
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => [
-                'result'       => 'OK',
-                'providerName' => $provider->getName(),
-                'url'          => $post['url'] ?? null,
-            ],
+        $this->psr7Response = $this->responseAsJson([
+            'result'       => 'OK',
+            'providerName' => $provider->getName(),
+            'url'          => $post['url'] ?? null,
         ]);
     }
 
@@ -340,10 +337,9 @@ class Controller extends Base
             'folderId'    => $component->getContext()->getId(),
         ]);
 
-        $this->getResponse()->content->set([
-            'template' => '@ltiConsumer/redirect.twig',
-            'format'   => 'nochrome',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@ltiConsumer/redirect.twig',
+            [
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
                 'embedUrl'       => $embedUrl,
@@ -351,7 +347,7 @@ class Controller extends Base
                 'height'         => $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
-        ]);
+        );
     }
 
     /**
@@ -371,13 +367,12 @@ class Controller extends Base
          * so return a generic error template instead
          */
         if ($provider->isDeleted()) {
-            $this->getResponse()->content->set([
-                'template' => '@ltiConsumer/unavailable.twig',
-                'format'   => 'nochrome',
-                'data'     => [
+            $this->psr7Response = $this->responseFromTemplateUnthemed(
+                '@ltiConsumer/unavailable.twig',
+                [
                     'provider'  => $provider,
                 ],
-            ]);
+            );
 
             return;
         }
@@ -535,16 +530,15 @@ class Controller extends Base
 
         // Render form that will automatically submit LTI request
 
-        $this->getResponse()->content->set([
-            'template' => '@ltiConsumer/form.twig',
-            'format'   => 'nochrome',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@ltiConsumer/form.twig',
+            [
                 'params'    => $launch_data,
                 'provider'  => $provider,
                 'signature' => $signature,
                 'embedUrl'  => $embedUrl,
             ],
-        ]);
+        );
     }
 
     /**
@@ -626,10 +620,9 @@ class Controller extends Base
         // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
         // javascript inside this template updates these in the DOM.
 
-        $this->getResponse()->content->set([
-            'template' => '@ltiConsumer/redirect.twig',
-            'format'   => 'nochrome',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplateUnthemed(
+            '@ltiConsumer/redirect.twig',
+            [
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
                 'embedUrl'       => $embedUrl,
@@ -637,7 +630,7 @@ class Controller extends Base
                 'height'         => $height,
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
-        ]);
+        );
 
         return;
     }

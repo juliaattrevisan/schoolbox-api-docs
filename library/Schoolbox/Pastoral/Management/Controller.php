@@ -67,14 +67,12 @@ class Controller extends Base
             }
         );
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoralManagement/groups.twig',
             [
-                'template' => '@pastoralManagement/groups.twig',
-                'data'     => [
-                    'groups' => $groups,
-                ],
-                'title'    => 'Pastoral Group Management',
-            ]
+                'groups' => $groups,
+            ],
+            'Pastoral Group Management',
         );
     }
 
@@ -94,18 +92,16 @@ class Controller extends Base
             ]
         );
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoralManagement/groups_modify.twig',
             [
-                'template' => '@pastoralManagement/groups_modify.twig',
-                'data'     => [
-                    'group'               => $group,
-                    'roleTypes'           => null,
-                    'roles'               => $roles,
-                    'moderatorIds'        => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
-                    'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
-                ],
-                'title'    => 'Update Pastoral Group',
-            ]
+                'group'               => $group,
+                'roleTypes'           => null,
+                'roles'               => $roles,
+                'moderatorIds'        => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
+                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+            ],
+            'Update Pastoral Group',
         );
     }
 

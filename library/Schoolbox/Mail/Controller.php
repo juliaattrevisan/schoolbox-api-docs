@@ -188,24 +188,22 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@mail/send.twig',
             [
-                'template' => '@mail/send.twig',
-                'data'     => [
-                    'invalidEmails' => $invalidEmails,
-                    'subject'       => $params->get('subject'),
-                    'body'          => $emailBody,
-                    'replyTo'       => json_encode(array_values($addressLists['replyto'])),
-                    'cc'            => json_encode(array_values($addressLists['cc'])),
-                    'bcc'           => json_encode(array_values($addressLists['bcc'])),
-                    'attachzone'    => $zone->getTwigContext(),
-                    'baseHref'      => $uri,
-                    'folder'        => $folder,
-                    'student'       => $student,
-                    'title'         => $params->get('title'),
-                ],
-                'title'    => 'Webmail',
-            ]
+                'invalidEmails' => $invalidEmails,
+                'subject'       => $params->get('subject'),
+                'body'          => $emailBody,
+                'replyTo'       => json_encode(array_values($addressLists['replyto'])),
+                'cc'            => json_encode(array_values($addressLists['cc'])),
+                'bcc'           => json_encode(array_values($addressLists['bcc'])),
+                'attachzone'    => $zone->getTwigContext(),
+                'baseHref'      => $uri,
+                'folder'        => $folder,
+                'student'       => $student,
+                'title'         => $params->get('title'),
+            ],
+            'Webmail',
         );
     }
 

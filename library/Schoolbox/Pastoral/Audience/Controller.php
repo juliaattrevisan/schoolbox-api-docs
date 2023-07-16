@@ -108,11 +108,11 @@ class Controller extends Base
          * not configured the Pastoral Module sufficiently
          * Empty State
          */
-        $this->getResponse()->content->set([
-            'template' => '@pastoralAudience/audiences.twig',
-            'data' => [],
-            'title' => 'Pastoral Group Management',
-        ]);
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoralAudience/audiences.twig',
+            [],
+            'Pastoral Group Management',
+        );
     }
 
 
@@ -206,9 +206,9 @@ class Controller extends Base
         $transformer     = new ColorHelper();
         $backgroundColor = ($foregroundColor === null ? null : $transformer->calculateBackground($foregroundColor));
 
-        $this->getResponse()->content->set([
-            'template' => '@pastoralAudience/audiences_modify.twig',
-            'data'     => [
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoralAudience/audiences_modify.twig',
+            [
                 'flyout'          => $flyout->generateVars($url),
                 'breadcrumbs'     => $flyout->generateBreadcrumbs($url),
                 'record'          => $record,
@@ -233,8 +233,8 @@ class Controller extends Base
                     'baseDark'   => ColorHelper::BASE_BACKGROUND_COLOR_DARK,
                 ],
             ],
-            'title'    => 'Pastoral Group Management',
-        ]);
+            'Pastoral Group Management',
+        );
     }
 
 

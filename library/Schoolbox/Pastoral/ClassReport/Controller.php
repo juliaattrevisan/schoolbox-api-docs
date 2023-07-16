@@ -59,15 +59,13 @@ class Controller extends Base
             $this->getUser(),
             $this->requestQuery->getArrayCopy(),
         );
-        $this->getResponse()->content->set(
+        $this->psr7Response = $this->responseFromTemplate(
+            '@pastoralClassReportModule/index.twig',
             [
-                'template' => '@pastoralClassReportModule/index.twig',
-                'data'     => [
-                    'folder'      => $folder,
-                    'pageTitle'   => $folder->getTitle(),
-                    'filterPanel' => $filterPanel,
-                ],
-            ]
+                'folder'      => $folder,
+                'pageTitle'   => $folder->getTitle(),
+                'filterPanel' => $filterPanel,
+            ],
         );
     }
 
