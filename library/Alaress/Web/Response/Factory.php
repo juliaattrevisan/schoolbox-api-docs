@@ -167,9 +167,12 @@ class Factory
      * Build a response from the content of a data stream, each line of which is
      * then rendered via Twig.
      *
+     * @see TwigCallbackStream::__construct for further parameter documentation.
+     *
      * @param string      $template
      * @param Closure     $dataCallback
      * @param array       $dataCallbackArguments
+     * @param User        $currentUser
      * @param string|null $headerTemplate
      * @param string|null $footerTemplate
      * @param array       $headerFooterData
@@ -179,10 +182,12 @@ class Factory
         string $template,
         Closure $dataCallback,
         array $dataCallbackArguments,
-        ?string $headerTemplate = null,
-        ?string $footerTemplate = null,
-        array $headerFooterData = [],
-    ) {
+        User $currentUser,
+        ?string $headerTemplate,
+        ?string $footerTemplate,
+        array $headerFooterData,
+    ): ResponseInterface {
+        $this->injectCurrentUserGlobal($currentUser);
         return $this->buildFromStream(
             new TwigCallbackStream(
                 $this->twig,

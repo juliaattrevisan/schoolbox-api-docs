@@ -292,11 +292,10 @@ class Controller extends Base
                     $data['useInlineCSS'] = true;
                 }
 
-                $this->getResponse()->content->set([
-                    'template' => $template,
-                    'format'   => $format,
-                    'data'     => $data
-                ]);
+                $this->psr7Response = $format === 'nochrome'
+                    ? $this->responseFromTemplateUnthemed($template, $data)
+                    : $this->responseFromTemplate($template, $data)
+                ;
             }
         } catch (Mapper\Exception $e) {
             // 404 on the log - we have no aura way of doing this!! :(

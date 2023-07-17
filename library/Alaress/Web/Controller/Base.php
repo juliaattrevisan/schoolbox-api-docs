@@ -615,12 +615,15 @@ abstract class Base
     /**
      * Shortcut method for building a HTML response from streamed data.
      *
-     * @param string $template
-     * @param Closure $dataCallback
-     * @param array $dataCallbackArguments
+     * @see \Alaress\Web\Response\TwigCallbackStream::__construct for further
+     * parameter documentation.
+     *
+     * @param string      $template
+     * @param Closure     $dataCallback
+     * @param array       $dataCallbackArguments
      * @param string|null $headerTemplate
      * @param string|null $footerTemplate
-     * @param array $headerFooterData
+     * @param array       $headerFooterData
      * @return ResponseInterface
      */
     protected function responseFromTemplateStreamedData(
@@ -635,6 +638,7 @@ abstract class Base
             $template,
             $dataCallback,
             $dataCallbackArguments,
+            $this->user,
             $headerTemplate,
             $footerTemplate,
             $headerFooterData,
