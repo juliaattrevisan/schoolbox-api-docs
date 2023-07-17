@@ -372,7 +372,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $args['outputStackTrace'] = $config->get('debug_show_stack_trace');
 
                 /** @var ServerRequestInterface $request */
-                $request = $di->get('request');
+                $request = $di->get('httpRequest');
                 if ((new IsJson())->isSatisfiedBy($request)) {
                     $problem = (new ApiProblem($message))
                         ->setStatus($code)

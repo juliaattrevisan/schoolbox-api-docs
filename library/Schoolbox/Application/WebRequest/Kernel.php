@@ -104,7 +104,7 @@ class Kernel extends WebKernelAbstract
     {
         // First get the request object
         /** @var ServerRequestInterface $request */
-        $request = $this->di->get('request');
+        $request = $this->di->get('httpRequest');
 
         // Run router with requested path (trim trailing /)
         $server  = $request->getServerParams();

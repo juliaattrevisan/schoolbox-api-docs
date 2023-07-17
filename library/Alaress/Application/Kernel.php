@@ -658,9 +658,9 @@ abstract class Kernel
         // Web request/response factory
         $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
 
-        // New PSR-7 compliant request object
+        // Incoming HTTP request, conforming to PSR-7 ServerRequestInterface.
         $di->set(
-            'request',
+            'httpRequest',
             $di->lazy(
                 function () use ($di) {
                     // This will be a ServerRequestInterface,
@@ -684,9 +684,11 @@ abstract class Kernel
             ),
         );
 
-        // Response factory
+        // HTTP response factory, conforming to PSR-17 ResponseFactoryInterface
+        // and also providing helpers for generating responses specific to
+        // Schoolbox's uses cases.
         $di->set(
-            'responseFactory',
+            'httpResponseFactory',
             $di->lazy(
                 function () use ($di, $mapperFactory) {
                     // Copypasted data generators from elsewhere
