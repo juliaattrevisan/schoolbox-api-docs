@@ -69,6 +69,7 @@ const hasDraftFeedback = window.Vue.computed(() =>
 );
 // is the user excluded from the assessment
 const isExcluded = window.Vue.ref(false);
+const isParticipant = window.Vue.ref(false);
 const isActivityEmpty = window.Vue.computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length === 1);
 const routes: Ref<Routes> = window.Vue.ref({
@@ -114,6 +115,9 @@ const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
 const viewAllText = window.Vue.computed(() => {
     if ("Task" === assessmentType.value || "Project" === assessmentType.value) {
         return "";
+    }
+    if (!isParticipant.value) {
+        return "The student is no longer a participant in the class.";
     }
     if (isExcluded.value) {
         return "The student has been excluded. You may include this student in this activity";
@@ -258,7 +262,8 @@ async function onPopOutSelected(event: CustomEvent) {
         routes.value = updateRoutes(event.detail.routes as Routes);
         isSelected.value = true;
         isExpanded.value = false;
-        isExcluded.value = "true" === event.detail.isExcluded; //make bool from string issues....
+        isExcluded.value = event.detail.isExcluded;
+        isParticipant.value = event.detail.isParticipant;
         assessmentType.value = event.detail.assessmentType;
         referenceElement.value = event.detail.target;
         if ("Task" === assessmentType.value || "Project" === assessmentType.value) {
@@ -495,14 +500,14 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
                     </pop-out-menu-item>
                 </template>
                 <pop-out-menu-item
-                    v-if="isExcluded"
+                    v-if="isExcluded && isParticipant"
                     :class="{ 'is-disabled': !isExcluded }"
                     @selected="onMenuItemSelected(routes.includeRoute, 'exclude')"
                 >
                     Include Student
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    v-else-if="'Project' !== assessmentType"
+                    v-if="!isExcluded && 'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
                     @selected="excludeCheck()"
                 >
