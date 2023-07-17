@@ -5,9 +5,11 @@
  */
 
 import { useResultsStore } from "./store/spResultsStore";
+import { useQueryStore } from "../store/spQueryStore";
 import { useSearchStore } from "../store/spSearchStore";
 
 const resultsStore = useResultsStore();
+const queryStore = useQueryStore();
 const searchStore = useSearchStore();
 
 /**
@@ -24,7 +26,7 @@ const showHeader = window.Vue.computed(() => {
  */
 const title = window.Vue.computed(() => {
     const showing = resultsStore.hasResults ? "Showing" : "No";
-    return `${showing} results for <strong>${searchStore.activeQuery}</strong>`;
+    return `${showing} results for <strong>${queryStore.activeQuery}</strong>`;
 });
 </script>
 
