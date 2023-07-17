@@ -4,6 +4,7 @@
  *  pulling in all our CSS,
  *  MSW (https://storybook.js.org/addons/msw-storybook-addon) to be able to load dummy data into stories
  *  v-tables-3-select-rows so we can use it in stories
+ *  adding window.Vue references as we load Vue globally in our vendors.js file in Schoobox browser context
  */
 
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
@@ -12,6 +13,14 @@ import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to 
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
+window.Vue = {};
+window.Vue.ref = ref;
+window.Vue.computed = computed;
+window.Vue.watch = watch;
+window.Vue.onMounted = onMounted;
+window.Vue.onUnmounted = onUnmounted;
+window.Vue.nextTick = nextTick;
 
 initialize({
     // Initialize MSW
