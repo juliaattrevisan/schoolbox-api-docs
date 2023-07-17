@@ -21,7 +21,6 @@ use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -180,20 +179,20 @@ class Module extends BaseModule
      */
 
     /**
-     * @return Mapper|UserMapper
+     * @return UserMapper
      * @throws \InvalidArgumentException
      */
-    protected function getUserMapper()
+    protected function getUserMapper(): UserMapper
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
 
     /**
-     * @return QuizMapper|Mapper
+     * @return QuizMapper
      * @throws \InvalidArgumentException
      */
-    protected function getQuizMapper()
+    protected function getQuizMapper(): QuizMapper
     {
         return $this->getMapperFactory()->get(QuizMapper::class);
     }
@@ -219,70 +218,70 @@ class Module extends BaseModule
 
 
     /**
-     * @return CourseImplementationMapper|Mapper
+     * @return CourseImplementationMapper
      * @throws \InvalidArgumentException
      */
-    protected function getCourseImplementationMapper(): CourseImplementationMapper|Mapper
+    protected function getCourseImplementationMapper(): CourseImplementationMapper
     {
         return $this->getMapperFactory()->get(CourseImplementationMapper::class);
     }
 
 
     /**
-     * @return UnitImplementation\Mapper|Mapper
+     * @return UnitImplementation\Mapper
      * @throws \InvalidArgumentException
      */
-    protected function getUnitImplementationMapper()
+    protected function getUnitImplementationMapper(): UnitImplementation\Mapper
     {
         return $this->getMapperFactory()->get(UnitImplementation\Mapper::class);
     }
 
 
     /**
-     * @return UnitSpecification\Mapper|Mapper
+     * @return UnitSpecification\Mapper
      * @throws \InvalidArgumentException
      */
-    protected function getUnitSpecificationMapper()
+    protected function getUnitSpecificationMapper(): UnitSpecification\Mapper
     {
         return $this->getMapperFactory()->get(UnitSpecification\Mapper::class);
     }
 
 
     /**
-     * @return StudentSubmissionMapper|Mapper
+     * @return StudentSubmissionMapper
      * @throws \InvalidArgumentException
      */
-    protected function getStudentSubmissionMapper()
+    protected function getStudentSubmissionMapper(): StudentSubmissionMapper
     {
         return $this->getMapperFactory()->get(StudentSubmissionMapper::class);
     }
 
 
     /**
-     * @return SubmissionReturnMapper|Mapper
+     * @return SubmissionReturnMapper
      * @throws \InvalidArgumentException
      */
-    protected function getSubmissionReturnMapper()
+    protected function getSubmissionReturnMapper(): SubmissionReturnMapper
     {
         return $this->getMapperFactory()->get(SubmissionReturnMapper::class);
     }
 
 
     /**
-     * @return Mapper|StorageMapper
+     * @return StorageMapper
      * @throws \InvalidArgumentException
      */
-    protected function getStorageMapper()
+    protected function getStorageMapper(): StorageMapper
     {
         return $this->getMapperFactory()->get(StorageMapper::class);
     }
 
 
     /**
-     * @return Mapper|FolderMapper
+     * @return FolderMapper
      * @throws \InvalidArgumentException
      */
-    protected function getFolderMapper()
+    protected function getFolderMapper(): FolderMapper
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
     }
