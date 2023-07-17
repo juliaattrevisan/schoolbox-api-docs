@@ -1,5 +1,5 @@
 /**
- * HTML canvas util methods to ge the object, size and clear once used.
+ * HTML canvas util methods to get the object, size and clear once used.
  */
 
 /**

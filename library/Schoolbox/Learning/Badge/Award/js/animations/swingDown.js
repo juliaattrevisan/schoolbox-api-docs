@@ -4,7 +4,8 @@
 
 import { gsap, Physics2DPlugin } from "gsap/all";
 import Star from "./Star";
-import { getCanvasDimensions, getContext, getStarCount } from "@js/util/canvasUtils";
+import { getCanvasDimensions, getContext } from "@js/util/canvasUtils";
+import { getStarCount } from "../animateBadgeImage";
 
 gsap.registerPlugin(Physics2DPlugin);
 
