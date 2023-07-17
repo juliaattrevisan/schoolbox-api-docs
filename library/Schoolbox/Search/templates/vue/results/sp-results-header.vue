@@ -4,7 +4,6 @@
  * or there's no results to be found
  */
 
-import { computed } from "vue";
 import { useResultsStore } from "./store/spResultsStore";
 import { useSearchStore } from "../store/spSearchStore";
 
@@ -15,7 +14,7 @@ const searchStore = useSearchStore();
  * We should only show the header if we have searched, the search has completed and there's no error
  * @returns {boolean}
  */
-const showHeader = computed(() => {
+const showHeader = window.Vue.computed(() => {
     return !searchStore.hasNotSearched && !searchStore.isSearching && !searchStore.hasLoadError;
 });
 
@@ -23,7 +22,7 @@ const showHeader = computed(() => {
  * To show that no results match the current search
  * @returns {boolean}
  */
-const title = computed(() => {
+const title = window.Vue.computed(() => {
     const showing = resultsStore.hasResults ? "Showing" : "No";
     return `${showing} results for <strong>${searchStore.activeQuery}</strong>`;
 });

@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
 import { useStore } from "./searchPageStore";
 import { useResultsStore } from "../results/store/spResultsStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
@@ -11,25 +10,25 @@ import { useFiltersStore } from "../filters/store/spFiltersStore";
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 
 export const useSearchStore = defineStore("spSearch", () => {
-    const hasNotSearched = ref(true); // to determine whether any searches have been made
-    const isSearching = ref(false); // to notify that search results
-    const hasLoadError = ref(false); // to notify of a search error
-    const query = ref("biology"); // current search input
-    const activeQuery = ref(""); // the latest query that was searched
-    const hasSearchedWithActiveFilters = ref(false); // to determine whether the latest search has been made with filters
+    const hasNotSearched = window.Vue.ref(true); // to determine whether any searches have been made
+    const isSearching = window.Vue.ref(false); // to notify that search results
+    const hasLoadError = window.Vue.ref(false); // to notify of a search error
+    const query = window.Vue.ref("biology"); // current search input
+    const activeQuery = window.Vue.ref(""); // the latest query that was searched
+    const hasSearchedWithActiveFilters = window.Vue.ref(false); // to determine whether the latest search has been made with filters
 
     /**
      * To only start showing search results once enough characters
      * have been added
      * @returns {boolean}
      */
-    const isActive = computed(() => activeQuery.value.length >= MIN_QUERY_LENGTH);
+    const isActive = window.Vue.computed(() => activeQuery.value.length >= MIN_QUERY_LENGTH);
 
     /**
      * the search string broken into words, to search for each word
      * @returns {string[]} the search string broken into single words
      */
-    const queryWordList = computed(() => {
+    const queryWordList = window.Vue.computed(() => {
         const queryTrimmed = activeQuery.value.trim(); // remove any front or back white space
         const regularExpression = /\s*(?:,|$)\s*/; // adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
         const commaSeparated = queryTrimmed.split(regularExpression) ?? []; // split the string into a comma separated list

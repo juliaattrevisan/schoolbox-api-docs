@@ -3,15 +3,14 @@
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
 
 export const useResultsStore = defineStore("spResults", () => {
-    const results = ref<unknown[]>([]); // returned search results
+    const results = window.Vue.ref<unknown[]>([]); // returned search results
     /**
      * To show that there is results that match the current search
      * @returns {boolean}
      */
-    const hasResults = computed(() => {
+    const hasResults = window.Vue.computed(() => {
         return results.value.length > 0;
     });
 
@@ -19,7 +18,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * To show that no results match the current search
      * @returns {boolean}
      */
-    const hasNoResults = computed(() => {
+    const hasNoResults = window.Vue.computed(() => {
         return results.value.length === 0;
     });
 

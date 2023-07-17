@@ -3,23 +3,21 @@
  * To display a nodes description
  */
 
-import { ref, nextTick, onMounted } from "vue";
-
 interface Props {
     node: Node; // the assigned node to display
 }
 const props = defineProps<Props>();
 
-const descriptionEl = ref<HTMLDivElement | null>(null);
+const descriptionEl = window.Vue.ref<HTMLDivElement | null>(null);
 
 /**
  * Check if the decription contains any videos that
  * we need to apply the media player to
  */
-onMounted(async () => {
-    await nextTick();
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
     $.fn.schoolboxResource_ReplaceAll($(descriptionEl.value));
-    await nextTick();
+    await window.Vue.nextTick();
     $.fn.schoolboxResource_InitialiseMediaElementPlayer($(descriptionEl.value));
 });
 </script>

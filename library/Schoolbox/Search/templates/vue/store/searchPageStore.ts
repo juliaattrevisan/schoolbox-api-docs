@@ -3,10 +3,9 @@
  */
 
 import { defineStore } from "pinia";
-import { ref } from "vue";
 
 export const useStore = defineStore("searchPage", () => {
-    const endpoint = ref(""); // to display loading note
+    const endpoint = window.Vue.ref(""); // to display loading note
 
     /**
      * When switching between stories, we need to reset the data models

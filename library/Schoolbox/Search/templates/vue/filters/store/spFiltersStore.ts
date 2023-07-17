@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import { computed } from "vue";
 import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorStore } from "./spFilterCreatorStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
@@ -13,7 +12,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
      * Are there any filters active
      * @returns {boolean}
      */
-    const isActive = computed(
+    const isActive = window.Vue.computed(
         () => useFilterDateRangeStore().isActive || useFilterCreatorStore().isActive || useFilterTypesStore().isActive
     );
 

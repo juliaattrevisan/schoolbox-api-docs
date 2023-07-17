@@ -3,16 +3,15 @@
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
 
 export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
-    const creator = ref(null);
+    const creator = window.Vue.ref(null);
 
     /**
      * Is the creator filter set
      * @returns {boolean}
      */
-    const isActive = computed(() => creator.value !== null);
+    const isActive = window.Vue.computed(() => creator.value !== null);
 
     /**
      * clear the creator filter

@@ -3,17 +3,16 @@
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
 
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
-    const allTypes = ref([]); // all filters passed in
-    const activeTypes = ref([]); // the currently active filters
+    const allTypes = window.Vue.ref([]); // all filters passed in
+    const activeTypes = window.Vue.ref([]); // the currently active filters
 
     /**
      * Are there any types active
      * @returns {boolean}
      */
-    const isActive = computed(() => activeTypes.value.length > 0);
+    const isActive = window.Vue.computed(() => activeTypes.value.length > 0);
 
     /**
      * clear the current types
