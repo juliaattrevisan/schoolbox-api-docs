@@ -23,7 +23,7 @@ use Twig\Error\Error as TwigError;
 /**
  * Factory for building various variants of a response.
  */
-class Factory
+class Factory implements ResponseFactoryInterface
 {
     /**
      * Constructor
@@ -43,14 +43,27 @@ class Factory
     }
 
     /**
-     * Build an empty response.
+     * Create a new response using `$this->responseFactory`.
      *
-     * @param int $statusCode
+     * @param int    $code
+     * @param string $reasonPhrase
      * @return ResponseInterface
      */
-    public function build(int $statusCode): ResponseInterface
+    public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
-        return $this->responseFactory->createResponse($statusCode);
+        return $this->responseFactory->createResponse($code, $reasonPhrase);
+    }
+
+    /**
+     * Build an empty response.
+     *
+     * @param int    $statusCode
+     * @param string $reasonPhrase
+     * @return ResponseInterface
+     */
+    public function build(int $statusCode = 200, string $reasonPhrase = ''): ResponseInterface
+    {
+        return $this->createResponse($statusCode, $reasonPhrase);
     }
 
     /**
