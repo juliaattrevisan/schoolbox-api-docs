@@ -179,7 +179,8 @@ export default {
          */
         animateBadgeImage() {
             const badgeImage = this.$refs.badgeImage.$el.querySelector("img");
-            animateBadgeImage(badgeImage);
+            const awardCanvas = this.$refs.awardCanvas;
+            animateBadgeImage(badgeImage, awardCanvas);
             this.award.viewedOn = ""; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
             axios.post(`/learning/badge/award/${this.award.id}/view`); //to update viewedOn in the backend
         },
@@ -355,7 +356,7 @@ export default {
                 <div class="badge-modal">
                     <div class="badge-img-container" ref="badgeImgContainer">
                         <div class="badge-img-container__background">
-                            <canvas :width="canvasWidth" :height="canvasHeight" data-badge-award-canvas></canvas>
+                            <canvas :width="canvasWidth" :height="canvasHeight" ref="awardCanvas"></canvas>
                         </div>
                         <div class="badge-img-container__foreground">
                             <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>

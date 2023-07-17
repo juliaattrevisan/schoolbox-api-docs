@@ -4,7 +4,8 @@
 
 import { gsap, Physics2DPlugin } from "gsap/all";
 import Star from "./Star";
-import { getCanvasDimensions, getContext, getStarCount } from "../animateBadgeImage";
+import { getCanvasDimensions, getContext } from "@js/util/canvasUtils";
+import { getStarCount } from "../animateBadgeImage";
 
 gsap.registerPlugin(Physics2DPlugin);
 
@@ -12,10 +13,11 @@ gsap.registerPlugin(Physics2DPlugin);
  * Set up both the badge and the stars animations
  *
  * @param { DOMElement }
+ * @param DOMElement
  */
-export async function init(badgeImage) {
+export async function init(badgeImage, awardCanvas) {
     animateBadge(badgeImage);
-    animateStars();
+    animateStars(awardCanvas);
 }
 
 /**
@@ -32,11 +34,12 @@ function animateBadge(badgeImage) {
 
 /**
  * Get all the stars, add an animation to the gsap.timeline for each and ensure the Canvas is redrawn on each update.
+ * @param DOMElement
  */
-function animateStars() {
-    const stars = getStars();
-    const context = getContext();
-    const canvasDimensions = getCanvasDimensions();
+function animateStars(canvas) {
+    const stars = getStars(canvas);
+    const context = getContext(canvas);
+    const canvasDimensions = getCanvasDimensions(canvas);
     const starsTimeline = gsap.timeline({
         //https://greensock.com/docs/v3/GSAP/gsap.timeline()
         delay: 0.2, //wait prior to animating the stars ot best sync to the badge animation
@@ -51,12 +54,13 @@ function animateStars() {
  * Spread them across the width of the canvas and put them above view, so they will drop down from below
  *
  * @return { Array }
+ * @param DOMElement
  */
-function getStars() {
+function getStars(canvas) {
     const stars = [];
-    const canvasDimensions = getCanvasDimensions();
+    const canvasDimensions = getCanvasDimensions(canvas);
     let star; //reuse reference in loop
-    for (let i = 0; i < getStarCount(); i++) {
+    for (let i = 0; i < getStarCount(canvas); i++) {
         star = new Star({
             x: gsap.utils.random(0, canvasDimensions.width),
             y: -200,

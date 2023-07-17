@@ -3,7 +3,7 @@
  * Pop-up badge award animation component used within Storybook only
  */
 
-import { clearCanvas } from "../../../library/Schoolbox/Learning/Badge/Award/js/animateBadgeImage";
+import { clearCanvas } from "@js/util/canvasUtils";
 import { init } from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/dropDown";
 
 export default {
@@ -35,8 +35,9 @@ export default {
          */
         animateBadgeImage() {
             const badgeImage = this.$refs.badgeImage;
-            clearCanvas();
-            init(badgeImage);
+            const awardCanvas = this.$refs.awardCanvas;
+            clearCanvas(awardCanvas);
+            init(badgeImage, awardCanvas);
         },
     },
 };
@@ -46,7 +47,7 @@ export default {
     <div>
         <div class="badge-img-container" ref="badgeImgContainer">
             <div class="badge-img-container__background">
-                <canvas :width="canvasWidth" :height="canvasHeight" data-badge-award-canvas></canvas>
+                <canvas :width="canvasWidth" :height="canvasHeight" ref="awardCanvas"></canvas>
             </div>
             <div class="badge-img-container__foreground">
                 <img src="../../assets/badge-award-sample.svg" ref="badgeImage" alt="badge sample" />
