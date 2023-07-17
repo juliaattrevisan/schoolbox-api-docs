@@ -19,7 +19,7 @@ handles the HTTP request:
 ### JSON
 
 JSON content is generated differently in Aura and Sitepage controllers: the key
-difference is that output is set into the `response` object in Aura, whilst
+difference is that output is set into the `psr7Response` object in Aura, whilst
 Sitepage outputs to stdout directly.
 
 #### Aura
@@ -29,7 +29,7 @@ class MyController extends \Alaress\Web\Controller\Base
 {
     public function myAction(): void
     {
-        $this->response->content->set($this->buildJsonOutput($data));
+        $this->psr7Response = $this->responseAsJson($data);
     }
 }
 ```
@@ -47,7 +47,7 @@ echo json_encode($data);
 
 ### Binary
 
-Likewise: binary content is set into the `response` object in Aura, whilst
+Likewise: binary content is set into the `psr7Response` object in Aura, whilst
 Sitepage outputs it directly.
 
 #### Aura
@@ -57,10 +57,11 @@ class MyController extends \Alaress\Web\Controller\Base
 {
     public function myAction(): void
     {
-        $this->response->headers->set('Content-Type', 'application/pdf');
-        $this->response->headers->set('Content-Length', strlen($content));
-        $this->response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-        $this->response->content->set($this->buildFileOutputFromString($content));
+        $this->psr7Response = $this->responseFromContent($content)
+            ->withHeader('Content-Type', 'application/pdf')
+            ->withHeader('Content-Length', strlen($content))
+            ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+        ;
     }
 }
 ```
