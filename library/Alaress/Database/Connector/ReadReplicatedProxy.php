@@ -677,7 +677,7 @@ class ReadReplicatedProxy implements IConnector
     public function update(string $table, array|string $identifier, array $array): bool
     {
         $this->lastWriteTime = microtime(true);
-        return $this->writeConnector->insert($table, $identifier, $array);
+        return $this->writeConnector->update($table, $identifier, $array);
     }
 
     /**
