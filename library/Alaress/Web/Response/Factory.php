@@ -13,6 +13,7 @@ use Alaress\Web\Output\DataGenerator\IDataGenerator;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\StreamInterface;
 use Schoolbox\User;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -169,9 +170,20 @@ class Factory
      */
     public function buildFromContent(string $content): ResponseInterface
     {
+        return $this->buildFromStream($this->streamFactory->createStream($content));
+    }
+
+    /**
+     * Build a response from a stream.
+     *
+     * @param StreamInterface $stream
+     * @return ResponseInterface
+     */
+    public function buildFromStream(StreamInterface $stream): ResponseInterface
+    {
         return $this->responseFactory
             ->createResponse()
-            ->withBody($this->streamFactory->createStream($content));
+            ->withBody($stream);
     }
 
     /**
