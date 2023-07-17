@@ -15,24 +15,49 @@ You should be able to read method names and get a general idea of what is going 
 > One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
 ## 2.2 Requests and Responses
-These represent the parameters from a `GET` or `POST` request, and the data at the end of a Controller method that will be passed to View, respectively.
 
-### 2.2.1 GET and POST vars
-Querystring parameters can be obtained using the `$this->requestQuery` array.
+These represent the incoming HTTP request, and the outgoing HTTP response,
+respectively.
+
+### 2.2.1 Reading data from the Request
+
+`$this->psr7Request` is a standard PSR-7 `ServerRequestInterface` object which
+represents the incoming HTTP request.
+
+For example, the following request information may be accessed with these
+methods:
+* `getUploadedFiles` to fetch any files uploaded as part of the request
+* `getParsedBody` for fetching parsed JSON payloads
+* `getServerParams` for fetching the contents of `$_SERVER` without accessing
+  the superglobal
+* `getHeader` or `getHeaderLine` for fetching a request header
+
+See the official documentation for
+[ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface)
+and its parent interfaces
+[RequestInterface](https://www.php-fig.org/psr/psr-7/#32-psrhttpmessagerequestinterface)
+and
+[MessageInterface](https://www.php-fig.org/psr/psr-7/#31-psrhttpmessagemessageinterface)
+for further documentation on what can be done with a `ServerRequestInterface`
+instance.
+
+#### 2.2.1.1 Helpers for GET and POST vars
+
+Querystring parameters may be fetched from `$this->psr7Request->getQueryParams()`,
+but are better obtained using the `$this->requestQuery` helper property.
+
 To access a particular querystring parameter `cat`, you can use:
 
 ```php
 $this->requestQuery['cat']
 ```
 
-POST parameters can be obtained using the `$this->requestPost` array.
-To access a particular POST parameter `cat`, you can use:
+Likewise: POST parameters can be fetched from `$this->psr7Request->getParsedBody()`,
+but are better obtained using the `$this->requestPost` helper property.
 
 ```php
 $this->requestPost['cat']
 ```
-
-#### 2.2.1.1 The `Values` object
 
 Both `$this->requestQuery` and `$this->requestPost` data are instances of
 `\Alaress\Web\Request\Values`: this class allows array access via its

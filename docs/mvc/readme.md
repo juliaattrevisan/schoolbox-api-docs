@@ -17,7 +17,8 @@
 * [2 Responsibilities of Controller](02-controller.md)
     * 2.1 Shove details elsewhere
     * 2.2 Requests and Responses
-        * 2.2.1 GET and POST vars
+        * 2.2.1 Reading data from the Request
+            * 2.2.1.1 Helpers for GET and POST vars
         * 2.2.2 Setting The Response for View
             * 2.2.2.1 Responses generated from a Twig template
             * 2.2.2.2 JSON Responses
