@@ -17,6 +17,13 @@ use Psr\Http\Message\ResponseInterface;
 class Outputter
 {
     /**
+     * Amount of bytes to read at a time when outputting the response body.
+     *
+     * This is currently an arbitrary value of 10000 bytes.
+     */
+    private const RESPONSE_BODY_READ_BYTES = 10000;
+
+    /**
      * Output a response's headers and body.
      *
      * @param ResponseInterface $response
@@ -54,8 +61,12 @@ class Outputter
             );
         }
 
-        // Output body
-        // TODO consider streaming?
-        echo $response->getBody();
+        // Output body: stream so that the entire body is not loaded into memory
+        // only to output it.
+        // Important when streaming large content (e.g. logs): see SA-413.
+        $body = $response->getBody();
+        while (!$body->eof()) {
+            echo $body->read(self::RESPONSE_BODY_READ_BYTES);
+        }
     }
 }
