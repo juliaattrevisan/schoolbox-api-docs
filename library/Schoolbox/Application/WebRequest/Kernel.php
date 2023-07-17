@@ -163,7 +163,7 @@ class Kernel extends WebKernelAbstract
             }
 
             /** @var Factory $responseFactory */
-            $responseFactory = $this->di->get('responseFactory');
+            $responseFactory = $this->di->get('httpResponseFactory');
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
@@ -192,7 +192,7 @@ class Kernel extends WebKernelAbstract
             }
 
             /** @var Factory $responseFactory */
-            $responseFactory = $this->di->get('responseFactory');
+            $responseFactory = $this->di->get('httpResponseFactory');
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)

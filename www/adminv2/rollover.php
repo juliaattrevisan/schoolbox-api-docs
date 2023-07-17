@@ -39,7 +39,7 @@ $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
 );
 
 /** @var Factory $responseFactory */
-$responseFactory = $this->getDi()->get('responseFactory');
+$responseFactory = $this->getDi()->get('httpResponseFactory');
 $this->setVar(
     'JS_NODE_TYPE_ICON_MAP',
     $responseFactory->buildUnthemedHtml(

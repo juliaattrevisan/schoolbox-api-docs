@@ -249,20 +249,6 @@ class SitePage
             return true;
         }
 
-//        if (!$lite && !$this->lite) {
-//            self::saveHistory();
-//            /** @var Output\ThemedHtml $renderer */
-//            $renderer = $this->getDi()->get('webOutput:html');
-//            $renderer
-//                ->setTab($this->currentTab)
-//                ->setTitle($this->getVar('TITLE'));
-//        } else {
-//            /** @var Output\Html $renderer */
-//            $renderer = $this->getDi()->get('webOutput:nochrome');
-//        }
-//        $renderer->setTemplate('include/sitepageContent.twig');
-
-
         // Put the PHPLib together
         $this->setFile(TEMPLATE_body, 'include/chromeContent.html');
         $this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
@@ -293,20 +279,9 @@ class SitePage
                 $this->getVar('TITLE'),
                 $this->currentTab,
             );
-//            /** @var Output\ThemedHtml $renderer */
-//            $renderer = $this->getDi()->get('webOutput:html');
-//            $renderer
-//                ->setTab($this->currentTab)
-//                ->setTitle($this->getVar('TITLE'));
         } else {
             $response = $responseFactory->buildUnthemedHtml($template, $data, $user);
-//
-//                /** @var Output\Html $renderer */
-//            $renderer = $this->getDi()->get('webOutput:nochrome');
         }
-//        $renderer->setData([
-//            'content' => $this->template->parse('finaloutput', TEMPLATE_body)
-//        ]);
 
         // Do this leftover thing
         self::disableXssProtectionAfterForm();
