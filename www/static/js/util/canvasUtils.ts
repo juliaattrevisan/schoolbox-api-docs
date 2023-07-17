@@ -26,19 +26,6 @@ export function getContext(canvas: HTMLCanvasElement) {
 }
 
 /**
- * Will be decreased on smaller screens, as there's not as much space to show them.
- * This gives us about 600 at max width (972px) and decreases as we get down to around 168 at (272px),
- * which is an iPhone 5, a pretty small screen.
- *
- * @param canvas { HTMLCanvasElement }
- * @return { Number }
- */
-export function getStarCount(canvas: HTMLCanvasElement) {
-    const currentCanvasDimensions = getCanvasDimensions(canvas);
-    return Math.round(currentCanvasDimensions.width * 0.62);
-}
-
-/**
  * Ensure there's no left over animation if user is moving through the new rewards quickly
  * @param canvas { HTMLCanvasElement }
  */
