@@ -14,7 +14,9 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\Values;
 use InvalidArgumentException;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
@@ -27,6 +29,7 @@ use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
@@ -68,7 +71,12 @@ class Module extends BaseModule
                     new Rule\HasHomepageAccess(
                         UserAccess::ACCESS_WRITE,
                         function ($params) {
-                            $query = $this->injector->get('webFactory')->newRequest()->query;
+                            // Should not be checking DI for query string here,
+                            // but it's a pre-existing condition.
+                            /** @var ServerRequestInterface $request */
+                            $request    = $this->injector->get('httpRequest');
+                            $requestUri = new Uri($request->getUri()->__toString());
+                            $query      = new Values($requestUri->getQueryAsArray());
                             if (
                                 $query->get(Querystring::ENTITY_TYPE) === Strategy\Folder::getEntityType()
                                 && $query->get(Querystring::FOLDER)
