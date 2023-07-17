@@ -34,13 +34,13 @@ public function getPayload(): void
         ];
     }
 
-    $this->getResponse()->content->set($this->buildJsonOutput($data));
+    $this->psr7Response = $this->responseAsJson($data);
 }
 
 
 public function getContainer(): void
 {
-    $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/container.twig', []));
+    $this->psr7Response = $this->responseFromTemplate('@greenhouse/container.twig', []);
 }
 ```
 

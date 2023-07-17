@@ -977,9 +977,7 @@ class Controller extends Base
             'allKingdoms' => $kingdomMapper->findAll()
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@kingdom/list.twig", $twigData)
-        );
+        $this->psr7Response = $this->responseFromTemplate("@kingdom/list.twig", $twigData);
     }
 }
 ```
@@ -1061,9 +1059,7 @@ Add the `getKingdom()` method to the Controller as well. Note that in our route,
             'allKingdoms' => $kingdomMapper->findByColumn('id', $kingdomId),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@kingdom/list.twig", $twigData)
-        );
+        $this->psr7Response = $this->responseFromTemplate("@kingdom/list.twig", $twigData);
     }
 ```
 

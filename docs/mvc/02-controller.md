@@ -54,20 +54,22 @@ $this->requestQuery->getFloat('value', 1.50);
 When a Controller finishes processing, it needs to set up the resultant data for the View to render. This is done via the `getResponse()` method.
 
  ```php
- $this->getResponse()->content->set(
-     $this->buildHtmlOutput('@test/index.twig', [
+ $this->psr7Response = $this->responseFromTemplate(
+     '@test/index.twig',
+     [
         'name' => $name
-     ])
+     ]
  );
  ```
 
 The example above gives an array of values `['name' => $name]` to twig to render in a template `index.twig`. You can pass scalars and objects to twig, though you should be mindful of the various pitfalls with the latter.
 
 ### 2.2.3 Redirects
-Sometimes you need to redirect. You can use the `getResponse()` method to also get access to a redirection method in which you can specify a url:
+Sometimes you need to redirect. You can use one of the `redirect*()` methods to
+create a redirect response:
 
 ```php
-$this->getResponse()->redirect->to('http://www.google.com');
+$this->psr7Response = $this->redirectFound('http://www.google.com');
 ```
 
 ...or derive a Route instead:
