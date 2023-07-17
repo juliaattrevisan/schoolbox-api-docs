@@ -180,7 +180,8 @@ class ReadReplicatedProxy implements IConnector
      */
     public function enableMultipleActiveResultSets()
     {
-        // TODO: Implement enableMultipleActiveResultSets() method.
+        $this->determineConnector()->enableMultipleActiveResultSets();
+        return $this;
     }
 
     /**
@@ -190,7 +191,8 @@ class ReadReplicatedProxy implements IConnector
      */
     public function disableMultipleActiveResultSets()
     {
-        // TODO: Implement disableMultipleActiveResultSets() method.
+        $this->determineConnector()->disableMultipleActiveResultSets();
+        return $this;
     }
 
     /**
@@ -464,7 +466,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function addPostProcessor($callable)
     {
-        // TODO: Implement addPostProcessor() method.
+        return $this->determineConnector()->addPostProcessor($callable);
     }
 
     /**
@@ -477,7 +479,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function prepareInBindings($externalIds, $prefix = 'param')
     {
-        // TODO: Implement prepareInBindings() method.
+        return $this->determineConnector()->prepareInBindings($externalIds, $prefix);
     }
 
     /**
@@ -602,7 +604,8 @@ class ReadReplicatedProxy implements IConnector
      */
     public function trimAll(array $rowset): array
     {
-        // TODO: Implement trimAll() method.
+        $this->lastWriteTime = microtime(true);
+        return $this->writeConnector->trimAll($rowset);
     }
 
     /**
@@ -614,7 +617,8 @@ class ReadReplicatedProxy implements IConnector
      */
     public function trimRow(array $row): array
     {
-        // TODO: Implement trimRow() method.
+        $this->lastWriteTime = microtime(true);
+        return $this->writeConnector->trimRow($row);
     }
 
     /**
@@ -626,7 +630,8 @@ class ReadReplicatedProxy implements IConnector
      */
     public function trimField($fieldValue)
     {
-        // TODO: Implement trimField() method.
+        $this->lastWriteTime = microtime(true);
+        return $this->writeConnector->trimField($fieldValue);
     }
 
     /**
