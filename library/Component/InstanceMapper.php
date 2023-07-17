@@ -150,7 +150,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByDefinition($module, $definitionId)
     {
-        $componentInstanceTable = $this->databaseRead->getQuoter()->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module AND
@@ -174,7 +174,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByModule($module)
     {
-        $componentInstanceTable = $this->databaseRead->getQuoter()->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module
@@ -196,7 +196,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByContext($module, $identifier)
     {
-        $componentInstanceTable = $this->databaseRead->getQuoter()->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module AND
@@ -244,7 +244,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByContextAndClass($module, $identifier, $class)
     {
-        $componentInstanceTable = $this->databaseRead->getQuoter()->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
             WHERE       {$componentInstanceTable}.`module` = :module AND
@@ -270,11 +270,8 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByInstanceId($id, $options = [])
     {
-        if ($options['queryWrite'] ?? false) {
-            $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
-        } else {
-            $componentInstanceTable = $this->databaseRead->getQuoter()->quoteIdentifier($this->getTable());
-        }
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
+
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`id` = :id
@@ -296,11 +293,8 @@ class Component_InstanceMapper extends BaseMapper
      */
     protected function findByFields($sql, $fields, $options = [])
     {
-        if ($options['queryWrite'] ?? false) {
-            $statement = $this->database->prepare($sql);
-        } else {
-            $statement = $this->databaseRead->prepare($sql);
-        }
+        $statement = $this->database->prepare($sql);
+
         $statement->execute($fields);
 
         // Hydrate a whole bunch of stuff here.

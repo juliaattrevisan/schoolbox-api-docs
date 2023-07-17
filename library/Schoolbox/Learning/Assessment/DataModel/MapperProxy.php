@@ -1242,7 +1242,7 @@ class MapperProxy
         // Look up the data model's assessment object ID, and translate to a project ID
         $context = $dataModel->getAssessmentContext();
         if ($context instanceof Project) {
-            $project = ProjectMapper::getInstance()->findOneByColumn('assessment_id', $context->getAssessmentModel()->getId(), ['queryWrite' => true]);
+            $project = ProjectMapper::getInstance()->findOneByColumn('assessment_id', $context->getAssessmentModel()->getId());
             $context->setId($project->getId());
         }
 

@@ -755,7 +755,7 @@ class ListController extends Web\Controller\Base
         $planMap = $this->participantDataSource->getPlanMapper();
 
         // preload the plans list
-        $plans = $planMap->findByColumnList([ 'assessment_id' => $assessmentId ], ['queryWrite' => $createAssessment])
+        $plans = $planMap->findByColumnList([ 'assessment_id' => $assessmentId ])
                          ->indexBy('id');
 
         // obtain this reference for later
