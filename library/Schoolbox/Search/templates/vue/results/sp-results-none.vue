@@ -16,7 +16,7 @@ async function onNoFiltersSelected() {
 </script>
 
 <template>
-    <div class="empty-state-flex-centered">
+    <div class="empty-state-flex-centered" data-test-sp-results-none>
         <i class="icon-search"></i>
         <p>
             Sorry, but your search did not return any results.

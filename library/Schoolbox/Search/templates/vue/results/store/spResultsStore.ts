@@ -12,8 +12,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasResults = computed(() => {
-        // return !hasNotSearched.value && results.value.length !== 0 && !isSearching.value && !hasLoadError.value;
-        return results.value.length !== 0;
+        return results.value.length > 0;
     });
 
     /**
@@ -21,7 +20,6 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasNoResults = computed(() => {
-        // return !hasNotSearched.value && results.value.length === 0 && !isSearching.value && !hasLoadError.value;
         return results.value.length === 0;
     });
 
