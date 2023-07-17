@@ -14,7 +14,6 @@ use Schoolbox\Mapper;
 
 abstract class AbstractController extends \Alaress\Web\Controller\Restful\AbstractController
 {
-
     /** @var Mapper */
     protected $mapper;
 
