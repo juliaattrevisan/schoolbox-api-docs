@@ -75,7 +75,7 @@ class Factory implements ResponseFactoryInterface
      */
     public function buildRedirect(string $location, int $statusCode = Response::HTTP_FOUND): ResponseInterface
     {
-        $response = $this->responseFactory
+        $response = $this
             ->createResponse($statusCode)
             ->withHeader('location', $location);
 
@@ -97,7 +97,7 @@ class Factory implements ResponseFactoryInterface
      */
     public function buildJson(mixed $data): ResponseInterface
     {
-        return $this->responseFactory
+        return $this
             ->createResponse()
             ->withHeader('content-type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode($data)));
@@ -233,7 +233,7 @@ class Factory implements ResponseFactoryInterface
      */
     public function buildFromStream(StreamInterface $stream): ResponseInterface
     {
-        return $this->responseFactory
+        return $this
             ->createResponse()
             ->withBody($stream);
     }
