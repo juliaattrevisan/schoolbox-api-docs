@@ -44,7 +44,7 @@ class CampusReassignment extends AbstractNotificationTest
      */
     public function requiredDaemons()
     {
-        return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
+        return [ self::DAEMON_SCHEDULE ];
     }
 
 

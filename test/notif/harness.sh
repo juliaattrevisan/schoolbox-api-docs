@@ -29,7 +29,6 @@ mysql schoolbox < sql/notifications-all-instant.sql
 
 # create a special hell for yourself (we don't need socket or digest presently)
 service schoolbox-cloud-scheduled@vagrantx start
-service schoolbox-cloud-routed@vagrantx start
 
 # run the test case
 php test/notif/harness.php 2> /dev/null
