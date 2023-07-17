@@ -60,17 +60,15 @@ class TwigCallbackStream implements StreamInterface
      * Constructor
      *
      * @param Environment $twig                  Twig environment, for rendering templates.
-     * @param Closure     $dataCallback          The callback for generating data to pass into `$twig->render`.
-     *                                           Expected to return either:
-     *                                           - an array with data to pass into `$twig->render`, with the following
-     *                                             additional keys:
-     *                                             - `increment_counter`: if set and `false`, do not increment
-     *                                               `$this->counter`
-     *                                             - `render_item`: if set and `false`, do not render at all
-     *                                           - `false` if the callback will return no more data (i.e. EOF)
-     * @param array       $dataCallbackArguments A list of arguments to pass into `$dataCallback`: will also have
-     *                                           `int $counter` added as the current result counter.
      * @param string      $template              The template to render for each return of `$dataCallback`.
+     *                                           Returns either: an array with data to pass into `$twig->render`,
+     *                                           with additional keys `increment_counter` (if set and `false`, do not
+     *                                           increment `$this->counter`) and `render_item` (if set and `false`, do
+     *                                           not render at all); or `false` if the callback will return no more data
+     *                                           (i.e. EOF)
+     * @param Closure     $dataCallback          The callback for generating data to pass into `$twig->render`.
+     *                                           `int $counter` added as the current result counter.
+     * @param array       $dataCallbackArguments A list of arguments to pass into `$dataCallback`: will also have
      * @param string|null $headerTemplate        The template to render before the first `$dataCallback`.
      * @param string|null $footerTemplate        The template to render after the last `$dataCallback`.
      * @param array       $headerFooterData      Data to pass to `$twig->render` when rendering either `$headerTemplate`
@@ -78,9 +76,9 @@ class TwigCallbackStream implements StreamInterface
      */
     public function __construct(
         private Environment $twig,
+        private string $template,
         private Closure $dataCallback,
         private array $dataCallbackArguments,
-        private string $template,
         private ?string $headerTemplate = null,
         private ?string $footerTemplate = null,
         private array $headerFooterData = [],

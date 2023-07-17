@@ -615,26 +615,26 @@ abstract class Base
     /**
      * Shortcut method for building a HTML response from streamed data.
      *
+     * @param string $template
      * @param Closure $dataCallback
      * @param array $dataCallbackArguments
-     * @param string $template
      * @param string|null $headerTemplate
      * @param string|null $footerTemplate
      * @param array $headerFooterData
      * @return ResponseInterface
      */
     protected function responseFromTemplateStreamedData(
+        string $template,
         Closure $dataCallback,
         array $dataCallbackArguments,
-        string $template,
         ?string $headerTemplate = null,
         ?string $footerTemplate = null,
         array $headerFooterData = [],
     ): ResponseInterface {
         return $this->responseFactory->buildHtmlFromStream(
+            $template,
             $dataCallback,
             $dataCallbackArguments,
-            $template,
             $headerTemplate,
             $footerTemplate,
             $headerFooterData,

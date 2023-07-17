@@ -167,18 +167,18 @@ class Factory
      * Build a response from the content of a data stream, each line of which is
      * then rendered via Twig.
      *
+     * @param string      $template
      * @param Closure     $dataCallback
      * @param array       $dataCallbackArguments
-     * @param string      $template
      * @param string|null $headerTemplate
      * @param string|null $footerTemplate
      * @param array       $headerFooterData
      * @return ResponseInterface
      */
     public function buildHtmlFromStream(
+        string $template,
         Closure $dataCallback,
         array $dataCallbackArguments,
-        string $template,
         ?string $headerTemplate = null,
         ?string $footerTemplate = null,
         array $headerFooterData = [],
@@ -186,9 +186,9 @@ class Factory
         return $this->buildFromStream(
             new TwigCallbackStream(
                 $this->twig,
+                $template,
                 $dataCallback,
                 $dataCallbackArguments,
-                $template,
                 $headerTemplate,
                 $footerTemplate,
                 $headerFooterData,

@@ -253,13 +253,13 @@ class Controller extends Base
 
             if ('stream' === $format) {
                 $this->psr7Response = $this->responseFromTemplateStreamedData(
+                    $template,
                     Closure::fromCallable([$this, 'streamLog']),
                     [
                         'stream'          => $this->filesystemProxy->readStream($model->getStorage()),
                         'filter'          => $this->parseFilterString($filter),
                         'filterBlacklist' => ['rulestring'],
                     ],
-                    $template,
                     "@upsRuleset/log/stream-header.twig",
                     "@upsRuleset/log/stream-footer.twig",
                     [
