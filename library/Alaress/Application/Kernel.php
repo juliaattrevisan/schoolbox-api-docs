@@ -29,6 +29,7 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
 use Alaress\Web\Response\Factory as ResponseFactory;
+use Alaress\Web\Response\Outputter;
 use Alaress\Web\Router\PathMatcher;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
@@ -764,6 +765,10 @@ abstract class Kernel
                 }
             )
         );
+
+        // HTTP response outputter: convenience class for actually outputting a
+        // PSR-7 response as created by the httpResponseFactory above.
+        $di->set('httpResponseOutputter', $di->lazyNew(Outputter::class));
 
         // SitePage :D
         $di->set(

@@ -435,7 +435,8 @@ class Kernel extends WebKernelAbstract
 
         // Output whatever kind of response we have
         if ($psr7Response) {
-            $outputter = new Outputter();
+            /** @var Outputter $outputter */
+            $outputter = $this->di->get('httpResponseOutputter');
             $outputter->output($psr7Response);
         } elseif ($auraWebOutput && $auraWebResponse) {
             $auraWebOutput->output($auraWebResponse);
