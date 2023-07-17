@@ -2,6 +2,8 @@
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Web\Output;
+use Alaress\Web\Response\Factory as ResponseFactory;
+use Alaress\Web\Response\Outputter;
 use Aura\Router\Generator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -247,18 +249,18 @@ class SitePage
             return true;
         }
 
-        if (!$lite && !$this->lite) {
-            self::saveHistory();
-            /** @var Output\ThemedHtml $renderer */
-            $renderer = $this->getDi()->get('webOutput:html');
-            $renderer
-                ->setTab($this->currentTab)
-                ->setTitle($this->getVar('TITLE'));
-        } else {
-            /** @var Output\Html $renderer */
-            $renderer = $this->getDi()->get('webOutput:nochrome');
-        }
-        $renderer->setTemplate('include/sitepageContent.twig');
+//        if (!$lite && !$this->lite) {
+//            self::saveHistory();
+//            /** @var Output\ThemedHtml $renderer */
+//            $renderer = $this->getDi()->get('webOutput:html');
+//            $renderer
+//                ->setTab($this->currentTab)
+//                ->setTitle($this->getVar('TITLE'));
+//        } else {
+//            /** @var Output\Html $renderer */
+//            $renderer = $this->getDi()->get('webOutput:nochrome');
+//        }
+//        $renderer->setTemplate('include/sitepageContent.twig');
 
 
         // Put the PHPLib together
@@ -275,17 +277,44 @@ class SitePage
 
 
         // Output the PHPLib using the renderer
-        $renderer->setData([
+        /** @var ResponseFactory $responseFactory */
+        $responseFactory = $this->di->get('httpResponseFactory');
+        $template = 'include/sitepageContent.twig';
+        $data = [
             'content' => $this->template->parse('finaloutput', TEMPLATE_body)
-        ]);
+        ];
+        $user = $this->user ?? new User();
+        if (!$lite && !$this->lite) {
+            self::saveHistory();
+            $response = $responseFactory->buildHtml(
+                $template,
+                $data,
+                $user,
+                $this->getVar('TITLE'),
+                $this->currentTab,
+            );
+//            /** @var Output\ThemedHtml $renderer */
+//            $renderer = $this->getDi()->get('webOutput:html');
+//            $renderer
+//                ->setTab($this->currentTab)
+//                ->setTitle($this->getVar('TITLE'));
+        } else {
+            $response = $responseFactory->buildUnthemedHtml($template, $data, $user);
+//
+//                /** @var Output\Html $renderer */
+//            $renderer = $this->getDi()->get('webOutput:nochrome');
+        }
+//        $renderer->setData([
+//            'content' => $this->template->parse('finaloutput', TEMPLATE_body)
+//        ]);
 
         // Do this leftover thing
         self::disableXssProtectionAfterForm();
 
         // Finagle a response
-        $renderer->output($this->getDi()->get('webFactory')->newResponse());
-
-
+        /** @var Outputter $outputter */
+        $outputter = $this->di->get('httpResponseOutputter');
+        $outputter->output($response);
 
         return true;
     }
