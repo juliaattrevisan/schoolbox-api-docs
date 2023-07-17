@@ -16,7 +16,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
  * This is a format we adopted for tass more-or-less across the board
  *
  * ----
- * From Tammy, 8/10/22
+ * From Tammy, 8/10/20
  * Hi Steve
  *
  * A school will either be ‘Unitised’ or ‘Non-Unitised’ in their timetable setup.
@@ -28,7 +28,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
  * specific for one year level then ‘subtab_year_grp’ will be entered.
  *
  * If the subject is a true unitised subject and is not specific for one year level
- * (eg an elective subject in senior) then no year group will be defined at all
+ * (e.g. an elective subject in senior) then no year group will be defined at all
  * and ‘subtab_year_grp’ will be blank.
  * ----
  *
