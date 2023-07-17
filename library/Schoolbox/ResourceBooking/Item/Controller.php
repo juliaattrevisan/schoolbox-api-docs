@@ -94,7 +94,8 @@ class Controller extends Base
                 try {
                     $category = $this->mapper->getJoinMapper('category')->findById($catId);
                 } catch (SchoolboxNotFoundException $e) {
-                    $this->getResponse()->status->setCode(404);
+                    $this->psr7Response = $this->responseEmpty(404);
+                    return;
                 }
             }
 

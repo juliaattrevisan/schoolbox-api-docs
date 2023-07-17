@@ -246,7 +246,6 @@ class Controller extends Base
 
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
-        $this->response->status->setCode(201);
 
         // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
@@ -269,7 +268,7 @@ class Controller extends Base
                     new ScrubAdapter(),
                 ),
             )
-        );
+        )->withStatus(201);
     }
 
 
@@ -349,8 +348,8 @@ class Controller extends Base
     public function deleteEvidence(Model $evidence): void
     {
         //unless there are mapper errors, set the return status code to 204 (No Content)
-        $this->response->status->setCode(204);
         $this->mapper->delete($evidence);
+        $this->psr7Response = $this->responseEmpty(204);
     }
 
 

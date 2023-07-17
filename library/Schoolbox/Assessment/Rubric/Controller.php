@@ -278,8 +278,7 @@ class Controller extends BaseController
      */
     protected function sendJSONError($data, $statusCode = 400)
     {
-        $this->getResponse()->status->set($statusCode);
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus($statusCode);
     }
 
 
@@ -325,8 +324,7 @@ class Controller extends BaseController
             $maxLevels = (int)$this->getDi()->get('config')->get('rubric_max_levels');
             $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
         } catch (\Exception $e) {
-            $this->getResponse()->status->setCode(400);
-            $this->psr7Response = $this->responseAsJson($e->getMessage());
+            $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(400);
             return;
         }
 
@@ -499,8 +497,7 @@ class Controller extends BaseController
 
         // Response code is always 200:
         // this is a valid request even if marks would've been invalidated.
-        $this->response->status->setCode(200);
-        $this->psr7Response = $this->responseAsJson($response);
+        $this->psr7Response = $this->responseAsJson($response)->withStatus(200);
     }
 
 

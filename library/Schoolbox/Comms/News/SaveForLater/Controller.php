@@ -164,17 +164,21 @@ class Controller extends Base
      */
     public function postAdd(News\Model $article): void
     {
+        $status = 200;
         try {
             $this->addArticleToUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception | PDOException | UnexpectedValueException $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
             $this->captureException($e);
-            $this->getResponse()->status->set(500);
+            $status = 500;
         }
 
         if ($this->isXhrRequest()) {
             $this->psr7Response = $this->responseAsJson([]);
+        } else {
+            $this->psr7Response = $this->responseEmpty();
         }
+        $this->psr7Response = $this->psr7Response->withStatus($status);
     }
 
 
@@ -188,17 +192,21 @@ class Controller extends Base
      */
     public function postRemove(News\Model $article): void
     {
+        $status = 200;
         try {
             $this->removeArticleFromUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
             $this->captureException($e);
-            $this->getResponse()->status->set(500);
+            $status = 500;
         }
 
         if ($this->isXhrRequest()) {
             $this->psr7Response = $this->responseAsJson([]);
+        } else {
+            $this->psr7Response = $this->responseEmpty();
         }
+        $this->psr7Response = $this->psr7Response->withStatus($status);
     }
 
 

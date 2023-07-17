@@ -273,15 +273,13 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
-
             $this->psr7Response = $this->responseAsJson(
                 [
                     'item'      => $bookingList,
                     'errors'    => $errors,
                     'returnUrl' => (string)$returnUrl,
                 ],
-            );
+            )->withStatus($code);
         } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
@@ -400,14 +398,13 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
             $this->psr7Response = $this->responseAsJson(
                 [
                     'item'      => $item,
                     'errors'    => $errors,
                     'returnUrl' => $returnUrl,
                 ],
-            );
+            )->withStatus($code);
         } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
@@ -974,14 +971,13 @@ class Controller extends Base
     protected function setUpdateStatusResponse(Model $booking, $callbackUrl, $errors = [])
     {
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode(empty($errors) ? 200 : 400);
             $this->psr7Response = $this->responseAsJson(
                 [
                     'item'        => $booking,
                     'callbackUrl' => $callbackUrl,
                     'errors'      => $errors,
                 ],
-            );
+            )->withStatus(empty($errors) ? 200 : 400);
         } else {
             // Is there a previous location to redirect to? if so use that.
             $this->psr7Response = $this->redirectAfterPost(

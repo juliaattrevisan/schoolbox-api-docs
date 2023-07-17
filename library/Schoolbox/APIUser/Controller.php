@@ -123,7 +123,7 @@ class Controller extends Base
     public function apiUserDelete(User $user)
     {
         $this->userMapper->delete($user);
-        $this->getResponse()->status->setCode(204);
+        $this->psr7Response = $this->responseEmpty(204);
     }
 
     /**
@@ -187,7 +187,7 @@ class Controller extends Base
          * set default response code to 201 (created)
          * if there are errors they will set their own code
          */
-        $this->response->status->setCode(201);
+        $this->psr7Response = $this->responseEmpty(201);
     }
 
     /**

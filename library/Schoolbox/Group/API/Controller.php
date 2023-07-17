@@ -219,7 +219,7 @@ class Controller extends Base
 
         try {
             $this->userAccessMapper->delete($userAccesses);
-            $this->getResponse()->status->setCode(204);
+            $this->psr7Response = $this->responseEmpty(204);
         } catch (MapperException $e) {
             $this->sendJsonError('Unable to remove the user from the group.', 400);
         }

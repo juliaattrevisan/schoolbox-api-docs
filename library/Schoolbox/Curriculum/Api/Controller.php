@@ -200,8 +200,7 @@ class Controller extends Base
     public function deleteNode(Node\Model $node): void
     {
         $this->nodeMapper->delete($node);
-        /** @noinspection PhpUnhandledExceptionInspection - this can't throw an invalid with a 204 */
-        $this->response->status->setCode(204);
+        $this->psr7Response = $this->responseEmpty(204);
     }
 
     /**

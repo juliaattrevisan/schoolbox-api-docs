@@ -178,8 +178,7 @@ class Controller extends Base
                 });
             }
 
-            $this->response->status->setCode(201);
-            $this->assignJsonResponseForAuthenticatedUser($sessionUser);
+            $this->assignJsonResponseForAuthenticatedUser($sessionUser, 201);
         }
     }
 
@@ -316,10 +315,11 @@ class Controller extends Base
     /**
      * Assigns JSON response (headers and output) for an authenticated user.
      *
-     * @param User $user The user to build output for.
-     *                   In practise this will always be the logged-in user.
+     * @param User     $user   The user to build output for: in practise this
+     *                         will always be the logged-in user.
+     * @param int|null $status A status code.
      */
-    private function assignJsonResponseForAuthenticatedUser(User $user): void
+    private function assignJsonResponseForAuthenticatedUser(User $user, ?int $status = null): void
     {
         $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
 
@@ -329,6 +329,9 @@ class Controller extends Base
             'role'     => $user->getRole()->getType(),
             'username' => $user->getUsername(),
         ]);
+        if (isset($status)) {
+            $this->psr7Response = $this->psr7Response->withStatus($status);
+        }
     }
 
     /**

@@ -245,8 +245,7 @@ class Controller extends Base
     {
         if ($this->isXhrRequest()) {
             // Dump out an AJAX error
-            $this->getResponse()->status->setCode(500);
-            $this->psr7Response = $this->responseAsJson($e->getMessage());
+            $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(500);
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FORM_SUBMIT, $e, $e->getMessage());
         }

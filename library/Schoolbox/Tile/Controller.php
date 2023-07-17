@@ -148,8 +148,7 @@ class Controller extends Base
 
         // XHR: return a simple JSON response
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson($layout);
-            $this->getResponse()->status->setCode($code);
+            $this->psr7Response = $this->responseAsJson($layout)->withStatus($code);
             return;
         }
 
@@ -300,8 +299,7 @@ class Controller extends Base
             $code = 500;
         }
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
-            $this->psr7Response = $this->responseAsJson([]);
+            $this->psr7Response = $this->responseAsJson([])->withStatus($code);
         } else {
             $this->psr7Response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(

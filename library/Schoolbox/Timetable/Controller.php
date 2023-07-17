@@ -140,8 +140,7 @@ class Controller extends Base
                 }
             }
         }
-        $this->response->status->setCode($code);
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus($code);
     }
 
     /**

@@ -101,20 +101,18 @@ class Controller extends BaseController
             try {
                 $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
-                $this->response->status->setCode(200);
                 $this->psr7Response = $this->responseAsJson([
-                    'status' => $this->response->status->getCode(),
+                    'status' => 200,
                     'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
                     'redirect' => '/homepage/' . $folder->getId()
-                ]);
+                ])->withStatus(200);
             } catch (\Exception | \UnexpectedValueException $e) {
-                $this->response->status->setCode(400);
                 $this->psr7Response = $this->responseAsJson([
                     'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
-                    'status' => $this->response->status->getCode(),
+                    'status' => 400,
                     'detail' => $e->getMessage(),
                     'instance' => $this->psr7Request->getUri()->__toString(),
-                ]);
+                ])->withStatus(400);
             }
         }
     }

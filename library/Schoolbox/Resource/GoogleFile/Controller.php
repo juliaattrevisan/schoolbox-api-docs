@@ -82,13 +82,12 @@ class Controller extends Base
             $message = 'Could not store Google Access Token data.';
         }
 
-        $this->getResponse()->status->set(200);
         $this->psr7Response = $this->responseAsJson(
             [
                 'success' => $success,
                 'message' => $message
             ]
-        );
+        )->withStatus(200);
     }
 
 
@@ -231,13 +230,12 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->status->set(200);
         $this->psr7Response = $this->responseAsJson(
             [
                 'success'  => true,
                 'messages' => $errors,
             ]
-        );
+        )->withStatus(200);
     }
 
     /**

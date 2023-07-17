@@ -186,8 +186,7 @@ class Controller extends Base
             //catch both Runtime and Domain Exceptions
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus(400);
-            $this->getResponse()->status->setCode(400);
-            $this->psr7Response = $this->responseAsJson($problem->asArray());
+            $this->psr7Response = $this->responseAsJson($problem->asArray())->withStatus(400);
         }
         //send as json to frontend
         $this->psr7Response = $this->responseAsJson([

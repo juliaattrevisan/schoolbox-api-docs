@@ -870,14 +870,10 @@ class Controller extends Assessment\Controller
      */
     private function configureResponseWithError(string $errorMessage, string $redirectTo, int $errorCode = 403): void
     {
-        $rs = $this->getResponse();
-
         if ($this->isXhrRequest()) {
             $result['success'] = false;
             $result['message'] = $errorMessage;
-
-            $rs->status->setCode($errorCode);
-            $this->psr7Response = $this->responseAsJson($result);
+            $this->psr7Response = $this->responseAsJson($result)->withStatus($errorCode);
         } else {
             // Show some error message?
             $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
@@ -1206,8 +1202,7 @@ class Controller extends Assessment\Controller
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
 
-            $rs->status->setCode(200);
-            $this->psr7Response = $this->responseAsJson($result);
+            $this->psr7Response = $this->responseAsJson($result)->withStatus(200);
         } else {
             // Redirect after saving to Due Work Summary for particular student.
             $this->psr7Response = $this->redirectFound(
@@ -1264,8 +1259,7 @@ class Controller extends Assessment\Controller
             ];
             $code = 403;
         }
-        $this->getResponse()->status->set($code);
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus($code);
     }
 
 
@@ -1380,8 +1374,7 @@ class Controller extends Assessment\Controller
             ];
             $code = 403;
         }
-        $this->getResponse()->status->set($code);
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus(403);
     }
 
 
@@ -1556,8 +1549,7 @@ class Controller extends Assessment\Controller
             // noop - submission box doesn't exist
         }
 
-        $this->getResponse()->status->setCode(204);
-        $this->psr7Response = $this->responseAsJson(null);
+        $this->psr7Response = $this->responseAsJson(null)->withStatus(204);
     }
 
 

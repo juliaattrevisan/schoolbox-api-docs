@@ -316,10 +316,8 @@ class Controller extends Base\Base
      */
     protected function returnJson($message, $code = 200)
     {
-        $this->getResponse()->status->set($code);
-
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson($message);
+            $this->psr7Response = $this->responseAsJson($message)->withStatus($code);
         } else {
             die(json_encode($message));
         }
@@ -1221,9 +1219,9 @@ class Controller extends Base\Base
     public function deleteCourseSpecification(CourseSpecification $courseSpec, $deleteFolder = false)
     {
         // TODO: make delete of folder and course atomic
-
+        $status = 200;
         if ($courseSpec->isDeleted()) {
-            $this->getResponse()->status->set(410);
+            $status = 410;
         }
 
         // Call delete(), even if already deleted, to enable mapper hooks to fire
@@ -1239,7 +1237,7 @@ class Controller extends Base\Base
         $this->psr7Response = $this->responseAsJson([
             'id'     => $courseSpec->getId(),
             'result' => 'success',
-        ]);
+        ])->withStatus($status);
     }
 
 
@@ -1264,8 +1262,9 @@ class Controller extends Base\Base
             return;
         }
 
+        $status = 200;
         if ($unitSpec->isDeleted()) {
-            $this->getResponse()->status->set(410);
+            $status = 410;
         }
 
         // Call delete(), even if already deleted, to enable mapper hooks to fire
@@ -1273,7 +1272,7 @@ class Controller extends Base\Base
 
         $this->psr7Response = $this->responseAsJson([
             'id' => $unitSpec->getId(),
-        ]);
+        ])->withStatus($status);
     }
 
 
@@ -1298,8 +1297,9 @@ class Controller extends Base\Base
             return;
         }
 
+        $status = 200;
         if ($unitImpl->isDeleted()) {
-            $this->getResponse()->status->set(410);
+            $status = 410;
         }
 
         // Call delete(), even if already deleted, to enable mapper hooks to fire
@@ -1307,7 +1307,7 @@ class Controller extends Base\Base
 
         $this->psr7Response = $this->responseAsJson([
             'id' => $unitImpl->getId(),
-        ]);
+        ])->withStatus($status);
     }
 
 

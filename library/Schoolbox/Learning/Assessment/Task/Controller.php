@@ -287,8 +287,6 @@ class Controller extends Assessment\Controller
 
         try {
             $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
-            $this->getResponse()->status->setCode(200);
-
             if ($this->isXhrRequest()) {
                 $this->psr7Response = $this->responseAsJson([
                     'success' => true,
@@ -308,20 +306,19 @@ class Controller extends Assessment\Controller
                     )
                 );
             }
+            $this->psr7Response = $this->psr7Response->withStatus(200);
         } catch (ConcurrentModificationException | InvalidTaskResponseException $e) {
             // We don't need to log concurrent exceptions, we expect them to happen from time to time.
             if (!$e instanceof ConcurrentModificationException) {
                 $this->captureException($e);
             }
 
-            $this->getResponse()->status->setCode(400);
-
             if ($this->isXhrRequest()) {
                 $this->psr7Response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage(),
                     'id'      => null,
-                ]);
+                ])->withStatus(400);
             } else {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, $e, $e->getMessage());
             }

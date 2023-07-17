@@ -305,8 +305,7 @@ class Controller extends Base
             // 400: requested a page that doesn't exist
             if ($this->isXhrRequest()) {
                 // just tell them they're naughty, that will be enough
-                $this->getResponse()->status->set(400);
-                $this->psr7Response = $this->responseAsJson($e->getMessage());
+                $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(400);
             } else {
                 $this->psr7Response = $this->redirectFound($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
             }

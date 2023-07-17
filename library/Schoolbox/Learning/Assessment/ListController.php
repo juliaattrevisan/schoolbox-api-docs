@@ -440,8 +440,7 @@ class ListController extends Web\Controller\Base
     {
         $weight = (float) $this->requestPost['weight'];
         if ($weight < 0) {
-            $this->getResponse()->status->setCode(500);
-            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid weight value']);
+            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid weight value'])->withStatus(500);
             return;
         }
         $assessment->setWeight($weight);
@@ -471,8 +470,7 @@ class ListController extends Web\Controller\Base
         $visibility            = (int)$this->requestPost['visibility'];
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
         if (!in_array($visibility, $availableVisibilities)) {
-            $this->getResponse()->status->setCode(500);
-            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid visibility']);
+            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);
             return;
         }
 
@@ -959,7 +957,7 @@ class ListController extends Web\Controller\Base
             // Update project mark as the excluded assessment may affect the project result
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
-            $this->getResponse()->status->setCode(201);
+            $this->psr7Response = $this->responseEmpty(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
@@ -987,7 +985,7 @@ class ListController extends Web\Controller\Base
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
 
-            $this->getResponse()->status->setCode(201);
+            $this->psr7Response = $this->responseEmpty(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());

@@ -351,8 +351,7 @@ class Controller extends AbstractController
                 //empty query exit early
                 $problem = new ApiProblem('Empty Search');
                 $problem->setStatus(400);
-                $this->getResponse()->status->setCode(400);
-                $this->psr7Response = $this->responseAsJson($problem->asArray());
+                $this->psr7Response = $this->responseAsJson($problem->asArray())->withStatus(400);
                 return;
             }
             $database = $this->getMapper()->getDatabase();

@@ -783,8 +783,7 @@ class Controller extends Base
         $records = $this->processPastoralRecords($studentId, $post, $duplicates);
 
         if ($this->isJsonRequest()) {
-            $this->response->status->setCode(201);
-            $this->psr7Response = $this->responseAsJson($records->map($this->pastoralTranslator));
+            $this->psr7Response = $this->responseAsJson($records->map($this->pastoralTranslator))->withStatus(201);
             return;
         }
 
@@ -1372,7 +1371,8 @@ class Controller extends Base
         $recordActionId = (int)$this->requestPost->get('recordActionId');
         $checked        = (bool)$this->requestPost->get('checked');
 
-        $data = [];
+        $data   = [];
+        $status = 200;
         try {
             $recordAction = $this->pastoralRecordActionMapper->findById($recordActionId);
             $recordAction->setCompleted($checked)
@@ -1382,9 +1382,9 @@ class Controller extends Base
             $data = ($this->pastoralTranslator)($recordAction->getPastoral());
         } catch (MapperException $e) {
             $data['error'] = $e->getMessage();
-            $this->getResponse()->status->setCode(400);
+            $status = 400;
         }
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus($status);
     }
 
     /**

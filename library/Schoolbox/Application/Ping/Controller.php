@@ -28,9 +28,9 @@ class Controller extends Base
             $cache = Redis::getCacheClientInstance();
             $cache->ping();
         } catch (\Throwable $e) {
-            $this->getResponse()->status->setCode(500);
+            $this->psr7Response = $this->responseEmpty(500);
             return;
         }
-        $this->getResponse()->status->setCode(200);
+        $this->psr7Response = $this->responseEmpty(200);
     }
 }

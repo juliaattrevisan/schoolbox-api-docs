@@ -727,8 +727,7 @@ class Controller extends Base
                 ->setStatus(400)
                 ->asArray();
 
-            $this->getResponse()->status->setCode(400);
-            $this->psr7Response = $this->responseAsJson($problem);
+            $this->psr7Response = $this->responseAsJson($problem)->withStatus(400);
         }
     }
 
@@ -881,8 +880,7 @@ class Controller extends Base
             'award'   => $achievement,
             'awardId' => $achievement->getId(),
         ]);
-        $this->response->status->setCode(201);
-        $this->psr7Response = $this->responseAsJson(array_merge($translator($achievement), $data));
+        $this->psr7Response = $this->responseAsJson(array_merge($translator($achievement), $data))->withStatus(201);
     }
 
 

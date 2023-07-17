@@ -37,8 +37,7 @@ class Controller extends Base
             $problem = (new ApiProblem('Assessment not found, ID must be a number'))
                 ->setStatus(404)
                 ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->psr7Response = $this->responseAsJson($problem);
+            $this->psr7Response = $this->responseAsJson($problem)->withStatus(404);
             return;
         }
 
@@ -49,8 +48,7 @@ class Controller extends Base
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(404)
                 ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->psr7Response = $this->responseAsJson($problem);
+            $this->psr7Response = $this->responseAsJson($problem)->withStatus(404);
             return;
         }
 
@@ -83,8 +81,7 @@ class Controller extends Base
             $problem = (new ApiProblem('Filter must not be blank'))
                 ->setStatus(401)
                 ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->psr7Response = $this->responseAsJson($problem);
+            $this->psr7Response = $this->responseAsJson($problem)->withStatus(401);
             return; //exit early there is a malformed keyword for search
         }
 

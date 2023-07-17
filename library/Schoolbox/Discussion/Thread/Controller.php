@@ -140,7 +140,7 @@ class Controller extends BaseController
             /* UnexpectedValueException thrown when you're in a conflicting scenario
              * trying to associate threads to objects, results in http 409 Conflict
              */
-            $this->response->status->setCode($e->getCode());
+            $this->psr7Response = $this->responseEmpty($e->getCode());
             return;
         }
     }
@@ -246,8 +246,7 @@ class Controller extends BaseController
     {
         $thread->setOpen($value);
         $this->threadMapper->save($thread);
-
-        $this->response->status->setCode(204);
+        $this->psr7Response = $this->responseEmpty(204);
     }
 
     /**

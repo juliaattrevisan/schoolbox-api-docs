@@ -358,11 +358,10 @@ class Controller extends Base
         try {
             $this->validateArticleAndAudience($article);
         } catch (UnsatisfiedException $e) {
-            $this->getResponse()->status->set(400);
             $this->psr7Response = $this->responseAsJson([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ]);
+            ])->withStatus(400);
 
             return;
         }
@@ -483,11 +482,10 @@ class Controller extends Base
             }
         } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
             if ($this->isXhrRequest()) {
-                $this->getResponse()->status->set(400);
                 $this->psr7Response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage()
-                ]);
+                ])->withStatus(400);
 
                 return;
             }

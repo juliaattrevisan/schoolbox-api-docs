@@ -148,7 +148,7 @@ class Controller extends Base
             $this->sendJsonError('Failed to remove member: ' . $e->getMessage(), 400);
             return;
         }
-        $this->getResponse()->status->setCode(204);
+        $this->psr7Response = $this->responseEmpty(204);
     }
 
     /**

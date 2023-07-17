@@ -259,14 +259,10 @@ class Controller extends BaseController
                 $baseFolder,
                 $unit
             );
-            $this->psr7Response = $this->responseAsJson([]);
-            // SHUP.
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(204);
+            $this->psr7Response = $this->responseAsJson([])->withStatus(204);
         } catch (SchoolboxException $e) {
             if ($this->isXhrRequest()) {
-                $this->response->status->set(400);
-                $this->psr7Response = $this->responseAsJson($e->getMessage());
+                $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(400);
             } else {
                 throw $e;
             }

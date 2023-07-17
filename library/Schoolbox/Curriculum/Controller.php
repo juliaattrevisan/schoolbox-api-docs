@@ -198,13 +198,12 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
             $this->psr7Response = $this->responseAsJson(
                 [
                     'item' => $item,
                     'tree' => $this->getAsJsTree($item),
                 ],
-            );
+            )->withStatus($code);
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
@@ -248,13 +247,12 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
             $this->psr7Response = $this->responseAsJson(
                 [
                     'item' => $item,
                     'tree' => $this->getAsJsTree($item),
                 ],
-            );
+            )->withStatus($code);
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
@@ -279,13 +277,12 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
             $this->psr7Response = $this->responseAsJson(
                 [
                     'item' => $item,
                     'tree' => $this->getAsJsTree($item),
                 ],
-            );
+            )->withStatus($code);
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed

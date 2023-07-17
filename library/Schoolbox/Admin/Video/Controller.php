@@ -76,7 +76,7 @@ class Controller extends Base
     public function postSubmit()
     {
         $post = $this->requestPost;
-
+        $status = 200;
         try {
             /** @var VideoQueue $video */
             $video = $this->getVideoQueueMapper()->findById($post['videoId']);
@@ -93,13 +93,13 @@ class Controller extends Base
                 'result' => 'success'
             ];
         } catch (MapperException $e) {
-            $this->getResponse()->status->setCode(500);
             $data = [
                 'result' => 'error'
             ];
+            $status = 500;
         }
 
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus($status);
     }
 
     /** Here be mappers and stuff */

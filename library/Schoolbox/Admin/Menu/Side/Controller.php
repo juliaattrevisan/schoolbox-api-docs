@@ -318,15 +318,13 @@ class Controller extends Base
 
             $this->getMenuSideSectionMapper()->save($section);
 
-            $this->getResponse()->status->setCode(200);
             $this->psr7Response = $this->responseAsJson([
                 'result' => 'OK'
-            ]);
+            ])->withStatus(200);
         } catch (MapperException $e) {
-            $this->getResponse()->status->setCode(500);
             $this->psr7Response = $this->responseAsJson([
                 'result' => 'Error updating record'
-            ]);
+            ])->withStatus(500);
         }
     }
 

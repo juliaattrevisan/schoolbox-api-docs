@@ -350,7 +350,6 @@ class Controller extends Base
             $data['redirect'] = $redirect;
         }
 
-        $this->getResponse()->status->set($httpCode);
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus($httpCode);
     }
 }

@@ -47,8 +47,7 @@ class Controller extends Base
             $problem = (new ApiProblem("'message' is not set"))
                 ->setStatus(400)
                 ->asArray();
-            $this->getResponse()->status->setCode(400);
-            $this->psr7Response = $this->responseAsJson($problem);
+            $this->psr7Response = $this->responseAsJson($problem)->withStatus(400);
             return; //exit early the message field is not set...
         }
         try {
@@ -71,8 +70,7 @@ class Controller extends Base
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(500)
                 ->asArray();
-            $this->getResponse()->status->setCode(500);
-            $this->psr7Response = $this->responseAsJson($problem);
+            $this->psr7Response = $this->responseAsJson($problem)->withStatus(500);
             return;
         }
     }

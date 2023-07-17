@@ -111,7 +111,7 @@ class Controller extends Base
 
         // Check for incorrect URLs
         if (!isset($tableData[$tableKey])) {
-            $this->getResponse()->status->setCode(404);
+            $this->psr7Response = $this->responseEmpty(404);
             return;
         }
 
@@ -1257,7 +1257,7 @@ class Controller extends Base
 
         // Check for incorrect URLs
         if (!isset($tables[$table])) {
-            $this->getResponse()->status->setCode(404);
+            $this->psr7Response = $this->responseEmpty(404);
             return;
         }
 

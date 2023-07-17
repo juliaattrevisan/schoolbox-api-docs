@@ -60,8 +60,7 @@ class Controller extends Base
         $data = $list->getTours($this->getUser(), $url);
 
         // Return results in JSON
-        $this->getResponse()->status->set(200);
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->psr7Response = $this->responseAsJson($data)->withStatus(200);
     }
 
 
@@ -87,11 +86,10 @@ class Controller extends Base
         try {
             //Save it real good
             $this->tourStatusMapper->save($newTourStatus);
-            $this->getResponse()->status->set(204);
+            $this->psr7Response = $this->responseEmpty(204);
         } catch (Mapper\Exception $e) {
             //Attempted to save invalid data
-            $this->psr7Response = $this->responseAsJson('Invalid status data. Did not save status.');
-            $this->getResponse()->status->set(400);
+            $this->psr7Response = $this->responseAsJson('Invalid status data. Did not save status.')->withStatus(400);
         }
     }
 
