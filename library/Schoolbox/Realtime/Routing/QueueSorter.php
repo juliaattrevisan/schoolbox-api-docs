@@ -72,7 +72,20 @@ class QueueSorter implements FilterInterface
     public function process(User $user, Instance $instance): bool
     {
         $userId = $user->getId();
-        $this->validate($instance, $user);
+        try {
+            $this->validate($instance, $user);
+        } catch (FilterException $e) {
+            $this->log->notice(
+                sprintf(
+                    'DROP %s:%s -> user %d: %s',
+                    $instance->getBaseHash(),
+                    $instance->getParamHash(),
+                    $userId,
+                    $e->getMessage()
+                )
+            );
+            return false;
+        }
 
         $outputLevels = $this->getReroutedLevel($user, $instance);
         if ($this->permMapper->isMuted($outputLevels)) {
@@ -120,16 +133,6 @@ class QueueSorter implements FilterInterface
                         $this->log->warning("Unable to SEND: could not map priority '$level'");
                         break;
                 }
-            } catch (FilterException $e) {
-                $this->log->notice(
-                    sprintf(
-                        'DROP %s:%s -> user %d: %s',
-                        $instance->getBaseHash(),
-                        $instance->getParamHash(),
-                        $userId,
-                        $e->getMessage()
-                    )
-                );
             } catch (RfcComplianceException $e) {
                 $this->log->warning($e->getMessage());
             } catch (PDOException $e) {

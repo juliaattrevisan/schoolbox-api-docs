@@ -14,7 +14,7 @@ class Digest extends AbstractList
     /**
      * @return string
      */
-    protected function getSuffix()
+    protected function getSuffix(): string
     {
         return 'digest';
     }

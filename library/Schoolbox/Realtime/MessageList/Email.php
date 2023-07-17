@@ -19,29 +19,20 @@ use UnderflowException;
 
 class Email implements QueueInterface
 {
-
-    /** @var User */
-    private $user;
-
-    /** @var Mailer */
-    private $mailer;
-
     /**
      * This is declared within push()
      *
      * @var Instance|null
      */
-    private $messageInstance;
+    private Instance|null $messageInstance = null;
 
 
     /**
      * @param User   $user
      * @param Mailer $mailer
      */
-    public function __construct(User $user, Mailer $mailer)
+    public function __construct(private User $user, private Mailer $mailer)
     {
-        $this->user   = $user;
-        $this->mailer = $mailer;
     }
 
 
@@ -50,7 +41,7 @@ class Email implements QueueInterface
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return "{$this->user->getId()}:email";
     }
@@ -62,7 +53,7 @@ class Email implements QueueInterface
      * @param Instance $instance
      * @return bool
      */
-    public function contains(Instance $instance)
+    public function contains(Instance $instance): bool
     {
         return $this->messageInstance === $instance;
     }
@@ -73,7 +64,7 @@ class Email implements QueueInterface
      *
      * @return void
      */
-    public function drain()
+    public function drain(): void
     {
         $this->messageInstance = null;
     }
@@ -87,7 +78,7 @@ class Email implements QueueInterface
      * @throws UnderflowException
      * @return void
      */
-    public function push(Instance $instance)
+    public function push(Instance $instance): void
     {
         $this->messageInstance = $instance;
 
@@ -104,7 +95,7 @@ class Email implements QueueInterface
      * @param bool               $dropCache whether or not any internally-held cache should be dropped
      * @return void
      */
-    public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false)
+    public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void
     {
         if ($this->messageInstance) {
             $bundle->appendInstance($this->messageInstance);
