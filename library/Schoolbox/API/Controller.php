@@ -348,7 +348,6 @@ class Controller extends Base
         } else {
             $this->psr7Response = $this->redirectFound('/');
         }
-        $this->psr7Response = $this->responseEmpty();
     }
 
     /**
