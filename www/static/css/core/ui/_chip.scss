@@ -33,7 +33,7 @@
             .sb-chip__icon {
                 &::before {
                     display: inline-block;
-                    margin-left: 0.25rem;
+                    margin-inline-start: 0.25rem;
                 }
 
                 &::after {
@@ -55,11 +55,12 @@
             margin: 0;
             padding: var(--whitespace-xs) var(--whitespace-m);
             user-select: none;
+            box-sizing: border-box;
 
             .sb-chip__icon {
                 color: var(--content-ui-foreground-contrast);
                 line-height: normal;
-                margin-left: var(--whitespace-s);
+                margin-inline-start: var(--whitespace-s);
 
                 &::before {
                     display: none;
@@ -74,8 +75,8 @@
                     content: "";
                     display: flex;
                     height: 0.25rem;
-                    margin-left: 0.5rem;
-                    margin-right: 0.25rem;
+                    margin-inline-start: 0.5rem;
+                    margin-inline-end: 0.25rem;
                     opacity: 0.5;
                     width: 0.25rem;
                 }
@@ -86,6 +87,18 @@
     &--rounded {
         li > input[type="checkbox"] + label {
             border-radius: 2048px;
+        }
+    }
+
+    &--no-border {
+        li > input[type="checkbox"] + label {
+            border: none;
+        }
+    }
+
+    &--no-background {
+        li > input[type="checkbox"] + label {
+            background: none;
         }
     }
 }
