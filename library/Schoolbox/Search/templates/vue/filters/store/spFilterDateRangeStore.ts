@@ -28,6 +28,12 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     const hasDateRange = computed(() => hasStartDate.value && hasEndDate.value);
 
     /**
+     * Is either the start or end date filter set
+     * @returns {boolean}
+     */
+    const isActive = computed(() => hasStartDate.value || hasEndDate.value);
+
+    /**
      * clear the date filter
      */
     function clear() {
@@ -41,6 +47,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         hasEndDate,
         hasStartDate,
         hasDateRange,
+        isActive,
         clear,
     };
 });

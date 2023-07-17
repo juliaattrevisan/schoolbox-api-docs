@@ -12,7 +12,7 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
      * Is the creator filter set
      * @returns {boolean}
      */
-    const hasCreator = computed(() => creator.value !== null);
+    const isActive = computed(() => creator.value !== null);
 
     /**
      * clear the creator filter
@@ -23,7 +23,7 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
 
     return {
         creator,
-        hasCreator,
+        isActive,
         clear,
     };
 });

@@ -3,11 +3,20 @@
  */
 
 import { defineStore } from "pinia";
+import { computed } from "vue";
 import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorStore } from "./spFilterCreatorStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
 
-export const useFilters = defineStore("spFilters", () => {
+export const useFiltersStore = defineStore("spFilters", () => {
+    /**
+     * Are there any filters active
+     * @returns {boolean}
+     */
+    const isActive = computed(
+        () => useFilterDateRangeStore().isActive || useFilterCreatorStore().isActive || useFilterTypesStore().isActive
+    );
+
     /**
      * clear all filters
      */
@@ -18,6 +27,7 @@ export const useFilters = defineStore("spFilters", () => {
     }
 
     return {
+        isActive,
         clear,
     };
 });

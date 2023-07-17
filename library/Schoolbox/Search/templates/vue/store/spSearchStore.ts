@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useStore } from "./searchPageStore";
 import { useResultsStore } from "../results/store/spResultsStore";
-import { useFiltersStore } from "../filters/store/spFilterTypesStore";
+import { useFiltersStore } from "../filters/store/spFiltersStore";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 
@@ -41,7 +41,7 @@ export const useSearchStore = defineStore("spSearch", () => {
      */
     async function search() {
         activeQuery.value = query.value;
-        hasSearchedWithActiveFilters.value = useFiltersStore().hasActiveFilters;
+        hasSearchedWithActiveFilters.value = useFiltersStore().isActive;
         hasNotSearched.value = false;
         isSearching.value = true;
         try {

@@ -13,7 +13,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      * Are there any types active
      * @returns {boolean}
      */
-    const hasActiveTypes = computed(() => activeTypes.value.length > 0);
+    const isActive = computed(() => activeTypes.value.length > 0);
 
     /**
      * clear the current types
@@ -25,7 +25,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     return {
         allTypes,
         activeTypes,
-        hasActiveTypes,
+        isActive,
         clear,
     };
 });
