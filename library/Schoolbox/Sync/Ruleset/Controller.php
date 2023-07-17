@@ -9,7 +9,7 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
-use GuzzleHttp\Psr7\PumpStream;
+use Closure;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Effect;
@@ -252,32 +252,22 @@ class Controller extends Base
             $model  = Log\Mapper::getInstance()->findById($logId);
 
             if ('stream' === $format) {
-                $this->psr7Response = $this->responseFactory->buildFromStream(
-                    new PumpStream(function () {
-                        static $counter = 1;
-                        if ($counter <= 10) {
-                            return ($counter++) . "\n";
-                        }
-                        return false;
-                    })
+                $this->psr7Response = $this->responseFromTemplateStreamedData(
+                    Closure::fromCallable([$this, 'streamLog']),
+                    [
+                        'stream'          => $this->filesystemProxy->readStream($model->getStorage()),
+                        'filter'          => $this->parseFilterString($filter),
+                        'filterBlacklist' => ['rulestring'],
+                    ],
+                    $template,
+                    "@upsRuleset/log/stream-header.twig",
+                    "@upsRuleset/log/stream-footer.twig",
+                    [
+                        'id'            => $logId,
+                        'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
+                        'useInlineCSS'  => true,
+                    ],
                 );
-//                $this->getResponse()->content->set([
-//                    'header'    => "@upsRuleset/log/stream-header.twig",
-//                    'template'  => $template,
-//                    'footer'    => "@upsRuleset/log/stream-footer.twig",
-//                    'format'    => $format,
-//                    'data' => [
-//                        'id'            => $logId,
-//                        'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
-//                        'useInlineCSS'  => true,
-//                    ],
-//                    'callback'  => [ $this, 'streamLog' ],
-//                    'param_arr' => [
-//                        'stream'          => $this->filesystemProxy->readStream($model->getStorage()),
-//                        'filter'          => $this->parseFilterString($filter),
-//                        'filterBlacklist' => ['rulestring'],
-//                    ],
-//                ]);
             } else {
                 $log = [
                     'timestamp' => $model->getStorage()->getCreatedAt(),

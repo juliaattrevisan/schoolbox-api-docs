@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Web\Response;
 
 use Alaress\Web\Output\DataGenerator\IDataGenerator;
+use Closure;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -160,6 +161,39 @@ class Factory
 
         // Render it all out
         return $this->buildFromContent($this->twig->render('include/chrome.twig', $data));
+    }
+
+    /**
+     * Build a response from the content of a data stream, each line of which is
+     * then rendered via Twig.
+     *
+     * @param Closure     $dataCallback
+     * @param array       $dataCallbackArguments
+     * @param string      $template
+     * @param string|null $headerTemplate
+     * @param string|null $footerTemplate
+     * @param array       $headerFooterData
+     * @return ResponseInterface
+     */
+    public function buildHtmlFromStream(
+        Closure $dataCallback,
+        array $dataCallbackArguments,
+        string $template,
+        ?string $headerTemplate = null,
+        ?string $footerTemplate = null,
+        array $headerFooterData = [],
+    ) {
+        return $this->buildFromStream(
+            new TwigCallbackStream(
+                $this->twig,
+                $dataCallback,
+                $dataCallbackArguments,
+                $template,
+                $headerTemplate,
+                $footerTemplate,
+                $headerFooterData,
+            )
+        );
     }
 
     /**

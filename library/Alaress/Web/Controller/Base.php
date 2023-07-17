@@ -21,6 +21,7 @@ use Aura\Session\SegmentInterface;
 use Aura\Web\Response;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
+use Closure;
 use Crell\ApiProblem\ApiProblem;
 use LogicException;
 use Psr\Container\ContainerInterface;
@@ -609,6 +610,35 @@ abstract class Base
     protected function responseFromTemplateUnthemed(string $template, array $data): ResponseInterface
     {
         return $this->responseFactory->buildUnthemedHtml($template, $data, $this->user);
+    }
+
+    /**
+     * Shortcut method for building a HTML response from streamed data.
+     *
+     * @param Closure $dataCallback
+     * @param array $dataCallbackArguments
+     * @param string $template
+     * @param string|null $headerTemplate
+     * @param string|null $footerTemplate
+     * @param array $headerFooterData
+     * @return ResponseInterface
+     */
+    protected function responseFromTemplateStreamedData(
+        Closure $dataCallback,
+        array $dataCallbackArguments,
+        string $template,
+        ?string $headerTemplate = null,
+        ?string $footerTemplate = null,
+        array $headerFooterData = [],
+    ): ResponseInterface {
+        return $this->responseFactory->buildHtmlFromStream(
+            $dataCallback,
+            $dataCallbackArguments,
+            $template,
+            $headerTemplate,
+            $footerTemplate,
+            $headerFooterData,
+        );
     }
 
     /**
