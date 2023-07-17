@@ -74,9 +74,27 @@ test("should show nodes in search results when search is active", async () => {
     await useSearchStore().$patch({
         query: "Node",
         results: [
-            { id: 1, code: "C1", name: "Node 1" },
-            { id: 2, code: "C2", name: "Node 2" },
-            { id: 3, code: "C2", name: "Node 3" },
+            {
+                id: 1,
+                code: "C1",
+                name: "Node 1",
+                description: "",
+                _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
+            },
+            {
+                id: 2,
+                code: "C2",
+                name: "Node 2",
+                description: "",
+                _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
+            },
+            {
+                id: 3,
+                code: "C2",
+                name: "Node 3",
+                description: "",
+                _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
+            },
         ],
     });
     expect(wrapper.findAllComponents("[data-test-view-node-name]")).toHaveLength(3);
