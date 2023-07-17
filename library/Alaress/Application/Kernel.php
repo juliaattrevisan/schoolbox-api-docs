@@ -645,6 +645,16 @@ abstract class Kernel
             )
         );
 
+        // PSR-17 compliant request factory: implements all of the interfaces
+        // defined in that PSR.
+        // TODO consider hand-building instead of relying upon discovery?
+        //      The reason I'm using discovery is because the discovery class
+        //      provides a convenient createServerRequestFromGlobals method.
+        $di->set(
+            'httpFactory',
+            $di->lazyNew(Psr17Factory::class)
+        );
+
         // Web request/response factory
         $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
 
@@ -652,12 +662,13 @@ abstract class Kernel
         $di->set(
             'request',
             $di->lazy(
-                function () {
+                function () use ($di) {
                     // This will be a ServerRequestInterface,
                     // but of a discovered rather than defined type.
                     // That should be fine: they all obey the same interface.
-                    // TODO hand-build instead of relying upon discovery?
-                    $request = (new Psr17Factory())->createServerRequestFromGlobals();
+                    /** @var Psr17Factory $httpFactory */
+                    $httpFactory = $di->get('httpFactory');
+                    $request     = $httpFactory->createServerRequestFromGlobals();
 
                     // If the request is JSON:
                     // set the parsed body appropriately
@@ -740,11 +751,11 @@ abstract class Kernel
                         );
                     }
 
-                    // TODO hand-build factories instead of discovering?
-                    $psr17Factory = new Psr17Factory();
+                    /** @var Psr17Factory $httpFactory */
+                    $httpFactory = $di->get('httpFactory');
                     return new ResponseFactory(
-                        $psr17Factory,
-                        $psr17Factory,
+                        $httpFactory,
+                        $httpFactory,
                         $templateEngine,
                         $dataGenerators
                     );
