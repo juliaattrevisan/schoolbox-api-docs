@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useStore } from "./searchPageStore";
 import { useResultsStore } from "../results/store/spResultsStore";
-import { useFiltersStore } from "../filters/store/spFiltersStore";
+import { useFiltersStore } from "../filters/store/spFilterTypesStore";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 

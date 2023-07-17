@@ -1,29 +1,23 @@
 /**
- * Store the current search results when searching from sp-input
+ * Store all the filters
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
+import { useFilterCreatorStore } from "./spFilterCreatorStore";
+import { useFilterTypesStore } from "./spFilterTypesStore";
 
-export const useFiltersStore = defineStore("spFilters", () => {
-    const activeFilters = ref([]); // the currently active filters
-
+export const useFilters = defineStore("spFilters", () => {
     /**
-     * Are there any filters active
-     * @returns {boolean}
-     */
-    const hasActiveFilters = computed(() => activeFilters.value.length > 0);
-
-    /**
-     * clear the current filters
+     * clear all filters
      */
     function clear() {
-        activeFilters.value = [];
+        useFilterDateRangeStore().clear();
+        useFilterCreatorStore().clear();
+        useFilterTypesStore().clear();
     }
 
     return {
-        activeFilters,
-        hasActiveFilters,
         clear,
     };
 });
