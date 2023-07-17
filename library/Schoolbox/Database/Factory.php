@@ -4,6 +4,7 @@ namespace Schoolbox\Database;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
+use Alaress\Database\Connector\ReadReplicatedProxy;
 use Alaress\Database\Exception;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
@@ -136,6 +137,19 @@ class Factory
      */
     public function getInternalDatabase(): IConnector
     {
+        // TODO: use the DB Proxy to correctly route to the correct DB connection...
+        return new ReadReplicatedProxy($this->getInternalWriteDatabase(), $this->getInternalReadDatabase(), 10);
+    }
+
+    /**
+     * Retrieve a writable connection to Schoolbox database
+     *
+     * @return IConnector
+     * @throws DatabaseException
+     */
+    private function getInternalWriteDatabase(): IConnector
+    {
+        // TODO: use the DB Proxy to correctly route to the correct DB connection...
         $connectorInternal = $this->factory->createMysql();
 
         $host = SQL_host;
