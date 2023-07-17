@@ -72,6 +72,18 @@ class Controller extends Base
             'config'    => [
                 'activity_edit' => [
                     'back' => false,
+                    'item' => [
+                        'title' => [
+                            'show' => true
+                        ]
+                    ]
+                ],
+                'item_edit' => [
+                    'item' => [
+                        'title' => [
+                            'show' => true
+                        ]
+                    ]
                 ]
             ],
             'mode'      => 'activity_edit',
