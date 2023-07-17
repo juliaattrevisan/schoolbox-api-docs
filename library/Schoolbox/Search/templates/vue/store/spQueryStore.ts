@@ -7,7 +7,7 @@ import { defineStore } from "pinia";
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 
 export const useQueryStore = defineStore("spQuery", () => {
-    const query = window.Vue.ref("biology"); // current search input
+    const query = window.Vue.ref("test"); // current search input
     const activeQuery = window.Vue.ref(""); // the latest query that was searched
 
     /**
