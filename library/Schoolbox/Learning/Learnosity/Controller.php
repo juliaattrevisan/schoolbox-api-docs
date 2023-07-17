@@ -77,6 +77,11 @@ class Controller extends Base
                             'show' => true
                         ]
                     ],
+                    'item_search' => [
+                        'title' => [
+                            'show' => true,
+                        ],
+                    ],
                     'reference' => [
                         'show' => false,
                     ]
