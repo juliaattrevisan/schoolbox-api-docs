@@ -331,22 +331,40 @@ class Controller extends Base
 
 
     /**
+     * Archive (soft-delete)
+     *
+     * @return void
+     * @throws ValidationException
+     * @throws \DebugBar\DebugBarException
+     * @throws \JsonException
+     */
+    public function getArchiveReferences(): void
+    {
+        $references = [
+            '8a841c38-c4ab-4dc0-827e-1927c071c9c4',
+            '785f3e5a-4338-491e-a3e8-9b592e5774bc',
+        ];
+
+        foreach ($references as $reference) {
+            $payload = [
+                'reference' => $reference,
+                'status' => 'archived'
+            ];
+
+            $result = $this->api->dataRequest('/itembank/questions', $payload, 'post');
+
+            new \Alaress_Probe($result);
+        }
+    }
+
+
+    /**
      * Build quiz contents
      */
     public function getActivityList(): void
     {
         $payload = [
-            'mode' => 'activity_edit',
-
-            /* A Learnosity uuid that we arbitrarily prescribed
-             */
-            'reference' => 'fdf98aef-3a7c-4851-ab3a-0fd499ee3553',
-
-            'config' => [
-                'activity_edit' => [
-                    'back' => false,
-                ]
-            ],
+            'mode' => 'activity_list',
 
             'user' => [
                 /* Corresponds to a user in the Learnosity Console who will be

@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Lumberjack\Logger;
+use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
+use LearnositySdk\Request\DataApi;
 use LearnositySdk\Request\Init;
 
 /**
@@ -22,6 +24,9 @@ use LearnositySdk\Request\Init;
  */
 class Api
 {
+    private const DATA_API_HOST = 'https://data.learnosity.com/v2023.1.LTS/';
+
+
     /**
      * Constructor.
      *
@@ -79,5 +84,33 @@ class Api
             $this->consumerSecret,
             $payload
         ))->generate();
+    }
+
+
+    /**
+     * Make a specific request to the Data API in Learnosity
+     *
+     * @param string $endpoint
+     * @param array  $payload
+     * @param string $method
+     * @return mixed
+     * @throws ValidationException
+     */
+    public function dataRequest(string $endpoint, array $payload, string $method = 'get'): mixed
+    {
+        /* Strip slashes, to prevent typos
+         */
+        $response = (new DataApi())->request(
+            self::DATA_API_HOST . trim($endpoint, '/'),
+            [
+                'domain'       => $this->serverName,
+                'consumer_key' => $this->consumerKey
+            ],
+            $this->consumerSecret,
+            $payload,
+            $method
+        );
+
+        return $response->json();
     }
 }
