@@ -36,6 +36,16 @@ export const useSearchStore = defineStore("spSearch", () => {
     });
 
     /**
+     * To collect all the params to send to the search api
+     * @returns {string} - the query params
+     */
+    function getQueryParams() {
+        const newQueryParams = new URLSearchParams();
+        newQueryParams.append("keyword", activeQuery.value);
+        return newQueryParams.toString();
+    }
+
+    /**
      * search for nodes that match
      */
     async function search() {
@@ -44,7 +54,7 @@ export const useSearchStore = defineStore("spSearch", () => {
         hasNotSearched.value = false;
         isSearching.value = true;
         try {
-            const response = await fetch(`${useStore().endpoint}?query=${activeQuery.value}`, {
+            const response = await fetch(`${useStore().endpoint}?${getQueryParams()}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
