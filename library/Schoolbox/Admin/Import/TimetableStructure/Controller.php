@@ -131,14 +131,12 @@ class Controller extends UserAccount\Controller
         $contents = stream_get_contents($fp);
         fclose($fp);
 
-        $headers  = $this->getResponse()->headers;
-
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', strlen($contents));
-        $headers->set('Content-Disposition', "attachment; filename=\"timetableStructure.csv\"");
-
-        $this->psr7Response = $this->responseFromContent($contents);
+        $this->psr7Response = $this->responseFromContent($contents)
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', strlen($contents))
+            ->withHeader('Content-Disposition', "attachment; filename=\"timetableStructure.csv\"")
+        ;
     }
 }

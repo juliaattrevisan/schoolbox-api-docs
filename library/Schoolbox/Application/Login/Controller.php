@@ -65,9 +65,9 @@ class Controller extends Base
 
         // Don't output login screen if XHR request
         if ($this->isJsonRequest() || $this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(['error' => 'Unauthenticated']);
-            $this->getResponse()->headers->set('Unauthenticated', 401);
-            exit;
+            $this->psr7Response = $this->responseAsJson(['error' => 'Unauthenticated'])
+                ->withHeader('Unauthenticated', 401);
+            return;
         }
 
         // is SAML enabled?

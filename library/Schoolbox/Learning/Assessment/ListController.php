@@ -163,15 +163,13 @@ class ListController extends Web\Controller\Base
 
         /* Send as a downloadable file
          */
-        $headers  = $this->getResponse()->headers;
-
-        $headers->set('Pragma', 'no-cache');
-        $headers->set('Cache-Control', 'private, max-age=1, no-transform');
-        $headers->set('Content-Type', 'application/seb');
-        $headers->set('Content-Length', strlen($contents));
-        $headers->set('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"");
-
-        $this->psr7Response = $this->responseFromContent($contents);
+        $this->psr7Response = $this->responseFromContent($contents)
+            ->withHeader('Pragma', 'no-cache')
+            ->withHeader('Cache-Control', 'private, max-age=1, no-transform')
+            ->withHeader('Content-Type', 'application/seb')
+            ->withHeader('Content-Length', strlen($contents))
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"")
+        ;
     }
 
 

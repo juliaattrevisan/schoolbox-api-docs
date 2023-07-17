@@ -187,13 +187,12 @@ class Controller extends Base
         $content = (new Csv())->generate($report, $indicators);
         $today = \Alaress_Date_Format::now()->getDatabaseDate();
 
-        $headers = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', \strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"");
-
-        $this->psr7Response = $this->responseFromContent($content);
+        $this->psr7Response = $this->responseFromContent($content)
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', \strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"")
+        ;
     }
 }

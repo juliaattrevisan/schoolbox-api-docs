@@ -579,12 +579,6 @@ class Controller extends Base
         // Otherwise: render it in Twig, and output as an attachment if either:
         // * the HTML mimetype is openable inline
         // * the `save` query string param exists
-        if (!$file->getMimetype()->getInline() || $this->requestQuery->get('save')) {
-            $this->response->headers->set(
-                'Content-Disposition',
-                sprintf('attachment; filename="%s"', $file->getBasename()),
-            );
-        }
         $this->psr7Response = $this->responseFromTemplateUnthemed(
             '@learningDueWorkResponse/responseFileInline.twig',
             [
@@ -592,6 +586,12 @@ class Controller extends Base
                 'fileContent' => $this->filesystemProxy->read($file),
             ],
         );
+        if (!$file->getMimetype()->getInline() || $this->requestQuery->get('save')) {
+            $this->psr7Response = $this->psr7Response->withHeader(
+                'Content-Disposition',
+                sprintf('attachment; filename="%s"', $file->getBasename()),
+            );
+        }
     }
 
 

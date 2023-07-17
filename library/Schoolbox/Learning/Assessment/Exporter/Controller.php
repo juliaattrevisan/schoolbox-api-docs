@@ -628,25 +628,22 @@ class Controller extends BaseController
 
         // Force download/
         if (file_exists($filename)) {
-            $headers = $this->getResponse()->headers;
-
-            // per header
-            $headers->set('Content-Description', 'File Transfer');
-            $headers->set('Content-Type', 'text/csv');
-            $headers->set('Content-Description', 'File Transfer');
-            $headers->set('Content-Disposition', 'attachment; filename="' . $newFilename . '"');
-            $headers->set('Expires', 0);
-            $headers->set('Cache-Control', 'must-revalidate');
-            $headers->set('Pragma', 'public');
-            $headers->set('Content-Length', filesize($filename));
-
             $this->postOutputCallbacks[] = function () use ($filename) {
                 /* Delete the temp file
                  */
                 unlink($filename);
             };
 
-            $this->psr7Response = $this->responseFromContent(file_get_contents($filename));
+            $this->psr7Response = $this->responseFromContent(file_get_contents($filename))
+                ->withHeader('Content-Description', 'File Transfer')
+                ->withHeader('Content-Type', 'text/csv')
+                ->withHeader('Content-Description', 'File Transfer')
+                ->withHeader('Content-Disposition', 'attachment; filename="' . $newFilename . '"')
+                ->withHeader('Expires', 0)
+                ->withHeader('Cache-Control', 'must-revalidate')
+                ->withHeader('Pragma', 'public')
+                ->withHeader('Content-Length', filesize($filename))
+            ;
         }
     }
 
