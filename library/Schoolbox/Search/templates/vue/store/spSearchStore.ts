@@ -7,6 +7,7 @@ import { useStore } from "./searchPageStore";
 import { useQueryStore } from "./spQueryStore";
 import { useResultsStore } from "../results/store/spResultsStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
+import type { Result } from "../../js/types/Result";
 
 export const useSearchStore = defineStore("spSearch", () => {
     const hasNotSearched = window.Vue.ref(true); // to determine whether any searches have been made
@@ -39,7 +40,7 @@ export const useSearchStore = defineStore("spSearch", () => {
                     "Content-Type": "application/json",
                 },
             });
-            useResultsStore().results = (await response.json()) as unknown[];
+            useResultsStore().results = (await response.json()) as Result[];
         } catch (error) {
             hasLoadError.value = true;
         } finally {

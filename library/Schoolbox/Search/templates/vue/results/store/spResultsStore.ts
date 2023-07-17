@@ -3,9 +3,10 @@
  */
 
 import { defineStore } from "pinia";
+import type { Result } from "../../../js/types/Result";
 
 export const useResultsStore = defineStore("spResults", () => {
-    const results = window.Vue.ref<unknown[]>([]); // returned search results
+    const results = window.Vue.ref<Result[]>([]); // returned search results
     /**
      * To show that there is results that match the current search
      * @returns {boolean}
