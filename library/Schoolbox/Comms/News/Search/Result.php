@@ -307,7 +307,7 @@ class Result extends Base
             LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
-        $stmt = $mapper->getDatabaseRead()->prepare($query);
+        $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute();
 
         return $stmt->fetchAll();

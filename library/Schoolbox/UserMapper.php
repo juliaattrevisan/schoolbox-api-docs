@@ -336,7 +336,7 @@ class UserMapper extends Mapper
             }
         }
         $query = $this->getSelectString() . ' WHERE ' . $query . ' AND user.deleted_at IS NULL';
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateSelect($statement);
     }
@@ -708,7 +708,7 @@ class UserMapper extends Mapper
         }
 
         $users = new Collection();
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
         foreach ($statement as $row) {
@@ -736,7 +736,7 @@ class UserMapper extends Mapper
      */
     public function hashPassword(#[SensitiveParameter] string $password): string
     {
-        $statement = $this->getDatabaseRead()->prepare('SELECT PASSWORD(?)');
+        $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
         $statement->execute([$password]);
         return $statement->fetchColumn();
     }

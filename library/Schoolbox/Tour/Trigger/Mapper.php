@@ -118,7 +118,7 @@ class Mapper extends BaseMapper
     {
         $sql = "{$this->getSelectString()} WHERE `tour_uuid` = :tourUuid AND :url REGEXP `url_regex`";
 
-        $statement = $this->getDatabaseRead()->prepare($sql);
+        $statement = $this->getDatabase()->prepare($sql);
         $statement->execute([
             'url'      => $url,
             'tourUuid' => $tour->getUuid(),

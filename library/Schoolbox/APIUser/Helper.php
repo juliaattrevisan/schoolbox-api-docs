@@ -28,7 +28,7 @@ class Helper
         ?array $filter
     ) {
         [$query, $params] = $this->buildSearch($keyword, $filter);
-        $statement = $this->userMapper->getDatabaseRead()->prepare($query);
+        $statement = $this->userMapper->getDatabase()->prepare($query);
         foreach ($params as $label => $value) {
             $statement->bindValue($label, $value);
         }
@@ -63,7 +63,7 @@ class Helper
             $query .= " LIMIT :limit";
         }
 
-        $statement = $this->userMapper->getDatabaseRead()->prepare($query);
+        $statement = $this->userMapper->getDatabase()->prepare($query);
         if (0 !== $limit) {
             $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }

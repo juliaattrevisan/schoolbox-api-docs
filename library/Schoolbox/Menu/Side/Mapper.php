@@ -81,7 +81,7 @@ class Mapper extends BaseMapper
             $params['roleId'] = $user->getRole()->getId();
         }
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateSelect($statement);
     }
@@ -113,7 +113,7 @@ class Mapper extends BaseMapper
             'userAccess' => UserAccess::ACCESS_AWAITING_AUTHORISATION,
         ];
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
         $groups = $statement->fetchAll();

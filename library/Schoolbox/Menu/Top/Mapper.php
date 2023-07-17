@@ -76,7 +76,7 @@ class Mapper extends BaseMapper
         $params = $this->getPredicateBuilder()->getArrayParameters($campusList, 'campus');
         $params['roleId'] = $user->getRole()->getId();
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateList($statement);
     }

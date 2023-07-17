@@ -128,7 +128,7 @@ class Mapper extends \Schoolbox\Mapper
             ORDER BY ssf.id
         ';
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
             'assessmentId' => $assessmentId,
             'status' => Model::STATUS_COMPLETE

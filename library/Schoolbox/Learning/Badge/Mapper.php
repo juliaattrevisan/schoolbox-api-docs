@@ -154,7 +154,7 @@ class Mapper extends \Schoolbox\Mapper
             WHERE {$this->getTable()}.{$this->getIdentifierColumn()} = :badgeId
         ";
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
             'badgeId' => $badge->getId()
         ]);

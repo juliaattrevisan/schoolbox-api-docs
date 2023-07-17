@@ -276,7 +276,7 @@ class Mapper extends BaseMapper
             WHERE {$this->getTable()}.{$this->getIdentifierColumn()} = :evidenceId
         ";
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute(
             [
                 'evidenceId' => $evidence->getId(),

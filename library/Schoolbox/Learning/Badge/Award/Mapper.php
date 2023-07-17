@@ -402,7 +402,7 @@ class Mapper extends \Schoolbox\Mapper
             $query .= ' WHERE (' . implode(') AND (', $wheres) . ')';
         }
         $query     .= ' ORDER BY badge_user.awarded_at DESC ';
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($pb->getParams());
 
         return $this->hydrateSelect($statement);
@@ -492,7 +492,7 @@ class Mapper extends \Schoolbox\Mapper
         $params['status'] = $awardStatus;
         $params['roleType'] = $roleType;
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
         $users = [];

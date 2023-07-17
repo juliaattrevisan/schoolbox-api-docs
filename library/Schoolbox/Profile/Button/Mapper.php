@@ -74,7 +74,7 @@ class Mapper extends BaseMapper
             'visibilityRoleId' => $viewer->getRole()->getId()
         ]);
 
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         $buttons = $this->hydrateList($statement);
 

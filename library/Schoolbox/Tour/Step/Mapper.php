@@ -176,7 +176,7 @@ class Mapper extends BaseMapper
                         `tour_step_tooltip`.`deleted_at` IS NULL
             ORDER BY    `tour_step_event`.`order`
         ";
-        $statement = $this->getDatabaseRead()->prepare($query);
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
             'tourUuid' => $tourUuid
         ]);

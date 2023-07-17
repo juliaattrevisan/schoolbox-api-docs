@@ -88,7 +88,7 @@ class Helper
             $query .= "\nLIMIT :limit ";
         }
 
-        $statement = $this->mapper->getDatabaseRead()->prepare($query);
+        $statement = $this->mapper->getDatabase()->prepare($query);
 
         if (0 !== $limit) {
             $statement->bindValue('limit', $limit, PDO::PARAM_INT);
@@ -193,7 +193,7 @@ class Helper
     public function searchForAssessmentsCount(array $filter): int
     {
         [$query, $params] = $this->buildSearch($filter);
-        $statement = $this->mapper->getDatabaseRead()->prepare($query);
+        $statement = $this->mapper->getDatabase()->prepare($query);
         foreach ($params as $label => $value) {
             $statement->bindValue($label, $value);
         }
@@ -857,7 +857,7 @@ class Helper
     public function getFolderCode(int $folderId)
     {
         if (null === $this->folderCodes) {
-            $statement = $this->mapper->getDatabaseRead()->prepare("
+            $statement = $this->mapper->getDatabase()->prepare("
             SELECT folder_id, code
             FROM folder_code
             WHERE deleted_at is NULL
@@ -904,7 +904,7 @@ class Helper
      */
     public function getRubric(string $assessmentId): ?array
     {
-        $statement = $this->mapper->getDatabaseRead()->prepare("
+        $statement = $this->mapper->getDatabase()->prepare("
         SELECT
             rd.id as `descriptor_id`,
             rd.max_value as `descriptor_max_value`,
@@ -973,7 +973,7 @@ class Helper
      */
     public function getRubricFeedback(string $assessmentId, int $feedbackID): ?array
     {
-        $statement = $this->mapper->getDatabaseRead()->prepare("
+        $statement = $this->mapper->getDatabase()->prepare("
         select `sb`.`assessment_id`                                  AS `assessment_id`,
            `vr`.`capability_mark_type_id`                        AS `capability_mark_type_id`,
            `vr`.`capability_grade_group_id`                      AS `capability_grade_group_id`,
