@@ -29,7 +29,6 @@ use UnexpectedValueException;
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * @var ComponentDelegate
      */

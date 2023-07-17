@@ -157,7 +157,6 @@ class ReadReplicatedProxy implements IConnector
     public function connect(string $hostname, string $database, string $username, #[SensitiveParameter] string $password, array $options = [],): bool
     {
         throw new Exception('Not supported.');
-        return false;
     }
 
     /**
@@ -169,7 +168,6 @@ class ReadReplicatedProxy implements IConnector
     public function reconnect($options = null)
     {
         throw new Exception('Not supported.');
-        return false;
     }
 
     /**
