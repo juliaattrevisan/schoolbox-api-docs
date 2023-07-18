@@ -57,6 +57,7 @@ export const useResultsStore = defineStore("spResults", () => {
      */
     function setMoreResults(moreResults: Result[]) {
         results.value = [...results.value, ...moreResults];
+        moreResultsCount.value += 1;
     }
 
     /**

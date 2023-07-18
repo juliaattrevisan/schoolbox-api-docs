@@ -4,6 +4,7 @@
  */
 
 import { useResultsStore } from "../store/spResultsStore";
+import SpResultsListLoadMore from "./sp-results-list-load-more.vue";
 
 const resultsStore = useResultsStore();
 </script>
@@ -20,7 +21,7 @@ const resultsStore = useResultsStore();
                 </div>
             </template>
         </div>
-        <button v-if="resultsStore.hasMoreResults">Load more</button>
+        <sp-results-list-load-more />
     </div>
 </template>
 
