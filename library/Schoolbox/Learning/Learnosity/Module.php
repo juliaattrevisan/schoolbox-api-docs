@@ -14,7 +14,9 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use OutOfBoundsException;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Alaress\Authorizer\Rule;
@@ -174,9 +176,6 @@ class Module extends BaseModule
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
             throw new NotFound();
-        } catch (OutOfBoundsException $e) {
-            // given user/assessment combination is invalid: not a participant
-            throw new NotFound();
         } catch (MapperException $e) {
             // either assessment or user was not found
             throw new NotFound();
@@ -194,6 +193,12 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
+     * @throws Exception
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws NotFound
      */
     protected function preloadAttempt(array $params): array
     {
@@ -254,7 +259,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|ErrorMapper
+     * @return ErrorMapper
      * @throws InvalidArgumentException
      */
     protected function getErrorMapper()
