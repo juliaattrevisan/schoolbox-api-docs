@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
@@ -23,6 +24,7 @@ use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Seb\Payload;
@@ -31,6 +33,7 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -575,6 +578,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $before   = $notifier->dehydrate($assessment);
             $this->getAssessmentMapper()->delete($assessment);
             $notifier->notify($assessment, $this->getUser(), $before);
+        }
+
+        /* Delete corresponding Learnosity items
+         */
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            $api = new Api(
+                $_SERVER['SERVER_NAME'],
+                $this->getConfigLoader()->get('learnosity_consumer_key'),
+                $this->getConfigLoader()->get('learnosity_consumer_secret'),
+                new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+            );
+
+            (new Helper($api))->archive($assessment->getLearnosityReference());
         }
 
         $folder = $assessment->getContext()->getFolder();

@@ -7,10 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Learning\Learnosity;
+namespace Schoolbox\Learning\Learnosity;
 
 use LearnositySdk\Exceptions\ValidationException;
-use Schoolbox\Learning\Learnosity\Api;
 
 /**
  * A shortcut to simple operations that involve
