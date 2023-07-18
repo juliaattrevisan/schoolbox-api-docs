@@ -5,20 +5,20 @@
 import { defineStore } from "pinia";
 
 export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
-    const creator = window.Vue.ref<string | null>(null);
-    const activeCreator = window.Vue.ref<string | null>(null);
+    const creator = window.Vue.ref<string>("");
+    const activeCreator = window.Vue.ref<string>("");
 
     /**
      * Is the creator filter set
      * @returns {boolean}
      */
-    const isSelected = window.Vue.computed(() => creator.value !== null);
+    const isSelected = window.Vue.computed(() => creator.value !== "");
 
     /**
      * Is the active creator filter set
      * @returns {boolean}
      */
-    const isActive = window.Vue.computed(() => activeCreator.value !== null);
+    const isActive = window.Vue.computed(() => activeCreator.value !== "");
 
     /**
      * set the active creator filter, linked to the currently active search,
@@ -43,8 +43,8 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
      * clear the creator filter
      */
     function clear() {
-        creator.value = null;
-        activeCreator.value = null;
+        creator.value = "";
+        activeCreator.value = "";
     }
 
     return {

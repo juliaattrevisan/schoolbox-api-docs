@@ -7,6 +7,7 @@ import { defineStore } from "pinia";
 export type FilterType = {
     title: string;
     value: string;
+    subTypes?: FilterType[];
 };
 
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {

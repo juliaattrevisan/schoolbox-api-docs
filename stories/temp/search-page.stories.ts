@@ -49,8 +49,26 @@ const meta: Meta<typeof SearchPage> = {
         endpoint,
         filterTypes: [
             {
+                title: "Assessment",
+                value: "assessment",
+                subTypes: [
+                    {
+                        title: "Due Work",
+                        value: "assessment.dueWork",
+                    },
+                    {
+                        title: "Lesson Plan",
+                        value: "assessment.lessonPlan",
+                    },
+                    {
+                        title: "Project",
+                        value: "assessment.project",
+                    },
+                ],
+            },
+            {
                 title: "Badge",
-                value: "badge",
+                value: "event",
             },
             {
                 title: "Event",

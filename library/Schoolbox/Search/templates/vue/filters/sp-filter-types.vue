@@ -9,8 +9,8 @@ const filterTypesStore = useFilterTypesStore();
 </script>
 
 <template>
-    <h2 class="subheader">Filters</h2>
-    <section class="content">
+    <div class="small-12 columns">
+        <label>Types</label>
         <fieldset class="checklist">
             <ul class="option-list">
                 <li v-for="filter in filterTypesStore.allTypes" :key="filter.value">
@@ -21,10 +21,21 @@ const filterTypesStore = useFilterTypesStore();
                         :value="filter.value"
                     />
                     <label :for="filter.value">{{ filter.title }}</label>
+                    <ul v-if="filter.subTypes">
+                        <li v-for="subType in filter.subTypes" :key="subType.value">
+                            <input
+                                :id="subType.value"
+                                v-model="filterTypesStore.selectedTypes"
+                                type="checkbox"
+                                :value="subType.value"
+                            />
+                            <label :for="subType.value">{{ subType.title }}</label>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </fieldset>
-    </section>
+    </div>
 </template>
 
 <style scoped></style>
