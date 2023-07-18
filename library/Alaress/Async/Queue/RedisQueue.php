@@ -202,7 +202,7 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance|TriggerInterface $instance
      * @return string
      */
-    private static function deflate(Instance|TriggerInterface  $instance): string
+    private static function deflate(Instance|TriggerInterface $instance): string
     {
         return gzcompress(serialize($instance), self::COMPRESSION_LEVEL);
     }

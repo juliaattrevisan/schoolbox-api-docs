@@ -186,13 +186,4 @@ class RedisCache implements ICache
     {
         return implode($glue, array_filter($array));
     }
-
-    /**
-     * @param TriggerInterface $trigger
-     * @return string
-     */
-    private static function compress(TriggerInterface $trigger): string
-    {
-        return gzcompress(serialize($trigger), RedisQueue::COMPRESSION_LEVEL);
-    }
 }
