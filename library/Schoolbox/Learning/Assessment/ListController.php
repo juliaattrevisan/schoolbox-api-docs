@@ -504,7 +504,7 @@ class ListController extends Web\Controller\Base
                 // delegate to the appropriate sub-controller
                 $delegate = $this->getDelegateController($type);
                 $delegate->getCreateAssessmentForm($context);
-                $this->setResponse($delegate->getResponse());
+                $this->psr7Response = $delegate->getPsr7Response();
                 return;
             } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
                 // if the client enters an invalid type: ignore

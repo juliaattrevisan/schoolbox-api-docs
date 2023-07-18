@@ -900,7 +900,6 @@ class Controller extends Assessment\Controller
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         $requestPost = $this->requestPost;
-        $rs          = $this->getResponse();
 
         /* Set in javascript when automatically saving a draft
          * Careful the negation

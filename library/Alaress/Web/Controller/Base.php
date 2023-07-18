@@ -57,16 +57,6 @@ abstract class Base
     protected Values $requestPost;
 
     /**
-     * Response object from Aura.Web package.
-     *
-     * @deprecated This will be replaced with a PSR-7 compliant response object
-     *             in `$this->psr7Response`.
-     *             If that object is not set, the output mechanism will fall
-     *             back to this object.
-     */
-    protected Response $response;
-
-    /**
      * A PSR-7 compliant response object.
      *
      * If this is set: a response will be output from this object instead of
@@ -230,28 +220,6 @@ abstract class Base
     public function getAllowBackToTheFuture()
     {
         return $this->allowBackToTheFuture;
-    }
-
-    /**
-     * @deprecated use `$this->psr7Response` instead
-     *
-     * @param  Response $response
-     * @return $this
-     */
-    public function setResponse(Response $response): self
-    {
-        $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * @deprecated use `$this->psr7Response` instead
-     *
-     * @return Response
-     */
-    public function getResponse(): Response
-    {
-        return $this->response;
     }
 
     /**

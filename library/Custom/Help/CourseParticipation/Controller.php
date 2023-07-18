@@ -251,8 +251,6 @@ class Controller extends Base
      */
     public function postFolderAccessBySchool(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
