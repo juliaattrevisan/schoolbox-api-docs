@@ -278,7 +278,7 @@ $rotate-span-width: 11rem;
             }
 
             th:last-child > div {
-                width: 80px; /* Without this hack the rightmost div will have a tiny width.  Could not figure out why. */
+                min-width: $square-grid-td-size; /* Without this hack the rightmost div will have a tiny width.  Could not figure out why. */
             }
         }
 
@@ -324,7 +324,7 @@ $rotate-span-width: 11rem;
 
     td,
     thead th {
-        width: $square-grid-td-size;
+        min-width: $square-grid-td-size;
         white-space: nowrap;
     }
 }
@@ -346,7 +346,6 @@ $rotate-span-width: 11rem;
         border-color: $vapor;
         height: $rotate-width * 2 + 1;
         min-width: $rotate-th-width;
-        max-width: $rotate-th-width;
         position: relative;
         vertical-align: bottom;
         padding: 0 !important;
@@ -355,8 +354,8 @@ $rotate-span-width: 11rem;
         > div {
             transform: skew(-#{$rotate-angle}deg, 0deg);
             overflow: hidden;
-            border: 0 solid #eeeeee;
-            border-left-width: 1px;
+            border: 0 solid #ccc;
+            border-right-width: 1px;
             z-index: 1;
             position: relative;
             height: 100%;
