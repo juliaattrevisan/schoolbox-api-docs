@@ -283,7 +283,7 @@ HELP;
                         $assessmentId,
                         json_encode($expectedAssessmentData),
                         json_encode($actualAssessmentData),
-                        json_encode($differ->diff($expectedAssessmentData, $actualAssessmentData))
+                        json_encode($differ->diff($expectedAssessmentData ?? [], $actualAssessmentData ?? [])),
                     )
                 );
             }
