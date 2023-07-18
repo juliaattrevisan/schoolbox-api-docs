@@ -236,7 +236,7 @@ class Controller extends Assessment\Controller
 
         /* FIXME Temporary shim into Learnosity Prototype
          */
-        $url = $this->router->getGenerator()->generate('learnosity.getAttempt', [
+        $url = $this->router->getGenerator()->generate('learnosity.getIntro', [
             'assessmentId' => $assessment->getId(),
             'studentId' => $student->getId()
         ]);

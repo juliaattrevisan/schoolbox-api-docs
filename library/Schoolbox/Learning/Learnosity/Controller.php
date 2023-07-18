@@ -132,6 +132,24 @@ class Controller extends Base
 
 
     /**
+     * Just use our Welcome screen for now
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     */
+    public function getIntro(IAssessable $assessment, \Schoolbox\User $student): void
+    {
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learnosity/intro.twig', [
+                'assessment' => $assessment,
+                'student' => $student,
+            ])->setTitle("Start {$assessment->getTitle()}")
+        );
+    }
+
+
+    /**
      * Let a student do an attempt in a Learnosity quiz
      *
      * @param IAssessable $assessment
@@ -231,7 +249,7 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learnosity/items.twig', [
+            $this->buildHtmlOutput('@learnosity/attempt.twig', [
                 'initOptions'         => $this->api->initOptions('items', $payload),
                 'assessment'          => $assessment,
                 'attemptId'           => $attempt->getId(),

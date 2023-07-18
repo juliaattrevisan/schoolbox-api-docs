@@ -1,0 +1,36 @@
+{##
+ # Do an attempt
+ #
+ # @param IAssessable $assessment      Our schoolbgox quiz instance
+ # @param int $attemptId               In int corresponding a row in assess_attempt
+ # @param string $completionUrl        A url to the endpoint that records an attempt as "finished"
+ # @param string $learnosityReference  A Learnosity UUID corresponding uniquely to this attempt
+ #}
+<script src="https://items.learnosity.com/?v2023.2.LTS"></script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+
+        <section class="content">
+            <div id="learnosity_assess"></div>
+        </section>
+    </div>
+</div>
+
+<script>
+    let itemsApp = LearnosityItems.init({{ initOptions | raw }});
+
+    /* Async attempt completion
+     */
+    itemsApp.on('test:submit:success', function() {
+        let payload = new FormData();
+        payload.append('attemptId', '{{ attemptId }}');
+        payload.append('learnosityReference','{{ learnosityReference }}');
+
+        const response = fetch('{{ completionUrl }}', {
+            method: 'POST',
+            body: payload
+        });
+    });
+</script>

@@ -71,6 +71,10 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerPerms, $preloadParticipant);
 
+        /* Welcome screen for an attempt
+         */
+        $this->register('GET', '/{assessmentId}/intro/{studentId}', 'getIntro', $learnerPerms, $preloadParticipant);
+
         /* Start a new attempt
          */
         $this->register('GET', '/{assessmentId}/attempt/{studentId}', 'getAttempt', $learnerPerms, $preloadParticipant);
@@ -84,6 +88,8 @@ class Module extends BaseModule
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
 
+        /* Older exploratory urls that aren't part of our conventional workflow
+         */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
         $this->register('GET', '/items', 'getItems', $instructorPerms, null);
         $this->register('GET', '/feedback', 'getFeedback', $instructorPerms, null);
