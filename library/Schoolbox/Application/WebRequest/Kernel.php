@@ -17,8 +17,6 @@ use Alaress\Csrf;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Registry;
-use Alaress\Web\Output\Json;
-use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Alaress\Web\Response\Factory;
@@ -26,7 +24,6 @@ use Alaress\Web\Response\Outputter;
 use Aura\Di\Container;
 use Aura\Router\Route;
 use Aura\Router\RouterContainer;
-use Aura\Web\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 use RuntimeException;
@@ -35,6 +32,7 @@ use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -303,14 +301,6 @@ class Kernel extends WebKernelAbstract
         );
         unset($module);
 
-//        // now the preloading is done initialise the controller
-//        $module->initControllers($this->di);
-//        unset($module);
-//
-//        // TODO replace with a create controller method
-//        /** @var \Alaress\Web\Controller\Base $controller */
-//        $controller = $this->di->get('controller:' . $controllerName);
-
         // The user is now injected directly into the controller, instead of the
         // user being loaded from the session within the controller.
         $controller->setUser($user);
@@ -359,48 +349,23 @@ class Kernel extends WebKernelAbstract
 
         $method->invokeArgs($controller, $args);
 
-        // Process the response: using the PSR-7 response if there is one,
-        // otherwise the output in the old response content.
+        // Process the response, using a blank one if there is none.
         $psr7Response = $controller->getPsr7Response();
-        /** @var ?Response $auraWebResponse */
-        $auraWebResponse = null;
-        /** @var ?OutputInterface $auraWebOutput */
-        $auraWebOutput = null;
         if ($psr7Response) {
-            $redirect  = $psr7Response->getHeader('location');
-            $isJson    = str_contains($psr7Response->getHeaderLine('content-type'), 'application/json');
+            $redirect = $psr7Response->getHeader('location');
+            $isJson   = str_contains($psr7Response->getHeaderLine('content-type'), 'application/json');
         } else {
-            $auraWebResponse = $controller->getResponse();
-            $auraWebOutput   = $auraWebResponse->content->get();
-            if (!$auraWebOutput instanceof OutputInterface) {
-                if (is_array($auraWebOutput)) {
-                    // Figure out output type.
-                    // In order of preference, output type is:
-                    // * set in the response content
-                    // * set in route
-                    // * default to 'html'
-                    $format = $auraWebOutput['format'] ?? null;
-                    if (empty($format)) {
-                        // Strip leading . from format
-                        $format = preg_replace('/^\\./', '', $params['format'] ?? '');
-                        if (empty($format)) {
-                            $format = 'html';
-                        }
-                    }
-                    // Create a different output type (Sitepage, JSON, whatever) based on a
-                    // route param, defaulting to HTML
-                    $auraWebOutput = $this->di->get("webOutput:$format");
-                } elseif (null === $auraWebOutput) {
-                    $auraWebOutput = $this->di->get("webOutput:noContent");
-                } else {
-                    // Maybe it has a __toString method, or it IS actually a string.
-                    // Ram it into the base output type.
-                    $auraWebOutput = $this->di->get("webOutput:base");
-                }
-            }
-
-            $redirect = $controller->getResponse()->headers->get('location');
-            $isJson   = $auraWebOutput instanceof Json;
+            trigger_error(
+                sprintf(
+                    'Controller action `%s::%s` returned no response: falling back to empty response',
+                    $controller::class,
+                    $action,
+                ),
+                E_USER_WARNING,
+            );
+            $psr7Response = $controller->getResponseFactory()->createResponse(HttpResponse::HTTP_NO_CONTENT);
+            $redirect     = false;
+            $isJson       = false;
         }
 
         // Post-processing: if this is a HTML request and not a redirect,
@@ -434,13 +399,9 @@ class Kernel extends WebKernelAbstract
         }
 
         // Output whatever kind of response we have
-        if ($psr7Response) {
-            /** @var Outputter $outputter */
-            $outputter = $this->di->get('httpResponseOutputter');
-            $outputter->output($psr7Response);
-        } elseif ($auraWebOutput && $auraWebResponse) {
-            $auraWebOutput->output($auraWebResponse);
-        }
+        /** @var Outputter $outputter */
+        $outputter = $this->di->get('httpResponseOutputter');
+        $outputter->output($psr7Response);
 
         // Output post-output callbacks
         $postOutputCallbacks = $controller->getPostOutputCallbacks();
