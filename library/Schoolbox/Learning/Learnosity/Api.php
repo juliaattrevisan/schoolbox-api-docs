@@ -89,14 +89,17 @@ class Api
     /**
      * Make a specific request to the Data API in Learnosity
      *
+     * $actionType corresponds to Action Type in their docs;
+     * Learnosity is *not* a RESTful api.
+     *
      * @param string $endpoint
      * @param array $payload
-     * @param string $method
+     * @param string $actionType
      * @return mixed
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function dataRequest(string $endpoint, array $payload, string $method = 'get'): mixed
+    public function dataRequest(string $endpoint, array $payload, string $actionType = 'get'): mixed
     {
         /* Strip slashes, to prevent typos
          */
@@ -110,7 +113,7 @@ class Api
             ],
             $this->consumerSecret,
             $payload,
-            $method
+            $actionType
         );
 
         $json = $response->json();
