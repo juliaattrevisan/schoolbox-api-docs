@@ -16,7 +16,7 @@ const filterTypesStore = useFilterTypesStore();
                 <li>
                     <input
                         id="selectAllOrdinary"
-                        v-model="filterTypesStore.activeTypes"
+                        v-model="filterTypesStore.selectedTypes"
                         type="checkbox"
                         value="assessments"
                     />
@@ -25,7 +25,7 @@ const filterTypesStore = useFilterTypesStore();
                 <li>
                     <input
                         id="ordinaryCheckbox1"
-                        v-model="filterTypesStore.activeTypes"
+                        v-model="filterTypesStore.selectedTypes"
                         type="checkbox"
                         value="badges"
                     />
@@ -34,7 +34,7 @@ const filterTypesStore = useFilterTypesStore();
                 <li>
                     <input
                         id="ordinaryCheckbox2"
-                        v-model="filterTypesStore.activeTypes"
+                        v-model="filterTypesStore.selectedTypes"
                         type="checkbox"
                         value="events"
                     />

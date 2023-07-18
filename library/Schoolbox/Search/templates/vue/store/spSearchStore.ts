@@ -13,7 +13,6 @@ export const useSearchStore = defineStore("spSearch", () => {
     const hasNotSearched = window.Vue.ref(true); // to determine whether any searches have been made
     const isSearching = window.Vue.ref(false); // to notify of searching
     const hasLoadError = window.Vue.ref(false); // to notify of a search error
-    const hasSearchedWithActiveFilters = window.Vue.ref(false); // to determine whether the latest search has been made with filters
 
     /**
      * To collect all the params to send to the search api
@@ -26,11 +25,18 @@ export const useSearchStore = defineStore("spSearch", () => {
     }
 
     /**
+     * To record the active query and filters at the time of the search
+     */
+    function setActive() {
+        useQueryStore().setActive();
+        useFiltersStore().setActive();
+    }
+
+    /**
      * search for nodes that match
      */
     async function search() {
-        useQueryStore().setActiveQuery();
-        hasSearchedWithActiveFilters.value = useFiltersStore().isActive;
+        setActive();
         hasNotSearched.value = false;
         isSearching.value = true;
         try {
@@ -70,7 +76,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         hasNotSearched,
         isSearching,
         hasLoadError,
-        hasSearchedWithActiveFilters,
         search,
         clear,
         clearFiltersAndSearch,

@@ -31,7 +31,7 @@ export const useQueryStore = defineStore("spQuery", () => {
     /**
      * search has been triggered so set the active query
      */
-    function setActiveQuery() {
+    function setActive() {
         activeQuery.value = query.value;
     }
 
@@ -48,7 +48,7 @@ export const useQueryStore = defineStore("spQuery", () => {
         activeQuery,
         isActive,
         queryWordList,
-        setActiveQuery,
+        setActive,
         clear,
     };
 });

@@ -31,7 +31,7 @@ async function onLoadMore() {
 </script>
 
 <template>
-    <loading-table v-if="loadMoreResultsStore.isLoading" />
+    <loading-table v-if="loadMoreResultsStore.isLoading" :rows="2" />
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
     <button v-else-if="showLoadMore" @click.prevent="onLoadMore">Load more results</button>
 </template>

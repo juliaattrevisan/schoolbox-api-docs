@@ -7,6 +7,8 @@ import { defineStore } from "pinia";
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     const startDate = window.Vue.ref(null); //
     const endDate = window.Vue.ref(null); //
+    const activeStartDate = window.Vue.ref(null); //
+    const activeEndDate = window.Vue.ref(null); //
 
     /**
      * Is the start date filter set
@@ -30,7 +32,22 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
      * Is either the start or end date filter set
      * @returns {boolean}
      */
-    const isActive = window.Vue.computed(() => hasStartDate.value || hasEndDate.value);
+    const isSelected = window.Vue.computed(() => hasStartDate.value || hasEndDate.value);
+
+    /**
+     * Is either the active start or active end date filter set
+     * @returns {boolean}
+     */
+    const isActive = window.Vue.computed(() => activeStartDate.value || activeEndDate.value);
+
+    /**
+     * set the active date ranges, linked to the currently active search,
+     * so any filter changes are not applied to more result loads
+     */
+    function setActive() {
+        activeStartDate.value = startDate.value;
+        activeEndDate.value = endDate.value;
+    }
 
     /**
      * clear the date filter
@@ -38,6 +55,8 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     function clear() {
         startDate.value = null;
         endDate.value = null;
+        activeStartDate.value = null;
+        activeEndDate.value = null;
     }
 
     return {
@@ -46,7 +65,9 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         hasEndDate,
         hasStartDate,
         hasDateRange,
+        isSelected,
         isActive,
+        setActive,
         clear,
     };
 });
