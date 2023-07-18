@@ -660,7 +660,6 @@ class SitePage
     public function goLoginPage()
     {
         try {
-            $this->getDi()->get('webFactory');
             throw new Unauthenticated();
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface | RuntimeException $e) {
             $parts = parse_url($_SERVER['REQUEST_URI']);
