@@ -796,9 +796,6 @@ abstract class Kernel
                     /** @var MapperFactory $mapperFactory */
                     $mapperFactory = $di->get('mapperFactory');
 
-                    /** @var UserAccessMapper $userAccessMapper */
-                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
-
                     /** @var Folder\Mapper $folderMapper */
                     $folderMapper = $mapperFactory->get(Folder\Mapper::class);
 
@@ -857,9 +854,6 @@ abstract class Kernel
 
                     /** @var UserMapper $userMapper */
                     $userMapper = $mapperFactory->get(UserMapper::class);
-
-                    /** @var UserAccessMapper $userAccessMapper */
-                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
 
                     return new News\Audience\UserResolver(
                         $db,
@@ -939,97 +933,6 @@ abstract class Kernel
                 }
             )
         );
-
-        // Web output class - currently uses Sitepage
-        $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
-        $di->set('webOutput:html', $di->lazy(function () use ($di, $mapperFactory) {
-
-            /** @var IConfigLoader $config */
-            $config  = $di->get('config');
-
-            /** @var Session $session */
-            $session = $di->get('session');
-
-            /** @var TourMapper $tourMapper */
-            $tourMapper = $mapperFactory->get(TourMapper::class);
-
-            /** @var StepMapper $tourStepMapper */
-            $tourStepMapper = $mapperFactory->get(StepMapper::class);
-            $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
-            $output   = new Output\ThemedHtml();
-
-            /** @var Environment $templateEngine */
-            $templateEngine = $di->get('templateEngine');
-
-            /** @var TopMenuMapper $topMenuMapper */
-            $topMenuMapper = $mapperFactory->get(TopMenuMapper::class);
-
-            /** @var SideMenuSectionMapper $sideMenuSectionMapper */
-            $sideMenuSectionMapper = $mapperFactory->get(SideMenuSectionMapper::class);
-
-            /** @var SideMenuMapper $sideMenuMapper */
-            $sideMenuMapper = $mapperFactory->get(SideMenuMapper::class);
-
-            /** @var BookmarkMapper $bookMarkMapper */
-            $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
-
-            /** @var Access $access */
-            $access = $mapperFactory->get(Access::class);
-
-            /** @var Predis\ClientInterface $redisStorage */
-            $redisStorage = $di->get('redis.storage');
-            $output
-                ->setTemplateEngine($templateEngine)
-                ->addDataGenerator(
-                    'ws',
-                    new Output\DataGenerator\Websocket(
-                        $config,
-                        $session->getAuthUser(),
-                        new UnreadRetriever($redisStorage),
-                        INSTANCE_ID
-                    )
-                )
-                ->addDataGenerator(
-                    'tour',
-                    new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER)
-                )
-                ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session))
-                ->addDataGenerator(
-                    'topMenu',
-                    new Output\DataGenerator\TopMenu(
-                        $session->getAuthUser(),
-                        $topMenuMapper
-                    )
-                )
-                ->addDataGenerator(
-                    'sideMenu',
-                    new Output\DataGenerator\SideMenu(
-                        $config,
-                        $session->getAuthUser(),
-                        $sideMenuSectionMapper,
-                        $sideMenuMapper,
-                        $bookMarkMapper,
-                    )
-                )
-                ->addDataGenerator('scripts', new Output\DataGenerator\Scripts($config, $_SERVER));
-
-            if ($config->get('debug_mode')) {
-                $output->addDataGenerator(
-                    'debugBar',
-                    new Output\DataGenerator\DebugBar(\Alaress\DebugBar\Instance::getInstance(), '/debugbar/')
-                );
-            }
-
-            return $output;
-        }));
-
-        $outputSetters = ['setTemplateEngine' => $di->lazyGet('templateEngine')];
-        $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class, [], $outputSetters));
-        $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
-        $di->set('webOutput:file', $di->lazyNew(Output\File::class));
-        $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class, [], $outputSetters));
-        $di->set('webOutput:noContent', $di->lazyNew(Output\NoContent::class));
-        $di->set('webOutput:xml', $di->lazyNew(Output\Xml::class, [], $outputSetters));
 
         // Template engine and functions
         // Template loader: sets up link to templates without a namespace.

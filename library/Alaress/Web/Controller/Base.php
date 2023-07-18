@@ -553,23 +553,6 @@ abstract class Base
     }
 
     /**
-     * Factory method for loading a JSON output object.
-     *
-     * @deprecated use `responseAsJson` to build a response object
-     *
-     * @param  mixed $data
-     * @return Output\Json
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildJsonOutput($data)
-    {
-        /** @var Output\Json $output */
-        $output = $this->getDi()->get('webOutput:json');
-        return $output->setData($data);
-    }
-
-    /**
      * Build a JSON response from `$data`.
      *
      * @param mixed $data
@@ -578,25 +561,6 @@ abstract class Base
     protected function responseAsJson(mixed $data): ResponseInterface
     {
         return $this->responseFactory->buildJson($data);
-    }
-
-    /**
-     * Factory method for loading a chromeless HTML output object.
-     *
-     * @deprecated use `responseFromTemplateUnthemed` to build a response object
-     *
-     * @param  string $template A Twig template
-     * @param  mixed  $data
-     * @return Output\Html
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildUnthemedHtmlOutput($template, $data)
-    {
-        /** @var Output\Html $output */
-        $output = $this->getDi()->get('webOutput:nochrome');
-        $output = $this->injectCurrentUserGlobal($output);
-        return $output->setTemplate($template)->setData($data);
     }
 
     /**
@@ -646,39 +610,6 @@ abstract class Base
     }
 
     /**
-     * Factory method for loading a chromed HTML output object.
-     *
-     * @deprecated use `responseFromTemplate` to build a response object
-     *
-     * @param  string $template A Twig template
-     * @param  mixed  $data
-     * @param string  $title
-     * @param string  $tab
-     * @return Output\ThemedHtml
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildHtmlOutput($template, $data, $title = '', $tab = '')
-    {
-        /** @var Output\ThemedHtml $output */
-        $output = $this->getDi()->get('webOutput:html');
-        $output = $this->injectCurrentUserGlobal($output);
-
-        /** @var Output\ThemedHtml $tpl */
-        $tpl = $output->setTemplate($template)->setData($data);
-
-        if ($title) {
-            $tpl->setTitle($title);
-        }
-
-        if ($tab) {
-            $tpl->setTab($tab);
-        }
-
-        return $tpl;
-    }
-
-    /**
      * Shortcut method for building a chromed HTML response.
      *
      * @param string $template A Twig template to render.
@@ -696,23 +627,6 @@ abstract class Base
         string $tab = '',
     ): ResponseInterface {
         return $this->responseFactory->buildHtml($template, $data, $this->user, $title, $tab);
-    }
-
-    /**
-     * Factory method for loading a file output object.
-     *
-     * @deprecated use `responseFromContent` to build a response object
-     *
-     * @param  string $fileContents
-     * @return Output\File
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildFileOutputFromString($fileContents)
-    {
-        /** @var Output\File $output */
-        $output = $this->getDi()->get('webOutput:base');
-        return $output->setData($fileContents);
     }
 
     /**
@@ -880,31 +794,6 @@ abstract class Base
         // full synchronous page
         return $this->responseFromTemplate($template, $data, $title, $tab);
     }
-
-    /**
-     * @deprecated Use one of the `build*Output` methods instead, to build
-     *             exactly the type of content you specify
-     *
-     * @param string $template
-     * @param array  $data
-     * @return \Alaress\Web\Output\Base
-     */
-    protected function buildContent($template, array $data)
-    {
-        if ($this->isJsonRequest()) {
-            // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
-            return $this->buildJsonOutput($data);
-        }
-
-        if ($this->isXhrRequest()) {
-            // if the request is AJAX, don't return the chrome
-            return $this->buildUnthemedHtmlOutput($template, $data);
-        }
-
-        // full synchronous page
-        return $this->buildHtmlOutput($template, $data);
-    }
-
 
     /**
      * Send a neat and tidy error back to the client
