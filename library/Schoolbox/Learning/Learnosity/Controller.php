@@ -14,6 +14,7 @@ use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use DebugBar\DebugBarException;
+use Learning\Learnosity\Helper;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
@@ -28,12 +29,6 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-    /**
-     * Softdeleting is equivalent to Learnosity's "archiving"
-     */
-    private const LEARNOSITY_ITEM_STATUS_ARCHIVED = 'archived';
-
-
     /**
      * Learnosity API instance is the same for everything afaict
      *
@@ -378,57 +373,7 @@ class Controller extends Base
      */
     public function getArchiveReference(string $learnosityReference): void
     {
-        /* List of Items
-         */
-        $activities = $this->api->dataGetRequest('/itembank/activities', [
-            'references' => [
-                $learnosityReference
-            ]
-        ]);
-
-        /* Find all the items associated with the activity
-         */
-        $activityPayload = [
-            'activities' => []
-        ];
-
-        foreach ($activities['data'] as $activity) {
-            /* Shank the activity into the Archived state
-             */
-            $updatedActivity = $activity;
-            $updatedActivity['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
-            $activityPayload['activities'][] = $updatedActivity;
-
-            $activityArchiveResult = $this->api->dataSetRequest('/itembank/activities', $activityPayload);
-
-            /* Then shank its items into the Archived state
-             */
-            $references = [];
-
-            foreach ($activity['data']['items'] as $item) {
-                $references[] = $item['reference'];
-            }
-
-            /* Get all the items' details so we can archive it
-             * and all its related pieces
-             */
-            $items = $this->api->dataGetRequest('/itembank/items', ['references' => $references]);
-
-            $itemsPayload = [
-                'items' => []
-            ];
-
-            foreach ($items['data'] as $item) {
-                $updatedItem = $item;
-                $updatedItem['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
-
-                $itemsPayload['items'][] = $updatedItem;
-            }
-
-            /* Shank them into the Archived state
-             */
-            $itemArchiveResult = $this->api->dataSetRequest('/itembank/items', $itemsPayload);
-        }
+        (new Helper($this->api))->archive($learnosityReference);
     }
 
 
