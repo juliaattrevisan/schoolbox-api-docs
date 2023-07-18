@@ -1,17 +1,20 @@
 <?php
 
-/**
- * @copyright Copyright 2023, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
- */
-
 namespace Tests\Smoketests;
 
+
+use Exception;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Permission\Access\UserAccess;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\CreateLessonPlanTemplate;
-use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\DeleteLessonPlanTemplate;
 use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\EnableDisableLessonPlanTemplate;
-use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\ModifyLessonPlanTemplate;
+use Schoolbox\Resource\Folder;
+use Tests\Support\Payload;
+use Tests\Support\Payload\Group\AddMembers;
+use Tests\Support\Payload\LessonPlan\Create;
 
 class LessonPlanCest
 {
@@ -27,138 +30,146 @@ class LessonPlanCest
     }
 
     /**
-     * Creates a lesson plan template using a curl payload
-     *
+     * Creates a lesson plan using a curl payload with Visible to students OFF
+     * Check the student cannot see the lesson plan
+     * Check the teacher is able to see the lesson plan
      *
      * @param IntegrationTester $i
+     * @throws Exception
      */
-    public function createLessonPlanTemplate(IntegrationTester $i): void
+    public function createLessonPlan(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp  = time();
-        $lessonPlanTemplateTitle = 'Lesson Plan Template ' . $timestamp;
-        $timestamp  = time();
+        $student = $i->grabUser('jreed');
+        $teacher = $i->grabUser('jcoles');
+        $lessonPlanTemplateTitle = 'Lesson Plan Template' . $timestamp;
+        $lessonPlanTemplateFieldName1 = 'Field 1 ' . $timestamp;
+        $lessonPlanTemplateFieldName2 = 'Field 2 ' . $timestamp;
+        $lessonPlanTemplateFieldName3 = 'Field 3 ' . $timestamp;
 
-        $lessons = array(
-            array(1, 'Field 1 ' . $timestamp, 'on', 'Body ' . $timestamp),
-            array(2, 'Field 2 ' . $timestamp, 'on', 'Body 2 ' . $timestamp),
-            array(3, 'Field 3 ' . $timestamp, 'off', 'Body 3 ' . $timestamp)
-        );
+        $i->amGoingTo('Send request to create a homepage');
+        $groupPage = $this->createHomepage($i, 'Testing Create Assessments on Group Page at ' . $timestamp);
 
-        $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
-            $lessonPlanTemplateTitle,
-            $lessons
-        );
-
-        #WHEN
         $i->amGoingTo('Send request to create a lesson plan template');
-        $i->sendRequest($lessonPlanTemplateCreate);
-        $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
+        $lessons = array(
+            array(1, $lessonPlanTemplateFieldName1, 'on', 'Body ' . $timestamp),
+            array(2, $lessonPlanTemplateFieldName2, 'on', 'Body 2 ' . $timestamp),
+            array(3, $lessonPlanTemplateFieldName3, 'off', 'Body 3 ' . $timestamp)
+        );
+        $this->createLessonPlanTemplate($i,$lessonPlanTemplateTitle,$lessons);
 
-        #THEN
+        $lessonPlanTemplateName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
+        $lessonPlanTemplateFieldName = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanTemplateFieldName1);
+
         $i->seeResponseCodeIs(303);
 
         #WHEN
-        $disableEnableLessonPlanTemplate = new EnableDisableLessonPlanTemplate($lessonPlanName->getId());
-        $i->amGoingTo('Send request to disable a lesson plan template');
-        $i->sendRequest($disableEnableLessonPlanTemplate);
+        $i->amGoingTo('Send a request to create a lesson plan with Visible to students OFF');
+        $contextType = AssessmentContextType::TYPE_FOLDER;
+        $contextId = $groupPage->getId();
+        $folderId = $groupPage->getId();
+        $lessonPlanTemplateId = $lessonPlanTemplateName->getId();
+        $lessonPlanTemplateFieldId1 = $lessonPlanTemplateFieldName->getId();
+        $title = 'Automation Lesson Plan' . $timestamp;
 
-        #THEN
-        $i->seeResponseCodeIs(200);
-    }
-
-    /**
-     * Update a lesson plan template using a curl payload
-     *
-     *
-     * @param IntegrationTester $i
-     */
-    public function updateLessonPlanTemplate(IntegrationTester $i): void
-    {
-        #GIVEN
-        $timestamp  = time();
-        $lessonPlanTemplateTitle = 'Lesson Plan Template to be updated ' . $timestamp;
-        $lessonPlanFieldName1 = 'Field 1 to be updated' . $timestamp;
-        $lessonPlanFieldName2 = 'Field 2 to be updated' . $timestamp;
-        $lessonPlanFieldName3 = 'Field 3 to be updated' . $timestamp;
-
-        $lessons = array(
-            array(1, $lessonPlanFieldName1, 'off', 'Body ' . $timestamp),
-            array(2, $lessonPlanFieldName2, 'off', 'Body 2 ' . $timestamp),
-            array(3, $lessonPlanFieldName3, 'off', 'Body 3 ' . $timestamp)
-        );
-
-        $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
-            $lessonPlanTemplateTitle,
-            $lessons
-        );
-
-        $i->amGoingTo('Send request to create a lesson plan template');
-        $i->sendRequest($lessonPlanTemplateCreate);
-        $i->seeResponseCodeIs(303);
-        $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
-        $lessonPlanFieldName1 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName1);
-        $lessonPlanFieldName2 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName2);
-        $lessonPlanTemplateId = $lessonPlanName->getId();
-        $lessonPlanFieldName1Id = $lessonPlanFieldName1->getId();
-        $lessonPlanFieldName2Id = $lessonPlanFieldName2->getId();
-
-        #WHEN
-
-        $lessonPlanTemplateNewTitle = 'Lesson Plan Template to be updated test ' . $timestamp;
-
-        $lessons = array(
-            array($lessonPlanFieldName1Id, 'Field 1 updated ' . $timestamp, 'on', 'Body updated ' . $timestamp),
-            array($lessonPlanFieldName2Id, 'Field 2 updated ' . $timestamp, 'on', 'Body 2 updated ' . $timestamp),
-        );
-
-        $lessonPlanTemplateUpdate = new ModifyLessonPlanTemplate(
-            $lessonPlanTemplateNewTitle,
+        $lessonPlanCreate = new Create(
+            $contextType,
+            $contextId,
+            $folderId,
             $lessonPlanTemplateId,
+            $title,
             $lessons
         );
 
-        #WHEN
-        $i->amGoingTo('Send request to update a lesson plan template');
-        $i->sendRequest($lessonPlanTemplateUpdate);
+        for ($j = 0;$j < count($lessons); $j++) {
+            $lessonPlanCreate->setFormParam('field[new' . $j + 1 . '][template]', ''.$lessonPlanTemplateFieldId1 + $j);
+            $lessonPlanCreate->setFormParam('field[new' . $j + 1 . '][body]', 'Body field text'. $j + 1 );
+        }
 
         #THEN
+        $i->amGoingTo('Check the lesson plan is created');
+        $i->sendRequest($lessonPlanCreate);
+        $lessonPlanName = $i->grabFirstAssessmentByTitle($title);
         $i->seeResponseCodeIs(303);
+
+        #WHEN
+        $i->amGoingTo('Check the student cannot view the lesson plan as Visible to students is OFF');
+        $lessonPlanId = $lessonPlanName->getId();
+        $i->impersonateUser($student->getId());
+        $i->sendGet('/learning/assessments/' .$lessonPlanId .'/'. $student->getId());
+
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        #WHEN
+        $i->amGoingTo('Check the teacher can view the lesson plan as Visible to students is OFF');
+        $lessonPlanId = $lessonPlanName->getId();
+        $i->impersonateUser($teacher->getId());
+        $i->sendGet('/learning/assessments/' .$lessonPlanId .'/'. $student->getId());
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+
     }
 
     /**
-     * Delete a lesson plan template using a curl payload
-     *
+     * Convenience method to create and return a new folder with homepage via the HTTP API
      *
      * @param IntegrationTester $i
+     * @param string            $groupTitle
+     * @return Folder\Model
+     * @throws Exception
      */
-    public function deleteLessonPlanTemplate(IntegrationTester $i): void
+    private function createHomepage(IntegrationTester $i, string $groupTitle): Folder\Model
     {
-        #GIVEN
-        $timestamp  = time();
-        $lessonPlanTemplateTitle = 'Lesson Plan Template to be deleted ' . $timestamp;
+        $folderPayload = new Payload\Resource\Folder\Create();
+        $folderPayload->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
+        $folderPayload->setName($groupTitle);
+        $i->amGoingTo('Send request create Group Page');
+        $i->sendRequest($folderPayload);
+        $i->seeResponseCodeIs(303);
 
-        $lessons = array(
-            array(1, 'Field 1 ' . $timestamp, 'on', 'Body ' . $timestamp),
-            array(2, 'Field 2 ' . $timestamp, 'on', 'Body 2 ' . $timestamp),
-            array(3, 'Field 3 ' . $timestamp, 'off', 'Body 3 ' . $timestamp)
-        );
+        $groupName = $i->grabFirstFolderByTitle($groupTitle);
+        $student = $i->grabUser('jreed');
+        $teacher = $i->grabUser('jcoles');
+        $admin   = $i->grabUser('alaress');
 
+
+        $addMembers = new AddMembers($groupName->getId());
+        $addMembers->setNewMembers([$student->getId(), $admin->getId(), $teacher->getId()]);
+        $i->amGoingTo('Add group members to Group Page #' . $groupName->getId());
+        $i->sendRequest($addMembers);
+
+        $setAccessLevels = new Payload\Group\ModifyAccessLevel($groupName->getId());
+        $setAccessLevels->setMemberAccessLevel($student->getId(), UserAccess::ACCESS_READ);
+        $setAccessLevels->setMemberAccessLevel($teacher->getId(), UserAccess::ACCESS_WRITE);
+        $setAccessLevels->setMemberAccessLevel($admin->getId(), UserAccess::ACCESS_FULL);
+        $i->amGoingTo("Add group members permissions to Group Page #{$groupName->getId()}");
+        $i->sendRequest($setAccessLevels);
+
+        return $groupName;
+
+
+    }
+
+    /**
+     * Convenience method to create a lesson plan template
+     *
+     * @param IntegrationTester $i
+     * @param string            $lessonPlanTemplateTitle
+     * @return void
+     * @throws Exception
+     */
+    private function createLessonPlanTemplate(IntegrationTester $i, string $lessonPlanTemplateTitle, array $lessons): void
+    {
         $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
             $lessonPlanTemplateTitle,
             $lessons
         );
-        $i->amGoingTo('Send request to create a lesson plan template');
+
         $i->sendRequest($lessonPlanTemplateCreate);
-        $i->seeResponseCodeIs(303);
-        $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
-
-        #WHEN
-        $lessonPlanTemplateDelete = new DeleteLessonPlanTemplate($lessonPlanName->getId());
-        $i->amGoingTo('Send request to delete a lesson plan template');
-        $i->sendRequest($lessonPlanTemplateDelete);
-
-      #THEN
-        $i->seeResponseCodeIs(200);
     }
+
+
 }
