@@ -378,7 +378,7 @@ class Controller extends Base
                 'registry' => $iconRegistry->getRegistry(),
                 'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
             ]
-        ],                                            'Modify Badge');
+        ], 'Modify Badge');
     }
 
 

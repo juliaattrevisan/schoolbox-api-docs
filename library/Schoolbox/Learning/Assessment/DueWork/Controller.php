@@ -1650,7 +1650,7 @@ class Controller extends Assessment\Controller
                 'assessment' => $assessment,
                 'assessmentId' => $assessment->getId()
             ])
-        ],                                            "{$assessment->getTitle()} Similarity Report");
+        ], "{$assessment->getTitle()} Similarity Report");
     }
 
 

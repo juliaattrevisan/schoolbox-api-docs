@@ -146,7 +146,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learning/pendingAssessmentsOuter.twig', [
                 'viewee'      => $viewee,
                 'filterPanel' => $filterPanel,
-            ],                                        $title, 'submission');
+            ], $title, 'submission');
     }
 
     /**
@@ -379,7 +379,7 @@ class Controller extends Base
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
-            ],                                        $folder->getName(), 'classes');
+            ], $folder->getName(), 'classes');
     }
 
     /**

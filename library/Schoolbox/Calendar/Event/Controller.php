@@ -172,7 +172,7 @@ class Controller extends Base
                     'current' => $event->getAttendance(),
                 ],
             ],
-        ],                                            $event->getTitle());
+        ], $event->getTitle());
     }
 
 
@@ -281,7 +281,7 @@ class Controller extends Base
 
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
-        ],                                            'Create event');
+        ], 'Create event');
     }
 
 
@@ -373,7 +373,7 @@ class Controller extends Base
 
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
-        ],                                            "Modify {$event->getTitle()}");
+        ], "Modify {$event->getTitle()}");
     }
 
 

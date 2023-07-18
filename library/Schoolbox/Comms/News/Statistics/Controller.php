@@ -98,7 +98,7 @@ class Controller extends Base
             /* Recent Visitors to this article
              */
             'recentVisitors' => (new Visitation\Payload\Top10($this->statisticsMapper, $this->userMapper))->generate($article)
-        ],                                            "Statistics for {$article->getTitle()}");
+        ], "Statistics for {$article->getTitle()}");
     }
 
 
@@ -131,7 +131,7 @@ class Controller extends Base
     {
         $this->response = $this->responseFromTemplate('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
-        ],                                            "Visitors for {$article->getTitle()}");
+        ], "Visitors for {$article->getTitle()}");
     }
 
 

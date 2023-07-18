@@ -204,7 +204,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ],                                            "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
+        ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
 
@@ -314,7 +314,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ],                                            "Update {$article->getTitle()}", 'news');
+        ], "Update {$article->getTitle()}", 'news');
     }
 
 
