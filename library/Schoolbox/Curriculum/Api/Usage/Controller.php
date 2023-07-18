@@ -105,7 +105,7 @@ class Controller extends Base
             $badgeTranslator
         );
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'data'     => $hydrator->hydrateResults($data),
             'metadata' => [
                 'count' => $cursor->retrieveResultCount(),

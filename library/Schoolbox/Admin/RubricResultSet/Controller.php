@@ -42,7 +42,7 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminRubricResultSet/index.twig',
             [
                 'pageCurrent'          => $this->routeGenerator->generate('adminRubricResultSet.getList'),
@@ -96,7 +96,7 @@ class Controller extends Base
      */
     public function getUpdate(?int $resultSetId): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminRubricResultSet/create.twig',
             [
                 'maxCharsPerLabel'    => self::MAX_CHARS_PER_LABEL,
@@ -133,6 +133,6 @@ class Controller extends Base
 
         $this->mapper->saveSet($resultSetId, $indexedLabels); // If $resultSetId is null, a new set will be created.
 
-        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminRubricResultSet.getList'));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('adminRubricResultSet.getList'));
     }
 }

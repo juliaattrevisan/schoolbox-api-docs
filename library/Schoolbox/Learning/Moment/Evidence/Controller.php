@@ -65,7 +65,7 @@ class Controller extends Base
      */
     public function redirectToCreateForm(): void
     {
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',
@@ -115,7 +115,7 @@ class Controller extends Base
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
         ];
 
-        $this->psr7Response = $this->responseFromTemplate($template, $params);
+        $this->response = $this->responseFromTemplate($template, $params);
     }
 
 
@@ -143,7 +143,7 @@ class Controller extends Base
             || ($this->getUser()->getRole()->isParent() && $this->getConfigLoader()->get('evidence_parent_comment'))
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningMomentEvidence/detail.twig',
             [
                 'evidence'                 => $item,
@@ -182,7 +182,7 @@ class Controller extends Base
             ->map($this->buildTranslatorWithComments(2))
             ->reindex();
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'data'     => $mappedData,
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
@@ -260,7 +260,7 @@ class Controller extends Base
             $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $evidenceCollection->map(
                 new Translator\ModelToArray\Base(
                     new User\Translator\Author\ModelToArray(),
@@ -303,7 +303,7 @@ class Controller extends Base
         $params['zone']     = $zone->getTwigContext();
         $params['evidence'] = $evidence;
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             $template,
             $params
         );
@@ -333,7 +333,7 @@ class Controller extends Base
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
-        $this->psr7Response = $this->responseAsJson($responseTranslator($evidence));
+        $this->response     = $this->responseAsJson($responseTranslator($evidence));
     }
 
 
@@ -349,7 +349,7 @@ class Controller extends Base
     {
         //unless there are mapper errors, set the return status code to 204 (No Content)
         $this->mapper->delete($evidence);
-        $this->psr7Response = $this->responseEmpty(204);
+        $this->response = $this->responseEmpty(204);
     }
 
 
@@ -372,7 +372,7 @@ class Controller extends Base
                 'name' => $tag->getName(),
             ];
         }
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
 

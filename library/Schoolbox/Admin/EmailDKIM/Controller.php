@@ -47,7 +47,7 @@ class Controller extends Base
      */
     public function getDomainListPage()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@emailDKIM/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('emailDKIM.getDomainListPage'),
@@ -85,7 +85,7 @@ class Controller extends Base
                 ],
             ];
         }
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -99,7 +99,7 @@ class Controller extends Base
         $id     = $this->requestPost->get('id');
         $domain = trim($this->requestPost->get('domain') ?? '');
         if (empty($domain) || (!getmxrr($domain, $temp) && !checkdnsrr($domain, 'ANY'))) {
-            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid domain name'])
+            $this->response = $this->responseAsJson(['error' => 'Invalid domain name'])
                 ->withStatus(404);
             return;
         }
@@ -118,18 +118,18 @@ class Controller extends Base
                       ->setUpdatedAt(\Alaress_Date_Format::now());
 
             if (!$this->emailDKIMMapper->isUnique(['domain' => $emailDKIM->getDomain()], $emailDKIM->getId())) {
-                $this->psr7Response = $this->responseAsJson(['error' => 'The domain already exists'])
+                $this->response = $this->responseAsJson(['error' => 'The domain already exists'])
                     ->withStatus(404);
                 return;
             }
 
             $this->emailDKIMMapper->save($emailDKIM);
         } catch (MapperException $e) {
-            $this->psr7Response = $this->responseAsJson(['error' => $e->getMessage()])
+            $this->response = $this->responseAsJson(['error' => $e->getMessage()])
                 ->withStatus(404);
             return;
         }
-        $this->psr7Response = $this->responseAsJson([]);
+        $this->response = $this->responseAsJson([]);
     }
 
     /**
@@ -151,7 +151,7 @@ class Controller extends Base
                 'formatted' => $emailDKIM->getUpdatedAt()->getShort(),
             ],
         ];
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -164,6 +164,6 @@ class Controller extends Base
     public function deleteDKIM(Model $emailDKIM)
     {
         $this->emailDKIMMapper->delete($emailDKIM);
-        $this->psr7Response = $this->responseAsJson([]);
+        $this->response = $this->responseAsJson([]);
     }
 }

@@ -112,7 +112,7 @@ class Controller extends Base
             $campusVisibilitySelected[$button->getId()] = array_fill_keys($campusVisibilitySelections->indexBy('campusId')->keys(), true);
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminProfileButton/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
@@ -158,7 +158,7 @@ class Controller extends Base
         $campusVisibilitySelections = $this->campusVisibilityMapper->findByColumn('profile_button_id', $id);
         $campusVisibilitySelected = array_fill_keys($campusVisibilitySelections->indexBy('campusId')->keys(), true);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
@@ -189,7 +189,7 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
@@ -333,6 +333,6 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->redirectAfterPost('/adminv2/profile-button');
+        $this->response = $this->redirectAfterPost('/adminv2/profile-button');
     }
 }

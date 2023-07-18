@@ -120,6 +120,6 @@ class Controller extends BaseController
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($response);
+        $this->response = $this->responseAsJson($response);
     }
 }

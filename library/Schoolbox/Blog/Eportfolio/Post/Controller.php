@@ -211,7 +211,7 @@ class Controller extends Base
 
         // Send them back to the item detail page
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'eportfolioBlog.getItem',
                 ['pageId' => $page->getPageId(), 'id' => $blog->getId(),]
@@ -239,7 +239,7 @@ class Controller extends Base
 
         // Lets get the party started...
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@eportfolioBlog/item.twig',
             [
                 'record'            => $blog,
@@ -285,7 +285,7 @@ class Controller extends Base
             );
         }
 
-        $this->psr7Response = $this->redirectAfterPost($returnUrl);
+        $this->response = $this->redirectAfterPost($returnUrl);
     }
 
     /**
@@ -317,7 +317,7 @@ class Controller extends Base
     public function getModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
         // Lets get the party started...
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@eportfolioBlog/modify.twig',
             [
                 'record'            => $blog,
@@ -339,7 +339,7 @@ class Controller extends Base
     public function getInsert(EportfolioPageModel $page)
     {
         // Lets get the party started...
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@eportfolioBlog/modify.twig',
             [
                 'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
@@ -396,7 +396,7 @@ class Controller extends Base
         }
 
         // Lets get the party started...
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@eportfolioBlog/archive.twig',
             [
                 'blogs'             => $blogsSelectedMonth,

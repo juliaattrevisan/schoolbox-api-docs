@@ -120,7 +120,7 @@ class Controller extends Base
             $data['hashes'][$school] = $this->handler->computeAuthDigest($now->getUnixTimeStamp(), $school, $code->getAccessToken());
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@helpCourseParticipation/apitest.twig', $data);
+        $this->response = $this->responseFromTemplate('@helpCourseParticipation/apitest.twig', $data);
     }
 
 
@@ -144,7 +144,7 @@ class Controller extends Base
 
         $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'ts'    => $now->getUnixTimeStamp(),
             'digest' => $digest
         ]);
@@ -179,14 +179,14 @@ class Controller extends Base
                 'form_params' => $post
             ]);
 
-            $this->psr7Response = $this->redirectAfterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getRouteIfAuthorized('helpCourseParticipation.getApiTest')
             );
         } catch (BadResponseException $e) {
             $response           = $e->getResponse();
-            $this->psr7Response = $this->responseFromContent($response->getBody()->getContents())
-                ->withStatus($response->getStatusCode())
-                ->withHeader('content-type', 'text/html');
+            $this->response = $this->responseFromContent($response->getBody()->getContents())
+                                   ->withStatus($response->getStatusCode())
+                                   ->withHeader('content-type', 'text/html');
         }
     }
 
@@ -209,7 +209,7 @@ class Controller extends Base
 
         $enrolments = $this->handler->getFolderAccessBySchool($schoolCode);
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@helpCourseParticipation/apitest-usertable.twig', [
+        $this->response = $this->responseFromTemplateUnthemed('@helpCourseParticipation/apitest-usertable.twig', [
             'courses' => $enrolments,
             'users'   => $registeredUsers
         ]);
@@ -229,7 +229,7 @@ class Controller extends Base
 
         // ok, if you're here, you can see the thing.
         try {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 $this->handler->getFolderAccessBySchool($schoolCode)
             );
         } catch (Mapper\Exception $e) {
@@ -312,7 +312,7 @@ class Controller extends Base
         }
 
         if ($failures) {
-            $this->psr7Response = $this
+            $this->response = $this
                 ->responseAsJson(array_keys($failures))
                 ->withStatus(self::STATUS_MULTI_STATUS);
             return;
@@ -344,7 +344,7 @@ class Controller extends Base
             return;
         }
 
-        $this->psr7Response = $this->responseAsJson($users);
+        $this->response = $this->responseAsJson($users);
     }
 
 
@@ -392,7 +392,7 @@ class Controller extends Base
         if (\count($failedUsers)) {
             // just blame the client :P
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST);
-            $this->psr7Response = $this->responseAsJson($failedUsers);
+            $this->response = $this->responseAsJson($failedUsers);
         } else {
             // everything went fine, nothing to respond with
             $this->sendGenericStatus(self::STATUS_NO_CONTENT);
@@ -486,7 +486,7 @@ class Controller extends Base
      */
     private function sendGenericStatus(int $code, ?string $reason = null): void
     {
-        $this->psr7Response = $code === self::STATUS_NO_CONTENT
+        $this->response = $code === self::STATUS_NO_CONTENT
             ? $this->responseEmpty()->withStatus($code)
             : $this->responseAsJson($reason ?? '')->withStatus($code, $reason)
         ;

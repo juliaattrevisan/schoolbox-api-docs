@@ -138,6 +138,6 @@ class Controller extends BaseController
         // Handle the request: this validates the request body
         $handler            = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
         $server             = new ServiceServer($validator, $handler);
-        $this->psr7Response = $server->handle($request);
+        $this->response = $server->handle($request);
     }
 }

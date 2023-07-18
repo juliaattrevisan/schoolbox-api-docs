@@ -80,7 +80,7 @@ class Controller extends Base
             ];
         })->getAll();
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminTerms/index.twig',
             [
                 'pageCurrent'      => $this->routeGenerator->generate('adminTerms.getIndex'),
@@ -224,12 +224,12 @@ class Controller extends Base
     protected function outputPostSuccess(Term\Model $term)
     {
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseFromTemplateUnthemed(
+            $this->response = $this->responseFromTemplateUnthemed(
                 "@adminTerms/listItem.twig",
                 ['term' => $term,]
             );
         } else {
-            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminTerms.getIndex'));
+            $this->response = $this->redirectFound($this->routeGenerator->generate('adminTerms.getIndex'));
         }
     }
 
@@ -245,7 +245,7 @@ class Controller extends Base
     {
         if ($this->isXhrRequest()) {
             // Dump out an AJAX error
-            $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(500);
+            $this->response = $this->responseAsJson($e->getMessage())->withStatus(500);
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FORM_SUBMIT, $e, $e->getMessage());
         }

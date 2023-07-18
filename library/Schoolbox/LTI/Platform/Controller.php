@@ -96,7 +96,7 @@ class Controller extends Base
             $this->userAuthenticator,
         ))->build($this->request);
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
             ['message' => $message,]
         );
@@ -139,7 +139,7 @@ class Controller extends Base
 
         // Build the access token response
         $generator          = new AccessTokenResponseGenerator($this->keyChains, $factory);
-        $this->psr7Response = $generator->generate(
+        $this->response = $generator->generate(
             $this->request,
             (new ResponseFactory())->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
@@ -165,8 +165,8 @@ class Controller extends Base
      */
     public function getJsonWebKeySet(): void
     {
-        $jwksExporter = new JwksExporter($this->keyChains);
-        $this->psr7Response = $this->responseAsJson($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME));
+        $jwksExporter   = new JwksExporter($this->keyChains);
+        $this->response = $this->responseAsJson($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME));
     }
 
     /**
@@ -198,7 +198,7 @@ class Controller extends Base
 
         // The end recipient of the resource link will need to know about the
         // tool which created the link, so it can launch the link later.
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/receiveDeepLinkingResponse.twig',
             [
                 'context'       => $this->requestQuery->get('context'),

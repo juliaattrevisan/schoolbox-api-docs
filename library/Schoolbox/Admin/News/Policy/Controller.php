@@ -71,7 +71,7 @@ class Controller extends ConfigController
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@commsNewsPolicy/index.twig',
             [
                 'pageCurrent'   => $this->routeGenerator->generate('commsNewsPolicy.getPolicies'),
@@ -99,7 +99,7 @@ class Controller extends ConfigController
     public function postPolicies(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('commsNewsPolicy.getPolicies'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('commsNewsPolicy.getPolicies'));
     }
 
 

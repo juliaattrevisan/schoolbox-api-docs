@@ -78,7 +78,7 @@ class Controller extends Base
             }
         } catch (GuzzleException $e) {
             $message = $this->getReasonPhrase($e);
-            $this->psr7Response = $this->responseAsJson(['error' => $message])->withStatus($e->getCode());
+            $this->response = $this->responseAsJson(['error' => $message])->withStatus($e->getCode());
             return;
         }
         // All the staff in our Schoolbox instance
@@ -121,7 +121,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($userList);
+        $this->response = $this->responseAsJson($userList);
     }
 
     /**
@@ -166,7 +166,7 @@ class Controller extends Base
             $errors[] = $this->getReasonPhrase($e);
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@shaps/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('shaps.getAll'),
@@ -236,7 +236,7 @@ class Controller extends Base
         }
 
         // Build response
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'data' => $messages,
             ]

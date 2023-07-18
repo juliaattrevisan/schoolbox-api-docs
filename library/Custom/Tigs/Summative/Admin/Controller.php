@@ -61,7 +61,7 @@ class Controller extends ConfigController
 
         $data = ['configContext' => $configContext,];
 
-        $this->psr7Response = $this->responseFromTemplate('@tigsSummativeAdmin/admin.twig', $data, "TIGS Summative Reporting Admin");
+        $this->response = $this->responseFromTemplate('@tigsSummativeAdmin/admin.twig', $data, "TIGS Summative Reporting Admin");
     }
 
 
@@ -79,7 +79,7 @@ class Controller extends ConfigController
     public function postAdmin(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('tigsSummativeAdmin.getAdmin'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('tigsSummativeAdmin.getAdmin'));
     }
 
 

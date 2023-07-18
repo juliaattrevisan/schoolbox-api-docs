@@ -179,7 +179,7 @@ class Controller extends Base
         $displayFormatDate = $this->getConfigLoader()->get('date_local');
         $displayFormatTime = $displayFormatDate . ' ' . $this->getConfigLoader()->get('date_time');
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@pickerDatetime/picker.twig',
             [
                 'id' => $id,
@@ -232,7 +232,7 @@ class Controller extends Base
             return min(count($v), 5) * 20;
         }, $heat);
 
-        $this->psr7Response = $this->responseAsJson($heat);
+        $this->response = $this->responseAsJson($heat);
     }
 
 
@@ -384,7 +384,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'appointments' => $appointments,
             'date' => $date->toIso8601String()
         ]);
@@ -403,7 +403,7 @@ class Controller extends Base
     {
         // Don't show other students' due work to anyone but staff
         if (!$this->getUser()->getRole()->isStaff()) {
-            $this->psr7Response = $this->responseAsJson([]);
+            $this->response = $this->responseAsJson([]);
 
             return;
         }
@@ -414,7 +414,7 @@ class Controller extends Base
         $end = $end->endOfDay();
 
         // Spit this out in a JSON array
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
             'date' => $date->toIso8601String()
         ]);

@@ -160,7 +160,7 @@ class Controller extends Base
             'referrer'   => News\Statistics\Mapper::REFERRER_RSS,
             'articles'   => $articles,
         ];
-        $this->psr7Response = $this
+        $this->response = $this
             ->responseFromTemplateUnthemed('@commsNewsFeed/rss.twig', $data)
             ->withHeader('Content-Type', 'application/rss+xml; charset=UTF-8');
     }

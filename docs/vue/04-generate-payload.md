@@ -34,7 +34,7 @@ This is going to produce a lot of data that frontend doesn't actually need. We c
             ];
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@greenhouse/container.twig',
             [
                 'data' => $data

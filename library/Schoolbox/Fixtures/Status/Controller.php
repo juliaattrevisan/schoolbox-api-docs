@@ -48,7 +48,7 @@ class Controller extends AbstractController
             ]
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@sportsfixturesStatus/list.twig',
             [
                 'allStatus' => $allStatus
@@ -97,7 +97,7 @@ class Controller extends AbstractController
                 ])
             ];
 
-            $this->psr7Response = $this->responseAsJson($status);
+            $this->response = $this->responseAsJson($status);
         }
     }
 

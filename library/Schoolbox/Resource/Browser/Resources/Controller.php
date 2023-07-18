@@ -96,7 +96,7 @@ class Controller extends AbstractController
             'namespace'  => $this->namespace,
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@resourceBrowser/showLinkInfo.twig',
             $data,
         );
@@ -181,7 +181,7 @@ class Controller extends AbstractController
         }
         //just dump the lot to the page for front end use.
         //output results
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceBrowser/viewAll.twig',
             [
                 'referrer'       => $referrer,
@@ -295,6 +295,6 @@ class Controller extends AbstractController
             'hidden'        => $file->isHidden(),
         ];
 
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 }

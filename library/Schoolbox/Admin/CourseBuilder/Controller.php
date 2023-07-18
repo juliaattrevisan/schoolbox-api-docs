@@ -107,7 +107,7 @@ class Controller extends Base
         }
 
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminCourseBuilder/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminCourseBuilder.getIndex'),
@@ -178,6 +178,6 @@ class Controller extends Base
 
         // Send them back to the admin page
 
-        $this->psr7Response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
+        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
     }
 }

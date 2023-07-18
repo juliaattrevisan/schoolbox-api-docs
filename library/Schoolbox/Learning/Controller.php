@@ -102,13 +102,13 @@ class Controller extends Base
     {
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
-            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', [
+            $this->response = $this->redirectFound($this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', [
                 'studentId' => $this->getUser()->getId(),
             ]));
         }
 
         // If no staff explicitly requested, redirect to current user
-        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('learning.getPendingAssessmentsForUser', [
+        $this->response = $this->redirectFound($this->routeGenerator->generate('learning.getPendingAssessmentsForUser', [
             'userId' => $this->getUser()->getId(),
             'viewee' => $this->getUser(),
         ]));
@@ -143,10 +143,10 @@ class Controller extends Base
             $title .= " for {$viewee->getFullName()}";
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@learning/pendingAssessmentsOuter.twig', [
+        $this->response = $this->responseFromTemplate('@learning/pendingAssessmentsOuter.twig', [
                 'viewee'      => $viewee,
                 'filterPanel' => $filterPanel,
-            ], $title, 'submission');
+            ],                                        $title, 'submission');
     }
 
     /**
@@ -172,7 +172,7 @@ class Controller extends Base
             $postFilterSelections = $this->requestPost['filter_selection'] ?: [];
             $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $viewee, $postFilterSelections);
 
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'status'  => 200,
                 'content' => $content,
             ]);
@@ -279,7 +279,7 @@ class Controller extends Base
      */
     protected function returnJsonError(Throwable $e): void
     {
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'status'  => 500,
             'code'    => $e->getCode(),
             'message' => $e->getMessage(),
@@ -332,7 +332,7 @@ class Controller extends Base
             'hideTimetable' => $hideTimetable,
         ]);
 
-        $this->psr7Response = $this->responseFromTemplate('@learning/classes.twig', $gridData, '', 'classes');
+        $this->response = $this->responseFromTemplate('@learning/classes.twig', $gridData, '', 'classes');
     }
 
     /**
@@ -357,7 +357,7 @@ class Controller extends Base
             $this->rosettaStone
         ))->getStudentLists();
 
-        $this->psr7Response = $this->responseAsJson($students);
+        $this->response = $this->responseAsJson($students);
     }
 
     /**
@@ -365,7 +365,7 @@ class Controller extends Base
      */
     public function getClassListPage(Folder\Model $folder): void
     {
-        $this->psr7Response = $this->responseFromTemplate('@learning/classLists.twig', [
+        $this->response = $this->responseFromTemplate('@learning/classLists.twig', [
                 'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess(),
@@ -379,7 +379,7 @@ class Controller extends Base
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
-            ], $folder->getName(), 'classes');
+            ],                                        $folder->getName(), 'classes');
     }
 
     /**

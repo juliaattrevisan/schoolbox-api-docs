@@ -100,7 +100,7 @@ class Controller extends Base
 
         /* Presentation
          */
-        $this->psr7Response = $this->responseFromTemplate('@helpHero/hero.twig', [
+        $this->response = $this->responseFromTemplate('@helpHero/hero.twig', [
             'course' => $courseSpecification,
             'duration' => number_format($end - $start, 2),
             'aggregatedData' => $aggregatedData

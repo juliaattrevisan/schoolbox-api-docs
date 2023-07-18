@@ -119,7 +119,7 @@ class Controller extends Base
 
         // And render this thing out
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralReportBuilder/index.twig',
             [
                 'reportsMine'  => $reportsMine,
@@ -273,7 +273,7 @@ class Controller extends Base
         );
 
         // And render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralReportBuilder/modify.twig',
             [
                 'moderator'            => $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0,
@@ -317,7 +317,7 @@ class Controller extends Base
 
         // And spit this thing out
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
@@ -354,7 +354,7 @@ class Controller extends Base
 
         // And spit this thing out
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => $report->getName(),
@@ -636,7 +636,7 @@ class Controller extends Base
 
         // Go back to the reports list
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoralReportBuilder.getIndex')
         );
     }
@@ -655,7 +655,7 @@ class Controller extends Base
 
         $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'status' => 'OK',
             'result' => $result,
         ]);

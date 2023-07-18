@@ -57,7 +57,7 @@ class Controller extends AbstractController
                 ]
             );
 
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@sportsfixturesPosition/list.twig',
                 [
                     'sport'        => $context,
@@ -82,7 +82,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesPosition/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesPosition/entity.twig', [
             'sport'    => $sport,
             'position' => $entity
         ]);
@@ -104,7 +104,7 @@ class Controller extends AbstractController
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesPosition/create.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesPosition/create.twig', [
             'position' => $entity,
             'sport'    => $context,
             'action'   => $entity->getId() ? 'Modify' : 'Create'
@@ -127,7 +127,7 @@ class Controller extends AbstractController
 
         $this->savePosition($sport, $this->requestPost['name'], $entity);
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesPosition.getList', [
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesPosition.getList', [
             'contextId' => $sportId
         ]));
     }

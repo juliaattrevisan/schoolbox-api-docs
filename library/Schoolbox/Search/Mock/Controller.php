@@ -42,7 +42,7 @@ class Controller extends BaseController
      */
     public function getSearch(): void
     {
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->resultBuilder->generateResultList(random_int(0, 10))
         );
     }

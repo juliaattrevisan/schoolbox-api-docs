@@ -50,7 +50,7 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminLessonPlanTemplate/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
@@ -69,7 +69,7 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminLessonPlanTemplate/create.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
@@ -143,7 +143,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 
@@ -156,7 +156,7 @@ class Controller extends Base
      */
     public function getUpdate(Model $lessonPlanTemplate): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminLessonPlanTemplate/create.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
@@ -257,7 +257,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 

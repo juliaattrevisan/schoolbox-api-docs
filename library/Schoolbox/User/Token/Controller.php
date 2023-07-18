@@ -82,7 +82,7 @@ class Controller extends Base
 
         // JSON response:
         // generate from JWT generator
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'token'        => $this->tokenBuilder->generate(
                     $user,
@@ -110,6 +110,6 @@ class Controller extends Base
         if ($jwtId) {
             $this->tokenMapper->deleteByColumn('jwt_id', $jwtId);
         }
-        $this->psr7Response = $this->responseAsJson([]);
+        $this->response = $this->responseAsJson([]);
     }
 }

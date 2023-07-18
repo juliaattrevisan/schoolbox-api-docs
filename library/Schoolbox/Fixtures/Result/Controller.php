@@ -135,7 +135,7 @@ class Controller extends AbstractController
         } catch (MapperException $e) {
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@sportsfixturesResult/create.twig',
             [
                 'sport'    => $sport,
@@ -185,7 +185,7 @@ class Controller extends AbstractController
         try {
             $allResults = $this->getMapper()->findByColumn('match_id', $context->getId());
 
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@sportsfixturesResult/list.twig',
                 [
                     'sport'      => $sport,
@@ -198,7 +198,7 @@ class Controller extends AbstractController
             /* No Results for this Match?
              * Prompt to spawn one
              */
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'sportsfixturesResult.getCreateForm',
                     [
@@ -308,7 +308,7 @@ class Controller extends AbstractController
          */
         $hasMatchModify = $this->hasMatchModify($teamMetadata->getCoaches()->getOffset($team->getId()));
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@sportsfixturesResult/team.twig',
             [
                 'sport'          => $sport,
@@ -454,7 +454,7 @@ class Controller extends AbstractController
 
         $this->saveResult($matchup, $team, $status, $this->requestPost['description'], $entity);
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'sportsfixturesResult.getResultForTeam',
                 [

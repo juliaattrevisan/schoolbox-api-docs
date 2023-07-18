@@ -71,7 +71,7 @@ class Controller extends Base
 
         /* Otherwise show the gallery
          */
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@geosnapshotApi/studentPhotos.twig',
             [
                 'allBreadcrumbs' => [

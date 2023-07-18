@@ -50,12 +50,12 @@ class Controller extends Base
 
             if ($authToken['access_token']) {
                 $output = ['token' => $authToken['access_token'], 'subdomain' => $subdomain];
-                $this->psr7Response = $this->responseAsJson($output);
+                $this->response = $this->responseAsJson($output);
             }
         } catch (ClientException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->psr7Response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray());
         }
     }
 }

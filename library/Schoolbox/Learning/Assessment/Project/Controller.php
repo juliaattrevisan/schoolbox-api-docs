@@ -178,7 +178,7 @@ class Controller extends Assessment\Controller
                     : $this->getSession()->getHistory(),
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',
             $twigData
         );
@@ -257,7 +257,7 @@ class Controller extends Assessment\Controller
             'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->request->getUri()->getPath()),
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/summary/student.twig',
             $twigData
         );

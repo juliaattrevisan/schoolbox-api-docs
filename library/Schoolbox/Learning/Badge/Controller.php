@@ -190,7 +190,7 @@ class Controller extends Base
             $next    = null;
             $current = null;
         }
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'data'     => $data,
             'metadata' => [
                 'count'  => $count,
@@ -222,7 +222,7 @@ class Controller extends Base
             $this->requestQuery->getArrayCopy(),
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningBadge/list.twig',
             ['filterPanel' => $filterPanel,],
             'Badges'
@@ -258,7 +258,7 @@ class Controller extends Base
             }
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningBadge/createUpdateForm.twig',
             [
                 'badge' => [],
@@ -330,7 +330,7 @@ class Controller extends Base
         $this->mapper->save($model);
 
         // Return the badge just created
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->buildModelToArrayTranslator()($model)
         );
     }
@@ -366,7 +366,7 @@ class Controller extends Base
         );
 
         $curriculumCodes = $badge->getViewableCurriculumNodes()?->reindex();
-        $this->psr7Response = $this->responseFromTemplate('@learningBadge/createUpdateForm.twig', [
+        $this->response = $this->responseFromTemplate('@learningBadge/createUpdateForm.twig', [
             'badge' => $badge,
             'curriculumCodes' => $curriculumCodes,
             'attachzone' => $attachzone->getTwigContext(),
@@ -378,7 +378,7 @@ class Controller extends Base
                 'registry' => $iconRegistry->getRegistry(),
                 'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
             ]
-        ], 'Modify Badge');
+        ],                                            'Modify Badge');
     }
 
 

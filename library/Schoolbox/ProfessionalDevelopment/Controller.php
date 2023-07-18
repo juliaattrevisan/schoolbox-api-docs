@@ -64,7 +64,7 @@ class Controller extends Base
         /* Redirect upon successful save
          */
         if ($result) {
-            $this->psr7Response = $this->redirectFound("/search/user/{$user->getId()}");
+            $this->response = $this->redirectFound("/search/user/{$user->getId()}");
             return;
         }
 
@@ -96,7 +96,7 @@ class Controller extends Base
             $status = self::ACCREDIT_FAIL;
         }
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'userId' => $userId,
             'status' => $status
         ]);

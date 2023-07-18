@@ -73,7 +73,7 @@ class Controller extends Base
         } else {
             $_SESSION = $previous; //Recover old session
         }
-        $this->psr7Response = $this->redirectFound('/');
+        $this->response = $this->redirectFound('/');
     }
 
 
@@ -87,7 +87,7 @@ class Controller extends Base
         if (array_key_exists('previous', $_SESSION)) {
             $_SESSION = $_SESSION['previous'];
         }
-        $this->psr7Response = $this->redirectFound('/');
+        $this->response = $this->redirectFound('/');
     }
 
 
@@ -126,7 +126,7 @@ class Controller extends Base
         $parentEmails = (new TupleStack())->normaliseValues($parentEmails);
 
         // Return a json encoded array :)
-        $this->psr7Response = $this->responseAsJson($parentEmails);
+        $this->response = $this->responseAsJson($parentEmails);
     }
 
     /**
@@ -153,6 +153,6 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseAsJson($result);
+        $this->response = $this->responseAsJson($result);
     }
 }

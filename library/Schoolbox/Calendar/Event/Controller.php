@@ -147,7 +147,7 @@ class Controller extends Base
 
         $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
-        $this->psr7Response = $this->responseFromTemplate('@calendarEvent/event.twig', [
+        $this->response = $this->responseFromTemplate('@calendarEvent/event.twig', [
             'event' => $event,
             'level' => $helper->getEventLevel($event),
             'campusCollection' => $helper->getCampusCollection($event),
@@ -172,7 +172,7 @@ class Controller extends Base
                     'current' => $event->getAttendance(),
                 ],
             ],
-        ], $event->getTitle());
+        ],                                            $event->getTitle());
     }
 
 
@@ -236,7 +236,7 @@ class Controller extends Base
          */
         $event->setShowAttendees(true);
 
-        $this->psr7Response = $this->responseFromTemplate('@calendarEvent/create.twig', [
+        $this->response = $this->responseFromTemplate('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
@@ -281,7 +281,7 @@ class Controller extends Base
 
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
-        ], 'Create event');
+        ],                                            'Create event');
     }
 
 
@@ -328,7 +328,7 @@ class Controller extends Base
             ? $this->campusMapper->findAll()
             : $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
-        $this->psr7Response = $this->responseFromTemplate('@calendarEvent/create.twig', [
+        $this->response = $this->responseFromTemplate('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
@@ -373,7 +373,7 @@ class Controller extends Base
 
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
-        ], "Modify {$event->getTitle()}");
+        ],                                            "Modify {$event->getTitle()}");
     }
 
 
@@ -726,7 +726,7 @@ class Controller extends Base
 
         /* Apply redirect - go back to the place from whence you came
          */
-        $this->psr7Response = $this->redirectFound(Redirect::decode($returnUrl));
+        $this->response = $this->redirectFound(Redirect::decode($returnUrl));
     }
 
 
@@ -825,11 +825,11 @@ class Controller extends Base
                 $redirect = $this->routeGenerator->generate('calendar.getOwnCalendar');
             }
 
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'callbackUrl' => $redirect
             ]);
         } else {
-            $this->psr7Response = $this->redirectFound($redirect);
+            $this->response = $this->redirectFound($redirect);
         }
     }
 }

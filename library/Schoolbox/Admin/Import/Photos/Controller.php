@@ -143,11 +143,11 @@ class Controller extends Base
             }
         }
         if ($this->isJsonRequest()) {
-            $this->psr7Response = $this->responseAsJson($results)->withStatus(200);
+            $this->response = $this->responseAsJson($results)->withStatus(200);
             return;
         }
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportPhotos.getIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportPhotos.getIndex'));
     }
 
 
@@ -185,7 +185,7 @@ class Controller extends Base
             ]
         ]);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportPhotos/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportPhotos.getIndex'),

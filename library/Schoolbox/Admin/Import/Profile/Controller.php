@@ -106,7 +106,7 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportProfile/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportProfile.getIndex'),
@@ -215,13 +215,13 @@ class Controller extends Base
         }
 
         if ($this->isJsonRequest()) {
-            $this->psr7Response = $this->responseAsJson([$errors, $logs])->withStatus(
+            $this->response = $this->responseAsJson([$errors, $logs])->withStatus(
                 !empty($errors) ? 400 : 200
             );
             return;
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportProfile/log.twig',
             [
                 'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
@@ -254,7 +254,7 @@ class Controller extends Base
             $this->staffProfileMapper,
             $this->relationshipMapper
         ))->process();
-        $this->psr7Response = $this->responseFromContent($content)
+        $this->response = $this->responseFromContent($content)
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')

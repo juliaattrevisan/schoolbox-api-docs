@@ -167,7 +167,7 @@ class Controller extends ConfigController
             ]
         ]);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
@@ -198,7 +198,7 @@ class Controller extends ConfigController
 
         $report = $this->reportMapper->createModel();
         $report->setFileName(Model::DEFAULT_FILENAME);
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/create.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
@@ -258,7 +258,7 @@ class Controller extends ConfigController
             $logoZone->attachFiles([$report->getLogo()]);
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/create.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
@@ -342,7 +342,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -472,7 +472,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -495,7 +495,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -516,7 +516,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -538,7 +538,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -569,7 +569,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -586,7 +586,7 @@ class Controller extends ConfigController
     {
         $this->reportMapper->delete($report);
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -701,7 +701,7 @@ class Controller extends ConfigController
 
         /* Show waiting screen for the result payload associated with this report generation
          */
-        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminSummativeReport.getStatus', [
+        $this->response = $this->redirectFound($this->routeGenerator->generate('adminSummativeReport.getStatus', [
             'reportId' => $report->getId(),
             'key' => $key
         ]));
@@ -735,7 +735,7 @@ class Controller extends ConfigController
             throw new NotFound();
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/result.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminSummativeReport.getList'),
@@ -967,7 +967,7 @@ class Controller extends ConfigController
             'customReportStyle'          => (new CustomStyleExtractor())->extract((string)$this->getConfigLoader()->get('skin_custom_css'))
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@adminSummativeReport/studentReport.twig', $data);
+        $this->response = $this->responseFromTemplateUnthemed('@adminSummativeReport/studentReport.twig', $data);
     }
 
 
@@ -1044,7 +1044,7 @@ class Controller extends ConfigController
         } else {
             //if reports exist.
             //redirect user to report preview
-            $this->psr7Response = $this->redirectFound($reports[0]['url']);
+            $this->response = $this->redirectFound($reports[0]['url']);
         }
     }
 

@@ -131,7 +131,7 @@ class Controller extends UserAccount\Controller
         $contents = stream_get_contents($fp);
         fclose($fp);
 
-        $this->psr7Response = $this->responseFromContent($contents)
+        $this->response = $this->responseFromContent($contents)
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')

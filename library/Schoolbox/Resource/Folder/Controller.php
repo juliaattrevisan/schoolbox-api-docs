@@ -267,7 +267,7 @@ class Controller extends BaseController
 
         $canChangeClassCodes = $this->getUser()->isSuperuser() || $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS) === UserAccess::ACCESS_FULL;
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@folder/modify.twig',
             [
                 'user'                => $this->getUser(),
@@ -308,7 +308,7 @@ class Controller extends BaseController
     {
         $this->recursiveDelete($folder->getId(), $this->getUser());
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             json_encode(['result' => 'success'])
         );
     }
@@ -333,7 +333,7 @@ class Controller extends BaseController
 
         $this->folderMapper->moveFolder($folder->getId(), $newParent->getId(), $this->getUser());
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             json_encode(['result' => 'success'])
         );
     }
@@ -412,7 +412,7 @@ class Controller extends BaseController
                 $newLocation = $this->createGroup($this->requestPost, $model, $this->getUser());
             }
 
-            $this->psr7Response = $this->redirectAfterPost($newLocation);
+            $this->response = $this->redirectAfterPost($newLocation);
         } catch (RangeException $e) {
             // not enough info submitted to the form
             throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING, $e);
@@ -861,7 +861,7 @@ class Controller extends BaseController
 
         $this->getSession()->set('resourcesID', $folder->getParent()->getId());
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             json_encode(['result' => 'success'])
         );
     }
@@ -899,7 +899,7 @@ class Controller extends BaseController
             $linkMapper->delete($currentLink);
         }
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             json_encode(['result' => 'success'])
         );
     }
@@ -932,7 +932,7 @@ class Controller extends BaseController
             $folderList->add($folder);
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@folder/groups.twig', [
+        $this->response = $this->responseFromTemplate('@folder/groups.twig', [
             'groupList'           => $folderList->sortByCallback(function ($a, $b) {
                 return strnatcasecmp($a->getName(), $b->getName());
             }),

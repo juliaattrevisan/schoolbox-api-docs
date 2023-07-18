@@ -46,7 +46,7 @@ class Controller extends Base
     public function getIndex(): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminGrades/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminGrades.getIndex'),
@@ -88,7 +88,7 @@ class Controller extends Base
         $this->gradeLevelMapper->delete($gradeGroup->getGradeLevels());
         $this->gradeLevelGroupMapper->delete($gradeGroup);
 
-        $this->psr7Response = $this->responseAsJson($this->retrieveAllGradeGroups());
+        $this->response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**
@@ -108,7 +108,7 @@ class Controller extends Base
 
         $this->gradeLevelMapper->delete($gradeLevel);
 
-        $this->psr7Response = $this->responseAsJson($this->retrieveAllGradeGroups());
+        $this->response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**
@@ -154,7 +154,7 @@ class Controller extends Base
             $this->gradeLevelMapper->save($gradeLevelGroup->getGradeLevels());
         }
 
-        $this->psr7Response = $this->responseAsJson($this->retrieveAllGradeGroups());
+        $this->response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**

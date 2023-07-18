@@ -31,7 +31,7 @@ class Controller extends Base
      */
     public function getSelectize()
     {
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->surveyMapper->findByKeyword(
                 $this->requestQuery['query']
             )

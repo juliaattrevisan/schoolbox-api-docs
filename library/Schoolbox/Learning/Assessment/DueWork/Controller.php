@@ -263,7 +263,7 @@ class Controller extends Assessment\Controller
             ))->getFirstUrl(),
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/status.twig',
             $twigData,
             "Status of {$assessment->getTitle()}",
@@ -310,7 +310,7 @@ class Controller extends Assessment\Controller
         );
 
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->psr7Response = $this->redirectFound($sebDownload);
+            $this->response = $this->redirectFound($sebDownload);
             return;
         }
 
@@ -414,7 +414,7 @@ class Controller extends Assessment\Controller
             $twigData['acknowledgementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/summary/student.twig',
             $twigData,
             "{$assessment->getTitle()} - {$student->getFullName()}",
@@ -466,7 +466,7 @@ class Controller extends Assessment\Controller
                 'learningAssessment.getStatus',
                 ['assessmentId' => $assessment->getId()],
             );
-        $this->psr7Response = $this->redirectFound($returnUrl);
+        $this->response = $this->redirectFound($returnUrl);
     }
 
 
@@ -519,7 +519,7 @@ class Controller extends Assessment\Controller
             );
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/overview.twig',
             $data,
             'Rubric Report'
@@ -552,12 +552,12 @@ class Controller extends Assessment\Controller
 
         $basename = (new Url($assessment->getTitle()))->getSlug();
         $content  = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
-        $this->psr7Response = $this->responseFromContent($content)
-            ->withHeader('Pragma', ' ')
-            ->withHeader('Cache-Control', ' ')
-            ->withHeader('Content-Type', 'text/csv')
-            ->withHeader('Content-Length', strlen($content))
-            ->withHeader('Content-Disposition', "attachment; filename=\"$basename-results.csv\"")
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'text/csv')
+                               ->withHeader('Content-Length', strlen($content))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"$basename-results.csv\"")
         ;
     }
 
@@ -853,7 +853,7 @@ class Controller extends Assessment\Controller
             'showRubricTotal'     => $selfAssess
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/createSubmission.twig',
             $data
         );
@@ -873,11 +873,11 @@ class Controller extends Assessment\Controller
         if ($this->isXhrRequest()) {
             $result['success'] = false;
             $result['message'] = $errorMessage;
-            $this->psr7Response = $this->responseAsJson($result)->withStatus($errorCode);
+            $this->response = $this->responseAsJson($result)->withStatus($errorCode);
         } else {
             // Show some error message?
             $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
-            $this->psr7Response = $this->redirectFound($redirectTo);
+            $this->response = $this->redirectFound($redirectTo);
         }
     }
 
@@ -1201,10 +1201,10 @@ class Controller extends Assessment\Controller
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
 
-            $this->psr7Response = $this->responseAsJson($result)->withStatus(200);
+            $this->response = $this->responseAsJson($result)->withStatus(200);
         } else {
             // Redirect after saving to Due Work Summary for particular student.
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'learningAssessment.getSummary',
                     [
@@ -1258,7 +1258,7 @@ class Controller extends Assessment\Controller
             ];
             $code = 403;
         }
-        $this->psr7Response = $this->responseAsJson($data)->withStatus($code);
+        $this->response = $this->responseAsJson($data)->withStatus($code);
     }
 
 
@@ -1288,7 +1288,7 @@ class Controller extends Assessment\Controller
             $this->persistAcknowledgementResponse($assessment, $student, $submissionTime);
             $participant = $assessment->getParticipant($student);
 
-            $this->psr7Response = $this->responseFromTemplateUnthemed(
+            $this->response = $this->responseFromTemplateUnthemed(
                 '@learning/fragments/toMarkParticipant.twig',
                 [
                     'participant' => $participant,
@@ -1297,7 +1297,7 @@ class Controller extends Assessment\Controller
             );
             $code = 200;
         } catch (PDOException $e) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'success' => false,
                     'message' => $e->getMessage(),
@@ -1305,7 +1305,7 @@ class Controller extends Assessment\Controller
             );
             $code = 403;
         }
-        $this->psr7Response = $this->psr7Response->withStatus($code);
+        $this->response = $this->response->withStatus($code);
     }
 
 
@@ -1373,7 +1373,7 @@ class Controller extends Assessment\Controller
             ];
             $code = 403;
         }
-        $this->psr7Response = $this->responseAsJson($data)->withStatus(403);
+        $this->response = $this->responseAsJson($data)->withStatus(403);
     }
 
 
@@ -1548,7 +1548,7 @@ class Controller extends Assessment\Controller
             // noop - submission box doesn't exist
         }
 
-        $this->psr7Response = $this->responseAsJson(null)->withStatus(204);
+        $this->response = $this->responseAsJson(null)->withStatus(204);
     }
 
 
@@ -1638,7 +1638,7 @@ class Controller extends Assessment\Controller
      */
     public function getSimilarityReport(IAssessable $assessment): void
     {
-        $this->psr7Response = $this->responseFromTemplate('@learningAssessment/dueWork/similarityReport.twig', [
+        $this->response = $this->responseFromTemplate('@learningAssessment/dueWork/similarityReport.twig', [
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
                 $this->getRouteIfAuthorized('learningAssessment.getStatus', [
@@ -1654,7 +1654,7 @@ class Controller extends Assessment\Controller
                 'assessment' => $assessment,
                 'assessmentId' => $assessment->getId()
             ])
-        ], "{$assessment->getTitle()} Similarity Report");
+        ],                                            "{$assessment->getTitle()} Similarity Report");
     }
 
 
@@ -1668,6 +1668,6 @@ class Controller extends Assessment\Controller
         $payload = (new Turnitin\SimilarityReportPayload($this->turnitinFileMapper, $this->getUserMapper(), $this->routeGenerator))
             ->generate($assessment);
 
-        $this->psr7Response = $this->responseAsJson($payload);
+        $this->response = $this->responseAsJson($payload);
     }
 }

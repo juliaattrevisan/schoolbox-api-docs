@@ -47,11 +47,11 @@ class Controller extends Base
 
         if (empty($reportYears)) {
             // 404
-            $this->psr7Response = $this->responseEmpty(404);
+            $this->response = $this->responseEmpty(404);
         } else {
             // Redirect to current year, or last year in report
             $lastReportYear = max($reportYears);
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'customMeridenPastoral.index',
                     array(
@@ -73,13 +73,13 @@ class Controller extends Base
     {
         try {
             $report = $this->buildReportData($year, $student);
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 $report['template'],
                 $report,
                 'School Report - ' . $year . ' - ' . $student->formatName(),
             );
         } catch (RangeException $e) {
-            $this->psr7Response = $this->responseEmpty(404);
+            $this->response = $this->responseEmpty(404);
         }
     }
 
@@ -99,7 +99,7 @@ class Controller extends Base
         try {
             $baseReportData = $this->buildReportData($year, $student);
         } catch (RangeException $e) {
-            $this->psr7Response = $this->responseEmpty(404);
+            $this->response = $this->responseEmpty(404);
             return;
         }
 
@@ -118,7 +118,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@customMeridenPastoral/printableReport.twig',
             [
                 'baseReport'     => $baseReportData,
@@ -143,13 +143,13 @@ class Controller extends Base
 
             /** @var Subject\Base $subjectReport */
             $subjectReport      = $reportData['report']['subjectReport'];
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 $reportData['template'],
                 $reportData,
                 $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
             );
         } catch (RangeException $e) {
-            $this->psr7Response = $this->responseEmpty(404);
+            $this->response = $this->responseEmpty(404);
         }
     }
 

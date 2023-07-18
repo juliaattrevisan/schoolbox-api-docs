@@ -155,7 +155,7 @@ class Controller extends ConfigController
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportIndex/schoolData/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
@@ -217,7 +217,7 @@ class Controller extends ConfigController
         $this->updateConfig($postData, $this->buildConfigPredicate());
         /* Go back to the place from whence you came
          */
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
     }
 
 
@@ -257,7 +257,7 @@ class Controller extends ConfigController
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@adminImportIndex/schoolData/status.twig', [
+        $this->response = $this->responseFromTemplateUnthemed('@adminImportIndex/schoolData/status.twig', [
             'isReachable' => $isReachable
         ]);
     }
@@ -288,7 +288,7 @@ class Controller extends ConfigController
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportIndex/schoolData/statusReport.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
@@ -323,7 +323,7 @@ class Controller extends ConfigController
         }
 
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
-        $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
 
         /* Spawn a logger out of darkness
          * Was there a particular way to do this?
@@ -334,7 +334,7 @@ class Controller extends ConfigController
         $this->postOutputCallbacks[] = function () use ($logger) {
             $this->syncCallback($logger);
         };
-        $this->psr7Response = $this->responseEmpty();
+        $this->response              = $this->responseEmpty();
     }
 
 
@@ -575,12 +575,12 @@ class Controller extends ConfigController
     public function getTimetableExport(): void
     {
         $content = (new Timetable($this->eventMapper))->export();
-        $this->psr7Response = $this->responseFromContent($content)
-            ->withHeader('Pragma', ' ')
-            ->withHeader('Cache-Control', ' ')
-            ->withHeader('Content-Type', 'text/csv')
-            ->withHeader('Content-Length', \strlen($content))
-            ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"")
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'text/csv')
+                               ->withHeader('Content-Length', \strlen($content))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"")
         ;
     }
 
@@ -595,12 +595,12 @@ class Controller extends ConfigController
     public function getClassesExport(): void
     {
         $content = (new Classes($this->classEntryMapper))->export();
-        $this->psr7Response = $this->responseFromContent($content)
-            ->withHeader('Pragma', ' ')
-            ->withHeader('Cache-Control', ' ')
-            ->withHeader('Content-Type', 'text/csv')
-            ->withHeader('Content-Length', \strlen($content))
-            ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"")
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'text/csv')
+                               ->withHeader('Content-Length', \strlen($content))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"")
         ;
     }
 }

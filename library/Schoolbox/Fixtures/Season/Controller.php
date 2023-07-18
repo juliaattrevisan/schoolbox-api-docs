@@ -91,7 +91,7 @@ class Controller extends AbstractController
                 }
             );
 
-            $this->psr7Response = $this->responseAsJson($seasons);
+            $this->response = $this->responseAsJson($seasons);
 
             return;
         }
@@ -115,7 +115,7 @@ class Controller extends AbstractController
                 }
             }
 
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@sportsfixturesSeason/list.twig',
                 [
                     'allSeasons'     => $allSeasons,
@@ -138,7 +138,7 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSeason/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesSeason/entity.twig', [
             'season' => $entity
         ]);
     }
@@ -165,7 +165,7 @@ class Controller extends AbstractController
             'action' => $entity->getId() ? 'Modify' : 'Create',
         ];
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSeason/create.twig', $data);
+        $this->response = $this->responseFromTemplate('@sportsfixturesSeason/create.twig', $data);
     }
 
     /**
@@ -187,7 +187,7 @@ class Controller extends AbstractController
                 Alaress_Date_Format::newLocalShort($this->requestPost['end'])
             );
 
-            $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSeason.getList'));
+            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSeason.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }
@@ -270,7 +270,7 @@ class Controller extends AbstractController
         // Either season now has no linked divisions/matches, or caller specified to cascade the delete
         try {
             $this->getMapper()->delete($entity);
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'status' => 200,
             ]);
         } catch (Exception $e) {
@@ -331,7 +331,7 @@ class Controller extends AbstractController
                 $matchCounts[$season->getId()] = 0;
             }
 
-            $this->psr7Response = $this->responseFromTemplateUnthemed(
+            $this->response = $this->responseFromTemplateUnthemed(
                 "@sportsfixturesSeason/listItem.twig",
                 [
                     'currentSeason'  => $season,
@@ -340,7 +340,7 @@ class Controller extends AbstractController
                 ]
             );
         } else {
-            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate('sportsfixturesSeason.getList'));
+            $this->response = $this->redirectFound($this->routeGenerator->generate('sportsfixturesSeason.getList'));
         }
     }
 
@@ -356,7 +356,7 @@ class Controller extends AbstractController
     {
         if ($this->isXhrRequest()) {
             // Dump out an AJAX error
-            $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(500);
+            $this->response = $this->responseAsJson($e->getMessage())->withStatus(500);
         } else {
             throw $e;
         }

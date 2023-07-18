@@ -105,7 +105,7 @@ class Controller extends Assessment\Controller
             'isInstructor' => $isViewerAnInstructor,
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/lessonPlan/summary/student.twig',
             $twigData
         );

@@ -92,7 +92,7 @@ class Controller extends Base
             $reports[$year][$semester][$reportId] = ['description' => $description];
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@customStkOleReport/list.twig',
             [
                 'student' => $student,
@@ -138,12 +138,12 @@ class Controller extends Base
         $content  = $row['Document'];
         $fileName = "{$row['Description']}.pdf";
 
-        $this->psr7Response = $this->responseFromContent($content)
-            ->withHeader('Pragma', ' ')
-            ->withHeader('Cache-Control', ' ')
-            ->withHeader('Content-Type', 'application/pdf')
-            ->withHeader('Content-Length', strlen($content))
-            ->withHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'application/pdf')
+                               ->withHeader('Content-Length', strlen($content))
+                               ->withHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"')
         ;
     }
 

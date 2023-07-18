@@ -55,7 +55,7 @@ class Controller extends ConfigController
     public function getInsert()
     {
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminLti/modify.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
@@ -77,7 +77,7 @@ class Controller extends ConfigController
         );
 
         $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminLti/index.twig',
             [
                 'pageCurrent'           => $this->routeGenerator->generate('adminLti.getIndex'),
@@ -105,7 +105,7 @@ class Controller extends ConfigController
     public function getModify(Provider $provider): void
     {
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminLti/modify.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
@@ -125,7 +125,7 @@ class Controller extends ConfigController
     public function postDelete(Provider $provider): void
     {
         $this->providerMapper->delete($provider);
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**
@@ -222,7 +222,7 @@ class Controller extends ConfigController
 
         $this->providerMapper->save($provider);
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**
@@ -234,7 +234,7 @@ class Controller extends ConfigController
     public function postConfig(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
 
     /**

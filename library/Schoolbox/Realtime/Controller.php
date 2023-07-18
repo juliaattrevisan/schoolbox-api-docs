@@ -262,7 +262,7 @@ class Controller extends BaseController
                                ->indexBy('id')
                                ->getAll();
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@messages/settings.twig',
             [
                 'ns'        => $ns,
@@ -299,9 +299,9 @@ class Controller extends BaseController
         }
 
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson($conf);
+            $this->response = $this->responseAsJson($conf);
         } else {
-            $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('messages.configure'));
+            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('messages.configure'));
         }
     }
 }

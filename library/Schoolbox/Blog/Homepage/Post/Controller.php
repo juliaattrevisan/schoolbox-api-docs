@@ -216,7 +216,7 @@ class Controller extends Base
 
         // Redirect user page to blog detail page
 
-        $this->psr7Response = $this->redirectAfterPost("/blog/{$blog->getId()}");
+        $this->response = $this->redirectAfterPost("/blog/{$blog->getId()}");
     }
 
     /**
@@ -259,7 +259,7 @@ class Controller extends Base
 
         // Lets get the party started...
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@blog/item.twig',
             [
                 'session'           => $_SESSION,
@@ -301,7 +301,7 @@ class Controller extends Base
             $returnUrl = $this->routeGenerator->generate('blog.getItem', ['id' => $blog->getId()]);
         }
 
-        $this->psr7Response = $this->redirectAfterPost($returnUrl);
+        $this->response = $this->redirectAfterPost($returnUrl);
     }
 
     /**
@@ -336,7 +336,7 @@ class Controller extends Base
         $blog->setFolder($this->getFolderMapper()->findById($blog->getFolder()->getId()));
 
         // Lets get the party started...
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@blog/modify.twig',
             [
                 'session'           => $_SESSION,
@@ -357,7 +357,7 @@ class Controller extends Base
     public function getInsert(FolderModel $folder)
     {
         // Lets get the party started...
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@blog/modify.twig',
             [
                 'session'           => $_SESSION,
@@ -418,7 +418,7 @@ class Controller extends Base
 
         // Lets get the party started...
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@blog/archive.twig',
             [
                 'session'           => $_SESSION,

@@ -63,7 +63,7 @@ class Controller extends Base
         $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
         $audience = $this->userResolver->findUsersForArticle($article);
 
-        $this->psr7Response = $this->responseFromTemplate('@commsNewsStatistics/index.twig', [
+        $this->response = $this->responseFromTemplate('@commsNewsStatistics/index.twig', [
             'article' => $article,
 
             /* Length of period to record granular data
@@ -98,7 +98,7 @@ class Controller extends Base
             /* Recent Visitors to this article
              */
             'recentVisitors' => (new Visitation\Payload\Top10($this->statisticsMapper, $this->userMapper))->generate($article)
-        ], "Statistics for {$article->getTitle()}");
+        ],                                            "Statistics for {$article->getTitle()}");
     }
 
 
@@ -120,7 +120,7 @@ class Controller extends Base
             'interactions' => $interactions->fetchOpensVsTime($article, $scale),
         ];
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -129,9 +129,9 @@ class Controller extends Base
      */
     public function getVisitation(News\Model $article): void
     {
-        $this->psr7Response = $this->responseFromTemplate('@commsNewsStatistics/visitation/container.twig', [
+        $this->response = $this->responseFromTemplate('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
-        ], "Visitors for {$article->getTitle()}");
+        ],                                            "Visitors for {$article->getTitle()}");
     }
 
 
@@ -148,7 +148,7 @@ class Controller extends Base
         $payload = (new Visitation\Payload\Top10($this->statisticsMapper, $this->userMapper))
             ->generate($article);
 
-        $this->psr7Response = $this->responseAsJson($payload);
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -170,6 +170,6 @@ class Controller extends Base
         $payload = (new Visitation\Payload\Full($this->statisticsMapper, $this->userResolver, $this->userMapper))
             ->generate($article);
 
-        $this->psr7Response = $this->responseAsJson($payload);
+        $this->response = $this->responseAsJson($payload);
     }
 }

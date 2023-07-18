@@ -215,7 +215,7 @@ class Controller extends BaseController
             ],
         ];
 
-        $this->psr7Response = $this->responseFromTemplate('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps');
+        $this->response = $this->responseFromTemplate('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps');
     }
 
 
@@ -247,7 +247,7 @@ class Controller extends BaseController
                 return;
         }
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed($template, $data);
+        $this->response = $this->responseFromTemplateUnthemed($template, $data);
     }
 
 
@@ -346,11 +346,11 @@ class Controller extends BaseController
 
         if ($this->isXhrRequest()) {
             // respond with an empty 200 OK
-            $this->psr7Response = $this->responseAsJson(null);
+            $this->response = $this->responseAsJson(null);
             return;
         }
 
-        $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
+        $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
     }
 
 
@@ -416,7 +416,7 @@ class Controller extends BaseController
 
         //Filtering out $config display further in Twig. Is there a more elegant solution?
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminMessages/configure.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminMessages.configure'),
@@ -463,7 +463,7 @@ class Controller extends BaseController
         /** @var NS $ns */
         $ns = $this->getNsMapper()->findById($source->getNamespace()->getId());
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@adminMessages/custom-config.twig',
             [
                 'ns'        => [$ns->getId() => $ns],
@@ -522,7 +522,7 @@ class Controller extends BaseController
             }
         }
 
-        $this->psr7Response = $this->responseAsJson($conf);
+        $this->response = $this->responseAsJson($conf);
     }
 
 
@@ -584,7 +584,7 @@ class Controller extends BaseController
 
         $content['data']['logs'] = array_filter(explode("\n", trim(stream_get_contents($write))));
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             $content['template'],
             $content['data'],
         );
@@ -626,7 +626,7 @@ class Controller extends BaseController
         //set deleted in app registries
         $registryMapper->deleteByColumn('app_id', $service->getId());
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'id' => $service->getId(),
         ]);
     }

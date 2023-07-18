@@ -73,7 +73,7 @@ class Controller extends Base
 
         /* Pass to twig to render nicely
          */
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@nceaReport/report.twig',
             [
                 'user' => $user,

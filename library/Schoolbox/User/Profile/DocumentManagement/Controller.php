@@ -79,7 +79,7 @@ class Controller extends Base
         $l10n = $this->getDi()->get('l10n');
 
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@profileDocumentManagement/index.twig',
             [
                 'student' => $student,
@@ -117,7 +117,7 @@ class Controller extends Base
 
         //Santise the filename leaving only words, spaces, numbers and a few punctation characters
         $filename = mb_ereg_replace("([^\w\s\d\-_~,;'()\[\]\.])", '', $report['filename']);
-        $this->psr7Response = $this->responseFromContent($report['blob'])
+        $this->response = $this->responseFromContent($report['blob'])
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', $mimeType->getMime())

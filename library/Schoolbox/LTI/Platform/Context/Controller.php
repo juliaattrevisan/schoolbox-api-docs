@@ -182,7 +182,7 @@ class Controller extends BaseController
         );
 
         // Send the request
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
             ['message' => $message],
         );
@@ -238,7 +238,7 @@ class Controller extends BaseController
         );
 
         // Build a DL request to this tool
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
             ['message' => $message],
         );
@@ -291,7 +291,7 @@ class Controller extends BaseController
         );
         $handler            = new MembershipServiceServerRequestHandler($builder);
         $server             = new ServiceServer($validator, $handler);
-        $this->psr7Response = $server->handle($request);
+        $this->response = $server->handle($request);
     }
 
     /**

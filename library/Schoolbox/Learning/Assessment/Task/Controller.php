@@ -143,7 +143,7 @@ class Controller extends Assessment\Controller
             'writable'    => Access::getInstance()->isInstructor($this->getUser(), $assessment->getContext()->getFolder()),
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/task/status.twig',
             $twigData,
             "Status of {$assessment->getTitle()}",
@@ -174,7 +174,7 @@ class Controller extends Assessment\Controller
         );
 
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->psr7Response = $this->redirectFound($sebDownload);
+            $this->response = $this->redirectFound($sebDownload);
             return;
         }
 
@@ -244,7 +244,7 @@ class Controller extends Assessment\Controller
             'transitions'  => $tickTransitions,
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/task/summary/student.twig',
             $twigData
         );
@@ -288,7 +288,7 @@ class Controller extends Assessment\Controller
         try {
             $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
             if ($this->isXhrRequest()) {
-                $this->psr7Response = $this->responseAsJson([
+                $this->response = $this->responseAsJson([
                     'success' => true,
                     'message' => 'OK',
                     'id'      => $response->getId(),
@@ -296,7 +296,7 @@ class Controller extends Assessment\Controller
                 ]);
             } else {
                 // redirect after saving to Task Summary for particular Student
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate(
                         'learningAssessment.getSummary',
                         [
@@ -306,7 +306,7 @@ class Controller extends Assessment\Controller
                     )
                 );
             }
-            $this->psr7Response = $this->psr7Response->withStatus(200);
+            $this->response = $this->response->withStatus(200);
         } catch (ConcurrentModificationException | InvalidTaskResponseException $e) {
             // We don't need to log concurrent exceptions, we expect them to happen from time to time.
             if (!$e instanceof ConcurrentModificationException) {
@@ -314,7 +314,7 @@ class Controller extends Assessment\Controller
             }
 
             if ($this->isXhrRequest()) {
-                $this->psr7Response = $this->responseAsJson([
+                $this->response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage(),
                     'id'      => null,

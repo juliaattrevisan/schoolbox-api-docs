@@ -136,7 +136,7 @@ class Controller extends Base
             }
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoral/index.twig',
             [
                 'user'             => $user,
@@ -158,7 +158,7 @@ class Controller extends Base
     {
         $get = $this->requestQuery;
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoral/search.twig',
             [
                 'search'              => trim($get['keyword']),
@@ -197,7 +197,7 @@ class Controller extends Base
             $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD))
         );
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -254,7 +254,7 @@ class Controller extends Base
         );
         $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student, $pastoralCountHelper->getStartDate($pastoralCountHelper::COUNT_PERIOD_12MONTHS));
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoral/student.twig',
             [
                 'user'                => $user,
@@ -333,7 +333,7 @@ class Controller extends Base
         // populate related records
         $pageRecords = $this->pastoralDataSource->findRecords($this->getUser(), $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, $linkedStudent->getId());
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoral/student_linked.twig',
             [
                 'user'                => $this->getUser(),
@@ -417,7 +417,7 @@ class Controller extends Base
 
         // Lets render this thing
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoral/record.twig',
             [
                 'record'             => $record,
@@ -601,7 +601,7 @@ class Controller extends Base
 
         // Render this thing out
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoral/modify.twig',
             [
                 'record'            => $record,
@@ -688,7 +688,7 @@ class Controller extends Base
             $pastoralExternal->createComment($comment);
 
             // Post a JSON response
-            $this->psr7Response = $this->responseAsJson(call_user_func($this->pastoralCommentTranslator, $comment));
+            $this->response = $this->responseAsJson(call_user_func($this->pastoralCommentTranslator, $comment));
         } else {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -783,7 +783,7 @@ class Controller extends Base
         $records = $this->processPastoralRecords($studentId, $post, $duplicates);
 
         if ($this->isJsonRequest()) {
-            $this->psr7Response = $this->responseAsJson($records->map($this->pastoralTranslator))->withStatus(201);
+            $this->response = $this->responseAsJson($records->map($this->pastoralTranslator))->withStatus(201);
             return;
         }
 
@@ -794,7 +794,7 @@ class Controller extends Base
         } else {
             $returnUrl = $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,]);
         }
-        $this->psr7Response = $this->redirectAfterPost($returnUrl);
+        $this->response = $this->redirectAfterPost($returnUrl);
     }
 
     /**
@@ -833,7 +833,7 @@ class Controller extends Base
 
         // Go back to students pastoral record
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,])
         );
     }
@@ -1156,7 +1156,7 @@ class Controller extends Base
             $pastoralExternal->deletePastoral($record);
         }
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $studentId,])
         );
     }
@@ -1357,7 +1357,7 @@ class Controller extends Base
                 'default' => $action->getDefault(),
             ];
         }
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -1384,7 +1384,7 @@ class Controller extends Base
             $data['error'] = $e->getMessage();
             $status = 400;
         }
-        $this->psr7Response = $this->responseAsJson($data)->withStatus($status);
+        $this->response = $this->responseAsJson($data)->withStatus($status);
     }
 
     /**
@@ -1401,7 +1401,7 @@ class Controller extends Base
                 'name' => $tag->getName(),
             ];
         });
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 }
 

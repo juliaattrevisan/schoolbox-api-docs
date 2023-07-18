@@ -129,7 +129,7 @@ class Controller extends WebController\Base
 
         $route = $this->routeGenerator->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
 
-        $this->psr7Response = $this->redirectFound("{$route}{$getArgString}");
+        $this->response = $this->redirectFound("{$route}{$getArgString}");
     }
 
 
@@ -158,7 +158,7 @@ class Controller extends WebController\Base
         $route       = $this->routeGenerator->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@courseMarkbook/courseMarkbookOuter.twig',
             [
                 'courseSpec'  => $courseSpec,
@@ -246,7 +246,7 @@ class Controller extends WebController\Base
                     'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                 ]
             );
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'status'  => 200,
                 'content' => $contentResponse->getBody()->getContents(),
             ]);
@@ -264,7 +264,7 @@ class Controller extends WebController\Base
                     'file'    => $e->getFile(),
                 ]);
             }
-            $this->psr7Response = $this->responseAsJson($data);
+            $this->response = $this->responseAsJson($data);
         } catch (Throwable $e) {
             $this->captureException($e);
             $this->returnJsonError($e);
@@ -382,6 +382,6 @@ class Controller extends WebController\Base
                 'file'    => $e->getFile(),
             ]);
         }
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 }

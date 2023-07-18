@@ -70,7 +70,7 @@ class Controller extends Base
             );
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceCategory/browse.twig',
             [
                 'list'      => $list,
@@ -85,7 +85,7 @@ class Controller extends Base
      */
     public function add()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceCategory/edit.twig',
             [
                 'item' => new Model(),
@@ -105,7 +105,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -136,7 +136,7 @@ class Controller extends Base
             ]));
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceCategory/read.twig',
             [
                 'category'      => $category,
@@ -157,7 +157,7 @@ class Controller extends Base
      */
     public function edit(Model $category): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceCategory/edit.twig',
             [
                 'category' => $category,
@@ -181,7 +181,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -203,7 +203,7 @@ class Controller extends Base
             $this->getMapper()->delete($category);
         }
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -237,7 +237,7 @@ class Controller extends Base
             $this->getUser()
         );
         $output = json_decode('[' . \implode(',', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)) . ']');
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**

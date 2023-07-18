@@ -41,7 +41,7 @@ class Controller extends Base
 
         $queueItems = $this->getVideoQueueMapper()->findByStatus($statuses, ['order' => ['createdOn' => 'desc']]);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminVideo/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminVideo.getIndex'),
@@ -62,7 +62,7 @@ class Controller extends Base
      */
     public function getLog($queue)
     {
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@adminVideo/log.twig',
             [
                 'log' => $queue,
@@ -84,7 +84,7 @@ class Controller extends Base
             if ($post['videoAction'] == 'resubmit') {
                 $video->setStatus(VideoQueueMapper::STATUS_PENDING);
                 $this->getVideoQueueMapper()->save($video);
-                $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminVideo.getIndex'));
+                $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminVideo.getIndex'));
             } else if ($post['videoAction'] == 'delete') {
                 $this->getVideoQueueMapper()->delete($video);
             }
@@ -99,7 +99,7 @@ class Controller extends Base
             $status = 500;
         }
 
-        $this->psr7Response = $this->responseAsJson($data)->withStatus($status);
+        $this->response = $this->responseAsJson($data)->withStatus($status);
     }
 
     /** Here be mappers and stuff */

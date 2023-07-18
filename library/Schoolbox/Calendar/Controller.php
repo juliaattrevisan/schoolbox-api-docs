@@ -148,7 +148,7 @@ class Controller extends Base
             $route .= '?s=1';
         }
 
-        $this->psr7Response = $this->redirectFound($route);
+        $this->response = $this->redirectFound($route);
     }
 
     /**
@@ -179,7 +179,7 @@ class Controller extends Base
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->userMapper->getCalendarView($this->getUser()->getId())]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@calendar/calendar.twig',
             [
                 'user'         => $user->getId() === null ? $this->getUser() : $user,
@@ -230,6 +230,6 @@ class Controller extends Base
         $this->userMapper->updateCalendarView($this->getUser()->getId(), $storedView);
 
         // We no longer store calendarView in session, as it doesn't work as expected
-        $this->psr7Response = $this->responseAsJson([]);
+        $this->response = $this->responseAsJson([]);
     }
 }

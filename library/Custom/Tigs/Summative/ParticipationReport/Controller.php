@@ -183,7 +183,7 @@ class Controller extends Web\Controller\Base
             'moreInfoId'         => $this->getExplanationOfGradesHomepageId($attributes),
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@tigsParticipationReport/participation.twig',
             $data,
             "Progress Report"

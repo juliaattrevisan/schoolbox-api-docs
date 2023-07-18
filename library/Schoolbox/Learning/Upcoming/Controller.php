@@ -101,7 +101,7 @@ class Controller extends Base
      */
     public function getUpcoming(): void
     {
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'learningUpcoming.getUpcomingForStudent',
                 ['studentId' => $this->getUser()->getId(),]
@@ -226,8 +226,8 @@ class Controller extends Base
             'filterIdSlugMap' => $this->buildFilterIdSlugMap($filterPanel),
         ];
 
-        $namespace = Module::BASENAME;
-        $this->psr7Response = $this->responseFromTemplate("@$namespace/upcomingOuter.twig", $data, "Upcoming Due Work", 'submission');
+        $namespace      = Module::BASENAME;
+        $this->response = $this->responseFromTemplate("@$namespace/upcomingOuter.twig", $data, "Upcoming Due Work", 'submission');
     }
 
     /** @noinspection PhpUnused */
@@ -298,7 +298,7 @@ class Controller extends Base
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningUpcoming/upcomingInner.twig', $data)->getBody()->getContents(),
         ]);
@@ -380,7 +380,7 @@ class Controller extends Base
             $this->getUser()
         );
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
         );
     }

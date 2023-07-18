@@ -293,7 +293,7 @@ class Controller extends Base
             $selfAssessmentFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback));
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);
+        $this->response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);
     }
 
     /**
@@ -327,7 +327,7 @@ class Controller extends Base
             $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false);
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/kamiView.twig', [
+        $this->response = $this->responseFromTemplate('@learningDueWorkResponse/kamiView.twig', [
             'kami'     => $kami,
             'session'  => $session,
             'response' => $response
@@ -371,21 +371,21 @@ class Controller extends Base
         // Unable to generate the export? (either due to error or timeout)
         if (!$export->isStatusDone()) {
             // Don't change browser viewport
-            $this->psr7Response = $this->responseEmpty();
+            $this->response = $this->responseEmpty();
             return;
         }
 
         // This works in all browsers, but means we need to stream the file through schoolbox as a proxy.
         $filename           = $kami->getStudentSubmissionFile()->getBasename();
         $guzzleResponse     = (new Client())->get($export->getFileUrl());
-        $this->psr7Response = $this->responseFromContent($guzzleResponse->getBody())
-            ->withHeader('Content-Description', 'File Transfer')
-            ->withHeader('Content-Type', 'application/octet-stream')
-            ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"')
-            ->withHeader('Expires', '0')
-            ->withHeader('Cache-Control', 'must-revalidate')
-            ->withHeader('Pragma', 'public')
-            ->withHeader('Content-Length', $guzzleResponse->getHeader('Content-Length')[0])
+        $this->response = $this->responseFromContent($guzzleResponse->getBody())
+                               ->withHeader('Content-Description', 'File Transfer')
+                               ->withHeader('Content-Type', 'application/octet-stream')
+                               ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"')
+                               ->withHeader('Expires', '0')
+                               ->withHeader('Cache-Control', 'must-revalidate')
+                               ->withHeader('Pragma', 'public')
+                               ->withHeader('Content-Length', $guzzleResponse->getHeader('Content-Length')[0])
         ;
     }
 
@@ -462,9 +462,9 @@ class Controller extends Base
     {
         try {
             $this->responseDataSource->delete($response);
-            $this->psr7Response = $this->responseEmpty();
+            $this->response = $this->responseEmpty();
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->psr7Response = $this->responseFromContent($e->getMessage())->withStatus(400);
+            $this->response = $this->responseFromContent($e->getMessage())->withStatus(400);
         }
     }
 
@@ -500,7 +500,7 @@ class Controller extends Base
                     ->add(['Similarity Check', '']),
             ];
 
-            $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/turnitin/iframe.twig', $data);
+            $this->response = $this->responseFromTemplate('@learningDueWorkResponse/turnitin/iframe.twig', $data);
         }
 
         /* TODO You might error out here when json_decode returns null
@@ -526,7 +526,7 @@ class Controller extends Base
             'interactiveAvailable' => false
         ];
 
-        $this->psr7Response = $this->responseFromTemplate('@learningDueWorkResponse/plagscan/iframe.twig', $data);
+        $this->response = $this->responseFromTemplate('@learningDueWorkResponse/plagscan/iframe.twig', $data);
     }
 
     /**
@@ -545,7 +545,7 @@ class Controller extends Base
             'html' => $this->filesystemProxy->read($plagscan->getStorage()),
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@learningDueWorkResponse/plagscan/contents.twig', $data);
+        $this->response = $this->responseFromTemplateUnthemed('@learningDueWorkResponse/plagscan/contents.twig', $data);
     }
 
     /**
@@ -569,7 +569,7 @@ class Controller extends Base
 
         // Is this file not editable inline? Just show in storage
         if (!$file->getEditableInline()) {
-            $this->psr7Response = $this->redirectPermanent(
+            $this->response = $this->redirectPermanent(
                 (new Uri('/storage/fetch.php'))
                     ->appendQueryParameters($this->requestQuery->getArrayCopy())
                     ->__toString()
@@ -579,7 +579,7 @@ class Controller extends Base
         // Otherwise: render it in Twig, and output as an attachment if either:
         // * the HTML mimetype is openable inline
         // * the `save` query string param exists
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@learningDueWorkResponse/responseFileInline.twig',
             [
                 'file'        => $file,
@@ -587,7 +587,7 @@ class Controller extends Base
             ],
         );
         if (!$file->getMimetype()->getInline() || $this->requestQuery->get('save')) {
-            $this->psr7Response = $this->psr7Response->withHeader(
+            $this->response = $this->response->withHeader(
                 'Content-Disposition',
                 sprintf('attachment; filename="%s"', $file->getBasename()),
             );

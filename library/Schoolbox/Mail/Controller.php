@@ -188,7 +188,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@mail/send.twig',
             [
                 'invalidEmails' => $invalidEmails,
@@ -303,7 +303,7 @@ class Controller extends Base
 
         try {
             $mail->send();
-            $this->psr7Response = $this->redirectAfterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory(2)
             );
         } catch (TransportExceptionInterface $e) {
@@ -356,7 +356,7 @@ class Controller extends Base
         if ($replyTo && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $this->requestPost->get('template'))) {
             foreach ($this->requestPost->getArrayCopy() as $key => $var) {
                 if (!$this->checkSpamHeaders($var)) {
-                    $this->psr7Response = $this->redirectFound('/');
+                    $this->response = $this->redirectFound('/');
                 }
                 $key = strtoupper($key);
 
@@ -385,9 +385,9 @@ class Controller extends Base
         }
 
         if (preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation'])) {
-            $this->psr7Response = $this->redirectFound($_POST['confirmation']);
+            $this->response = $this->redirectFound($_POST['confirmation']);
         } else {
-            $this->psr7Response = $this->redirectFound('/feedback/thank-you');
+            $this->response = $this->redirectFound('/feedback/thank-you');
         }
     }
 

@@ -122,7 +122,7 @@ class Controller extends Base
         if ($userId === 'sis_user_id:') {
             $problem = new ApiProblem("No External User ID");
             $problem->setStatus(400);
-            $this->psr7Response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray());
         }
         //get date 30 days in the future
         $endDate = gmdate("Y-m-d\TH:i:s", date_create('+2 Month')->getTimestamp());
@@ -186,10 +186,10 @@ class Controller extends Base
             //catch both Runtime and Domain Exceptions
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus(400);
-            $this->psr7Response = $this->responseAsJson($problem->asArray())->withStatus(400);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(400);
         }
         //send as json to frontend
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'assignments' => $assignments,
         ]);
     }

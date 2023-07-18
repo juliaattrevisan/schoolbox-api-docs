@@ -85,7 +85,7 @@ class Controller extends Base
     public function getIndex(): void
     {
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminBulkCourseImport/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
@@ -130,7 +130,7 @@ class Controller extends Base
         ))->import($this->filesystemProxy->readStream($csvFile), $defaultDueTime, $performMode);
 
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminBulkCourseImport/importResults.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),

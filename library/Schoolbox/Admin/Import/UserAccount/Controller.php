@@ -77,7 +77,7 @@ class Controller extends Base
      */
     public function getUpload()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             "@{$this->basename}/upload.twig",
             $this->getBaseData() + [
                 'attachzone' => $this->getAttachzone()->getTwigContext(),
@@ -118,14 +118,14 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
+            $this->response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }
 
         $this->buildImporter($reader, $logger)->save();
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             "@{$this->basename}/preview.twig",
             $this->getBaseData() + [
                 'log' => [
@@ -150,14 +150,14 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->psr7Response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
+            $this->response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }
 
         $this->buildImporter($reader, $logger, true)->save();
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             "@{$this->basename}/import.twig",
             $this->getBaseData() + [
                 'log' => [

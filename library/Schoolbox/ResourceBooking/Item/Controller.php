@@ -94,7 +94,7 @@ class Controller extends Base
                 try {
                     $category = $this->mapper->getJoinMapper('category')->findById($catId);
                 } catch (SchoolboxNotFoundException $e) {
-                    $this->psr7Response = $this->responseEmpty(404);
+                    $this->response = $this->responseEmpty(404);
                     return;
                 }
             }
@@ -114,7 +114,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceItem/browse.twig',
             [
                 'list'         => $list->sortByCallback(static function (Model $a, Model $b) {
@@ -152,7 +152,7 @@ class Controller extends Base
                                ];
                            });
         $data->reindex();
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -161,7 +161,7 @@ class Controller extends Base
      */
     public function add(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceItem/edit.twig',
             [
                 'item'            => new Model(),
@@ -189,7 +189,7 @@ class Controller extends Base
         if (!($calendarDate instanceof DateTime)) {
             $calendarDate = new DateTime('now');
         }
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceItem/read.twig',
             [
                 'item'         => $item,
@@ -224,7 +224,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceItem/edit.twig',
             [
                 'item'            => $item,
@@ -256,7 +256,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.read', ['id' => $model->getId(), 'format' => ''])
         );
     }
@@ -278,7 +278,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.read', ['id' => $item->getId(), 'format' => ''])
         );
     }
@@ -293,7 +293,7 @@ class Controller extends Base
     public function delete(Model $item): void
     {
         $this->mapper->delete($item);
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.browse', ['format' => ''])
         );
     }

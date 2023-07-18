@@ -82,7 +82,7 @@ class Controller extends Base
             $message = 'Could not store Google Access Token data.';
         }
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'success' => $success,
                 'message' => $message
@@ -104,7 +104,7 @@ class Controller extends Base
     {
         $folder = $this->folderMapper->findById($googleFile->getFolderId());
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@googleFile/detail.twig',
             [
                 'googleFile' => $googleFile,
@@ -143,7 +143,7 @@ class Controller extends Base
     {
         $googleIdString = $this->requestPost->get('googleIds');
         if (!$googleIdString) {
-            $this->psr7Response = $this->redirectAfterPost('/homepage/' . $folder->getId());
+            $this->response = $this->redirectAfterPost('/homepage/' . $folder->getId());
             return;
         }
 
@@ -151,7 +151,7 @@ class Controller extends Base
         $editAccessLevel    = is_numeric($this->requestPost->get('gfileEdit')) ? (int)$this->requestPost->get('gfileEdit') : null;
         $commentAccessLevel = is_numeric($this->requestPost->get('gfileComment')) ? (int)$this->requestPost->get('gfileComment') : null;
         if (!$editAccessLevel || !$commentAccessLevel) {
-            $this->psr7Response = $this->redirectAfterPost('/homepage/' . $folder->getId());
+            $this->response = $this->redirectAfterPost('/homepage/' . $folder->getId());
             return;
         }
 
@@ -230,7 +230,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'success'  => true,
                 'messages' => $errors,

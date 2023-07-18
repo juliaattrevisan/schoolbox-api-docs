@@ -108,7 +108,7 @@ class Controller extends Base
         $sections = $this->getMenuSideSectionMapper()->findAll()->sortBy('sortOrder', 'asc');
 
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminMenuSide/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
@@ -193,7 +193,7 @@ class Controller extends Base
         }
 
         // Render this mess out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminMenuSide/modify.twig',
             [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
@@ -220,7 +220,7 @@ class Controller extends Base
      */
     public function getCreate()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminMenuSide/modify.twig',
             [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
@@ -283,7 +283,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->redirectAfterPost("/adminv2/menu-side");
+        $this->response = $this->redirectAfterPost("/adminv2/menu-side");
     }
 
 
@@ -318,11 +318,11 @@ class Controller extends Base
 
             $this->getMenuSideSectionMapper()->save($section);
 
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'result' => 'OK'
             ])->withStatus(200);
         } catch (MapperException $e) {
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'result' => 'Error updating record'
             ])->withStatus(500);
         }
@@ -338,7 +338,7 @@ class Controller extends Base
     {
         $post = $this->requestPost;
         $this->getMenuSideMapper()->deleteByColumn("id", $post["id"]);
-        $this->psr7Response = $this->responseAsJson([])->withStatus(204);
+        $this->response = $this->responseAsJson([])->withStatus(204);
     }
 
     /**
@@ -376,10 +376,10 @@ class Controller extends Base
                 $this->getMenuSideMapper()->save($node);
             }
         } catch (\Exception $e) {
-            $this->psr7Response = $this->responseAsJson(['result' => 'Error']);
+            $this->response = $this->responseAsJson(['result' => 'Error']);
         }
 
-        $this->psr7Response = $this->responseAsJson(['result' => 'OK']);
+        $this->response = $this->responseAsJson(['result' => 'OK']);
     }
 
     /**

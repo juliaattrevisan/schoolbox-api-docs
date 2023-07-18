@@ -67,7 +67,7 @@ class Controller extends Base
             }
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralManagement/groups.twig',
             [
                 'groups' => $groups,
@@ -92,7 +92,7 @@ class Controller extends Base
             ]
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralManagement/groups_modify.twig',
             [
                 'group'               => $group,
@@ -114,7 +114,7 @@ class Controller extends Base
         $group = $this->pastoralGroupMapper->findById($groupId);
         $this->pastoralGroupMapper->delete($group);
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoralManagement.getGroups')
         );
     }
@@ -206,7 +206,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoralManagement.getGroups')
         );
     }

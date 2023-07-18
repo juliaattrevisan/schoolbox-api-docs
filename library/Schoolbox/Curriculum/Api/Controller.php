@@ -107,7 +107,7 @@ class Controller extends Base
             )
         );
 
-        $this->psr7Response = $this->responseAsJson($translatedResults);
+        $this->response = $this->responseAsJson($translatedResults);
     }
 
     /**
@@ -123,7 +123,7 @@ class Controller extends Base
             'parent',
             'children',
         );
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $tree->map(
                 new ModelToArray(
                     $this->routeGenerator,
@@ -200,7 +200,7 @@ class Controller extends Base
     public function deleteNode(Node\Model $node): void
     {
         $this->nodeMapper->delete($node);
-        $this->psr7Response = $this->responseEmpty(204);
+        $this->response = $this->responseEmpty(204);
     }
 
     /**
@@ -234,7 +234,7 @@ class Controller extends Base
         $childNodes = $node->getChildren();
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
-        $translator = new ModelToArray(
+        $translator     = new ModelToArray(
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
@@ -242,7 +242,7 @@ class Controller extends Base
             $descendantCount,
             $this->counter->findUsageCounts($this->extractIdsFromNode($node)),
         );
-        $this->psr7Response = $this->responseAsJson($translator($node));
+        $this->response = $this->responseAsJson($translator($node));
     }
 
     /**

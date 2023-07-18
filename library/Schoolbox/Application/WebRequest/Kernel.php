@@ -350,7 +350,7 @@ class Kernel extends WebKernelAbstract
         $method->invokeArgs($controller, $args);
 
         // Process the response, using a blank one if there is none.
-        $psr7Response = $controller->getPsr7Response();
+        $psr7Response = $controller->getResponse();
         if ($psr7Response) {
             $redirect = $psr7Response->getHeader('location');
             $isJson   = str_contains($psr7Response->getHeaderLine('content-type'), 'application/json');

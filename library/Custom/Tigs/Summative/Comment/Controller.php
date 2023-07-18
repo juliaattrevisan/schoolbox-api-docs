@@ -24,7 +24,7 @@ class Controller extends Web\Controller\Base
      */
     public function getDeanComments(int $roleId, string $termSlug): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@tigsSummativeComment/yearLevel.twig',
             [
                 'roleId'   => $roleId,
@@ -46,7 +46,7 @@ class Controller extends Web\Controller\Base
      */
     public function getTeacherComments(int $folderId, string $termSlug): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@tigsSummativeComment/folder.twig',
             [
                 'folderId' => $folderId,

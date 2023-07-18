@@ -176,7 +176,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $content    = $this->responseFromTemplateUnthemed('@learningAssessment/seb.twig', [
             'url' => $defaultUrl,
         ]);
-        $this->psr7Response = $content;
+        $this->response = $content;
     }
 
 
@@ -347,7 +347,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         }
 
-        $this->psr7Response = $content;
+        $this->response = $content;
     }
 
 
@@ -415,7 +415,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
-        $this->psr7Response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
+        $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
 
 
@@ -505,7 +505,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $unitProjects->offsetSet($unitSpec->getId(), $projects);
             }
         }
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@learningAssessment/fragments/assessmentLocationList.twig',
             [
                 'units'        => $allUnitSpecs,
@@ -583,7 +583,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 Redirect::RETURN_URL => $returnUrl
             ]);
         } else {

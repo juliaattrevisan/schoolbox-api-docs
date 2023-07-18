@@ -65,7 +65,7 @@ class Controller extends Base
             !(new ValidAccess())->isSatisfiedBy($this->getConfigLoader()->get('dio_achievement_report_enabled'), $this->getUser())
             || !isset($externalUser['StudentID'])
         ) {
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@achievementreport/unavailable.twig',
                 [
                     'message' => $this->getConfigLoader()->get('dio_achievement_report_unavailable')
@@ -88,7 +88,7 @@ class Controller extends Base
          */
         switch ($report) {
             case NavigationSelector::SCHOOLGRADES_KEY:
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getSchoolGrades', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -98,7 +98,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::IB_KEY:
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getIb', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -108,7 +108,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::NCEA_KEY:
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getNcea', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -118,7 +118,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::COMMENTS_KEY:
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getComments', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -128,7 +128,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::STANDARDISEDTEST_KEY:
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getStandardisedTests', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -138,7 +138,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::COCURRICULAR_KEY:
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getCoCurricular', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
@@ -148,7 +148,7 @@ class Controller extends Base
                 break;
 
             case NavigationSelector::MYP_KEY:
-                $this->psr7Response = $this->redirectFound(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate('achievementreport.getMyp', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year'           => $year,
@@ -161,7 +161,7 @@ class Controller extends Base
              * at that, I guess
              */
             default:
-                $this->psr7Response = $this->responseFromTemplate(
+                $this->response = $this->responseFromTemplate(
                     '@achievementreport/Error.twig',
                     [
                         'errorMessage' => $report['error']
@@ -189,7 +189,7 @@ class Controller extends Base
          * PAT, STAR, Reading, Writing, Mathematics, Literacy/Numeracy
          */
 
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate('achievementreport.getStandardisedTestsPAT', [
                 'externalUserId' => $externalUser['StudentID'],
                 'year' => $year
@@ -254,7 +254,7 @@ class Controller extends Base
          */
         $headingVisible = $PATMathematics['visible'] || $PATListeningComprehension['visible'] || $PATReadingVocabulary['visible'] || $PATReadingComprehension['visible'];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@standardisedTest/PAT/index.twig',
             [
                 'navigation' => [
@@ -319,7 +319,7 @@ class Controller extends Base
             'visible' => (new STAR\Stanine\ValidHasData())->isSatisfiedBy($user->getYear(), $STARStaninePayload->hasData())
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@standardisedTest/STAR/index.twig',
             [
                 'navigation' => [
@@ -368,7 +368,7 @@ class Controller extends Base
             'visible' => (new Reading\ValidHasData())->isSatisfiedBy($user->getYear(), $readingPayload->hasData())
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@standardisedTest/Reading/index.twig',
             [
                 'navigation' => [
@@ -412,7 +412,7 @@ class Controller extends Base
             'visible' => (new Writing\ValidHasData())->isSatisfiedBy($user->getYear(), $writingPayload->hasData())
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@standardisedTest/Writing/index.twig',
             [
                 'navigation' => [
@@ -456,7 +456,7 @@ class Controller extends Base
             'visible' => (new Mathematics\ValidHasData())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@standardisedTest/Mathematics/index.twig',
             [
                 'navigation' => [
@@ -509,7 +509,7 @@ class Controller extends Base
             'visible' => (new LiteracyNumeracy\Numeracy\ValidHasData())->isSatisfiedBy($user->getYear(), $numeracyPayload->hasData())
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@standardisedTest/LiteracyNumeracy/index.twig',
             [
                 'navigation' => [
@@ -550,7 +550,7 @@ class Controller extends Base
         $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($user, $externalUser, $db, $year);
 
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@schoolGrades/index.twig',
             [
                 'navigation' => [
@@ -605,7 +605,7 @@ class Controller extends Base
         /* If $year wasn't provided, go with the most recent year we have
          */
         if (null === $year && \count($allYears)) {
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('achievementreport.getIb', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]
@@ -614,7 +614,7 @@ class Controller extends Base
         }
 
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@ib/index.twig',
             [
                 'navigation' => [
@@ -763,7 +763,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate($output['template'], $output['data']);
+        $this->response = $this->responseFromTemplate($output['template'], $output['data']);
     }
 
 
@@ -787,7 +787,7 @@ class Controller extends Base
         /* If $year wasn't provided, go with the most recent year we have
          */
         if (null === $year && \count($allYears)) {
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('achievementreport.getComments', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]
@@ -796,7 +796,7 @@ class Controller extends Base
         }
 
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@comments/index.twig',
             [
                 'navigation' => [
@@ -829,7 +829,7 @@ class Controller extends Base
      */
     public function getCoCurricular(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@coCurricular/index.twig',
             [
                 'navigation' => [
@@ -876,7 +876,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@myp/index.twig',
             [
                 'navigation'   => [

@@ -127,7 +127,7 @@ class Controller extends Base
                                ->map($translator)
                                ->reindex();
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'data'     => $mappedData,
                 'metadata' => [

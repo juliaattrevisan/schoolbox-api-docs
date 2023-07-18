@@ -59,7 +59,7 @@ class Controller extends Base
         // Alpha-sort route summaries
         ksort($routeSummaries);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminRouteSummary/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminRouteSummary.getRouteList'),

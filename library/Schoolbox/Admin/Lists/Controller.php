@@ -96,7 +96,7 @@ class Controller extends Base
             $responseData['message'] = $tableData[$post['table']]['deleteFailMsg'];
         }
 
-        $this->psr7Response = $this->responseAsJson($responseData);
+        $this->response = $this->responseAsJson($responseData);
     }
 
     /**
@@ -111,7 +111,7 @@ class Controller extends Base
 
         // Check for incorrect URLs
         if (!isset($tableData[$tableKey])) {
-            $this->psr7Response = $this->responseEmpty(404);
+            $this->response = $this->responseEmpty(404);
             return;
         }
 
@@ -215,7 +215,7 @@ class Controller extends Base
             }
         }
         if (!empty($newIds)) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'newRowIdList' => $newIds,
                 ]
@@ -223,7 +223,7 @@ class Controller extends Base
             return;
         }
 
-        $this->psr7Response = $this->redirectAfterPost('/adminv2/lists/' . $this->requestPost["table"]);
+        $this->response = $this->redirectAfterPost('/adminv2/lists/' . $this->requestPost["table"]);
     }
 
     /**
@@ -1257,7 +1257,7 @@ class Controller extends Base
 
         // Check for incorrect URLs
         if (!isset($tables[$table])) {
-            $this->psr7Response = $this->responseEmpty(404);
+            $this->response = $this->responseEmpty(404);
             return;
         }
 
@@ -1346,7 +1346,7 @@ class Controller extends Base
 
         if ($json) {
             $currentTable = $tables[$table];
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'hasDBid'       => $currentTable['showId'] ?? false,
                     'canDelete'     => $currentTable['delete'] ?? false,
@@ -1363,7 +1363,7 @@ class Controller extends Base
             );
         } else {
             // Render this thing out
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@adminLists/index.twig',
                 [
                     'pageCurrent'    => $this->routeGenerator->generate('adminLists.getIndex') . "/{$table}",

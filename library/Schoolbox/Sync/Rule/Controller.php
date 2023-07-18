@@ -37,7 +37,7 @@ class Controller extends Base
             new Node('Add Rule', '#', true)
         ]);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@upsRule/add.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('upsRule.add'),
@@ -77,7 +77,7 @@ class Controller extends Base
 
         $mapper->create($rule);
 
-        $this->psr7Response = $this->redirectFound("/adminv2/ups/$roleType#rule-{$rule->getId()}");
+        $this->response = $this->redirectFound("/adminv2/ups/$roleType#rule-{$rule->getId()}");
     }
 
 
@@ -102,7 +102,7 @@ class Controller extends Base
             new Node(ucwords($rulesetId), "/adminv2/ups/{$rulesetId}", true)
         ]);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@upsRule/add.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('upsRule.add'),
@@ -135,7 +135,7 @@ class Controller extends Base
 
         Mapper::getInstance()->save($rule);
 
-        $this->psr7Response = $this->redirectFound("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
+        $this->response = $this->redirectFound("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
     }
 
 
@@ -149,6 +149,6 @@ class Controller extends Base
         $ruleId = $this->requestPost->get('ruleId');
         $deleteCount = Mapper::getInstance()->deleteByColumn('id', $ruleId);
 
-        $this->psr7Response = $this->responseAsJson($deleteCount > 0);
+        $this->response = $this->responseAsJson($deleteCount > 0);
     }
 }

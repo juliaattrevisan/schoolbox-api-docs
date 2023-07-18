@@ -69,7 +69,7 @@ class Controller extends BaseController
             return strnatcasecmp($a['name'], $b['name']);
         });
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@groups/groups.twig',
             [
                 'groupList'         => $possibleGroups,
@@ -132,7 +132,7 @@ class Controller extends BaseController
             //save group object
             $this->userAccessMapper->save($userGroup);
 
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'group'             => $groupFolderId,
                 'user'              => $user->getId(),
                 'isFavourite'       => $userGroup->getFavourite(),
@@ -176,7 +176,7 @@ class Controller extends BaseController
          */
         $this->groupsHelper->setNotification($groupFolderId, $user, true);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'user'            => $user->getId(),
             'group'           => $groupFolderId,
             'action'          => 'delete',
@@ -219,7 +219,7 @@ class Controller extends BaseController
         //update the notification to what the user sets.
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $isNotificationOn);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'group'             => $groupFolderId,
             'user'              => $user->getId(),
             'isNotificationsOn' => $isNotificationOn,
@@ -255,7 +255,7 @@ class Controller extends BaseController
         //save group object
         $this->userAccessMapper->save($userGroup);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'group'           => $groupFolderId,
             'user'            => $user->getId(),
             'isFavourite'     => $userGroup->getFavourite(),

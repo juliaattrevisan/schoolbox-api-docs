@@ -200,7 +200,7 @@ class Controller extends BaseController
         ];
 
         $template = '@learningAssessmentExporter/export_unit.twig';
-        $this->psr7Response = $this->responseFromTemplate($template, $data);
+        $this->response = $this->responseFromTemplate($template, $data);
     }
 
 
@@ -634,7 +634,7 @@ class Controller extends BaseController
                 unlink($filename);
             };
 
-            $this->psr7Response = $this->responseFromContent(file_get_contents($filename))
+            $this->response = $this->responseFromContent(file_get_contents($filename))
                 ->withHeader('Content-Description', 'File Transfer')
                 ->withHeader('Content-Type', 'text/csv')
                 ->withHeader('Content-Description', 'File Transfer')

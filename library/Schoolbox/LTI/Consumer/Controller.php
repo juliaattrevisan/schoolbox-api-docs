@@ -183,7 +183,7 @@ class Controller extends Base
             );
         }
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'result'       => 'OK',
             'providerName' => $provider->getName(),
             'url'          => $post['url'] ?? null,
@@ -337,7 +337,7 @@ class Controller extends Base
             'folderId'    => $component->getContext()->getId(),
         ]);
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@ltiConsumer/redirect.twig',
             [
                 'componentId'    => $component->getInstance()->getId(),
@@ -367,7 +367,7 @@ class Controller extends Base
          * so return a generic error template instead
          */
         if ($provider->isDeleted()) {
-            $this->psr7Response = $this->responseFromTemplateUnthemed(
+            $this->response = $this->responseFromTemplateUnthemed(
                 '@ltiConsumer/unavailable.twig',
                 [
                     'provider'  => $provider,
@@ -424,13 +424,13 @@ class Controller extends Base
                 $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
                 if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
                     // I have picked something: just go there
-                    $this->psr7Response = $this->redirectFound($embedUrl);
+                    $this->response = $this->redirectFound($embedUrl);
                     return;
                 }
             } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
                 // Is this content which has actually been picked?
                 // Maintain current behaviour (for fear of breaking any existing integrations)
-                $this->psr7Response = $this->redirectFound($embedUrl);
+                $this->response = $this->redirectFound($embedUrl);
                 return;
             } else {
                 // This component is a picker, and content has been selected:
@@ -530,7 +530,7 @@ class Controller extends Base
 
         // Render form that will automatically submit LTI request
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@ltiConsumer/form.twig',
             [
                 'params'    => $launch_data,
@@ -620,7 +620,7 @@ class Controller extends Base
         // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
         // javascript inside this template updates these in the DOM.
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@ltiConsumer/redirect.twig',
             [
                 'componentId'    => $component->getInstance()->getId(),

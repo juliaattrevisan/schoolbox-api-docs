@@ -61,7 +61,7 @@ class Controller extends Base
         }
 
         // Load parent nodes and all of their subnodes, and dump them in a tree
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@curriculum/browse.twig',
             [
                 'tree'   => $tree,
@@ -83,7 +83,7 @@ class Controller extends Base
     public function search()
     {
         $search = trim($this->requestQuery['query']);
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->nodeMapper->search(
                 $this->articleResolver,
                 $this->getSession()->getAuthUser(),
@@ -105,7 +105,7 @@ class Controller extends Base
             'parent',
             'children',
         );
-        $this->psr7Response = $this->responseAsJson($tree);
+        $this->response = $this->responseAsJson($tree);
     }
 
     /**
@@ -154,7 +154,7 @@ class Controller extends Base
      */
     public function read(Node\Model $item)
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@curriculum/read.twig',
             ['item' => $item],
             'Curriculum'
@@ -198,7 +198,7 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'item' => $item,
                     'tree' => $this->getAsJsTree($item),
@@ -207,7 +207,7 @@ class Controller extends Base
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->psr7Response = $this->redirectAfterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }
@@ -247,7 +247,7 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'item' => $item,
                     'tree' => $this->getAsJsTree($item),
@@ -256,7 +256,7 @@ class Controller extends Base
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->psr7Response = $this->redirectAfterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }
@@ -277,7 +277,7 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'item' => $item,
                     'tree' => $this->getAsJsTree($item),
@@ -286,7 +286,7 @@ class Controller extends Base
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->psr7Response = $this->redirectAfterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }

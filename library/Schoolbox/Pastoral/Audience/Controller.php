@@ -81,7 +81,7 @@ class Controller extends Base
                     /* Find the first available subtype
                      * and redirect to its modify screen
                      */
-                    $this->psr7Response = $this->redirectFound(
+                    $this->response = $this->redirectFound(
                         $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
                             'subtypeId' => $subtype->getId(),
                         ])
@@ -94,7 +94,7 @@ class Controller extends Base
             /* If there aren't any subtypes, find the first available type
              * and redirect to its modify screen
              */
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
                     'typeId' => $type->getId(),
                     'type' => $type,
@@ -108,7 +108,7 @@ class Controller extends Base
          * not configured the Pastoral Module sufficiently
          * Empty State
          */
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralAudience/audiences.twig',
             [],
             'Pastoral Group Management',
@@ -206,7 +206,7 @@ class Controller extends Base
         $transformer     = new ColorHelper();
         $backgroundColor = ($foregroundColor === null ? null : $transformer->calculateBackground($foregroundColor));
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralAudience/audiences_modify.twig',
             [
                 'flyout'          => $flyout->generateVars($url),
@@ -383,7 +383,7 @@ class Controller extends Base
          *
          * TODO Possibly replace this with an async toast
          */
-        $this->psr7Response = $this->redirectFound($redirect);
+        $this->response = $this->redirectFound($redirect);
     }
 
 

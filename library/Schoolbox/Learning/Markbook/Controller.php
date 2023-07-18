@@ -97,10 +97,10 @@ class Controller extends Base
 
         $pageTitle = 'Class Markbook';
 
-        $this->psr7Response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
+        $this->response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
-            ], $pageTitle, 'submission');
+            ],                                        $pageTitle, 'submission');
     }
 
 
@@ -133,7 +133,7 @@ class Controller extends Base
              */
             $rank = $markbook->getRanking();
 
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'status'  => 200,
                 'content' => $this->responseFromTemplateUnthemed('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
@@ -159,7 +159,7 @@ class Controller extends Base
                     'file'    => $e->getFile(),
                 ]);
             }
-            $this->psr7Response = $this->responseAsJson($data);
+            $this->response = $this->responseAsJson($data);
         } catch (\Throwable $e) {
             $this->captureException($e);
             $this->returnJsonError($e);
@@ -218,7 +218,7 @@ class Controller extends Base
         $codec        = new Codec(Filter\Mapper::getInstance(), Filter\Selection\Mapper::getInstance());
         $getArgString = $codec->convertSelectionsToQueryString($selections);
 
-        $this->psr7Response = $this->redirectFound("{$route}?{$getArgString}");
+        $this->response = $this->redirectFound("{$route}?{$getArgString}");
     }
 
 
@@ -382,7 +382,7 @@ class Controller extends Base
                 'file'    => $e->getFile(),
             ]);
         }
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
 

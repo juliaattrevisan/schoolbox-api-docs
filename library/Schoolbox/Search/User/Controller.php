@@ -137,7 +137,7 @@ class Controller extends BaseController
         }
         $showDetails = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser());
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             'user/parent.twig',
             [
                 'session'        => $_SESSION,
@@ -163,7 +163,7 @@ class Controller extends BaseController
         $customButtons  = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
         $externalUser   = $staff->getExternalId() ? $this->externalUser->getStaff($staff->getExternalId()) : [];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             'user/staff.twig',
             [
                 'session'        => $_SESSION,
@@ -587,7 +587,7 @@ class Controller extends BaseController
             $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             'user/student.twig',
             [
                 'session'                  => $_SESSION,

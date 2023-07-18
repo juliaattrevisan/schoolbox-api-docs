@@ -38,7 +38,7 @@ class Controller extends ConfigController
             'configContext' => $configContext,
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminOauth/admin.twig',
             $data,
             "oAuth Provider Configuration"
@@ -60,7 +60,7 @@ class Controller extends ConfigController
     public function postAdmin(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminOauth.getAdmin'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOauth.getAdmin'));
     }
 
 

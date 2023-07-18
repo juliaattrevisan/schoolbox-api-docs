@@ -91,7 +91,7 @@ class Controller extends AbstractController
             ]
         ]);
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesItineraryItem/list.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesItineraryItem/list.twig', [
             'sport'             => $sport,
             'division'          => $division,
             'match'             => $context,
@@ -127,7 +127,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesItineraryItem/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesItineraryItem/entity.twig', [
             'sport'         => $sport,
             'division'      => $division,
             'match'         => $matchup,
@@ -166,7 +166,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesItineraryItem/create.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesItineraryItem/create.twig', [
             'sport'         => $sport,
             'division'      => $division,
             'match'         => $context,
@@ -205,7 +205,7 @@ class Controller extends AbstractController
 
         $this->saveItineraryItem($matchup, $this->requestPost['description'], $startAt, $entity);
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesMatch.getModifyForm', [
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesMatch.getModifyForm', [
             'entityId' => $matchId
         ]));
     }

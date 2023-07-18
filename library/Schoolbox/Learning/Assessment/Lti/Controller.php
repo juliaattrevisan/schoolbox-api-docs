@@ -182,7 +182,7 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/status.twig',
             [
                 'type'        => Assessment\AssessmentType::objectToString($assessment),
@@ -217,7 +217,7 @@ class Controller extends Assessment\Controller
             ]
         );
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->psr7Response = $this->redirectFound($sebDownload);
+            $this->response = $this->redirectFound($sebDownload);
             return;
         }
 
@@ -242,7 +242,7 @@ class Controller extends Assessment\Controller
         );
         $lastView->addNewView($assessment, $student, $this->getUser());
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/summary.twig',
             [
                 'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
@@ -336,7 +336,7 @@ class Controller extends Assessment\Controller
 
         // Then redir to the return URL, or the assessment's folder
         $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             isset($encodedReturnUrl)
                 ? Redirect::decode($encodedReturnUrl)
                 : ('/homepage' . $assessment->getBaseContext()->getFolder()->getId()),
@@ -379,7 +379,7 @@ class Controller extends Assessment\Controller
                 )
             ])
             ->add(['View in LTI Tool', '']);
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/ltiStatus.twig',
             [
                 'assessment'  => $assessment,
@@ -402,7 +402,7 @@ class Controller extends Assessment\Controller
         $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $this->getUser());
 
         // And send message to template, where it's POSTed
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/lti/messageForm.twig',
             ['message' => $message]
         );
@@ -448,7 +448,7 @@ class Controller extends Assessment\Controller
                 )
             ])
             ->add(['Create Response for ' . $assessment->getTitle(), '']);
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/ltiCreateResponse.twig',
             [
                 'assessment'  => $assessment,
@@ -473,7 +473,7 @@ class Controller extends Assessment\Controller
         $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $student);
 
         // And send message to template, where it's POSTed
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/lti/messageForm.twig',
             ['message' => $message]
         );

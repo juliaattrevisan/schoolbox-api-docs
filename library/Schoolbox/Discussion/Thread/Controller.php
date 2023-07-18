@@ -140,7 +140,7 @@ class Controller extends BaseController
             /* UnexpectedValueException thrown when you're in a conflicting scenario
              * trying to associate threads to objects, results in http 409 Conflict
              */
-            $this->psr7Response = $this->responseEmpty($e->getCode());
+            $this->response = $this->responseEmpty($e->getCode());
             return;
         }
     }
@@ -163,7 +163,7 @@ class Controller extends BaseController
             $responseData['data'][$key]['content'] = Scrub::html($data['content']);
         }
 
-        $this->psr7Response =
+        $this->response =
             $this->isJsonRequest()
                 ? $this->responseAsJson($responseData)
                 : $this->responseFromTemplateUnthemed(
@@ -204,7 +204,7 @@ class Controller extends BaseController
         // Clean-up content before returning the result
         $responseData['content'] = Scrub::html($responseData['content']);
 
-        $this->psr7Response =
+        $this->response =
             $this->isJsonRequest()
                 ? $this->responseAsJson($responseData)
                 : $this->responseFromTemplateUnthemed('@discussionComments/item.twig', ['item' => $responseData])
@@ -246,7 +246,7 @@ class Controller extends BaseController
     {
         $thread->setOpen($value);
         $this->threadMapper->save($thread);
-        $this->psr7Response = $this->responseEmpty(204);
+        $this->response = $this->responseEmpty(204);
     }
 
     /**
@@ -329,7 +329,7 @@ class Controller extends BaseController
         $responseData['children'] = $loadChildren
             ? $this->retrieveCommentList($thread, $context, null)
             : [];
-        $this->psr7Response =
+        $this->response =
             $this->isJsonRequest()
                 ? $this->responseAsJson($responseData)
                 : $this->responseFromTemplateUnthemed('@discussionThreads/item.twig', ['item' => $responseData])

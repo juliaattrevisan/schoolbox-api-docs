@@ -108,7 +108,7 @@ class Controller extends Base
 
         // check the provider is valid
         if (!in_array($provider, $providers, true)) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
             )->withStatus(400);
             return;
@@ -156,7 +156,7 @@ class Controller extends Base
                             $registry->setDeviceId($deviceId);
                         }
                     } catch (MapperException $e) {
-                        $this->psr7Response = $this->responseAsJson('Invalid app ID given')->withStatus(400);
+                        $this->response = $this->responseAsJson('Invalid app ID given')->withStatus(400);
                         return;
                     }
                 }
@@ -275,7 +275,7 @@ class Controller extends Base
             $status   = 400;
         }
 
-        $this->psr7Response = $this->responseAsJson($response)->withStatus($status);
+        $this->response = $this->responseAsJson($response)->withStatus($status);
         return null;
     }
 
@@ -323,14 +323,14 @@ class Controller extends Base
     {
         $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'id'       => $user->getId(),
             'key'      => $user->getKey(),
             'role'     => $user->getRole()->getType(),
             'username' => $user->getUsername(),
         ]);
         if (isset($status)) {
-            $this->psr7Response = $this->psr7Response->withStatus($status);
+            $this->response = $this->response->withStatus($status);
         }
     }
 
@@ -344,9 +344,9 @@ class Controller extends Base
         $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
         // Redirect somewhere (locally only)
         if ($page && (new Uri($page))->isAbsolutePath()) {
-            $this->psr7Response = $this->redirectFound($page);
+            $this->response = $this->redirectFound($page);
         } else {
-            $this->psr7Response = $this->redirectFound('/');
+            $this->response = $this->redirectFound('/');
         }
     }
 

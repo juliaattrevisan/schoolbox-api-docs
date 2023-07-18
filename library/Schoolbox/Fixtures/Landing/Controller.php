@@ -18,6 +18,6 @@ class Controller extends Base
      */
     public function getLanding()
     {
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixtures/landing.twig', []);
+        $this->response = $this->responseFromTemplate('@sportsfixtures/landing.twig', []);
     }
 }

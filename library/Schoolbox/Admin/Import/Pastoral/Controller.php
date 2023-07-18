@@ -67,7 +67,7 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportPastoral/index.twig',
             [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
@@ -83,7 +83,7 @@ class Controller extends Base
      */
     public function getLog()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportPastoral/log.twig',
             [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
@@ -102,7 +102,7 @@ class Controller extends Base
      */
     public function getLogDetail($log)
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportPastoral/logDetail.twig',
             [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),
@@ -138,7 +138,7 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords) {
             $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
         };
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportPastoral/log.twig',
             [
                 'pageCurrent'     => $this->routeGenerator->generate('adminImportPastoral.getIndex'),

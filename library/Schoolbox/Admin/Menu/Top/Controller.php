@@ -67,7 +67,7 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminMenuTop/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
@@ -108,7 +108,7 @@ class Controller extends Base
             $campusesSelected[$selection->getCampusId()] = true;
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminMenuTop/modify.twig',
             [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
@@ -137,7 +137,7 @@ class Controller extends Base
      */
     public function getCreate()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminMenuTop/modify.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
@@ -277,7 +277,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->redirectAfterPost("/adminv2/menu-top");
+        $this->response = $this->redirectAfterPost("/adminv2/menu-top");
     }
 
     /** Here be mappers and stuff */

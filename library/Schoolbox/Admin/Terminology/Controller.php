@@ -33,7 +33,7 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminTerminology/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminTerminology.getIndex'),
@@ -66,6 +66,6 @@ class Controller extends Base
             // noop, I guess? skip unknown terminologies
         }
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('adminTerminology.getIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminTerminology.getIndex'));
     }
 }

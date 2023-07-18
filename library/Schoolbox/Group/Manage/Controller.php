@@ -69,7 +69,7 @@ class Controller extends Base
      */
     public function getModify(Folder $folder)
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@group/modify.twig',
             [
                 'folder'      => $folder,
@@ -124,7 +124,7 @@ class Controller extends Base
             'members'   => $members,
         ];
 
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -148,7 +148,7 @@ class Controller extends Base
             $this->sendJsonError('Failed to remove member: ' . $e->getMessage(), 400);
             return;
         }
-        $this->psr7Response = $this->responseEmpty(204);
+        $this->response = $this->responseEmpty(204);
     }
 
     /**
@@ -189,7 +189,7 @@ class Controller extends Base
             return;
         }
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'members' => $userAccesses->map(function ($userAccess) {
                     $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
@@ -249,7 +249,7 @@ class Controller extends Base
             $this->userAccessMapper->save($newAccesses);
         }
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'newMembers' => $newAccesses->map(function ($userAccess) {
                     $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
@@ -284,8 +284,8 @@ class Controller extends Base
             !$folder->getGroup()->getNotificationDisabled()
         );
 
-        $this->psr7Response = $this->responseAsJson(['success' => true]);
-        $data = [
+        $this->response = $this->responseAsJson(['success' => true]);
+        $data           = [
             'settings' => [
                 'new'                    => $this->requestQuery->get('new') ?? 0,
                 'access'                 => $group->getTypeString(),
@@ -293,7 +293,7 @@ class Controller extends Base
                 'isForceFollow'          => $group->getForceFollow(),
             ],
         ];
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -338,7 +338,7 @@ class Controller extends Base
                 'id'   => $group->getId(),
             ];
         }
-        $this->psr7Response = $this->responseAsJson($return);
+        $this->response = $this->responseAsJson($return);
     }
 
     /**
@@ -357,7 +357,7 @@ class Controller extends Base
                 'id'   => $role->getId(),
             ];
         }
-        $this->psr7Response = $this->responseAsJson($return);
+        $this->response = $this->responseAsJson($return);
     }
 
     /**
@@ -426,7 +426,7 @@ class Controller extends Base
                 'external_id' => $user->getExternalId(),
             ];
         }
-        $this->psr7Response = $this->responseAsJson($return);
+        $this->response = $this->responseAsJson($return);
     }
 
     /**

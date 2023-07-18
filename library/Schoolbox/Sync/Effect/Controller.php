@@ -108,7 +108,7 @@ class Controller extends Base
             ]
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@upsEffect/container.twig',
             $data,
         );
@@ -165,7 +165,7 @@ class Controller extends Base
             'currentEffect' => $newEffect,
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@upsEffect/container-skip.twig',
             $data,
         );
@@ -214,7 +214,7 @@ class Controller extends Base
             ]
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             $fragment->getFilename(),
             $data,
         );
@@ -231,7 +231,7 @@ class Controller extends Base
         $effectId = $this->requestPost->get('effectId');
         $deleteCount = Effect\Mapper::getInstance()->deleteByColumn('id', $effectId);
 
-        $this->psr7Response = $this->responseAsJson($deleteCount > 0);
+        $this->response = $this->responseAsJson($deleteCount > 0);
 
         return true;
     }
@@ -285,7 +285,7 @@ class Controller extends Base
             'preselected' => '',
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@upsEffect/map-row.twig',
             $data,
         );

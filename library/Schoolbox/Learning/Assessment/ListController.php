@@ -134,7 +134,7 @@ class ListController extends Web\Controller\Base
      */
     public function getSebDownload(IAssessable $assessment): void
     {
-        $this->psr7Response = $this->responseFromTemplate('@learningAssessment/sebDownload.twig', [
+        $this->response = $this->responseFromTemplate('@learningAssessment/sebDownload.twig', [
             'assessmentId' => $assessment->getId(),
             'assessment' => $assessment,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
@@ -163,12 +163,12 @@ class ListController extends Web\Controller\Base
 
         /* Send as a downloadable file
          */
-        $this->psr7Response = $this->responseFromContent($contents)
-            ->withHeader('Pragma', 'no-cache')
-            ->withHeader('Cache-Control', 'private, max-age=1, no-transform')
-            ->withHeader('Content-Type', 'application/seb')
-            ->withHeader('Content-Length', strlen($contents))
-            ->withHeader('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"")
+        $this->response = $this->responseFromContent($contents)
+                               ->withHeader('Pragma', 'no-cache')
+                               ->withHeader('Cache-Control', 'private, max-age=1, no-transform')
+                               ->withHeader('Content-Type', 'application/seb')
+                               ->withHeader('Content-Length', strlen($contents))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"")
         ;
     }
 
@@ -269,7 +269,7 @@ class ListController extends Web\Controller\Base
             '_is_xhr'         => $this->isXhrRequest(),
         ];
 
-        $this->psr7Response = $this->responseDependentOnRequest('@learningAssessment/component.twig', $data);
+        $this->response = $this->responseDependentOnRequest('@learningAssessment/component.twig', $data);
     }
 
 
@@ -440,7 +440,7 @@ class ListController extends Web\Controller\Base
     {
         $weight = (float) $this->requestPost['weight'];
         if ($weight < 0) {
-            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid weight value'])->withStatus(500);
+            $this->response = $this->responseAsJson(['error' => 'Invalid weight value'])->withStatus(500);
             return;
         }
         $assessment->setWeight($weight);
@@ -453,7 +453,7 @@ class ListController extends Web\Controller\Base
             (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
         }
 
-        $this->psr7Response = $this->responseAsJson(['message' => 'Successfully updated weighting']);
+        $this->response = $this->responseAsJson(['message' => 'Successfully updated weighting']);
     }
 
     /**
@@ -470,7 +470,7 @@ class ListController extends Web\Controller\Base
         $visibility            = (int)$this->requestPost['visibility'];
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
         if (!in_array($visibility, $availableVisibilities)) {
-            $this->psr7Response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);
+            $this->response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);
             return;
         }
 
@@ -481,7 +481,7 @@ class ListController extends Web\Controller\Base
         // triggering notification explicitly, to notify marked, if necessary
         $this->getAssessmentMapper()->getNotifier()->notify($assessment, $this->getUser(), $previous);
 
-        $this->psr7Response = $this->responseAsJson(['message' => 'Loaded successfully']);
+        $this->response = $this->responseAsJson(['message' => 'Loaded successfully']);
     }
 
     /**
@@ -504,7 +504,7 @@ class ListController extends Web\Controller\Base
                 // delegate to the appropriate sub-controller
                 $delegate = $this->getDelegateController($type);
                 $delegate->getCreateAssessmentForm($context);
-                $this->psr7Response = $delegate->getPsr7Response();
+                $this->response = $delegate->getResponse();
                 return;
             } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
                 // if the client enters an invalid type: ignore
@@ -609,7 +609,7 @@ class ListController extends Web\Controller\Base
             ];
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
+        $this->response = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
     }
 
 
@@ -844,9 +844,9 @@ class ListController extends Web\Controller\Base
     protected function redirect($url)
     {
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson([ Redirect::RETURN_URL => $url ]);
+            $this->response = $this->responseAsJson([Redirect::RETURN_URL => $url ]);
         } else {
-            $this->psr7Response = $this->redirectAfterPost($url);
+            $this->response = $this->redirectAfterPost($url);
         }
     }
 
@@ -957,11 +957,11 @@ class ListController extends Web\Controller\Base
             // Update project mark as the excluded assessment may affect the project result
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
-            $this->psr7Response = $this->responseEmpty(201);
+            $this->response = $this->responseEmpty(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->psr7Response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray());
         }
     }
 
@@ -985,11 +985,11 @@ class ListController extends Web\Controller\Base
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
 
-            $this->psr7Response = $this->responseEmpty(201);
+            $this->response = $this->responseEmpty(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->psr7Response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray());
         }
     }
 

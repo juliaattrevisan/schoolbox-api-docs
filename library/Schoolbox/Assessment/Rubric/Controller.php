@@ -264,7 +264,7 @@ class Controller extends BaseController
         }
 
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             "@rubric/$template.twig",
             $context
         );
@@ -278,7 +278,7 @@ class Controller extends BaseController
      */
     protected function sendJSONError($data, $statusCode = 400)
     {
-        $this->psr7Response = $this->responseAsJson($data)->withStatus($statusCode);
+        $this->response = $this->responseAsJson($data)->withStatus($statusCode);
     }
 
 
@@ -324,7 +324,7 @@ class Controller extends BaseController
             $maxLevels = (int)$this->getDi()->get('config')->get('rubric_max_levels');
             $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
         } catch (\Exception $e) {
-            $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(400);
+            $this->response = $this->responseAsJson($e->getMessage())->withStatus(400);
             return;
         }
 
@@ -358,7 +358,7 @@ class Controller extends BaseController
             'fragment' => $fragment,
         ];
 
-        $this->psr7Response = $this->responseAsJson($payload);
+        $this->response = $this->responseAsJson($payload);
     }
 
     /**
@@ -416,7 +416,7 @@ class Controller extends BaseController
         $basename = (new Url($assessment->getTitle()))->getSlug();
         $content  = $this->array2csv((new ArrayExporter())->export($grid));
 
-        $this->psr7Response = $this->responseFromContent($content)
+        $this->response = $this->responseFromContent($content)
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')
@@ -497,7 +497,7 @@ class Controller extends BaseController
 
         // Response code is always 200:
         // this is a valid request even if marks would've been invalidated.
-        $this->psr7Response = $this->responseAsJson($response)->withStatus(200);
+        $this->response = $this->responseAsJson($response)->withStatus(200);
     }
 
 

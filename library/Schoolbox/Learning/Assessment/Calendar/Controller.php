@@ -106,7 +106,7 @@ class Controller extends Base
             $queryArgs
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessmentCalendar/index.twig',
             [
                 'user'        => $this->getUser(),

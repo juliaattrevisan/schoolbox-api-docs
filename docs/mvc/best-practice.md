@@ -25,8 +25,8 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Delegate low-level implementations to Supporting Classes. [(more)](02-controller.md#21-shove-details-elsewhere)
 * Controllers themselves should do very little other than taking the request and arranging the output to give to the View. [(more)](02-controller.md#2-responsibilities-of-controller)
 * Don't access superglobals directly; use abstractions `$this->getSession()`, `$this->requestQuery` and `$this->requestPost` instead. [(more)](02-controller.md#23-superglobals)
-* Use `psr7response` to set up data for twig. [(more)](02-controller.md#222-setting-the-response-for-view)
-* Use `psr7response` to redirect to specific urls or Routes. [(more)](02-controller.md#223-redirects)
+* Use `response` to set up data for twig. [(more)](02-controller.md#222-setting-the-response-for-view)
+* Use `response` to redirect to specific urls or Routes. [(more)](02-controller.md#223-redirects)
 * Catch unfriendly exceptions and convert them into user-friendly ones, otherwise users experience a meaningless stack trace. [(more)](02-controller.md#24-error-handling)
 * Use the `@api` docblock to indicate corresponding Routes when documenting Controller methods. [(more)](02-controller.md#25-corresponding-route-docblock)
 

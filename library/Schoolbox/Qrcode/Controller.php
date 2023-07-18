@@ -66,7 +66,7 @@ class Controller extends Base
      */
     public function getListPage(Folder $folder): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@qrcode/list.twig',
             [
                 'folder' => $folder,
@@ -183,6 +183,6 @@ class Controller extends Base
             'expiry'   => $expiry?->getLocalShort(),
         ];
 
-        $this->psr7Response = $this->responseAsJson($payload);
+        $this->response = $this->responseAsJson($payload);
     }
 }

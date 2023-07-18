@@ -80,7 +80,7 @@ $this->requestQuery->getFloat('value', 1.50);
 ### 2.2.2 Setting The Response for View
 
 When a Controller finishes processing, it needs to set up the resultant data for
-the View to render. This is done via setting the `psr7Response` property to a
+the View to render. This is done via setting the `response` property to a
 `\Psr\Http\Message\ResponseInterface` instance; this may be done via helper
 methods within the controller class.
 
@@ -99,7 +99,7 @@ instance.
 #### 2.2.2.1 Responses generated from a Twig template
 
  ```php
-$this->psr7Response = $this->responseFromTemplate(
+$this->response = $this->responseFromTemplate(
     '@test/index.twig',
     [
         'name' => $name
@@ -121,7 +121,7 @@ document title (as shown in the browser's title bar) and selected tab (as shown
 in the top navigation).
 
  ```php
-$this->psr7Response = $this->responseFromTemplateUnthemed(
+$this->response = $this->responseFromTemplateUnthemed(
     '@test/index.twig',
     [
         'name' => $name
@@ -137,7 +137,7 @@ site theme in the rendering; it renders the template's content as is.
 JSON is a common response type for APIs, and for asynchronous requests.
 
  ```php
-$this->psr7Response = $this->responseAsJson($data);
+$this->response = $this->responseAsJson($data);
 ```
 
 The above example simply outputs `json_encode($data)`, and automatically sets
@@ -149,7 +149,7 @@ Simple creation of output from a string might be appropriate when streaming a
 file's content.
 
 ```php
-$this->psr7Response = $this->responseFromContent($pdfContent)
+$this->response = $this->responseFromContent($pdfContent)
     ->withHeader('Content-Type', 'application/pdf');
 ```
 
@@ -161,7 +161,7 @@ Sometimes you need to redirect. You can use one of the `redirect*()` methods to
 create a redirect response:
 
 ```php
-$this->psr7Response = $this->redirectFound('http://www.google.com');
+$this->response = $this->redirectFound('http://www.google.com');
 ```
 
 ...or derive a Route instead:
@@ -172,7 +172,7 @@ $this->getRouter()->generate('myModule.myRoute', [
 ]));
 ```
 
-> Use `psr7response` to set up twig data and also to process redirects using Routes.
+> Use `response` to set up twig data and also to process redirects using Routes.
 
 ## 2.3 Superglobals
 We don't directly access the superglobals `$_SESSION`, `$_GET` and `$_POST` because we can't mock these out with test data and also presumes a lot about where this data came from. Instead, there are accessor methods which provide an abstraction.

@@ -108,8 +108,8 @@ class Controller extends Base
         /**
          * build the whole thing
          */
-        $output = (new User\Translator\ModelToArray())($user, $groupsArr);
-        $this->psr7Response = $this->responseAsJson($output);
+        $output         = (new User\Translator\ModelToArray())($user, $groupsArr);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -123,7 +123,7 @@ class Controller extends Base
     public function apiUserDelete(User $user)
     {
         $this->userMapper->delete($user);
-        $this->psr7Response = $this->responseEmpty(204);
+        $this->response = $this->responseEmpty(204);
     }
 
     /**
@@ -147,8 +147,8 @@ class Controller extends Base
             $problem = (new ApiProblem('Unable to update a user at this endpoint.'))
                 ->setStatus(404)
                 ->asArray();
-            $this->psr7Response = $this->responseAsJson($problem)
-                ->withStatus(404);
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus(404);
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
 
@@ -187,7 +187,7 @@ class Controller extends Base
          * set default response code to 201 (created)
          * if there are errors they will set their own code
          */
-        $this->psr7Response = $this->responseEmpty(201);
+        $this->response = $this->responseEmpty(201);
     }
 
     /**
@@ -402,8 +402,8 @@ class Controller extends Base
         /**
          * build the whole thing
          */
-        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
-        $this->psr7Response = $this->responseAsJson($output);
+        $output         = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -459,7 +459,7 @@ class Controller extends Base
              */
             $output[] = (new User\Translator\ModelToArray())($user, $groupsArr);
         }
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'data'  =>  $output,
                 'metadata'  => [

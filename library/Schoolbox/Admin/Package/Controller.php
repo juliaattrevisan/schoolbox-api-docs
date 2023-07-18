@@ -33,7 +33,7 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminPackage/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminPackage.getIndex'),
@@ -59,6 +59,6 @@ class Controller extends Base
         $packageInstaller = new Installer($this->packageMapper);
         $packageInstaller->installPackage($package, $this->getUser());
 
-        $this->psr7Response = $this->responseAsJson(['success' => true]);
+        $this->response = $this->responseAsJson(['success' => true]);
     }
 }

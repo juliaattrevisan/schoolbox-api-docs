@@ -33,7 +33,7 @@ class Controller extends Base
      */
     public function getList()
     {
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSchool/list.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesSchool/list.twig', [
             'schools' => $this->getSchoolTagCloudMapper()->findAll()
         ]);
     }
@@ -56,11 +56,11 @@ class Controller extends Base
                 ])
             ];
 
-            $this->psr7Response = $this->responseAsJson($status);
+            $this->response = $this->responseAsJson($status);
             return;
         }
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
     }
 
     /**
@@ -92,11 +92,11 @@ class Controller extends Base
                 ])
             ];
 
-            $this->psr7Response = $this->responseAsJson($status);
+            $this->response = $this->responseAsJson($status);
             return;
         }
 
-        $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSchool.getList', []));
     }
 
     /**

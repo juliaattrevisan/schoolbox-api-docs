@@ -56,7 +56,7 @@ class Controller extends Base
     {
         // If you try to access the login screen but you are already logged in, just go home
         if ($this->getSession()->getAuthUser() instanceof User && $this->getSession()->getAuthUser()->getId()) {
-            $this->psr7Response = $this->redirectSeeOther('/');
+            $this->response = $this->redirectSeeOther('/');
         }
 
         $samlAuth = $this->requestQuery->get('samlAuth');
@@ -65,8 +65,8 @@ class Controller extends Base
 
         // Don't output login screen if XHR request
         if ($this->isJsonRequest() || $this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(['error' => 'Unauthenticated'])
-                ->withHeader('Unauthenticated', 401);
+            $this->response = $this->responseAsJson(['error' => 'Unauthenticated'])
+                                   ->withHeader('Unauthenticated', 401);
             return;
         }
 
@@ -84,7 +84,7 @@ class Controller extends Base
             if ($pageUri && $pageUri->isAbsolutePath()) {
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
             }
-            $this->psr7Response = $this->redirectSeeOther($redirectUrl);
+            $this->response = $this->redirectSeeOther($redirectUrl);
             return;
         }
 
@@ -121,7 +121,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@login/login.twig', $data);
+        $this->response = $this->responseFromTemplateUnthemed('@login/login.twig', $data);
     }
 
 
@@ -186,10 +186,10 @@ class Controller extends Base
                         && $page !== '/login'
                         && $page !== '/login/'
                     ) {
-                        $page = rawurldecode($page);
-                        $this->psr7Response = $this->redirectSeeOther($page);
+                        $page           = rawurldecode($page);
+                        $this->response = $this->redirectSeeOther($page);
                     } else {
-                        $this->psr7Response = $this->redirectSeeOther('/');
+                        $this->response = $this->redirectSeeOther('/');
                     }
                 } else {
                     //get rid of session started earlier to stop it conflicting with next login

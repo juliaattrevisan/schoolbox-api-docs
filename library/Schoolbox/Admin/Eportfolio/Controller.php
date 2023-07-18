@@ -103,7 +103,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'pages' => $options
         ]);
     }
@@ -114,7 +114,7 @@ class Controller extends Base
     public function getDeploy()
     {
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminEportfolio/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
@@ -143,7 +143,7 @@ class Controller extends Base
         $this->postOutputCallbacks[] = function () use ($post, $id) {
             $this->deployCallback($post, $id);
         };
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminEportfolio/importResults.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
@@ -460,10 +460,10 @@ class Controller extends Base
                 }
             }
 
-            $this->psr7Response = $this->responseAsJson($result);
+            $this->response = $this->responseAsJson($result);
         } catch (MapperException $e) {
             // Requested import didn't exist,
-            $this->psr7Response = $this->responseAsJson([]);
+            $this->response = $this->responseAsJson([]);
         }
     }
 }

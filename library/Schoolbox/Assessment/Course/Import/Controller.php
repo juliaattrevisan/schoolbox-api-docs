@@ -148,7 +148,7 @@ class Controller extends Base\Base
             ]);
         }
 
-        $this->psr7Response = $this->responseDependentOnRequest('@course/import.twig', $data);
+        $this->response = $this->responseDependentOnRequest('@course/import.twig', $data);
     }
 
 
@@ -207,7 +207,7 @@ class Controller extends Base\Base
         $exists = (bool)\count(array_intersect($existingInFolderIds, $targetFolderIds));
 
         // respond with stage 2: units
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/unitImportForm.twig',
             [
                 'action'           => 'import',
@@ -267,7 +267,7 @@ class Controller extends Base\Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
 
@@ -440,7 +440,7 @@ class Controller extends Base\Base
         }
 
         // respond with stage 4: coursework list
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/unitImportResults.twig',
             [
                 'action'              => $action,
@@ -505,7 +505,7 @@ class Controller extends Base\Base
         } else {
             $redirect = $this->getSession()->getHistory(2);
         }
-        $this->psr7Response = $this->responseAsJson(['redirect' => $redirect]);
+        $this->response = $this->responseAsJson(['redirect' => $redirect]);
     }
 
 
@@ -598,7 +598,7 @@ class Controller extends Base\Base
         $orderedUnits = $courseImpl->getUnits()->sortBy('title', 'ASC');
         $courseImpl->setUnits($orderedUnits);
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/import.twig',
             [
                 'action'           => 'modify',
@@ -744,7 +744,7 @@ class Controller extends Base\Base
             $folderAncestry[$courseImplId] = array_reverse($folderAncestry[$courseImplId]);
         }
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/management.twig',
             [
                 'folder'           => $folder,
@@ -795,7 +795,7 @@ class Controller extends Base\Base
             });
             $this->componentInstanceMapper->delete($componentsForCourse);
 
-            $this->psr7Response = $this->responseAsJson(['data' => true]);
+            $this->response = $this->responseAsJson(['data' => true]);
         } catch (\Exception $e) {
             $this->sendError($e->getMessage(), [], 500);
             return;
@@ -819,7 +819,7 @@ class Controller extends Base\Base
     {
         $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($courseImpl->getFolder()->getId());
         $componentName     = $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'result'        => 'success',
             'componentName' => $componentName,
         ]);

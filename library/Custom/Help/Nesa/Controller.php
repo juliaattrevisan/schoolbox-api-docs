@@ -104,7 +104,7 @@ class Controller extends Base
             RubricDescriptorMapper::getInstance()
         );
 
-        $this->psr7Response = $this->responseFromTemplate('@helpNesa/selector.twig', [
+        $this->response = $this->responseFromTemplate('@helpNesa/selector.twig', [
             'course' => $courseSpecification,
             'states' => $this->pdMapper->getAvailableStates(),
             'descriptors' => $selector->generate()
@@ -142,7 +142,7 @@ class Controller extends Base
 
         /* The usual output
          */
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@helpNesa/report.twig',
             [
                 'report' => $report,
@@ -187,12 +187,12 @@ class Controller extends Base
         $content = (new Csv())->generate($report, $indicators);
         $today = \Alaress_Date_Format::now()->getDatabaseDate();
 
-        $this->psr7Response = $this->responseFromContent($content)
-            ->withHeader('Pragma', ' ')
-            ->withHeader('Cache-Control', ' ')
-            ->withHeader('Content-Type', 'text/csv')
-            ->withHeader('Content-Length', \strlen($content))
-            ->withHeader('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"")
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'text/csv')
+                               ->withHeader('Content-Length', \strlen($content))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"")
         ;
     }
 }

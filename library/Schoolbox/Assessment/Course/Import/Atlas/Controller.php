@@ -68,7 +68,7 @@ class Controller extends BaseController
     public function getImport(): void
     {
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ?? $this->getSession()->getHistory();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@courseImportAtlas/import.twig',
             [
                 'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
@@ -94,7 +94,7 @@ class Controller extends BaseController
      */
     public function getCurriculumList(): void
     {
-        $this->psr7Response = $this->responseAsJson($this->apiBridge->getCurriculumList());
+        $this->response = $this->responseAsJson($this->apiBridge->getCurriculumList());
     }
 
 
@@ -106,7 +106,7 @@ class Controller extends BaseController
      */
     public function getCurriculum(int $curriculumId): void
     {
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->apiBridge->getCurriculum($curriculumId, Module::ENABLE_ATTACHMENT_IMPORT)
         );
     }
@@ -161,7 +161,7 @@ class Controller extends BaseController
 
         $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-1']);
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@courseImportAtlas/import/plan.twig',
             [
                 'curriculum'             => $curriculumPlan,
@@ -203,7 +203,7 @@ class Controller extends BaseController
 
         $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-2']);
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@courseImportAtlas/import/facultySelector.twig',
             [
                 'curriculum'             => $curriculumPlan,
@@ -259,10 +259,10 @@ class Controller extends BaseController
                 $baseFolder,
                 $unit
             );
-            $this->psr7Response = $this->responseAsJson([])->withStatus(204);
+            $this->response = $this->responseAsJson([])->withStatus(204);
         } catch (SchoolboxException $e) {
             if ($this->isXhrRequest()) {
-                $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(400);
+                $this->response = $this->responseAsJson($e->getMessage())->withStatus(400);
             } else {
                 throw $e;
             }
@@ -275,7 +275,7 @@ class Controller extends BaseController
      */
     private function throwNotSelectedError(string $message): void
     {
-        $this->psr7Response = $this
+        $this->response = $this
             ->responseFromTemplateUnthemed(
                 'sub/mage-error.twig',
                 [
@@ -311,7 +311,7 @@ class Controller extends BaseController
         }
 
 
-        $this->psr7Response = $this
+        $this->response = $this
             ->responseFromTemplateUnthemed(
                 'sub/mage-error.twig',
                 [

@@ -101,7 +101,7 @@ class Controller extends Base
                 $options[] = $option;
             }
         }
-        $this->psr7Response = $this->responseAsJson($options);
+        $this->response = $this->responseAsJson($options);
     }
 
 
@@ -151,7 +151,7 @@ class Controller extends Base
             'valueLabels'        => $valueLabels,
         ];
 
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
 

@@ -97,7 +97,7 @@ class Controller extends Base
     public function getIndex(): void
     {
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportFolder/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
@@ -157,7 +157,7 @@ class Controller extends Base
         }
 
         // Render this thing out
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminImportFolder/importResults.twig',
             [
                 'errorMessage'   => $csvFileFormatErrorMessage,

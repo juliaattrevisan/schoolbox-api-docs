@@ -85,7 +85,7 @@ class Controller extends Base
         ], $sidebar->generate());
 
 
-        $this->psr7Response = $this->responseFromTemplate('@commsNewsModeration/index.twig', $data, 'Requiring Moderation', 'news');
+        $this->response = $this->responseFromTemplate('@commsNewsModeration/index.twig', $data, 'Requiring Moderation', 'news');
     }
 
     /**
@@ -177,7 +177,7 @@ class Controller extends Base
             if ($this->isXhrRequest()) {
                 $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
             } else {
-                $this->psr7Response = $this->redirectFound($route);
+                $this->response = $this->redirectFound($route);
             }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
@@ -251,7 +251,7 @@ class Controller extends Base
             if ($this->isXhrRequest()) {
                 $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
             } else {
-                $this->psr7Response = $this->redirectFound($route);
+                $this->response = $this->redirectFound($route);
             }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
@@ -350,6 +350,6 @@ class Controller extends Base
             $data['redirect'] = $redirect;
         }
 
-        $this->psr7Response = $this->responseAsJson($data)->withStatus($httpCode);
+        $this->response = $this->responseAsJson($data)->withStatus($httpCode);
     }
 }

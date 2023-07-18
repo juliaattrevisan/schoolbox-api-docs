@@ -76,7 +76,7 @@ class Controller extends Base
             $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds, 'backpack');
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@surveySnapshot/classSnapshot.twig',
             [
                 'folder' => $folder,

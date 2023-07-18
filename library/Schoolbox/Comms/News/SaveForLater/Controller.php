@@ -87,7 +87,7 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             // this is for turning on saved icon in news feed
             // this may contain non-accessible article ids, but should not be a problem
-            $this->psr7Response = $this->responseAsJson($savedArticleIds);
+            $this->response = $this->responseAsJson($savedArticleIds);
             return;
         }
 
@@ -137,7 +137,7 @@ class Controller extends Base
          */
         $readMores = (new ReadMore($this->getConfigLoader()->get(ConfigMapper::_READ_MORE), $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)))->generate($articles);
 
-        $data = array_merge(
+        $data           = array_merge(
             [
                 'articles'         => $articles,
                 'attachmentCounts' => $attachmentCounts,
@@ -150,7 +150,7 @@ class Controller extends Base
             ],
             $sidebar->generate()
         );
-        $this->psr7Response = $this->responseFromTemplate('@commsNewsSaveForLater/index.twig', $data, 'Saved For Later', 'news');
+        $this->response = $this->responseFromTemplate('@commsNewsSaveForLater/index.twig', $data, 'Saved For Later', 'news');
     }
 
 
@@ -174,11 +174,11 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson([]);
+            $this->response = $this->responseAsJson([]);
         } else {
-            $this->psr7Response = $this->responseEmpty();
+            $this->response = $this->responseEmpty();
         }
-        $this->psr7Response = $this->psr7Response->withStatus($status);
+        $this->response = $this->response->withStatus($status);
     }
 
 
@@ -202,11 +202,11 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson([]);
+            $this->response = $this->responseAsJson([]);
         } else {
-            $this->psr7Response = $this->responseEmpty();
+            $this->response = $this->responseEmpty();
         }
-        $this->psr7Response = $this->psr7Response->withStatus($status);
+        $this->response = $this->response->withStatus($status);
     }
 
 

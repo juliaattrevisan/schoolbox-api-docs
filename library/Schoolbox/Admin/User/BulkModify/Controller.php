@@ -105,7 +105,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminUserBulkModify/bulkModify.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminUserBulkModify.getModify'),
@@ -131,14 +131,14 @@ class Controller extends Base
         $selected = $this->request->getParsedBody();
         /* If there were any search results, display control options
          */
-        $userList = $this->userBulkMapper->bulkModifySearch(
+        $userList       = $this->userBulkMapper->bulkModifySearch(
             $selected['campusId'] ? [(int)$selected['campusId']] : [UserBulkMapper::ANY],
             $selected['roleId'] ? [(int)$selected['roleId']] : [UserBulkMapper::ANY],
             (int)$selected['ePortfolio'],
             $selected['yearLevelId'] ? [(int)$selected['yearLevelId']] : [UserBulkMapper::ANY],
             (int)$selected['token']
         );
-        $this->psr7Response = $this->responseAsJson($userList);
+        $this->response = $this->responseAsJson($userList);
     }
 
     /**
@@ -179,10 +179,10 @@ class Controller extends Base
                 (int)$params->get('revokeToken')
             ))->update();
         } catch (SchoolboxException $e) {
-            $problem = (new ApiProblem('Campus has been deleted or does not exist'))
+            $problem        = (new ApiProblem('Campus has been deleted or does not exist'))
                 ->setStatus(501)
                 ->asArray();
-            $this->psr7Response = $this->responseAsJson($problem)->withStatus(501);
+            $this->response = $this->responseAsJson($problem)->withStatus(501);
             return;
         }
 
@@ -193,7 +193,7 @@ class Controller extends Base
             \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
-        $this->psr7Response = $this->responseAsJson($jsonPayload);
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 
     /**
@@ -221,6 +221,6 @@ class Controller extends Base
             \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
-        $this->psr7Response = $this->responseAsJson($jsonPayload);
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 }

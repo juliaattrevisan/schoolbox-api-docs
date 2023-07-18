@@ -59,10 +59,10 @@ abstract class Base
     /**
      * A PSR-7 compliant response object.
      *
-     * If this is set: a response will be output from this object instead of
-     * from `$this->response`.
+     * If this is set, a response will be output from this object; otherwise, an
+     * empty response will be output (and a warning raised).
      */
-    protected ?ResponseInterface $psr7Response = null;
+    protected ?ResponseInterface $response = null;
 
     /**
      * A custom response factory, designed for building PSR-7 compliant response
@@ -225,17 +225,17 @@ abstract class Base
     /**
      * @return ResponseInterface|null
      */
-    public function getPsr7Response(): ?ResponseInterface
+    public function getResponse(): ?ResponseInterface
     {
-        return $this->psr7Response;
+        return $this->response;
     }
 
     /**
-     * @param ResponseInterface|null $psr7Response
+     * @param ResponseInterface|null $response
      */
-    public function setPsr7Response(?ResponseInterface $psr7Response): void
+    public function setResponse(?ResponseInterface $response): void
     {
-        $this->psr7Response = $psr7Response;
+        $this->response = $response;
     }
 
     /**
@@ -785,7 +785,7 @@ abstract class Base
             throw $this->generateException($errorCode, null, $problem . implode(', ', $resolutions));
         }
 
-        $this->psr7Response = $this
+        $this->response = $this
             ->responseFromTemplateUnthemed(
                 'sub/mage-error.twig',
                 [
@@ -808,7 +808,7 @@ abstract class Base
         $problem = (new ApiProblem($message))
             ->setStatus($code)
             ->asArray();
-        $this->psr7Response = $this
+        $this->response = $this
             ->responseAsJson($problem)
             ->withStatus($code);
     }

@@ -36,7 +36,7 @@ class Controller extends Base
      */
     public function getExample(User $user): void
     {
-        $this->psr7Response = $this->responseFromTemplate('@example/index.twig', ['user' => $user], 'Example');
+        $this->response = $this->responseFromTemplate('@example/index.twig', ['user' => $user], 'Example');
     }
 
 
@@ -51,7 +51,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@example/submit.twig',
             [
                 'user' => $user,

@@ -59,7 +59,7 @@ class Controller extends Base
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
-        $this->psr7Response = $this->responseAsJson($model);
+        $this->response = $this->responseAsJson($model);
     }
 
 
@@ -95,7 +95,7 @@ class Controller extends Base
 
 
         // Render the textbox
-        $this->psr7Response = $this->responseAsJson($model);
+        $this->response = $this->responseAsJson($model);
     }
 
 
@@ -111,7 +111,7 @@ class Controller extends Base
     {
         $textbox = $this->persistTextbox($textbox);
         $this->mapper->save($textbox);
-        $this->psr7Response = $this->responseAsJson($textbox);
+        $this->response = $this->responseAsJson($textbox);
     }
 
 
@@ -162,7 +162,7 @@ class Controller extends Base
             ['Text Boxes', null]
         ];
 
-        $this->psr7Response = $this->responseFromTemplate('@textbox/index.twig', [
+        $this->response = $this->responseFromTemplate('@textbox/index.twig', [
             'folder'         => $folder,
             'allBreadcrumbs' => $allBreadcrumbs,
         ]);
@@ -203,7 +203,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($usages);
+        $this->response = $this->responseAsJson($usages);
     }
 
 
@@ -241,7 +241,7 @@ class Controller extends Base
 
         /* I guess you go back to the homepage instead of the Textbox Usage index...?
          */
-        $this->psr7Response = $this->redirectFound("/homepage/{$folder->getId()}");
+        $this->response = $this->redirectFound("/homepage/{$folder->getId()}");
     }
 
     /**
@@ -254,7 +254,7 @@ class Controller extends Base
      */
     public function getTextbox(Model $textbox): void
     {
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@textbox/blank.twig', [
+        $this->response = $this->responseFromTemplateUnthemed('@textbox/blank.twig', [
             'textbox'         => $textbox,
         ]);
     }

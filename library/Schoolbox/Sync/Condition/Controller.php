@@ -79,7 +79,7 @@ class Controller extends Base
             ],
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@upsCondition/container.twig',
             $data,
         );
@@ -96,7 +96,7 @@ class Controller extends Base
         $conditionId = $this->requestPost->get('conditionId');
         $deleteCount = Condition\Mapper::getInstance()->deleteByColumn('id', $conditionId);
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $deleteCount > 0
         );
 

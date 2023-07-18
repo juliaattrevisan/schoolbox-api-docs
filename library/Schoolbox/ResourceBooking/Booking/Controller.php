@@ -145,7 +145,7 @@ class Controller extends Base
             $booking->getEvent()->setEndDateTime(new Alaress_Date_Format($endDate));
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceBooking/book.twig',
             [
                 /* Confusingly, 'item' refers to a Booking/Model, and a 'resource'
@@ -273,7 +273,7 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'item'      => $bookingList,
                     'errors'    => $errors,
@@ -283,7 +283,7 @@ class Controller extends Base
         } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
-            $this->psr7Response = $this->redirectAfterPost($returnUrl ?? $this->getSession()->getHistory());
+            $this->response = $this->redirectAfterPost($returnUrl ?? $this->getSession()->getHistory());
         }
     }
 
@@ -398,7 +398,7 @@ class Controller extends Base
         }
 
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'item'      => $item,
                     'errors'    => $errors,
@@ -409,7 +409,7 @@ class Controller extends Base
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             // Consider storing redirect URL in form or GET?
-            $this->psr7Response = $this->redirectAfterPost($returnUrl ?? $this->getSession()->getHistory(2));
+            $this->response = $this->redirectAfterPost($returnUrl ?? $this->getSession()->getHistory(2));
         }
     }
 
@@ -722,7 +722,7 @@ class Controller extends Base
 
         $output = json_decode('[' . \implode(',', $output) . ']');
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -747,7 +747,7 @@ class Controller extends Base
         $item->getResource()->setCategory($category);
 
         // Cancel callback URL: point to the last page if it wasn't set.
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceBooking/book.twig',
             [
                 'item'              => $item,
@@ -971,7 +971,7 @@ class Controller extends Base
     protected function setUpdateStatusResponse(Model $booking, $callbackUrl, $errors = [])
     {
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson(
+            $this->response = $this->responseAsJson(
                 [
                     'item'        => $booking,
                     'callbackUrl' => $callbackUrl,
@@ -980,7 +980,7 @@ class Controller extends Base
             )->withStatus(empty($errors) ? 200 : 400);
         } else {
             // Is there a previous location to redirect to? if so use that.
-            $this->psr7Response = $this->redirectAfterPost(
+            $this->response = $this->redirectAfterPost(
                 $callbackUrl ?: $this->getSession()->getHistory()
             );
         }

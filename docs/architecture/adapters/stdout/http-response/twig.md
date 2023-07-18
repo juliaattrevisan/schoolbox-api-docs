@@ -33,7 +33,7 @@ class MyController extends \Alaress\Web\Controller\Base
 {
     public function myAction(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@myModule/template.twig',
             $data,
             $title,

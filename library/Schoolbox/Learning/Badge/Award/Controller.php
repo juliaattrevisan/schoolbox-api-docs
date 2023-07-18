@@ -118,7 +118,7 @@ class Controller extends Base
      */
     public function redirectToAwardAsAchievementForm(): void
     {
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningBadgeAward.getAwardAsAchievementForm',
@@ -158,7 +158,7 @@ class Controller extends Base
      */
     public function redirectToSetAsGoalForm(): void
     {
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningBadgeAward.getSetAsGoalForm',
@@ -269,7 +269,7 @@ class Controller extends Base
         $returnUrl  = $requestUri . '?' . http_build_query($queryArgs);
 
         $translator = new User\Translator\Author\ModelToArray();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             $template,
             [
                 'settingForSelf' => $settingForSelf,
@@ -305,7 +305,7 @@ class Controller extends Base
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
         $userTranslator  = new User\Translator\Author\ModelToArray();
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningBadgeAward/awardWithEvidenceForm.twig',
             [
                 'isGoal'        => false,
@@ -345,8 +345,8 @@ class Controller extends Base
         foreach ($badges as $badge) {
             $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
         }
-        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
-        $this->psr7Response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
+        $returnUrl      = $this->requestQuery->get(Redirect::RETURN_URL);
+        $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 
     /**
@@ -372,7 +372,7 @@ class Controller extends Base
                 'user'   => $award->getRecipient(),
             ]);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningBadgeAward/awardWithEvidence.twig',
             [
                 'badges'    => $badges->map($badgeTranslator),
@@ -460,7 +460,7 @@ class Controller extends Base
             $stack['categories'][$categoryId]['awards'][$badgeId]['count']++;
         }
 
-        $this->psr7Response = $this->responseAsJson($stack);
+        $this->response = $this->responseAsJson($stack);
     }
 
 
@@ -522,8 +522,8 @@ class Controller extends Base
         );
 
         // Return what was just created
-        $translator = $this->buildBadgeAwardModelToArrayTranslator();
-        $this->psr7Response = $this->responseAsJson($collection->map($translator));
+        $translator     = $this->buildBadgeAwardModelToArrayTranslator();
+        $this->response = $this->responseAsJson($collection->map($translator));
     }
 
 
@@ -617,7 +617,7 @@ class Controller extends Base
 
         $translator = $this->buildBadgeAwardModelToArrayTranslator();
 
-        $this->psr7Response = $this->responseAsJson($translator($award));
+        $this->response = $this->responseAsJson($translator($award));
     }
 
 
@@ -640,7 +640,7 @@ class Controller extends Base
         $yearPrefix = $this->l10n->translate('year', false, true);
         $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, Role::STUDENT, $yearPrefix);
 
-        $this->psr7Response = $this->responseAsJson($users);
+        $this->response = $this->responseAsJson($users);
     }
 
 
@@ -663,7 +663,7 @@ class Controller extends Base
         $yearPrefix = $this->l10n->translate('year', false, true);
         $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, Role::STUDENT, $yearPrefix);
 
-        $this->psr7Response = $this->responseAsJson($users);
+        $this->response = $this->responseAsJson($users);
     }
 
 
@@ -727,7 +727,7 @@ class Controller extends Base
                 ->setStatus(400)
                 ->asArray();
 
-            $this->psr7Response = $this->responseAsJson($problem)->withStatus(400);
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
         }
     }
 
@@ -788,7 +788,7 @@ class Controller extends Base
             );
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningBadgeAward/awardUpdate.twig',
             [
                 'badges'    => $badges->map($badgeTranslator),
@@ -836,7 +836,7 @@ class Controller extends Base
         if (null !== $this->requestQuery->get(Redirect::RETURN_URL)) {
             $redirectUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         }
-        $this->psr7Response = $this->redirectFound($redirectUrl);
+        $this->response = $this->redirectFound($redirectUrl);
     }
 
 
@@ -880,7 +880,7 @@ class Controller extends Base
             'award'   => $achievement,
             'awardId' => $achievement->getId(),
         ]);
-        $this->psr7Response = $this->responseAsJson(array_merge($translator($achievement), $data))->withStatus(201);
+        $this->response = $this->responseAsJson(array_merge($translator($achievement), $data))->withStatus(201);
     }
 
 
@@ -941,7 +941,7 @@ class Controller extends Base
             [],
             $this->requestQuery->getArrayCopy(),
         );
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningBadgeAward/list.twig',
             [
                 'filterPanel' => $filterPanel,
@@ -1009,6 +1009,6 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson(['data' => $data]);
+        $this->response = $this->responseAsJson(['data' => $data]);
     }
 }

@@ -57,11 +57,11 @@ class Controller extends Base
         */
         $userPassword = $this->getUser()->getPassword() ?? '';
         if ($userPassword === '') {
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } else {
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@passwordChange/index.twig',
                 [
                     'isRequestMade'   => $this->getSessionSegment()->getFlash('isRequestMade'),
@@ -112,7 +112,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate('passwordChange.getChangePassword')
         );
     }

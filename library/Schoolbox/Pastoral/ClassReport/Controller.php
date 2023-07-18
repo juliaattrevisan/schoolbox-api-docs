@@ -59,7 +59,7 @@ class Controller extends Base
             $this->getUser(),
             $this->requestQuery->getArrayCopy(),
         );
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@pastoralClassReportModule/index.twig',
             [
                 'folder'      => $folder,
@@ -115,7 +115,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'data'     => $result,
             'metadata' => null,
         ]);
@@ -139,7 +139,7 @@ class Controller extends Base
             new GenericCollection(User::class, [$student]),
             $this->requestQuery->getArrayCopy(),
         );
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->retrieveCursoredRecords(
                 $folder,
                 $student,

@@ -19,6 +19,6 @@ class Controller extends Base
      */
     public function getPolicy(): void
     {
-        $this->psr7Response = $this->responseFromTemplate('@policy/policy.twig', []);
+        $this->response = $this->responseFromTemplate('@policy/policy.twig', []);
     }
 }

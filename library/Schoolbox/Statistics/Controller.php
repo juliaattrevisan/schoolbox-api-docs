@@ -155,7 +155,7 @@ class Controller extends Base
         }
 
         $redirect = $this->getRouteIfAuthorized('statistics.' . $get['pageRoute'], $chunks);
-        $this->psr7Response = $this->redirectFound($redirect);
+        $this->response = $this->redirectFound($redirect);
     }
 
 
@@ -220,7 +220,7 @@ class Controller extends Base
         /**
          * Send view
          */
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@statistics/index.twig',
             [
                 'pageRoute'         => 'getIndex',
@@ -283,7 +283,7 @@ class Controller extends Base
 
         $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC');
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@statistics/topVisitors.twig',
             [
                 'pageRoute'         => 'getTopVisitors',
@@ -327,7 +327,7 @@ class Controller extends Base
 
         $topFiles = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@statistics/topFiles.twig',
             [
                 'pageRoute'         => 'getTopFiles',
@@ -368,7 +368,7 @@ class Controller extends Base
 
         $recentVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'datetime DESC');
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@statistics/recentVisitors.twig',
             [
                 'pageRoute'         => 'getRecentVisitors',
@@ -410,7 +410,7 @@ class Controller extends Base
 
         $yetToVisitors = $dataSource->getYetToVisit($folder, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@statistics/yetToVisit.twig',
             [
                 'pageRoute'         => 'getYetToVisit',
@@ -453,7 +453,7 @@ class Controller extends Base
 
         $topLinks = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_LINK, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@statistics/topLinks.twig',
             [
                 'pageRoute'         => 'getTopLinks',

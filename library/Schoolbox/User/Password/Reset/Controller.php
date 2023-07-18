@@ -67,7 +67,7 @@ class Controller extends Base
     {
         $this->validateAccess();
         $sessionSegment = $this->getSessionSegment();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@userPasswordReset/createRequestForm.twig',
             [
                 'email' => $sessionSegment->getFlash('email', ''),
@@ -89,7 +89,7 @@ class Controller extends Base
         $this->validateAccess();
         $this->validateResetRequest($reset);
         $sessionSegment = $this->getSessionSegment();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@userPasswordReset/resetForm.twig',
             [
                 'reset' => $reset,
@@ -105,7 +105,7 @@ class Controller extends Base
      */
     public function displaySuccessMessage()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@userPasswordReset/successMessage.twig',
             [
                 'isCommunityPortalPasswordSet' => $this->getSessionSegment()->getFlash('isCommunityPortalPasswordSet', true),
@@ -136,7 +136,7 @@ class Controller extends Base
             $sessionSegment->setFlash('isEmailValid', false);
         }
 
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
         );
     }
@@ -172,14 +172,14 @@ class Controller extends Base
             // This reset has been used, save it
             $this->resetMapper->save($reset->setResetTime(\Alaress_Date_Format::now()));
 
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'userPasswordReset.displaySuccessMessage'
                 )
             );
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'userPasswordReset.displayResetForm',
                     ['token' => $reset->getToken(),]
@@ -196,7 +196,7 @@ class Controller extends Base
     protected function validateAccess()
     {
         if ($this->getUser()->getId()) {
-            $this->psr7Response = $this->redirectFound('/');
+            $this->response = $this->redirectFound('/');
         }
     }
 
@@ -210,24 +210,24 @@ class Controller extends Base
     {
         if ($reset->getUser() === null) {
             // User does not exist
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } elseif (!$reset->getToken()) {
             // Token wasn't found - go elsewhere
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } elseif ($reset->getResetTime()) {
             // Token already used - go elsewhere
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
             // This request has expired. Create a new one
             // Not setting email - stale requests should not give out this information.
             $this->getSessionSegment()->setFlash('isResetExpired', true);
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         }

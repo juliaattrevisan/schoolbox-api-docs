@@ -135,7 +135,7 @@ class Controller extends Base
             )
         );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@resourceBookingReport/index.twig',
             [
                 'categoryList' => $categoryList,

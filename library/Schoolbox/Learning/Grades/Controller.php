@@ -88,7 +88,7 @@ class Controller extends Base
             $termCode = $this->termMapper->findForToday()->getCode();
         }
 
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'learningGrades.getGrades',
                 [
@@ -170,7 +170,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $this->psr7Response = $this->responseFromTemplate('@learningGrades/summary.twig', [
+        $this->response = $this->responseFromTemplate('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
             'year'             => ($termIsWholeYear ? $term->getStart()->getYear() : null),
@@ -181,7 +181,7 @@ class Controller extends Base
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'currentUser'      => $this->getUser(),
             'yearUrl'          => $this->getYearUrl($viewee->getId())
-        ], '', 'grade');
+        ],                                            '', 'grade');
     }
 
     /**
@@ -258,7 +258,7 @@ class Controller extends Base
         $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $yearUrl = $this->getYearUrl($viewee->getId());
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningGrades/gradesOuter.twig',
             [
                 'student'            => $viewee,
@@ -500,7 +500,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
                 'student'               => $viewee,

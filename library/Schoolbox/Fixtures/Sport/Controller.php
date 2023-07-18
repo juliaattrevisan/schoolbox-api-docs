@@ -67,7 +67,7 @@ class Controller extends AbstractController
             ]
         ]);
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSport/list.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesSport/list.twig', [
             'allSports' => $allSports
         ]);
     }
@@ -79,7 +79,7 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSport/create.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesSport/create.twig', [
             'sport'  => $entity,
             'action' => $entity->getId() ? 'Modify' : 'Create'
         ]);
@@ -109,7 +109,7 @@ class Controller extends AbstractController
             $division->setTeams($teams);
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesSport/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesSport/entity.twig', [
             'sport'     => $entity,
             'divisions' => $divisions
         ]);
@@ -129,7 +129,7 @@ class Controller extends AbstractController
 
             $this->saveSport($entity, $post['name'], $post['url'], $positions);
 
-            $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSport.getList'));
+            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesSport.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }

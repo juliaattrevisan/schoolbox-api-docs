@@ -82,7 +82,7 @@ class Controller extends Base
     public function layout(Layout\Model $layout)
     {
         // Load layout
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@tile/layout.twig',
             [
                 'item' => $layout,
@@ -148,7 +148,7 @@ class Controller extends Base
 
         // XHR: return a simple JSON response
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson($layout)->withStatus($code);
+            $this->response = $this->responseAsJson($layout)->withStatus($code);
             return;
         }
 
@@ -166,7 +166,7 @@ class Controller extends Base
             // Should never happen
             $href = '#';
         }
-        $this->psr7Response = $this->redirectAfterPost($href);
+        $this->response = $this->redirectAfterPost($href);
     }
 
     /**
@@ -179,7 +179,7 @@ class Controller extends Base
     {
         /** @var Model $model */
         $model = $this->mapper->createModel();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@tile/modify.twig',
             [
                 'item'       => $model,
@@ -203,7 +203,7 @@ class Controller extends Base
         // No:  Create a layout, and redirect to it
         try {
             $layout = $this->findLayoutForComponent($component);
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'tile.add',
                     ['layoutId' => $layout->getId()]
@@ -211,7 +211,7 @@ class Controller extends Base
             );
         } catch (MapperException $e) {
             $layout = $this->buildLayoutForComponent($component);
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $layout->getId()]
@@ -240,7 +240,7 @@ class Controller extends Base
         $item->setTileLayout($layout);
 
         $this->mapper->save($item);
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $layout->getId()]
@@ -255,7 +255,7 @@ class Controller extends Base
      */
     public function edit(Model $item)
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@tile/modify.twig',
             [
                 'item'       => $item,
@@ -279,7 +279,7 @@ class Controller extends Base
         );
 
         $this->mapper->save($item);
-        $this->psr7Response = $this->redirectAfterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $item->getTileLayout()->getId()]
@@ -299,9 +299,9 @@ class Controller extends Base
             $code = 500;
         }
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson([])->withStatus($code);
+            $this->response = $this->responseAsJson([])->withStatus($code);
         } else {
-            $this->psr7Response = $this->redirectAfterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $item->getTileLayout()->getId()]

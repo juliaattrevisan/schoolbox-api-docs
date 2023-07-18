@@ -69,7 +69,7 @@ class Controller extends Base
             return !$node->getAssessmentContext()->isDeleted();
         });
 
-        $this->psr7Response = $this->responseFromTemplate('@restore/index.twig', [
+        $this->response = $this->responseFromTemplate('@restore/index.twig', [
             'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
             'deletedFolders'     => $deletedFolders,
@@ -104,7 +104,7 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->psr7Response = $this->responseAsJson(['success' => true]);
+        $this->response = $this->responseAsJson(['success' => true]);
     }
 
     /**
@@ -126,6 +126,6 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->psr7Response = $this->responseAsJson(['success' => true]);
+        $this->response = $this->responseAsJson(['success' => true]);
     }
 }

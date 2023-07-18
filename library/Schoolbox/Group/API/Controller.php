@@ -74,7 +74,7 @@ class Controller extends Base
         //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
         $output->reindex();
 
-        $this->psr7Response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -92,8 +92,8 @@ class Controller extends Base
             $this->sendJsonError('User is not enroled in the group', 404);
             return;
         }
-        $output = (new ModelToArray())($userAccess);
-        $this->psr7Response = $this->responseAsJson($output);
+        $output         = (new ModelToArray())($userAccess);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -198,8 +198,8 @@ class Controller extends Base
                 return;
             }
         }
-        $output = (new ModelToArray())($newAccess);
-        $this->psr7Response = $this->responseAsJson($output);
+        $output         = (new ModelToArray())($newAccess);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -219,7 +219,7 @@ class Controller extends Base
 
         try {
             $this->userAccessMapper->delete($userAccesses);
-            $this->psr7Response = $this->responseEmpty(204);
+            $this->response = $this->responseEmpty(204);
         } catch (MapperException $e) {
             $this->sendJsonError('Unable to remove the user from the group.', 400);
         }

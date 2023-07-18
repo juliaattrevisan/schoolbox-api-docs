@@ -197,7 +197,7 @@ abstract class AbstractController extends BaseController
         $data['source_slug'] = $sourceSlug;
         $data['mime'] = $mime;
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@resourceBrowser/picker.twig', $data);
+        $this->response = $this->responseFromTemplateUnthemed('@resourceBrowser/picker.twig', $data);
     }
 
     /**
@@ -234,7 +234,7 @@ abstract class AbstractController extends BaseController
         if ($folderId) {
             $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
-            $this->psr7Response = $this->redirectFound(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate("{$this->namespace}.browse", array())
             );
             return;
@@ -263,7 +263,7 @@ abstract class AbstractController extends BaseController
 
         $data['attachzone'] = $this->getFolderAttachzoneData();
 
-        $this->psr7Response = $this->responseFromTemplate('@resourceBrowser/browse.twig', $data, '', $this->tab);
+        $this->response = $this->responseFromTemplate('@resourceBrowser/browse.twig', $data, '', $this->tab);
     }
 
 
@@ -281,7 +281,7 @@ abstract class AbstractController extends BaseController
             $mime = "*/*";
         }
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->treeBuilder->buildChildNodes($folderId, [], $mime)
         );
     }
@@ -300,7 +300,7 @@ abstract class AbstractController extends BaseController
             'namespace' => $this->namespace,
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@resourceBrowser/listResources.twig',
             $data,
         );
@@ -319,7 +319,7 @@ abstract class AbstractController extends BaseController
     {
         $data = $this->getFolderData($folderId);
         $data['attachzone'] = $this->getFolderAttachzoneData();
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@resourceBrowser/showFolderInfo.twig',
             $data,
         );
@@ -357,7 +357,7 @@ abstract class AbstractController extends BaseController
             'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($file),
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@resourceBrowser/showFileInfo.twig',
             $data,
         );
@@ -381,7 +381,7 @@ abstract class AbstractController extends BaseController
             'filesize' => $file->getSize(),
         ];
 
-        $this->psr7Response = $this->responseAsJson($data);
+        $this->response = $this->responseAsJson($data);
     }
 
 
@@ -407,7 +407,7 @@ abstract class AbstractController extends BaseController
             'namespace' => $this->namespace,
         ];
 
-        $this->psr7Response = $this->responseFromTemplateUnthemed(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@resourceBrowser/showMultiFileInfo.twig',
             $data,
         );
@@ -457,7 +457,7 @@ abstract class AbstractController extends BaseController
         }
 
         // Output something: I guess whatever the contents of the folder are now
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->treeBuilder->buildChildNodes($folderId),
         );
     }

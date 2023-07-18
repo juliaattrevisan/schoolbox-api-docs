@@ -40,7 +40,7 @@ class Controller extends Base
      */
     public function getConsole()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminIntellischool/console.twig',
             [
                 'pageCurrent'      => $this->routeGenerator->generate('adminIntellischool.getConsole'),

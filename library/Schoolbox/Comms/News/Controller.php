@@ -193,7 +193,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@commsNews/create.twig', [
+        $this->response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Create',
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
@@ -204,7 +204,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
+        ],                                            "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
 
@@ -227,7 +227,7 @@ class Controller extends Base
         $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
         $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
 
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate('commsNews.getCreate') . '?' . $params
         );
     }
@@ -303,7 +303,7 @@ class Controller extends Base
             $fileZone->attachFiles($article->getAttachedFiles()->indexBy('hash')->keys());
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@commsNews/create.twig', [
+        $this->response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Update',
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
@@ -314,7 +314,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ], "Update {$article->getTitle()}", 'news');
+        ],                                            "Update {$article->getTitle()}", 'news');
     }
 
 
@@ -358,7 +358,7 @@ class Controller extends Base
         try {
             $this->validateArticleAndAudience($article);
         } catch (UnsatisfiedException $e) {
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'success' => false,
                 'message' => $e->getMessage(),
             ])->withStatus(400);
@@ -403,7 +403,7 @@ class Controller extends Base
                 $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
             }
 
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'success'      => true,
                 'articleId'    => $article->getId(),
                 'url'          => $url,
@@ -425,7 +425,7 @@ class Controller extends Base
                     $nextStep .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
                 }
             }
-            $this->psr7Response = $this->redirectAfterPost($nextStep);
+            $this->response = $this->redirectAfterPost($nextStep);
             return;
         }
     }
@@ -473,16 +473,16 @@ class Controller extends Base
             }
 
             if ($this->isXhrRequest()) {
-                $this->psr7Response = $this->responseAsJson([
+                $this->response = $this->responseAsJson([
                     'success' => true,
                     'redirect' => $nextStep
                 ]);
             } else {
-                $this->psr7Response = $this->redirectFound($nextStep);
+                $this->response = $this->redirectFound($nextStep);
             }
         } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
             if ($this->isXhrRequest()) {
-                $this->psr7Response = $this->responseAsJson([
+                $this->response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage()
                 ])->withStatus(400);
@@ -503,7 +503,7 @@ class Controller extends Base
      */
     public function getTopics(): void
     {
-        $this->psr7Response = $this->responseAsJson($this->topicMapper->findAll());
+        $this->response = $this->responseAsJson($this->topicMapper->findAll());
     }
 
 
@@ -599,7 +599,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@commsNews/detail.twig',
             $data,
             $article->getTitle(),
@@ -636,13 +636,13 @@ class Controller extends Base
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->psr7Response = $this->responseAsJson($partialData['articles']);
+            $this->response = $this->responseAsJson($partialData['articles']);
             return;
         }
 
         $content = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'success' => true,
             'fragment' => $content
         ]);
@@ -764,7 +764,7 @@ class Controller extends Base
 
         $data = array_merge($data, $sidebar->generate());
 
-        $this->psr7Response = $this->responseFromTemplate('@commsNews/index.twig', $data, 'News Feed', 'news');
+        $this->response = $this->responseFromTemplate('@commsNews/index.twig', $data, 'News Feed', 'news');
     }
 
 
@@ -882,7 +882,7 @@ class Controller extends Base
             }
         }
 
-        $this->psr7Response = $this->responseAsJson($articles);
+        $this->response = $this->responseAsJson($articles);
     }
 
 
@@ -981,7 +981,7 @@ class Controller extends Base
 
         $data = array_merge($data, $sidebar->generate());
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@commsNews/archive.twig',
             $data,
             $pageTitle,
@@ -1100,7 +1100,7 @@ class Controller extends Base
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'articles' => $partialData['articles']
             ]);
 
@@ -1110,7 +1110,7 @@ class Controller extends Base
         $content     = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
         $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'success' => true,
             'title' => $this->getDi()->get('l10n')->translate('news', false, true),
             'url' => $partialData['currentUrl'],
@@ -1146,7 +1146,7 @@ class Controller extends Base
             'status' => $status,
         ], $sidebar->generate());
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@commsNews/authored.twig',
             $data,
             'My News',
@@ -1212,7 +1212,7 @@ class Controller extends Base
             )
         );
 
-        $this->psr7Response = $this->responseAsJson($articles);
+        $this->response = $this->responseAsJson($articles);
     }
 
 

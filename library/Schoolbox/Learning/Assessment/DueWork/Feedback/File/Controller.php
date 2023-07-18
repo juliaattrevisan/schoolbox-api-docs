@@ -50,6 +50,6 @@ class Controller extends Base
             $data['message'] = $e->getMessage();
         }
 
-        $this->psr7Response = $this->responseAsJson($data)->withStatus($code);
+        $this->response = $this->responseAsJson($data)->withStatus($code);
     }
 }

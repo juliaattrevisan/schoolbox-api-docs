@@ -348,7 +348,7 @@ class Controller extends Base
             $connectorName = '' !== $connectorName ? $connectorName : 'External';
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminUser/modify.twig',
             [
                 'serviceMapping' => self::SERVICE_MAPPING,
@@ -399,7 +399,7 @@ class Controller extends Base
      */
     public function getStaleReport(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminUser/stale.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getStaleReport'),
@@ -444,7 +444,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($jsonPayload);
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 
     /**
@@ -466,7 +466,7 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setAttachPrompt('add a portrait image');
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminUser/modify.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getInsert'),
@@ -510,7 +510,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#groups");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#groups");
     }
 
     /**
@@ -533,7 +533,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#permissions");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#permissions");
     }
 
     /**
@@ -557,7 +557,7 @@ class Controller extends Base
         } catch (MapperException $e) {
         }
 
-        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#linked");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#linked");
     }
 
     /**
@@ -573,7 +573,7 @@ class Controller extends Base
             'uid' => $user->getId()
         ]);
 
-        $this->psr7Response = $this->responseAsJson(true);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -590,7 +590,7 @@ class Controller extends Base
             'uid' => $user->getId()
         ]);
 
-        $this->psr7Response = $this->responseAsJson(true);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -612,7 +612,7 @@ class Controller extends Base
 
         $this->userMapper->save($user);
 
-        $this->psr7Response = $this->responseAsJson(true);
+        $this->response = $this->responseAsJson(true);
     }
 
 
@@ -789,7 +789,7 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify");
     }
 
     /**
@@ -800,7 +800,7 @@ class Controller extends Base
     {
         $this->userMapper->delete($user);
 
-        $this->psr7Response = $this->responseAsJson(true);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -811,7 +811,7 @@ class Controller extends Base
     {
         $userList = $this->requestPost['users'];
         if ($this->userMapper->deleteByColumn('id', $userList)) {
-            $this->psr7Response = $this->responseAsJson(true);
+            $this->response = $this->responseAsJson(true);
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -848,7 +848,7 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->psr7Response = $this->redirectAfterPost("/adminv2/user/{$userId}/modify");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$userId}/modify");
     }
 
     /**
@@ -889,7 +889,7 @@ class Controller extends Base
         } catch (MapperException $e) {
         }
 
-        $this->psr7Response = $this->responseAsJson(true);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -911,6 +911,6 @@ class Controller extends Base
         } catch (MapperException $e) {
         }
 
-        $this->psr7Response = $this->responseAsJson(true);
+        $this->response = $this->responseAsJson(true);
     }
 }

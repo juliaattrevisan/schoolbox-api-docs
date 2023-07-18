@@ -133,7 +133,7 @@ class Controller extends Base
         $route       = $this->routeGenerator->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@rubricMarkbook/markbookOuter.twig',
             [
                 'folder'      => $folder,
@@ -210,7 +210,7 @@ class Controller extends Base
             $overallMarks
         ] = $this->buildMarkbookData($folder, $request, $assessmentIds);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed(
                 '@rubricMarkbook/markbookInner.twig',

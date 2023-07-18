@@ -78,6 +78,6 @@ class Controller extends BaseController
         if (!$comment->isDeleted()) {
             $this->mapper->delete($comment);
         }
-        $this->psr7Response = $this->responseEmpty(204);
+        $this->response = $this->responseEmpty(204);
     }
 }

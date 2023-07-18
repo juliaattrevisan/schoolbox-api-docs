@@ -48,7 +48,7 @@ class Controller extends FullAccessController
         }
 
         // Output something: I guess whatever the contents of the folder are now
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $this->treeBuilder->buildChildNodes($folderId),
         );
     }

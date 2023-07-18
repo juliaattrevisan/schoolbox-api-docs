@@ -61,7 +61,7 @@ class Controller extends ConfigController
         $pageCurrent = $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
         $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@settings/settings.twig',
             [
                 'pageCurrent'    => $pageCurrent,
@@ -153,7 +153,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->psr7Response = $this->responseAsJson($jsonPayload);
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 
     /**
@@ -214,11 +214,11 @@ class Controller extends ConfigController
         if ($rebuildModules) {
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
-            $this->psr7Response = $this->responseEmpty();
+            $this->response = $this->responseEmpty();
         }
 
-        $route = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
-        $this->psr7Response = $this->redirectAfterPost($route);
+        $route          = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
+        $this->response = $this->redirectAfterPost($route);
     }
 
 

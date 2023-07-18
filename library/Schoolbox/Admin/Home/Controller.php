@@ -100,7 +100,7 @@ class Controller extends Base
         $configDismissUpgradeReminder->setValue($latestVersionMajor);
         $this->configMapper->save($configDismissUpgradeReminder);
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             [
                 'success'  => true,
                 'messages' => []
@@ -166,7 +166,7 @@ class Controller extends Base
             $importLogs = $this->importLogMapper->status();
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminHome/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
@@ -210,7 +210,7 @@ class Controller extends Base
      */
     public function getSslRenewalHelp(): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminHome/ssl-renewal-help.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
@@ -260,7 +260,7 @@ class Controller extends Base
             ];
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminHome/healthcheck.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
@@ -289,7 +289,7 @@ class Controller extends Base
             $enabledData = [];
         }
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@adminHome/disaster-recovery.twig',
             array_merge(
                 [

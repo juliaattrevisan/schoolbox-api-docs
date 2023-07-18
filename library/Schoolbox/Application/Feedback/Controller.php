@@ -45,7 +45,7 @@ class Controller extends Base
 
         $data['types'] = explode(',', $this->getConfigLoader()->get('site_feedback_types'));
 
-        $this->psr7Response = $this->responseFromTemplate('@feedback/feedback.twig', $data, $this->getConfigLoader()->get('feedback_text'));
+        $this->response = $this->responseFromTemplate('@feedback/feedback.twig', $data, $this->getConfigLoader()->get('feedback_text'));
     }
 
     /**
@@ -57,6 +57,6 @@ class Controller extends Base
      */
     public function getFeedbackReceipt()
     {
-        $this->psr7Response = $this->responseFromTemplate('@feedback/feedback-thankyou.twig', [], 'Message Delivered');
+        $this->response = $this->responseFromTemplate('@feedback/feedback-thankyou.twig', [], 'Message Delivered');
     }
 }

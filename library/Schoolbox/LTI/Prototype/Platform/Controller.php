@@ -59,7 +59,7 @@ class Controller extends Base
     public function getIndex(): void
     {
         [$staffUsers, $studentUsers] = $this->buildUserLists();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@ltiPrototypePlatform/index.twig',
             [
                 'staffUsers'    => $staffUsers,
@@ -102,7 +102,7 @@ class Controller extends Base
                     ->withPath($this->routeGenerator->generate('ltiPrototypePlatform.getDeepLinkingResponse')),
             );
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@ltiPrototypePlatform/generateMessage.twig',
             ['message' => $message,],
             self::TITLE,
@@ -124,12 +124,12 @@ class Controller extends Base
                 $this->buildRegistrationRepository(),
                 new UserAuthenticator($this->userMapper)
             ))->build($this->request);
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@ltiPrototypePlatform/oidcAuthenticationRequest.twig',
                 ['message' => $message,]
             );
         } catch (LtiExceptionInterface $e) {
-            $this->psr7Response = $this->responseFromTemplate(
+            $this->response = $this->responseFromTemplate(
                 '@ltiPrototypePlatform/oidcAuthenticationRequestException.twig',
                 ['exception' => $e,],
                 self::TITLE,
@@ -154,7 +154,7 @@ class Controller extends Base
         $resourceLinks = (new ResourceCollectionFactory())->createFromClaim($contentItems);
 
         [$staffUsers, $studentUsers] = $this->buildUserLists();
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@ltiPrototypePlatform/deepLinkingResponse.twig',
             [
                 'result'        => $result,

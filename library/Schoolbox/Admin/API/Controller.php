@@ -166,9 +166,9 @@ class Controller extends Web\Controller\Base
             $statusCode = $e->getCode();
         }
 
-        $this->psr7Response = $this->responseAsJson($responseJson);
+        $this->response = $this->responseAsJson($responseJson);
         if (isset($statusCode)) {
-            $this->psr7Response = $this->psr7Response->withStatus($statusCode);
+            $this->response = $this->response->withStatus($statusCode);
         }
     }
 
@@ -291,7 +291,7 @@ class Controller extends Web\Controller\Base
             $statusCode = $e->getCode();
         }
 
-        $this->psr7Response = $this->responseAsJson($responseJson)->withStatus($statusCode);
+        $this->response = $this->responseAsJson($responseJson)->withStatus($statusCode);
     }
 
 

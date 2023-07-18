@@ -67,7 +67,7 @@ class Controller extends BaseController
      */
     public function getForm(FolderModel $folder): void
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@rubricManager/form.twig',
             $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true)),
             sprintf(
@@ -101,13 +101,13 @@ class Controller extends BaseController
             try {
                 $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
-                $this->psr7Response = $this->responseAsJson([
+                $this->response = $this->responseAsJson([
                     'status' => 200,
                     'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
                     'redirect' => '/homepage/' . $folder->getId()
                 ])->withStatus(200);
             } catch (\Exception | \UnexpectedValueException $e) {
-                $this->psr7Response = $this->responseAsJson([
+                $this->response = $this->responseAsJson([
                     'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
                     'status' => 400,
                     'detail' => $e->getMessage(),

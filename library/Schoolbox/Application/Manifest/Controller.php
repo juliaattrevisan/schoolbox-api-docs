@@ -134,7 +134,7 @@ class Controller extends Base
 
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
-        $this->psr7Response = $this->responseAsJson($manifest);
+        $this->response = $this->responseAsJson($manifest);
     }
 
     /**
@@ -146,7 +146,7 @@ class Controller extends Base
      */
     public function getOffline(): void
     {
-        $this->psr7Response = $this->responseFromTemplateUnthemed('@manifest/offline.twig', []);
+        $this->response = $this->responseFromTemplateUnthemed('@manifest/offline.twig', []);
     }
 
     /**
@@ -166,7 +166,7 @@ class Controller extends Base
     {
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
-        $this->psr7Response = $this
+        $this->response = $this
             ->responseFromTemplateUnthemed('@manifest/service-worker.js', ['debug' => (bool)$this->getConfigLoader()->get('debug_mode')])
             ->withHeader('Content-Type', 'application/javascript')
         ;

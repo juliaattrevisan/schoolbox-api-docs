@@ -304,7 +304,7 @@ class Controller extends Base\Base
         $this->unitSpecificationMapper->save($unit);
         $response['unit'] = $unit->getId();
 
-        $this->psr7Response = $this->responseAsJson($response);
+        $this->response = $this->responseAsJson($response);
     }
 
 
@@ -317,7 +317,7 @@ class Controller extends Base\Base
     protected function returnJson($message, $code = 200)
     {
         if ($this->isXhrRequest()) {
-            $this->psr7Response = $this->responseAsJson($message)->withStatus($code);
+            $this->response = $this->responseAsJson($message)->withStatus($code);
         } else {
             die(json_encode($message));
         }
@@ -403,7 +403,7 @@ class Controller extends Base\Base
             $encodedReturnUrls[$unitSpecId] = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
         }
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
                 'courseSpec'        => $courseSpec,
@@ -429,7 +429,7 @@ class Controller extends Base\Base
     public function newCourse(?string $name): void
     {
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
                 'courseSpec'         => null,
@@ -510,14 +510,14 @@ class Controller extends Base\Base
 
         if ($this->isXhrRequest()) {
             // respond to XHR with JSON
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'id'              => $courseSpec->getId(),
                 'urlModifyCourse' => $this->routeGenerator->generate('course.updateCourse', ['id' => $courseSpec->getId()]),
                 'urlNewUnit'      => $this->routeGenerator->generate('course.newUnit', ['id' => $courseSpec->getId()]),
             ]);
         } else {
             // respond to synchronous POST with redirect
-            $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
+            $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
         }
     }
 
@@ -727,12 +727,12 @@ class Controller extends Base\Base
 
         if ($this->isXhrRequest()) {
             // respond to XHR with JSON
-            $this->psr7Response = $this->responseAsJson([
+            $this->response = $this->responseAsJson([
                 'id' => $courseSpec->getId(),
             ]);
         } else {
             // respond to synchronous POST with redirect
-            $this->psr7Response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
+            $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
         }
     }
 
@@ -832,7 +832,7 @@ class Controller extends Base\Base
                 'toastSelector'    => '[data-relation="ajax-response"]',
             ];
 
-            $this->psr7Response = $this->responseDependentOnRequest(
+            $this->response = $this->responseDependentOnRequest(
                 '@course/unit.twig',
                 $data,
                 self::TAB,
@@ -972,7 +972,7 @@ class Controller extends Base\Base
             ];
         }
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/courseList.twig',
             array_merge($data, $options),
             self::TAB,
@@ -1027,7 +1027,7 @@ class Controller extends Base\Base
             'encodedReturnUrl' => $query->get('encodedReturnUrl'),
         ];
 
-        $this->psr7Response = $this->responseDependentOnRequest(
+        $this->response = $this->responseDependentOnRequest(
             '@course/courseListResults.twig',
             array_merge($data, $options),
             self::TAB,
@@ -1201,7 +1201,7 @@ class Controller extends Base\Base
             'folderId' => $folderId
         ];
 
-        $this->psr7Response = $this->responseDependentOnRequest('@course/picker.twig', $data, self::TAB);
+        $this->response = $this->responseDependentOnRequest('@course/picker.twig', $data, self::TAB);
     }
 
 
@@ -1234,7 +1234,7 @@ class Controller extends Base\Base
             $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
         }
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'id'     => $courseSpec->getId(),
             'result' => 'success',
         ])->withStatus($status);
@@ -1270,7 +1270,7 @@ class Controller extends Base\Base
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitSpecificationMapper->delete($unitSpec);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'id' => $unitSpec->getId(),
         ])->withStatus($status);
     }
@@ -1305,7 +1305,7 @@ class Controller extends Base\Base
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitImplementationMapper->delete($unitImpl);
 
-        $this->psr7Response = $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'id' => $unitImpl->getId(),
         ])->withStatus($status);
     }
@@ -1340,7 +1340,7 @@ class Controller extends Base\Base
         // Don't show children if this is an invalid location
         $showChildren = $treeBuilder->isValidCourseLocation($folderId);
 
-        $this->psr7Response = $this->responseAsJson(
+        $this->response = $this->responseAsJson(
             $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
         );
     }

@@ -26,7 +26,7 @@ This will call a controller's `getContainer` method; as usual, add that to the c
  */
 public function getContainer(): void
 {
-    $this->psr7Response = $this->responseFromTemplate(
+    $this->response = $this->responseFromTemplate(
         '@greenhouse/container.twig',
         [
             'test' => 'Successful container!'

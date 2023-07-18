@@ -64,7 +64,7 @@ class Controller extends AbstractController
                 // noop
             }
 
-            $this->psr7Response = $this->responseAsJson($venues);
+            $this->response = $this->responseAsJson($venues);
         } else {
             try {
                 $allVenues = $this->mapper->findAll(
@@ -75,7 +75,7 @@ class Controller extends AbstractController
                     ]
                 );
 
-                $this->psr7Response = $this->responseFromTemplate(
+                $this->response = $this->responseFromTemplate(
                     '@sportsfixturesVenue/list.twig',
                     [
                         'allVenues' => $allVenues
@@ -98,7 +98,7 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesVenue/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesVenue/entity.twig', [
             'venue' => $entity
         ]);
     }
@@ -137,7 +137,7 @@ class Controller extends AbstractController
             $data['zoom']     = 5;
         }
 
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesVenue/create.twig', $data);
+        $this->response = $this->responseFromTemplate('@sportsfixturesVenue/create.twig', $data);
     }
 
     /**
@@ -161,7 +161,7 @@ class Controller extends AbstractController
                 $this->requestPost['address']
             );
 
-            $this->psr7Response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));
+            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }

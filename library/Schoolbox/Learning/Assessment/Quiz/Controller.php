@@ -181,7 +181,7 @@ class Controller extends Assessment\Controller
             'returnUrlSuffix' => $returnUrlSuffix
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/quiz/status.twig',
             $twigData,
             "Status of {$assessment->getTitle()}",
@@ -230,7 +230,7 @@ class Controller extends Assessment\Controller
         );
 
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->psr7Response = $this->redirectFound($sebDownload);
+            $this->response = $this->redirectFound($sebDownload);
             return;
         }
 
@@ -306,7 +306,7 @@ class Controller extends Assessment\Controller
             'externalRedirectUrl' => $externalRedirectUrl
         ];
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@learningAssessment/quiz/summary/student.twig',
             $twigData,
             "Status of {$assessment->getTitle()}",

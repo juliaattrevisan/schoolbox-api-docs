@@ -298,7 +298,7 @@ class Controller extends Base
      */
     public function getUpload()
     {
-        $this->psr7Response = $this->responseFromTemplate('@sportsfixturesImport/upload.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesImport/upload.twig', [
             'attachzone' => $this->getAttachZone()
         ]);
     }
@@ -347,10 +347,10 @@ class Controller extends Base
                 }
             }
 
-            $this->psr7Response = $this->responseAsJson($result);
+            $this->response = $this->responseAsJson($result);
         } catch (MapperException $e) {
             // Requested import didn't exist,
-            $this->psr7Response = $this->responseAsJson([]);
+            $this->response = $this->responseAsJson([]);
         }
     }
 
@@ -392,7 +392,7 @@ class Controller extends Base
      */
     public function getImport($id)
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@sportsfixturesImport/importing.twig',
             [
                 'id' => $id
@@ -479,11 +479,11 @@ class Controller extends Base
 
                 // All done!
             };
-            $this->psr7Response = $this->redirectAfterPost("/fixtures/import/{$this->import->getId()}");
+            $this->response = $this->redirectAfterPost("/fixtures/import/{$this->import->getId()}");
         } else {
             // Nothing was attached, not much to do but stare at our navels
 
-            $this->psr7Response = $this->redirectAfterPost("/fixtures/upload");
+            $this->response = $this->redirectAfterPost("/fixtures/upload");
         }
     }
 

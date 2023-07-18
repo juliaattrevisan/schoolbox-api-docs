@@ -88,7 +88,7 @@ class Controller extends Base
 
         /* Twig data
          */
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@upsRuleset/intro.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('upsRuleset.intro'),
@@ -138,7 +138,7 @@ class Controller extends Base
         $twigData['pageCurrent'] = $this->routeGenerator->generate('upsRuleset.intro');
         $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
 
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@upsRuleset/ruleset.twig',
             $twigData,
         );
@@ -189,7 +189,7 @@ class Controller extends Base
      */
     public function logs()
     {
-        $this->psr7Response = $this->responseFromTemplate(
+        $this->response = $this->responseFromTemplate(
             '@upsRuleset/log/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('upsRuleset.intro'),
@@ -252,7 +252,7 @@ class Controller extends Base
             $model  = Log\Mapper::getInstance()->findById($logId);
 
             if ('stream' === $format) {
-                $this->psr7Response = $this->responseFromTemplateStreamedData(
+                $this->response = $this->responseFromTemplateStreamedData(
                     $template,
                     Closure::fromCallable([$this, 'streamLog']),
                     [
@@ -292,7 +292,7 @@ class Controller extends Base
                     $data['useInlineCSS'] = true;
                 }
 
-                $this->psr7Response = $format === 'nochrome'
+                $this->response = $format === 'nochrome'
                     ? $this->responseFromTemplateUnthemed($template, $data)
                     : $this->responseFromTemplate($template, $data)
                 ;
@@ -305,9 +305,9 @@ class Controller extends Base
             // 400: requested a page that doesn't exist
             if ($this->isXhrRequest()) {
                 // just tell them they're naughty, that will be enough
-                $this->psr7Response = $this->responseAsJson($e->getMessage())->withStatus(400);
+                $this->response = $this->responseAsJson($e->getMessage())->withStatus(400);
             } else {
-                $this->psr7Response = $this->redirectFound($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
+                $this->response = $this->redirectFound($this->getRouteIfAuthorized('upsRuleset.log', ['logId' => $logId ]));
             }
         }
     }
@@ -470,7 +470,7 @@ class Controller extends Base
     {
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]
@@ -494,7 +494,7 @@ class Controller extends Base
     {
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasPerformUpdate', true);
-        $this->psr7Response = $this->redirectFound(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]
@@ -539,7 +539,7 @@ class Controller extends Base
         $response['sequence']   = $this->updateRuleSequence(($postData['sequence']));
         $response['customRule'] = $this->updateCustomRules($roleType, $postData['customRule'] ?? null);
 
-        $this->psr7Response = $this->responseAsJson($response);
+        $this->response = $this->responseAsJson($response);
     }
 
 
@@ -563,7 +563,7 @@ class Controller extends Base
             $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect'] ?? null);
         }
 
-        $this->psr7Response = $this->responseAsJson($response);
+        $this->response = $this->responseAsJson($response);
     }
 
     /**

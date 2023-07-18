@@ -52,11 +52,11 @@ class Controller extends Base
          */
         $weekends = 'false';
 
-        $this->psr7Response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
+        $this->response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
             'user' => $user,
             'selectedDate' => $selectedDate,
             'weekends' => $weekends
-        ], sprintf(
+        ],                                            sprintf(
             'Timetable Calendar for %s',
             $user->getFullName()
         ));
@@ -140,7 +140,7 @@ class Controller extends Base
                 }
             }
         }
-        $this->psr7Response = $this->responseAsJson($data)->withStatus($code);
+        $this->response = $this->responseAsJson($data)->withStatus($code);
     }
 
     /**
