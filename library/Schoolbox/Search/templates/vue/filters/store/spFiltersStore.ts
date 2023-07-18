@@ -9,6 +9,17 @@ import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorStore } from "./spFilterCreatorStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
 
+export type FilterData = {
+    filter: {
+        date: {
+            from: string;
+            to: string;
+        };
+        creator: string;
+        types: string[];
+    };
+};
+
 export const useFiltersStore = defineStore("spFilters", () => {
     /**
      * Are there any filters selected
@@ -39,6 +50,19 @@ export const useFiltersStore = defineStore("spFilters", () => {
     }
 
     /**
+     * Get the filter data
+     * @returns {FilterData} -
+     */
+    function getFormData() {
+        const filterData = {
+            ...useFilterDateRangeStore().getFormData(),
+            ...useFilterCreatorStore().getFormData(),
+            ...useFilterTypesStore().getFormData(),
+        };
+        return JSON.stringify(filterData);
+    }
+
+    /**
      * clear all filters
      */
     function clear() {
@@ -51,6 +75,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
         isSelected,
         isActive,
         setActive,
+        getFormData,
         clear,
     };
 });

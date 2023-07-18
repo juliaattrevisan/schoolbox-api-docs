@@ -50,6 +50,21 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     }
 
     /**
+     * Get the date range filter data
+     * @returns {string} - the date range filter data
+     */
+    function getFormData() {
+        const from = activeStartDate.value !== null ? activeStartDate.value : "";
+        const to = activeEndDate.value !== null ? activeEndDate.value : "";
+        return {
+            date: {
+                from,
+                to,
+            },
+        };
+    }
+
+    /**
      * clear the date filter
      */
     function clear() {
@@ -68,6 +83,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         isSelected,
         isActive,
         setActive,
+        getFormData,
         clear,
     };
 });

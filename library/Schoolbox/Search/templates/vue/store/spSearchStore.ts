@@ -21,6 +21,7 @@ export const useSearchStore = defineStore("spSearch", () => {
     function getQueryParams() {
         const newQueryParams = new URLSearchParams();
         newQueryParams.append("keyword", useQueryStore().activeQuery);
+        newQueryParams.append("filter", useFiltersStore().getFormData());
         return newQueryParams.toString();
     }
 

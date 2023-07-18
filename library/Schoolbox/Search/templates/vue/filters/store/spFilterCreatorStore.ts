@@ -5,8 +5,8 @@
 import { defineStore } from "pinia";
 
 export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
-    const creator = window.Vue.ref(null);
-    const activeCreator = window.Vue.ref(null);
+    const creator = window.Vue.ref<string | null>(null);
+    const activeCreator = window.Vue.ref<string | null>(null);
 
     /**
      * Is the creator filter set
@@ -29,6 +29,17 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
     }
 
     /**
+     * Get the creator filter data
+     * @returns {string} - the creator filter data
+     */
+    function getFormData() {
+        const id = isActive.value ? activeCreator.value : "";
+        return {
+            creator: id,
+        };
+    }
+
+    /**
      * clear the creator filter
      */
     function clear() {
@@ -41,6 +52,7 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
         isSelected,
         isActive,
         setActive,
+        getFormData,
         clear,
     };
 });

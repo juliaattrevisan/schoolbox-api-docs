@@ -15,31 +15,13 @@ const filterTypesStore = useFilterTypesStore();
             <ul class="option-list">
                 <li v-for="filter in filterTypesStore.allTypes" :key="filter.value">
                     <input
-                        id="selectAllOrdinary"
+                        :id="filter.value"
                         v-model="filterTypesStore.selectedTypes"
                         type="checkbox"
                         :value="filter.value"
                     />
-                    <label for="selectAllOrdinary">{{ filter.title }}</label>
+                    <label :for="filter.value">{{ filter.title }}</label>
                 </li>
-                <!-- <li>
-                    <input
-                        id="ordinaryCheckbox1"
-                        v-model="filterTypesStore.selectedTypes"
-                        type="checkbox"
-                        value="badges"
-                    />
-                    <label for="ordinaryCheckbox1">Badges</label>
-                </li>
-                <li>
-                    <input
-                        id="ordinaryCheckbox2"
-                        v-model="filterTypesStore.selectedTypes"
-                        type="checkbox"
-                        value="events"
-                    />
-                    <label for="ordinaryCheckbox2">Events</label>
-                </li> -->
             </ul>
         </fieldset>
     </section>

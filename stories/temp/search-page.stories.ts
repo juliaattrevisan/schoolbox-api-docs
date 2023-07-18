@@ -7,7 +7,7 @@ import { rest } from "msw";
 import SearchPage from "../../library/Schoolbox/Search/templates/vue/search-page.vue";
 import { data } from "./dataSearchPage";
 
-let requestCount = 0;
+let requestCount = 0; // number of times the endpoint has been called, note this won't be reset between stories
 
 /**
  * Mock Service Worker handlers to load dummy data for testing
