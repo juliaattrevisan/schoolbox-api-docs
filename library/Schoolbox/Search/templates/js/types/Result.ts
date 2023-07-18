@@ -13,14 +13,14 @@ export type Result = {
     title: string;
     image: string | null;
     description: string | null;
-    creator: {
+    creator?: {
         id: number;
         title?: string;
         firstName?: string;
         lastName?: string;
         fullName?: string;
     };
-    context: ResultContext[] | null;
+    context: ResultContext[];
     icon?: string;
     _links: {
         subResults?: string; // url to load further results froms

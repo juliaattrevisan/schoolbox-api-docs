@@ -8,7 +8,7 @@ import SpResultsHeader from "./sp-results-header.vue";
 import SpResultsPrompt from "./sp-results-prompt.vue";
 import SpResultsError from "./sp-results-error.vue";
 import SpResultsNone from "./sp-results-none.vue";
-import SpResultsList from "./sp-results-list.vue";
+import SpResultsList from "./list/sp-results-list.vue";
 import { useSearchStore } from "../store/spSearchStore";
 import { useResultsStore } from "./store/spResultsStore";
 

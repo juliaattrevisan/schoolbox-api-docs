@@ -15,7 +15,6 @@ const mswHandlers = [
     rest.get(endpoint, (req, res, ctx) => {
         return res(
             // we grab an endpoint and then modify the data before it's returned
-            ctx.delay(3000),
             ctx.json(data)
         );
     }),
@@ -92,7 +91,7 @@ export const Error: Story = {
         msw: {
             handlers: [
                 rest.get(endpoint, (req, res, ctx) => {
-                    return res(ctx.delay(1000), ctx.status(500));
+                    return res(ctx.delay(2000), ctx.status(500));
                 }),
                 ...mswHandlers,
             ],

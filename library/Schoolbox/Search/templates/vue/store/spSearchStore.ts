@@ -11,7 +11,7 @@ import type { Results } from "../../js/types/Results";
 
 export const useSearchStore = defineStore("spSearch", () => {
     const hasNotSearched = window.Vue.ref(true); // to determine whether any searches have been made
-    const isSearching = window.Vue.ref(false); // to notify that search results
+    const isSearching = window.Vue.ref(false); // to notify of searching
     const hasLoadError = window.Vue.ref(false); // to notify of a search error
     const hasSearchedWithActiveFilters = window.Vue.ref(false); // to determine whether the latest search has been made with filters
 
@@ -41,7 +41,7 @@ export const useSearchStore = defineStore("spSearch", () => {
                 },
             });
             const resultsData = (await response.json()) as Results;
-            useResultsStore().results = resultsData.data;
+            useResultsStore().setFirstResults(resultsData.data);
         } catch (error) {
             hasLoadError.value = true;
         } finally {
