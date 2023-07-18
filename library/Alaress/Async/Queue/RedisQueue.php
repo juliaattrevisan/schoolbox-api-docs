@@ -12,8 +12,10 @@ namespace Alaress\Async\Queue;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use ErrorException;
 use InvalidArgumentException;
+use Predis\Client;
 use Predis\ClientInterface;
 use Predis\Transaction\MultiExec;
 
@@ -61,7 +63,7 @@ abstract class RedisQueue implements QueueInterface
     public function drain(): void
     {
         // delete the list, which is a user's reference to the messages. they will be expired automatically (and other users may still be attached)
-        $this->redis->del([ $this->getRedisSetKey() ]);
+        $this->redis->del([$this->getRedisSetKey()]);
     }
 
 
@@ -73,8 +75,12 @@ abstract class RedisQueue implements QueueInterface
      */
     public function push(Instance $instance): void
     {
-        $id    = $this->getRedisMsgKey($instance);
-        $data  = self::deflate($instance);
+        $id   = $this->getRedisMsgKey($instance);
+        $data = self::deflate($instance);
+
+        if (!$this->redis instanceof Client) {
+            throw new InvalidArgumentException('Unexpected redis client');
+        }
 
         $this->redis->transaction(function (MultiExec $tx) use ($id, $data, $instance) {
             $ttl = $instance->getTTL() > 0 ? $instance->getTTL() : Instance::DEFAULT_TTL;
@@ -91,7 +97,7 @@ abstract class RedisQueue implements QueueInterface
      * @param NotificationBundle $bundle
      * @param bool               $dropCache
      * @return void
-     *@throws InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void
     {
@@ -193,10 +199,10 @@ abstract class RedisQueue implements QueueInterface
      * Prepare an instance for storage.
      * Inverse of inflate()
      *
-     * @param Instance $instance
+     * @param Instance|TriggerInterface $instance
      * @return string
      */
-    private static function deflate(Instance $instance): string
+    private static function deflate(Instance|TriggerInterface  $instance): string
     {
         return gzcompress(serialize($instance), self::COMPRESSION_LEVEL);
     }
@@ -207,8 +213,8 @@ abstract class RedisQueue implements QueueInterface
      * Inverse of deflate()
      *
      * @param string $data
-     * @throws InvalidArgumentException if the given payload is unable to be restored into an Instance
      * @return Instance
+     * @throws InvalidArgumentException if the given payload is unable to be restored into an Instance
      */
     private static function inflate(string $data): Instance
     {
@@ -225,6 +231,19 @@ abstract class RedisQueue implements QueueInterface
             throw new InvalidArgumentException('Could not inflate and unserialize payload');
         }
         return $unserial;
+    }
+
+    /**
+     * @param TriggerInterface $trigger
+     * @param string           $instanceId
+     * @return array
+     */
+    public static function getStorage(TriggerInterface $trigger, string $instanceId): array
+    {
+        $compressedData = self::deflate($trigger);
+        $hash           = sha1($compressedData);
+        $itemKey        = "msg:{$instanceId}:s:$hash";
+        return [$itemKey, $compressedData];
     }
 
 

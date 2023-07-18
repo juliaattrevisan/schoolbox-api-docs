@@ -29,16 +29,16 @@ interface IBroker
      * @param IConsumer $consumer
      * @return void
      */
-    public function registerConsumer(IConsumer $consumer);
+    public function registerConsumer(IConsumer $consumer): void;
 
 
     /**
      * Publish the given payload to this broker's queue.
      *
-     * @param mixed  $serializable
-     * @param array  $context
-     * @param int    $ttl
+     * @param mixed    $serializable
+     * @param array    $context
+     * @param int|null $ttl
      * @return void
      */
-    public function publish($serializable, array $context = [], int $ttl = null);
+    public function publish(mixed $serializable, array $context = [], ?int $ttl = null): void;
 }

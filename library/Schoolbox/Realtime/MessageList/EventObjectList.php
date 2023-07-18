@@ -74,8 +74,6 @@ class EventObjectList extends AbstractList
         } else {
             $this->redis->del([$this->getRedisSetKey()]);
         }
-
-        return;
     }
 
     /**

@@ -9,6 +9,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Async\Broker\StompRedis\Broker;
 use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Redis\Async;
@@ -23,7 +24,6 @@ use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Realtime\Schedule;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Schoolbox\Application\Daemon;
@@ -54,7 +54,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $amqp = $di->get('amqp');
 
         // we'll be using the schedule broker for receiving...
-        $scheduleBroker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
+        $scheduleBroker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp);
 
         /** @var Routing\Cache\Redis\ReadCache $subscriptionCache */
         $subscriptionCache = $di->get('subscriptionCache.readonly');
@@ -62,19 +62,19 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $postman = new Postman($log, $subscriptionCache, $loop, $flags, INSTANCE_ID, $redis);
 
         $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler($loop, $strat, $log, new Clock(), $conf, $postman);
+        $scheduler = new Scheduler($loop, $strat, $log, new Clock(), $conf, $postman, INSTANCE_ID);
 
         // restoring from redis cache
         $jit = new RedisCache($redis, $log, INSTANCE_ID);
         $scheduler->setJitCache($jit);
-        $jit->restoreSchedule($amqp, Schedule\Broker::QUEUE);
+        $jit->restoreSchedule($amqp, Broker::QUEUE);
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established
         $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log, $asyncRedis) {
             $log->info('Connected to STOMP', ['char' => '+']);
 
             $scheduleBroker->registerConsumer($scheduler);
-            $log->debug('Consuming amqp://' . Schedule\Broker::QUEUE);
+            $log->debug('Consuming amqp://' . Broker::QUEUE);
 
             $topic = 'scheduled.' . INSTANCE_ID . '.*';
 

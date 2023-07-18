@@ -51,11 +51,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
 
 		-
-			message: "#^Property Alaress\\\\Async\\\\Queue\\\\RedisQueue\\:\\:\\$redis \\(Predis\\\\Client\\) does not accept Predis\\\\ClientInterface\\.$#"
-			count: 1
-			path: library/Alaress/Async/Queue/RedisQueue.php
-
-		-
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Async/Test/Subscription.php
@@ -5104,11 +5099,6 @@ parameters:
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Message/RoutePermissionMapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Realtime\\\\MessageList\\\\EventObjectList\\:\\:getName\\(\\) should return string but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/MessageList/EventObjectList.php
 
 		-
 			message: "#^Access to an undefined property Ratchet\\\\ConnectionInterface\\:\\:\\$httpRequest\\.$#"

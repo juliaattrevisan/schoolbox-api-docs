@@ -27,37 +27,26 @@ use Predis\ClientInterface;
  *
  * @package Alaress\Async\Broker\StompRedis
  */
-abstract class Broker implements IBroker
+class Broker implements IBroker
 {
-    /** @var IClient */
-    private $stomp;
-
-    /** @var ClientInterface */
-    private $redis;
-
-    /** @var string */
-    private $queue;
-
-    /** @var AMQPInterface */
-    private $amqp;
-
+    public const QUEUE = 'sb.schedule';
 
     /**
-     * @param string          $queue   the name of the queue to deposit into in AMQP
+     * @param string          $instanceId
      * @param AMQPInterface   $amqp    an instance of the AMQP client interface
      * @param ClientInterface $redis   an instance of the Predis client interface
      * @param IClient|null    $stomp   an instanceof the STOMP client interface
      *                                 (only needs to be supplied if attaching a consumer, otherwise can be omitted)
      */
-    public function __construct(string $queue, AMQPInterface $amqp, ClientInterface $redis, IClient $stomp = null)
-    {
-        $this->queue = $queue;
-        $this->redis = $redis;
-        $this->amqp  = $amqp;
-        $this->stomp = $stomp;
-
+    public function __construct(
+        private string $instanceId,
+        private AMQPInterface $amqp,
+        private ClientInterface $redis,
+        private ?IClient $stomp = null
+    ) {
         // ensure the queue requested exists so we can publish to it (via the default exchange)
-        $amqp->declareQueue($queue);
+
+        $amqp->declareQueue(self::QUEUE);
     }
 
 
@@ -66,7 +55,7 @@ abstract class Broker implements IBroker
      * @return void
      * @throws ConnectionException
      */
-    public function registerConsumer(IConsumer $consumer)
+    public function registerConsumer(IConsumer $consumer): void
     {
         if (null === $this->stomp) {
             throw new ConnectionException('No STOMP connection exists');
@@ -74,13 +63,13 @@ abstract class Broker implements IBroker
 
         try {
             $this->stomp->subscribeWithAck(
-                $this->queue,
+                self::QUEUE,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
                 function (IFrame $frame, IAckResolver $resolver) use ($consumer) {
                     $resolve = new Resolver($resolver);
 
                     try {
-                        [ $key, $context ] = json_decode($frame->getBody(), true);
+                        [$key, $context] = json_decode($frame->getBody(), true);
                     } catch (\Throwable $e) {
                         // if the JSON decode fails, fall back to assuming frame.body == key
                         $key     = $frame->getBody();
@@ -130,13 +119,9 @@ abstract class Broker implements IBroker
      * @param int|null   $ttl
      * @return void
      */
-    public function publish($serializable, array $context = null, int $ttl = null)
+    public function publish(mixed $serializable, array $context = null, ?int $ttl = null): void
     {
-        $serial = serialize($serializable);
-        $gzip   = gzcompress($serial, RedisQueue::COMPRESSION_LEVEL);
-        $hash   = sha1($gzip);
-
-        $storageKey = $this->getStorageKey($serializable, $hash);
+        [$storageKey, $gzip] = RedisQueue::getStorage($serializable, $this->instanceId);
         $routingKey = $this->getRoutingKey();
         $exchange   = $this->getExchangeName();
 
@@ -147,38 +132,27 @@ abstract class Broker implements IBroker
             $this->redis->set($storageKey, $gzip);
         }
 
-        $amqpPayload = $context ? json_encode([ $storageKey, $context ]) : $storageKey;
+        $amqpPayload = $context ? json_encode([$storageKey, $context]) : $storageKey;
 
         // ...then advise AMQP to pick it up (on the default exchange)
-        $this->amqp->publish($amqpPayload, $routingKey, [ 'exchange' => $exchange ]);
+        $this->amqp->publish($amqpPayload, $routingKey, ['exchange' => $exchange]);
     }
 
 
     /**
      * @return string
      */
-    public function getQueue()
+    protected function getRoutingKey(): string
     {
-        return $this->queue;
+        return self::QUEUE; // the routing key is simply the queue's name
     }
 
 
     /**
-     * @param mixed  $serializable
-     * @param string $hash
      * @return string
      */
-    abstract protected function getStorageKey($serializable, $hash);
-
-
-    /**
-     * @return string
-     */
-    abstract protected function getRoutingKey();
-
-
-    /**
-     * @return string
-     */
-    abstract protected function getExchangeName();
+    protected function getExchangeName(): string
+    {
+        return ''; // we want to use AMQP default exchange
+    }
 }

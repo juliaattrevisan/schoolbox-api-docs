@@ -9,6 +9,7 @@
 
 namespace Alaress\Scheduler\Cache;
 
+use Alaress\Async\Broker\StompRedis\Broker;
 use Alaress\Async\Queue\RedisQueue;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Predis;
@@ -100,7 +101,7 @@ class RedisCache implements ICache
             // Restore
             $context     = ["msg:{$this->instanceId}:"];
             $amqpPayload = json_encode([$itemKey, $context]);
-            $mq->publish($amqpPayload, \Schoolbox\Realtime\Schedule\Broker::QUEUE, ['exchange' => '']);
+            $mq->publish($amqpPayload, Broker::QUEUE, ['exchange' => '']);
             $this->log->debug(sprintf("Restoring event in key %s", $itemKey));
             ++$i;
         }
@@ -126,17 +127,13 @@ class RedisCache implements ICache
      */
     public function storeCache(TriggerInterface $trigger): bool
     {
-        $compressedData = self::compress($trigger);
-        $hash           = sha1($compressedData);
-        $itemKey        = "msg:{$this->instanceId}:s:$hash";
-
-        // it should already
+        [$itemKey, $compressedData] = RedisQueue::getStorage($trigger, $this->instanceId);
         $existingData = $this->redis->get($itemKey);
         if ($existingData) {
-            $this->log->debug("Adding existing key $itemKey");
+            $this->log->debug("Back up existing key $itemKey for {$trigger->getEventObjectId()} {$trigger->getEvent()->getAction()}");
             $isset = $this->redis->sadd($this->getNamespacedKey('index'), [$itemKey]);
         } else {
-            $this->log->debug("Storing new key $itemKey");
+            $this->log->debug("Back up new key $itemKey");
             [$isset] = $this->redis->transaction(
                 function (Predis\Transaction\MultiExec $tx) use ($itemKey, $compressedData) {
                     // don't override data if it already exists (it probably doesn't matter, but hey. integrity, yo.)
@@ -152,21 +149,18 @@ class RedisCache implements ICache
     }
 
     /**
-     * @param TriggerInterface $trigger
+     * @param string $itemKey
      * @return bool
      */
-    public function removeCache(TriggerInterface $trigger): bool
+    public function removeCache(string $itemKey): bool
     {
-        $compressedData = self::compress($trigger);
-        $hash           = sha1($compressedData);
-        $itemKey        = "msg:{$this->instanceId}:s:$hash";
         $isset          = 0;
 
         // it should already
         $existingData = $this->redis->get($itemKey);
         if ($existingData) {
-            $this->log->debug("Adding existing key $itemKey");
-            $isset = $this->redis->srem($this->getNamespacedKey('index'), [$itemKey]);
+            $this->log->debug("Removing $itemKey from back up");
+            $isset = $this->redis->srem($this->getNamespacedKey('index'), $itemKey);
         }
         return (bool)$isset;
     }

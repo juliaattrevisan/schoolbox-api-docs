@@ -50,9 +50,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
-     * @param IConfigLoader             $conf
      * @param IClock                    $clock
+     * @param IConfigLoader             $conf
      * @param Postman                   $postman
+     * @param string                    $instanceId
      */
     public function __construct(
         LoopInterface $loop,
@@ -60,9 +61,11 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         LoggerInterface $log,
         IClock $clock,
         private IConfigLoader $conf,
-        private Postman $postman
+        private Postman $postman,
+        string $instanceId
     ) {
         parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        $this->instanceId = $instanceId;
 
         // register signal listeners
         $this->on(SIGHUP, [ $this, 'onHangup' ]);
@@ -236,33 +239,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         // if possible, rescue the schedule queue from certain destruction
         $this->log->debug('Attempting save of queue');
         $this->stop();
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     */
-    public function dispatchTrigger(TriggerInterface $trigger): void
-    {
-        if (count($trigger->getCallbacks()) === 0) {
-            $this->log->warning("Trigger '{$trigger->getIdString()}' has no callbacks");
-        } else {
-            parent::dispatchTrigger($trigger);
-        }
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     * @return bool
-     */
-    protected function unschedule(TriggerInterface $trigger): bool
-    {
-        // if a trigger was legitimately unscheduled, also attempt to detach it from its resolver
-        if (parent::unschedule($trigger)) {
-            return true;
-        }
-        return false;
     }
 
 

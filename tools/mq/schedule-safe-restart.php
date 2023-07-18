@@ -22,7 +22,6 @@ use Schoolbox\Di\Configurator;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
@@ -284,7 +283,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 
         $instanceId = INSTANCE_ID;
 
-        $broker = new Broker($instanceId, $amqp, $redis);
+        $broker = new \Alaress\Async\Broker\StompRedis\Broker($instanceId, $amqp, $redis);
 
         // handle this message by splitting this event and propagating its triggers
         (new Propagator($splitter, $broker, $instanceId))->propagateEvent($event);

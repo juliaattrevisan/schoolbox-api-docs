@@ -39,7 +39,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
 use Schoolbox\Mapper\Performance\IMonitor;
 use Schoolbox\Mapper\Performance\LiveMonitor;
-use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
@@ -714,7 +713,7 @@ abstract class Mapper implements IMapper
                                 new Configurator($this->getDi()),
                             ),
                         ),
-                        new Broker(
+                        new \Alaress\Async\Broker\StompRedis\Broker(
                             INSTANCE_ID,
                             $this->getDi()->get('amqp'),
                             $this->getDi()->get('redis.storage'),
