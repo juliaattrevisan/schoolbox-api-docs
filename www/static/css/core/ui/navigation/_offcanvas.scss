@@ -141,7 +141,7 @@ $menu-slide: "transform 500ms ease" !default;
 @mixin off-canvas-wrap {
     @include kill-flicker;
     @include wrap-base;
-    overflow: hidden;
+    overflow: clip; /* Clip rather than hidden so that position: 'sticky' can be used within. */
     &.move-right,
     &.move-left,
     &.move-bottom,

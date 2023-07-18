@@ -252,6 +252,19 @@ $rotate-th-width: $square-grid-td-size;
 $rotate-span-width: 11rem;
 
 .square-grid {
+    thead > tr > th {
+        position: sticky;
+        z-index: 2;
+    }
+
+    thead > tr:nth-child(1) > th {
+        top: 0;
+    }
+
+    thead > tr:nth-child(2) > th {
+        top: $rotate-width * 2 + 1; /* To match '.rotate-headers th' height set below */
+    }
+
     td,
     thead th {
         width: $square-grid-td-size;

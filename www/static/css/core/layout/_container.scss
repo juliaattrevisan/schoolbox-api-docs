@@ -5,7 +5,7 @@
 
 .main {
     flex: 1;
-    overflow: hidden;
+    overflow: clip; /* Clip rather than hidden so that position: 'sticky' can be used within. */
 }
 
 #container {

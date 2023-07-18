@@ -58,7 +58,7 @@
             <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpec.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a></li>
         </ul>
     </div>
-    <div class="small-12 columns" style="overflow-x: scroll;">
+    <div class="small-12 columns" style="overflow-x: clip;"> {# Overflow 'clip' rather than 'hidden' so that position: 'sticky' can be used within. #}
         <table class="square-grid marksheet" data-mark-sheet>
             <thead>
             <tr class="rotate-headers">
