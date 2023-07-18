@@ -32,7 +32,6 @@ use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -361,7 +360,7 @@ class Kernel extends WebKernelAbstract
                 ),
                 E_USER_WARNING,
             );
-            $psr7Response = $controller->getResponseFactory()->createResponse(HttpResponse::HTTP_NO_CONTENT);
+            $psr7Response = $controller->getResponseFactory()->createResponse();
             $redirect     = false;
             $isJson       = false;
         }
