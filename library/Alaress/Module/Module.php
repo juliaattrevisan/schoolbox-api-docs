@@ -680,7 +680,7 @@ class Module
         );
 
         $controller
-            ->setPsr7Request($request)
+            ->setRequest($request)
             ->setRequestQuery($requestQuery)
             ->setRequestPost($requestPost)
             ->setResponseFactory($container->get('httpResponseFactory'))

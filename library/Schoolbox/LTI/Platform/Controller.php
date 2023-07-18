@@ -94,7 +94,7 @@ class Controller extends Base
         $message = (new OidcAuthenticationRequestFactory(
             $this->registrations,
             $this->userAuthenticator,
-        ))->build($this->psr7Request);
+        ))->build($this->request);
 
         $this->psr7Response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
@@ -140,7 +140,7 @@ class Controller extends Base
         // Build the access token response
         $generator          = new AccessTokenResponseGenerator($this->keyChains, $factory);
         $this->psr7Response = $generator->generate(
-            $this->psr7Request,
+            $this->request,
             (new ResponseFactory())->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
@@ -186,7 +186,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->psr7Request);
+        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->request);
         if ($result->hasError()) {
             throw new LtiException($result->getError());
         }

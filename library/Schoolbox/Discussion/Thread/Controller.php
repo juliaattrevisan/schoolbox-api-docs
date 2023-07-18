@@ -122,7 +122,7 @@ class Controller extends BaseController
      */
     public function createThread(IThreadLocation $context): void
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
 
         /* Presume a new thread if you accessed this method
          * but check whether you are actually allowed, first.
@@ -187,7 +187,7 @@ class Controller extends BaseController
      */
     public function createCommentInThread(Model $thread, IThreadLocation $context): void
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
 
         $comment = $this->commentMapper->createModel()
             ->setThread($thread)

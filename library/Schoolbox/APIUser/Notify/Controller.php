@@ -41,7 +41,7 @@ class Controller extends Base
      */
     public function apiUserNotify(User $user): void
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
         //check for required fields
         if ('' === ($data['message'] ?? '')) {
             $problem = (new ApiProblem("'message' is not set"))

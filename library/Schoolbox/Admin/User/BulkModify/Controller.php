@@ -128,7 +128,7 @@ class Controller extends Base
      */
     public function getUserList()
     {
-        $selected = $this->psr7Request->getParsedBody();
+        $selected = $this->request->getParsedBody();
         /* If there were any search results, display control options
          */
         $userList = $this->userBulkMapper->bulkModifySearch(

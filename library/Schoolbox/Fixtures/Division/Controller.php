@@ -164,7 +164,7 @@ class Controller extends AbstractController
             'division' => $entity,
             'sport'    => $context,
             'action'   => $entity->getId() ? 'Modify' : 'Create',
-            'referer'  => base64_encode($this->psr7Request->getHeaderLine('Referer'))
+            'referer'  => base64_encode($this->request->getHeaderLine('Referer'))
         ]);
     }
 

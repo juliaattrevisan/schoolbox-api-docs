@@ -117,7 +117,7 @@ class Controller extends Base
         $params = new News\Querystring($this->requestQuery);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order' => ['publish_at' => 'desc']]);
-        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->getServerParams()));
 
         /* Attachment counts for each article in this set
          */

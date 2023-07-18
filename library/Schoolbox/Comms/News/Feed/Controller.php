@@ -151,12 +151,12 @@ class Controller extends Base
             'folder'     => $folder,
             'title'      => $this->getConfigLoader()->get('title'),
             'schoolName' => $this->getConfigLoader()->get('school_name'),
-            'baseUrl'    => $this->psr7Request->getUri()
-                                              ->withPath('')
-                                              ->withQuery('')
-                                              ->withFragment('')
-                                              ->__toString(),
-            'url'        => $this->psr7Request->getUri()->__toString(),
+            'baseUrl'    => $this->request->getUri()
+                                          ->withPath('')
+                                          ->withQuery('')
+                                          ->withFragment('')
+                                          ->__toString(),
+            'url'        => $this->request->getUri()->__toString(),
             'referrer'   => News\Statistics\Mapper::REFERRER_RSS,
             'articles'   => $articles,
         ];

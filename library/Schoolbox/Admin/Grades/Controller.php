@@ -120,7 +120,7 @@ class Controller extends Base
      */
     public function postSaveGrades(): void
     {
-        $payload          = $this->psr7Request->getParsedBody();
+        $payload          = $this->request->getParsedBody();
         $gradeLevelGroups = $this->gradeLevelGroupMapper->createCollection();
 
         foreach ($payload as $gradeLevelGroupPayload) {

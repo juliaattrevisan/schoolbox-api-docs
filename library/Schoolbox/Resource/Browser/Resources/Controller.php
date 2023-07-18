@@ -81,7 +81,7 @@ class Controller extends AbstractController
 
         $folderId = $link->getFolder()->getId();
 
-        $server = $this->psr7Request->getServerParams();
+        $server = $this->request->getServerParams();
 
         $data = [
             'file'       => $link,
@@ -275,7 +275,7 @@ class Controller extends AbstractController
      */
     public function patchFileInfo(Resource\File\Model $file)
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
         if (isset($data['hidden'])) {
             $file->setHidden($data['hidden']);
         } else {

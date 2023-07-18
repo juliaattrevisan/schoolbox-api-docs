@@ -139,7 +139,7 @@ class Controller extends Base
      */
     private function persistTextbox(Model $model): Model
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
         return $model->setHeading($data['heading'])
                      ->setBody($data['body'])
                      ->setDeletedAt(null);

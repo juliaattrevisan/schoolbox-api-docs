@@ -143,7 +143,7 @@ class Controller extends Web\Controller\Base
 
             // key validated; you may proceed
             /** @var UploadedFileInterface|null $file */
-            $file = $this->getPsr7Request()->getUploadedFiles()['file'] ?? null;
+            $file = $this->getRequest()->getUploadedFiles()['file'] ?? null;
 
             if (!$file) {
                 throw new InvalidArgumentException('No CSV was received by the server.', 400);

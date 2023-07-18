@@ -128,7 +128,7 @@ class Controller extends AbstractController
     public function getList($context = null)
     {
         // ajax a list of Teams for a particular Division
-        if (str_contains($this->psr7Request->getHeaderLine('accept'), 'application/json')) {
+        if (str_contains($this->request->getHeaderLine('accept'), 'application/json')) {
             $this->getJsonList($context);
         } else {
             $this->getHtmlList($context);

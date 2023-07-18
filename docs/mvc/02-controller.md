@@ -21,7 +21,7 @@ respectively.
 
 ### 2.2.1 Reading data from the Request
 
-`$this->psr7Request` is a standard PSR-7 `ServerRequestInterface` object which
+`$this->request` is a standard PSR-7 `ServerRequestInterface` object which
 represents the incoming HTTP request.
 
 For example, the following request information may be accessed with these
@@ -43,7 +43,7 @@ instance.
 
 #### 2.2.1.1 Helpers for GET and POST vars
 
-Querystring parameters may be fetched from `$this->psr7Request->getQueryParams()`,
+Querystring parameters may be fetched from `$this->request->getQueryParams()`,
 but are better obtained using the `$this->requestQuery` helper property.
 
 To access a particular querystring parameter `cat`, you can use:
@@ -52,7 +52,7 @@ To access a particular querystring parameter `cat`, you can use:
 $this->requestQuery['cat']
 ```
 
-Likewise: POST parameters can be fetched from `$this->psr7Request->getParsedBody()`,
+Likewise: POST parameters can be fetched from `$this->request->getParsedBody()`,
 but are better obtained using the `$this->requestPost` helper property.
 
 ```php

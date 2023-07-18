@@ -41,7 +41,7 @@ abstract class Base
      * A PSR-7 compliant request object, which represents the current incoming
      * request.
      */
-    protected ServerRequestInterface $psr7Request;
+    protected ServerRequestInterface $request;
 
     /**
      * A values container, representing the parsed query string (a.k.a. $_GET).
@@ -153,18 +153,18 @@ abstract class Base
     /**
      * @return ServerRequestInterface
      */
-    public function getPsr7Request(): ServerRequestInterface
+    public function getRequest(): ServerRequestInterface
     {
-        return $this->psr7Request;
+        return $this->request;
     }
 
     /**
-     * @param ServerRequestInterface $psr7Request
+     * @param ServerRequestInterface $request
      * @return $this
      */
-    public function setPsr7Request(ServerRequestInterface $psr7Request): self
+    public function setRequest(ServerRequestInterface $request): self
     {
-        $this->psr7Request = $psr7Request;
+        $this->request = $request;
         return $this;
     }
 
@@ -377,7 +377,7 @@ abstract class Base
      */
     public function isJsonRequest(): bool
     {
-        return $this->isJsonSpec->isSatisfiedBy($this->psr7Request);
+        return $this->isJsonSpec->isSatisfiedBy($this->request);
     }
 
 
@@ -402,7 +402,7 @@ abstract class Base
      */
     public function isXhrRequest(): bool
     {
-        return $this->isXhrSpec->isSatisfiedBy($this->psr7Request);
+        return $this->isXhrSpec->isSatisfiedBy($this->request);
     }
 
 

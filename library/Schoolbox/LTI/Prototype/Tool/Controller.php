@@ -29,7 +29,7 @@ class Controller extends Base
     {
         // Handle the OIDC initiation on the tool side
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#2-tool-side-oidc-initiation
-        $message = (new OidcInitiationRequestFactory($this->buildRegistrationRepository()))->build($this->psr7Request);
+        $message = (new OidcInitiationRequestFactory($this->buildRegistrationRepository()))->build($this->request);
         $this->psr7Response = $this->responseFromTemplateUnthemed(
             '@ltiPrototypeTool/oidcInitiationRequest.twig',
             ['message' => $message,]
@@ -57,7 +57,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#4-tool-side-launch-validation
-        $result = (new PlatformOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->psr7Request);
+        $result = (new PlatformOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
         $this->psr7Response = $this->responseFromTemplateUnthemed(
             '@ltiPrototypeTool/launch.twig',
             ['result' => $result]

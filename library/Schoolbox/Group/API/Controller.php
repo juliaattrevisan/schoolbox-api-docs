@@ -164,7 +164,7 @@ class Controller extends Base
      */
     private function processGroupPostData(UserGroupAccess $userAccess, User $user, Group $group, bool $isPatch)
     {
-        $post = $this->psr7Request->getParsedBody();
+        $post = $this->request->getParsedBody();
 
         try {
             /** @var UserGroupAccess $newAccess */

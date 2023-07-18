@@ -291,7 +291,7 @@ class Controller extends Base
      */
     public function postBadge(?Model $badge): void
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
 
         // TODO figure out a better way to handle backend validation than this
         if (trim($data['name']) === '') {

@@ -242,7 +242,7 @@ class Controller extends Base
      */
     public function postMomentForUsers(Collection $users): void
     {
-        $requestBody = $this->psr7Request->getParsedBody();
+        $requestBody = $this->request->getParsedBody();
 
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
@@ -319,7 +319,7 @@ class Controller extends Base
      */
     public function putEvidence(Model $evidence): void
     {
-        $requestBody       = $this->psr7Request->getParsedBody();
+        $requestBody       = $this->request->getParsedBody();
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());

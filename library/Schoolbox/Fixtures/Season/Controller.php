@@ -75,7 +75,7 @@ class Controller extends AbstractController
 
         /* ajax a list of seasons
          */
-        if (str_contains($this->psr7Request->getHeaderLine('accept'), 'application/json')) {
+        if (str_contains($this->request->getHeaderLine('accept'), 'application/json')) {
             // quote the query string to protect against injection and the like
             $query = $this->requestQuery->get('query');
 

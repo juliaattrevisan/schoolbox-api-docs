@@ -265,7 +265,7 @@ class Controller extends Base
         }
 
         // requires filter params and returnUrl
-        $requestUri = RequestUriParser::parseUrlPath($this->psr7Request->getServerParams());
+        $requestUri = RequestUriParser::parseUrlPath($this->request->getServerParams());
         $returnUrl  = $requestUri . '?' . http_build_query($queryArgs);
 
         $translator = new User\Translator\Author\ModelToArray();
@@ -502,7 +502,7 @@ class Controller extends Base
      */
     private function createAwards(Model $badge, string $awardStatus): void
     {
-        $data    = $this->psr7Request->getParsedBody();
+        $data    = $this->request->getParsedBody();
         $userIds = array_column($data['users'] ?? [], 'id');
         if (empty($userIds)) {
             $this->sendJsonError("No users provided to set $awardStatus", 400);
