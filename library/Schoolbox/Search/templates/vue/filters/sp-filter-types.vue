@@ -13,16 +13,16 @@ const filterTypesStore = useFilterTypesStore();
     <section class="content">
         <fieldset class="checklist">
             <ul class="option-list">
-                <li>
+                <li v-for="filter in filterTypesStore.allTypes" :key="filter.value">
                     <input
                         id="selectAllOrdinary"
                         v-model="filterTypesStore.selectedTypes"
                         type="checkbox"
-                        value="assessments"
+                        :value="filter.value"
                     />
-                    <label for="selectAllOrdinary">Assessments</label>
+                    <label for="selectAllOrdinary">{{ filter.title }}</label>
                 </li>
-                <li>
+                <!-- <li>
                     <input
                         id="ordinaryCheckbox1"
                         v-model="filterTypesStore.selectedTypes"
@@ -39,7 +39,7 @@ const filterTypesStore = useFilterTypesStore();
                         value="events"
                     />
                     <label for="ordinaryCheckbox2">Events</label>
-                </li>
+                </li> -->
             </ul>
         </fieldset>
     </section>

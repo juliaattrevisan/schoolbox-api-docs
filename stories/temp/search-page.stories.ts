@@ -47,6 +47,16 @@ const mswHandlers = [
 const meta: Meta<typeof SearchPage> = {
     args: {
         endpoint,
+        filterTypes: [
+            {
+                title: "Badge",
+                value: "badge",
+            },
+            {
+                title: "Event",
+                value: "event",
+            },
+        ],
     },
     component: SearchPage,
     decorators: [

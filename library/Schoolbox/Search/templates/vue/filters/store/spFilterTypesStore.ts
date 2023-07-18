@@ -4,8 +4,13 @@
 
 import { defineStore } from "pinia";
 
+export type FilterType = {
+    title: string;
+    value: string;
+};
+
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
-    const allTypes = window.Vue.ref([]); // all filters passed in
+    const allTypes = window.Vue.ref<FilterType[]>([]); //
     const selectedTypes = window.Vue.ref([]); // the currently selected filters
     const activeTypes = window.Vue.ref([]); // the currently selected filters
 

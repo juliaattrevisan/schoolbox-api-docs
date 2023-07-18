@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
 
 export const useStore = defineStore("searchPage", () => {
     const endpoint = window.Vue.ref(""); // to display loading note
@@ -21,10 +22,12 @@ export const useStore = defineStore("searchPage", () => {
     /**
      * store any passed through properties
      * @param {string} $endpoint - the search api url
+     * @param {FilterType[]} $filterTypes - the filter types
      */
-    function init($endpoint: string) {
+    function init($endpoint: string, $filterTypes: FilterType[]) {
         checkForStorybook();
         endpoint.value = $endpoint;
+        useFilterTypesStore().allTypes = $filterTypes;
     }
 
     return {
