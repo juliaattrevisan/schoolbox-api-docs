@@ -297,7 +297,7 @@ class ListController extends Web\Controller\Base
             $post = $this->getRequest()->post->getArrayCopy();
             $post['context'] = $context;
 
-            $assessmentInfo = $this->persistAssessment($this->getUser(), $post, createAssessment: true);
+            $assessmentInfo = $this->persistAssessment($this->getUser(), $post);
 
             $type       = AssessmentType::objectToString($assessmentInfo['assessment']);
             $controller = $this->getDelegateController($type);
@@ -629,10 +629,9 @@ class ListController extends Web\Controller\Base
      * @param User              $user
      * @param array|Traversable $postData
      * @param IAssessable|null  $assessment
-     * @param bool              $createAssessment
      * @return array
      */
-    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null, bool $createAssessment = false): array
+    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
@@ -682,7 +681,7 @@ class ListController extends Web\Controller\Base
             // Note: in the returned collection
             //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
             //    - any plans UPDATED by this method will be ID INDEXED
-            $plans = $this->savePlanData($assessment, $postData['plans'] ?? [], $createAssessment);
+            $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
             $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         } catch (\Exception $e) {
