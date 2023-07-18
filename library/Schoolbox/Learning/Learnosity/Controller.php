@@ -340,20 +340,58 @@ class Controller extends Base
      */
     public function getArchiveReferences(): void
     {
-        $references = [
-            '8a841c38-c4ab-4dc0-827e-1927c071c9c4',
-            '785f3e5a-4338-491e-a3e8-9b592e5774bc',
+        $activityId = '82b2d7f3-2678-4138-be64-2e7561e6d1a3';
+
+        /* List of Items
+         */
+        $activities = $this->api->dataGetRequest('/itembank/activities', [
+            'references' => [
+                $activityId
+            ]
+        ]);
+
+        /* Find all the items associated with the activity
+         */
+        $activityPayload = [
+            'activities' => []
         ];
 
-        foreach ($references as $reference) {
-            $payload = [
-                'reference' => $reference,
-                'status' => 'archived'
+        foreach ($activities['data'] as $activity) {
+            /* Shank the activity into the Archived state
+             */
+            $updatedActivity = $activity;
+            $updatedActivity['status'] = 'archived';
+            $activityPayload['activities'][] = $updatedActivity;
+
+            $activityArchiveResult = $this->api->dataSetRequest('/itembank/activities', $activityPayload);
+
+            /* Then shank its items into the Archived state
+             */
+            $references = [];
+
+            foreach ($activity['data']['items'] as $item) {
+                $references[] = $item['reference'];
+            }
+
+            /* Get all the items' details so we can archive it
+             * and all its related pieces
+             */
+            $items = $this->api->dataGetRequest('/itembank/items', ['references' => $references]);
+
+            $itemsPayload = [
+                'items' => []
             ];
 
-            $result = $this->api->dataRequest('/itembank/questions', $payload, 'post');
+            foreach ($items['data'] as $item) {
+                $updatedItem = $item;
+                $updatedItem['status'] = 'archived';
 
-            new \Alaress_Probe($result);
+                $itemsPayload['items'][] = $updatedItem;
+            }
+
+            /* Shank them into the Archived state
+             */
+            $itemArchiveResult = $this->api->dataSetRequest('/itembank/items', $itemsPayload);
         }
     }
 
