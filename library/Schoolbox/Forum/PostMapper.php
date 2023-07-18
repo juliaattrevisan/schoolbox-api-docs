@@ -127,7 +127,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
             LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner', true)}
             WHERE post.postID=? ";
 
-        $statement = $this->databaseRead->prepare($query);
+        $statement = $this->database->prepare($query);
         $statement->execute(array($id));
 
         if (($row = $statement->fetch()) !== false) {
@@ -159,7 +159,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
         $limit = (int)$limit;
         $offset = (int)$offset;
 
-        $stmt = $this->databaseRead->prepare("
+        $stmt = $this->database->prepare("
             SELECT
                 {$this->getColumnString('p')},
                 {$this->getJoinColumnString('owner', 'o')},
@@ -220,7 +220,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
             WHERE post.parentID IS NULL AND post.threadID=?
             LIMIT 1";
 
-        $statement = $this->databaseRead->prepare($query);
+        $statement = $this->database->prepare($query);
         $statement->execute(array($threadID));
 
         if (($row = $statement->fetch()) !== false) {
@@ -300,7 +300,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
      */
     public function getPageNumber(Post $post)
     {
-        $stmt = $this->databaseRead->prepare("SELECT count(*) as postCount FROM forumPost
+        $stmt = $this->database->prepare("SELECT count(*) as postCount FROM forumPost
         WHERE deleted = 'false'
             AND threadID = :threadId
             AND postID <= :postId");

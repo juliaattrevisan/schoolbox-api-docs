@@ -743,11 +743,10 @@ class ListController extends Web\Controller\Base
      *
      * @param IAssessable $assessment
      * @param array       $postPlans
-     * @param bool        $createAssessment
      * @return GenericCollection|PlanModel[]
      * @throws MapperException
      */
-    private function savePlanData(IAssessable $assessment, array $postPlans = [], bool $createAssessment = false)
+    private function savePlanData(IAssessable $assessment, array $postPlans = [])
     {
         $assessmentId = $assessment->getId();
         $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];

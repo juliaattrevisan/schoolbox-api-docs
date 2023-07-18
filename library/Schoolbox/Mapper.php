@@ -466,9 +466,9 @@ abstract class Mapper implements IMapper
 
         //Read Only DB
         try {
-            $this->databaseRead = Factory::getInstanceInternalRead();
+            $this->database = Factory::getInstanceInternalRead();
         } catch (DatabaseException $e) {
-            $this->databaseRead = new NullConnector();
+            $this->database = new NullConnector();
         }
     }
 
@@ -670,7 +670,7 @@ abstract class Mapper implements IMapper
      */
     public function setDatabaseRead($database)
     {
-        $this->databaseRead = $database;
+        $this->database = $database;
         return $this;
     }
 
@@ -681,7 +681,7 @@ abstract class Mapper implements IMapper
      */
     public function getDatabaseRead(): IConnector
     {
-        return $this->databaseRead;
+        return $this->database;
     }
 
     /**

@@ -265,10 +265,9 @@ class Component_InstanceMapper extends BaseMapper
 
     /**
      * @param int $id
-     * @param array $options
      * @return Component_Instance|null
      */
-    public function findByInstanceId($id, $options = [])
+    public function findByInstanceId($id)
     {
         $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
@@ -282,16 +281,15 @@ class Component_InstanceMapper extends BaseMapper
 
         return $this->findByFields($sql, [
             ':id' => $id
-        ], $options)->first();
+        ])->first();
     }
 
     /**
      * @param string $sql
      * @param array $fields
-     * @param array $options
      * @return Component_Instance[]|GenericCollection
      */
-    protected function findByFields($sql, $fields, $options = [])
+    protected function findByFields($sql, $fields)
     {
         $statement = $this->database->prepare($sql);
 
@@ -658,7 +656,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findComponentByConfigValue($key, $value)
     {
-        $stmt = $this->databaseRead->prepare("
+        $stmt = $this->database->prepare("
 			SELECT    `component_instance_id`
 			FROM      `component_config_instance`
 			WHERE     `value` = :value AND

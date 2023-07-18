@@ -573,7 +573,7 @@ class UserMapper extends Mapper
             WHERE
         " . implode(' AND ', $pb->getWhere());
 
-        $statement = $this->databaseRead->prepare($query);
+        $statement = $this->database->prepare($query);
 
         $statement->execute($pb->getParams());
 
@@ -698,7 +698,7 @@ class UserMapper extends Mapper
         if (is_array($order) && !empty($order)) {
             $order_parts = array();
             foreach ($order as $column => $direction) {
-                $order_parts[] = $this->databaseRead->getQuoter()->quoteIdentifier($column) . (strtoupper($direction) == 'DESC' ? ' DESC' : ' ASC');
+                $order_parts[] = $this->database->getQuoter()->quoteIdentifier($column) . (strtoupper($direction) == 'DESC' ? ' DESC' : ' ASC');
             }
             $query .= ' ORDER BY ' . (implode(', ', $order_parts));
         }
@@ -1069,7 +1069,7 @@ class UserMapper extends Mapper
     public function getCalendarView(int $userId): string
     {
         $query = "SELECT calendar_view FROM {$this->table} WHERE id = :userId";
-        return $this->databaseRead->query($query, ['userId' => $userId])->fetchColumn();
+        return $this->database->query($query, ['userId' => $userId])->fetchColumn();
     }
 
     /**

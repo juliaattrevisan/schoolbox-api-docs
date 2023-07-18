@@ -80,7 +80,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             AND `key` = :key
         ";
 
-        $statement = $this->databaseRead->prepare($query);
+        $statement = $this->database->prepare($query);
         $statement->bindParam(':instanceId', $instanceId);
         $statement->bindParam(':key', $key);
         $statement->execute();

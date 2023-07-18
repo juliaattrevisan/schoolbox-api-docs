@@ -31,7 +31,7 @@ class ReadReplicatedProxy implements IConnector
      * If a read happens less than this long after a write: send the query to
      * the write connection instead of to a read replica.
      */
-    public const DEFAULT_REPLICATION_LAG_LEEWAY = 1000;
+    public const DEFAULT_REPLICATION_LAG_LEEWAY = 1.000;
 
     /**
      * Current last write time (if any).
@@ -178,7 +178,8 @@ class ReadReplicatedProxy implements IConnector
      */
     public function enableMultipleActiveResultSets()
     {
-        $this->determineConnector()->enableMultipleActiveResultSets();
+        $this->writeConnector->enableMultipleActiveResultSets();
+        $this->readReplicaConnector->enableMultipleActiveResultSets();
         return $this;
     }
 
@@ -189,19 +190,21 @@ class ReadReplicatedProxy implements IConnector
      */
     public function disableMultipleActiveResultSets()
     {
-        $this->determineConnector()->disableMultipleActiveResultSets();
+        $this->writeConnector->disableMultipleActiveResultSets();
+        $this->readReplicaConnector->disableMultipleActiveResultSets();
         return $this;
     }
 
     /**
-     * Set the timezone on the connection (Note this is only appplicable on MySQL connections)
+     * Set the timezone on the all db connections (Note this is only appplicable on MySQL connections)
      *
      * @param string $timezone A valid timezone
      * @return $this
      */
     public function setTimezone($timezone)
     {
-        $this->determineConnector()->setTimezone($timezone);
+        $this->writeConnector->setTimezone($timezone);
+        $this->readReplicaConnector->setTimezone($timezone);
         return $this;
     }
 

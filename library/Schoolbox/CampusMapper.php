@@ -107,7 +107,7 @@ class CampusMapper extends Mapper
                 ORDER BY luCampus.sequence
 			";
 
-        $statement = $this->databaseRead->prepare($query);
+        $statement = $this->database->prepare($query);
 
         $statement->execute(
             [
@@ -137,7 +137,7 @@ class CampusMapper extends Mapper
     {
         $uMap = UserMapper::getInstance();
 
-        $stmt = $this->databaseRead->prepare(
+        $stmt = $this->database->prepare(
             "
             SELECT {$uMap->getColumnString('u')}
             FROM userCampus c
@@ -184,7 +184,7 @@ class CampusMapper extends Mapper
             ORDER BY c.name
         ";
 
-        $statement = $this->databaseRead->prepare($query);
+        $statement = $this->database->prepare($query);
         $statement->execute(
             [
                 'name' => "%{$name}%",

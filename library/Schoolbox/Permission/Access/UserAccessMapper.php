@@ -473,7 +473,7 @@ class UserAccessMapper extends Mapper
             ORDER BY ua.type DESC, u.lastname, u.chosen_name
         ";
 
-        $stmt = $this->databaseRead->prepare($query);
+        $stmt = $this->database->prepare($query);
         $stmt->execute($outerPb->getParams());
 
         /** @noinspection PhpAssignmentInConditionInspection */
