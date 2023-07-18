@@ -13,6 +13,7 @@ use Aura\Router\Generator;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Learning\Assessment\Lti\Model;
+use Schoolbox\LTI\Provider\Model as LtiToolModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
@@ -50,22 +51,25 @@ class ClaimFactory
      */
     public function buildForAssessmentAndUser(Model $assessment, User $user, ?int $height): LaunchPresentationClaim
     {
-        $returnUrl = $this->access->isInstructor($user, $assessment->getBaseContext()->getFolder())
-            ? $this->routeGenerator->generate(
-                'learningAssessment.getLaunchAssessmentAsInstructorReturn',
-                [
-                    'assessmentId' => $assessment->getId(),
-                    'target'       => $assessment->getLtiTool()->getTarget(),
-                ]
-            )
-            : $this->routeGenerator->generate(
-                'learningAssessment.getLaunchAssessmentAsStudentReturn',
-                [
-                    'assessmentId' => $assessment->getId(),
-                    'studentId'    => $user->getId(),
-                    'target'       => $assessment->getLtiTool()->getTarget(),
-                ]
-            );
+        $hasInstructorAccess = $this->access->isInstructor($user, $assessment->getBaseContext()->getFolder());
+        $launchTarget        = $assessment->getLtiTool()->getTarget();
+        if ($hasInstructorAccess) {
+            $route = $launchTarget === LtiToolModel::TARGET_WINDOW
+                ? 'learningAssessment.getLaunchAssessmentAsInstructorReturnWindow'
+                : 'learningAssessment.getLaunchAssessmentAsInstructorReturnIframe'
+            ;
+            $params = ['assessmentId' => $assessment->getId()];
+        } else {
+            $route = $launchTarget === LtiToolModel::TARGET_WINDOW
+                ? 'learningAssessment.getLaunchAssessmentAsStudentReturnWindow'
+                : 'learningAssessment.getLaunchAssessmentAsStudentReturnIframe'
+            ;
+            $params = [
+                'assessmentId' => $assessment->getId(),
+                'studentId'    => $user->getId(),
+            ];
+        }
+        $returnUrl = $this->routeGenerator->generate($route, $params);
         return new LaunchPresentationClaim(
             $assessment->getLtiTool()->getTarget(),
             isset($height) ? (string)$height : null,

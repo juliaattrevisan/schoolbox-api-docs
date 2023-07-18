@@ -1,0 +1,31 @@
+<style>
+    /**
+     * Fade in the show redirect link
+     */
+    #redirect-prompt {
+        animation: fadeIn 1s;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+</style>
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        // Redirect
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => window.parent.location.href = '{{ returnUrl }}',
+        );
+
+        // 3s and still no redirect? Show the link
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => window.setTimeout(
+                () => document.getElementById('redirect-prompt').classList.remove('hide'),
+                3000,
+            ),
+        );
+    </script>
+{% endautoescape %}

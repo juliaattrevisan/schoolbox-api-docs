@@ -13,14 +13,10 @@
         <div class="small-12 island">
             <section class="content">
                 <p>You will soon automatically return to the activity page.</p>
-                <p>If you are not automatically returned, <a target="_parent" href="{{ returnUrl }}">click here</a>.</p>
+                <p id="redirect-prompt" class="hide">If you are not automatically returned, <a target="_parent" href="{{ returnUrl }}">click here</a>.</p>
             </section>
         </div>
     </div>
 </div>
 
-{% autoescape 'js' %}
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => window.parent.location.href = '{{ returnUrl }}')
-    </script>
-{% endautoescape %}
+{% include '@learningAssessment/lti/return/fragments/redirect.twig' with {returnUrl: returnUrl} only %}
