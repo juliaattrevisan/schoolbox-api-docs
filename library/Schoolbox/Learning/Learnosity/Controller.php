@@ -347,7 +347,7 @@ class Controller extends Base
     public function getArchiveReferences(): void
     {
         $activityReferences = [
-            '3b96245e-190a-4ff3-a110-47062b6ea66f',
+            'aaabbbbbbcccccddddd',
         ];
 
         $messages = [];
@@ -357,7 +357,6 @@ class Controller extends Base
                 $this->getArchiveReference($activityReference);
             } catch (\RuntimeException $e) {
                 $messages[] = $e->getMessage();
-
             }
         }
 
@@ -372,18 +371,18 @@ class Controller extends Base
      * If you can't delete an activity because it tells you that you need a published item,
      * also check any Welcome/Exit screens - those are Items too
      *
-     * @param string $activityReference
+     * @param string $learnosityReference
      * @return void
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    private function getArchiveReference(string $activityReference): void
+    public function getArchiveReference(string $learnosityReference): void
     {
         /* List of Items
          */
         $activities = $this->api->dataGetRequest('/itembank/activities', [
             'references' => [
-                $activityReference
+                $learnosityReference
             ]
         ]);
 
@@ -440,7 +439,14 @@ class Controller extends Base
     {
         $payload = [
             'mode' => 'activity_list',
-
+            'config' => [
+                'activity_list' => [
+                    'title' => [
+                        'show' => true,
+                        'show_reference' => true
+                    ]
+                ]
+            ],
             'user' => [
                 /* Corresponds to a user in the Learnosity Console who will be
                  * considered "the author" of stuff created by the school's teachers
