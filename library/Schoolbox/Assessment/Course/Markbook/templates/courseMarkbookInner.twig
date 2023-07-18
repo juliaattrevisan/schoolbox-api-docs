@@ -58,12 +58,12 @@
             <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpec.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a></li>
         </ul>
     </div>
-    <div class="small-12 columns" style="overflow-x: clip;"> {# Overflow 'clip' rather than 'hidden' so that position: 'sticky' can be used within. #}
+    <div class="square-grid-container small-12 columns">
         <table class="square-grid marksheet" data-mark-sheet>
             <thead>
             <tr class="rotate-headers">
-                <th></th>
-                <th><div><span>Student Weighted Average</span></div></th>
+                <th class="fixed-left"><div><span></span></div></th>
+                <th class="fixed-left"><div><span>Student Weighted Average</span></div></th>
                 {% if rankEnabled %}
                     <th>
                         <div>
@@ -89,8 +89,8 @@
                 {% endfor %}
             </tr>
             <tr class="course-headers">
-                <th class="transparent"></th>
-                <th class="white"></th>
+                <th class="fixed-left"></th>
+                <th class="fixed-left"></th>
                 {% if rankEnabled %}
                 <th class="white"></th>
                 {% endif %}
@@ -123,7 +123,7 @@
             </thead>
             <tbody>
             <tr>
-                <td colspan="{% if rankEnabled %}3{% else %}2{% endif %}" class="course-row class-row-heading">Course Average <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span></td>
+                <th colspan="{% if rankEnabled %}3{% else %}2{% endif %}" class="course-row class-row-heading fixed-left">Course Average <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span></th>
                 {% for assessment in collapsedAssessments %}
                     {% if assessment.isSpecification %}
                         <td class="course-row">
@@ -146,7 +146,7 @@
             </tr>
             {% for courseImpl in courseImpls %}
                 <tr>
-                    <td colspan="{% if rankEnabled %}3{% else %}2{% endif %}" class="class-row class-row-heading"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></td>
+                    <th colspan="{% if rankEnabled %}3{% else %}2{% endif %}" class="class-row class-row-heading fixed-left"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></th>
                     {% for assessment in collapsedAssessments %}
                         {% if courseImportAssessments[courseImpl.id][assessment.id] is defined %}
                             {% set assessmentImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
@@ -171,7 +171,7 @@
                 </tr>
                 {% for student in courseImportStudents[courseImpl.id] %}
                     <tr>
-                        <th class="profile-cell">
+                        <th class="profile-cell fixed-left white">
                             <div class="compact card no-pad small-12">
                                 <a href="/search/user/{{ student.id }}" title="View Profile">
                                     {% include 'include/portrait.twig' with {user: student, render: 'tiny'} only %}
@@ -190,13 +190,13 @@
                         {% set draftsOffClass = marks.published is defined and marks.published.hr ? urgency.marks(publishedNormMark) ~ '-bg' : 'gradient-off-bg' %}
                         {% set draftsOnClass = marks.any is defined and marks.any.hr ? urgency.marks(draftNormMark) ~ '-bg' : 'gradient-off-bg' %}
 
-                        <td class="student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
+                        <th class="white fixed-left student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                             {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
                             <a class="{{ draftsOffClass }}" href="{{ gradesRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
                             {% if marks.any is defined %}
                                   <a class="{{ draftsOnClass }}" href="{{ gradesRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
                             {% endif %}
-                        </td>
+                        </th>
                         {% if rankEnabled %}
                             <td>
                                 {% if rank[student.id] is defined and publishedNormMark %}
