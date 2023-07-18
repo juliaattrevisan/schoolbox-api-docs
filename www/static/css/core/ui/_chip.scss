@@ -1,7 +1,7 @@
 /**
  *  chip.scss
  *
- *  See: https://schoolbox.atlassian.net/browse/SA-15995
+ *  See: https://schoolbox.atlassian.net/browse/SA-15995 and https://m3.material.io/components/chips/overview
  *  Basically, an alternative and more visual way to do checkbox selections. Read the pantry for example use cases.
 **/
 
@@ -9,7 +9,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: var(--whitespace-xs);
+    //gap: var(--whitespace-xs);
     list-style: none;
     // The default ul left margin is not necessary here.
     margin-left: 0;
@@ -33,7 +33,7 @@
             .sb-chip__icon {
                 &::before {
                     display: inline-block;
-                    margin-inline-start: 0.25rem;
+                    margin-inline-end: 0.25rem;
                 }
 
                 &::after {
@@ -51,16 +51,18 @@
             color: var(--content-ui-foreground);
             cursor: pointer;
             display: flex;
+            flex-direction: row-reverse;
             font-weight: 400;
             margin: 0;
-            padding: var(--whitespace-xs) var(--whitespace-m);
+            padding-block: var(--whitespace-xs);
+            padding-inline: var(--whitespace-m);
             user-select: none;
             box-sizing: border-box;
 
             .sb-chip__icon {
                 color: var(--content-ui-foreground-contrast);
                 line-height: normal;
-                margin-inline-start: var(--whitespace-s);
+                margin-inline-end: var(--whitespace-s);
 
                 &::before {
                     display: none;
@@ -75,8 +77,8 @@
                     content: "";
                     display: flex;
                     height: 0.25rem;
-                    margin-inline-start: 0.5rem;
-                    margin-inline-end: 0.25rem;
+                    margin-inline-start: 0.25rem;
+                    margin-inline-end: 0.5rem;
                     opacity: 0.5;
                     width: 0.25rem;
                 }
@@ -99,6 +101,17 @@
     &--no-background {
         li > input[type="checkbox"] + label {
             background: none;
+        }
+    }
+
+    /* See: https://m3.material.io/components/chips/guidelines */
+    &--scroll {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+
+        // Make every item as wide as it needs to be to display it's contents
+        li {
+            flex: 0 0 max-content;
         }
     }
 }
