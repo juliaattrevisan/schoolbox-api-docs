@@ -459,15 +459,14 @@ class Controller extends Base
      * @param array<int,array> $assessments
      * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
      * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @param array            $students             The array of student values which will already contian latest results, we are adding only the published marks
      * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws UnderflowException
      */
-    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
+    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators, array $students): array
     {
-        $students = [];
-
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -598,13 +597,7 @@ class Controller extends Base
             ];
 
             // Stuff everything about the students marks into an array
-            $students[$row['student_id']] = [
-                'firstname'      => $row['student_firstname'],
-                'preferred_name' => $row['student_preferred_name'],
-                'lastname'       => $row['student_lastname'],
-                'assessments'    => $assessmentsForStudent,
-                'profileLink'    => '/search/user/' . $row['student_id'],
-            ];
+            $students[$row['student_id']]['assessmentsPublished'] = $assessmentsForStudent;
 
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
@@ -733,9 +726,9 @@ class Controller extends Base
             if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
                 // Draft mark
                 $indicatorMarks[$row['indicator_id']] = [
-                    'latestDatabaseMark'           => $row['indicator_mark'],
-                    'latestMaxMark'                => $row['indicator_max_value'],
-                    'latestSelectedDescriptorText' => $row['descriptor_name'],
+                    'databaseMark'           => $row['indicator_mark'],
+                    'maxMark'                => $row['indicator_max_value'],
+                    'selectedDescriptorText' => $row['descriptor_name'],
                 ];
             }
 
@@ -744,15 +737,15 @@ class Controller extends Base
             ];
             $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
             if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                    $capData['latestDatabaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
-                    $capData['latestHumanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
-                    $capData['latestMaxMark']           = $row['capability_max_value'];
+                    $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
+                    $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
+                    $capData['maxMark']           = $row['capability_max_value'];
 
                     /* Capabilities' Mark Type and Grade Group can be represented differently to
                      * their Assessments' Mark Type and Grade Group
                      */
-                    $capData['latestCapabilityMarkTypeId']   = $row['capability_mark_type_id'];
-                    $capData['latestCapabilityGradeGroupId'] = $row['capability_grade_group_id'];
+                    $capData['capabilityMarkTypeId']   = $row['capability_mark_type_id'];
+                    $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
             }
             $capabilityMarks[$row['capability_id']] = $capData;
 
@@ -765,7 +758,7 @@ class Controller extends Base
                 'firstname'      => $row['student_firstname'],
                 'preferred_name' => $row['student_preferred_name'],
                 'lastname'       => $row['student_lastname'],
-                'assessments'    => $assessmentsForStudent,
+                'assessmentsLatest'    => $assessmentsForStudent,
                 'profileLink'    => '/search/user/' . $row['student_id'],
             ];
 
@@ -1209,11 +1202,11 @@ class Controller extends Base
     {
         [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
         $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
         $databaseMarksLatest = $this->retrieveDatabaseAllMarks($assessments, $selectedCapabilities, $selectedIndicators);
+        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarksLatest);
 
-        // Merge the published only and the latest marks into one array
-        $databaseMarks = array_merge_recursive($databaseMarks, $databaseMarksLatest);
+//        // Merge the published only and the latest marks into one array
+//        $databaseMarks = array_merge_recursive($databaseMarks, $databaseMarksLatest);
 
         $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);

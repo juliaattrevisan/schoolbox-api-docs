@@ -200,13 +200,13 @@
                                         {% elseif studentId in (exclusions[assessmentId] ?? []) %}
                                             <td class="excluded" title="Excluded from assessment"></td>
                                         {% else %}
-                                            {% set capabilityMark           = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
-                                            {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
+                                            {% set capabilityMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
+                                            {% set normalisedCapabilityMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
                                             {% set summaryLink              = student.assessments[assessmentId].summaryLink %}
                                             {% set gradientClass            = urgency.marks(normalisedCapabilityMark) %}
                                             {# Latest Marks #}
-                                            {% set latestCapabilityMark           = student.assessments[assessmentId].capabilities[capabilityId].latestHumanReadableMark ?? null %}
-                                            {% set latestNormalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
+                                            {% set latestCapabilityMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
+                                            {% set latestNormalisedCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
                                             {% set latestGradientClass                  = urgency.marks(latestNormalisedCapabilityMark) %}
                                             <td class="mark">
                                                 <a
@@ -232,16 +232,16 @@
                                             {% if studentId in (exclusions[assessmentId] ?? []) %}
                                                 <td class="excluded" title="Excluded from assessment"></td>
                                             {% else %}
-                                                {% set indicatorMark           = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
-                                                {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
-                                                {% set descriptorText          = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
+                                                {% set indicatorMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
+                                                {% set normalisedIndicatorMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
+                                                {% set descriptorText          = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
                                                 {% set summaryLink             = student.assessments[assessmentId].summaryLink %}
                                                 {% set gradientClass           = urgency.marks(normalisedIndicatorMark) %}
                                                 {% set renderedIndicatorMark   = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}
                                                 {# Latest Marks #}
-                                                {% set latestIndicatorMark           = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].latestHumanReadableMark ?? null %}
-                                                {% set latestNormalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].latestNormalisedMark ?? null %}
-                                                {% set latestDescriptorText          = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].latestSelectedDescriptorText ?? null %}
+                                                {% set latestIndicatorMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
+                                                {% set latestNormalisedIndicatorMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
+                                                {% set latestDescriptorText          = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
                                                 {% set latestGradientClass           = urgency.marks(latestNormalisedIndicatorMark) %}
                                                 {% set latestRenderedIndicatorMark   = latestDescriptorText ? latestIndicatorMark|default('✓') : latestIndicatorMark|default('–') %}
 
