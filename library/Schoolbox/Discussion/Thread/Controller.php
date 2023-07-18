@@ -215,7 +215,6 @@ class Controller extends BaseController
      * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/open
      * @param Model $thread
      *
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \Schoolbox\Mapper\Exception
      */
     public function openThread(Model $thread): void
@@ -227,7 +226,6 @@ class Controller extends BaseController
      * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/close
      * @param Model $thread
      *
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \Schoolbox\Mapper\Exception
      */
     public function closeThread(Model $thread): void
@@ -240,7 +238,6 @@ class Controller extends BaseController
      * @param bool  $value
      *
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     private function setThreadStatus(Model $thread, bool $value): void
     {

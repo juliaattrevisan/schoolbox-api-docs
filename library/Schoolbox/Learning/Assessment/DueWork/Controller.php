@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidStatusCode;
 use CFPropertyList\IOException;
 use CFPropertyList\PListException;
 use DomainException;
@@ -866,7 +865,6 @@ class Controller extends Assessment\Controller
      * @param string $errorMessage
      * @param string $redirectTo
      * @param int    $errorCode
-     * @throws InvalidStatusCode
      */
     private function configureResponseWithError(string $errorMessage, string $redirectTo, int $errorCode = 403): void
     {
@@ -889,7 +887,6 @@ class Controller extends Assessment\Controller
      * @param Model $assessment
      * @param User  $student
      * @return void
-     * @throws InvalidStatusCode
      * @throws MapperException If unable to create new Response object
      * @throws Deleted If specified Response is deleted
      * @throws RouteNotFound If unable to generate a specified Route
@@ -1520,7 +1517,6 @@ class Controller extends Assessment\Controller
      *
      * @param Model $assessment
      * @return void
-     * @throws InvalidStatusCode
      * @throws PDOException
      * @throws UnexpectedValueException
      */

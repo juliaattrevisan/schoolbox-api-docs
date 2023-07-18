@@ -12,7 +12,6 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Module\Registry;
 use Alaress\Web;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidStatusCode;
 use Crell\ApiProblem\ApiProblem;
 use DomainException;
 use InvalidArgumentException;
@@ -433,7 +432,6 @@ class ListController extends Web\Controller\Base
      * @api   POST /learning/weight/:assessmentId
      *
      * @param IAssessable $assessment
-     * @throws InvalidStatusCode
      * @throws MapperException
      */
     public function updateWeight(IAssessable $assessment): void
@@ -462,7 +460,6 @@ class ListController extends Web\Controller\Base
      * @api   POST /learning/visibility/:assessmentId
      *
      * @param IAssessable $assessment
-     * @throws InvalidStatusCode
      * @throws MapperException
      */
     public function updateVisibility(IAssessable $assessment): void
@@ -946,7 +943,6 @@ class ListController extends Web\Controller\Base
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
-     * @throws InvalidStatusCode
      */
     public function postInclude(IAssessable $assessment, User $student): void
     {
@@ -972,7 +968,6 @@ class ListController extends Web\Controller\Base
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
-     * @throws InvalidStatusCode
      */
     public function postExclude(IAssessable $assessment, User $student): void
     {

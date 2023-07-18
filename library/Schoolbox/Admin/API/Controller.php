@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\API;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web;
-use Aura\Web\Exception\InvalidStatusCode;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
@@ -125,7 +124,6 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * @throws InvalidStatusCode
      * @api POST /api/admin/csv
      */
     public function postUploadCsv(): void
@@ -175,7 +173,6 @@ class Controller extends Web\Controller\Base
 
     /**
      *
-     * @throws InvalidStatusCode
      * @throws FilesystemException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

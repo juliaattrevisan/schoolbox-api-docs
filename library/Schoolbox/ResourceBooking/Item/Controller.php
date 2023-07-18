@@ -11,8 +11,6 @@
 namespace Schoolbox\ResourceBooking\Item;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidComponent;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use DateTime;
 use Alaress\Paginator\IUrlPaginator;
@@ -57,10 +55,8 @@ class Controller extends Base
 
     /**
      * Browses the list of items.
-     * @throws InvalidComponent
      * @throws MapperException
      * @throws MapperException\Deleted
-     * @throws InvalidStatusCode
      */
     public function browse(): void
     {

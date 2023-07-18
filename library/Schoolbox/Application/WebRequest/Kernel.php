@@ -94,7 +94,6 @@ class Kernel extends WebKernelAbstract
      * Execute the main script
      *
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      */
@@ -237,7 +236,6 @@ class Kernel extends WebKernelAbstract
      * @param User|null $authHeaderUser A user from the `Authorization` header,
      *                                  if provided and valid.
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      * @throws Throwable

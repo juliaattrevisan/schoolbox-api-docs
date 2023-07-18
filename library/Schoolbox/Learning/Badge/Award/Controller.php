@@ -847,7 +847,6 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      * @throws RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @api   POST /learning/badge/award/{awardId}/achieve
      * @since 22.1
      */

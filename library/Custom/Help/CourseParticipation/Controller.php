@@ -247,7 +247,6 @@ class Controller extends Base
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function postFolderAccessBySchool(string $schoolCode): void
     {

@@ -340,7 +340,6 @@ class Controller extends Base
      * @throws Kami\Exception\EmptyApiKeyException If Kami is not enabled
      * @throws Kami\Exception\NotFound If unable to find the document in Kami
      * @throws Kami\Exception\ResponseDecodeException If cannot decode the Kami Response
-     * @throws \Aura\Web\Exception\InvalidStatusCode If tried to set an invalid HTTP status code on the response.
      */
     public function getKamiExport(Kami\Model $kami): void
     {

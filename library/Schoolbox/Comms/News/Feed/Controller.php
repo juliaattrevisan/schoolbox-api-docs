@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Feed;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
-use Aura\Web\Exception\InvalidComponent;
 use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Application\Exception\NotFound;
@@ -64,7 +63,6 @@ class Controller extends Base
      * @api          /news/feed/{key}?topic={slug}
      *
      * @param User $user
-     * @throws InvalidComponent
      * @throws InvalidColumnException
      * @throws InvalidArgumentException
      * @throws PDOException
@@ -94,7 +92,6 @@ class Controller extends Base
      * @param Folder\Model $folder
      * @throws InvalidArgumentException
      * @throws InvalidColumnException
-     * @throws InvalidComponent
      * @throws PDOException
      * @throws UnderflowException
      * @throws DefinitionException
@@ -121,7 +118,6 @@ class Controller extends Base
      * @throws DefinitionException
      * @throws InvalidArgumentException
      * @throws InvalidColumnException
-     * @throws InvalidComponent
      * @throws NotFound
      * @throws PDOException
      * @throws UnderflowException

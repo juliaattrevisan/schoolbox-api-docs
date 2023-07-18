@@ -354,7 +354,6 @@ class Controller extends Base
      *
      * @param Alaress_Date_Format $date
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @return void
      */
     public function getByDate(Alaress_Date_Format $date)

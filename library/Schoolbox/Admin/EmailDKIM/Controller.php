@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\EmailDKIM;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
 use Schoolbox\Auth\KeyPairGenerator;
@@ -92,7 +91,6 @@ class Controller extends Base
      * Create/update domain
      *
      * @return void
-     * @throws InvalidStatusCode
      */
     public function postDomain()
     {

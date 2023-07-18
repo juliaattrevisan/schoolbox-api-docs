@@ -131,7 +131,6 @@ class Controller extends Base
      * Remove members from a group
      * @param Folder $folder
      * @return void
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @since 22.1
      * @api   DELETE /group/removeMembers/{folderId}
      */

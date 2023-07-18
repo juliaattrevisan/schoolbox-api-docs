@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
@@ -276,7 +275,6 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
-     * @throws InvalidStatusCode
      * @throws MapperException
      * @throws RouteNotFound
      */

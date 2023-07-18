@@ -1213,7 +1213,6 @@ class Controller extends Base
      * @api   /adminv2/lists
      *
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \ReflectionException
      */
     public function getIndex(?string $table): void
@@ -1230,7 +1229,6 @@ class Controller extends Base
      * @api   /adminv2/lists/data
      *
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \ReflectionException
      */
     public function getData(?string $table): void
@@ -1244,7 +1242,6 @@ class Controller extends Base
      * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
      * @param bool        $json
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \ReflectionException
      */
     private function getLists(?string $table, bool $json): void

@@ -97,7 +97,6 @@ class Controller extends Base
      *
      * @param Layout\Model $layout
      * @throws MapperException
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function layoutForm(Layout\Model $layout)
     {

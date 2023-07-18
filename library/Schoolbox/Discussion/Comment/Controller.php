@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -71,7 +70,6 @@ class Controller extends BaseController
      *
      * @param Model $comment
      * @throws MapperException
-     * @throws InvalidStatusCode if somehow 204 becomes an invalid status code?!
      */
     public function deleteComment(Model $comment): void
     {
