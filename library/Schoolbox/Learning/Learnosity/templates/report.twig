@@ -2,8 +2,13 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Result Summary for {{ assessment.title }}</h1>
+        <h1>{{ assessment.title }}</h1>
 
+        <section class="content">
+            {{ assessment.completionMessage | purify }}
+        </section>
+
+        <h2 class="subheader">Result Summary</h2>
         <section class="content">
             <div id="schoolbox-result-1"></div>
         </section>
