@@ -461,26 +461,6 @@ parameters:
 			path: library/Alaress/Validator/Abstract.php
 
 		-
-			message: "#^Property Alaress\\\\Web\\\\Output\\\\Base\\:\\:\\$data \\(string\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/Base.php
-
-		-
-			message: "#^Variable \\$data in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/Base.php
-
-		-
-			message: "#^Property Alaress\\\\Web\\\\Output\\\\File\\:\\:\\$file \\(string\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/File.php
-
-		-
-			message: "#^Property Alaress\\\\Web\\\\Output\\\\Html\\:\\:\\$template \\(string\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/Html.php
-
-		-
 			message: "#^Property Alaress\\\\WorkerCrew\\\\Dispatcher\\:\\:\\$timer \\(React\\\\EventLoop\\\\TimerInterface\\) does not accept null\\.$#"
 			count: 2
 			path: library/Alaress/WorkerCrew/Dispatcher.php
