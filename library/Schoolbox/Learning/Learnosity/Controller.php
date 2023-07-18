@@ -14,7 +14,6 @@ use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use DebugBar\DebugBarException;
-use Learning\Learnosity\Helper;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
