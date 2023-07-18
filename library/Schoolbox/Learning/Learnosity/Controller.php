@@ -28,6 +28,12 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
+     * Softdeleting is equivalent to Learnosity's "archiving"
+     */
+    private const LEARNOSITY_ITEM_STATUS_ARCHIVED = 'archived';
+
+
+    /**
      * Learnosity API instance is the same for everything afaict
      *
      * @var Api
@@ -335,8 +341,7 @@ class Controller extends Base
      *
      * @return void
      * @throws ValidationException
-     * @throws \DebugBar\DebugBarException
-     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function getArchiveReferences(): void
     {
@@ -360,7 +365,7 @@ class Controller extends Base
             /* Shank the activity into the Archived state
              */
             $updatedActivity = $activity;
-            $updatedActivity['status'] = 'archived';
+            $updatedActivity['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
             $activityPayload['activities'][] = $updatedActivity;
 
             $activityArchiveResult = $this->api->dataSetRequest('/itembank/activities', $activityPayload);
@@ -384,7 +389,7 @@ class Controller extends Base
 
             foreach ($items['data'] as $item) {
                 $updatedItem = $item;
-                $updatedItem['status'] = 'archived';
+                $updatedItem['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
 
                 $itemsPayload['items'][] = $updatedItem;
             }
