@@ -127,7 +127,8 @@ class Factory implements ResponseFactoryInterface
      *
      * @param string $template    A Twig template to render.
      * @param array  $data        Data to inject into the template.
-     * @param User   $currentUser The currently authenticated user.
+     * @param ?User  $currentUser If provided, the current authenticated user:
+     *                            this will override the `USER` global in Twig.
      * @param string $title       If not empty: use this as the page title.
      * @param string $tab         If not empty: use this as the selected
      *                            navigation tab.
@@ -137,7 +138,7 @@ class Factory implements ResponseFactoryInterface
     public function buildHtml(
         string $template,
         array $data,
-        User $currentUser,
+        ?User $currentUser = null,
         string $title = '',
         string $tab = '',
     ): ResponseInterface {
@@ -170,7 +171,9 @@ class Factory implements ResponseFactoryInterface
             $data[$key] = $generator->generate($chromeData);
         }
 
-        $this->injectCurrentUserGlobal($currentUser);
+        if ($currentUser) {
+            $this->injectCurrentUserGlobal($currentUser);
+        }
 
         // Render it all out
         return $this->buildFromContent($this->twig->render('include/chrome.twig', $data));

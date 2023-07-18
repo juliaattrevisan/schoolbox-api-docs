@@ -1,7 +1,6 @@
 <?php
 
 use Alaress\Authorizer\Failure\Unauthenticated;
-use Alaress\Web\Output;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
 use Aura\Router\Generator;
