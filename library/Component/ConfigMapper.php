@@ -174,7 +174,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             $to   = $this->determineDestinationPath($instance, $access);
 
             if (isset($from)) {
-                $this->getDatabaseRead()->query($query, ['from' => $from, 'to' => $to]);
+                $this->getDatabase()->query($query, ['from' => $from, 'to' => $to]);
             }
         }
     }

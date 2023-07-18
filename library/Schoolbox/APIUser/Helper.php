@@ -123,16 +123,16 @@ class Helper
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $params['firstName'] = $params['preferredName'] =
-                        '%' . $this->userMapper->getDatabaseRead()->getQuoter()->escapeForLike($name[1]) . '%';
+                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[1]) . '%';
                     $params['lastName']  =
-                        '%' . $this->userMapper->getDatabaseRead()->getQuoter()->escapeForLike($name[2]) . '%';
+                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[2]) . '%';
                     $where .= "AND (
                         (firstname like :firstName or preferred_name like :preferredName)
                         and lastname like :lastName
                     ) ";
                 } else {
                     $params['username'] = $params['lastName'] = $params['firstName'] = $params['preferredName'] =
-                        '%' . $this->userMapper->getDatabaseRead()->getQuoter()->escapeForLike($keyword) . '%';
+                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
                     $where .= "AND (
                         firstname like :firstName
                         or preferred_name like :preferredName

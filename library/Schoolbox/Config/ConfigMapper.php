@@ -375,7 +375,7 @@ class ConfigMapper extends Mapper
             WHERE hidden = 'false'
             ORDER BY lu_config_type.sequence
         ";
-        $statement = $this->getDatabaseRead()->query($query);
+        $statement = $this->getDatabase()->query($query);
         $result    = [];
         foreach ($statement as $row) {
             $result[] = $row['type'];

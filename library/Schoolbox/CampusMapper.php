@@ -219,7 +219,7 @@ class CampusMapper extends Mapper
         ";
         $query .= ' WHERE ' . implode(' AND ', $pb->getWhere());
 
-        $statement = $this->getDatabaseRead()->query($query, $pb->getParams());
+        $statement = $this->getDatabase()->query($query, $pb->getParams());
 
         $campusCollection = $this->createCollection();
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {

@@ -2199,7 +2199,7 @@ abstract class Mapper implements IMapper
      */
     public function findByColumnList($columnList, $options = array())
     {
-        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabaseRead()->getQuoter(), $this->getTable()), $columnList, $options);
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
     }
 
     /**
@@ -2665,7 +2665,7 @@ abstract class Mapper implements IMapper
             $from = "FROM {$this->getTable()}";
         }
 
-        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabaseRead()->getQuoter(), $this->getTable()), $columnList, $options);
+        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
 
@@ -4195,7 +4195,7 @@ abstract class Mapper implements IMapper
         }
 
         $mappedFields = array_keys($mappedFields);
-        $stmt         = $this->getDatabaseRead()->query("SHOW COLUMNS FROM {$this->table}");
+        $stmt         = $this->getDatabase()->query("SHOW COLUMNS FROM {$this->table}");
         $knownFields  = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         return array_values(array_diff($knownFields, $mappedFields));

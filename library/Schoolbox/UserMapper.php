@@ -633,7 +633,7 @@ class UserMapper extends Mapper
 
                     $foundValidKeyword = true;
 
-                    $searchLike = "%{$this->getDatabaseRead()->getQuoter()->escapeForLike($keyword)}%";
+                    $searchLike = "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%";
                     $pb->like('firstname', $searchLike)
                        ->like('preferred_name', $searchLike)
                        ->like('lastname', $searchLike);
