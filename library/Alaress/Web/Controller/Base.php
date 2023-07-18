@@ -867,21 +867,6 @@ abstract class Base
     }
 
     /**
-     * Inject the controller's current user into the output object as a global
-     * variable.
-     *
-     * This overrides any previous value which the global might have had.
-     *
-     * @param Output\Html $output
-     * @return Output\Html
-     */
-    private function injectCurrentUserGlobal(Output\Html $output): Output\Html
-    {
-        $output->getTemplateEngine()->addGlobal('USER', $this->getUser());
-        return $output;
-    }
-
-    /**
      * Extends the allowed execution time of this script, by default by another
      * 5 minutes.
      *
