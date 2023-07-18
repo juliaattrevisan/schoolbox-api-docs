@@ -7,16 +7,35 @@ import { rest } from "msw";
 import SearchPage from "../../library/Schoolbox/Search/templates/vue/search-page.vue";
 import { data } from "./dataSearchPage";
 
+let requestCount = 0;
+
 /**
  * Mock Service Worker handlers to load dummy data for testing
  */
 const endpoint = "/search";
 const mswHandlers = [
     rest.get(endpoint, (req, res, ctx) => {
+        requestCount += 1;
+        if (requestCount === 1) {
+            return res(ctx.delay(2000), ctx.json(data));
+        }
         return res(
-            // we grab an endpoint and then modify the data before it's returned
+            // on the second call we shorten the results so load more doesn't show anymore
             ctx.delay(2000),
-            ctx.json(data)
+            ctx.json({
+                data: [
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More results 1",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More results 2",
+                    },
+                ],
+            })
         );
     }),
 ];
@@ -74,7 +93,7 @@ export const NoResults: Story = {
         msw: {
             handlers: [
                 rest.get(endpoint, (req, res, ctx) => {
-                    return res(ctx.delay(2000), ctx.json([]));
+                    return res(ctx.delay(2000), ctx.json({ data: [] }));
                 }),
                 ...mswHandlers,
             ],

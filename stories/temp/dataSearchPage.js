@@ -317,7 +317,7 @@ export const data = {
             type: "user.parent",
             title: "Dummy",
         },
-        //20th result
+        // 20th result
         {
             id: 4,
             type: "user.parent",
