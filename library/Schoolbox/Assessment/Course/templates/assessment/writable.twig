@@ -32,7 +32,7 @@ Usage:
         </div>
         <nav>
             <span class="show-for-large-up">
-                <a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes"></a>
+                <a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes"></a>
                 {% if assessment is quiz %}
                     <a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-modify" title="Modify"></a>
                 {% else %}
@@ -45,7 +45,7 @@ Usage:
             </span>
         </nav>
         <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
-            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes">Export</a></li>
+            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes">Export</a></li>
             <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="icon-modify">Modify</a></li>
             <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
         </ul>

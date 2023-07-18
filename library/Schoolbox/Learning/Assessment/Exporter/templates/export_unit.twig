@@ -1,0 +1,120 @@
+{#
+    Overview:
+
+    This page allows the user to select classes into which they want a unit specification exported.
+    Only classes into which the unit specification's course has already been implemented are available for selection.
+
+    To 'export a unit specification to a class' means to 'export a unit specification to a pre-existing course implementation'.
+
+    So this is for the situation where a course specification has already been partially implemented in a class, and now
+    the user wants to either:
+     * export a unit into a course implementation that currently does not contain that unit, or
+     * export a unit into a course implementation that already contains that unit (and in doing so overwrite that pre-
+       existing unit)
+
+    The classes are displayed in two lists:
+     * Those whose relevant course implementation does not contain the unit
+     * Those whose relevant course implementation already contains the unit
+
+    'unitSpec'                          CourseUnitSpecificationModel - The unit spec
+    'returnUrl'                         string                       - A URL to return to
+    'returnUrlName'                     string                       - query arg name
+    'courseImplsInWhichUnitNotImported' CourseImplementationModel[]  - Course implementations in which unitSpec has not been imported
+    'courseImplsInWhichUnitImported'    CourseImplementationModel[]  - Course implementations in which unitSpec has been imported
+    'folderWritePerms'                  bool[]                       - Does current user have WRITE+ perm to the class folder
+    'enableReimport'                    bool                         - Should already imported class assessments be re-importable?
+#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+
+{{ bread.crumbsArray(breadcrumbs) }}
+<script type="text/javascript">
+    $(function () {
+        const $importForm = $('#importForm');
+        const $checkboxes = $importForm.find('input[type=checkbox][data-course-id]');
+        const $submitButton = $importForm.find('input[type=submit]');
+
+        // Enable submit button if any checkbox is checked.
+        $checkboxes.change(function () {
+            if ($checkboxes.filter(':checked:not(:disabled)').length) {
+                $submitButton.prop('disabled', false);
+            } else {
+                $submitButton.prop('disabled', true);
+            }
+        });
+        $importForm.alaressValidate();
+        $checkboxes.change(); // Run on page load.
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Export {{ unitSpec.title }}</h1>
+    </div>
+</div>
+<div class="row">
+    {% if courseImplsInWhichUnitNotImported|length == 0 and courseImplsInWhichUnitImported|length == 0 %}
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-class-list"></i>
+                <p>There are no open classes that currently use this unit.</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="small-12 island">
+
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
+
+            <form method="post"
+                  action="{{ routeLookup('learningAssessmentExporter.postExportForUnit', {unitSpecId: unitSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
+                  id="importForm">
+                {% if courseImplsInWhichUnitNotImported|length %}
+                    <section data-not-imported>
+                        <ul class="information-list card-selectable">
+                            <li>
+                                <div class="small-12 column">
+                                    <div class="selector">
+                                        <input id="checkAll"
+                                               type="checkbox"
+                                               data-select-all="[data-not-imported]"
+                                        />
+                                        <label for="checkAll" class="checkbox-label"></label>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="information-list card-selectable">
+                            {% for courseImpl in courseImplsInWhichUnitNotImported %}
+                                {% include '@learningAssessmentExporter/export_unit_row.twig' with {
+                                    unitSpec:         unitSpec,
+                                    courseImpl:       courseImpl,
+                                    folderWritePerms: folderWritePerms,
+                                    isImported:       false,
+                                    enableReimport:   enableReimport,
+                                } only %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                {% if courseImplsInWhichUnitImported|length %}
+                    <section>
+                        <ul class="information-list card-selectable">
+                            {% for courseImpl in courseImplsInWhichUnitImported %}
+                                {% include '@learningAssessmentExporter/export_unit_row.twig' with {
+                                    unitSpec:         unitSpec,
+                                    courseImpl:       courseImpl,
+                                    folderWritePerms: folderWritePerms,
+                                    isImported:       true,
+                                    enableReimport:   enableReimport,
+                                } only %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+                <input type="submit" disabled value="Export to selected classes"/>
+            </form>
+        </div>
+    {% endif %}
+</div>

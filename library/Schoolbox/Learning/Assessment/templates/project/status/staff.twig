@@ -129,7 +129,7 @@ Data:
                         {% endif %}
 
                         {% import '@learningAssessment/project/macro/icon.twig' as icon %}
-                        {% set exportRoute = routeLookupIfAuthorized('learningAssessmentExporter.getExportForm', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set exportRoute = routeLookupIfAuthorized('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% if assessable is quiz %}
                             {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}

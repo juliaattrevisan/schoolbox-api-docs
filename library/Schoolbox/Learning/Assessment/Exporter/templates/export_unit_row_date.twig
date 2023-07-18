@@ -1,0 +1,17 @@
+{#
+    'dateType'             string
+    'label'                string
+    'courseImplementation' CourseImplementation\Model
+#}
+
+<div class="small-12 medium-6 large-6 columns">
+    <label for="{{ dateType }}Date-{{ courseImplementation.id }}">{{ label }} Date</label>
+    <input id="{{ dateType }}Date-{{ courseImplementation.id }}"
+           name="unitDatesByCourseId[{{ courseImplementation.id }}][{{ dateType }}]"
+           type="text"
+           value=""
+           data-datepicker
+           data-datepicker-format="date"
+           data-datepicker-buttontext=""
+    />
+</div>

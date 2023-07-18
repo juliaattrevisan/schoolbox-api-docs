@@ -18,9 +18,9 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -56,6 +56,9 @@ class Module extends BaseModule
         $preloadAssessment = function ($params) {
             return $this->preloadAssessment($params);
         };
+        $preloadUnitSpec = function ($params) {
+            return $this->preloadUnitSpec($params);
+        };
 
         // rules in use
         $isStaff = $this->getAuthRule('isStaffOrSuper');
@@ -68,11 +71,22 @@ class Module extends BaseModule
             new IsSpecification()
         );
 
+        $canExportForUnit = new Rule\All(
+            new Rule\IsLoggedIn(),
+            $isStaff
+        );
+
         // register the routes
         $route = '/assessment/{assessmentId:\d+}';
-        $this->register('GET', $route, 'getExportForm', $canExport, $preloadAssessment);
+        $this->register('GET', $route, 'getExportFormForAssessment', $canExport, $preloadAssessment);
         $this->register('GET', '/assessment/csv', 'getCSV', $isSuperuser);
-        $this->register('POST', $route, 'postExport', $canExport, $preloadAssessment);
+        $this->register('POST', $route, 'postExportForAssessment', $canExport, $preloadAssessment);
+
+        // register the routes
+        $routeForUnit = '/unit/{unitSpecId:\d+}';
+        $this->register('GET', $routeForUnit, 'getExportFormForUnit', $canExportForUnit, $preloadUnitSpec);
+        $this->register('GET', '/unit/csv', 'getCSVForUnit', $isSuperuser);
+        $this->register('POST', $routeForUnit, 'postExportForUnit', $canExportForUnit, $preloadUnitSpec);
     }
 
 
@@ -106,6 +120,32 @@ class Module extends BaseModule
         ];
     }
 
+
+    /**
+     * Convert route params into a unitSpec object
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws ApplicationException
+     * @throws \Exception
+     */
+    protected function preloadUnitSpec(array $params): array
+    {
+        try {
+            $unitSpec = $this->getUnitSpecificationMapper()->findById($params['unitSpecId']);
+        } catch (MapperException\Deleted $e) {
+            $unitSpec = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        return [
+            'unitSpec' => $unitSpec
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -123,6 +163,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(Access::class),
             $this->getAssessmentMapperProxy(),
+            $this->getCourseImplementationMapper(),
             $this->getUnitImplementationMapper(),
             new Replicator(
                 $this->getAssessmentMapperProxy(),
@@ -138,30 +179,30 @@ class Module extends BaseModule
      */
 
     /**
-     * @return Mapper|UserMapper
+     * @return UserMapper
      * @throws \InvalidArgumentException
      */
-    protected function getUserMapper()
+    protected function getUserMapper(): UserMapper
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
 
     /**
-     * @return QuizMapper|Mapper
+     * @return QuizMapper
      * @throws \InvalidArgumentException
      */
-    protected function getQuizMapper()
+    protected function getQuizMapper(): QuizMapper
     {
         return $this->getMapperFactory()->get(QuizMapper::class);
     }
 
 
     /**
-     * @return ErrorMapper|Mapper
+     * @return ErrorMapper
      * @throws \InvalidArgumentException
      */
-    protected function getErrorMapper()
+    protected function getErrorMapper(): ErrorMapper
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
@@ -170,67 +211,77 @@ class Module extends BaseModule
     /**
      * @return AssessmentMapperProxy
      */
-    protected function getAssessmentMapperProxy()
+    protected function getAssessmentMapperProxy(): AssessmentMapperProxy
     {
         return $this->injector->get('assessmentDataSource');
     }
 
 
     /**
-     * @return UnitImplementation\Mapper|Mapper
+     * @return CourseImplementationMapper
      * @throws \InvalidArgumentException
      */
-    protected function getUnitImplementationMapper()
+    protected function getCourseImplementationMapper(): CourseImplementationMapper
+    {
+        return $this->getMapperFactory()->get(CourseImplementationMapper::class);
+    }
+
+
+    /**
+     * @return UnitImplementation\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getUnitImplementationMapper(): UnitImplementation\Mapper
     {
         return $this->getMapperFactory()->get(UnitImplementation\Mapper::class);
     }
 
 
     /**
-     * @return UnitSpecification\Mapper|Mapper
+     * @return UnitSpecification\Mapper
      * @throws \InvalidArgumentException
      */
-    protected function getUnitSpecificationMapper()
+    protected function getUnitSpecificationMapper(): UnitSpecification\Mapper
     {
         return $this->getMapperFactory()->get(UnitSpecification\Mapper::class);
     }
 
 
     /**
-     * @return StudentSubmissionMapper|Mapper
+     * @return StudentSubmissionMapper
      * @throws \InvalidArgumentException
      */
-    protected function getStudentSubmissionMapper()
+    protected function getStudentSubmissionMapper(): StudentSubmissionMapper
     {
         return $this->getMapperFactory()->get(StudentSubmissionMapper::class);
     }
 
 
     /**
-     * @return SubmissionReturnMapper|Mapper
+     * @return SubmissionReturnMapper
      * @throws \InvalidArgumentException
      */
-    protected function getSubmissionReturnMapper()
+    protected function getSubmissionReturnMapper(): SubmissionReturnMapper
     {
         return $this->getMapperFactory()->get(SubmissionReturnMapper::class);
     }
 
 
     /**
-     * @return Mapper|StorageMapper
+     * @return StorageMapper
      * @throws \InvalidArgumentException
      */
-    protected function getStorageMapper()
+    protected function getStorageMapper(): StorageMapper
     {
         return $this->getMapperFactory()->get(StorageMapper::class);
     }
 
 
     /**
-     * @return Mapper|FolderMapper
+     * @return FolderMapper
      * @throws \InvalidArgumentException
      */
-    protected function getFolderMapper()
+    protected function getFolderMapper(): FolderMapper
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
     }

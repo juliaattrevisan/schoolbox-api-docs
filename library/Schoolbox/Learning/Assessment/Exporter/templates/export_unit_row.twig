@@ -1,0 +1,124 @@
+{#
+    'unitSpec'         CourseUnitSpecificationModel - The unitSpec to export
+    'courseImpl'       CourseImplementationModel    - The course implementation into which the unitSpec may be exported
+    'folderWritePerms' bool[]                       - Does current user have WRITE+ perm to the class folder
+    'isImported'       bool                         - Has the unitSpec already been imported into this courseImpl?
+    'enableReimport'   bool                         - Should already imported class units be re-importable?
+#}
+{% set unitImpl = null %}
+{% if isImported %}
+    {# Find the already imported unit implementation #}
+    {% for courseUnitImpl in courseImpl.units %}
+        {% if courseUnitImpl.specification.id == unitSpec.id %}
+            {% set unitImpl = courseUnitImpl %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% set isInstructor = folderWritePerms[courseImpl.folder.id] %}
+{% set canImport = isInstructor and (not isImported or enableReimport) %}
+
+<script type="text/javascript">
+    $(function () {
+        const $checkbox = $('#import-{{ courseImpl.id }}');
+        const courseId = $checkbox.attr('data-course-id');
+
+        // Toggle date fields
+        $checkbox.change(function () {
+            const datesContainer = $('#course-' + courseId + '-dates');
+
+            if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
+                datesContainer.removeAttr('hidden');
+                datesContainer.find('input').attr('required', true);
+            } else {
+                datesContainer.attr('hidden', true);
+                datesContainer.find('input').removeAttr('required');
+            }
+        });
+
+        $checkbox.change(); // Run function on page load.
+
+        // Warn user they are about to clobber previous interactions
+        {% if enableReimport %}
+        $('[data-warn-destructive-export]').click(function (e) {
+            const $checkbox = $(this);
+
+            if ($checkbox.prop('checked')) {
+                e.preventDefault();
+                $checkbox.confirmDialog({
+                    text: (
+                        'Are you sure you want to re-export to this class? ' +
+                        'Doing so will overwrite the existing class unit.'
+                    ),
+                    format: 'html',
+                    confirmLabel: 'Delete and re-export',
+                    cancelLabel: 'Cancel',
+                    confirmEvent: function () {
+                        $checkbox.prop('checked', true);
+                        $checkbox.trigger('change')
+                    }
+                });
+            }
+        });
+        {% endif %}
+    });
+</script>
+
+<li>
+    <div class="small-12 columns">
+        <div class="selector">
+            <input type="checkbox"
+                   id="import-{{ courseImpl.id }}"
+                   name="courseImplementationIds[{{ courseImpl.id }}]"
+                   value="1"
+                   {% if not canImport %}disabled{% endif %}
+                   {% if enableReimport and isImported %}
+                       data-warn-destructive-export
+                   {% endif %}
+                   data-course-id="{{ courseImpl.id }}"/>
+            <label for="import-{{ courseImpl.id }}" class="checkbox-label"></label>
+        </div>
+        <div class="card small-12">
+            <span class="size-32 icon-home"></span>
+            <h3><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></h3>
+            <p class="meta">
+                {% if isImported %}
+                    Unit duration:
+                    {% apply spaceless %}
+                        <time title="{{ unitImpl.openDate.short }}"
+                              datetime="{{ unitImpl.openDate.databaseDate }}"
+                        >{{ unitImpl.openDate.relativeTime }}</time>
+                        &ndash;
+                        <time title="{{ unitImpl.dueDate.short }}"
+                              datetime="{{ unitImpl.dueDate.databaseDate }}"
+                        >{{ unitImpl.dueDate.relativeTime }}</time>
+                    {% endapply %}
+                {% else %}
+                    <br/>
+                {% endif %}
+            </p>
+            <p class="meta">
+                {% if isImported %}
+                    This unit already exists in this class.
+                {% elseif not isInstructor %}
+                    You don't have write permission for this class.
+                {% else %}
+                    This unit does not exist in this class.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    <div class="list-item" id="course-{{ courseImpl.id }}-dates" hidden>
+        {% set dateFieldsInfo = [
+            {type: 'open' , label: 'Open' },
+            {type: 'close', label: 'Close'},
+        ] %}
+        {% for dateFieldInfo in dateFieldsInfo %}
+            {% include '@learningAssessmentExporter/export_unit_row_date.twig' with {
+                dateType:             dateFieldInfo.type,
+                label:                dateFieldInfo.label,
+                courseImplementation: courseImpl,
+            } only %}
+        {% endfor %}
+    </div>
+</li>

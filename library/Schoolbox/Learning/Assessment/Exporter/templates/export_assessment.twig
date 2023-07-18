@@ -68,7 +68,7 @@
                         </ul>
                         <ul class="information-list card-selectable">
                             {% for assessmentImpl in unImported %}
-                                {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                {% include '@learningAssessmentExporter/export_assessment_row.twig' with {
                                     assessmentSpec:         assessmentSpec,
                                     assessmentImpl:         assessmentImpl,
                                     folderWritePerms:       folderWritePerms,
@@ -87,7 +87,7 @@
                     <section>
                         <ul class="information-list card-selectable">
                             {% for assessmentImpl in imported %}
-                                {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                {% include '@learningAssessmentExporter/export_assessment_row.twig' with {
                                     assessmentSpec:         assessmentSpec,
                                     assessmentImpl:         assessmentImpl,
                                     folderWritePerms:       folderWritePerms,

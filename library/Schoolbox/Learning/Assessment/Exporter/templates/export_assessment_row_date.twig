@@ -4,7 +4,6 @@
     'dateType'           string
     'label'              string
     'unitImplementation' UnitImplementation\Model
-    'assessment'         IAssessable
 #}
 
 {% set large = (fullSetOfDates) ? 3 : 6 %}
@@ -33,5 +32,6 @@
            data-datepicker-buttontext=""
            {% if startSync is defined %}data-datesync-startdate="#{{ startSync }}Date-{{ unitImplementation.id }}"{% endif %}
            {% if endSync is defined %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
+           required
     />
 </div>
