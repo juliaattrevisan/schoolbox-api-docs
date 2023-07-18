@@ -87,6 +87,36 @@ class Api
 
 
     /**
+     * Alias for ActionType "get" endpoints
+     *
+     * @param string $endpoint
+     * @param array $payload
+     * @return mixed
+     * @throws ValidationException
+     * @throws \RuntimeException
+     */
+    public function dataGetRequest(string $endpoint, array $payload): mixed
+    {
+        return $this->dataRequest($endpoint, $payload, 'get');
+    }
+
+
+    /**
+     * Alias for ActionType "set" endpoints
+     *
+     * @param string $endpoint
+     * @param array $payload
+     * @return mixed
+     * @throws ValidationException
+     * @throws \RuntimeException
+     */
+    public function dataSetRequest(string $endpoint, array $payload): mixed
+    {
+        return $this->dataRequest($endpoint, $payload, 'set');
+    }
+
+
+    /**
      * Make a specific request to the Data API in Learnosity
      *
      * $actionType corresponds to Action Type in their docs;
@@ -99,7 +129,7 @@ class Api
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function dataRequest(string $endpoint, array $payload, string $actionType = 'get'): mixed
+    private function dataRequest(string $endpoint, array $payload, string $actionType = 'get'): mixed
     {
         /* Strip slashes, to prevent typos
          */
@@ -123,7 +153,8 @@ class Api
          */
         if (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
             throw new \RuntimeException(sprintf(
-                '%s: HTTP %s %s',
+                '%s %s: HTTP %s %s',
+                $actionType,
                 $url,
                 $response->getStatusCode(),
                 $response->getBody()
