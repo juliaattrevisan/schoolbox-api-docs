@@ -37,7 +37,6 @@ use Aura\Di;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouterContainer;
-use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
@@ -655,9 +654,6 @@ abstract class Kernel
             'httpFactory',
             $di->lazyNew(Psr17Factory::class)
         );
-
-        // Web request/response factory
-        $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
 
         // Incoming HTTP request, conforming to PSR-7 ServerRequestInterface.
         $di->set(
