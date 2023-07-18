@@ -3,7 +3,7 @@ import { Result } from "./Result";
 /**
  * The returned search data
  */
-export type Search = {
+export type Results = {
     data: Result[];
     metadata?: {
         cursor: {

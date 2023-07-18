@@ -1,5 +1,6 @@
 import { ResultTypes } from "./ResultTypes";
 import type { ResultContext } from "./ResultContext";
+import type { Results } from "./Results";
 
 /**
  * A search result
@@ -32,4 +33,5 @@ export type Result = {
             };
         };
     };
+    _subResults?: Results; // further results within the result
 };
