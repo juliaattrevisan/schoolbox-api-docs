@@ -129,7 +129,7 @@ class Api
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    private function dataRequest(string $endpoint, array $payload, string $actionType = 'get'): mixed
+    private function dataRequest(string $endpoint, array $payload, string $actionType): mixed
     {
         /* Strip slashes, to prevent typos
          */
