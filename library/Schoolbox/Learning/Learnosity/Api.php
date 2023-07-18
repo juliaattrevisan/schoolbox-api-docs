@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Lumberjack\Logger;
-use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Request\DataApi;
 use LearnositySdk\Request\Init;
@@ -24,7 +23,7 @@ use LearnositySdk\Request\Init;
  */
 class Api
 {
-    private const DATA_API_HOST = 'https://data.learnosity.com/v2023.1.LTS/';
+    private const DATA_API_HOST = 'https://data.learnosity.com/v2023.2.LTS/';
 
 
     /**
@@ -91,17 +90,20 @@ class Api
      * Make a specific request to the Data API in Learnosity
      *
      * @param string $endpoint
-     * @param array  $payload
+     * @param array $payload
      * @param string $method
      * @return mixed
      * @throws ValidationException
+     * @throws \RuntimeException
      */
     public function dataRequest(string $endpoint, array $payload, string $method = 'get'): mixed
     {
         /* Strip slashes, to prevent typos
          */
+        $url = self::DATA_API_HOST . trim($endpoint, '/');
+
         $response = (new DataApi())->request(
-            self::DATA_API_HOST . trim($endpoint, '/'),
+            $url,
             [
                 'domain'       => $this->serverName,
                 'consumer_key' => $this->consumerKey
@@ -111,6 +113,20 @@ class Api
             $method
         );
 
-        return $response->json();
+        $json = $response->json();
+
+        /* There was some kind of error and you didn't get a valid json response
+         * The place where the json response would be contains some random text string instead
+         */
+        if (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
+            throw new \RuntimeException(sprintf(
+                '%s: HTTP %s %s',
+                $url,
+                $response->getStatusCode(),
+                $response->getBody()
+            ));
+        }
+
+        return $json;
     }
 }
