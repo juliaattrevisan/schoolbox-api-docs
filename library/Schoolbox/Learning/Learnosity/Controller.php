@@ -337,7 +337,7 @@ class Controller extends Base
 
 
     /**
-     * Archive (soft-delete)
+     * Archive (soft-delete) multiple Learnosity Activities
      *
      * @return void
      * @throws ValidationException
@@ -345,13 +345,51 @@ class Controller extends Base
      */
     public function getArchiveReferences(): void
     {
-        $activityId = '82b2d7f3-2678-4138-be64-2e7561e6d1a3';
+        $activityReferences = [
+//            '4ab73c58-91ac-4aed-9fb0-195701c5d61a',
+//            'd5c1ad12-93f2-4c2d-88b2-2a22b1a6f810',
+//            '0f338735-2f59-4efe-8392-642b92fa85e9',
+//            'f3fafd8e-3eb4-4cb4-9e0b-a2ee4315800c',
+//            'c9314edf-3ce1-4022-a7eb-9c407eaf4a7e',
+//            'caf0cfb6-7bf8-4cda-893d-4ef70c223ded',
+//            '4a4de982-2237-40c9-8afb-8d8c6a88e580',
+//            '4b902bd8-256b-4c94-92c1-c2a764ecb138',
+            '3a6e3b23-6020-46c1-9411-31a5fecf8628',
+            '455f61eb-7940-40cc-85cb-9a2af4267cf9',
+            'fab52025-6d8e-4ba1-b990-78d7b32aae53',
+            '5b34831d-07e5-4e79-9edb-2c7f2b2d4534',
+            'afbe0f9f-3f67-4951-94d3-91f839d7a5c3',
+            '7bc2167d-4ee2-4e27-b813-54ec1207d763',
+            '3b96245e-190a-4ff3-a110-47062b6ea66f',
+            '870b4fd1-496e-45d4-b872-729a308f5efa',
+            'fdf98aef-3a7c-4851-ab3a-0fd499ee3553'
+        ];
 
+        foreach ($activityReferences as $activityReference) {
+            $this->archiveReference($activityReference);
+        }
+    }
+
+
+    /**
+     * Archive (soft-delete) a particular Learnosity Activity
+     * Activities must have at least one published item before an activity can be archived
+     *
+     * If you can't delete an activity because it tells you that you need a published item,
+     * also check any Welcome/Exit screens - those are Items too
+     *
+     * @param string $activityReference
+     * @return void
+     * @throws ValidationException
+     * @throws \RuntimeException
+     */
+    private function archiveReference(string $activityReference): void
+    {
         /* List of Items
          */
         $activities = $this->api->dataGetRequest('/itembank/activities', [
             'references' => [
-                $activityId
+                $activityReference
             ]
         ]);
 
