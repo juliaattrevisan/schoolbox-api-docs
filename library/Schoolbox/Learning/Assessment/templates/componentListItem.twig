@@ -8,11 +8,7 @@
 {% else %}
     {# If write mode: show tot only if there's at least one action #}
     {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
-    {% if assessable is quiz %}
-        {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
-    {% else %}
-        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
-    {% endif %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
     {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
     {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
     {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
@@ -45,7 +41,18 @@
             {% apply spaceless %}
                 {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}">View Status</a></li>{% endif %}
                 {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
-                {% if modifyRoute %}<li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>{% endif %}
+
+                {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
+                {% if modifyRoute %}
+                    {% if assessable is quiz %}
+                        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessable.id}) %}
+                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Quiz</a></li>
+                        <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
+                    {% else %}
+                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>
+                    {% endif %}
+                {% endif %}
+
                 {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>{% endif %}
             {% endapply %}
         </ul>
