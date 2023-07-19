@@ -141,7 +141,6 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
 
 table {
     border-collapse: collapse;
-    width: 98%; /* Not 100% so that the rightmost column sloped heading is not completely hidden. */
     line-height: 1.4;
     .card {
         padding: 0;
@@ -261,6 +260,10 @@ $rotate-span-width: 11rem;
     left: 1rem;
     padding-left: 0 !important;
     padding-right: 0 !important;
+}
+
+.square-grid-container table {
+    width: 98%; /* Not 100% so that the rightmost column sloped heading is not completely hidden. */
 }
 
 .square-grid {
