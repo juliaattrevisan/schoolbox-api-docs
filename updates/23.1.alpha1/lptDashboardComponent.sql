@@ -46,10 +46,10 @@ INSERT INTO component_config_definition (
 #              1,
 #              'Show Title to Read-Only Users',
 #              null
-#          ), (
-#              (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Dashboard\\CurrentLessonPlanController'),
-#              'componentname',
-#              'Lesson Plans',
-#              'Heading',
-#              null
+         ), (
+             (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Dashboard\\CurrentLessonPlanController'),
+             'componentname',
+             'Lesson Plans',
+             'Heading',
+             null
          );
