@@ -9,7 +9,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-$remoteUrl = 'http://campusonline.cis.edu.sg/signon.asp';
+$remoteUrl = 'http://campusonline.cis.edu.sg/Handler/SSOHandler.ashx';
 $mapFile = '/home/cispl/parent_map.csv';
 
 if (!file_exists($mapFile) || !is_readable($mapFile)) {
