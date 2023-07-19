@@ -7,6 +7,12 @@
  #}
 <script src="https://authorapi.learnosity.com/?v2023.2.LTS"></script>
 
+<style>
+    .lrn-author-activity-intro-outro {
+        display: none !important;
+    }
+</style>
+
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{{ assessment.title }} content</h2>
@@ -21,14 +27,7 @@
 </div>
 
 <script>
-    let callbacks = {
-        readyListener: function () {
-            authorApp.on("render:activity", function() {
-                document.getElementsByClassName('lrn-author-activity-intro-outro')[0].style.display = 'none';
-                document.getElementsByClassName('lrn-author-activity-intro-outro')[1].style.display = 'none';
-            });
-        }
-    };
-
-    let authorApp = LearnosityAuthor.init({{ initOptions | raw }}, callbacks);
+    let authorApp = LearnosityAuthor.init(
+        {{ initOptions | raw }}
+    );
 </script>
