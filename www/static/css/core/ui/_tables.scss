@@ -314,15 +314,13 @@ $rotate-span-width: 11rem;
         }
     }
 
-    thead th.fixed-left,
-    tbody th.fixed-left {
+    th.fixed-left {
         position: sticky;
         left: 0;
         z-index: 2; /* Z-index for left cells. */
     }
 
-    thead th.fixed-left:nth-child(2),
-    tbody th.fixed-left:nth-child(2) {
+    th.fixed-left:nth-child(2) {
         left: 160px;
     }
 
