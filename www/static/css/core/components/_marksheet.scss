@@ -115,7 +115,6 @@
             background: $submit-button-bg-color;
             color: $submit-button-color;
             text-transform: uppercase;
-            //font-size: 12px;
             text-align: center;
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
@@ -153,6 +152,8 @@ table.dataTable.marksheet {
      * DataTables sets the width of these elements as an inline style attribute, so we need to use !important to override them.
      *
      * This means when the markbook is filtered, it will remain full-width.
+     *
+     * TODO: Remove this rule once DataTables has been removed from the Class Markbook and Rubric Markbook pages.
      */
     width: 100% !important;
 }
