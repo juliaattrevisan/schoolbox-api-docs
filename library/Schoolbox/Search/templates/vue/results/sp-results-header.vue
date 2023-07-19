@@ -32,7 +32,10 @@ const title = window.Vue.computed(() => {
 
 <template>
     <template v-if="showHeader">
-        <h1 class="header" v-html="title"></h1>
+        <div>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <h1 class="header" data-test-sp-results-header v-html="title"></h1>
+        </div>
     </template>
 </template>
 
