@@ -596,7 +596,7 @@ class Controller extends Base
                 'capabilities' => $capabilityMarks,
             ];
 
-            // Stuff everything about the students marks into an array
+            // Stuff everything about the students marks into the existing array
             $students[$row['student_id']]['assessmentsPublished'] = $assessmentsForStudent;
 
             $lastObservedAssessmentId = $row['assessment_id'];
@@ -724,7 +724,6 @@ class Controller extends Base
             }
 
             if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
-                // Draft mark
                 $indicatorMarks[$row['indicator_id']] = [
                     'databaseMark'           => $row['indicator_mark'],
                     'maxMark'                => $row['indicator_max_value'],
