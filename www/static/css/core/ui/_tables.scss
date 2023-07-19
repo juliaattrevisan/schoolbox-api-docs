@@ -276,14 +276,6 @@ $rotate-span-width: 11rem;
             th:nth-child(1) > div {
                 background-color: $body-bg;
             }
-
-            th:last-child {
-                max-width: $square-grid-td-size; /* Without this hack the rightmost column will be too wide.  Could not figure out why. */
-            }
-
-            th:last-child > div {
-                min-width: $square-grid-td-size; /* Without this hack the rightmost div will have a tiny width.  Could not figure out why. */
-            }
         }
 
         tr.course-headers {
