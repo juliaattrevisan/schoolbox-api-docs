@@ -23,6 +23,19 @@ Usage:
 
 {% autoescape 'js' %}
     <script type="text/javascript">
+        function onResize() {
+            const gridContainers = document.querySelectorAll('.square-grid-container');
+            const gridContainer = (gridContainers.length === 1)? gridContainers[0]: null;
+
+            if (gridContainer === null) {
+                return;
+            }
+
+            // Update style rule initially set in _tables.scss.
+            gridContainer.style.maxHeight = 'calc(100vh - ' + Math.round(gridContainer.getBoundingClientRect().top) + 'px)';
+            console.info(gridContainer.getBoundingClientRect().top);
+        }
+
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function() {
                 $("#show-drafts").click(function () {
@@ -44,7 +57,11 @@ Usage:
                         });
                     }
                 });
+
+                onResize();
             });
+
+            window.addEventListener('resize', onResize);
         });
     </script>
 {% endautoescape %}

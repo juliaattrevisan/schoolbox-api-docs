@@ -252,7 +252,7 @@ $rotate-th-width: $square-grid-td-size;
 $rotate-span-width: 11rem;
 
 .square-grid-container {
-    max-height: calc(100vh - 320px);
+    max-height: calc(100vh - 290px); /* 290px is the top offset of the .square-grid-container when the page is in its widest layout.  Updated by Javascript on resize in courseMarkbookInner.twig */
     overflow: auto;
     width: calc(100vw - 4rem);
 
