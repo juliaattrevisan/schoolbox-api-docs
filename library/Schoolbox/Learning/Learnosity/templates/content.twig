@@ -12,10 +12,22 @@
         display: none !important;
     }
 </style>
+<div class="actions-small-1 row">
+    <div class="small-12 columns">
+        <h1>Questions in {{ assessment.title }}</h1>
+    </div>
+
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    <nav>
+        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-modify" href="{{ modifyRoute }}">Modify Quiz</a></li>
+    </ul>
+</div>
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ assessment.title }} content</h2>
         <section class="content">
             <div id="learnosity-author"></div>
         </section>
