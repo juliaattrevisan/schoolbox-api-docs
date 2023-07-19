@@ -1,7 +1,10 @@
 {#
-    array allBreadcrumbs
-    array results
-    bool  perform
+    Expected parameters
+    -------------------
+    allBreadcrumbs array
+    errorMessage   array
+    results        array
+    perform        bool
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -19,7 +22,12 @@
 
         <div class="row">
             <div class="large-12 columns">
-                {% if not perform %}
+                {% if errorMessage %}
+                    <div data-alert="" class="alert-box alert">
+                        The file could not be imported because an error occurred.<br/><br/>
+                        <pre>{{ errorMessage }}</pre>
+                    </div>
+                {% elseif not perform %}
                     <div data-alert="" class="alert-box warning">
                         This is a preview only. Repeat with 'Apply Changes' enabled to persist changes.
                     </div>

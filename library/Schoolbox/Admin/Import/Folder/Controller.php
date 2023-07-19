@@ -149,13 +149,21 @@ class Controller extends Base
         );
 
         $performMode = (bool)$post->get('perform');
-        $allFolders = $bulkHandler->addFolders($performMode);
+        $csvFileFormatErrorMessage = '';
+
+        try {
+            $allFolders = $bulkHandler->addFolders($performMode);
+        } catch (UnexpectedValueException $e) {
+            $csvFileFormatErrorMessage = $e->getMessage();
+            $allFolders = [];
+        }
 
         // Render this thing out
         $this->getResponse()->content->set(
             [
                 'template' => '@adminImportFolder/importResults.twig',
                 'data' => [
+                    'errorMessage'   => $csvFileFormatErrorMessage,
                     'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
                     'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
                     'results'        => $allFolders,
