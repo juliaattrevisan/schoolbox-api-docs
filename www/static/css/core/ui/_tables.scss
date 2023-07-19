@@ -270,8 +270,9 @@ $rotate-span-width: 11rem;
     thead {
         tr.rotate-headers {
             th {
-               top: 0; /* Used in conjunction with position:sticky */
-               border: 0;
+                border: 0;
+                position: sticky;
+                top: 0;
             }
 
             th:nth-child(1),
@@ -283,6 +284,7 @@ $rotate-span-width: 11rem;
 
         tr.course-headers {
             th {
+                position: sticky;
                 top: $rotate-width * 2 + 1; /* To match '.rotate-headers th' height set below. */
             }
 
@@ -304,7 +306,6 @@ $rotate-span-width: 11rem;
         }
 
         th {
-            position: sticky;
             z-index: 3; /* Z-index for top cells must be greater than z-index for left cells. */
         }
     }
