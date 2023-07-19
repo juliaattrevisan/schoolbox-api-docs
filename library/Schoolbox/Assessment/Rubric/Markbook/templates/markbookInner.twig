@@ -272,9 +272,9 @@
                                     {% if capabilityData.show %}
                                         <td class="mark">
                                         {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? '') %}
-                                        <a href="#" class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
+                                        <a href="#" data-actual-mark class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
                                         {% set draftGradientClass = urgency.marks(capabilityData.marks[studentId].latestNormalised ?? '') %}
-                                        <a href="#" data-draft-mark class="{% if draftGradientClass %} {{ draftGradientClass }}{% endif %}">{{ capabilityData.marks[studentId].drraftHumanReadable|default('–') }}</a>
+                                        <a href="#" data-draft-mark class="{% if draftGradientClass %} {{ draftGradientClass }}{% endif %}">{{ capabilityData.marks[studentId].latestHumanReadable|default('–') }}</a>
                                         </td>
                                     {% else %}
                                         <td class="excluded"></td>
@@ -286,7 +286,7 @@
                                     {% for studentId, studentData in students %}
                                         <td class="mark">
                                             {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
-                                        <a href="#" class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
+                                        <a href="#" data-actual-mark class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
                                             {% set draftGradientClass = urgency.marks(indicatorData.marks[studentId].latestNormalised ?? '') %}
                                         <a href="#" data-draft-mark class="{% if draftGradientClass %} {{ draftGradientClass }}{% endif %}">{{ indicatorData.marks[studentId].latestHumanReadable|default('–') }}</a>
                                         </td>
