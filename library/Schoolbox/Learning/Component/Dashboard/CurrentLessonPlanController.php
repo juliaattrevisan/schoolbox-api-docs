@@ -2,13 +2,11 @@
 
 namespace Schoolbox\Learning\Component\Dashboard;
 
+use Alaress\Database\Connector\IConnector;
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\DataModel\Translator\LessonPlan;
-use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Visibility;
 
 class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 {
@@ -27,7 +25,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
      *
      * @var IAssessable[]|Collection
      */
-    private $visibleLessonPlans;
+    private $visibleLessonPlans = [];
 
     /**
      * @var AssessmentMapperProxy
@@ -47,34 +45,75 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
     {
 
         $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
+        $this->range = 60;
+
+        $dateStart = \Alaress_Date_Format::now()->addDays(-$this->range);
+        $dateEnd = \Alaress_Date_Format::now()->addDays($this->range);
 
         $this->assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
         $student = $this->getUser();
 
-        $visibility                = new Visibility($this->getAccess());
-        $this->visibleLessonPlans = $this->assessmentDataSource
-            ->findAllByStudentBetweenDates(
-                $student,
-                true,
-                \Alaress_Date_Format::now()->addDays(-$this->range),
-                \Alaress_Date_Format::now()->addDays($this->range)
-            )
-            ->filter(static function (IAssessable $assessable) use ($student, $visibility) {
-                // Only show lesson plans
-                if (!$assessable instanceof LessonPlan) {
-                    return false;
-                }
-                // Only show work that the student has permission to view
-                $participation = $assessable->getParticipantIfExtant($student);
-                return $participation
-                    && ($participation->isResponseRequired() || $participation->isResubmissionRequired())
-                    && $visibility->isVisibleToUser($assessable, $student, false);
-            })
-            ->sortByCallback(new DueDateSortStrategy($student));
+        /** @var IConnector $database */
+        $database = $this->getSitePage()->getDi()->get('databaseInternal');
+        $pb          = $database
+            ->buildPredicateBuilder('')
+            ->betweenDates('assessment.due_date', $dateStart, $dateEnd);
+        if ($this->getUser()->getRole()->isStudent()) {
+            $pb->equals('lesson_plan.visibility', 'student');
+        }
+        $whereClause = implode(' AND ', $pb->getWhere());
+        $query       = "
+            SELECT * FROM assessment
+            JOIN lesson_plan ON (assessment.id = lesson_plan.assessment_id)
+            WHERE {$whereClause}
+            ";
+        $statement   = $database->executeQuery($query, $pb->getParams());
 
-        return true;
-//        return \count($this->visibleLessonPlans) > 0;
+        $assessmentIds = [];
+        while ($row = $statement->fetch()) {
+            $assessmentIds[] = $row['assessment_id'];
+        }
+
+        $plans = $this->assessmentDataSource->findAllByIds($assessmentIds);
+
+        $route = 'learningAssessment.getSummary';
+        foreach ($plans as $lessonPlan) {
+            // are all fields visible?
+
+            $params =  [
+                'assessmentId' => $lessonPlan->getId(),
+                'assessment'   => $lessonPlan,
+                'studentId'    => $student->getId(),
+                'student'      => $student,
+            ];
+
+            //build array
+            $this->visibleLessonPlans[] = [
+                'title' => $lessonPlan->getTitle(),
+                'dueDate' => $lessonPlan->getDueAt(),
+                'className' => $lessonPlan->getContext()->getFolder()->getTitle(),
+                'classColour' => $lessonPlan->getContext()->getFolder()->getColour(),
+                'url' => $this->getRouteGenerator()->generate($route, $params)
+            ];
+        }
+
+//        return true;
+        return \count($this->visibleLessonPlans) > 0;
+        /**
+         * return array should be similar to:
+         * ```
+         * [{
+         * 'title': 'Lesson Plan Title',
+         * 'dueDate': '2023-07-21 11:13:56Z',
+         * 'class': 'class Name',
+         * 'classColour': '#FFFFFF',
+         * 'url': 'https://vagrant.dev.schoolbox.cloud/learning/assessments/434/1'
+         * },
+         * ]
+         * ```
+         *
+         */
     }
 
     /**
