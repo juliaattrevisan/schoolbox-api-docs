@@ -59,9 +59,8 @@ class Reporter extends App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        $db           = $this->getDatabaseInternal();
-        $logger       = $this->getLogger();
-        $hasDataIssue = false;
+        $db     = $this->getDatabaseInternal();
+        $logger = $this->getLogger();
 
         // Collect expected rows
         $logger->notice('Fetching expected mv_assessment_relation data...');
@@ -70,81 +69,51 @@ class Reporter extends App
             . Reloader::SELECT_ASSESSMENT_RELATION_SQL,
         );
         $selectExpectedDataQuery->execute();
-        $expectedData = $selectExpectedDataQuery->fetchRowArray('assessment_id');
+        $expectedData = $selectExpectedDataQuery->fetchAll();
         $logger->info(sprintf('Fetched expected data: %d rows', count($expectedData)));
 
         // Collect actual rows
         $logger->info('Fetching actual mv_assessment_relation data...');
         $selectActualDataQuery = $db->prepareQuery('SELECT * FROM mv_assessment_relation');
         $selectActualDataQuery->execute();
-        $actualData = $selectActualDataQuery->fetchRowArray('assessment_id');
+        $actualData = $selectActualDataQuery->fetchAll();
         $logger->info(sprintf('Fetched actual data: %d rows', count($actualData)));
 
-        // Report on data expected but not actual
-        $expectedRowsNotInActual = array_diff_key($expectedData, $actualData);
-        if (count($expectedRowsNotInActual)) {
-            $logger->warning(
-                sprintf(
-                    '%d expected assessments not found in actual: %s',
-                    count($expectedRowsNotInActual),
-                    implode(',', array_keys($expectedRowsNotInActual)),
-                )
-            );
-            $hasDataIssue = true;
-        } else {
-            $logger->notice('No expected assessments not found in actual assessments.');
-        }
+        // Sort consistently
+        usort($expectedData, [$this, 'sortCallback']);
+        usort($actualData, [$this, 'sortCallback']);
 
-        // Report on actual but unexpected data
-        $actualRowsNotInExpected = array_diff_key($actualData, $expectedData);
-        if (count($actualRowsNotInExpected)) {
-            $logger->warning(
-                sprintf(
-                    '%d actual assessments not found in expected: %s',
-                    count($actualRowsNotInExpected),
-                    implode(',', array_keys($actualRowsNotInExpected)),
-                )
-            );
-            $hasDataIssue = true;
-        } else {
-            $logger->notice('No actual assessments not found in expected assessments.');
-        }
+        $keyedExpectedData = $this->groupDataByKey($expectedData);
+        $keyedActualData   = $this->groupDataByKey($actualData);
 
-        // Report on differences
-        $differentRows = [];
-        $differ        = new Differ('expected', 'actual');
-        foreach ($actualData as $assessmentId => $actualAssessmentData) {
-            $expectedAssessmentData = $expectedData[$assessmentId] ?? null;
-            if (!isset($expectedAssessmentData)) {
-                continue;
-            }
-            if ($expectedAssessmentData !== $actualAssessmentData) {
-                $differentRows[] = $assessmentId;
-                $logger->debug(
-                    sprintf(
-                        "Assessment %d does not match:\nexpected: %s\nactual: %s\ndiff: %s",
-                        $assessmentId,
-                        json_encode($expectedAssessmentData),
-                        json_encode($actualAssessmentData),
-                        json_encode($differ->diff($expectedAssessmentData, $actualAssessmentData))
-                    )
-                );
-            }
-        }
-        if (count($differentRows)) {
-            $logger->warning(
-                sprintf(
-                    '%d assessments different in actual and expected: %s',
-                    count($differentRows),
-                    implode(',', $differentRows),
-                )
-            );
-            $hasDataIssue = true;
-        } else {
-            $logger->notice('No assessments different in actual and expected.');
-        }
+        // Report on duplicates (both expected and actual)
+        $this->reportOnDuplicates($keyedExpectedData, 'expected');
+        $this->reportOnDuplicates($keyedActualData, 'actual');
+
+        // Report on data expected but not actual, and vice versa
+        $expectedRowsNotInActual = $this->reportOnMissingData(
+            $keyedExpectedData,
+            'expected',
+            $keyedActualData,
+            'actual',
+        );
+        $actualRowsNotInExpected = $this->reportOnMissingData(
+            $keyedActualData,
+            'actual',
+            $keyedExpectedData,
+            'expected',
+        );
+
+        // Report on differences between rows
+        $differentRows = $this->reportOnDifferences($keyedActualData, $keyedExpectedData);
 
         // Raise error code if there was any data difference
+        $hasDataIssue =
+            count($expectedRowsNotInActual) > 0
+            || count($actualRowsNotInExpected) > 0
+            || count($differentRows) > 0
+        ;
+
         exit($hasDataIssue ? CliKernelAbstract::EXIT_STATUS_APP_ERROR : CliKernelAbstract::EXIT_STATUS_OK);
     }
 
@@ -187,5 +156,182 @@ OPTIONS
 
 
 HELP;
+    }
+
+    /**
+     * Report on duplicates in data.
+     *
+     * @param array  $keyedData
+     * @param string $type
+     * @return void Duplicates in data aren't yet considered a problem
+     */
+    private function reportOnDuplicates(array $keyedData, string $type): void
+    {
+        $logger     = $this->getLogger();
+        $duplicates = $this->findDuplicateAssessments($keyedData);
+        if (count($duplicates)) {
+            $logger->warning(
+                sprintf(
+                    '%d %s rows contain duplicates: %s',
+                    count($duplicates),
+                    $type,
+                    implode(',', array_keys($duplicates)),
+                )
+            );
+        } else {
+            $logger->notice(sprintf('No %s rows contain duplicates.', $type));
+        }
+    }
+
+    /**
+     * Finds duplicate assessment IDs in data.
+     *
+     * @param array $keyedData
+     * @return array
+     */
+    private function findDuplicateAssessments(array $keyedData): array
+    {
+        return array_filter($keyedData, fn($v) => count($v) > 1);
+    }
+
+    /**
+     * Report on whatever data might be missing.
+     *
+     * @param array  $keyedBaseData
+     * @param string $baseDataType
+     * @param array  $keyedComparisonData
+     * @param string $comparisonDataType
+     * @return array list of rows missing from `$baseData` in `$comparisonData`,
+     *               if any.
+     */
+    private function reportOnMissingData(
+        array $keyedBaseData,
+        string $baseDataType,
+        array $keyedComparisonData,
+        string $comparisonDataType,
+    ): array {
+        $logger                      = $this->getLogger();
+        $baseDataNotInComparisonData = array_keys(
+            array_diff_key(
+                $keyedBaseData,
+                $keyedComparisonData,
+            )
+        );
+        if (count($baseDataNotInComparisonData)) {
+            $logger->warning(
+                sprintf(
+                    '%d %s rows not found in %s for assessments: %s',
+                    count($baseDataNotInComparisonData),
+                    $baseDataType,
+                    $comparisonDataType,
+                    implode(',', $baseDataNotInComparisonData),
+                )
+            );
+        } else {
+            $logger->notice(
+                sprintf('No %s rows not found in %s assessments.', $baseDataType, $comparisonDataType)
+            );
+        }
+        return $baseDataNotInComparisonData;
+    }
+
+    /**
+     * Group data by its assessment ID.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function groupDataByKey(array $data): array
+    {
+        $returnData = [];
+        foreach ($data as $row) {
+            $assessmentId = $row['assessment_id'];
+            $returnData[$assessmentId] ??= [];
+            $returnData[$assessmentId][] = $row;
+        }
+        return $returnData;
+    }
+
+    /**
+     * Report on data for assessments existing in both `$keyedActualData` and
+     * `$keyedExpectedData`, but different.
+     *
+     * @param array $keyedActualData
+     * @param array $keyedExpectedData
+     * @return array list of assessment IDs in both `$keyedActualData` and
+     *               `$keyedExpectedData`, but with different values.
+     */
+    private function reportOnDifferences(array $keyedActualData, array $keyedExpectedData): array
+    {
+        $logger        = $this->getLogger();
+        $differentRows = [];
+        $differ        = new Differ('expected', 'actual');
+        $assessmentIds = array_unique(
+            array_merge(
+                array_keys($keyedActualData),
+                array_keys($keyedExpectedData),
+            )
+        );
+        foreach ($assessmentIds as $assessmentId) {
+            $actualAssessmentData   = $keyedActualData[$assessmentId] ?? null;
+            $expectedAssessmentData = $keyedExpectedData[$assessmentId] ?? null;
+            if ($expectedAssessmentData !== $actualAssessmentData) {
+                $differentRows[] = $assessmentId;
+                $logger->debug(
+                    sprintf(
+                        "Assessment %d does not match:\nexpected: %s\nactual: %s\ndiff: %s",
+                        $assessmentId,
+                        json_encode($expectedAssessmentData),
+                        json_encode($actualAssessmentData),
+                        json_encode($differ->diff($expectedAssessmentData ?? [], $actualAssessmentData ?? [])),
+                    )
+                );
+            }
+        }
+        if (count($differentRows)) {
+            $logger->warning(
+                sprintf(
+                    '%d assessments different in actual and expected: %s',
+                    count($differentRows),
+                    implode(',', $differentRows),
+                )
+            );
+        } else {
+            $logger->notice('No assessments different in actual and expected.');
+        }
+        return $differentRows;
+    }
+
+    /**
+     * Sort callback for results from DB.
+     *
+     * A little easier (and possibly quicker, believe it or not due to temporary
+     * table creation) than sorting in the DB.
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    private function sortCallback(array $a, array $b): int
+    {
+        $columns = [
+            'assessment_id',
+            'folder_id',
+            'project_assessment_id',
+            'course_implementation_id',
+            'course_unit_implementation_id',
+            'course_specification_id',
+            'course_unit_specification_id',
+        ];
+
+        // Return the first of these which isn't equal
+        foreach ($columns as $column) {
+            $aValue = $a[$column];
+            $bValue = $b[$column];
+            if ($aValue !== $bValue) {
+                return $a <=> $b;
+            }
+        }
+        return 0;
     }
 }
