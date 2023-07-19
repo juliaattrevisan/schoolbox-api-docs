@@ -64,7 +64,7 @@ class Common
     /**
      * Search icon selector
      */
-    public const SEARCH_ICON = 'label.icon-search.no-text';
+    public const SEARCH_ICON = 'button.icon-search.no-text';
 
 
     /**
