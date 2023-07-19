@@ -629,6 +629,7 @@ class Controller extends Base
          */
         (new Fetcher($this->getConfigLoader(), $this->getDi()->get('filesystem.storageProxy')))
             ->fetch($file->getBasename(), $resource, (bool)$this->request->query->get('cache'), $this->getRequest()->query['save'] ?? false);
+        exit;
     }
 
 
