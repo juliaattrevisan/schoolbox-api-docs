@@ -72,10 +72,12 @@
                         {% endif %}
                     </td>
                     <td>grade goes here</td>
-                    <td class="actions-small-1">
+                    <td class="actions-small-2">
                         <nav>
                             {% if not finished %}
-                            <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                                <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                            {% else %}
+                                <a href="{{ routeLookupIfAuthorized('learnosity.getReport', {assessmentId: assessment.id, studentId: student.id, learnosityReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
                             {% endif %}
                         </nav>
                     </td>
