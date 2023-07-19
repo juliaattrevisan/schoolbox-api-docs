@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\Timeline\Module as TimelineModule;
 use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
 use Schoolbox\Learning\Badge\Module as BadgeModule;
 use Schoolbox\Learning\Grades;
+use Schoolbox\Learning\Learnosity\Module as LearnosityModule;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\Module as LearningModule;
@@ -117,5 +118,9 @@ class Learning extends ModuleLoader
         /* Assessment Timelines, accessed asynchronously
          */
         $this->loadModule($di, TimelineModule::class, "/{$namespace}/assessment/timeline");
+
+        /* Learnosity
+         */
+        $this->loadModule($di, LearnosityModule::class, "/{$namespace}/learnosity");
     }
 }
