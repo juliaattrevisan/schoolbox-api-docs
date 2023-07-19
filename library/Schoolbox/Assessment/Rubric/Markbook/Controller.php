@@ -786,8 +786,8 @@ class Controller extends Base
         foreach ($students as $studentId => $student) {
             foreach (($student['assessmentsLatest'] ?? []) as $assessmentId => $assessmentMarks) {
                 foreach (($assessmentMarks['capabilities'] ?? []) as $capabilityId => $capabilityMarks) {
-                    $capabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['databaseMark'] ?? null);
-                    $capabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['maxMark'] ?? null);
+                    $capabilityDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['databaseMark'] ?? null);
+                    $capabilityMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['maxMark'] ?? null);
                     $humanReadableCapabilityMark = null;
                     $normalisedCapabilityMark    = null;
                     if ($capabilityMaxMark) {
@@ -799,22 +799,22 @@ class Controller extends Base
                     $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
                     $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
                     // Draft marks
-                    $latestCapabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['latestDatabaseMark'] ?? null);
-                    $latestCapabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['latestMaxMark'] ?? null);
+                    $latestCapabilityDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['databaseMark'] ?? null);
+                    $latestCapabilityMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['maxMark'] ?? null);
                     $latestHumanReadableCapabilityMark = null;
                     $latestNormalisedCapabilityMark    = null;
                     if ($latestCapabilityMaxMark) {
                         $latestNormalisedCapabilityMark = $latestCapabilityDatabaseMark !== null
                             ? ($latestCapabilityDatabaseMark / $latestCapabilityMaxMark) * 100
                             : null;
-                        $latestHumanReadableCapabilityMark = $capabilityMarks['latestHumanReadableMark'] ?? null;
+                        $latestHumanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
                     }
                     $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $latestHumanReadableCapabilityMark;
                     $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $latestNormalisedCapabilityMark;
 
                     foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
-                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark'] ?? null);
-                        $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark'] ?? null);
+                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['databaseMark'] ?? null);
+                        $indicatorMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['maxMark'] ?? null);
                         $humanReadableIndicatorMark = null;
                         $normalisedIndicatorMark    = null;
 
@@ -829,8 +829,8 @@ class Controller extends Base
                         $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
 
                         // Latest Marks
-                        $latestIndicatorDatabaseMark      = $decimalHydrator->hydrate($latestIndicatorMarks['latestDatabaseMark'] ?? null);
-                        $latestIndicatorMaxMark           = $decimalHydrator->hydrate($latestIndicatorMarks['latestMaxMark'] ?? null);
+                        $latestIndicatorDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['databaseMark'] ?? null);
+                        $latestIndicatorMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['maxMark'] ?? null);
                         $latestHumanReadableIndicatorMark = null;
                         $latestNormalisedIndicatorMark    = null;
 
