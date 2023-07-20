@@ -15,7 +15,7 @@
         <section class="content">
             <div id="schoolbox-student"></div>
         </section>
-        <input type="submit" value="Finalise marks" />
+        <input id='finalise' type="submit" value="Finalise marks" />
     </div>
 </div>
 
@@ -30,10 +30,11 @@
 </style>
 
 <script>
+    let attemptScores = JSON.parse('{{ scores|raw }}');
+
     let reportCallback = {
         readyListener: function() {
             let attemptReport = reportsApp.getReport('schoolbox-student');
-            let attemptScores = JSON.parse('{{ scores|raw }}');
 
             /* itemsApi only spawns if you used session-detail-by-item
              */
@@ -47,6 +48,7 @@
                          */
                         let learnosityReference = element.metadata.sheet_reference;
                         let learnosityReferenceTuple = element.response_id;
+                        let customIdentifier = 'sb-custom__' + learnosityReferenceTuple;
 
                         /* Student scoring and metadata
                          */
@@ -60,7 +62,7 @@
                         container.append('' +
                             '<div class="sb-custom-score">' +
                                 '<label>Customise score</label>' +
-                                '<input type="text" value="' + score + '">' +
+                                '<input id="' + customIdentifier + '" type="number" value="' + score + '">' +
                             '</div>' +
                         '');
                     });
@@ -72,4 +74,20 @@
     let reportsApp = LearnosityReports.init(
         {{ reportInitOptions | raw }}, reportCallback
     );
+
+    $(function() {
+        /* Collate and pump customisations back into Learnosity
+         */
+        $('#finalise').on('click', function(event) {
+            let payload = [];
+
+            $.each(attemptScores, function(index, element) {
+                let customIdentifier = 'sb-custom__' + index;
+
+                payload[index] = parseInt($('#' + customIdentifier).val());
+            });
+
+            console.log(payload);
+        });
+    });
 </script>
