@@ -1036,9 +1036,9 @@ class ListController extends Web\Controller\Base
         $returnUrl = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'            => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg'       => $this->request->query->get('lti_errormsg', ''),
-                    Redirect::RETURN_URL => $this->request->query->get(Redirect::RETURN_URL, $statusUrl),
+                    'lti_msg'            => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg'       => $this->requestQuery->get('lti_errormsg', ''),
+                    Redirect::RETURN_URL => $this->requestQuery->get(Redirect::RETURN_URL, $statusUrl),
                 ]
             )
         );
@@ -1076,13 +1076,13 @@ class ListController extends Web\Controller\Base
             ],
         );
         $returnUrl = new Uri(
-            $this->request->query->get(Redirect::RETURN_URL, $statusUrl),
+            $this->requestQuery->get(Redirect::RETURN_URL, $statusUrl),
         );
         $returnUrl = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'      => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
+                    'lti_msg'      => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg' => $this->requestQuery->get('lti_errormsg', ''),
                 ]
             )
         );
@@ -1179,9 +1179,9 @@ class ListController extends Web\Controller\Base
         $returnUrl = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'            => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg'       => $this->request->query->get('lti_errormsg', ''),
-                    Redirect::RETURN_URL => $this->request->query->get(Redirect::RETURN_URL, $summaryUrl),
+                    'lti_msg'            => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg'       => $this->requestQuery->get('lti_errormsg', ''),
+                    Redirect::RETURN_URL => $this->requestQuery->get(Redirect::RETURN_URL, $summaryUrl),
                 ]
             )
         );
@@ -1222,12 +1222,12 @@ class ListController extends Web\Controller\Base
             ],
         );
 
-        $returnUrl  = new Uri($this->request->query->get(Redirect::RETURN_URL, $summaryUrl));
+        $returnUrl  = new Uri($this->requestQuery->get(Redirect::RETURN_URL, $summaryUrl));
         $returnUrl  = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'      => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
+                    'lti_msg'      => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg' => $this->requestQuery->get('lti_errormsg', ''),
                 ]
             )
         );
