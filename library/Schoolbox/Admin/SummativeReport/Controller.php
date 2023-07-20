@@ -167,14 +167,14 @@ class Controller extends ConfigController
             ]
         ]);
 
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/list.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminSummativeReport/list.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'reports' => $reports
             ]
-        ]);
+        );
     }
 
 
@@ -198,9 +198,9 @@ class Controller extends ConfigController
 
         $report = $this->reportMapper->createModel();
         $report->setFileName(Model::DEFAULT_FILENAME);
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/create.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminSummativeReport/create.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'report' => $report,
@@ -208,7 +208,7 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext()
             ]
-        ]);
+        );
     }
 
 
@@ -258,9 +258,9 @@ class Controller extends ConfigController
             $logoZone->attachFiles([$report->getLogo()]);
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/create.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminSummativeReport/create.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
@@ -271,7 +271,7 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext()
             ]
-        ]);
+        );
     }
 
 
@@ -342,7 +342,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -472,7 +472,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -495,7 +495,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -516,7 +516,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -538,7 +538,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->response = $this->responseAsJson($output);
     }
 
 
@@ -569,7 +569,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -586,7 +586,7 @@ class Controller extends ConfigController
     {
         $this->reportMapper->delete($report);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminSummativeReport.getList'));
     }
 
 
@@ -701,7 +701,7 @@ class Controller extends ConfigController
 
         /* Show waiting screen for the result payload associated with this report generation
          */
-        $this->response->redirect->to($this->routeGenerator->generate('adminSummativeReport.getStatus', [
+        $this->response = $this->redirectFound($this->routeGenerator->generate('adminSummativeReport.getStatus', [
             'reportId' => $report->getId(),
             'key' => $key
         ]));
@@ -735,9 +735,9 @@ class Controller extends ConfigController
             throw new NotFound();
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@adminSummativeReport/result.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminSummativeReport/result.twig',
+            [
                 'pageCurrent'    => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
                     $this->routeGenerator->generate('adminSummativeReport.getList')
@@ -745,7 +745,7 @@ class Controller extends ConfigController
                 'reportCount'    => $statusPayload['numReports'],
                 'warnings'       => $statusPayload['warnings'],
             ]
-        ]);
+        );
     }
 
 
@@ -967,9 +967,7 @@ class Controller extends ConfigController
             'customReportStyle'          => (new CustomStyleExtractor())->extract((string)$this->getConfigLoader()->get('skin_custom_css'))
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildUnthemedHtmlOutput('@adminSummativeReport/studentReport.twig', $data)
-        );
+        $this->response = $this->responseFromTemplateUnthemed('@adminSummativeReport/studentReport.twig', $data);
     }
 
 
@@ -1046,7 +1044,7 @@ class Controller extends ConfigController
         } else {
             //if reports exist.
             //redirect user to report preview
-            $this->getResponse()->redirect->to($reports[0]['url']);
+            $this->response = $this->redirectFound($reports[0]['url']);
         }
     }
 

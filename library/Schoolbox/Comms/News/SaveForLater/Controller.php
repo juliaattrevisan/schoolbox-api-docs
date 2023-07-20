@@ -87,7 +87,7 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             // this is for turning on saved icon in news feed
             // this may contain non-accessible article ids, but should not be a problem
-            $this->getResponse()->content->set($this->buildJsonOutput($savedArticleIds));
+            $this->response = $this->responseAsJson($savedArticleIds);
             return;
         }
 
@@ -117,7 +117,7 @@ class Controller extends Base
         $params = new News\Querystring($this->requestQuery);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order' => ['publish_at' => 'desc']]);
-        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->getServerParams()));
 
         /* Attachment counts for each article in this set
          */
@@ -137,7 +137,7 @@ class Controller extends Base
          */
         $readMores = (new ReadMore($this->getConfigLoader()->get(ConfigMapper::_READ_MORE), $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)))->generate($articles);
 
-        $data = array_merge(
+        $data           = array_merge(
             [
                 'articles'         => $articles,
                 'attachmentCounts' => $attachmentCounts,
@@ -150,7 +150,7 @@ class Controller extends Base
             ],
             $sidebar->generate()
         );
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', $data)->setTitle('Saved For Later')->setTab('news'));
+        $this->response = $this->responseFromTemplate('@commsNewsSaveForLater/index.twig', $data, 'Saved For Later', 'news');
     }
 
 
@@ -164,18 +164,21 @@ class Controller extends Base
      */
     public function postAdd(News\Model $article): void
     {
+        $status = 200;
         try {
             $this->addArticleToUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception | PDOException | UnexpectedValueException $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
             $this->captureException($e);
-            $this->getResponse()->status->set(500);
+            $status = 500;
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([]));
-            return;
+            $this->response = $this->responseAsJson([]);
+        } else {
+            $this->response = $this->responseEmpty();
         }
+        $this->response = $this->response->withStatus($status);
     }
 
 
@@ -189,18 +192,21 @@ class Controller extends Base
      */
     public function postRemove(News\Model $article): void
     {
+        $status = 200;
         try {
             $this->removeArticleFromUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
             $this->captureException($e);
-            $this->getResponse()->status->set(500);
+            $status = 500;
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([]));
-            return;
+            $this->response = $this->responseAsJson([]);
+        } else {
+            $this->response = $this->responseEmpty();
         }
+        $this->response = $this->response->withStatus($status);
     }
 
 

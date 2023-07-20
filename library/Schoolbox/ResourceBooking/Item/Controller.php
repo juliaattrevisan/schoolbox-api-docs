@@ -11,8 +11,6 @@
 namespace Schoolbox\ResourceBooking\Item;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidComponent;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use DateTime;
 use Alaress\Paginator\IUrlPaginator;
@@ -57,10 +55,8 @@ class Controller extends Base
 
     /**
      * Browses the list of items.
-     * @throws InvalidComponent
      * @throws MapperException
      * @throws MapperException\Deleted
-     * @throws InvalidStatusCode
      */
     public function browse(): void
     {
@@ -74,7 +70,7 @@ class Controller extends Base
         $category->setName('All');
 
         // Use the paginator to limit searches
-        $this->paginator->setUrl($this->psr7Request->getUri()->__toString());
+        $this->paginator->setUrl($this->request->getUri()->__toString());
         $list = $this->mapper->createCollection();
         if (strlen($search) > 0) {
             $total = $this->mapper->searchCount($search);
@@ -94,7 +90,8 @@ class Controller extends Base
                 try {
                     $category = $this->mapper->getJoinMapper('category')->findById($catId);
                 } catch (SchoolboxNotFoundException $e) {
-                    $this->getResponse()->status->setCode(404);
+                    $this->response = $this->responseEmpty(404);
+                    return;
                 }
             }
 
@@ -113,23 +110,21 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@resourceItem/browse.twig',
             [
-                'template' => '@resourceItem/browse.twig',
-                'data'     => [
-                    'list'         => $list->sortByCallback(static function (Model $a, Model $b) {
-                        return strnatcasecmp($a->getName(), $b->getName());
-                    }),
-                    'categoryId'   => $catId,
-                    'category'     => $category,
-                    'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',],
-                    ]),
-                    'search'       => $search,
-                    'paginator'    => $this->paginator,
-                    'page'         => $page,
-                ],
-            ]
+                'list'         => $list->sortByCallback(static function (Model $a, Model $b) {
+                    return strnatcasecmp($a->getName(), $b->getName());
+                }),
+                'categoryId'   => $catId,
+                'category'     => $category,
+                'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
+                    'order' => ['name' => 'asc',],
+                ]),
+                'search'       => $search,
+                'paginator'    => $this->paginator,
+                'page'         => $page,
+            ],
         );
     }
 
@@ -153,12 +148,7 @@ class Controller extends Base
                                ];
                            });
         $data->reindex();
-        $this->getResponse()->content->set(
-            [
-                'format' => 'json',
-                'data'   => $data,
-            ]
-        );
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -167,21 +157,19 @@ class Controller extends Base
      */
     public function add(): void
     {
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@resourceItem/edit.twig',
             [
-                'template' => '@resourceItem/edit.twig',
-                'data'     => [
-                    'item'            => new Model(),
-                    'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',],
-                    ]),
-                    'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
-                    'moderatorList'   => [],
-                    'relatedItemList' => [],
-                    'roleList'        => $this->roleMapper->findAll(),
-                    'attachzone'      => $this->getAttachZoneData($this->mapper->createModel()),
-                ],
-            ]
+                'item'            => new Model(),
+                'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
+                    'order' => ['name' => 'asc',],
+                ]),
+                'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
+                'moderatorList'   => [],
+                'relatedItemList' => [],
+                'roleList'        => $this->roleMapper->findAll(),
+                'attachzone'      => $this->getAttachZoneData($this->mapper->createModel()),
+            ],
         );
     }
 
@@ -197,17 +185,15 @@ class Controller extends Base
         if (!($calendarDate instanceof DateTime)) {
             $calendarDate = new DateTime('now');
         }
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@resourceItem/read.twig',
             [
-                'template' => '@resourceItem/read.twig',
-                'data'     => [
-                    'item'         => $item,
-                    'currentTerm'  => $this->termMapper->findForToday(),
-                    'selectedDate' => $calendarDate->format('Y-m-d'),
-                    'calendarView' => $this->requestQuery->get('view') === 'day' ? 'timeGridDay' : '',
-                    'token'        => $this->getUser()->getKey(),
-                ],
-            ]
+                'item'         => $item,
+                'currentTerm'  => $this->termMapper->findForToday(),
+                'selectedDate' => $calendarDate->format('Y-m-d'),
+                'calendarView' => $this->requestQuery->get('view') === 'day' ? 'timeGridDay' : '',
+                'token'        => $this->getUser()->getKey(),
+            ],
         );
     }
 
@@ -234,21 +220,19 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@resourceItem/edit.twig',
             [
-                'template' => '@resourceItem/edit.twig',
-                'data'     => [
-                    'item'            => $item,
-                    'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',],
-                    ]),
-                    'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
-                    'moderatorList'   => $moderatorList,
-                    'relatedItemList' => $relatedItemList,
-                    'roleList'        => $this->roleMapper->findAll(),
-                    'attachzone'      => $this->getAttachZoneData($item),
-                ],
-            ]
+                'item'            => $item,
+                'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
+                    'order' => ['name' => 'asc',],
+                ]),
+                'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
+                'moderatorList'   => $moderatorList,
+                'relatedItemList' => $relatedItemList,
+                'roleList'        => $this->roleMapper->findAll(),
+                'attachzone'      => $this->getAttachZoneData($item),
+            ],
         );
     }
 
@@ -268,7 +252,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.read', ['id' => $model->getId(), 'format' => ''])
         );
     }
@@ -290,7 +274,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.read', ['id' => $item->getId(), 'format' => ''])
         );
     }
@@ -305,7 +289,7 @@ class Controller extends Base
     public function delete(Model $item): void
     {
         $this->mapper->delete($item);
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceItem.browse', ['format' => ''])
         );
     }

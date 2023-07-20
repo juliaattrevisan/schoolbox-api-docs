@@ -264,11 +264,10 @@ class Controller extends BaseController
         }
 
 
-        $this->getResponse()->content->set([
-            'data'     => $context,
-            'format'   => 'nochrome',
-            'template' => "@rubric/$template.twig"
-        ]);
+        $this->response = $this->responseFromTemplateUnthemed(
+            "@rubric/$template.twig",
+            $context
+        );
     }
 
     /**
@@ -279,11 +278,7 @@ class Controller extends BaseController
      */
     protected function sendJSONError($data, $statusCode = 400)
     {
-        $this->getResponse()->status->set($statusCode);
-        $this->getResponse()->content->set([
-            'data'     => $data,
-            'format'   => 'json',
-        ]);
+        $this->response = $this->responseAsJson($data)->withStatus($statusCode);
     }
 
 
@@ -329,11 +324,7 @@ class Controller extends BaseController
             $maxLevels = (int)$this->getDi()->get('config')->get('rubric_max_levels');
             $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
         } catch (\Exception $e) {
-            $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data'   => $e->getMessage()
-            ]);
+            $this->response = $this->responseAsJson($e->getMessage())->withStatus(400);
             return;
         }
 
@@ -341,11 +332,11 @@ class Controller extends BaseController
          *
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
-        $fragment = $this->buildUnthemedHtmlOutput('@rubric/grid-editable.twig', $context = [
+        $fragment = $this->responseFromTemplateUnthemed('@rubric/grid-editable.twig', $context = [
             'formField'  => $post->get('formField', 'rb'),
             'rubricGrid' => $assessment->getRubricGrid(),
             'levelLimit' => $maxLevels,
-        ])->getAsString();
+        ])->getBody()->getContents();
 
         $payload = [
 
@@ -367,7 +358,7 @@ class Controller extends BaseController
             'fragment' => $fragment,
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
     /**
@@ -425,18 +416,13 @@ class Controller extends BaseController
         $basename = (new Url($assessment->getTitle()))->getSlug();
         $content  = $this->array2csv((new ArrayExporter())->export($grid));
 
-        $headers  = $this->getResponse()->headers;
-
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"$basename-rubric.csv\"");
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->response = $this->responseFromContent($content)
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"$basename-rubric.csv\"")
+        ;
     }
 
 
@@ -511,8 +497,7 @@ class Controller extends BaseController
 
         // Response code is always 200:
         // this is a valid request even if marks would've been invalidated.
-        $this->response->status->setCode(200);
-        $this->response->content->set($this->buildJsonOutput($response));
+        $this->response = $this->responseAsJson($response)->withStatus(200);
     }
 
 

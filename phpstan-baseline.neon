@@ -461,26 +461,6 @@ parameters:
 			path: library/Alaress/Validator/Abstract.php
 
 		-
-			message: "#^Property Alaress\\\\Web\\\\Output\\\\Base\\:\\:\\$data \\(string\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/Base.php
-
-		-
-			message: "#^Variable \\$data in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/Base.php
-
-		-
-			message: "#^Property Alaress\\\\Web\\\\Output\\\\File\\:\\:\\$file \\(string\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/File.php
-
-		-
-			message: "#^Property Alaress\\\\Web\\\\Output\\\\Html\\:\\:\\$template \\(string\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Web/Output/Html.php
-
-		-
 			message: "#^Property Alaress\\\\WorkerCrew\\\\Dispatcher\\:\\:\\$timer \\(React\\\\EventLoop\\\\TimerInterface\\) does not accept null\\.$#"
 			count: 2
 			path: library/Alaress/WorkerCrew/Dispatcher.php
@@ -5724,11 +5704,6 @@ parameters:
 			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Statistics/DataSource.php
-
-		-
-			message: "#^Method Schoolbox\\\\Survey\\\\Controller\\:\\:getSelectize\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Survey/Controller.php
 
 		-
 			message: "#^If condition is always true\\.$#"

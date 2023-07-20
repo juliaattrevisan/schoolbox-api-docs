@@ -69,19 +69,17 @@ class Controller extends Base
      */
     public function getModify(Folder $folder)
     {
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@group/modify.twig',
             [
-                'template' => '@group/modify.twig',
-                'title'    => 'Manage Group',
-                'data'     => [
-                    'folder'      => $folder,
-                    'showSetting' => (bool)$this->requestQuery->get('new'),
-                    'breadcrumbs' => [
-                        [$folder->getTitle(), "/homepage/{$folder->getId()}"],
-                        ['Manage Group'],
-                    ],
+                'folder'      => $folder,
+                'showSetting' => (bool)$this->requestQuery->get('new'),
+                'breadcrumbs' => [
+                    [$folder->getTitle(), "/homepage/{$folder->getId()}"],
+                    ['Manage Group'],
                 ],
-            ]
+            ],
+            'Manage Group',
         );
     }
 
@@ -126,22 +124,19 @@ class Controller extends Base
             'members'   => $members,
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($data)
-        );
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
      * Remove members from a group
      * @param Folder $folder
      * @return void
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @since 22.1
      * @api   DELETE /group/removeMembers/{folderId}
      */
     public function removeMembers(Folder $folder)
     {
-        $requestBody = $this->psr7Request->getParsedBody();
+        $requestBody = $this->request->getParsedBody();
         $userIds     = array_map('intval', $requestBody['members']);
 
         $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
@@ -152,7 +147,7 @@ class Controller extends Base
             $this->sendJsonError('Failed to remove member: ' . $e->getMessage(), 400);
             return;
         }
-        $this->getResponse()->status->setCode(204);
+        $this->response = $this->responseEmpty(204);
     }
 
     /**
@@ -164,7 +159,7 @@ class Controller extends Base
      */
     public function updateMembers(Folder $folder)
     {
-        $requestBody = $this->psr7Request->getParsedBody();
+        $requestBody = $this->request->getParsedBody();
         $newAccesses = array_combine(
             array_map('intval', array_column($requestBody['accessTypes'], 'userId')),
             $requestBody['accessTypes']
@@ -193,16 +188,14 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'members' => $userAccesses->map(function ($userAccess) {
-                        $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
-                        $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
-                        return $array;
-                    }),
-                ]
-            )
+        $this->response = $this->responseAsJson(
+            [
+                'members' => $userAccesses->map(function ($userAccess) {
+                    $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
+                    $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
+                    return $array;
+                }),
+            ]
         );
     }
 
@@ -216,7 +209,7 @@ class Controller extends Base
      */
     public function addMembers(Folder $folder)
     {
-        $requestBody = $this->psr7Request->getParsedBody();
+        $requestBody = $this->request->getParsedBody();
         $users       = $this->getUsersFromRequest($requestBody);
 
         // Find users already in the group
@@ -255,16 +248,14 @@ class Controller extends Base
             $this->userAccessMapper->save($newAccesses);
         }
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'newMembers' => $newAccesses->map(function ($userAccess) {
-                        $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
-                        $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
-                        return $array;
-                    }),
-                ]
-            )
+        $this->response = $this->responseAsJson(
+            [
+                'newMembers' => $newAccesses->map(function ($userAccess) {
+                    $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
+                    $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
+                    return $array;
+                }),
+            ]
         );
     }
 
@@ -279,7 +270,7 @@ class Controller extends Base
     public function updateSettings(Folder $folder)
     {
         // access, isNotificationsEnabled, isForceFollow
-        $requestBody = $this->psr7Request->getParsedBody();
+        $requestBody = $this->request->getParsedBody();
 
         /** @var Group $group */
         $group = (new ArrayToModel\Group())($requestBody, $folder->getGroup());
@@ -292,10 +283,8 @@ class Controller extends Base
             !$folder->getGroup()->getNotificationDisabled()
         );
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(['success' => true])
-        );
-        $data = [
+        $this->response = $this->responseAsJson(['success' => true]);
+        $data           = [
             'settings' => [
                 'new'                    => $this->requestQuery->get('new') ?? 0,
                 'access'                 => $group->getTypeString(),
@@ -303,9 +292,7 @@ class Controller extends Base
                 'isForceFollow'          => $group->getForceFollow(),
             ],
         ];
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($data)
-        );
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -350,9 +337,7 @@ class Controller extends Base
                 'id'   => $group->getId(),
             ];
         }
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($return)
-        );
+        $this->response = $this->responseAsJson($return);
     }
 
     /**
@@ -371,9 +356,7 @@ class Controller extends Base
                 'id'   => $role->getId(),
             ];
         }
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($return)
-        );
+        $this->response = $this->responseAsJson($return);
     }
 
     /**
@@ -442,9 +425,7 @@ class Controller extends Base
                 'external_id' => $user->getExternalId(),
             ];
         }
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($return)
-        );
+        $this->response = $this->responseAsJson($return);
     }
 
     /**

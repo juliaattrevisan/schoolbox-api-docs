@@ -41,16 +41,16 @@ class Controller extends Base
 
         $queueItems = $this->getVideoQueueMapper()->findByStatus($statuses, ['order' => ['createdOn' => 'desc']]);
 
-        $this->getResponse()->content->set([
-            'template' => '@adminVideo/index.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminVideo/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminVideo.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminVideo.getIndex')),
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],
-            'title' => 'Admin - Video Queue'
-        ]);
+            'Admin - Video Queue'
+        );
     }
 
     /**
@@ -62,12 +62,12 @@ class Controller extends Base
      */
     public function getLog($queue)
     {
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput(
+        $this->response = $this->responseFromTemplateUnthemed(
             '@adminVideo/log.twig',
             [
                 'log' => $queue,
             ]
-        ));
+        );
     }
 
     /**
@@ -76,7 +76,7 @@ class Controller extends Base
     public function postSubmit()
     {
         $post = $this->requestPost;
-
+        $status = 200;
         try {
             /** @var VideoQueue $video */
             $video = $this->getVideoQueueMapper()->findById($post['videoId']);
@@ -84,7 +84,7 @@ class Controller extends Base
             if ($post['videoAction'] == 'resubmit') {
                 $video->setStatus(VideoQueueMapper::STATUS_PENDING);
                 $this->getVideoQueueMapper()->save($video);
-                $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminVideo.getIndex'));
+                $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminVideo.getIndex'));
             } else if ($post['videoAction'] == 'delete') {
                 $this->getVideoQueueMapper()->delete($video);
             }
@@ -93,18 +93,13 @@ class Controller extends Base
                 'result' => 'success'
             ];
         } catch (MapperException $e) {
-            $this->getResponse()->status->setCode(500);
             $data = [
                 'result' => 'error'
             ];
+            $status = 500;
         }
 
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $data
-            )
-        );
+        $this->response = $this->responseAsJson($data)->withStatus($status);
     }
 
     /** Here be mappers and stuff */

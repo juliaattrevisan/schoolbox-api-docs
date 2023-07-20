@@ -28,15 +28,13 @@ class Controller extends Base
 
     /**
      * Perform an AJAX search for surveys
-     *
-     * @return string
      */
     public function getSelectize()
     {
-        return $this->getResponse()->content->set($this->buildJsonOutput(
+        $this->response = $this->responseAsJson(
             $this->surveyMapper->findByKeyword(
                 $this->requestQuery['query']
             )
-        ));
+        );
     }
 }

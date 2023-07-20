@@ -61,21 +61,19 @@ class Controller extends Base
         }
 
         // Load parent nodes and all of their subnodes, and dump them in a tree
-        $this->getResponse()->content->set(
-            array(
-                'title'    => 'Curriculum',
-                'template' => '@curriculum/browse.twig',
-                'data'     => array(
-                    'tree'   => $tree,
-                    // Readonly check - for now, check without any parameters
-                    'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
-                        'curriculum.edit',
-                        [],
-                        $this->getUser()
-                    ),
-                    'uiLimit' => self::DEFAULT_UI_LIMIT,
+        $this->response = $this->responseFromTemplate(
+            '@curriculum/browse.twig',
+            [
+                'tree'   => $tree,
+                // Readonly check - for now, check without any parameters
+                'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
+                    'curriculum.edit',
+                    [],
+                    $this->getUser()
                 ),
-            )
+                'uiLimit' => self::DEFAULT_UI_LIMIT,
+            ],
+            'Curriculum',
         );
     }
 
@@ -85,14 +83,11 @@ class Controller extends Base
     public function search()
     {
         $search = trim($this->requestQuery['query']);
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $this->nodeMapper->search(
-                    $this->articleResolver,
-                    $this->getSession()->getAuthUser(),
-                    $search
-                ),
+        $this->response = $this->responseAsJson(
+            $this->nodeMapper->search(
+                $this->articleResolver,
+                $this->getSession()->getAuthUser(),
+                $search
             )
         );
     }
@@ -110,7 +105,7 @@ class Controller extends Base
             'parent',
             'children',
         );
-        $this->response->content->set($this->buildJsonOutput($tree));
+        $this->response = $this->responseAsJson($tree);
     }
 
     /**
@@ -159,14 +154,10 @@ class Controller extends Base
      */
     public function read(Node\Model $item)
     {
-        $this->getResponse()->content->set(
-            array(
-                'title'    => 'Curriculum',
-                'template' => '@curriculum/read.twig',
-                'data'     => array(
-                    'item' => $item,
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@curriculum/read.twig',
+            ['item' => $item],
+            'Curriculum'
         );
     }
 
@@ -207,20 +198,16 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set(
-                array(
-                    'format' => 'json',
-                    'data'   => array(
-                        'item' => $item,
-                        'tree' => $this->getAsJsTree($item),
-                    ),
-                )
-            );
+            $this->response = $this->responseAsJson(
+                [
+                    'item' => $item,
+                    'tree' => $this->getAsJsTree($item),
+                ],
+            )->withStatus($code);
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }
@@ -260,20 +247,16 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set(
-                array(
-                    'format' => 'json',
-                    'data'   => array(
-                        'item' => $item,
-                        'tree' => $this->getAsJsTree($item),
-                    ),
-                )
-            );
+            $this->response = $this->responseAsJson(
+                [
+                    'item' => $item,
+                    'tree' => $this->getAsJsTree($item),
+                ],
+            )->withStatus($code);
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }
@@ -294,20 +277,16 @@ class Controller extends Base
 
         // Send something back
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set(
-                array(
-                    'format' => 'json',
-                    'data'   => array(
-                        'item' => $item,
-                        'tree' => $this->getAsJsTree($item),
-                    ),
-                )
-            );
+            $this->response = $this->responseAsJson(
+                [
+                    'item' => $item,
+                    'tree' => $this->getAsJsTree($item),
+                ],
+            )->withStatus($code);
         } else {
             // Redirect back to the the last page?
             // Or elsewhere, should validation have failed
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
         }

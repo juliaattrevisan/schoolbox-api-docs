@@ -119,17 +119,15 @@ class Controller extends Base
 
         // And render this thing out
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@pastoralReportBuilder/index.twig',
             [
-                'template' => '@pastoralReportBuilder/index.twig',
-                'data'     => [
-                    'reportsMine'  => $reportsMine,
-                    'reportsGroup' => $reportsGroup,
-                    'reportsOther' => $reportsOther,
-                    'isModerator'  => $isModerator,
-                ],
-                'title'    => 'Pastoral Reports',
-            ]
+                'reportsMine'  => $reportsMine,
+                'reportsGroup' => $reportsGroup,
+                'reportsOther' => $reportsOther,
+                'isModerator'  => $isModerator,
+            ],
+            'Pastoral Reports',
         );
     }
 
@@ -275,35 +273,33 @@ class Controller extends Base
         );
 
         // And render this thing out
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@pastoralReportBuilder/modify.twig',
             [
-                'template' => '@pastoralReportBuilder/modify.twig',
-                'data'     => [
-                    'moderator'            => $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0,
-                    'years'                => $yearLevels,
-                    'houses'               => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
-                    'campuses'             => $this->campusMapper->findAll()->sortBy('sequence', 'asc'),
-                    'types'                => $this->pastoralTypeMapper->findAll(),
-                    'subTypes'             => $this->pastoralSubTypeMapper->findAll(),
-                    'severities'           => $severities,
-                    'tags'                 => $this->pastoralTagMapper->findAll(),
-                    'actions'              => $availableActions,
-                    'groups'               => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
-                    'studentsSelected'     => $studentsSelected,
-                    'authorsSelected'      => $authorsSelected,
-                    'tagsSelected'         => $tagsSelected,
-                    'actionsSelected'      => $actionsSelected,
-                    'foldersSelected'      => $foldersSelected,
-                    'report'               => $report,
-                    'datePresets'          => PastoralReport::RELATIVE_DATE_PRESETS,
-                    'selectedRelativeDate' => $report->getRelativeDateString(),
-                    'record'               => $fakeRecord,
-                    'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
-                    'roles'                => $roles,
-                    'orderFields'          => $orderFields,
-                ],
-                'title'    => 'Pastoral Report',
-            ]
+                'moderator'            => $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0,
+                'years'                => $yearLevels,
+                'houses'               => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
+                'campuses'             => $this->campusMapper->findAll()->sortBy('sequence', 'asc'),
+                'types'                => $this->pastoralTypeMapper->findAll(),
+                'subTypes'             => $this->pastoralSubTypeMapper->findAll(),
+                'severities'           => $severities,
+                'tags'                 => $this->pastoralTagMapper->findAll(),
+                'actions'              => $availableActions,
+                'groups'               => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
+                'studentsSelected'     => $studentsSelected,
+                'authorsSelected'      => $authorsSelected,
+                'tagsSelected'         => $tagsSelected,
+                'actionsSelected'      => $actionsSelected,
+                'foldersSelected'      => $foldersSelected,
+                'report'               => $report,
+                'datePresets'          => PastoralReport::RELATIVE_DATE_PRESETS,
+                'selectedRelativeDate' => $report->getRelativeDateString(),
+                'record'               => $fakeRecord,
+                'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
+                'roles'                => $roles,
+                'orderFields'          => $orderFields,
+            ],
+            'Pastoral Report',
         );
     }
 
@@ -321,18 +317,16 @@ class Controller extends Base
 
         // And spit this thing out
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@pastoralReportBuilder/report_results.twig',
             [
-                'template' => '@pastoralReportBuilder/report_results.twig',
-                'data'     => [
-                    'title'          => "Records By Tag - {$tag->getName()}",
-                    'export'         => false,
-                    'results'        => $records,
-                    'showSeverity'   => $showSeverity,
-                    'severityColors' => $severityColors,
-                ],
-                'title'    => 'Pastoral Tag Report',
-            ]
+                'title'          => "Records By Tag - {$tag->getName()}",
+                'export'         => false,
+                'results'        => $records,
+                'showSeverity'   => $showSeverity,
+                'severityColors' => $severityColors,
+            ],
+            'Pastoral Tag Report',
         );
     }
 
@@ -360,19 +354,17 @@ class Controller extends Base
 
         // And spit this thing out
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@pastoralReportBuilder/report_results.twig',
             [
-                'template' => '@pastoralReportBuilder/report_results.twig',
-                'data'     => [
-                    'title'          => $report->getName(),
-                    'export'         => true,
-                    'results'        => $records,
-                    'report'         => $report,
-                    'showSeverity'   => $showSeverity,
-                    'severityColors' => $severityColors,
-                ],
-                'title'    => $report->getName(),
-            ]
+                'title'          => $report->getName(),
+                'export'         => true,
+                'results'        => $records,
+                'report'         => $report,
+                'showSeverity'   => $showSeverity,
+                'severityColors' => $severityColors,
+            ],
+            $report->getName(),
         );
     }
 
@@ -644,7 +636,7 @@ class Controller extends Base
 
         // Go back to the reports list
 
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoralReportBuilder.getIndex')
         );
     }
@@ -663,15 +655,10 @@ class Controller extends Base
 
         $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
-        $this->getResponse()->content->set(
-            [
-                'format' => 'json',
-                'data'   => $this->buildJsonOutput([
-                                                       'status' => 'OK',
-                                                       'result' => $result,
-                                                   ]),
-            ]
-        );
+        $this->response = $this->responseAsJson([
+            'status' => 'OK',
+            'result' => $result,
+        ]);
     }
 
     /**

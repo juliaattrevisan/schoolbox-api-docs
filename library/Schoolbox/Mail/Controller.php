@@ -188,24 +188,22 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@mail/send.twig',
             [
-                'template' => '@mail/send.twig',
-                'data'     => [
-                    'invalidEmails' => $invalidEmails,
-                    'subject'       => $params->get('subject'),
-                    'body'          => $emailBody,
-                    'replyTo'       => json_encode(array_values($addressLists['replyto'])),
-                    'cc'            => json_encode(array_values($addressLists['cc'])),
-                    'bcc'           => json_encode(array_values($addressLists['bcc'])),
-                    'attachzone'    => $zone->getTwigContext(),
-                    'baseHref'      => $uri,
-                    'folder'        => $folder,
-                    'student'       => $student,
-                    'title'         => $params->get('title'),
-                ],
-                'title'    => 'Webmail',
-            ]
+                'invalidEmails' => $invalidEmails,
+                'subject'       => $params->get('subject'),
+                'body'          => $emailBody,
+                'replyTo'       => json_encode(array_values($addressLists['replyto'])),
+                'cc'            => json_encode(array_values($addressLists['cc'])),
+                'bcc'           => json_encode(array_values($addressLists['bcc'])),
+                'attachzone'    => $zone->getTwigContext(),
+                'baseHref'      => $uri,
+                'folder'        => $folder,
+                'student'       => $student,
+                'title'         => $params->get('title'),
+            ],
+            'Webmail',
         );
     }
 
@@ -305,7 +303,7 @@ class Controller extends Base
 
         try {
             $mail->send();
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory(2)
             );
         } catch (TransportExceptionInterface $e) {
@@ -358,7 +356,7 @@ class Controller extends Base
         if ($replyTo && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $this->requestPost->get('template'))) {
             foreach ($this->requestPost->getArrayCopy() as $key => $var) {
                 if (!$this->checkSpamHeaders($var)) {
-                    $this->getResponse()->redirect->to('/');
+                    $this->response = $this->redirectFound('/');
                 }
                 $key = strtoupper($key);
 
@@ -387,9 +385,9 @@ class Controller extends Base
         }
 
         if (preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation'])) {
-            $this->getResponse()->redirect->to($_POST['confirmation']);
+            $this->response = $this->redirectFound($_POST['confirmation']);
         } else {
-            $this->getResponse()->redirect->to('/feedback/thank-you');
+            $this->response = $this->redirectFound('/feedback/thank-you');
         }
     }
 

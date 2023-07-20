@@ -669,7 +669,7 @@ class Module
         // Generate a URI here (with Schoolbox's augmentations),
         // and inject its query params into the controller
         /** @var ServerRequestInterface $request */
-        $request    = $container->get('request');
+        $request    = $container->get('httpRequest');
         $requestUri = new Uri($request->getUri()->__toString());
 
         $requestQuery = new Values($requestUri->getQueryAsArray());
@@ -680,10 +680,10 @@ class Module
         );
 
         $controller
-            ->setResponse($container->get('webFactory')->newResponse())
-            ->setPsr7Request($request)
+            ->setRequest($request)
             ->setRequestQuery($requestQuery)
             ->setRequestPost($requestPost)
+            ->setResponseFactory($container->get('httpResponseFactory'))
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
             ->setRouteGenerator($container->get('router.generator'))

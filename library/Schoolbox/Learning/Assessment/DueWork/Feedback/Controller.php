@@ -195,9 +195,7 @@ class Controller extends Base
             $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
         }
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($results)
-        );
+        $this->response = $this->responseAsJson($results);
     }
 
     /**
@@ -396,8 +394,7 @@ class Controller extends Base
      */
     protected function respond($template, $data, $responseCode = 200)
     {
-        $this->getResponse()->status->set($responseCode);
-        $this->getResponse()->content->set($this->buildContent($template, $data));
+        $this->response = $this->responseDependentOnRequest($template, $data)->withStatus($responseCode);
     }
 
 

@@ -46,15 +46,13 @@ class Controller extends Base
     public function getIndex(): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@adminGrades/index.twig',
-                [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminGrades.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminGrades.getIndex')),
-                    'gradeGroups'    => $this->retrieveAllGradeGroups(),
-                ]
-            )
+        $this->response = $this->responseFromTemplate(
+            '@adminGrades/index.twig',
+            [
+                'pageCurrent'    => $this->routeGenerator->generate('adminGrades.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminGrades.getIndex')),
+                'gradeGroups'    => $this->retrieveAllGradeGroups(),
+            ]
         );
     }
 
@@ -90,9 +88,7 @@ class Controller extends Base
         $this->gradeLevelMapper->delete($gradeGroup->getGradeLevels());
         $this->gradeLevelGroupMapper->delete($gradeGroup);
 
-        $this->response->content->set(
-            $this->buildJsonOutput($this->retrieveAllGradeGroups())
-        );
+        $this->response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**
@@ -112,9 +108,7 @@ class Controller extends Base
 
         $this->gradeLevelMapper->delete($gradeLevel);
 
-        $this->response->content->set(
-            $this->buildJsonOutput($this->retrieveAllGradeGroups())
-        );
+        $this->response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**
@@ -126,7 +120,7 @@ class Controller extends Base
      */
     public function postSaveGrades(): void
     {
-        $payload          = $this->psr7Request->getParsedBody();
+        $payload          = $this->request->getParsedBody();
         $gradeLevelGroups = $this->gradeLevelGroupMapper->createCollection();
 
         foreach ($payload as $gradeLevelGroupPayload) {
@@ -160,9 +154,7 @@ class Controller extends Base
             $this->gradeLevelMapper->save($gradeLevelGroup->getGradeLevels());
         }
 
-        $this->response->content->set(
-            $this->buildJsonOutput($this->retrieveAllGradeGroups())
-        );
+        $this->response = $this->responseAsJson($this->retrieveAllGradeGroups());
     }
 
     /**

@@ -81,7 +81,7 @@ class Controller extends Base
                     /* Find the first available subtype
                      * and redirect to its modify screen
                      */
-                    $this->getResponse()->redirect->to(
+                    $this->response = $this->redirectFound(
                         $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
                             'subtypeId' => $subtype->getId(),
                         ])
@@ -94,7 +94,7 @@ class Controller extends Base
             /* If there aren't any subtypes, find the first available type
              * and redirect to its modify screen
              */
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
                     'typeId' => $type->getId(),
                     'type' => $type,
@@ -108,11 +108,11 @@ class Controller extends Base
          * not configured the Pastoral Module sufficiently
          * Empty State
          */
-        $this->getResponse()->content->set([
-            'template' => '@pastoralAudience/audiences.twig',
-            'data' => [],
-            'title' => 'Pastoral Group Management',
-        ]);
+        $this->response = $this->responseFromTemplate(
+            '@pastoralAudience/audiences.twig',
+            [],
+            'Pastoral Group Management',
+        );
     }
 
 
@@ -206,9 +206,9 @@ class Controller extends Base
         $transformer     = new ColorHelper();
         $backgroundColor = ($foregroundColor === null ? null : $transformer->calculateBackground($foregroundColor));
 
-        $this->getResponse()->content->set([
-            'template' => '@pastoralAudience/audiences_modify.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@pastoralAudience/audiences_modify.twig',
+            [
                 'flyout'          => $flyout->generateVars($url),
                 'breadcrumbs'     => $flyout->generateBreadcrumbs($url),
                 'record'          => $record,
@@ -233,8 +233,8 @@ class Controller extends Base
                     'baseDark'   => ColorHelper::BASE_BACKGROUND_COLOR_DARK,
                 ],
             ],
-            'title'    => 'Pastoral Group Management',
-        ]);
+            'Pastoral Group Management',
+        );
     }
 
 
@@ -383,7 +383,7 @@ class Controller extends Base
          *
          * TODO Possibly replace this with an async toast
          */
-        $this->response->redirect->to($redirect);
+        $this->response = $this->redirectFound($redirect);
     }
 
 

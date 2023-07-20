@@ -37,9 +37,9 @@ class Controller extends Base
             new Node('Add Rule', '#', true)
         ]);
 
-        $this->getResponse()->content->set([
-            'template' => '@upsRule/add.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@upsRule/add.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('upsRule.add'),
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $params['rulesetId'],
@@ -48,7 +48,7 @@ class Controller extends Base
                  */
                 'rule' => []
             ]
-        ]);
+        );
     }
 
 
@@ -77,7 +77,7 @@ class Controller extends Base
 
         $mapper->create($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/ups/$roleType#rule-{$rule->getId()}");
+        $this->response = $this->redirectFound("/adminv2/ups/$roleType#rule-{$rule->getId()}");
     }
 
 
@@ -102,15 +102,15 @@ class Controller extends Base
             new Node(ucwords($rulesetId), "/adminv2/ups/{$rulesetId}", true)
         ]);
 
-        $this->getResponse()->content->set([
-            'template' => '@upsRule/add.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@upsRule/add.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('upsRule.add'),
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $rulesetId,
                 'rule' => $rule
             ]
-        ]);
+        );
     }
 
 
@@ -135,7 +135,7 @@ class Controller extends Base
 
         Mapper::getInstance()->save($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
+        $this->response = $this->redirectFound("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
     }
 
 
@@ -149,9 +149,6 @@ class Controller extends Base
         $ruleId = $this->requestPost->get('ruleId');
         $deleteCount = Mapper::getInstance()->deleteByColumn('id', $ruleId);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $deleteCount > 0
-        ]);
+        $this->response = $this->responseAsJson($deleteCount > 0);
     }
 }

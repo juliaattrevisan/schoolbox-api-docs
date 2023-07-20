@@ -181,13 +181,11 @@ class Controller extends Assessment\Controller
             'returnUrlSuffix' => $returnUrlSuffix
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/quiz/status.twig',
-                $twigData,
-                "Status of {$assessment->getTitle()}",
-                'submission'
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/quiz/status.twig',
+            $twigData,
+            "Status of {$assessment->getTitle()}",
+            'submission'
         );
     }
 
@@ -232,7 +230,7 @@ class Controller extends Assessment\Controller
         );
 
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->getResponse()->redirect->to($sebDownload);
+            $this->response = $this->redirectFound($sebDownload);
             return;
         }
 
@@ -308,13 +306,11 @@ class Controller extends Assessment\Controller
             'externalRedirectUrl' => $externalRedirectUrl
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/quiz/summary/student.twig',
-                $twigData,
-                "Status of {$assessment->getTitle()}",
-                'submission'
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/quiz/summary/student.twig',
+            $twigData,
+            "Status of {$assessment->getTitle()}",
+            'submission'
         );
     }
 

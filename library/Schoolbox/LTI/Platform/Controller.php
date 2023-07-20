@@ -94,13 +94,11 @@ class Controller extends Base
         $message = (new OidcAuthenticationRequestFactory(
             $this->registrations,
             $this->userAuthenticator,
-        ))->build($this->psr7Request);
+        ))->build($this->request);
 
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/messageForm.twig',
-                ['message' => $message,]
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/messageForm.twig',
+            ['message' => $message,]
         );
     }
 
@@ -140,15 +138,12 @@ class Controller extends Base
         );
 
         // Build the access token response
-        $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
-        $response  = $generator->generate(
-            $this->psr7Request,
+        $generator          = new AccessTokenResponseGenerator($this->keyChains, $factory);
+        $this->response = $generator->generate(
+            $this->request,
             (new ResponseFactory())->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
-
-        // Convert that response into something Aura understands, and output it
-        $this->populateResponseFromPsr7Response($response);
     }
 
     /**
@@ -170,10 +165,8 @@ class Controller extends Base
      */
     public function getJsonWebKeySet(): void
     {
-        $jwksExporter = new JwksExporter($this->keyChains);
-        $this->response->content->set(
-            $this->buildJsonOutput($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME))
-        );
+        $jwksExporter   = new JwksExporter($this->keyChains);
+        $this->response = $this->responseAsJson($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME));
     }
 
     /**
@@ -193,7 +186,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->psr7Request);
+        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->request);
         if ($result->hasError()) {
             throw new LtiException($result->getError());
         }
@@ -205,16 +198,14 @@ class Controller extends Base
 
         // The end recipient of the resource link will need to know about the
         // tool which created the link, so it can launch the link later.
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/receiveDeepLinkingResponse.twig',
-                [
-                    'context'       => $this->requestQuery->get('context'),
-                    'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
-                    'tool'          => $tool,
-                    'resourceLinks' => $resourceLinks,
-                ],
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/receiveDeepLinkingResponse.twig',
+            [
+                'context'       => $this->requestQuery->get('context'),
+                'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+                'tool'          => $tool,
+                'resourceLinks' => $resourceLinks,
+            ],
         );
     }
 

@@ -182,11 +182,9 @@ class Controller extends BaseController
         );
 
         // Send the request
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/messageForm.twig',
-                ['message' => $message],
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/messageForm.twig',
+            ['message' => $message],
         );
     }
 
@@ -240,11 +238,9 @@ class Controller extends BaseController
         );
 
         // Build a DL request to this tool
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/messageForm.twig',
-                ['message' => $message],
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@ltiPlatform/messageForm.twig',
+            ['message' => $message],
         );
     }
 
@@ -275,7 +271,7 @@ class Controller extends BaseController
             new AccessTokenRepository($this->accessTokenCache),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
-        $request = $resourceServerValidator->validateAuthenticatedRequest($this->psr7Request);
+        $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
 
         // Handle the request
         $builder = new Builder(
@@ -293,9 +289,9 @@ class Controller extends BaseController
                 $this->userCodec,
             ),
         );
-        $handler = new MembershipServiceServerRequestHandler($builder);
-        $server  = new ServiceServer($validator, $handler);
-        $this->populateResponseFromPsr7Response($server->handle($request));
+        $handler            = new MembershipServiceServerRequestHandler($builder);
+        $server             = new ServiceServer($validator, $handler);
+        $this->response = $server->handle($request);
     }
 
     /**

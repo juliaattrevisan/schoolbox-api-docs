@@ -133,14 +133,14 @@ class Controller extends Base
         $route       = $this->routeGenerator->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@rubricMarkbook/markbookOuter.twig',
-                [
-                    'folder'      => $folder,
-                    'filterPanel' => $filterPanel,
-                ]
-            )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
+        $this->response = $this->responseFromTemplate(
+            '@rubricMarkbook/markbookOuter.twig',
+            [
+                'folder'      => $folder,
+                'filterPanel' => $filterPanel,
+            ],
+            'Rubric Markbook for ' . $folder->getName(),
+            'submission'
         );
     }
 
@@ -210,9 +210,9 @@ class Controller extends Base
             $overallMarks
         ] = $this->buildMarkbookData($folder, $request, $assessmentIds);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'status'  => 200,
-            'content' => $this->buildUnthemedHtmlOutput(
+            'content' => $this->responseFromTemplateUnthemed(
                 '@rubricMarkbook/markbookInner.twig',
                 [
                     'folder'      => $folder,
@@ -229,8 +229,8 @@ class Controller extends Base
                         )
                     ),
                 ]
-            )->getAsString(),
-        ]));
+            )->getBody()->getContents(),
+        ]);
     }
 
 

@@ -67,16 +67,16 @@ class Controller extends Base
     {
         $this->validateAccess();
         $sessionSegment = $this->getSessionSegment();
-        $this->getResponse()->content->set([
-            'title' => 'Reset Password',
-            'template' => '@userPasswordReset/createRequestForm.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@userPasswordReset/createRequestForm.twig',
+            [
                 'email' => $sessionSegment->getFlash('email', ''),
                 'isEmailValid' => $sessionSegment->getFlash('isEmailValid', true),
                 'isEmailSubmitted' => $sessionSegment->getFlash('isEmailSubmitted', false),
                 'isResetExpired' => $sessionSegment->getFlash('isResetExpired', false),
             ],
-        ]);
+            'Reset Password',
+        );
     }
 
     /**
@@ -89,15 +89,15 @@ class Controller extends Base
         $this->validateAccess();
         $this->validateResetRequest($reset);
         $sessionSegment = $this->getSessionSegment();
-        $this->getResponse()->content->set([
-            'title' => 'Reset Password',
-            'template' => '@userPasswordReset/resetForm.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@userPasswordReset/resetForm.twig',
+            [
                 'reset' => $reset,
                 'isPasswordSubmitted' => $sessionSegment->getFlash('isPasswordSubmitted', false),
                 'isPasswordValid' => $sessionSegment->getFlash('isPasswordValid', true),
-            ],
-        ]);
+             ],
+            'Reset Password',
+        );
     }
 
     /**
@@ -105,13 +105,13 @@ class Controller extends Base
      */
     public function displaySuccessMessage()
     {
-        $this->getResponse()->content->set([
-            'title' => 'Password Reset Successful',
-            'template' => '@userPasswordReset/successMessage.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@userPasswordReset/successMessage.twig',
+            [
                 'isCommunityPortalPasswordSet' => $this->getSessionSegment()->getFlash('isCommunityPortalPasswordSet', true),
             ],
-        ]);
+            'Password Reset Successful',
+        );
     }
 
     /**
@@ -130,13 +130,13 @@ class Controller extends Base
 
             $this->passwordMailService->sendResetLinkToAddress(
                 $emailAddress,
-                $this->psr7Request->getServerParams()['REMOTE_ADDR'] ?? ''
+                $this->request->getServerParams()['REMOTE_ADDR'] ?? ''
             );
         } else {
             $sessionSegment->setFlash('isEmailValid', false);
         }
 
-        $this->getResponse()->redirect->to(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
         );
     }
@@ -172,14 +172,14 @@ class Controller extends Base
             // This reset has been used, save it
             $this->resetMapper->save($reset->setResetTime(\Alaress_Date_Format::now()));
 
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'userPasswordReset.displaySuccessMessage'
                 )
             );
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'userPasswordReset.displayResetForm',
                     ['token' => $reset->getToken(),]
@@ -196,7 +196,7 @@ class Controller extends Base
     protected function validateAccess()
     {
         if ($this->getUser()->getId()) {
-            $this->getResponse()->redirect->found('/');
+            $this->response = $this->redirectFound('/');
         }
     }
 
@@ -210,24 +210,24 @@ class Controller extends Base
     {
         if ($reset->getUser() === null) {
             // User does not exist
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } elseif (!$reset->getToken()) {
             // Token wasn't found - go elsewhere
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } elseif ($reset->getResetTime()) {
             // Token already used - go elsewhere
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
             // This request has expired. Create a new one
             // Not setting email - stale requests should not give out this information.
             $this->getSessionSegment()->setFlash('isResetExpired', true);
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         }

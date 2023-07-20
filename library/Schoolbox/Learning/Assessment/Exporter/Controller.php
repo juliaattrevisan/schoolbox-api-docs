@@ -123,7 +123,7 @@ class Controller extends BaseController
         ];
 
         $template = '@learningAssessmentExporter/export_assessment.twig';
-        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        $this->response = $this->responseFromTemplate($template, $data);
     }
 
 
@@ -200,7 +200,7 @@ class Controller extends BaseController
         ];
 
         $template = '@learningAssessmentExporter/export_unit.twig';
-        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        $this->response = $this->responseFromTemplate($template, $data);
     }
 
 
@@ -628,29 +628,22 @@ class Controller extends BaseController
 
         // Force download/
         if (file_exists($filename)) {
-            $headers = $this->getResponse()->headers;
+            $this->postOutputCallbacks[] = function () use ($filename) {
+                /* Delete the temp file
+                 */
+                unlink($filename);
+            };
 
-            // per header
-            $headers->set('Content-Description', 'File Transfer');
-            $headers->set('Content-Type', 'text/csv');
-            $headers->set('Content-Description', 'File Transfer');
-            $headers->set('Content-Disposition', 'attachment; filename="' . $newFilename . '"');
-            $headers->set('Expires', 0);
-            $headers->set('Cache-Control', 'must-revalidate');
-            $headers->set('Pragma', 'public');
-            $headers->set('Content-Length', filesize($filename));
-
-            $this->getResponse()->content->set([
-                'format'     => 'file',
-                'file'       => $filename,
-                'postOutput' => [
-                    function () use ($filename) {
-                        /* Delete the temp file
-                         */
-                        unlink($filename);
-                    },
-                ],
-            ]);
+            $this->response = $this->responseFromContent(file_get_contents($filename))
+                ->withHeader('Content-Description', 'File Transfer')
+                ->withHeader('Content-Type', 'text/csv')
+                ->withHeader('Content-Description', 'File Transfer')
+                ->withHeader('Content-Disposition', 'attachment; filename="' . $newFilename . '"')
+                ->withHeader('Expires', 0)
+                ->withHeader('Cache-Control', 'must-revalidate')
+                ->withHeader('Pragma', 'public')
+                ->withHeader('Content-Length', filesize($filename))
+            ;
         }
     }
 
@@ -672,9 +665,9 @@ class Controller extends BaseController
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
+            $this->response = $this->responseAsJson([Redirect::RETURN_URL => $returnUrl]);
         } else {
-            $this->getResponse()->redirect->afterPost($returnUrl);
+            $this->response = $this->redirectAfterPost($returnUrl);
         }
     }
 }

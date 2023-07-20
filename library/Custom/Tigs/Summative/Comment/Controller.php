@@ -13,7 +13,6 @@ use Alaress\Web;
 
 class Controller extends Web\Controller\Base
 {
-
     /**
      * Displays a form where a Staff member (eg the Dean) can give comments across all
      * users in a selected student role
@@ -25,13 +24,14 @@ class Controller extends Web\Controller\Base
      */
     public function getDeanComments(int $roleId, string $termSlug): void
     {
-        $this
-            ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeComment/yearLevel.twig', [
+        $this->response = $this->responseFromTemplate(
+            '@tigsSummativeComment/yearLevel.twig',
+            [
                 'roleId'   => $roleId,
                 'termSlug' => $termSlug,
-            ])
-            ->setTitle("TIGS Summative Reporting  - Dean Comments"));
+            ],
+            "TIGS Summative Reporting  - Dean Comments"
+        );
     }
 
 
@@ -46,12 +46,13 @@ class Controller extends Web\Controller\Base
      */
     public function getTeacherComments(int $folderId, string $termSlug): void
     {
-        $this
-            ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeComment/folder.twig', [
+        $this->response = $this->responseFromTemplate(
+            '@tigsSummativeComment/folder.twig',
+            [
                 'folderId' => $folderId,
                 'termSlug' => $termSlug,
-            ])
-            ->setTitle("TIGS Summative Reporting  - Teacher Comments"));
+            ],
+            "TIGS Summative Reporting  - Teacher Comments"
+        );
     }
 }

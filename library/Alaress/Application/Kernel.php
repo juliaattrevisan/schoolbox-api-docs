@@ -28,6 +28,8 @@ use Alaress\Twig\Filter as AlaressFilter;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
+use Alaress\Web\Response\Factory as ResponseFactory;
+use Alaress\Web\Response\Outputter;
 use Alaress\Web\Router\PathMatcher;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
@@ -35,7 +37,6 @@ use Aura\Di;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouterContainer;
-use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
@@ -644,22 +645,31 @@ abstract class Kernel
             )
         );
 
-        // Web request/response factory
-        $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
-
-        // New PSR-7 compliant request object
+        // PSR-17 compliant request factory: implements all of the interfaces
+        // defined in that PSR.
+        // TODO consider hand-building instead of relying upon discovery?
+        //      The reason I'm using discovery is because the discovery class
+        //      provides a convenient createServerRequestFromGlobals method.
         $di->set(
-            'request',
+            'httpFactory',
+            $di->lazyNew(Psr17Factory::class)
+        );
+
+        // Incoming HTTP request, conforming to PSR-7 ServerRequestInterface.
+        $di->set(
+            'httpRequest',
             $di->lazy(
-                function () {
+                function () use ($di) {
                     // This will be a ServerRequestInterface,
                     // but of a discovered rather than defined type.
                     // That should be fine: they all obey the same interface.
-                    $request = (new Psr17Factory())->createServerRequestFromGlobals();
+                    /** @var Psr17Factory $httpFactory */
+                    $httpFactory = $di->get('httpFactory');
+                    $request     = $httpFactory->createServerRequestFromGlobals();
 
                     // If the request is JSON:
                     // set the parsed body appropriately
-                    // TODO move to spec pattern?
+                    // TODO move to spec pattern or middleware?
                     if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
                         $request->getBody()->rewind();
                         $content = $request->getBody()->getContents();
@@ -670,6 +680,91 @@ abstract class Kernel
                 }
             ),
         );
+
+        // HTTP response factory, conforming to PSR-17 ResponseFactoryInterface
+        // and also providing helpers for generating responses specific to
+        // Schoolbox's uses cases.
+        $di->set(
+            'httpResponseFactory',
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    // Copypasted data generators from elsewhere
+                    /** @var IConfigLoader $config */
+                    $config  = $di->get('config');
+
+                    /** @var Session $session */
+                    $session = $di->get('session');
+
+                    /** @var TourMapper $tourMapper */
+                    $tourMapper = $mapperFactory->get(TourMapper::class);
+
+                    /** @var StepMapper $tourStepMapper */
+                    $tourStepMapper = $mapperFactory->get(StepMapper::class);
+                    $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
+
+                    /** @var Environment $templateEngine */
+                    $templateEngine = $di->get('templateEngine');
+
+                    /** @var TopMenuMapper $topMenuMapper */
+                    $topMenuMapper = $mapperFactory->get(TopMenuMapper::class);
+
+                    /** @var SideMenuSectionMapper $sideMenuSectionMapper */
+                    $sideMenuSectionMapper = $mapperFactory->get(SideMenuSectionMapper::class);
+
+                    /** @var SideMenuMapper $sideMenuMapper */
+                    $sideMenuMapper = $mapperFactory->get(SideMenuMapper::class);
+
+                    /** @var BookmarkMapper $bookMarkMapper */
+                    $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
+
+                    /** @var Predis\ClientInterface $redisStorage */
+                    $redisStorage = $di->get('redis.storage');
+
+                    $dataGenerators = [
+                        'ws' => new Output\DataGenerator\Websocket(
+                            $config,
+                            $session->getAuthUser(),
+                            new UnreadRetriever($redisStorage),
+                            INSTANCE_ID
+                        ),
+                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER),
+                        'user' => new Output\DataGenerator\User($session->getAuthUser(), $session),
+                        'topMenu' => new Output\DataGenerator\TopMenu(
+                            $session->getAuthUser(),
+                            $topMenuMapper
+                        ),
+                        'sideMenu' => new Output\DataGenerator\SideMenu(
+                            $config,
+                            $session->getAuthUser(),
+                            $sideMenuSectionMapper,
+                            $sideMenuMapper,
+                            $bookMarkMapper,
+                        ),
+                        'scripts' => new Output\DataGenerator\Scripts($config, $_SERVER),
+                    ];
+
+                    if ($config->get('debug_mode')) {
+                        $dataGenerators['debugBar'] = new Output\DataGenerator\DebugBar(
+                            \Alaress\DebugBar\Instance::getInstance(),
+                            '/debugbar/',
+                        );
+                    }
+
+                    /** @var Psr17Factory $httpFactory */
+                    $httpFactory = $di->get('httpFactory');
+                    return new ResponseFactory(
+                        $httpFactory,
+                        $httpFactory,
+                        $templateEngine,
+                        $dataGenerators
+                    );
+                }
+            )
+        );
+
+        // HTTP response outputter: convenience class for actually outputting a
+        // PSR-7 response as created by the httpResponseFactory above.
+        $di->set('httpResponseOutputter', $di->lazyNew(Outputter::class));
 
         // SitePage :D
         $di->set(
@@ -696,9 +791,6 @@ abstract class Kernel
 
                     /** @var MapperFactory $mapperFactory */
                     $mapperFactory = $di->get('mapperFactory');
-
-                    /** @var UserAccessMapper $userAccessMapper */
-                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
 
                     /** @var Folder\Mapper $folderMapper */
                     $folderMapper = $mapperFactory->get(Folder\Mapper::class);
@@ -758,9 +850,6 @@ abstract class Kernel
 
                     /** @var UserMapper $userMapper */
                     $userMapper = $mapperFactory->get(UserMapper::class);
-
-                    /** @var UserAccessMapper $userAccessMapper */
-                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
 
                     return new News\Audience\UserResolver(
                         $db,
@@ -840,97 +929,6 @@ abstract class Kernel
                 }
             )
         );
-
-        // Web output class - currently uses Sitepage
-        $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
-        $di->set('webOutput:html', $di->lazy(function () use ($di, $mapperFactory) {
-
-            /** @var IConfigLoader $config */
-            $config  = $di->get('config');
-
-            /** @var Session $session */
-            $session = $di->get('session');
-
-            /** @var TourMapper $tourMapper */
-            $tourMapper = $mapperFactory->get(TourMapper::class);
-
-            /** @var StepMapper $tourStepMapper */
-            $tourStepMapper = $mapperFactory->get(StepMapper::class);
-            $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
-            $output   = new Output\ThemedHtml();
-
-            /** @var Environment $templateEngine */
-            $templateEngine = $di->get('templateEngine');
-
-            /** @var TopMenuMapper $topMenuMapper */
-            $topMenuMapper = $mapperFactory->get(TopMenuMapper::class);
-
-            /** @var SideMenuSectionMapper $sideMenuSectionMapper */
-            $sideMenuSectionMapper = $mapperFactory->get(SideMenuSectionMapper::class);
-
-            /** @var SideMenuMapper $sideMenuMapper */
-            $sideMenuMapper = $mapperFactory->get(SideMenuMapper::class);
-
-            /** @var BookmarkMapper $bookMarkMapper */
-            $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
-
-            /** @var Access $access */
-            $access = $mapperFactory->get(Access::class);
-
-            /** @var Predis\ClientInterface $redisStorage */
-            $redisStorage = $di->get('redis.storage');
-            $output
-                ->setTemplateEngine($templateEngine)
-                ->addDataGenerator(
-                    'ws',
-                    new Output\DataGenerator\Websocket(
-                        $config,
-                        $session->getAuthUser(),
-                        new UnreadRetriever($redisStorage),
-                        INSTANCE_ID
-                    )
-                )
-                ->addDataGenerator(
-                    'tour',
-                    new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER)
-                )
-                ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session))
-                ->addDataGenerator(
-                    'topMenu',
-                    new Output\DataGenerator\TopMenu(
-                        $session->getAuthUser(),
-                        $topMenuMapper
-                    )
-                )
-                ->addDataGenerator(
-                    'sideMenu',
-                    new Output\DataGenerator\SideMenu(
-                        $config,
-                        $session->getAuthUser(),
-                        $sideMenuSectionMapper,
-                        $sideMenuMapper,
-                        $bookMarkMapper,
-                    )
-                )
-                ->addDataGenerator('scripts', new Output\DataGenerator\Scripts($config, $_SERVER));
-
-            if ($config->get('debug_mode')) {
-                $output->addDataGenerator(
-                    'debugBar',
-                    new Output\DataGenerator\DebugBar(\Alaress\DebugBar\Instance::getInstance(), '/debugbar/')
-                );
-            }
-
-            return $output;
-        }));
-
-        $outputSetters = ['setTemplateEngine' => $di->lazyGet('templateEngine')];
-        $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class, [], $outputSetters));
-        $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
-        $di->set('webOutput:file', $di->lazyNew(Output\File::class));
-        $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class, [], $outputSetters));
-        $di->set('webOutput:noContent', $di->lazyNew(Output\NoContent::class));
-        $di->set('webOutput:xml', $di->lazyNew(Output\Xml::class, [], $outputSetters));
 
         // Template engine and functions
         // Template loader: sets up link to templates without a namespace.

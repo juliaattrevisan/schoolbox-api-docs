@@ -108,13 +108,9 @@ class Controller extends Base
 
         // check the provider is valid
         if (!in_array($provider, $providers, true)) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set(
-                $this->buildJsonOutput(
-                    "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
-                )
-            );
+            $this->response = $this->responseAsJson(
+                "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
+            )->withStatus(400);
             return;
         }
 
@@ -160,9 +156,7 @@ class Controller extends Base
                             $registry->setDeviceId($deviceId);
                         }
                     } catch (MapperException $e) {
-                        /** @noinspection PhpUnhandledExceptionInspection */
-                        $this->response->status->setCode(400);
-                        $this->response->content->set($this->buildJsonOutput('Invalid app ID given'));
+                        $this->response = $this->responseAsJson('Invalid app ID given')->withStatus(400);
                         return;
                     }
                 }
@@ -184,8 +178,7 @@ class Controller extends Base
                 });
             }
 
-            $this->response->status->setCode(201);
-            $this->assignJsonResponseForAuthenticatedUser($sessionUser);
+            $this->assignJsonResponseForAuthenticatedUser($sessionUser, 201);
         }
     }
 
@@ -282,9 +275,7 @@ class Controller extends Base
             $status   = 400;
         }
 
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode($status);
-        $this->response->content->set($this->buildJsonOutput($response));
+        $this->response = $this->responseAsJson($response)->withStatus($status);
         return null;
     }
 
@@ -324,22 +315,23 @@ class Controller extends Base
     /**
      * Assigns JSON response (headers and output) for an authenticated user.
      *
-     * @param User $user The user to build output for.
-     *                   In practise this will always be the logged-in user.
+     * @param User     $user   The user to build output for: in practise this
+     *                         will always be the logged-in user.
+     * @param int|null $status A status code.
      */
-    private function assignJsonResponseForAuthenticatedUser(User $user): void
+    private function assignJsonResponseForAuthenticatedUser(User $user, ?int $status = null): void
     {
-        $this->response->headers->set('Content-Type', 'application/json');
-        $this->response->content->set([
-            'format' => 'json',
-            'data'   => [
-                'id'       => $user->getId(),
-                'key'      => $user->getKey(),
-                'role'     => $user->getRole()->getType(),
-                'username' => $user->getUsername(),
-            ],
-            'postOutput' => [fn () => $this->shortenSessionLifetime()],
+        $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
+
+        $this->response = $this->responseAsJson([
+            'id'       => $user->getId(),
+            'key'      => $user->getKey(),
+            'role'     => $user->getRole()->getType(),
+            'username' => $user->getUsername(),
         ]);
+        if (isset($status)) {
+            $this->response = $this->response->withStatus($status);
+        }
     }
 
     /**
@@ -349,16 +341,13 @@ class Controller extends Base
      */
     private function assignRedirectResponseForAuthenticatedUser(string $page): void
     {
+        $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
         // Redirect somewhere (locally only)
         if ($page && (new Uri($page))->isAbsolutePath()) {
-            $this->response->redirect->to($page);
+            $this->response = $this->redirectFound($page);
         } else {
-            $this->response->redirect->to('/');
+            $this->response = $this->redirectFound('/');
         }
-        $this->response->content->set([
-            'format'     => 'noContent',
-            'postOutput' => [fn () => $this->shortenSessionLifetime()],
-        ]);
     }
 
     /**

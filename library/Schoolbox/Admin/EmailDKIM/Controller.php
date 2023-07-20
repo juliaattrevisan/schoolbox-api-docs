@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\EmailDKIM;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
 use Schoolbox\Auth\KeyPairGenerator;
@@ -47,13 +46,11 @@ class Controller extends Base
      */
     public function getDomainListPage()
     {
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@emailDKIM/index.twig',
             [
-                'template' => '@emailDKIM/index.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('emailDKIM.getDomainListPage'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('emailDKIM.getDomainListPage')),
-                ],
+                'pageCurrent'    => $this->routeGenerator->generate('emailDKIM.getDomainListPage'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('emailDKIM.getDomainListPage')),
             ]
         );
     }
@@ -87,22 +84,21 @@ class Controller extends Base
                 ],
             ];
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
      * Create/update domain
      *
      * @return void
-     * @throws InvalidStatusCode
      */
     public function postDomain()
     {
         $id     = $this->requestPost->get('id');
         $domain = trim($this->requestPost->get('domain') ?? '');
         if (empty($domain) || (!getmxrr($domain, $temp) && !checkdnsrr($domain, 'ANY'))) {
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid domain name']));
-            $this->getResponse()->status->setCode(404);
+            $this->response = $this->responseAsJson(['error' => 'Invalid domain name'])
+                ->withStatus(404);
             return;
         }
 
@@ -120,18 +116,18 @@ class Controller extends Base
                       ->setUpdatedAt(\Alaress_Date_Format::now());
 
             if (!$this->emailDKIMMapper->isUnique(['domain' => $emailDKIM->getDomain()], $emailDKIM->getId())) {
-                $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'The domain already exists']));
-                $this->getResponse()->status->setCode(404);
+                $this->response = $this->responseAsJson(['error' => 'The domain already exists'])
+                    ->withStatus(404);
                 return;
             }
 
             $this->emailDKIMMapper->save($emailDKIM);
         } catch (MapperException $e) {
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => $e->getMessage()]));
-            $this->getResponse()->status->setCode(404);
+            $this->response = $this->responseAsJson(['error' => $e->getMessage()])
+                ->withStatus(404);
             return;
         }
-        $this->getResponse()->content->set($this->buildJsonOutput([]));
+        $this->response = $this->responseAsJson([]);
     }
 
     /**
@@ -153,7 +149,7 @@ class Controller extends Base
                 'formatted' => $emailDKIM->getUpdatedAt()->getShort(),
             ],
         ];
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->response = $this->responseAsJson($data);
     }
 
     /**
@@ -166,6 +162,6 @@ class Controller extends Base
     public function deleteDKIM(Model $emailDKIM)
     {
         $this->emailDKIMMapper->delete($emailDKIM);
-        $this->getResponse()->content->set($this->buildJsonOutput([]));
+        $this->response = $this->responseAsJson([]);
     }
 }

@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
@@ -143,13 +142,11 @@ class Controller extends Assessment\Controller
             'writable'    => Access::getInstance()->isInstructor($this->getUser(), $assessment->getContext()->getFolder()),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/task/status.twig',
-                $twigData,
-                "Status of {$assessment->getTitle()}",
-                'submission'
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/task/status.twig',
+            $twigData,
+            "Status of {$assessment->getTitle()}",
+            'submission'
         );
     }
 
@@ -176,7 +173,7 @@ class Controller extends Assessment\Controller
         );
 
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->getResponse()->redirect->to($sebDownload);
+            $this->response = $this->redirectFound($sebDownload);
             return;
         }
 
@@ -199,7 +196,7 @@ class Controller extends Assessment\Controller
              * It manifests under the file list
              */
             if ($previewFragment['type'] === 'inline') {
-                $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
+                $previewFragment['fragment'] = $this->responseFromTemplateUnthemed($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getBody()->getContents();
             }
 
             /* Otherwise, just go to the Summary screen and show all these pieces:
@@ -246,11 +243,9 @@ class Controller extends Assessment\Controller
             'transitions'  => $tickTransitions,
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/task/summary/student.twig',
-                $twigData
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/task/summary/student.twig',
+            $twigData
         );
     }
 
@@ -280,7 +275,6 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
-     * @throws InvalidStatusCode
      * @throws MapperException
      * @throws RouteNotFound
      */
@@ -291,18 +285,16 @@ class Controller extends Assessment\Controller
 
         try {
             $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
-            $this->getResponse()->status->setCode(200);
-
             if ($this->isXhrRequest()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->response = $this->responseAsJson([
                     'success' => true,
                     'message' => 'OK',
                     'id'      => $response->getId(),
                     'status'  => $completionStatus,
-                ]));
+                ]);
             } else {
                 // redirect after saving to Task Summary for particular Student
-                $this->getResponse()->redirect->to(
+                $this->response = $this->redirectFound(
                     $this->routeGenerator->generate(
                         'learningAssessment.getSummary',
                         [
@@ -312,20 +304,19 @@ class Controller extends Assessment\Controller
                     )
                 );
             }
+            $this->response = $this->response->withStatus(200);
         } catch (ConcurrentModificationException | InvalidTaskResponseException $e) {
             // We don't need to log concurrent exceptions, we expect them to happen from time to time.
             if (!$e instanceof ConcurrentModificationException) {
                 $this->captureException($e);
             }
 
-            $this->getResponse()->status->setCode(400);
-
             if ($this->isXhrRequest()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage(),
                     'id'      => null,
-                ]));
+                ])->withStatus(400);
             } else {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, $e, $e->getMessage());
             }

@@ -61,15 +61,16 @@ class Controller extends ConfigController
         $pageCurrent = $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
         $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
 
-        $this->getResponse()->content->set(
-            $this->buildContent('@settings/settings.twig', [
+        $this->response = $this->responseDependentOnRequest(
+            '@settings/settings.twig',
+            [
                 'pageCurrent'    => $pageCurrent,
                 'allBreadcrumbs' => $allBreadcrumbs,
                 'settingsTabs'   => $settingsTabs,
                 'configContext'  => $configContext,
                 'isLocalisation' => $typeLabel === 'Localisation',  // TODO replace string literals with enums
                 'isSkinConfig'   => $typeLabel === 'Skin Config',   // TODO replace string literals with enums
-            ])
+            ]
         );
     }
 
@@ -152,7 +153,7 @@ class Controller extends ConfigController
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 
     /**
@@ -211,17 +212,13 @@ class Controller extends ConfigController
             }
         }
         if ($rebuildModules) {
+            $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
-            $this->getResponse()->content->set([
-                'format'     => 'noContent',
-                'postOutput' => [
-                    $this->buildRebuildModuleCacheCallback(),
-                ],
-            ]);
+            $this->response = $this->responseEmpty();
         }
 
-        $route = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
-        $this->getResponse()->redirect->afterPost($route);
+        $route          = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
+        $this->response = $this->redirectAfterPost($route);
     }
 
 

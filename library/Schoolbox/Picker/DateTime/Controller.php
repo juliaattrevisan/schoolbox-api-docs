@@ -179,10 +179,9 @@ class Controller extends Base
         $displayFormatDate = $this->getConfigLoader()->get('date_local');
         $displayFormatTime = $displayFormatDate . ' ' . $this->getConfigLoader()->get('date_time');
 
-        $this->getResponse()->content->set([
-            'template' => '@pickerDatetime/picker.twig',
-            'format' => 'nochrome',
-            'data' => [
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@pickerDatetime/picker.twig',
+            [
                 'id' => $id,
                 'value' => $date->toIso8601String(),
                 'element' => $element,
@@ -197,7 +196,7 @@ class Controller extends Base
                 'timetable' => $timetable,
                 'timetableVars' => $timetableVars
             ]
-        ]);
+        );
     }
 
 
@@ -233,7 +232,7 @@ class Controller extends Base
             return min(count($v), 5) * 20;
         }, $heat);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($heat));
+        $this->response = $this->responseAsJson($heat);
     }
 
 
@@ -355,7 +354,6 @@ class Controller extends Base
      *
      * @param Alaress_Date_Format $date
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @return void
      */
     public function getByDate(Alaress_Date_Format $date)
@@ -385,12 +383,9 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => [
-                'appointments' => $appointments,
-                'date' => $date->toIso8601String()
-            ]
+        $this->response = $this->responseAsJson([
+            'appointments' => $appointments,
+            'date' => $date->toIso8601String()
         ]);
     }
 
@@ -407,10 +402,7 @@ class Controller extends Base
     {
         // Don't show other students' due work to anyone but staff
         if (!$this->getUser()->getRole()->isStaff()) {
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => []
-            ]);
+            $this->response = $this->responseAsJson([]);
 
             return;
         }
@@ -421,12 +413,9 @@ class Controller extends Base
         $end = $end->endOfDay();
 
         // Spit this out in a JSON array
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => [
-                'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
-                'date' => $date->toIso8601String()
-            ]
+        $this->response = $this->responseAsJson([
+            'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
+            'date' => $date->toIso8601String()
         ]);
     }
 

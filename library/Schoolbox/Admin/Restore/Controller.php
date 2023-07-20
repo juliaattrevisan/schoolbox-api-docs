@@ -69,7 +69,7 @@ class Controller extends Base
             return !$node->getAssessmentContext()->isDeleted();
         });
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
+        $this->response = $this->responseFromTemplate('@restore/index.twig', [
             'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
             'deletedFolders'     => $deletedFolders,
@@ -82,7 +82,7 @@ class Controller extends Base
                 'lti'        => Assessment\Lti\Model::getDefaultTypeName(),
                 'lessonPlan' => Assessment\LessonPlan\Model::getDefaultTypeName(),
             ],
-        ]));
+        ]);
     }
 
     /**
@@ -104,7 +104,7 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
+        $this->response = $this->responseAsJson(['success' => true]);
     }
 
     /**
@@ -126,6 +126,6 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
+        $this->response = $this->responseAsJson(['success' => true]);
     }
 }

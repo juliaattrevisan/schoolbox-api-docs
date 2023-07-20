@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7ba4e23b3cee216443f3dce55df89ab",
+    "content-hash": "aff62852a1c5114b59dcbde0211e4a5e",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -296,64 +296,6 @@
                 "source": "https://github.com/auraphp/Aura.Session/tree/2.x"
             },
             "time": "2016-10-03T20:28:32+00:00"
-        },
-        {
-            "name": "aura/web",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/auraphp/Aura.Web.git",
-                "reference": "35d5444e28d94ace020262b271ace6681c550dca"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/35d5444e28d94ace020262b271ace6681c550dca",
-                "reference": "35d5444e28d94ace020262b271ace6681c550dca",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "aura/di": "~2.0",
-                "yoast/phpunit-polyfills": "~1.0"
-            },
-            "type": "library",
-            "extra": {
-                "aura": {
-                    "type": "library",
-                    "config": {
-                        "common": "Aura\\Web\\_Config\\Common"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Aura\\Web\\": "src/",
-                    "Aura\\Web\\_Config\\": "config/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Aura.Web Contributors",
-                    "homepage": "https://github.com/auraphp/Aura.Web/contributors"
-                }
-            ],
-            "description": "Provides web Request and Response objects for use by web controllers and actions. These are representations of the PHP web environment, not HTTP request and response objects proper.",
-            "homepage": "https://github.com/auraphp/Aura.Web",
-            "keywords": [
-                "request",
-                "response"
-            ],
-            "support": {
-                "issues": "https://github.com/auraphp/Aura.Web/issues",
-                "source": "https://github.com/auraphp/Aura.Web/tree/2.2.0"
-            },
-            "time": "2022-06-21T04:58:09+00:00"
         },
         {
             "name": "aws/aws-crt-php",

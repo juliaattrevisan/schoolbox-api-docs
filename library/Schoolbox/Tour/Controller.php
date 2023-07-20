@@ -60,8 +60,7 @@ class Controller extends Base
         $data = $list->getTours($this->getUser(), $url);
 
         // Return results in JSON
-        $this->getResponse()->status->set(200);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->response = $this->responseAsJson($data)->withStatus(200);
     }
 
 
@@ -70,7 +69,7 @@ class Controller extends Base
      */
     public function saveStatus()
     {
-        $this->getResponse()->content->set($this->buildJsonOutput(null));
+        $this->response = $this->responseAsJson(null);
         $post = $this->requestPost;
 
         /** @var User $user */
@@ -87,11 +86,10 @@ class Controller extends Base
         try {
             //Save it real good
             $this->tourStatusMapper->save($newTourStatus);
-            $this->getResponse()->status->set(204);
+            $this->response = $this->responseEmpty(204);
         } catch (Mapper\Exception $e) {
             //Attempted to save invalid data
-            $this->getResponse()->content->set($this->buildJsonOutput('Invalid status data. Did not save status.'));
-            $this->getResponse()->status->set(400);
+            $this->response = $this->responseAsJson('Invalid status data. Did not save status.')->withStatus(400);
         }
     }
 
@@ -103,7 +101,7 @@ class Controller extends Base
      */
     public function tourStatus(string $tour_uuid)
     {
-        $this->getResponse()->content->set($this->buildJsonOutput(null));
+        $this->response = $this->responseAsJson(null);
 
         /** @var User $user */
         $user = $this->getUser();
@@ -112,7 +110,7 @@ class Controller extends Base
         try {
             $status     = $this->tourStatusMapper->findOneByColumnList(["tour_uuid" => $tour_uuid, "user_id" => $user->getId()]);
             $serialized = $status->jsonSerialize();
-            $this->getResponse()->content->set($this->buildJsonOutput($serialized));
+            $this->response = $this->responseAsJson($serialized);
         } catch (Mapper\Exception $e) {
             //No status for any of the steps - we are taking the tour for the first time;
             return;

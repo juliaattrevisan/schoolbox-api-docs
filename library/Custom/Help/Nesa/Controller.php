@@ -104,11 +104,11 @@ class Controller extends Base
             RubricDescriptorMapper::getInstance()
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/selector.twig', [
+        $this->response = $this->responseFromTemplate('@helpNesa/selector.twig', [
             'course' => $courseSpecification,
             'states' => $this->pdMapper->getAvailableStates(),
             'descriptors' => $selector->generate()
-        ]));
+        ]);
     }
 
     /**
@@ -142,13 +142,16 @@ class Controller extends Base
 
         /* The usual output
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/report.twig', [
-            'report' => $report,
-            'duration' => number_format($end - $start, 2),
-            'states' => $this->requestPost['state'],
-            'unaccreditedOnly' => $this->requestPost['unaccreditedOnly'],
-            'indicators' => $indicators
-        ]));
+        $this->response = $this->responseFromTemplate(
+            '@helpNesa/report.twig',
+            [
+                'report' => $report,
+                'duration' => number_format($end - $start, 2),
+                'states' => $this->requestPost['state'],
+                'unaccreditedOnly' => $this->requestPost['unaccreditedOnly'],
+                'indicators' => $indicators
+            ]
+        );
     }
 
     /**
@@ -184,16 +187,12 @@ class Controller extends Base
         $content = (new Csv())->generate($report, $indicators);
         $today = \Alaress_Date_Format::now()->getDatabaseDate();
 
-        $headers = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', \strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"");
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'text/csv')
+                               ->withHeader('Content-Length', \strlen($content))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"")
+        ;
     }
 }

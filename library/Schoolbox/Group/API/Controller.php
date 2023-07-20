@@ -74,11 +74,7 @@ class Controller extends Base
         //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
         $output->reindex();
 
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -96,12 +92,8 @@ class Controller extends Base
             $this->sendJsonError('User is not enroled in the group', 404);
             return;
         }
-        $output = (new ModelToArray())($userAccess);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $output         = (new ModelToArray())($userAccess);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -172,7 +164,7 @@ class Controller extends Base
      */
     private function processGroupPostData(UserGroupAccess $userAccess, User $user, Group $group, bool $isPatch)
     {
-        $post = $this->psr7Request->getParsedBody();
+        $post = $this->request->getParsedBody();
 
         try {
             /** @var UserGroupAccess $newAccess */
@@ -206,12 +198,8 @@ class Controller extends Base
                 return;
             }
         }
-        $output = (new ModelToArray())($newAccess);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $output         = (new ModelToArray())($newAccess);
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -231,7 +219,7 @@ class Controller extends Base
 
         try {
             $this->userAccessMapper->delete($userAccesses);
-            $this->getResponse()->status->setCode(204);
+            $this->response = $this->responseEmpty(204);
         } catch (MapperException $e) {
             $this->sendJsonError('Unable to remove the user from the group.', 400);
         }

@@ -33,8 +33,7 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@staffDirectory/index.twig', [
-        ])->setTitle('Staff Directory'));
+        $this->response = $this->responseFromTemplate('@staffDirectory/index.twig', [], 'Staff Directory');
     }
 
 
@@ -46,6 +45,6 @@ class Controller extends Base
      */
     public function getPayload(): void
     {
-        $this->response->content->set($this->buildJsonOutput((new Payload($this->userMapper, $this->externalUser))->generate()));
+        $this->response = $this->responseAsJson((new Payload($this->userMapper, $this->externalUser))->generate());
     }
 }

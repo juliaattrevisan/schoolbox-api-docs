@@ -77,13 +77,13 @@ class Controller extends Base
      */
     public function getUpload()
     {
-        $this->getResponse()->content->set([
-            'template' => "@{$this->basename}/upload.twig",
-            'data' => $this->getBaseData() + [
+        $this->response = $this->responseFromTemplate(
+            "@{$this->basename}/upload.twig",
+            $this->getBaseData() + [
                 'attachzone' => $this->getAttachzone()->getTwigContext(),
                 'uploadMissing' => $this->getSession()->getSegment(static::class)->getFlash('uploadMissing', false)
             ],
-        ]);
+        );
     }
 
 
@@ -118,22 +118,22 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->getResponse()->redirect->to($this->routeGenerator->generate("{$this->basename}.getUpload"));
+            $this->response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }
 
         $this->buildImporter($reader, $logger)->save();
 
-        $this->getResponse()->content->set([
-            'template' => "@{$this->basename}/preview.twig",
-            'data' => $this->getBaseData() + [
+        $this->response = $this->responseFromTemplate(
+            "@{$this->basename}/preview.twig",
+            $this->getBaseData() + [
                 'log' => [
                     'lines' => $this->parseLogLines($logger, true),
                 ],
                 'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
-        ]);
+        );
     }
 
 
@@ -150,21 +150,21 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->getResponse()->redirect->to($this->routeGenerator->generate("{$this->basename}.getUpload"));
+            $this->response = $this->redirectFound($this->routeGenerator->generate("{$this->basename}.getUpload"));
 
             return;
         }
 
         $this->buildImporter($reader, $logger, true)->save();
 
-        $this->getResponse()->content->set([
-            'template' => "@{$this->basename}/import.twig",
-            'data' => $this->getBaseData() + [
+        $this->response = $this->responseFromTemplate(
+            "@{$this->basename}/import.twig",
+            $this->getBaseData() + [
                 'log' => [
                     'lines' => $this->parseLogLines($logger, false)
                 ],
             ],
-        ]);
+        );
     }
 
 

@@ -67,19 +67,14 @@ class Controller extends BaseController
      */
     public function getForm(FolderModel $folder): void
     {
-        $this->getResponse()->content->set(
-            $this
-                ->buildHtmlOutput(
-                    '@rubricManager/form.twig',
-                    $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true))
-                )
-                ->setTitle(
-                    sprintf(
-                        'Manage Rubric %s for %s',
-                        $this->rosettaStone->translate('rubricGroup', true, true),
-                        $folder->getName()
-                    )
-                )
+        $this->response = $this->responseFromTemplate(
+            '@rubricManager/form.twig',
+            $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true)),
+            sprintf(
+                'Manage Rubric %s for %s',
+                $this->rosettaStone->translate('rubricGroup', true, true),
+                $folder->getName()
+            )
         );
     }
 
@@ -106,24 +101,18 @@ class Controller extends BaseController
             try {
                 $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
-                $this->response->status->setCode(200);
-                $this->response->content->set(
-                    $this->buildJsonOutput([
-                        'status' => $this->response->status->getCode(),
-                        'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
-                        'redirect' => '/homepage/' . $folder->getId()
-                    ])
-                );
+                $this->response = $this->responseAsJson([
+                    'status' => 200,
+                    'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
+                    'redirect' => '/homepage/' . $folder->getId()
+                ])->withStatus(200);
             } catch (\Exception | \UnexpectedValueException $e) {
-                $this->response->status->setCode(400);
-                $this->response->content->set(
-                    $this->buildJsonOutput([
-                        'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
-                        'status' => $this->response->status->getCode(),
-                        'detail' => $e->getMessage(),
-                        'instance' => $this->psr7Request->getUri()->__toString(),
-                    ])
-                );
+                $this->response = $this->responseAsJson([
+                    'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
+                    'status' => 400,
+                    'detail' => $e->getMessage(),
+                    'instance' => $this->request->getUri()->__toString(),
+                ])->withStatus(400);
             }
         }
     }

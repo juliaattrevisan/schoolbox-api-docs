@@ -12,7 +12,6 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Module\Registry;
 use Alaress\Web;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Exception\InvalidStatusCode;
 use Crell\ApiProblem\ApiProblem;
 use DomainException;
 use InvalidArgumentException;
@@ -134,14 +133,14 @@ class ListController extends Web\Controller\Base
      */
     public function getSebDownload(IAssessable $assessment): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/sebDownload.twig', [
+        $this->response = $this->responseFromTemplate('@learningAssessment/sebDownload.twig', [
             'assessmentId' => $assessment->getId(),
             'assessment' => $assessment,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
                 '',
             ]),
-        ]));
+        ]);
     }
 
 
@@ -155,7 +154,7 @@ class ListController extends Web\Controller\Base
     {
         $sebPayload = new SebPayload(
             $this->getConfigLoader(),
-            $this->psr7Request->getServerParams()['HTTP_HOST'] ?? '',
+            $this->request->getServerParams()['HTTP_HOST'] ?? '',
             $this->routeGenerator
         );
 
@@ -163,18 +162,13 @@ class ListController extends Web\Controller\Base
 
         /* Send as a downloadable file
          */
-        $headers  = $this->getResponse()->headers;
-
-        $headers->set('Pragma', 'no-cache');
-        $headers->set('Cache-Control', 'private, max-age=1, no-transform');
-        $headers->set('Content-Type', 'application/seb');
-        $headers->set('Content-Length', strlen($contents));
-        $headers->set('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"");
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $contents,
-        ]);
+        $this->response = $this->responseFromContent($contents)
+                               ->withHeader('Pragma', 'no-cache')
+                               ->withHeader('Cache-Control', 'private, max-age=1, no-transform')
+                               ->withHeader('Content-Type', 'application/seb')
+                               ->withHeader('Content-Length', strlen($contents))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"")
+        ;
     }
 
 
@@ -201,7 +195,7 @@ class ListController extends Web\Controller\Base
             $this->session->set(Payload::SEB_KEY, $this->requestQuery->get(Payload::SEB_KEY));
         }
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
-            $this->psr7Request->getServerParams(),
+            $this->request->getServerParams(),
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
              */
@@ -210,7 +204,7 @@ class ListController extends Web\Controller\Base
              */
             (new SebPayload(
                 $this->getConfigLoader(),
-                $this->psr7Request->getServerParams()['HTTP_HOST'] ?? '',
+                $this->request->getServerParams()['HTTP_HOST'] ?? '',
                 $this->routeGenerator
             ))->generateConfigKey($assessment, $this->getUser()),
             $this->session->get(Payload::SEB_KEY)
@@ -274,7 +268,7 @@ class ListController extends Web\Controller\Base
             '_is_xhr'         => $this->isXhrRequest(),
         ];
 
-        $this->tpl('learningAssessment', 'component', $data);
+        $this->response = $this->responseDependentOnRequest('@learningAssessment/component.twig', $data);
     }
 
 
@@ -438,15 +432,13 @@ class ListController extends Web\Controller\Base
      * @api   POST /learning/weight/:assessmentId
      *
      * @param IAssessable $assessment
-     * @throws InvalidStatusCode
      * @throws MapperException
      */
     public function updateWeight(IAssessable $assessment): void
     {
         $weight = (float) $this->requestPost['weight'];
         if ($weight < 0) {
-            $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid weight value']));
+            $this->response = $this->responseAsJson(['error' => 'Invalid weight value'])->withStatus(500);
             return;
         }
         $assessment->setWeight($weight);
@@ -459,7 +451,7 @@ class ListController extends Web\Controller\Base
             (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Successfully updated weighting']));
+        $this->response = $this->responseAsJson(['message' => 'Successfully updated weighting']);
     }
 
     /**
@@ -468,7 +460,6 @@ class ListController extends Web\Controller\Base
      * @api   POST /learning/visibility/:assessmentId
      *
      * @param IAssessable $assessment
-     * @throws InvalidStatusCode
      * @throws MapperException
      */
     public function updateVisibility(IAssessable $assessment): void
@@ -476,8 +467,7 @@ class ListController extends Web\Controller\Base
         $visibility            = (int)$this->requestPost['visibility'];
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
         if (!in_array($visibility, $availableVisibilities)) {
-            $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid visibility']));
+            $this->response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);
             return;
         }
 
@@ -488,7 +478,7 @@ class ListController extends Web\Controller\Base
         // triggering notification explicitly, to notify marked, if necessary
         $this->getAssessmentMapper()->getNotifier()->notify($assessment, $this->getUser(), $previous);
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Loaded successfully']));
+        $this->response = $this->responseAsJson(['message' => 'Loaded successfully']);
     }
 
     /**
@@ -511,7 +501,7 @@ class ListController extends Web\Controller\Base
                 // delegate to the appropriate sub-controller
                 $delegate = $this->getDelegateController($type);
                 $delegate->getCreateAssessmentForm($context);
-                $this->setResponse($delegate->getResponse());
+                $this->response = $delegate->getResponse();
                 return;
             } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
                 // if the client enters an invalid type: ignore
@@ -616,7 +606,7 @@ class ListController extends Web\Controller\Base
             ];
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
+        $this->response = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
     }
 
 
@@ -851,9 +841,9 @@ class ListController extends Web\Controller\Base
     protected function redirect($url)
     {
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $url ]));
+            $this->response = $this->responseAsJson([Redirect::RETURN_URL => $url ]);
         } else {
-            $this->getResponse()->redirect->afterPost($url);
+            $this->response = $this->redirectAfterPost($url);
         }
     }
 
@@ -953,7 +943,6 @@ class ListController extends Web\Controller\Base
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
-     * @throws InvalidStatusCode
      */
     public function postInclude(IAssessable $assessment, User $student): void
     {
@@ -964,13 +953,11 @@ class ListController extends Web\Controller\Base
             // Update project mark as the excluded assessment may affect the project result
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
-            $this->getResponse()->status->setCode(201);
+            $this->response = $this->responseEmpty(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($problem->asArray())
-            );
+            $this->response = $this->responseAsJson($problem->asArray());
         }
     }
 
@@ -981,7 +968,6 @@ class ListController extends Web\Controller\Base
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
-     * @throws InvalidStatusCode
      */
     public function postExclude(IAssessable $assessment, User $student): void
     {
@@ -994,13 +980,11 @@ class ListController extends Web\Controller\Base
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
 
-            $this->getResponse()->status->setCode(201);
+            $this->response = $this->responseEmpty(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($problem->asArray())
-            );
+            $this->response = $this->responseAsJson($problem->asArray());
         }
     }
 
@@ -1045,11 +1029,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningAssessment/lti/return/instructor/iframe.twig',
-                ['returnUrl'   => $returnUrl->__toString(),],
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/lti/return/instructor/iframe.twig',
+            ['returnUrl'   => $returnUrl->__toString(),],
         );
     }
 
@@ -1097,11 +1079,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/return/instructor/window.twig',
-                $params,
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/lti/return/instructor/window.twig',
+            $params,
         );
     }
 
@@ -1188,11 +1168,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningAssessment/lti/return/student/iframe.twig',
-                ['returnUrl' => $returnUrl->__toString(),],
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/lti/return/student/iframe.twig',
+            ['returnUrl' => $returnUrl->__toString(),],
         );
     }
 
@@ -1242,11 +1220,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/return/student/window.twig',
-                $params,
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/lti/return/student/window.twig',
+            $params,
         );
     }
 

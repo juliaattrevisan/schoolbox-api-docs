@@ -99,14 +99,14 @@ class Controller extends BaseController
     {
         $filtersPerPage = $this->findAvailableFiltersPerPage();
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
+        $this->response = $this->responseFromTemplate('@filters/index.twig', [
             'filtersPerPage'     => $filtersPerPage,
             'pageLabels'         => $this->buildFilteredPageLabels(),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => $this->routeGenerator->generate('filters.getIndex'),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getIndex')),
-        ])->setTitle('Filterable pages'));
+        ], 'Filterable pages');
     }
 
 
@@ -147,7 +147,7 @@ class Controller extends BaseController
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
+        $this->response = $this->responseFromTemplate('@filters/settings.twig', [
             'page'               => $page,
             'pageCurrent'        => $this->routeGenerator->generate('filters.getPageSettings', ['page' => $page]),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getPageSettings', ['page' => $page])),
@@ -156,7 +156,7 @@ class Controller extends BaseController
             'roleTypes'          => $roleTypes,
             'rolesForFilter'     => $rolesForFilter,
             'pageLabels'         => $this->buildFilteredPageLabels(),
-        ])->setTitle(ucfirst($page) . ' filters'));
+        ], ucfirst($page) . ' filters');
     }
 
 
@@ -255,7 +255,7 @@ class Controller extends BaseController
             ->notIn('role_type', Page\Model::getPageRoleTypes()[$page]);
         $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
 
-        $this->response->content->set($this->buildJsonOutput(['status' => 200]));
+        $this->response = $this->responseAsJson(['status' => 200]);
     }
 
 
@@ -274,7 +274,7 @@ class Controller extends BaseController
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
         $this->selectionMapper->deleteSelectionsForRoleIds($roleIds, $page);
-        $this->response->content->set($this->buildJsonOutput(['status' => 200]));
+        $this->response = $this->responseAsJson(['status' => 200]);
     }
 
 

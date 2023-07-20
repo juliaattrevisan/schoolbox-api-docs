@@ -215,7 +215,7 @@ class Controller extends BaseController
             ],
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps'));
+        $this->response = $this->responseFromTemplate('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps');
     }
 
 
@@ -247,7 +247,7 @@ class Controller extends BaseController
                 return;
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput($template, $data));
+        $this->response = $this->responseFromTemplateUnthemed($template, $data);
     }
 
 
@@ -346,11 +346,11 @@ class Controller extends BaseController
 
         if ($this->isXhrRequest()) {
             // respond with an empty 200 OK
-            $this->getResponse()->content->set($this->buildJsonOutput(null));
+            $this->response = $this->responseAsJson(null);
             return;
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
+        $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
     }
 
 
@@ -416,10 +416,9 @@ class Controller extends BaseController
 
         //Filtering out $config display further in Twig. Is there a more elegant solution?
 
-        $this->getResponse()->content->set([
-            'title'    => 'Global Message Configuration',
-            'template' => '@adminMessages/configure.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@adminMessages/configure.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminMessages.configure'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.configure')),
                 'filters' => $filters,
@@ -429,7 +428,8 @@ class Controller extends BaseController
                 'perms'   => $this->getConfig()->getPermissionList(),
                 'msgConfig'  => $this->getConfig()->find($rolec->getPropertyValues('id')),
             ],
-        ]);
+            'Global Message Configuration',
+        );
     }
 
     /**
@@ -463,9 +463,9 @@ class Controller extends BaseController
         /** @var NS $ns */
         $ns = $this->getNsMapper()->findById($source->getNamespace()->getId());
 
-        $this->getResponse()->content->set([
-            'template' => '@adminMessages/custom-config.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@adminMessages/custom-config.twig',
+            [
                 'ns'        => [$ns->getId() => $ns],
                 'namespace' => ['id' => $ns->getId()],
                 'sources'   => [$source->getId() => $source],
@@ -474,8 +474,7 @@ class Controller extends BaseController
                 'perms'     => $this->getConfig()->getPermissionList(),
                 'roletype'  => $q['roletype'] ?? '',
             ],
-            'format'   => 'nochrome',
-        ]);
+        );
     }
 
 
@@ -523,10 +522,7 @@ class Controller extends BaseController
             }
         }
 
-        $this->getResponse()->content->set([
-            'data'   => $conf,
-            'format' => 'json',
-        ]);
+        $this->response = $this->responseAsJson($conf);
     }
 
 
@@ -588,7 +584,10 @@ class Controller extends BaseController
 
         $content['data']['logs'] = array_filter(explode("\n", trim(stream_get_contents($write))));
 
-        $this->getResponse()->content->set($content);
+        $this->response = $this->responseFromTemplate(
+            $content['template'],
+            $content['data'],
+        );
     }
 
     /**
@@ -627,8 +626,8 @@ class Controller extends BaseController
         //set deleted in app registries
         $registryMapper->deleteByColumn('app_id', $service->getId());
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'id' => $service->getId(),
-        ]));
+        ]);
     }
 }

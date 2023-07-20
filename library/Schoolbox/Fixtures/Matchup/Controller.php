@@ -173,11 +173,11 @@ class Controller extends AbstractController
             $matches->sortBy('startAt', 'asc');
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesMatch/list.twig', [
             'division'   => $division,
             'allSeasons' => $allSeasons,
             'allMatches' => $seasonMatches
-        ]));
+        ]);
     }
 
     /**
@@ -265,11 +265,11 @@ class Controller extends AbstractController
         ]);
         $matchup->setItinerary($allItineraryItems);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesMatch/create.twig', [
             'match'     => $matchup,
             'tagPrefix' => TagCloudMapper::SCHOOL_PREFIX,
             'action'    => $matchup->getId() ? 'Modify' : 'Create'
-        ]));
+        ]);
     }
 
     /**
@@ -289,7 +289,7 @@ class Controller extends AbstractController
          * All match pages are on a per-team basis
          */
 
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('sportsfixtures.getLanding', []));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('sportsfixtures.getLanding', []));
     }
 
     /**
@@ -359,7 +359,7 @@ class Controller extends AbstractController
 
         $this->saveMatch($entity, $division, $name, $season, $startAt, $finishAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesMatch.getList', [
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesMatch.getList', [
             'contextId' => $division->getId()
         ]));
     }

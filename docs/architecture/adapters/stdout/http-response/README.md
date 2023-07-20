@@ -29,7 +29,7 @@ class MyController extends \Alaress\Web\Controller\Base
 {
     public function myAction(): void
     {
-        $this->response->content->set($this->buildJsonOutput($data));
+        $this->response = $this->responseAsJson($data);
     }
 }
 ```
@@ -57,10 +57,11 @@ class MyController extends \Alaress\Web\Controller\Base
 {
     public function myAction(): void
     {
-        $this->response->headers->set('Content-Type', 'application/pdf');
-        $this->response->headers->set('Content-Length', strlen($content));
-        $this->response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-        $this->response->content->set($this->buildFileOutputFromString($content));
+        $this->response = $this->responseFromContent($content)
+            ->withHeader('Content-Type', 'application/pdf')
+            ->withHeader('Content-Length', strlen($content))
+            ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+        ;
     }
 }
 ```

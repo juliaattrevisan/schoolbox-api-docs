@@ -97,12 +97,10 @@ class Controller extends Base
 
         $pageTitle = 'Class Markbook';
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
+        $this->response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
-            ])->setTab('submission')->setTitle($pageTitle)
-        );
+            ], $pageTitle, 'submission');
     }
 
 
@@ -135,9 +133,9 @@ class Controller extends Base
              */
             $rank = $markbook->getRanking();
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 'status'  => 200,
-                'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
+                'content' => $this->responseFromTemplateUnthemed('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
                     'folder'                => $folder,
                     'rank'                  => $rank,
@@ -145,8 +143,8 @@ class Controller extends Base
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
-                ])->getAsString(),
-            ]));
+                ])->getBody()->getContents(),
+            ]);
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);
             $data = [
@@ -161,7 +159,7 @@ class Controller extends Base
                     'file'    => $e->getFile(),
                 ]);
             }
-            $this->getResponse()->content->set($this->buildJsonOutput($data));
+            $this->response = $this->responseAsJson($data);
         } catch (\Throwable $e) {
             $this->captureException($e);
             $this->returnJsonError($e);
@@ -220,7 +218,7 @@ class Controller extends Base
         $codec        = new Codec(Filter\Mapper::getInstance(), Filter\Selection\Mapper::getInstance());
         $getArgString = $codec->convertSelectionsToQueryString($selections);
 
-        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
+        $this->response = $this->redirectFound("{$route}?{$getArgString}");
     }
 
 
@@ -384,7 +382,7 @@ class Controller extends Base
                 'file'    => $e->getFile(),
             ]);
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->response = $this->responseAsJson($data);
     }
 
 

@@ -46,11 +46,11 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/global.twig', [
+        $this->response = $this->responseFromTemplate('@adminUsage/global.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex')),
             'isS3Adapter' => $this->isS3Adapter(),
-        ]));
+        ]);
     }
 
 
@@ -77,12 +77,12 @@ class Controller extends Base
         $crumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex'));
         $crumbs[] = [$user->getFullName(), ''];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/specificUser.twig', [
+        $this->response = $this->responseFromTemplate('@adminUsage/specificUser.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminUsage.getIndex'),
             'allBreadcrumbs' => $crumbs,
             'isS3Adapter' => $this->isS3Adapter(),
             'user' => $user
-        ]));
+        ]);
     }
 
 
@@ -100,7 +100,7 @@ class Controller extends Base
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_SYSTEM, $callback, '', Regenerate::CACHE_TIMEOUT);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -118,7 +118,7 @@ class Controller extends Base
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_ROLE, $callback, '', Regenerate::CACHE_TIMEOUT);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -129,7 +129,7 @@ class Controller extends Base
     {
         $payload = (new Graph\GlobalUsers\TotalPayload($this->database, $this->getConfigLoader()->get('storage_dir')))->generate();
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -147,7 +147,7 @@ class Controller extends Base
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_USER, $callback, '', Regenerate::CACHE_TIMEOUT);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -165,7 +165,7 @@ class Controller extends Base
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_FILETYPE, $callback, '', Regenerate::CACHE_TIMEOUT);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -179,7 +179,7 @@ class Controller extends Base
     {
         $payload = (new Graph\SpecificUser\SystemPayload($this->database))->generate($user);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -193,7 +193,7 @@ class Controller extends Base
     {
         $payload = (new Graph\SpecificUser\TotalPayload($this->database))->generate($user);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -208,7 +208,7 @@ class Controller extends Base
     {
         $payload = (new Graph\SpecificUser\FilePayload($this->database))->generate($user);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
 
@@ -222,7 +222,7 @@ class Controller extends Base
     {
         $payload = (new Graph\SpecificUser\FileTypePayload($this->database))->generate($user);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+        $this->response = $this->responseAsJson($payload);
     }
 
     /**

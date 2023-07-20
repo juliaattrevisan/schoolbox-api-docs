@@ -106,26 +106,30 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
-            'pageCurrent' => $this->routeGenerator->generate('adminImportProfile.getIndex'),
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
-            'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
-            'attachzone' => [
-                Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
-                Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
-                Mapping::CSV_RELATIONSHIP => $this->getAttachZone(Mapping::CSV_RELATIONSHIP, 'Upload Relationship CSV file'),
-                Mapping::CSV_STAFF => $this->getAttachZone(Mapping::CSV_STAFF, 'Upload Staff CSV file'),
-            ],
+        $this->response = $this->responseFromTemplate(
+            '@adminImportProfile/index.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminImportProfile.getIndex'),
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
+                'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
+                'attachzone' => [
+                    Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
+                    Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
+                    Mapping::CSV_RELATIONSHIP => $this->getAttachZone(Mapping::CSV_RELATIONSHIP, 'Upload Relationship CSV file'),
+                    Mapping::CSV_STAFF => $this->getAttachZone(Mapping::CSV_STAFF, 'Upload Staff CSV file'),
+                ],
 
-            /* Check which tables have data; if there is any content, link to the exporter
-             */
-            'profiles' => [
-                'numParents' => $this->parentProfileMapper->countAll(),
-                'numStaff' => $this->staffProfileMapper->countAll(),
-                'numStudents' => $this->studentProfileMapper->countAll(),
-                'numRelationships' => $this->relationshipMapper->countAll()
-            ]
-        ])->setTitle('Import User Profile'));
+                /* Check which tables have data; if there is any content, link to the exporter
+                 */
+                'profiles' => [
+                    'numParents' => $this->parentProfileMapper->countAll(),
+                    'numStaff' => $this->staffProfileMapper->countAll(),
+                    'numStudents' => $this->studentProfileMapper->countAll(),
+                    'numRelationships' => $this->relationshipMapper->countAll()
+                ]
+            ],
+            'Import User Profile'
+        );
     }
 
 
@@ -211,24 +215,25 @@ class Controller extends Base
         }
 
         if ($this->isJsonRequest()) {
-            if (!empty($errors)) {
-                $this->response->status->setCode(400);
-            } else {
-                $this->response->status->setCode(200);
-            }
-            $this->response->content->set($this->buildJsonOutput([$errors, $logs]));
+            $this->response = $this->responseAsJson([$errors, $logs])->withStatus(
+                !empty($errors) ? 400 : 200
+            );
             return;
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
-            'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
-            'attachment' => $this->requestPost['attachment'] ?? null,
-            'errors' => $errors,
-            'logs' => $logs,
-            'file' => $this->requestPost['file'],
-            'perform' => (bool)$this->requestQuery->get('perform')
-        ])->setTitle('Import User Profile'));
+        $this->response = $this->responseFromTemplate(
+            '@adminImportProfile/log.twig',
+            [
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
+                'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
+                'attachment' => $this->requestPost['attachment'] ?? null,
+                'errors' => $errors,
+                'logs' => $logs,
+                'file' => $this->requestPost['file'],
+                'perform' => (bool)$this->requestQuery->get('perform')
+            ],
+            'Import User Profile'
+        );
     }
 
 
@@ -249,17 +254,12 @@ class Controller extends Base
             $this->staffProfileMapper,
             $this->relationshipMapper
         ))->process();
-
-        $headers = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', \strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"export-{$type}.csv\"");
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->response = $this->responseFromContent($content)
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', \strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"export-{$type}.csv\"")
+        ;
     }
 }

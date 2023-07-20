@@ -262,10 +262,9 @@ class Controller extends BaseController
                                ->indexBy('id')
                                ->getAll();
 
-        $this->getResponse()->content->set([
-            'title'    => 'Message Settings',
-            'template' => '@messages/settings.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@messages/settings.twig',
+            [
                 'ns'        => $ns,
                 'sources'   => $sources,
                 'perms'     => $this->getConfig()->getPermissionList($digest, $mobile),
@@ -273,7 +272,8 @@ class Controller extends BaseController
                 'mobile'    => $mobile,
                 'msgConfig' => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
             ],
-        ]);
+            'Message Settings',
+        );
     }
 
 
@@ -299,12 +299,9 @@ class Controller extends BaseController
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set([
-                'data'   => $conf,
-                'format' => 'json',
-            ]);
+            $this->response = $this->responseAsJson($conf);
         } else {
-            $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('messages.configure'));
+            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('messages.configure'));
         }
     }
 }

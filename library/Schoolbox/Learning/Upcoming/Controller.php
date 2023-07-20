@@ -101,7 +101,7 @@ class Controller extends Base
      */
     public function getUpcoming(): void
     {
-        $this->getResponse()->redirect->to(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'learningUpcoming.getUpcomingForStudent',
                 ['studentId' => $this->getUser()->getId(),]
@@ -226,12 +226,8 @@ class Controller extends Base
             'filterIdSlugMap' => $this->buildFilterIdSlugMap($filterPanel),
         ];
 
-        $namespace = Module::BASENAME;
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@$namespace/upcomingOuter.twig", $data)
-                 ->setTitle("Upcoming Due Work")
-                 ->setTab('submission') // ¯\_(ツ)_/¯
-        );
+        $namespace      = Module::BASENAME;
+        $this->response = $this->responseFromTemplate("@$namespace/upcomingOuter.twig", $data, "Upcoming Due Work", 'submission');
     }
 
     /** @noinspection PhpUnused */
@@ -295,17 +291,17 @@ class Controller extends Base
         $data = [
             'student'         => $student,
             'upcomingWork'    => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
-            'returnUrl'       => Redirect::queryString(RequestUriParser::parseUrlPath($this->psr7Request->getServerParams())),
+            'returnUrl'       => Redirect::queryString(RequestUriParser::parseUrlPath($this->request->getServerParams())),
             'readableFolders' => array_unique($readableFolders),
             'isFiltered'      => (new Filter\RequestChecker())->isFilteredRequest($request),
         ];
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'status'  => 200,
-            'content' => $this->buildUnthemedHtmlOutput('@learningUpcoming/upcomingInner.twig', $data)->getAsString(),
-        ]));
+            'content' => $this->responseFromTemplateUnthemed('@learningUpcoming/upcomingInner.twig', $data)->getBody()->getContents(),
+        ]);
     }
 
     /**
@@ -384,9 +380,9 @@ class Controller extends Base
             $this->getUser()
         );
 
-        $this->response->content->set($this->buildJsonOutput(
+        $this->response = $this->responseAsJson(
             array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
-        ));
+        );
     }
 
     /**

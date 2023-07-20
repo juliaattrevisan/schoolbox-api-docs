@@ -92,14 +92,13 @@ class Controller extends Base
             $reports[$year][$semester][$reportId] = ['description' => $description];
         }
 
-        $this->getResponse()->content->set([
-            'format'   => 'html',
-            'template' => '@customStkOleReport/list.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@customStkOleReport/list.twig',
+            [
                 'student' => $student,
                 'reports' => $reports,
             ],
-        ]);
+        );
     }
 
     /**
@@ -139,14 +138,13 @@ class Controller extends Base
         $content  = $row['Document'];
         $fileName = "{$row['Description']}.pdf";
 
-        $headers  = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'application/pdf');
-        $headers->set('Content-Length', strlen($content));
-        $headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
-
-        $this->getResponse()->content->set($this->buildFileOutputFromString($content));
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'application/pdf')
+                               ->withHeader('Content-Length', strlen($content))
+                               ->withHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+        ;
     }
 
     // Getters / Setters

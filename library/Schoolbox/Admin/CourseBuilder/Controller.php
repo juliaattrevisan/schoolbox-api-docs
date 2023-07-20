@@ -107,23 +107,20 @@ class Controller extends Base
         }
 
         // Render this thing out
-
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminCourseBuilder/index.twig',
-                'data'     => array(
-                    'pageCurrent' => $this->routeGenerator->generate('adminCourseBuilder.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminCourseBuilder.getIndex')),
-                    'tab' => $tab != '' ? $tab : 'course',
-                    'roles' => $this->roleMapper->findAll(),
-                    'permissions' => $permissions,
-                    'templates' => $this->homepageTemplateMapper->findAll()->sortBy("name", "asc"),
-                    'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
-                    'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
-                    'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                    'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@adminCourseBuilder/index.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminCourseBuilder.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminCourseBuilder.getIndex')),
+                'tab' => $tab != '' ? $tab : 'course',
+                'roles' => $this->roleMapper->findAll(),
+                'permissions' => $permissions,
+                'templates' => $this->homepageTemplateMapper->findAll()->sortBy("name", "asc"),
+                'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
+                'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
+            ],
         );
     }
 
@@ -181,6 +178,6 @@ class Controller extends Base
 
         // Send them back to the admin page
 
-        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
+        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
     }
 }

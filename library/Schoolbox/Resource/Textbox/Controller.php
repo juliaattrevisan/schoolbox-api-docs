@@ -59,7 +59,7 @@ class Controller extends Base
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
-        $this->response->content->set($this->buildJsonOutput($model));
+        $this->response = $this->responseAsJson($model);
     }
 
 
@@ -95,7 +95,7 @@ class Controller extends Base
 
 
         // Render the textbox
-        $this->response->content->set($this->buildJsonOutput($model));
+        $this->response = $this->responseAsJson($model);
     }
 
 
@@ -111,7 +111,7 @@ class Controller extends Base
     {
         $textbox = $this->persistTextbox($textbox);
         $this->mapper->save($textbox);
-        $this->response->content->set($this->buildJsonOutput($textbox));
+        $this->response = $this->responseAsJson($textbox);
     }
 
 
@@ -139,7 +139,7 @@ class Controller extends Base
      */
     private function persistTextbox(Model $model): Model
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
         return $model->setHeading($data['heading'])
                      ->setBody($data['body'])
                      ->setDeletedAt(null);
@@ -162,10 +162,10 @@ class Controller extends Base
             ['Text Boxes', null]
         ];
 
-        $this->response->content->set($this->buildHtmlOutput('@textbox/index.twig', [
+        $this->response = $this->responseFromTemplate('@textbox/index.twig', [
             'folder'         => $folder,
             'allBreadcrumbs' => $allBreadcrumbs,
-        ]));
+        ]);
     }
 
 
@@ -203,9 +203,7 @@ class Controller extends Base
             ];
         }
 
-        $this->response->content->set(
-            $this->buildJsonOutput($usages)
-        );
+        $this->response = $this->responseAsJson($usages);
     }
 
 
@@ -243,7 +241,7 @@ class Controller extends Base
 
         /* I guess you go back to the homepage instead of the Textbox Usage index...?
          */
-        $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
+        $this->response = $this->redirectFound("/homepage/{$folder->getId()}");
     }
 
     /**
@@ -256,8 +254,8 @@ class Controller extends Base
      */
     public function getTextbox(Model $textbox): void
     {
-        $this->response->content->set($this->buildUnthemedHtmlOutput('@textbox/blank.twig', [
+        $this->response = $this->responseFromTemplateUnthemed('@textbox/blank.twig', [
             'textbox'         => $textbox,
-        ]));
+        ]);
     }
 }

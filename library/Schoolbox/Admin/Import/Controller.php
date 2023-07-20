@@ -155,27 +155,31 @@ class Controller extends ConfigController
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
-            'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
-            'allNavigation'  => (new SchoolData())->buildNavigation($this->routeGenerator)->getAllNodes(),
-            'dataSource' => $dataSource,
-            'configContext' => $configContext,
-            'hasIndicator' => $hasIndicator,
-            'statusIndicatorRoute' => $this->routeGenerator->generate('adminImportIndex.getStatusIndicator'),
-            'importLogs' => $this->importLogMapper->findLogsWithDuration(),
-            /* Decide if the Perform Live Sync is available based on the current
-             * data source selected (you can't do it if you're using No Data Source
-             * or if you're using CSV Files)
-             */
-            'canPerformUpdate' => $canPerformUpdate,
-            /* A flash message to tell users to w8
-             */
-            'hasPerformUpdate' => $hasPerformUpdate,
-            /* Decide if the current suds selection uses the cyclic grid
-             */
-            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource)
-        ])->setTitle('School Data Import'));
+        $this->response = $this->responseFromTemplate(
+            '@adminImportIndex/schoolData/index.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
+                'allNavigation'  => (new SchoolData())->buildNavigation($this->routeGenerator)->getAllNodes(),
+                'dataSource' => $dataSource,
+                'configContext' => $configContext,
+                'hasIndicator' => $hasIndicator,
+                'statusIndicatorRoute' => $this->routeGenerator->generate('adminImportIndex.getStatusIndicator'),
+                'importLogs' => $this->importLogMapper->findLogsWithDuration(),
+                /* Decide if the Perform Live Sync is available based on the current
+                 * data source selected (you can't do it if you're using No Data Source
+                 * or if you're using CSV Files)
+                 */
+                'canPerformUpdate' => $canPerformUpdate,
+                /* A flash message to tell users to w8
+                 */
+                'hasPerformUpdate' => $hasPerformUpdate,
+                /* Decide if the current suds selection uses the cyclic grid
+                 */
+                'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource)
+            ],
+            'School Data Import'
+        );
     }
 
 
@@ -213,7 +217,7 @@ class Controller extends ConfigController
         $this->updateConfig($postData, $this->buildConfigPredicate());
         /* Go back to the place from whence you came
          */
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
     }
 
 
@@ -253,9 +257,9 @@ class Controller extends ConfigController
             }
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
+        $this->response = $this->responseFromTemplateUnthemed('@adminImportIndex/schoolData/status.twig', [
             'isReachable' => $isReachable
-        ]));
+        ]);
     }
 
 
@@ -284,14 +288,17 @@ class Controller extends ConfigController
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
-            'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
-            'report' => \is_array($report) ? $report : [[
-                'message' => $message,
-                'reason' => '',
-                'status' => ISpecification::STATUS_ERROR
-            ]]
-        ]));
+        $this->response = $this->responseFromTemplate(
+            '@adminImportIndex/schoolData/statusReport.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
+                'report' => \is_array($report) ? $report : [[
+                    'message' => $message,
+                    'reason' => '',
+                    'status' => ISpecification::STATUS_ERROR
+                ]]
+            ]
+        );
     }
 
 
@@ -316,7 +323,7 @@ class Controller extends ConfigController
         }
 
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
 
         /* Spawn a logger out of darkness
          * Was there a particular way to do this?
@@ -324,14 +331,10 @@ class Controller extends ConfigController
         $logger = $this->spawnLogger();
 
         // Not the best place to put it but it will do for now
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-            'postOutput' => [
-                function () use ($logger) {
-                    $this->syncCallback($logger);
-                }
-            ],
-        ]);
+        $this->postOutputCallbacks[] = function () use ($logger) {
+            $this->syncCallback($logger);
+        };
+        $this->response              = $this->responseEmpty();
     }
 
 
@@ -572,18 +575,13 @@ class Controller extends ConfigController
     public function getTimetableExport(): void
     {
         $content = (new Timetable($this->eventMapper))->export();
-
-        $headers = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', \strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"");
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'text/csv')
+                               ->withHeader('Content-Length', \strlen($content))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"")
+        ;
     }
 
 
@@ -597,17 +595,12 @@ class Controller extends ConfigController
     public function getClassesExport(): void
     {
         $content = (new Classes($this->classEntryMapper))->export();
-
-        $headers = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', \strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"");
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->response = $this->responseFromContent($content)
+                               ->withHeader('Pragma', ' ')
+                               ->withHeader('Cache-Control', ' ')
+                               ->withHeader('Content-Type', 'text/csv')
+                               ->withHeader('Content-Length', \strlen($content))
+                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"")
+        ;
     }
 }

@@ -12,7 +12,6 @@ namespace External\Tass\Portal;
 
 use Alaress;
 use Alaress\Session\ImpersonationCheck;
-use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\User;
 use Schoolbox\Error;
 
@@ -80,7 +79,6 @@ class Controller extends Alaress\Web\Controller\Base
      * @param array      $deepLinkV2  Injected when generating a SSO v2 token
      * @param bool       $prodMenu    Should Tass render the product menu? Null for default behaviour
      * @param null|array $deepLinkV1  Injected when generating a SSO v1 token
-     * @throws InvalidStatusCode If unable to generate a token and unable to set appropriate error code
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, array $deepLinkV2, bool $prodMenu, array $deepLinkV1 = null)
@@ -93,7 +91,7 @@ class Controller extends Alaress\Web\Controller\Base
         if ((int)$this->getConfigLoader()->get('external_tass_sso_token_generation_strategy') === SSO::SSO_STRATEGY_V3_SAML) {
             // Redirect to SAML supporting TASS url
             $samlDeepLink = json_encode(array_merge($deepLinkV2, ['prod_menu' => $prodMenu ? 'Y' : 'N']));
-            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?go={$samlDeepLink}");
+            $this->response = $this->redirectFound("{$this->portalHost}{$productPath}?go={$samlDeepLink}");
             return;
         }
 
@@ -113,15 +111,14 @@ class Controller extends Alaress\Web\Controller\Base
 
         // If we successfully got a token, redirect the user to the Tass product URL
         if ($token) {
-            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?sso_token={$token}");
+            $this->response = $this->redirectFound("{$this->portalHost}{$productPath}?sso_token={$token}");
         } else {
-            $this->getResponse()->status->setCode(404);
+            $this->response = $this->responseEmpty(404);
         }
     }
 
     /**
      * SSO to parent lounge
-     * @throws InvalidStatusCode
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function parentLounge()
@@ -131,7 +128,6 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * SSO to TASSWeb
-     * @throws InvalidStatusCode
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function tassWeb()
@@ -143,7 +139,6 @@ class Controller extends Alaress\Web\Controller\Base
     /**
      * SSO to teacher kiosk
      *
-     * @throws InvalidStatusCode
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function teacherKiosk()
@@ -156,7 +151,6 @@ class Controller extends Alaress\Web\Controller\Base
      * Redirect to the student profile page in TASS's teacher kiosk
      *
      * @param User $student
-     * @throws InvalidStatusCode
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function studentProfile(User $student): void
@@ -176,7 +170,6 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * SSO to web book
-     * @throws InvalidStatusCode
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function webBook()
@@ -186,7 +179,6 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * SSO to student cafe
-     * @throws InvalidStatusCode
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function studentCafe()

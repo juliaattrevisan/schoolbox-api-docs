@@ -33,15 +33,15 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminTerminology/index.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@adminTerminology/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminTerminology.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerminology.getIndex')),
                 'terms' => $this->l10nMapper->findAll()->sortNaturally('title'),
             ],
-            'title' => 'Admin - Terminology'
-        ]);
+            'Admin - Terminology'
+        );
     }
 
 
@@ -66,6 +66,6 @@ class Controller extends Base
             // noop, I guess? skip unknown terminologies
         }
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminTerminology.getIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminTerminology.getIndex'));
     }
 }

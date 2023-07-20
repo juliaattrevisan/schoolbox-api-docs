@@ -80,17 +80,17 @@ class Controller extends Base
             ];
         })->getAll();
 
-        $this->getResponse()->content->set([
-            'template' => '@adminTerms/index.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@adminTerms/index.twig',
+            [
                 'pageCurrent'      => $this->routeGenerator->generate('adminTerms.getIndex'),
                 'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerms.getIndex')),
                 'terms'            => $terms,
                 'yearLevelValues'  => $yearLevelValues,
                 'yearLevelOptions' => $yearLevelOptions,
             ],
-            'title' => 'Admin - Terms'
-        ]);
+            'Admin - Terms'
+        );
     }
 
 
@@ -224,13 +224,12 @@ class Controller extends Base
     protected function outputPostSuccess(Term\Model $term)
     {
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set([
-                'template' => "@adminTerms/listItem.twig",
-                'format'   => 'nochrome',
-                'data'     => ['term' => $term,]
-            ]);
+            $this->response = $this->responseFromTemplateUnthemed(
+                "@adminTerms/listItem.twig",
+                ['term' => $term,]
+            );
         } else {
-            $this->getResponse()->redirect->to($this->routeGenerator->generate('adminTerms.getIndex'));
+            $this->response = $this->redirectFound($this->routeGenerator->generate('adminTerms.getIndex'));
         }
     }
 
@@ -246,11 +245,7 @@ class Controller extends Base
     {
         if ($this->isXhrRequest()) {
             // Dump out an AJAX error
-            $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data'   => $e->getMessage(),
-            ]);
+            $this->response = $this->responseAsJson($e->getMessage())->withStatus(500);
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FORM_SUBMIT, $e, $e->getMessage());
         }

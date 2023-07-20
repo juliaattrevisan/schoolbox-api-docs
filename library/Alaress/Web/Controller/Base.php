@@ -14,13 +14,13 @@ use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
 use Alaress\Web\Request\Values;
+use Alaress\Web\Response\Factory as ResponseFactory;
 use Aura\Router\Generator;
 use Aura\Router\RouterContainer;
 use Aura\Session\SegmentInterface;
-use Aura\Web\Exception\InvalidStatusCode;
-use Aura\Web\Response;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
+use Closure;
 use Crell\ApiProblem\ApiProblem;
 use LogicException;
 use Psr\Container\ContainerInterface;
@@ -29,8 +29,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
 use Schoolbox\Url\Uri;
+use Twig\Error\Error as TwigError;
 
 abstract class Base
 {
@@ -38,7 +40,7 @@ abstract class Base
      * A PSR-7 compliant request object, which represents the current incoming
      * request.
      */
-    protected ServerRequestInterface $psr7Request;
+    protected ServerRequestInterface $request;
 
     /**
      * A values container, representing the parsed query string (a.k.a. $_GET).
@@ -54,22 +56,26 @@ abstract class Base
     protected Values $requestPost;
 
     /**
-     * Response object from Aura.Web package.
-     *
-     * @deprecated This will be replaced with a PSR-7 compliant response object
-     *             in `$this->psr7Response`.
-     *             If that object is not set, the output mechanism will fall
-     *             back to this object.
-     */
-    protected Response $response;
-
-    /**
      * A PSR-7 compliant response object.
      *
-     * If this is set: a response will be output from this object instead of
-     * from `$this->response`.
+     * If this is set, a response will be output from this object; otherwise, an
+     * empty response will be output (and a warning raised).
      */
-    protected ?ResponseInterface $psr7Response = null;
+    protected ?ResponseInterface $response = null;
+
+    /**
+     * A custom response factory, designed for building PSR-7 compliant response
+     * objects.
+     */
+    protected ResponseFactory $responseFactory;
+
+    /**
+     * A list of callbacks to be called after output has been sent to the
+     * browser.
+     *
+     * @var array<callable>
+     */
+    protected array $postOutputCallbacks = [];
 
     /**
      * @deprecated you should be injecting your dependencies from the constructor!
@@ -130,7 +136,7 @@ abstract class Base
      *
      * @var User
      */
-    private $user;
+    protected $user;
 
 
     /**
@@ -146,18 +152,18 @@ abstract class Base
     /**
      * @return ServerRequestInterface
      */
-    public function getPsr7Request(): ServerRequestInterface
+    public function getRequest(): ServerRequestInterface
     {
-        return $this->psr7Request;
+        return $this->request;
     }
 
     /**
-     * @param ServerRequestInterface $psr7Request
+     * @param ServerRequestInterface $request
      * @return $this
      */
-    public function setPsr7Request(ServerRequestInterface $psr7Request): self
+    public function setRequest(ServerRequestInterface $request): self
     {
-        $this->psr7Request = $psr7Request;
+        $this->request = $request;
         return $this;
     }
 
@@ -216,41 +222,45 @@ abstract class Base
     }
 
     /**
-     * @deprecated use `$this->psr7Response` instead
-     *
-     * @param  Response $response
-     * @return $this
+     * @return ResponseInterface|null
      */
-    public function setResponse(Response $response): self
-    {
-        $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * @deprecated use `$this->psr7Response` instead
-     *
-     * @return Response
-     */
-    public function getResponse(): Response
+    public function getResponse(): ?ResponseInterface
     {
         return $this->response;
     }
 
     /**
-     * @return ResponseInterface|null
+     * @param ResponseInterface|null $response
      */
-    public function getPsr7Response(): ?ResponseInterface
+    public function setResponse(?ResponseInterface $response): void
     {
-        return $this->psr7Response;
+        $this->response = $response;
     }
 
     /**
-     * @param ResponseInterface|null $psr7Response
+     * @return ResponseFactory
      */
-    public function setPsr7Response(?ResponseInterface $psr7Response): void
+    public function getResponseFactory(): ResponseFactory
     {
-        $this->psr7Response = $psr7Response;
+        return $this->responseFactory;
+    }
+
+    /**
+     * @param ResponseFactory $responseFactory
+     * @return $this
+     */
+    public function setResponseFactory(ResponseFactory $responseFactory): self
+    {
+        $this->responseFactory = $responseFactory;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPostOutputCallbacks(): array
+    {
+        return $this->postOutputCallbacks;
     }
 
     /**
@@ -366,7 +376,7 @@ abstract class Base
      */
     public function isJsonRequest(): bool
     {
-        return $this->isJsonSpec->isSatisfiedBy($this->psr7Request);
+        return $this->isJsonSpec->isSatisfiedBy($this->request);
     }
 
 
@@ -391,7 +401,7 @@ abstract class Base
      */
     public function isXhrRequest(): bool
     {
-        return $this->isXhrSpec->isSatisfiedBy($this->psr7Request);
+        return $this->isXhrSpec->isSatisfiedBy($this->request);
     }
 
 
@@ -510,186 +520,247 @@ abstract class Base
     }
 
     /**
-     * Factory method for loading a JSON output object.
+     * Build a JSON response from `$data`.
      *
-     * @param  mixed $data
-     * @return Output\Json
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
+     * @param mixed $data
+     * @return ResponseInterface
      */
-    protected function buildJsonOutput($data)
+    protected function responseAsJson(mixed $data): ResponseInterface
     {
-        /** @var Output\Json $output */
-        $output = $this->getDi()->get('webOutput:json');
-        return $output->setData($data);
+        return $this->responseFactory->buildJson($data);
     }
 
     /**
-     * Factory method for loading a chromeless HTML output object.
+     * Shortcut method for building a chromeless HTML response.
      *
-     * @param  string $template A Twig template
-     * @param  mixed  $data
-     * @return Output\Html
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
+     * @param string $template A Twig template to render.
+     * @param array  $data     Data to inject into the template.
+     * @return ResponseInterface
+     * @throws TwigError if something goes wrong when rendering the template
      */
-    protected function buildUnthemedHtmlOutput($template, $data)
+    protected function responseFromTemplateUnthemed(string $template, array $data): ResponseInterface
     {
-        /** @var Output\Html $output */
-        $output = $this->getDi()->get('webOutput:nochrome');
-        $output = $this->injectCurrentUserGlobal($output);
-        return $output->setTemplate($template)->setData($data);
-    }
-
-
-    /**
-     * Factory method for loading an xml output object
-     *
-     * @param string $template
-     * @param string|array $data
-     * @return mixed
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildXmlOutput($template, $data)
-    {
-        /** @var Output\Xml $output */
-        $output = $this->getDi()->get('webOutput:xml');
-        $output = $this->injectCurrentUserGlobal($output);
-        return $output->setTemplate($template)->setData($data);
+        return $this->responseFactory->buildUnthemedHtml($template, $data, $this->user);
     }
 
     /**
-     * Factory method for loading a chromed HTML output object.
+     * Shortcut method for building a HTML response from streamed data.
      *
-     * @param  string $template A Twig template
-     * @param  mixed  $data
-     * @param string  $title
-     * @param string  $tab
-     * @return Output\ThemedHtml
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
+     * @see \Alaress\Web\Response\TwigCallbackStream::__construct for further
+     * parameter documentation.
+     *
+     * @param string      $template
+     * @param Closure     $dataCallback
+     * @param array       $dataCallbackArguments
+     * @param string|null $headerTemplate
+     * @param string|null $footerTemplate
+     * @param array       $headerFooterData
+     * @return ResponseInterface
      */
-    protected function buildHtmlOutput($template, $data, $title = '', $tab = '')
-    {
-        /** @var Output\ThemedHtml $output */
-        $output = $this->getDi()->get('webOutput:html');
-        $output = $this->injectCurrentUserGlobal($output);
-
-        /** @var Output\ThemedHtml $tpl */
-        $tpl = $output->setTemplate($template)->setData($data);
-
-        if ($title) {
-            $tpl->setTitle($title);
-        }
-
-        if ($tab) {
-            $tpl->setTab($tab);
-        }
-
-        return $tpl;
-    }
-
-    /**
-     * Factory method for loading a file output object.
-     *
-     * @param  string $filename
-     * @return Output\File
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildFileOutputFromFilename($filename)
-    {
-        /** @var Output\File $output */
-        $output = $this->getDi()->get('webOutput:file');
-        return $output->setFile($filename);
-    }
-
-    /**
-     * Factory method for loading a file output object.
-     *
-     * @param  string $fileContents
-     * @return Output\File
-     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
-     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
-     */
-    protected function buildFileOutputFromString($fileContents)
-    {
-        /** @var Output\File $output */
-        $output = $this->getDi()->get('webOutput:base');
-        return $output->setData($fileContents);
-    }
-
-    /**
-     * Parses a PSR-7 response into this controller's Aura response: this sets
-     * the status code, headers and body from the PSR-7 response into the Aura
-     * response.
-     *
-     * This relies upon the PSR-7 response's `getBody` method returning a
-     * rewindable stream.
-     *
-     * @param ResponseInterface $response A PSR-7 HTTP response object.
-     */
-    protected function populateResponseFromPsr7Response(ResponseInterface $response): void
-    {
-        $this->response->status->set($response->getStatusCode());
-        foreach ($response->getHeaders() as $name => $values) {
-            foreach ($values as $value) {
-                $this->response->headers->add($name, $value);
-            }
-        }
-        $response->getBody()->rewind();
-        $this->response->content->set(
-            $this->buildFileOutputFromString($response->getBody()->getContents())
+    protected function responseFromTemplateStreamedData(
+        string $template,
+        Closure $dataCallback,
+        array $dataCallbackArguments,
+        ?string $headerTemplate = null,
+        ?string $footerTemplate = null,
+        array $headerFooterData = [],
+    ): ResponseInterface {
+        return $this->responseFactory->buildHtmlFromStream(
+            $template,
+            $dataCallback,
+            $dataCallbackArguments,
+            $this->user,
+            $headerTemplate,
+            $footerTemplate,
+            $headerFooterData,
         );
     }
 
     /**
-     * Just a raw template render
+     * Shortcut method for building a chromed HTML response.
      *
-     * @deprecated Use `buildHtmlOutput` or `buildUnthemedHtmlOuptut` instead
-     *
-     * @param string $namespace
-     * @param string $template
-     * @param array  $data
-     * @param string $tab
+     * @param string $template A Twig template to render.
+     * @param array  $data     Data to inject into the template.
+     * @param string $title    If not empty: use this as the page title.
+     * @param string $tab      If not empty: use this as the selected navigation
+     *                         tab.
+     * @return ResponseInterface
+     * @throws TwigError if something goes wrong when rendering the template
      */
-    protected function tpl($namespace, $template, $data = [], $tab = '')
-    {
-        $content = $this->buildContent("@$namespace/$template.twig", $data);
-
-        if ($content instanceof Output\ThemedHtml) {
-            $content->setTab($tab);
-        }
-
-        $this->getResponse()->content->set($content);
+    protected function responseFromTemplate(
+        string $template,
+        array $data,
+        string $title = '',
+        string $tab = '',
+    ): ResponseInterface {
+        return $this->responseFactory->buildHtml($template, $data, $this->user, $title, $tab);
     }
 
+    /**
+     * Shortcut method for building a HTTP "301 Moved Permanently" response.
+     *
+     * The only difference between a 301 and 308 is that:
+     * - a 301 response may be changed from POST to GET by a user agent
+     *   (e.g. a browser)
+     * - a 308 response may not have its verb changed
+     * This difference should be irrelevant in practice, because redirects after
+     * a POST will nearly always be a 303 See Other.
+     *
+     * @deprecated IMO 308 (`$this->redirectPermanent()`) should be used instead
+     *             due to the user agent behavior mentioned above.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectMovedPermanently(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_MOVED_PERMANENTLY);
+    }
 
     /**
-     * @deprecated Use one of the `build*Output` methods instead, to build
-     *             exactly the type of content you specify
+     * Shortcut method for building a HTTP "302 Found" response.
      *
-     * @param string $template
-     * @param array  $data
-     * @return \Alaress\Web\Output\Base
+     * As with 301 vs. 308, the only difference between a 302 and 307 is that:
+     * - a 302 response may be changed from POST to GET by a user agent
+     *   (e.g. a browser)
+     * - a 307 response may not have its verb changed
+     * This difference should be irrelevant in practice, because redirects after
+     * a POST will nearly always be a 303 See Other.
+     *
+     * @deprecated IMO 307 (`$this->redirectTemporary()`) should be used instead
+     *             due to the user agent behavior mentioned above.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
      */
-    protected function buildContent($template, array $data)
+    protected function redirectFound(string $location): ResponseInterface
     {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_FOUND);
+    }
+
+    /**
+     * Alias for `redirectSeeOther`, named so that it is apparent that it should
+     * be used as the redirect after a POST request is processed.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectAfterPost(string $location): ResponseInterface
+    {
+        return $this->redirectSeeOther($location);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "303 See Other" response.
+     *
+     * This response should not be cached: thus, the 'cache-control: none'
+     * header will be set.
+     *
+     * This should be used as the redirect method after a `POST` request.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectSeeOther(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "307 Temporary Redirect" response.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectTemporary(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_TEMPORARY_REDIRECT);
+    }
+
+    /**
+     * Shortcut method for building a HTTP "308 Permanent Redirect" response.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectPermanent(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_PERMANENTLY_REDIRECT);
+    }
+
+    /**
+     * Shortcut method for building an empty response.
+     *
+     * @param int $statusCode Defaults to 204 for a No Content response.
+     * @return ResponseInterface
+     */
+    protected function responseEmpty(int $statusCode = HttpResponse::HTTP_NO_CONTENT): ResponseInterface
+    {
+        return $this->responseFactory->build($statusCode);
+    }
+
+    /**
+     * Shortcut method for building a generic response from the content of a
+     * string.
+     *
+     * @param string $content
+     * @return ResponseInterface
+     */
+    protected function responseFromContent(string $content): ResponseInterface
+    {
+        return $this->responseFactory->buildFromContent($content);
+    }
+
+    /**
+     * Convenience method for building a response, depending on what the request
+     * specifies it accepts.
+     * - JSON requests (accept: application/json) will have a JSON request made
+     *   from `$data`
+     * - XHR requests (x-requested-with: xmlhttprequest) will have an unthemed
+     *   HTML response, rendered from `$template` with `$data`
+     * - all other requests will have a chromed HTML response
+     *
+     * @param string $template A Twig template to render (if not JSON)
+     * @param array  $data     Data to render directly (if JSON) or inject into
+     *                         the template (if not JSON).
+     * @param string $title    If not empty: use this as the page title (if not
+     *                         JSON or XHR).
+     * @param string $tab      If not empty: use this as the selected navigation
+     *                         tab (if not JSON or XHR).
+     * @return ResponseInterface
+     * @throws TwigError if something goes wrong when rendering the template
+     */
+    protected function responseDependentOnRequest(
+        string $template,
+        array $data,
+        string $title = '',
+        string $tab = '',
+    ): ResponseInterface {
         if ($this->isJsonRequest()) {
             // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
-            return $this->buildJsonOutput($data);
+            return $this->responseAsJson($data);
         }
 
         if ($this->isXhrRequest()) {
             // if the request is AJAX, don't return the chrome
-            return $this->buildUnthemedHtmlOutput($template, $data);
+            return $this->responseFromTemplateUnthemed($template, $data);
         }
 
         // full synchronous page
-        return $this->buildHtmlOutput($template, $data);
+        return $this->responseFromTemplate($template, $data, $title, $tab);
     }
-
 
     /**
      * Send a neat and tidy error back to the client
@@ -708,23 +779,22 @@ abstract class Base
             $problem = $problem->getMessage();
         }
 
-        $this->getResponse()->status->set($statusCode);
-
         // if this isn't XHR, let the kernel and SitePage take care of
         if (!$this->isXhrRequest()) {
             throw $this->generateException($errorCode, null, $problem . implode(', ', $resolutions));
         }
 
-        $this->getResponse()->content->set([
-            'template' => 'sub/mage-error.twig',
-            'format' => 'nochrome',
-            'data' => [
-                'error' => [
-                    'problem' => $problem,
-                    'reasons' => $resolutions
+        $this->response = $this
+            ->responseFromTemplateUnthemed(
+                'sub/mage-error.twig',
+                [
+                    'error' => [
+                        'problem' => $problem,
+                        'reasons' => $resolutions
+                    ]
                 ]
-            ]
-        ]);
+            )
+            ->withStatus($statusCode);
     }
 
     /**
@@ -737,12 +807,9 @@ abstract class Base
         $problem = (new ApiProblem($message))
             ->setStatus($code)
             ->asArray();
-        try {
-            $this->getResponse()->status->setCode($code);
-        } catch (InvalidStatusCode $e) {
-            // noop
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($problem));
+        $this->response = $this
+            ->responseAsJson($problem)
+            ->withStatus($code);
     }
 
     /**
@@ -796,21 +863,6 @@ abstract class Base
         }
         $this->sentry->captureException($e);
         return true;
-    }
-
-    /**
-     * Inject the controller's current user into the output object as a global
-     * variable.
-     *
-     * This overrides any previous value which the global might have had.
-     *
-     * @param Output\Html $output
-     * @return Output\Html
-     */
-    private function injectCurrentUserGlobal(Output\Html $output): Output\Html
-    {
-        $output->getTemplateEngine()->addGlobal('USER', $this->getUser());
-        return $output;
     }
 
     /**

@@ -137,21 +137,19 @@ class Controller extends BaseController
         }
         $showDetails = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser());
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                'user/parent.twig',
-                [
-                    'session'        => $_SESSION,
-                    'user'           => $parent,
-                    'externalUser'   => $externalUser,
-                    'spouse'         => $spouse,
-                    'students'       => $students,
-                    'customButtons'  => $customButtons,
-                    'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
-                    'now'            => Alaress_Date_Format::now(),
-                    'showDetails'    => $showDetails,
-                ]
-            )
+        $this->response = $this->responseFromTemplate(
+            'user/parent.twig',
+            [
+                'session'        => $_SESSION,
+                'user'           => $parent,
+                'externalUser'   => $externalUser,
+                'spouse'         => $spouse,
+                'students'       => $students,
+                'customButtons'  => $customButtons,
+                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
+                'now'            => Alaress_Date_Format::now(),
+                'showDetails'    => $showDetails,
+            ]
         );
     }
 
@@ -165,20 +163,18 @@ class Controller extends BaseController
         $customButtons  = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
         $externalUser   = $staff->getExternalId() ? $this->externalUser->getStaff($staff->getExternalId()) : [];
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                'user/staff.twig',
-                [
-                    'session'        => $_SESSION,
-                    'user'           => $staff,
-                    'externalUser'   => $externalUser,
-                    'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
-                    'customButtons'  => $customButtons,
-                    'now'            => Alaress_Date_Format::now(),
-                    'showDetails'    => $detailsVisible->isSatisfiedBy($staff, $this->getUser()),
-                ],
-                'User'
-            )
+        $this->response = $this->responseFromTemplate(
+            'user/staff.twig',
+            [
+                'session'        => $_SESSION,
+                'user'           => $staff,
+                'externalUser'   => $externalUser,
+                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
+                'customButtons'  => $customButtons,
+                'now'            => Alaress_Date_Format::now(),
+                'showDetails'    => $detailsVisible->isSatisfiedBy($staff, $this->getUser()),
+            ],
+            'User'
         );
     }
 
@@ -591,42 +587,40 @@ class Controller extends BaseController
             $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
         }
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                'user/student.twig',
-                [
-                    'session'                  => $_SESSION,
-                    'user'                     => $student,
-                    'externalUser'             => $externalUser,
-                    'showPastoral'             => $showPastoral,
-                    'pastoralCounts'           => $pastoralCounts,
-                    'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
-                    'hideContacts'             => $hideContacts,
-                    'showClasses'              => $showClasses,
-                    'now'                      => Alaress_Date_Format::now(),
-                    'boarderType'              => $this->externalUser->determineBoarderType(isset($externalUser['StudentBoarder']) ? (string)$externalUser['StudentBoarder'] : null),
-                    'contacts'                 => $contacts,
-                    'subjects'                 => $subjects,
-                    'customButtons'            => $customButtons,
-                    'groups'                   => $groups,
-                    'formTeacher'              => $formTeacher,
-                    'tutorTeacher'             => $tutorTeacher,
-                    'hohTeacher'               => $hohTeacher,
-                    'coordTeacher'             => $coordTeacher,
-                    'studentCoach'             => $studentCoach,
-                    'isParentOfStudent'        => $isParentOfStudent,
-                    'isPrimaryCarer'           => $isPrimaryCarer,
-                    'allTeacherIds'            => implode(',', $allTeacherIds),
-                    'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
-                    'pd'                       => $pd,
-                    'showDetails'              => $showDetails,
-                    'showEmail'                => $showEmails,
-                    'travelLogs'               => $travelLogs,
-                    'learningMomentCanComment' => $learningMomentCanComment,
-                    'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
-                    'canEmailStaff'            => $canEmailStaff,
-                ]
-            )
+        $this->response = $this->responseFromTemplate(
+            'user/student.twig',
+            [
+                'session'                  => $_SESSION,
+                'user'                     => $student,
+                'externalUser'             => $externalUser,
+                'showPastoral'             => $showPastoral,
+                'pastoralCounts'           => $pastoralCounts,
+                'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
+                'hideContacts'             => $hideContacts,
+                'showClasses'              => $showClasses,
+                'now'                      => Alaress_Date_Format::now(),
+                'boarderType'              => $this->externalUser->determineBoarderType(isset($externalUser['StudentBoarder']) ? (string)$externalUser['StudentBoarder'] : null),
+                'contacts'                 => $contacts,
+                'subjects'                 => $subjects,
+                'customButtons'            => $customButtons,
+                'groups'                   => $groups,
+                'formTeacher'              => $formTeacher,
+                'tutorTeacher'             => $tutorTeacher,
+                'hohTeacher'               => $hohTeacher,
+                'coordTeacher'             => $coordTeacher,
+                'studentCoach'             => $studentCoach,
+                'isParentOfStudent'        => $isParentOfStudent,
+                'isPrimaryCarer'           => $isPrimaryCarer,
+                'allTeacherIds'            => implode(',', $allTeacherIds),
+                'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
+                'pd'                       => $pd,
+                'showDetails'              => $showDetails,
+                'showEmail'                => $showEmails,
+                'travelLogs'               => $travelLogs,
+                'learningMomentCanComment' => $learningMomentCanComment,
+                'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
+                'canEmailStaff'            => $canEmailStaff,
+            ]
         );
     }
 }

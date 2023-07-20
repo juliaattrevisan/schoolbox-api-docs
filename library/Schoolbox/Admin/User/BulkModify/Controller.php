@@ -105,22 +105,20 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@adminUserBulkModify/bulkModify.twig',
             [
-                'template' => '@adminUserBulkModify/bulkModify.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminUserBulkModify.getModify'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                        $this->routeGenerator->generate('adminUserBulkModify.getModify'),
-                        'Bulk Modify'
-                    ),
-                    'campuses'       => $campuses,
-                    'roles'          => $roles,
-                    'yearLevels'     => $yearLevels,
-                    'houses'         => $houses,
-                ],
-                'title'    => 'Admin - User Management',
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminUserBulkModify.getModify'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
+                    $this->routeGenerator->generate('adminUserBulkModify.getModify'),
+                    'Bulk Modify'
+                ),
+                'campuses'       => $campuses,
+                'roles'          => $roles,
+                'yearLevels'     => $yearLevels,
+                'houses'         => $houses,
+            ],
+            'Admin - User Management',
         );
     }
 
@@ -130,17 +128,17 @@ class Controller extends Base
      */
     public function getUserList()
     {
-        $selected = $this->psr7Request->getParsedBody();
+        $selected = $this->request->getParsedBody();
         /* If there were any search results, display control options
          */
-        $userList = $this->userBulkMapper->bulkModifySearch(
+        $userList       = $this->userBulkMapper->bulkModifySearch(
             $selected['campusId'] ? [(int)$selected['campusId']] : [UserBulkMapper::ANY],
             $selected['roleId'] ? [(int)$selected['roleId']] : [UserBulkMapper::ANY],
             (int)$selected['ePortfolio'],
             $selected['yearLevelId'] ? [(int)$selected['yearLevelId']] : [UserBulkMapper::ANY],
             (int)$selected['token']
         );
-        $this->getResponse()->content->set($this->buildJsonOutput($userList));
+        $this->response = $this->responseAsJson($userList);
     }
 
     /**
@@ -181,11 +179,10 @@ class Controller extends Base
                 (int)$params->get('revokeToken')
             ))->update();
         } catch (SchoolboxException $e) {
-            $problem = (new ApiProblem('Campus has been deleted or does not exist'))
+            $problem        = (new ApiProblem('Campus has been deleted or does not exist'))
                 ->setStatus(501)
                 ->asArray();
-            $this->getResponse()->status->setCode(501);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->response = $this->responseAsJson($problem)->withStatus(501);
             return;
         }
 
@@ -196,7 +193,7 @@ class Controller extends Base
             \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 
     /**
@@ -224,6 +221,6 @@ class Controller extends Base
             \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 }

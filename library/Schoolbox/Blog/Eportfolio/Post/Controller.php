@@ -211,7 +211,7 @@ class Controller extends Base
 
         // Send them back to the item detail page
 
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'eportfolioBlog.getItem',
                 ['pageId' => $page->getPageId(), 'id' => $blog->getId(),]
@@ -239,17 +239,15 @@ class Controller extends Base
 
         // Lets get the party started...
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@eportfolioBlog/item.twig',
-                'data'     => array(
-                    'record'            => $blog,
-                    'comments'          => $comments,
-                    'images'            => $images,
-                    'page'              => $page,
-                    'pageOwner'         => $this->getUserMapper()->findById($page->getOwner()->getId()),
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@eportfolioBlog/item.twig',
+            [
+                'record'            => $blog,
+                'comments'          => $comments,
+                'images'            => $images,
+                'page'              => $page,
+                'pageOwner'         => $this->getUserMapper()->findById($page->getOwner()->getId()),
+            ],
         );
     }
 
@@ -287,7 +285,7 @@ class Controller extends Base
             );
         }
 
-        $this->getResponse()->redirect->afterPost($returnUrl);
+        $this->response = $this->redirectAfterPost($returnUrl);
     }
 
     /**
@@ -319,19 +317,17 @@ class Controller extends Base
     public function getModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
         // Lets get the party started...
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@eportfolioBlog/modify.twig',
-                'data'     => array(
-                    'record'            => $blog,
-                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
-                    'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
-                    'page'              => $page,
-                    'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@eportfolioBlog/modify.twig',
+            [
+                'record'            => $blog,
+                'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
+                'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
+                'page'              => $page,
+                'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
+            ],
         );
     }
 
@@ -343,18 +339,16 @@ class Controller extends Base
     public function getInsert(EportfolioPageModel $page)
     {
         // Lets get the party started...
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@eportfolioBlog/modify.twig',
-                'data'     => array(
-                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
-                    'attachzone'        => $this->getAttachZone(new Collection()),
-                    'page'              => $page,
-                    'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@eportfolioBlog/modify.twig',
+            [
+                'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
+                'attachzone'        => $this->getAttachZone(new Collection()),
+                'page'              => $page,
+                'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
+            ],
         );
     }
 
@@ -402,18 +396,16 @@ class Controller extends Base
         }
 
         // Lets get the party started...
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@eportfolioBlog/archive.twig',
-                'data'     => array(
-                    'blogs'             => $blogsSelectedMonth,
-                    'blogImages'        => $blogImages,
-                    'blogComments'      => $blogComments,
-                    'dateSelectorArray' => $dateSelectorArray,
-                    'page'              => $page,
-                    'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@eportfolioBlog/archive.twig',
+            [
+                'blogs'             => $blogsSelectedMonth,
+                'blogImages'        => $blogImages,
+                'blogComments'      => $blogComments,
+                'dateSelectorArray' => $dateSelectorArray,
+                'page'              => $page,
+                'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
+            ],
         );
     }
 

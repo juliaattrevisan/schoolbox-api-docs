@@ -82,15 +82,12 @@ class Controller extends Base
             $message = 'Could not store Google Access Token data.';
         }
 
-        $this->getResponse()->status->set(200);
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'success' => $success,
-                    'message' => $message
-                ]
-            )
-        );
+        $this->response = $this->responseAsJson(
+            [
+                'success' => $success,
+                'message' => $message
+            ]
+        )->withStatus(200);
     }
 
 
@@ -107,17 +104,15 @@ class Controller extends Base
     {
         $folder = $this->folderMapper->findById($googleFile->getFolderId());
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@googleFile/detail.twig',
-                [
-                    'googleFile' => $googleFile,
-                    'googleAccessToken' => $_SESSION['googleAccessToken'] ?? '',
-                    'googleAccessTokenType' => $_SESSION['googleAccessTokenType'] ?? '',
-                    'folder' => $folder,
-                ],
-                'Google File'
-            )
+        $this->response = $this->responseFromTemplate(
+            '@googleFile/detail.twig',
+            [
+                'googleFile' => $googleFile,
+                'googleAccessToken' => $_SESSION['googleAccessToken'] ?? '',
+                'googleAccessTokenType' => $_SESSION['googleAccessTokenType'] ?? '',
+                'folder' => $folder,
+            ],
+            'Google File'
         );
     }
 
@@ -148,7 +143,7 @@ class Controller extends Base
     {
         $googleIdString = $this->requestPost->get('googleIds');
         if (!$googleIdString) {
-            $this->getResponse()->redirect->afterPost('/homepage/' . $folder->getId());
+            $this->response = $this->redirectAfterPost('/homepage/' . $folder->getId());
             return;
         }
 
@@ -156,7 +151,7 @@ class Controller extends Base
         $editAccessLevel    = is_numeric($this->requestPost->get('gfileEdit')) ? (int)$this->requestPost->get('gfileEdit') : null;
         $commentAccessLevel = is_numeric($this->requestPost->get('gfileComment')) ? (int)$this->requestPost->get('gfileComment') : null;
         if (!$editAccessLevel || !$commentAccessLevel) {
-            $this->getResponse()->redirect->afterPost('/homepage/' . $folder->getId());
+            $this->response = $this->redirectAfterPost('/homepage/' . $folder->getId());
             return;
         }
 
@@ -235,15 +230,12 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->status->set(200);
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                [
-                    'success'  => true,
-                    'messages' => $errors,
-                ]
-            )
-        );
+        $this->response = $this->responseAsJson(
+            [
+                'success'  => true,
+                'messages' => $errors,
+            ]
+        )->withStatus(200);
     }
 
     /**

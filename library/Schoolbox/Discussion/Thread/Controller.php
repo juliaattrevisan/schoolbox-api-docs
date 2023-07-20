@@ -107,7 +107,7 @@ class Controller extends BaseController
      */
     public function getThread(Model $thread, IThreadLocation $context): void
     {
-        $this->buildResponse($thread, $context, true);
+        $this->buildResponseForThread($thread, $context, true);
     }
 
 
@@ -122,7 +122,7 @@ class Controller extends BaseController
      */
     public function createThread(IThreadLocation $context): void
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
 
         /* Presume a new thread if you accessed this method
          * but check whether you are actually allowed, first.
@@ -135,12 +135,12 @@ class Controller extends BaseController
              */
             $this->context->associate($thread, $context);
 
-            $this->buildResponse($thread, $context, false);
+            $this->buildResponseForThread($thread, $context, false);
         } catch (\UnexpectedValueException $e) {
             /* UnexpectedValueException thrown when you're in a conflicting scenario
              * trying to associate threads to objects, results in http 409 Conflict
              */
-            $this->response->status->setCode($e->getCode());
+            $this->response = $this->responseEmpty($e->getCode());
             return;
         }
     }
@@ -163,14 +163,14 @@ class Controller extends BaseController
             $responseData['data'][$key]['content'] = Scrub::html($data['content']);
         }
 
-        $this->response->content->set(
+        $this->response =
             $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput(
+                ? $this->responseAsJson($responseData)
+                : $this->responseFromTemplateUnthemed(
                     '@discussionComments/list.twig',
                     ['list' => $responseData, 'thread' => $thread]
                 )
-        );
+        ;
     }
 
 
@@ -187,7 +187,7 @@ class Controller extends BaseController
      */
     public function createCommentInThread(Model $thread, IThreadLocation $context): void
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
 
         $comment = $this->commentMapper->createModel()
             ->setThread($thread)
@@ -204,18 +204,17 @@ class Controller extends BaseController
         // Clean-up content before returning the result
         $responseData['content'] = Scrub::html($responseData['content']);
 
-        $this->response->content->set(
+        $this->response =
             $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionComments/item.twig', ['item' => $responseData])
-        );
+                ? $this->responseAsJson($responseData)
+                : $this->responseFromTemplateUnthemed('@discussionComments/item.twig', ['item' => $responseData])
+        ;
     }
 
     /**
      * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/open
      * @param Model $thread
      *
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \Schoolbox\Mapper\Exception
      */
     public function openThread(Model $thread): void
@@ -227,7 +226,6 @@ class Controller extends BaseController
      * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/close
      * @param Model $thread
      *
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \Schoolbox\Mapper\Exception
      */
     public function closeThread(Model $thread): void
@@ -240,14 +238,12 @@ class Controller extends BaseController
      * @param bool  $value
      *
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     private function setThreadStatus(Model $thread, bool $value): void
     {
         $thread->setOpen($value);
         $this->threadMapper->save($thread);
-
-        $this->response->status->setCode(204);
+        $this->response = $this->responseEmpty(204);
     }
 
     /**
@@ -321,7 +317,7 @@ class Controller extends BaseController
      * @param IThreadLocation $context
      * @param bool     $loadChildren
      */
-    private function buildResponse(Model $thread, IThreadLocation $context, bool $loadChildren): void
+    private function buildResponseForThread(Model $thread, IThreadLocation $context, bool $loadChildren): void
     {
         $responseData             = $this->decoratorFactory->build($thread, $context)->jsonSerialize(
             $this->retrieveJsonDecorator(),
@@ -330,10 +326,10 @@ class Controller extends BaseController
         $responseData['children'] = $loadChildren
             ? $this->retrieveCommentList($thread, $context, null)
             : [];
-        $this->response->content->set(
+        $this->response =
             $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
-        );
+                ? $this->responseAsJson($responseData)
+                : $this->responseFromTemplateUnthemed('@discussionThreads/item.twig', ['item' => $responseData])
+        ;
     }
 }

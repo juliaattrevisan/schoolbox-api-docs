@@ -88,7 +88,7 @@ class Controller extends Base
         /* Pick a destination based on the X-Turnitin headers in the payload, but
          * you'd probably want to do some further validation here before you continue
          */
-        switch ($this->psr7Request->getHeaderLine(self::HEADER_EVENT_TYPE)) {
+        switch ($this->request->getHeaderLine(self::HEADER_EVENT_TYPE)) {
             /* Turnitin finished processing our upload
              */
             case self::SUBMISSION_COMPLETE:
@@ -212,12 +212,12 @@ class Controller extends Base
     {
         /* Only accept a specific header
          */
-        if ($headerKey !== $this->psr7Request->getHeaderLine(self::HEADER_EVENT_TYPE)) {
+        if ($headerKey !== $this->request->getHeaderLine(self::HEADER_EVENT_TYPE)) {
             throw new Turnitin\Exception\Exception(sprintf(
                 'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
                 $currentFunction,
                 self::HEADER_EVENT_TYPE,
-                $this->psr7Request->getHeaderLine(self::HEADER_EVENT_TYPE)
+                $this->request->getHeaderLine(self::HEADER_EVENT_TYPE)
             ));
         }
 

@@ -71,13 +71,17 @@ class Controller extends ConfigController
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
-            'pageCurrent'   => $this->routeGenerator->generate('commsNewsPolicy.getPolicies'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('commsNewsPolicy.getPolicies')),
-            'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->indexBy('id'),
-            'configContext' => $configContext,
-            'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
-        ])->setTitle('Comms Policies'));
+        $this->response = $this->responseFromTemplate(
+            '@commsNewsPolicy/index.twig',
+            [
+                'pageCurrent'   => $this->routeGenerator->generate('commsNewsPolicy.getPolicies'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('commsNewsPolicy.getPolicies')),
+                'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->indexBy('id'),
+                'configContext' => $configContext,
+                'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
+            ],
+            'Comms Policies'
+        );
     }
 
 
@@ -95,7 +99,7 @@ class Controller extends ConfigController
     public function postPolicies(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('commsNewsPolicy.getPolicies'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('commsNewsPolicy.getPolicies'));
     }
 
 

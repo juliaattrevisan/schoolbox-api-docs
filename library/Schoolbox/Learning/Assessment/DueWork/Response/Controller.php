@@ -293,7 +293,7 @@ class Controller extends Base
             $selfAssessmentFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback));
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
+        $this->response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);
     }
 
     /**
@@ -327,11 +327,11 @@ class Controller extends Base
             $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/kamiView.twig', [
+        $this->response = $this->responseFromTemplate('@learningDueWorkResponse/kamiView.twig', [
             'kami'     => $kami,
             'session'  => $session,
             'response' => $response
-        ]));
+        ]);
     }
 
 
@@ -340,7 +340,6 @@ class Controller extends Base
      * @throws Kami\Exception\EmptyApiKeyException If Kami is not enabled
      * @throws Kami\Exception\NotFound If unable to find the document in Kami
      * @throws Kami\Exception\ResponseDecodeException If cannot decode the Kami Response
-     * @throws \Aura\Web\Exception\InvalidStatusCode If tried to set an invalid HTTP status code on the response.
      */
     public function getKamiExport(Kami\Model $kami): void
     {
@@ -362,30 +361,31 @@ class Controller extends Base
         }
 
         // Let the browser know that the synchronous request has finished (either success or failure)
-        $response = $this->getResponse();
-        $token    = $this->requestQuery->get('token');
-        $response->cookies->set('kamiExportToken', $token, null, '/', null, null, false);
-        $response->cookies->set('kamiExportStatus', $export->getStatus(), null, '/', null, null, false);
+        $token = $this->requestQuery->get('token');
+
+        // TODO consider adding cookie setting method in response factory
+        setcookie('kamiExportToken', $token, null, '/', null, null, false);
+        setcookie('kamiExportStatus', $export->getStatus(), null, '/', null, null, false);
 
         // Unable to generate the export? (either due to error or timeout)
         if (!$export->isStatusDone()) {
             // Don't change browser viewport
-            $response->status->setCode(204);
+            $this->response = $this->responseEmpty();
             return;
         }
 
         // This works in all browsers, but means we need to stream the file through schoolbox as a proxy.
-        $response->status->setCode(200);
-        $filename = $kami->getStudentSubmissionFile()->getBasename();
-        $guzzleResponse = (new Client())->get($export->getFileUrl());
-        $response->headers->set('Content-Description', 'File Transfer');
-        $response->headers->set('Content-Type', 'application/octet-stream');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"');
-        $response->headers->set('Expires', '0');
-        $response->headers->set('Cache-Control', 'must-revalidate');
-        $response->headers->set('Pragma', 'public');
-        $response->headers->set('Content-Length', $guzzleResponse->getHeader('Content-Length')[0]);
-        $response->content->set($this->buildFileOutputFromString($guzzleResponse->getBody()));
+        $filename           = $kami->getStudentSubmissionFile()->getBasename();
+        $guzzleResponse     = (new Client())->get($export->getFileUrl());
+        $this->response = $this->responseFromContent($guzzleResponse->getBody())
+                               ->withHeader('Content-Description', 'File Transfer')
+                               ->withHeader('Content-Type', 'application/octet-stream')
+                               ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"')
+                               ->withHeader('Expires', '0')
+                               ->withHeader('Cache-Control', 'must-revalidate')
+                               ->withHeader('Pragma', 'public')
+                               ->withHeader('Content-Length', $guzzleResponse->getHeader('Content-Length')[0])
+        ;
     }
 
 
@@ -459,18 +459,12 @@ class Controller extends Base
      */
     public function deleteParticularResponse(IAssessable $assessment, Model $response)
     {
-        $code = 204;
-        $data = [];
-
         try {
             $this->responseDataSource->delete($response);
+            $this->response = $this->responseEmpty();
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $code = 400;
-            $data = $e->getMessage();
+            $this->response = $this->responseFromContent($e->getMessage())->withStatus(400);
         }
-
-        $this->getResponse()->status->set($code);
-        $this->getResponse()->content->set($this->buildContent('', $data));
     }
 
 
@@ -505,7 +499,7 @@ class Controller extends Base
                     ->add(['Similarity Check', '']),
             ];
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
+            $this->response = $this->responseFromTemplate('@learningDueWorkResponse/turnitin/iframe.twig', $data);
         }
 
         /* TODO You might error out here when json_decode returns null
@@ -531,7 +525,7 @@ class Controller extends Base
             'interactiveAvailable' => false
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/plagscan/iframe.twig', $data));
+        $this->response = $this->responseFromTemplate('@learningDueWorkResponse/plagscan/iframe.twig', $data);
     }
 
     /**
@@ -550,7 +544,7 @@ class Controller extends Base
             'html' => $this->filesystemProxy->read($plagscan->getStorage()),
         ];
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
+        $this->response = $this->responseFromTemplateUnthemed('@learningDueWorkResponse/plagscan/contents.twig', $data);
     }
 
     /**
@@ -574,7 +568,7 @@ class Controller extends Base
 
         // Is this file not editable inline? Just show in storage
         if (!$file->getEditableInline()) {
-            $this->response->redirect->permanentRedirect(
+            $this->response = $this->redirectPermanent(
                 (new Uri('/storage/fetch.php'))
                     ->appendQueryParameters($this->requestQuery->getArrayCopy())
                     ->__toString()
@@ -584,21 +578,19 @@ class Controller extends Base
         // Otherwise: render it in Twig, and output as an attachment if either:
         // * the HTML mimetype is openable inline
         // * the `save` query string param exists
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningDueWorkResponse/responseFileInline.twig',
+            [
+                'file'        => $file,
+                'fileContent' => $this->filesystemProxy->read($file),
+            ],
+        );
         if (!$file->getMimetype()->getInline() || $this->requestQuery->get('save')) {
-            $this->response->headers->set(
+            $this->response = $this->response->withHeader(
                 'Content-Disposition',
                 sprintf('attachment; filename="%s"', $file->getBasename()),
             );
         }
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningDueWorkResponse/responseFileInline.twig',
-                [
-                    'file'        => $file,
-                    'fileContent' => $this->filesystemProxy->read($file),
-                ],
-            )
-        );
     }
 
 

@@ -99,7 +99,7 @@ class Controller extends Base
      */
     public function getOwnCalendar(?string $selectedDate): void
     {
-        $this->buildResponse($this->getUser(), $this->generateSelectedDate($selectedDate));
+        $this->buildResponseForUser($this->getUser(), $this->generateSelectedDate($selectedDate));
     }
 
     /**
@@ -109,7 +109,7 @@ class Controller extends Base
      */
     public function getCalendar(?string $selectedDate, User $user): void
     {
-        $this->buildResponse($user, $this->generateSelectedDate($selectedDate));
+        $this->buildResponseForUser($user, $this->generateSelectedDate($selectedDate));
     }
 
     /**
@@ -148,14 +148,14 @@ class Controller extends Base
             $route .= '?s=1';
         }
 
-        $this->response->redirect->to($route);
+        $this->response = $this->redirectFound($route);
     }
 
     /**
      * @param User        $user
      * @param string|null $selectedDate
      */
-    private function buildResponse(User $user, ?string $selectedDate): void
+    private function buildResponseForUser(User $user, ?string $selectedDate): void
     {
         $groups       = (new Group($user, $this->folderMapper))->generate();
         $campus       = (new Campus($user, $this->campusMapper))->generate();
@@ -179,22 +179,20 @@ class Controller extends Base
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->userMapper->getCalendarView($this->getUser()->getId())]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@calendar/calendar.twig',
-                [
-                    'user'         => $user->getId() === null ? $this->getUser() : $user,
-                    'canInvite'    => (new ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
-                    'groups'       => $groups,
-                    'sources'      => $sourceList,
-                    'campuses'     => $campus,
-                    'eventTypes'   => $eventType,
-                    'calendarView' => $calendarView,
-                    'filters'      => $filters,
-                    'selectedDate' => $selectedDate ?? Alaress_Date_Format::now(),
-                    'exportOptions' => $exportOptions,
-                ]
-            )
+        $this->response = $this->responseFromTemplate(
+            '@calendar/calendar.twig',
+            [
+                'user'         => $user->getId() === null ? $this->getUser() : $user,
+                'canInvite'    => (new ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
+                'groups'       => $groups,
+                'sources'      => $sourceList,
+                'campuses'     => $campus,
+                'eventTypes'   => $eventType,
+                'calendarView' => $calendarView,
+                'filters'      => $filters,
+                'selectedDate' => $selectedDate ?? Alaress_Date_Format::now(),
+                'exportOptions' => $exportOptions,
+            ]
         );
     }
 
@@ -232,6 +230,6 @@ class Controller extends Base
         $this->userMapper->updateCalendarView($this->getUser()->getId(), $storedView);
 
         // We no longer store calendarView in session, as it doesn't work as expected
-        $this->getResponse()->content->set($this->buildJsonOutput([]));
+        $this->response = $this->responseAsJson([]);
     }
 }

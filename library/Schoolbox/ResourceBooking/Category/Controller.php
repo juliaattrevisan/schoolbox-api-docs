@@ -70,16 +70,13 @@ class Controller extends Base
             );
         }
 
-        $response = $this->getResponse();
-        $response->content->set(
-            array(
-                'template' => '@resourceCategory/browse.twig',
-                'data'     => array(
-                    'list'      => $list,
-                    'paginator' => $this->paginator,
-                    'page'      => $page,
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@resourceCategory/browse.twig',
+            [
+                'list'      => $list,
+                'paginator' => $this->paginator,
+                'page'      => $page,
+            ],
         );
     }
 
@@ -88,14 +85,11 @@ class Controller extends Base
      */
     public function add()
     {
-        $response = $this->getResponse();
-        $response->content->set(
-            array(
-                'template' => '@resourceCategory/edit.twig',
-                'data'     => array(
-                    'item' => new Model(),
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@resourceCategory/edit.twig',
+            [
+                'item' => new Model(),
+            ],
         );
     }
 
@@ -111,7 +105,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -142,19 +136,17 @@ class Controller extends Base
             ]));
         }
 
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@resourceCategory/read.twig',
             [
-                'template' => '@resourceCategory/read.twig',
-                'data'     => [
-                    'category'      => $category,
-                    'resources'     => $resources,
-                    'calendar' => [
-                        'date' => $calendarDate->getDatabase(),
-                        'view' => $this->requestQuery->get('view', 'week'),
-                    ],
-                    'token' => $this->getUser()->getKey()
+                'category'      => $category,
+                'resources'     => $resources,
+                'calendar' => [
+                    'date' => $calendarDate->getDatabase(),
+                    'view' => $this->requestQuery->get('view', 'week'),
                 ],
-            ]
+                'token' => $this->getUser()->getKey()
+            ],
         );
     }
 
@@ -165,14 +157,12 @@ class Controller extends Base
      */
     public function edit(Model $category): void
     {
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@resourceCategory/edit.twig',
-                'data'     => array(
-                    'category' => $category,
-                    'numItems' => $this->itemMapper->findByColumn('resource_category_id', $category->getId())->count()
-                ),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@resourceCategory/edit.twig',
+            [
+                'category' => $category,
+                'numItems' => $this->itemMapper->findByColumn('resource_category_id', $category->getId())->count()
+            ],
         );
     }
 
@@ -191,7 +181,7 @@ class Controller extends Base
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -213,7 +203,7 @@ class Controller extends Base
             $this->getMapper()->delete($category);
         }
 
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('resourceCategory.browse', ['format' => ''])
         );
     }
@@ -247,12 +237,7 @@ class Controller extends Base
             $this->getUser()
         );
         $output = json_decode('[' . \implode(',', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)) . ']');
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $output,
-            )
-        );
+        $this->response = $this->responseAsJson($output);
     }
 
     /**

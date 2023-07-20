@@ -14,7 +14,6 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
-
     /**
      * @var SingleFile\Mapper
      */
@@ -51,7 +50,6 @@ class Controller extends Base
             $data['message'] = $e->getMessage();
         }
 
-        $this->getResponse()->status->set($code);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->response = $this->responseAsJson($data)->withStatus($code);
     }
 }

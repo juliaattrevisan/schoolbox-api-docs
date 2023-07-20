@@ -14,23 +14,50 @@ You should be able to read method names and get a general idea of what is going 
 
 > One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
-## 2.2 getRequest() and getResponse()
-These represent the parameters from a `GET` or `POST` request, and the data at the end of a Controller method that will be passed to View, respectively.
+## 2.2 Requests and Responses
 
-### 2.2.1 GET and POST vars
-Querystring parameters can be obtained using the `$this->requestQuery` array instead. To access a particular querystring parameter `cat`, you can use
+These represent the incoming HTTP request, and the outgoing HTTP response,
+respectively.
+
+### 2.2.1 Reading data from the Request
+
+`$this->request` is a standard PSR-7 `ServerRequestInterface` object which
+represents the incoming HTTP request.
+
+For example, the following request information may be accessed with these
+methods:
+* `getUploadedFiles` to fetch any files uploaded as part of the request
+* `getParsedBody` for fetching parsed JSON payloads
+* `getServerParams` for fetching the contents of `$_SERVER` without accessing
+  the superglobal
+* `getHeader` or `getHeaderLine` for fetching a request header
+
+See the official documentation for
+[ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface)
+and its parent interfaces
+[RequestInterface](https://www.php-fig.org/psr/psr-7/#32-psrhttpmessagerequestinterface)
+and
+[MessageInterface](https://www.php-fig.org/psr/psr-7/#31-psrhttpmessagemessageinterface)
+for further documentation on what can be done with a `ServerRequestInterface`
+instance.
+
+#### 2.2.1.1 Helpers for GET and POST vars
+
+Querystring parameters may be fetched from `$this->request->getQueryParams()`,
+but are better obtained using the `$this->requestQuery` helper property.
+
+To access a particular querystring parameter `cat`, you can use:
 
 ```php
 $this->requestQuery['cat']
 ```
 
-POST parameters can be obtained using the `$this->requestPost` array instead. To access a particular POST parameter `cat`, you can use
+Likewise: POST parameters can be fetched from `$this->request->getParsedBody()`,
+but are better obtained using the `$this->requestPost` helper property.
 
 ```php
 $this->requestPost['cat']
 ```
-
-#### 2.2.1.1 The `Values` object
 
 Both `$this->requestQuery` and `$this->requestPost` data are instances of
 `\Alaress\Web\Request\Values`: this class allows array access via its
@@ -51,23 +78,90 @@ $this->requestQuery->getFloat('value', 1.50);
 ```
 
 ### 2.2.2 Setting The Response for View
-When a Controller finishes processing, it needs to set up the resultant data for the View to render. This is done via the `getResponse()` method.
+
+When a Controller finishes processing, it needs to set up the resultant data for
+the View to render. This is done via setting the `response` property to a
+`\Psr\Http\Message\ResponseInterface` instance; this may be done via helper
+methods within the controller class.
+
+Since these helper methods all return a standard `ResponseInterface` instance,
+the response may be customised further using its standard methods, e.g.:
+* `withStatus` to set a HTTP response code
+* `withHeader` to set a header value
+
+See the official documentation for
+[ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)
+and its parent interface
+[MessageInterface](https://www.php-fig.org/psr/psr-7/#31-psrhttpmessagemessageinterface)
+for further documentation on what can be done with a `ResponseInterface`
+instance.
+
+#### 2.2.2.1 Responses generated from a Twig template
 
  ```php
- $this->getResponse()->content->set(
-     $this->buildHtmlOutput('@test/index.twig', [
+$this->response = $this->responseFromTemplate(
+    '@test/index.twig',
+    [
         'name' => $name
-     ])
- );
- ```
+    ],
+    $title,
+    $tab,
+);
+```
 
-The example above gives an array of values `['name' => $name]` to twig to render in a template `index.twig`. You can pass scalars and objects to twig, though you should be mindful of the various pitfalls with the latter.
+The example above gives an array of values `['name' => $name]` to twig to render
+a template `index.twig` within the Schoolbox site theme (headers, footers, side
+menus).
 
-### 2.2.3 Redirects
-Sometimes you need to redirect. You can use the `getResponse()` method to also get access to a redirection method in which you can specify a url:
+You can pass scalars and objects to twig, though you should be mindful of the
+various pitfalls with the latter.
+
+The `title` and `tab` parameters are optional: if provided, they set the
+document title (as shown in the browser's title bar) and selected tab (as shown
+in the top navigation).
+
+ ```php
+$this->response = $this->responseFromTemplateUnthemed(
+    '@test/index.twig',
+    [
+        'name' => $name
+    ]
+);
+```
+
+The example above is the same as the first example, but does not include the
+site theme in the rendering; it renders the template's content as is.
+
+#### 2.2.2.2 JSON Responses
+
+JSON is a common response type for APIs, and for asynchronous requests.
+
+ ```php
+$this->response = $this->responseAsJson($data);
+```
+
+The above example simply outputs `json_encode($data)`, and automatically sets
+the appropriate `Content-Type` header of `application/json`.
+
+#### 2.2.2.3 Raw Content Responses
+
+Simple creation of output from a string might be appropriate when streaming a
+file's content.
 
 ```php
-$this->getResponse()->redirect->to('http://www.google.com');
+$this->response = $this->responseFromContent($pdfContent)
+    ->withHeader('Content-Type', 'application/pdf');
+```
+
+The above example simply outputs `$pdfContent`. Note the `withHeader` call
+setting the appropriate `Content-Type`.
+
+### 2.2.3 Redirects
+Sometimes you need to redirect. You can use one of the `redirect*()` methods to
+create a redirect response:
+
+```php
+$this->response = $this->redirectFound('http://www.google.com');
 ```
 
 ...or derive a Route instead:
@@ -78,7 +172,7 @@ $this->getRouter()->generate('myModule.myRoute', [
 ]));
 ```
 
-> Use `getResponse()` to set up twig data and also to process redirects using Routes.
+> Use `response` to set up twig data and also to process redirects using Routes.
 
 ## 2.3 Superglobals
 We don't directly access the superglobals `$_SESSION`, `$_GET` and `$_POST` because we can't mock these out with test data and also presumes a lot about where this data came from. Instead, there are accessor methods which provide an abstraction.

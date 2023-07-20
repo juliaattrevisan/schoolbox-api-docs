@@ -11,6 +11,8 @@ namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
+use Alaress\Web\Response\Factory as ResponseFactory;
+use Alaress\Web\Response\Outputter;
 use InvalidArgumentException;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,7 +25,6 @@ use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticate
 use Schoolbox\Deprecation\Registry;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
-use Alaress\Web\Output;
 use Schoolbox\User;
 use Throwable;
 
@@ -372,7 +373,11 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $args['outputStackTrace'] = $config->get('debug_show_stack_trace');
 
                 /** @var ServerRequestInterface $request */
-                $request = $di->get('request');
+                $request = $di->get('httpRequest');
+
+                /** @var ResponseFactory $responseFactory */
+                $responseFactory = $this->di->get('httpResponseFactory');
+
                 if ((new IsJson())->isSatisfiedBy($request)) {
                     $problem = (new ApiProblem($message))
                         ->setStatus($code)
@@ -386,24 +391,23 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                             : ($e['trace'] ?? []);
                     }
 
-                    /** @var Output\Json $output */
-                    $output = $di->get('webOutput:json');
-                    $output->setData($problem->asArray());
+                    $response = $responseFactory->buildJson($problem->asArray());
                 } else {
-                    /** @var Output\ThemedHtml $output */
-                    $output = $di->get('webOutput:html');
-                    $output
-                        ->setTitle('Error Encountered')
-                        ->setData($args)
-                        ->setTemplate($code === 404 || $code === 410
+                    $response = $responseFactory->buildHtml(
+                        $code === 404 || $code === 410
                             ? 'common/error/404.twig'
-                            : 'common/error/general.twig');
+                            : 'common/error/general.twig',
+                        $args,
+                        // Current user is not known here
+                        null,
+                        'Error Encountered',
+                    );
                 }
 
                 // Finagle a response?
-                $response = $di->get('webFactory')->newResponse();
-                $response->status->setCode($code);
-                $output->output($response);
+                /** @var Outputter $responseFactory */
+                $responseOutputter = $this->di->get('httpResponseOutputter');
+                $responseOutputter->output($response->withStatus($code));
                 return;
             } catch (Di\Exception\ServiceNotFound $e) {
                 // noop: fall thru to outputRawHtmlError

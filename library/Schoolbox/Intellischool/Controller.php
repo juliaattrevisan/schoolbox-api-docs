@@ -45,16 +45,14 @@ class Controller extends Base
      */
     public function getStudentAnalytics(User $student): void
     {
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@intellischool/studentDashboard.twig',
-                [
-                    'student'     => $student,
-                    'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
-                    'jwt'         => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
-                ],
-                'Student Analytics - ' . $student->getFullName(),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@intellischool/studentDashboard.twig',
+            [
+                'student'     => $student,
+                'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
+                'jwt'         => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
+            ],
+            'Student Analytics - ' . $student->getFullName(),
         );
     }
 
@@ -78,7 +76,7 @@ class Controller extends Base
         if (!$firstClassCode instanceof ClassCode) {
             throw new NotFound();
         }
-        $this->response->redirect->to(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'intellischool.getClassCodeAnalytics',
                 ['folderId' => $folder->getId(), 'classCode' => $firstClassCode->getCode()],
@@ -110,17 +108,15 @@ class Controller extends Base
         }
 
         // Output the class code
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@intellischool/classDashboard.twig',
-                [
-                    'folder'      => $folder,
-                    'classCode'   => $classCode,
-                    'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
-                    'jwt'         => $this->jwtFactory->buildForClass($this->getUser(), $classCode),
-                ],
-                sprintf('Class Analytics - %s', $folder->getTitle()),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@intellischool/classDashboard.twig',
+            [
+                'folder'      => $folder,
+                'classCode'   => $classCode,
+                'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
+                'jwt'         => $this->jwtFactory->buildForClass($this->getUser(), $classCode),
+            ],
+            sprintf('Class Analytics - %s', $folder->getTitle()),
         );
     }
 
@@ -131,15 +127,13 @@ class Controller extends Base
      */
     public function getCohortProfile(): void
     {
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@intellischool/cohort.twig',
-                [
-                    'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
-                    'jwt'         => $this->jwtFactory->buildForCohort($this->getUser(), '', ''),
-                ],
-                sprintf('Cohort Analytics'),
-            )
+        $this->response = $this->responseFromTemplate(
+            '@intellischool/cohort.twig',
+            [
+                'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
+                'jwt'         => $this->jwtFactory->buildForCohort($this->getUser(), '', ''),
+            ],
+            sprintf('Cohort Analytics'),
         );
     }
 }

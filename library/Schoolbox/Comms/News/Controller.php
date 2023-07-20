@@ -193,7 +193,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+        $this->response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Create',
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
@@ -204,7 +204,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
+        ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
 
@@ -227,7 +227,7 @@ class Controller extends Base
         $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
         $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
 
-        $this->response->redirect->to(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate('commsNews.getCreate') . '?' . $params
         );
     }
@@ -303,7 +303,7 @@ class Controller extends Base
             $fileZone->attachFiles($article->getAttachedFiles()->indexBy('hash')->keys());
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+        $this->response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Update',
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
@@ -314,7 +314,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-        ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
+        ], "Update {$article->getTitle()}", 'news');
     }
 
 
@@ -358,11 +358,10 @@ class Controller extends Base
         try {
             $this->validateArticleAndAudience($article);
         } catch (UnsatisfiedException $e) {
-            $this->getResponse()->status->set(400);
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ]));
+            ])->withStatus(400);
 
             return;
         }
@@ -404,7 +403,7 @@ class Controller extends Base
                 $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
             }
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 'success'      => true,
                 'articleId'    => $article->getId(),
                 'url'          => $url,
@@ -412,7 +411,7 @@ class Controller extends Base
                 'updateRoute'  => $updateRoute,
                 'submitRoute'  => $submitRoute,
                 'approveRoute' => $approveRoute
-            ]));
+            ]);
         } else {
             /* Otherwise, you're the creator and you're editing this thing normally
              * Go to the detail screen to see the outcome of your changes
@@ -426,7 +425,7 @@ class Controller extends Base
                     $nextStep .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
                 }
             }
-            $this->getResponse()->redirect->afterPost($nextStep);
+            $this->response = $this->redirectAfterPost($nextStep);
             return;
         }
     }
@@ -474,20 +473,19 @@ class Controller extends Base
             }
 
             if ($this->isXhrRequest()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->response = $this->responseAsJson([
                     'success' => true,
                     'redirect' => $nextStep
-                ]));
+                ]);
             } else {
-                $this->getResponse()->redirect->to($nextStep);
+                $this->response = $this->redirectFound($nextStep);
             }
         } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
             if ($this->isXhrRequest()) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                $this->response = $this->responseAsJson([
                     'success' => false,
                     'message' => $e->getMessage()
-                ]));
+                ])->withStatus(400);
 
                 return;
             }
@@ -505,7 +503,7 @@ class Controller extends Base
      */
     public function getTopics(): void
     {
-        $this->getResponse()->content->set($this->buildJsonOutput($this->topicMapper->findAll()));
+        $this->response = $this->responseAsJson($this->topicMapper->findAll());
     }
 
 
@@ -601,14 +599,12 @@ class Controller extends Base
             ];
         }
 
-        $output = $this->buildContent('@commsNews/detail.twig', $data);
-
-        if ($output instanceof ThemedHtml) {
-            $output->setTitle($article->getTitle())
-                   ->setTab('news');
-        }
-
-        $this->response->content->set($output);
+        $this->response = $this->responseDependentOnRequest(
+            '@commsNews/detail.twig',
+            $data,
+            $article->getTitle(),
+            'news',
+        );
     }
 
 
@@ -640,16 +636,16 @@ class Controller extends Base
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->response->content->set($this->buildJsonOutput($partialData['articles']));
+            $this->response = $this->responseAsJson($partialData['articles']);
             return;
         }
 
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $content = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'success' => true,
             'fragment' => $content
-        ]));
+        ]);
     }
 
 
@@ -764,15 +760,11 @@ class Controller extends Base
             'key' => $this->getUser()->getKey(),
         ];
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->getServerParams()));
 
         $data = array_merge($data, $sidebar->generate());
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/index.twig', $data)
-                ->setTitle('News Feed')
-                ->setTab('news')
-        );
+        $this->response = $this->responseFromTemplate('@commsNews/index.twig', $data, 'News Feed', 'news');
     }
 
 
@@ -890,7 +882,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($articles));
+        $this->response = $this->responseAsJson($articles);
     }
 
 
@@ -949,7 +941,7 @@ class Controller extends Base
             $year = array_keys($availableYearsAndMonths)[0];
         }
 
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $content = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
 
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
@@ -963,7 +955,7 @@ class Controller extends Base
             ],
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
-            'page' => RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()),
+            'page' => RequestUriParser::parseUrlPath($this->request->getServerParams()),
             'pageWithoutParams' => $this->routeGenerator->generate('commsNews.getArchive'),
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
@@ -989,10 +981,11 @@ class Controller extends Base
 
         $data = array_merge($data, $sidebar->generate());
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/archive.twig', $data)
-                ->setTab('news')
-                ->setTitle($pageTitle)
+        $this->response = $this->responseFromTemplate(
+            '@commsNews/archive.twig',
+            $data,
+            $pageTitle,
+            'news'
         );
     }
 
@@ -1107,24 +1100,24 @@ class Controller extends Base
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->response->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 'articles' => $partialData['articles']
-            ]));
+            ]);
 
             return;
         }
 
-        $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $content     = $this->responseFromTemplateUnthemed('@commsNews/partial.twig', $partialData)->getBody()->getContents();
         $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'success' => true,
             'title' => $this->getDi()->get('l10n')->translate('news', false, true),
             'url' => $partialData['currentUrl'],
             'fragment' => $content,
             'slug' => $params->getSlug(),
             'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
-        ]));
+        ]);
     }
 
 
@@ -1146,17 +1139,18 @@ class Controller extends Base
             $status = 'All';
         }
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->getServerParams()));
 
         $data = array_merge([
             'pageNum' => $pageNum,
             'status' => $status,
         ], $sidebar->generate());
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/authored.twig', $data)
-                ->setTab('news')
-            ->setTitle('My News')
+        $this->response = $this->responseFromTemplate(
+            '@commsNews/authored.twig',
+            $data,
+            'My News',
+            'news'
         );
     }
 
@@ -1218,7 +1212,7 @@ class Controller extends Base
             )
         );
 
-        $this->getResponse()->content->set($this->buildJsonOutput($articles));
+        $this->response = $this->responseAsJson($articles);
     }
 
 

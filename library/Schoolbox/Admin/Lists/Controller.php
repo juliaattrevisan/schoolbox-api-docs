@@ -96,10 +96,7 @@ class Controller extends Base
             $responseData['message'] = $tableData[$post['table']]['deleteFailMsg'];
         }
 
-        $this->getResponse()->content->set([
-            'data'   => $responseData,
-            'format' => 'json'
-        ]);
+        $this->response = $this->responseAsJson($responseData);
     }
 
     /**
@@ -114,7 +111,7 @@ class Controller extends Base
 
         // Check for incorrect URLs
         if (!isset($tableData[$tableKey])) {
-            $this->getResponse()->status->setCode(404);
+            $this->response = $this->responseEmpty(404);
             return;
         }
 
@@ -218,17 +215,15 @@ class Controller extends Base
             }
         }
         if (!empty($newIds)) {
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    [
-                        'newRowIdList' => $newIds,
-                    ]
-                )
+            $this->response = $this->responseAsJson(
+                [
+                    'newRowIdList' => $newIds,
+                ]
             );
             return;
         }
 
-        $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->requestPost["table"]);
+        $this->response = $this->redirectAfterPost('/adminv2/lists/' . $this->requestPost["table"]);
     }
 
     /**
@@ -1218,7 +1213,6 @@ class Controller extends Base
      * @api   /adminv2/lists
      *
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \ReflectionException
      */
     public function getIndex(?string $table): void
@@ -1235,7 +1229,6 @@ class Controller extends Base
      * @api   /adminv2/lists/data
      *
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \ReflectionException
      */
     public function getData(?string $table): void
@@ -1249,7 +1242,6 @@ class Controller extends Base
      * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
      * @param bool        $json
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \ReflectionException
      */
     private function getLists(?string $table, bool $json): void
@@ -1262,7 +1254,7 @@ class Controller extends Base
 
         // Check for incorrect URLs
         if (!isset($tables[$table])) {
-            $this->getResponse()->status->setCode(404);
+            $this->response = $this->responseEmpty(404);
             return;
         }
 
@@ -1351,36 +1343,32 @@ class Controller extends Base
 
         if ($json) {
             $currentTable = $tables[$table];
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    [
-                        'hasDBid'       => $currentTable['showId'] ?? false,
-                        'canDelete'     => $currentTable['delete'] ?? false,
-                        'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
-                        'deleteRoute'   => $this->routeGenerator->generate('adminLists.postDelete'),
-                        'deleteWarning' => $currentTable['deleteWarning'] ?? '',
-                        'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
-                        'isSortable'    => $currentTable['sortable'] ?? false,
-                        'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
-                        'rows'          => $this->reformatForJson($records, true),
-                        'saveRoute'     => $this->routeGenerator->generate('adminLists.postSave'),
-                        'title'         => $currentTable['title'],
-                    ]
-                )
+            $this->response = $this->responseAsJson(
+                [
+                    'hasDBid'       => $currentTable['showId'] ?? false,
+                    'canDelete'     => $currentTable['delete'] ?? false,
+                    'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
+                    'deleteRoute'   => $this->routeGenerator->generate('adminLists.postDelete'),
+                    'deleteWarning' => $currentTable['deleteWarning'] ?? '',
+                    'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
+                    'isSortable'    => $currentTable['sortable'] ?? false,
+                    'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
+                    'rows'          => $this->reformatForJson($records, true),
+                    'saveRoute'     => $this->routeGenerator->generate('adminLists.postSave'),
+                    'title'         => $currentTable['title'],
+                ]
             );
         } else {
             // Render this thing out
-            $this->getResponse()->content->set(
+            $this->response = $this->responseFromTemplate(
+                '@adminLists/index.twig',
                 [
-                    'template' => '@adminLists/index.twig',
-                    'data'     => [
-                        'pageCurrent'    => $this->routeGenerator->generate('adminLists.getIndex') . "/{$table}",
-                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLists.getIndex') . "/{$table}"),
-                        'tables'         => $tables,
-                        'table'          => $table,
-                        'records'        => $records,
-                    ],
-                ]
+                    'pageCurrent'    => $this->routeGenerator->generate('adminLists.getIndex') . "/{$table}",
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLists.getIndex') . "/{$table}"),
+                    'tables'         => $tables,
+                    'table'          => $table,
+                    'records'        => $records,
+                ],
             );
         }
     }

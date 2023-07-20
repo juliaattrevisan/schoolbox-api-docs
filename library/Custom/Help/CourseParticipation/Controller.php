@@ -120,7 +120,7 @@ class Controller extends Base
             $data['hashes'][$school] = $this->handler->computeAuthDigest($now->getUnixTimeStamp(), $school, $code->getAccessToken());
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
+        $this->response = $this->responseFromTemplate('@helpCourseParticipation/apitest.twig', $data);
     }
 
 
@@ -144,10 +144,10 @@ class Controller extends Base
 
         $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'ts'    => $now->getUnixTimeStamp(),
             'digest' => $digest
-        ]));
+        ]);
     }
 
     /**
@@ -179,17 +179,14 @@ class Controller extends Base
                 'form_params' => $post
             ]);
 
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->getRouteIfAuthorized('helpCourseParticipation.getApiTest')
             );
         } catch (BadResponseException $e) {
-            $response = $e->getResponse();
-
-            $content = $this->buildFileOutputFromString($response->getBody()->getContents());
-
-            $this->getResponse()->status->set($response->getStatusCode());
-            $this->getResponse()->content->set($content);
-            $this->getResponse()->headers->set('Content-Type', 'text/html');
+            $response           = $e->getResponse();
+            $this->response = $this->responseFromContent($response->getBody()->getContents())
+                                   ->withStatus($response->getStatusCode())
+                                   ->withHeader('content-type', 'text/html');
         }
     }
 
@@ -204,8 +201,6 @@ class Controller extends Base
      */
     public function getApiTestEnrolmentTable(string $schoolCode)
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
@@ -214,10 +209,10 @@ class Controller extends Base
 
         $enrolments = $this->handler->getFolderAccessBySchool($schoolCode);
 
-        $rs->content->set($this->buildUnthemedHtmlOutput('@helpCourseParticipation/apitest-usertable.twig', [
+        $this->response = $this->responseFromTemplateUnthemed('@helpCourseParticipation/apitest-usertable.twig', [
             'courses' => $enrolments,
             'users'   => $registeredUsers
-        ]));
+        ]);
     }
 
 
@@ -228,18 +223,14 @@ class Controller extends Base
      */
     public function getFolderAccessBySchool(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
         // ok, if you're here, you can see the thing.
         try {
-            $rs->content->set(
-                $this->buildJsonOutput(
-                    $this->handler->getFolderAccessBySchool($schoolCode)
-                )
+            $this->response = $this->responseAsJson(
+                $this->handler->getFolderAccessBySchool($schoolCode)
             );
         } catch (Mapper\Exception $e) {
             $this->sendGenericStatus(self::STATUS_NOT_FOUND, "No course area found for school: {$schoolCode}");
@@ -256,12 +247,9 @@ class Controller extends Base
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function postFolderAccessBySchool(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
@@ -323,8 +311,9 @@ class Controller extends Base
         }
 
         if ($failures) {
-            $rs->status->setCode(self::STATUS_MULTI_STATUS);
-            $rs->content->set($this->buildJsonOutput(array_keys($failures)));
+            $this->response = $this
+                ->responseAsJson(array_keys($failures))
+                ->withStatus(self::STATUS_MULTI_STATUS);
             return;
         }
 
@@ -341,8 +330,6 @@ class Controller extends Base
      */
     public function getUsersBySchool(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
@@ -356,7 +343,7 @@ class Controller extends Base
             return;
         }
 
-        $rs->content->set($this->buildJsonOutput($users));
+        $this->response = $this->responseAsJson($users);
     }
 
 
@@ -370,8 +357,6 @@ class Controller extends Base
      */
     public function postUserRegistrations(string $schoolCode): void
     {
-        $rs = $this->getResponse();
-
         if (!$this->isValidAuth($schoolCode)) {
             return;
         }
@@ -406,7 +391,7 @@ class Controller extends Base
         if (\count($failedUsers)) {
             // just blame the client :P
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST);
-            $rs->content->set($this->buildJsonOutput($failedUsers));
+            $this->response = $this->responseAsJson($failedUsers);
         } else {
             // everything went fine, nothing to respond with
             $this->sendGenericStatus(self::STATUS_NO_CONTENT);
@@ -451,7 +436,7 @@ class Controller extends Base
     private function isValidAuth(string $schoolCode): bool
     {
         // 1. Check we have all the pieces we need
-        $authHeader = $this->psr7Request->getHeaderLine('Authentication');
+        $authHeader = $this->request->getHeaderLine('Authentication');
         if ($authHeader !== '') {
             $authDigest = $authHeader;
         } elseif (null !== $this->requestQuery->get('digest')) {
@@ -500,17 +485,10 @@ class Controller extends Base
      */
     private function sendGenericStatus(int $code, ?string $reason = null): void
     {
-        $r = $reason
-            ? new Response($code, [], null, '1.1', $reason)
-            : new Response($code);
-
-        $this->getResponse()->status->set($r->getStatusCode());
-
-        $content = $code === self::STATUS_NO_CONTENT
-            ? null
-            : $this->buildJsonOutput($r->getReasonPhrase());
-
-        $this->getResponse()->content->set($content);
+        $this->response = $code === self::STATUS_NO_CONTENT
+            ? $this->responseEmpty()->withStatus($code)
+            : $this->responseAsJson($reason ?? '')->withStatus($code, $reason)
+        ;
     }
 
 

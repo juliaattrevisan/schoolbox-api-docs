@@ -32,7 +32,7 @@ use Schoolbox\User;
  *
     new Payload(
         $this->getConfigLoader()->get('site_location'),
-        $this->psr7Request->getServerParams('HTTP_HOST'),
+        $this->request->getServerParams('HTTP_HOST'),
         $router->generate('learningAssessment.getAssessment', [
             'assessmentId' => $assessment->getId()
         ]

@@ -18,7 +18,6 @@ use Schoolbox\Cyberhound\Url\Translator;
  */
 class Controller extends Base
 {
-
     /**
      * A list of test urls to try
      * Can delete this later
@@ -69,12 +68,12 @@ class Controller extends Base
             ['External Generic url' => "http://www.google.com.au/search?q=taylor+swift&oq=taylor+swift&aqs=chrome..69i57j69i65j69i60l4.1253j0j4&sourceid=chrome&es_sm=93&ie=UTF-8"],
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@preview/Index.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@preview/Index.twig',
+            [
                 'allUrls' => $testUrls,
             ],
-        ]);
+        );
     }
 
 
@@ -98,15 +97,13 @@ class Controller extends Base
         $previewFragment = (new Factory($translator))->urlFragment($params['encodedUrl']);
 
         if ($previewFragment['type'] === 'inline') {
-            $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])
-                                                ->getAsString();
+            $previewFragment['fragment'] = $this->responseFromTemplateUnthemed($previewFragment['twig']['template'], $previewFragment['twig']['data'])
+                                                ->getBody()->getContents();
         }
 
         //Not required by preview.js
         unset($previewFragment['twig']);
 
-        $this->getResponse()->content->set([
-            'data' => $previewFragment,
-        ]);
+        $this->response = $this->responseAsJson($previewFragment);
     }
 }

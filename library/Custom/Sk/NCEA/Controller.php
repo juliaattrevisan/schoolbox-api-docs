@@ -73,9 +73,13 @@ class Controller extends Base
 
         /* Pass to twig to render nicely
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
-            'user' => $user,
-            'data' => $aggregatedData,
-        ])->setTitle("NCEA Report for {$user->getFullName()}"));
+        $this->response = $this->responseFromTemplate(
+            '@nceaReport/report.twig',
+            [
+                'user' => $user,
+                'data' => $aggregatedData,
+            ],
+            "NCEA Report for {$user->getFullName()}",
+        );
     }
 }

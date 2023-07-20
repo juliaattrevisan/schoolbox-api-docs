@@ -128,9 +128,6 @@ class Controller extends Base
     /** @var string */
     private $baseUrl;
 
-    /** @var User */
-    private $user;
-
     /**
      * Controller constructor
      */
@@ -186,13 +183,10 @@ class Controller extends Base
             );
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => [
-                'result'       => 'OK',
-                'providerName' => $provider->getName(),
-                'url'          => $post['url'] ?? null,
-            ],
+        $this->response = $this->responseAsJson([
+            'result'       => 'OK',
+            'providerName' => $provider->getName(),
+            'url'          => $post['url'] ?? null,
         ]);
     }
 
@@ -343,10 +337,9 @@ class Controller extends Base
             'folderId'    => $component->getContext()->getId(),
         ]);
 
-        $this->getResponse()->content->set([
-            'template' => '@ltiConsumer/redirect.twig',
-            'format'   => 'nochrome',
-            'data'     => [
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@ltiConsumer/redirect.twig',
+            [
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
                 'embedUrl'       => $embedUrl,
@@ -354,7 +347,7 @@ class Controller extends Base
                 'height'         => $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
-        ]);
+        );
     }
 
     /**
@@ -374,18 +367,15 @@ class Controller extends Base
          * so return a generic error template instead
          */
         if ($provider->isDeleted()) {
-            $this->getResponse()->content->set([
-                'template' => '@ltiConsumer/unavailable.twig',
-                'format'   => 'nochrome',
-                'data'     => [
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiConsumer/unavailable.twig',
+                [
                     'provider'  => $provider,
                 ],
-            ]);
+            );
 
             return;
         }
-
-        $this->user = $this->getUser();
 
         switch ($provider->getLaunchType()) {
             case Provider::LAUNCH_TYPE_PICKER:
@@ -434,13 +424,13 @@ class Controller extends Base
                 $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
                 if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
                     // I have picked something: just go there
-                    $this->response->redirect->to($embedUrl);
+                    $this->response = $this->redirectFound($embedUrl);
                     return;
                 }
             } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
                 // Is this content which has actually been picked?
                 // Maintain current behaviour (for fear of breaking any existing integrations)
-                $this->response->redirect->to($embedUrl);
+                $this->response = $this->redirectFound($embedUrl);
                 return;
             } else {
                 // This component is a picker, and content has been selected:
@@ -540,16 +530,15 @@ class Controller extends Base
 
         // Render form that will automatically submit LTI request
 
-        $this->getResponse()->content->set([
-            'template' => '@ltiConsumer/form.twig',
-            'format'   => 'nochrome',
-            'data'     => [
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@ltiConsumer/form.twig',
+            [
                 'params'    => $launch_data,
                 'provider'  => $provider,
                 'signature' => $signature,
                 'embedUrl'  => $embedUrl,
             ],
-        ]);
+        );
     }
 
     /**
@@ -631,10 +620,9 @@ class Controller extends Base
         // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
         // javascript inside this template updates these in the DOM.
 
-        $this->getResponse()->content->set([
-            'template' => '@ltiConsumer/redirect.twig',
-            'format'   => 'nochrome',
-            'data'     => [
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@ltiConsumer/redirect.twig',
+            [
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
                 'embedUrl'       => $embedUrl,
@@ -642,7 +630,7 @@ class Controller extends Base
                 'height'         => $height,
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
-        ]);
+        );
 
         return;
     }

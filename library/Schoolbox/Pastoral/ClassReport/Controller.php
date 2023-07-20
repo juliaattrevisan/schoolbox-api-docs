@@ -59,15 +59,13 @@ class Controller extends Base
             $this->getUser(),
             $this->requestQuery->getArrayCopy(),
         );
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@pastoralClassReportModule/index.twig',
             [
-                'template' => '@pastoralClassReportModule/index.twig',
-                'data'     => [
-                    'folder'      => $folder,
-                    'pageTitle'   => $folder->getTitle(),
-                    'filterPanel' => $filterPanel,
-                ],
-            ]
+                'folder'      => $folder,
+                'pageTitle'   => $folder->getTitle(),
+                'filterPanel' => $filterPanel,
+            ],
         );
     }
 
@@ -117,12 +115,10 @@ class Controller extends Base
             ];
         }
 
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $result,
-                'metadata' => null,
-            ]),
-        );
+        $this->response = $this->responseAsJson([
+            'data'     => $result,
+            'metadata' => null,
+        ]);
     }
 
     /**
@@ -143,17 +139,15 @@ class Controller extends Base
             new GenericCollection(User::class, [$student]),
             $this->requestQuery->getArrayCopy(),
         );
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $this->retrieveCursoredRecords(
-                    $folder,
-                    $student,
-                    $pastoralIds,
-                    $this->requestQuery->get('cursor'),
-                    $this->requestQuery->get('sort', Cursor::SORT_OPTION_CREATED),
-                    $this->requestQuery->getInt('count', Cursor::LIMIT_DEFAULT),
-                )
-            ),
+        $this->response = $this->responseAsJson(
+            $this->retrieveCursoredRecords(
+                $folder,
+                $student,
+                $pastoralIds,
+                $this->requestQuery->get('cursor'),
+                $this->requestQuery->get('sort', Cursor::SORT_OPTION_CREATED),
+                $this->requestQuery->getInt('count', Cursor::LIMIT_DEFAULT),
+            )
         );
     }
 

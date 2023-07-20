@@ -103,11 +103,8 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => [
-                'pages' => $options
-            ]
+        $this->response = $this->responseAsJson([
+            'pages' => $options
         ]);
     }
 
@@ -117,17 +114,16 @@ class Controller extends Base
     public function getDeploy()
     {
         // Render this thing out
-
-        $this->getResponse()->content->set([
-            'template' => '@adminEportfolio/index.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminEportfolio/index.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
                 'roles' => $this->roleMapper->findAll(['order' => ['name' => 'asc']]),
                 'campuses' => $this->campusMapper->findAll(['order' => ['name' => 'asc']])
             ],
-            'title' => 'Admin - Eportfolio'
-        ]);
+            'Admin - Eportfolio'
+        );
     }
 
     /**
@@ -144,19 +140,17 @@ class Controller extends Base
         $this->eportfolioImportMapper->save($eportfolioImport);
         $id = $eportfolioImport->getId();
 
-        $this->getResponse()->content->set([
-            'template' => '@adminEportfolio/importResults.twig',
-            'data' => array(
+        $this->postOutputCallbacks[] = function () use ($post, $id) {
+            $this->deployCallback($post, $id);
+        };
+        $this->response = $this->responseFromTemplate(
+            '@adminEportfolio/importResults.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
                 'id' => $id
-            ),
-            'postOutput' => [
-                function () use ($post, $id) {
-                    $this->deployCallback($post, $id);
-                }
             ],
-        ]);
+        );
     }
 
     /**
@@ -466,17 +460,10 @@ class Controller extends Base
                 }
             }
 
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => $this->buildJsonOutput($result)
-            ]);
+            $this->response = $this->responseAsJson($result);
         } catch (MapperException $e) {
             // Requested import didn't exist,
-
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => []
-            ]);
+            $this->response = $this->responseAsJson([]);
         }
     }
 }

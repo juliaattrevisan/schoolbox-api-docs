@@ -57,18 +57,17 @@ class Controller extends Base
         */
         $userPassword = $this->getUser()->getPassword() ?? '';
         if ($userPassword === '') {
-            $this->getResponse()->redirect->to(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate('userPasswordReset.displayCreateRequestForm')
             );
         } else {
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput(
-                    '@passwordChange/index.twig',
-                    [
-                        'isRequestMade'   => $this->getSessionSegment()->getFlash('isRequestMade'),
-                        'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
-                    ]
-                )->setTitle('Change Password')
+            $this->response = $this->responseFromTemplate(
+                '@passwordChange/index.twig',
+                [
+                    'isRequestMade'   => $this->getSessionSegment()->getFlash('isRequestMade'),
+                    'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
+                ],
+                'Change Password'
             );
         }
     }
@@ -113,7 +112,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->to(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate('passwordChange.getChangePassword')
         );
     }

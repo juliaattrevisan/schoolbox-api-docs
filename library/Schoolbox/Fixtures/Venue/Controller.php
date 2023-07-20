@@ -64,7 +64,7 @@ class Controller extends AbstractController
                 // noop
             }
 
-            $this->getResponse()->content->set($this->buildJsonOutput($venues));
+            $this->response = $this->responseAsJson($venues);
         } else {
             try {
                 $allVenues = $this->mapper->findAll(
@@ -75,13 +75,11 @@ class Controller extends AbstractController
                     ]
                 );
 
-                $this->getResponse()->content->set(
-                    $this->buildHtmlOutput(
-                        '@sportsfixturesVenue/list.twig',
-                        [
-                            'allVenues' => $allVenues
-                        ]
-                    )
+                $this->response = $this->responseFromTemplate(
+                    '@sportsfixturesVenue/list.twig',
+                    [
+                        'allVenues' => $allVenues
+                    ]
                 );
             } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
@@ -100,9 +98,9 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesVenue/entity.twig', [
             'venue' => $entity
-        ]));
+        ]);
     }
 
     /**
@@ -139,7 +137,7 @@ class Controller extends AbstractController
             $data['zoom']     = 5;
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/create.twig', $data));
+        $this->response = $this->responseFromTemplate('@sportsfixturesVenue/create.twig', $data);
     }
 
     /**
@@ -163,7 +161,7 @@ class Controller extends AbstractController
                 $this->requestPost['address']
             );
 
-            $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));
+            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }

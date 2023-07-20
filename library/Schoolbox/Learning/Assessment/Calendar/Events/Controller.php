@@ -124,7 +124,7 @@ class Controller extends Base
     {
         // Events may take a while to generate
         $this->extendExecutionTime();
-        $this->response->content->set($this->buildJsonOutput($this->buildEventOutput()));
+        $this->response = $this->responseAsJson($this->buildEventOutput());
     }
 
 
@@ -141,10 +141,8 @@ class Controller extends Base
     {
         // Events may take a while to generate
         $this->extendExecutionTime();
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                array_values(array_reduce($this->buildEventOutput(), [$this, 'groupEvents'], []))
-            )
+        $this->response = $this->responseAsJson(
+            array_values(array_reduce($this->buildEventOutput(), [$this, 'groupEvents'], []))
         );
     }
 

@@ -120,6 +120,6 @@ class Controller extends BaseController
             ];
         }
 
-        $this->response->content->set($this->buildJsonOutput($response));
+        $this->response = $this->responseAsJson($response);
     }
 }

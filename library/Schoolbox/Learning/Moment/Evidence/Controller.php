@@ -65,7 +65,7 @@ class Controller extends Base
      */
     public function redirectToCreateForm(): void
     {
-        $this->response->redirect->to(
+        $this->response = $this->redirectFound(
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',
@@ -115,9 +115,7 @@ class Controller extends Base
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
         ];
 
-        $this->response->content->set(
-            $this->buildHtmlOutput($template, $params)
-        );
+        $this->response = $this->responseFromTemplate($template, $params);
     }
 
 
@@ -145,15 +143,13 @@ class Controller extends Base
             || ($this->getUser()->getRole()->isParent() && $this->getConfigLoader()->get('evidence_parent_comment'))
         );
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningMomentEvidence/detail.twig',
-                [
-                    'evidence'                 => $item,
-                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-                    'learningMomentCanComment' => $learningMomentCanComment,
-                ]
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningMomentEvidence/detail.twig',
+            [
+                'evidence'                 => $item,
+                'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'learningMomentCanComment' => $learningMomentCanComment,
+            ]
         );
     }
 
@@ -186,18 +182,16 @@ class Controller extends Base
             ->map($this->buildTranslatorWithComments(2))
             ->reindex();
 
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $mappedData,
-                'metadata' => [
-                    'count'  => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->current($data),
-                        'next'    => $cursor->next($data),
-                    ],
+        $this->response = $this->responseAsJson([
+            'data'     => $mappedData,
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->current($data),
+                    'next'    => $cursor->next($data),
                 ],
-            ])
-        );
+            ],
+        ]);
     }
 
 
@@ -248,11 +242,10 @@ class Controller extends Base
      */
     public function postMomentForUsers(Collection $users): void
     {
-        $requestBody = $this->psr7Request->getParsedBody();
+        $requestBody = $this->request->getParsedBody();
 
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
-        $this->response->status->setCode(201);
 
         // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
@@ -267,17 +260,15 @@ class Controller extends Base
             $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $evidenceCollection->map(
-                    new Translator\ModelToArray\Base(
-                        new User\Translator\Author\ModelToArray(),
-                        new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-                        new ScrubAdapter(),
-                    ),
-                )
+        $this->response = $this->responseAsJson(
+            $evidenceCollection->map(
+                new Translator\ModelToArray\Base(
+                    new User\Translator\Author\ModelToArray(),
+                    new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+                    new ScrubAdapter(),
+                ),
             )
-        );
+        )->withStatus(201);
     }
 
 
@@ -312,11 +303,9 @@ class Controller extends Base
         $params['zone']     = $zone->getTwigContext();
         $params['evidence'] = $evidence;
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                $template,
-                $params
-            )
+        $this->response = $this->responseFromTemplate(
+            $template,
+            $params
         );
     }
 
@@ -330,7 +319,7 @@ class Controller extends Base
      */
     public function putEvidence(Model $evidence): void
     {
-        $requestBody       = $this->psr7Request->getParsedBody();
+        $requestBody       = $this->request->getParsedBody();
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
@@ -344,11 +333,7 @@ class Controller extends Base
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $responseTranslator($evidence)
-            )
-        );
+        $this->response     = $this->responseAsJson($responseTranslator($evidence));
     }
 
 
@@ -363,8 +348,8 @@ class Controller extends Base
     public function deleteEvidence(Model $evidence): void
     {
         //unless there are mapper errors, set the return status code to 204 (No Content)
-        $this->response->status->setCode(204);
         $this->mapper->delete($evidence);
+        $this->response = $this->responseEmpty(204);
     }
 
 
@@ -387,7 +372,7 @@ class Controller extends Base
                 'name' => $tag->getName(),
             ];
         }
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
+        $this->response = $this->responseAsJson($output);
     }
 
 

@@ -9,6 +9,7 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
+use Closure;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Effect;
@@ -87,9 +88,9 @@ class Controller extends Base
 
         /* Twig data
          */
-        $this->getResponse()->content->set([
-            'template' => '@upsRuleset/intro.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@upsRuleset/intro.twig',
+            [
                 'pageCurrent'    => $this->routeGenerator->generate('upsRuleset.intro'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'allNavigation'  => $allNavigation->getAllNodes(),
@@ -97,7 +98,7 @@ class Controller extends Base
                 'upsCronTime'    => $this->getConfigLoader()->get('ups_cron_run_time'),
                 'timezone'       => $this->getConfigLoader()->get('date_timezone'),
             ]
-        ]);
+        );
     }
 
 
@@ -137,10 +138,10 @@ class Controller extends Base
         $twigData['pageCurrent'] = $this->routeGenerator->generate('upsRuleset.intro');
         $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
 
-        $this->getResponse()->content->set([
-            'template' => '@upsRuleset/ruleset.twig',
-            'data'     => $twigData,
-        ]);
+        $this->response = $this->responseFromTemplate(
+            '@upsRuleset/ruleset.twig',
+            $twigData,
+        );
     }
 
 
@@ -188,14 +189,14 @@ class Controller extends Base
      */
     public function logs()
     {
-        $this->getResponse()->content->set([
-            'template' => '@upsRuleset/log/list.twig',
-            'data'     => [
+        $this->response = $this->responseFromTemplate(
+            '@upsRuleset/log/list.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('upsRuleset.intro'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'logs'           => $this->findLogs()
             ]
-        ]);
+        );
     }
 
 
@@ -251,23 +252,22 @@ class Controller extends Base
             $model  = Log\Mapper::getInstance()->findById($logId);
 
             if ('stream' === $format) {
-                $this->getResponse()->content->set([
-                    'header'    => "@upsRuleset/log/stream-header.twig",
-                    'template'  => $template,
-                    'footer'    => "@upsRuleset/log/stream-footer.twig",
-                    'format'    => $format,
-                    'data' => [
-                        'id'            => $logId,
-                        'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
-                        'useInlineCSS'  => true,
-                    ],
-                    'callback'  => [ $this, 'streamLog' ],
-                    'param_arr' => [
+                $this->response = $this->responseFromTemplateStreamedData(
+                    $template,
+                    Closure::fromCallable([$this, 'streamLog']),
+                    [
                         'stream'          => $this->filesystemProxy->readStream($model->getStorage()),
                         'filter'          => $this->parseFilterString($filter),
                         'filterBlacklist' => ['rulestring'],
                     ],
-                ]);
+                    "@upsRuleset/log/stream-header.twig",
+                    "@upsRuleset/log/stream-footer.twig",
+                    [
+                        'id'            => $logId,
+                        'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
+                        'useInlineCSS'  => true,
+                    ],
+                );
             } else {
                 $log = [
                     'timestamp' => $model->getStorage()->getCreatedAt(),
@@ -292,11 +292,10 @@ class Controller extends Base
                     $data['useInlineCSS'] = true;
                 }
 
-                $this->getResponse()->content->set([
-                    'template' => $template,
-                    'format'   => $format,
-                    'data'     => $data
-                ]);
+                $this->response = $format === 'nochrome'
+                    ? $this->responseFromTemplateUnthemed($template, $data)
+                    : $this->responseFromTemplate($template, $data)
+                ;
             }
         } catch (Mapper\Exception $e) {
             // 404 on the log - we have no aura way of doing this!! :(
@@ -306,13 +305,9 @@ class Controller extends Base
             // 400: requested a page that doesn't exist
             if ($this->isXhrRequest()) {
                 // just tell them they're naughty, that will be enough
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set([
-                    'format' => 'json',
-                    'data'   => $e->getMessage()
-                ]);
+                $this->response = $this->responseAsJson($e->getMessage())->withStatus(400);
             } else {
-                $this->getResponse()->redirect->to($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
+                $this->response = $this->redirectFound($this->getRouteIfAuthorized('upsRuleset.log', ['logId' => $logId ]));
             }
         }
     }
@@ -475,21 +470,16 @@ class Controller extends Base
     {
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
-        $this->getResponse()->redirect->to(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]
             )
         );
         // Not the best place to put it but it will do for now
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-            'postOutput' => [
-                function () use ($rulesetId, $provisioner) {
-                    $this->syncCallback($rulesetId, $provisioner, false);
-                }
-            ],
-        ]);
+        $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
+            $this->syncCallback($rulesetId, $provisioner, false);
+        };
     }
 
 
@@ -504,21 +494,16 @@ class Controller extends Base
     {
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasPerformUpdate', true);
-        $this->getResponse()->redirect->to(
+        $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
                 'upsRuleset.read',
                 ['rulesetId' => $rulesetId]
             )
         );
         // Not the best place to put it but it will do for now
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-            'postOutput' => [
-                function () use ($rulesetId, $provisioner) {
-                    $this->syncCallback($rulesetId, $provisioner, true);
-                }
-            ],
-        ]);
+        $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
+            $this->syncCallback($rulesetId, $provisioner, true);
+        };
     }
 
 
@@ -554,7 +539,7 @@ class Controller extends Base
         $response['sequence']   = $this->updateRuleSequence(($postData['sequence']));
         $response['customRule'] = $this->updateCustomRules($roleType, $postData['customRule'] ?? null);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($response));
+        $this->response = $this->responseAsJson($response);
     }
 
 
@@ -578,7 +563,7 @@ class Controller extends Base
             $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect'] ?? null);
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($response));
+        $this->response = $this->responseAsJson($response);
     }
 
     /**

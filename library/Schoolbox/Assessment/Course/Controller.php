@@ -54,6 +54,11 @@ use Schoolbox\YearLevel;
  */
 class Controller extends Base\Base
 {
+    /**
+     * Selected tab for this controller.
+     */
+    private const TAB = 'course';
+
     /** @var FolderMapper */
     private $folderMapper;
 
@@ -299,7 +304,7 @@ class Controller extends Base\Base
         $this->unitSpecificationMapper->save($unit);
         $response['unit'] = $unit->getId();
 
-        $this->getResponse()->content->set($this->buildJsonOutput($response));
+        $this->response = $this->responseAsJson($response);
     }
 
 
@@ -311,10 +316,8 @@ class Controller extends Base\Base
      */
     protected function returnJson($message, $code = 200)
     {
-        $this->getResponse()->status->set($code);
-
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($message));
+            $this->response = $this->responseAsJson($message)->withStatus($code);
         } else {
             die(json_encode($message));
         }
@@ -333,18 +336,6 @@ class Controller extends Base\Base
     {
         $assessmentSequence = $this->requestPost->get('sequence');
         $this->returnJson($this->assessmentMapper->sequenceAssessments($assessmentSequence));
-    }
-
-
-    /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array $data
-     */
-    protected function courseTpl($template, array $data = [])
-    {
-        $this->tpl('course', $template, $data, 'course');
     }
 
 
@@ -412,14 +403,18 @@ class Controller extends Base\Base
             $encodedReturnUrls[$unitSpecId] = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
         }
 
-        $this->courseTpl('course', [
-            'courseSpec'        => $courseSpec,
-            'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-            'folderAccess'      => $folderAccess,
-            'encodedReturnUrls' => $encodedReturnUrls,
-            'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
-            'curriculumCodes'   => $courseSpec->getFolder()->getViewableCurriculumNodes()->reindex(),
-        ]);
+        $this->response = $this->responseDependentOnRequest(
+            '@course/course.twig',
+            [
+                'courseSpec'        => $courseSpec,
+                'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'folderAccess'      => $folderAccess,
+                'encodedReturnUrls' => $encodedReturnUrls,
+                'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+                'curriculumCodes'   => $courseSpec->getFolder()->getViewableCurriculumNodes()->reindex(),
+            ],
+            self::TAB,
+        );
     }
 
 
@@ -433,12 +428,17 @@ class Controller extends Base\Base
      */
     public function newCourse(?string $name): void
     {
-        $this->courseTpl('course', [
-            'courseSpec'         => null,
-            'courseName'         => $name ? urldecode($name) : null,
-            'curriculumEnabled'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-            'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
-        ]);
+
+        $this->response = $this->responseDependentOnRequest(
+            '@course/course.twig',
+            [
+                'courseSpec'         => null,
+                'courseName'         => $name ? urldecode($name) : null,
+                'curriculumEnabled'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+            ],
+            self::TAB,
+        );
     }
 
 
@@ -510,14 +510,14 @@ class Controller extends Base\Base
 
         if ($this->isXhrRequest()) {
             // respond to XHR with JSON
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 'id'              => $courseSpec->getId(),
                 'urlModifyCourse' => $this->routeGenerator->generate('course.updateCourse', ['id' => $courseSpec->getId()]),
                 'urlNewUnit'      => $this->routeGenerator->generate('course.newUnit', ['id' => $courseSpec->getId()]),
-            ]));
+            ]);
         } else {
             // respond to synchronous POST with redirect
-            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.courseList'));
+            $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
         }
     }
 
@@ -727,12 +727,12 @@ class Controller extends Base\Base
 
         if ($this->isXhrRequest()) {
             // respond to XHR with JSON
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 'id' => $courseSpec->getId(),
-            ]));
+            ]);
         } else {
             // respond to synchronous POST with redirect
-            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.courseList'));
+            $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
         }
     }
 
@@ -831,7 +831,12 @@ class Controller extends Base\Base
                 '_expanded'        => true,
                 'toastSelector'    => '[data-relation="ajax-response"]',
             ];
-            $this->courseTpl('unit', $data);
+
+            $this->response = $this->responseDependentOnRequest(
+                '@course/unit.twig',
+                $data,
+                self::TAB,
+            );
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             // quite simple not able to find things we need. bye bye.
             $this->sendError('Could not save because of an internal error.', [], 500);
@@ -967,7 +972,11 @@ class Controller extends Base\Base
             ];
         }
 
-        $this->courseTpl('courseList', array_merge($data, $options));
+        $this->response = $this->responseDependentOnRequest(
+            '@course/courseList.twig',
+            array_merge($data, $options),
+            self::TAB,
+        );
     }
 
 
@@ -1018,7 +1027,11 @@ class Controller extends Base\Base
             'encodedReturnUrl' => $query->get('encodedReturnUrl'),
         ];
 
-        $this->courseTpl('courseListResults', array_merge($data, $options));
+        $this->response = $this->responseDependentOnRequest(
+            '@course/courseListResults.twig',
+            array_merge($data, $options),
+            self::TAB,
+        );
     }
 
 
@@ -1188,7 +1201,7 @@ class Controller extends Base\Base
             'folderId' => $folderId
         ];
 
-        $this->courseTpl('picker', $data);
+        $this->response = $this->responseDependentOnRequest('@course/picker.twig', $data, self::TAB);
     }
 
 
@@ -1206,9 +1219,9 @@ class Controller extends Base\Base
     public function deleteCourseSpecification(CourseSpecification $courseSpec, $deleteFolder = false)
     {
         // TODO: make delete of folder and course atomic
-
+        $status = 200;
         if ($courseSpec->isDeleted()) {
-            $this->getResponse()->status->set(410);
+            $status = 410;
         }
 
         // Call delete(), even if already deleted, to enable mapper hooks to fire
@@ -1221,10 +1234,10 @@ class Controller extends Base\Base
             $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'id'     => $courseSpec->getId(),
             'result' => 'success',
-        ]));
+        ])->withStatus($status);
     }
 
 
@@ -1249,16 +1262,17 @@ class Controller extends Base\Base
             return;
         }
 
+        $status = 200;
         if ($unitSpec->isDeleted()) {
-            $this->getResponse()->status->set(410);
+            $status = 410;
         }
 
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitSpecificationMapper->delete($unitSpec);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'id' => $unitSpec->getId(),
-        ]));
+        ])->withStatus($status);
     }
 
 
@@ -1283,16 +1297,17 @@ class Controller extends Base\Base
             return;
         }
 
+        $status = 200;
         if ($unitImpl->isDeleted()) {
-            $this->getResponse()->status->set(410);
+            $status = 410;
         }
 
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitImplementationMapper->delete($unitImpl);
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'id' => $unitImpl->getId(),
-        ]));
+        ])->withStatus($status);
     }
 
 
@@ -1325,9 +1340,8 @@ class Controller extends Base\Base
         // Don't show children if this is an invalid location
         $showChildren = $treeBuilder->isValidCourseLocation($folderId);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
-        ]);
+        $this->response = $this->responseAsJson(
+            $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
+        );
     }
 }

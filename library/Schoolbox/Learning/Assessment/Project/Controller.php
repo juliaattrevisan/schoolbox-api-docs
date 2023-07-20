@@ -178,11 +178,9 @@ class Controller extends Assessment\Controller
                     : $this->getSession()->getHistory(),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/project/status/staff.twig',
-                $twigData
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/project/status/staff.twig',
+            $twigData
         );
     }
 
@@ -256,14 +254,12 @@ class Controller extends Assessment\Controller
             'student'         => $student,
             'assessment'      => $assessment,
             'transitions'     => $tickTransitions,
-            'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->psr7Request->getUri()->getPath()),
+            'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->request->getUri()->getPath()),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/project/summary/student.twig',
-                $twigData
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/project/summary/student.twig',
+            $twigData
         );
     }
 

@@ -38,12 +38,10 @@ class Controller extends ConfigController
             'configContext' => $configContext,
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@adminOauth/admin.twig',
-                $data,
-                "oAuth Provider Configuration"
-            )
+        $this->response = $this->responseFromTemplate(
+            '@adminOauth/admin.twig',
+            $data,
+            "oAuth Provider Configuration"
         );
     }
 
@@ -62,7 +60,7 @@ class Controller extends ConfigController
     public function postAdmin(): void
     {
         $this->updateConfig($this->requestPost->getArrayCopy(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminOauth.getAdmin'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOauth.getAdmin'));
     }
 
 

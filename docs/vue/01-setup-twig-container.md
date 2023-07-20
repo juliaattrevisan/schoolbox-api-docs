@@ -26,9 +26,12 @@ This will call a controller's `getContainer` method; as usual, add that to the c
  */
 public function getContainer(): void
 {
-    $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/container.twig', [
-        'test' => 'Successful container!'
-    ]));
+    $this->response = $this->responseFromTemplate(
+        '@greenhouse/container.twig',
+        [
+            'test' => 'Successful container!'
+        ]
+    );
 }
 ```
 

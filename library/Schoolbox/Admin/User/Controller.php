@@ -348,9 +348,9 @@ class Controller extends Base
             $connectorName = '' !== $connectorName ? $connectorName : 'External';
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@adminUser/modify.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminUser/modify.twig',
+            [
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
@@ -389,8 +389,8 @@ class Controller extends Base
                 'isSchoolboxAdmin' => $user->getUsername() === UserMapper::USERNAME_ALARESS_ADMIN,
                 'token' => $this->tokenMapper->findByColumn('user_id', $user->getId()),
             ],
-            'title' => 'Admin - Users'
-        ]);
+            'Admin - Users'
+        );
     }
 
     /**
@@ -399,14 +399,15 @@ class Controller extends Base
      */
     public function getStaleReport(): void
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminUser/stale.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminUser/stale.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getStaleReport'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getStaleReport')),
                 'listEndpoint' => $this->routeGenerator->generate('adminUser.getStaleUsers'),
                 'deleteEndpoint' => $this->routeGenerator->generate('adminUser.postDeleteList'),
-            ]]);
+            ]
+        );
     }
 
 
@@ -443,7 +444,7 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+        $this->response = $this->responseAsJson($jsonPayload);
     }
 
     /**
@@ -465,9 +466,9 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setAttachPrompt('add a portrait image');
 
-        $this->getResponse()->content->set([
-            'template' => '@adminUser/modify.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminUser/modify.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getInsert'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getInsert')),
                 'method'    => 'Create',
@@ -485,8 +486,8 @@ class Controller extends Base
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'identifiers' => self::IDENTIFIERS,
             ],
-            'title' => 'Admin - Users'
-        ]);
+            'Admin - Users'
+        );
     }
 
     /**
@@ -509,7 +510,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#groups");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#groups");
     }
 
     /**
@@ -532,7 +533,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#permissions");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#permissions");
     }
 
     /**
@@ -556,7 +557,7 @@ class Controller extends Base
         } catch (MapperException $e) {
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#linked");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify#linked");
     }
 
     /**
@@ -572,10 +573,7 @@ class Controller extends Base
             'uid' => $user->getId()
         ]);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => true
-        ]);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -592,10 +590,7 @@ class Controller extends Base
             'uid' => $user->getId()
         ]);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => true
-        ]);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -617,10 +612,7 @@ class Controller extends Base
 
         $this->userMapper->save($user);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => true
-        ]);
+        $this->response = $this->responseAsJson(true);
     }
 
 
@@ -797,7 +789,7 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$user->getId()}/modify");
     }
 
     /**
@@ -808,10 +800,7 @@ class Controller extends Base
     {
         $this->userMapper->delete($user);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => true
-        ]);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -822,12 +811,7 @@ class Controller extends Base
     {
         $userList = $this->requestPost['users'];
         if ($this->userMapper->deleteByColumn('id', $userList)) {
-            $this->getResponse()->content->set(
-                [
-                    'format' => 'json',
-                    'data'   => true
-                ]
-            );
+            $this->response = $this->responseAsJson(true);
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -864,7 +848,7 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/{$userId}/modify");
+        $this->response = $this->redirectAfterPost("/adminv2/user/{$userId}/modify");
     }
 
     /**
@@ -905,10 +889,7 @@ class Controller extends Base
         } catch (MapperException $e) {
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => true
-        ]);
+        $this->response = $this->responseAsJson(true);
     }
 
     /**
@@ -930,9 +911,6 @@ class Controller extends Base
         } catch (MapperException $e) {
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => true
-        ]);
+        $this->response = $this->responseAsJson(true);
     }
 }

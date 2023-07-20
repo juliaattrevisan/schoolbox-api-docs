@@ -1,7 +1,8 @@
 <?php
 
 use Alaress\Authorizer\Failure\Unauthenticated;
-use Alaress\Web\Output;
+use Alaress\Web\Response\Factory as ResponseFactory;
+use Alaress\Web\Response\Outputter;
 use Aura\Router\Generator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -247,20 +248,6 @@ class SitePage
             return true;
         }
 
-        if (!$lite && !$this->lite) {
-            self::saveHistory();
-            /** @var Output\ThemedHtml $renderer */
-            $renderer = $this->getDi()->get('webOutput:html');
-            $renderer
-                ->setTab($this->currentTab)
-                ->setTitle($this->getVar('TITLE'));
-        } else {
-            /** @var Output\Html $renderer */
-            $renderer = $this->getDi()->get('webOutput:nochrome');
-        }
-        $renderer->setTemplate('include/sitepageContent.twig');
-
-
         // Put the PHPLib together
         $this->setFile(TEMPLATE_body, 'include/chromeContent.html');
         $this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
@@ -275,17 +262,33 @@ class SitePage
 
 
         // Output the PHPLib using the renderer
-        $renderer->setData([
+        /** @var ResponseFactory $responseFactory */
+        $responseFactory = $this->di->get('httpResponseFactory');
+        $template = 'include/sitepageContent.twig';
+        $data = [
             'content' => $this->template->parse('finaloutput', TEMPLATE_body)
-        ]);
+        ];
+        $user = $this->user ?? new User();
+        if (!$lite && !$this->lite) {
+            self::saveHistory();
+            $response = $responseFactory->buildHtml(
+                $template,
+                $data,
+                $user,
+                $this->getVar('TITLE'),
+                $this->currentTab,
+            );
+        } else {
+            $response = $responseFactory->buildUnthemedHtml($template, $data, $user);
+        }
 
         // Do this leftover thing
         self::disableXssProtectionAfterForm();
 
         // Finagle a response
-        $renderer->output($this->getDi()->get('webFactory')->newResponse());
-
-
+        /** @var Outputter $outputter */
+        $outputter = $this->di->get('httpResponseOutputter');
+        $outputter->output($response);
 
         return true;
     }
@@ -656,7 +659,6 @@ class SitePage
     public function goLoginPage()
     {
         try {
-            $this->getDi()->get('webFactory');
             throw new Unauthenticated();
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface | RuntimeException $e) {
             $parts = parse_url($_SERVER['REQUEST_URI']);

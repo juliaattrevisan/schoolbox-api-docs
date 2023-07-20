@@ -14,7 +14,6 @@ use Schoolbox\Permission\Access;
 
 class Controller extends Base
 {
-
     /**
      * @var \Schoolbox\Error\Mapper
      */
@@ -50,10 +49,9 @@ class Controller extends Base
      */
     public function getRoster()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@service/permissions.twig', [
+        $this->response = $this->responseFromTemplate('@service/permissions.twig', [
             'services' => (new Permissions($this->userAccessMapper))->generate(),
             'pageCurrent' => 'user',
-
-        ]));
+        ]);
     }
 }

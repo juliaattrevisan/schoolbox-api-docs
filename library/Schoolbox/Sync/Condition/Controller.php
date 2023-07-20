@@ -79,11 +79,10 @@ class Controller extends Base
             ],
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@upsCondition/container.twig',
-            'data'     => $data,
-            'format'   => 'nochrome'
-        ]);
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@upsCondition/container.twig',
+            $data,
+        );
     }
 
 
@@ -97,10 +96,9 @@ class Controller extends Base
         $conditionId = $this->requestPost->get('conditionId');
         $deleteCount = Condition\Mapper::getInstance()->deleteByColumn('id', $conditionId);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $deleteCount > 0
-        ]);
+        $this->response = $this->responseAsJson(
+            $deleteCount > 0
+        );
 
         return true;
     }

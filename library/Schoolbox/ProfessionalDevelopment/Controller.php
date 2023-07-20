@@ -64,7 +64,7 @@ class Controller extends Base
         /* Redirect upon successful save
          */
         if ($result) {
-            $this->getResponse()->redirect->to("/search/user/{$user->getId()}");
+            $this->response = $this->redirectFound("/search/user/{$user->getId()}");
             return;
         }
 
@@ -96,9 +96,9 @@ class Controller extends Base
             $status = self::ACCREDIT_FAIL;
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'userId' => $userId,
             'status' => $status
-        ]));
+        ]);
     }
 }

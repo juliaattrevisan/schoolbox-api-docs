@@ -82,15 +82,13 @@ class Controller extends Base
     public function layout(Layout\Model $layout)
     {
         // Load layout
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@tile/layout.twig',
             [
-                'title'    => 'Tile Component Layout',
-                'template' => '@tile/layout.twig',
-                'data'     => [
-                    'item' => $layout,
-                    'maxPaddingPercentage' => Layout\Model::MAX_PADDING_PERCENTAGE
-                ],
-            ]
+                'item' => $layout,
+                'maxPaddingPercentage' => Layout\Model::MAX_PADDING_PERCENTAGE
+            ],
+            'Tile Component Layout',
         );
     }
 
@@ -99,7 +97,6 @@ class Controller extends Base
      *
      * @param Layout\Model $layout
      * @throws MapperException
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function layoutForm(Layout\Model $layout)
     {
@@ -150,13 +147,7 @@ class Controller extends Base
 
         // XHR: return a simple JSON response
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set(
-                [
-                    'format' => 'json',
-                    'data'   => $layout,
-                ]
-            );
-            $this->getResponse()->status->setCode($code);
+            $this->response = $this->responseAsJson($layout)->withStatus($code);
             return;
         }
 
@@ -174,7 +165,7 @@ class Controller extends Base
             // Should never happen
             $href = '#';
         }
-        $this->getResponse()->redirect->afterPost($href);
+        $this->response = $this->redirectAfterPost($href);
     }
 
     /**
@@ -187,16 +178,14 @@ class Controller extends Base
     {
         /** @var Model $model */
         $model = $this->mapper->createModel();
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@tile/modify.twig',
             [
-                'title'    => 'Add Tile',
-                'template' => '@tile/modify.twig',
-                'data'     => [
-                    'item'       => $model,
-                    'layout'     => $layout,
-                    'attachzone' => $this->getAttachZoneData($model),
-                ],
-            ]
+                'item'       => $model,
+                'layout'     => $layout,
+                'attachzone' => $this->getAttachZoneData($model),
+            ],
+            'Add Tile',
         );
     }
 
@@ -213,7 +202,7 @@ class Controller extends Base
         // No:  Create a layout, and redirect to it
         try {
             $layout = $this->findLayoutForComponent($component);
-            $this->response->redirect->found(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'tile.add',
                     ['layoutId' => $layout->getId()]
@@ -221,7 +210,7 @@ class Controller extends Base
             );
         } catch (MapperException $e) {
             $layout = $this->buildLayoutForComponent($component);
-            $this->response->redirect->found(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $layout->getId()]
@@ -250,7 +239,7 @@ class Controller extends Base
         $item->setTileLayout($layout);
 
         $this->mapper->save($item);
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $layout->getId()]
@@ -265,16 +254,14 @@ class Controller extends Base
      */
     public function edit(Model $item)
     {
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@tile/modify.twig',
             [
-                'title'    => 'Add Tile',
-                'template' => '@tile/modify.twig',
-                'data'     => [
-                    'item'       => $item,
-                    'layout'     => $item->getTileLayout(),
-                    'attachzone' => $this->getAttachZoneData($item),
-                ],
-            ]
+                'item'       => $item,
+                'layout'     => $item->getTileLayout(),
+                'attachzone' => $this->getAttachZoneData($item),
+            ],
+            'Add Tile',
         );
     }
 
@@ -291,7 +278,7 @@ class Controller extends Base
         );
 
         $this->mapper->save($item);
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'tile.layout',
                 ['layoutId' => $item->getTileLayout()->getId()]
@@ -311,15 +298,9 @@ class Controller extends Base
             $code = 500;
         }
         if ($this->isXhrRequest()) {
-            $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set(
-                [
-                    'format' => 'json',
-                    'data'   => [],
-                ]
-            );
+            $this->response = $this->responseAsJson([])->withStatus($code);
         } else {
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(
                     'tile.layout',
                     ['layoutId' => $item->getTileLayout()->getId()]

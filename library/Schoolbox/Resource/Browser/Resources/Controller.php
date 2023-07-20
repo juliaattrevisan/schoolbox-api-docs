@@ -81,7 +81,7 @@ class Controller extends AbstractController
 
         $folderId = $link->getFolder()->getId();
 
-        $server = $this->psr7Request->getServerParams();
+        $server = $this->request->getServerParams();
 
         $data = [
             'file'       => $link,
@@ -96,11 +96,10 @@ class Controller extends AbstractController
             'namespace'  => $this->namespace,
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@resourceBrowser/showLinkInfo.twig',
-            'format'   => 'nochrome',
-            'data'     => $data,
-        ]);
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@resourceBrowser/showLinkInfo.twig',
+            $data,
+        );
     }
 
     /**
@@ -182,24 +181,22 @@ class Controller extends AbstractController
         }
         //just dump the lot to the page for front end use.
         //output results
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@resourceBrowser/viewAll.twig',
             [
-                'template' => '@resourceBrowser/viewAll.twig',
-                'title'    => $title,
-                'data'     => [
-                    'referrer'       => $referrer,
-                    'canEdit'        => $accessSource >= UserAccess::ACCESS_WRITE,
-                    'homepage'       => $homepage,
-                    'filter'         => $filter,
-                    'files'          => $files,
-                    'breadcrumb'     => $breadcrumb,
-                    'title'          => $title,
-                    'sortDir'        => $sortDirection,
-                    'sortBy'         => $sortBy,
-                    'componentID'    => $componentID,
-                    'sourceFolderID' => $sourceFolder->getId(),
-                ],
-            ]
+                'referrer'       => $referrer,
+                'canEdit'        => $accessSource >= UserAccess::ACCESS_WRITE,
+                'homepage'       => $homepage,
+                'filter'         => $filter,
+                'files'          => $files,
+                'breadcrumb'     => $breadcrumb,
+                'title'          => $title,
+                'sortDir'        => $sortDirection,
+                'sortBy'         => $sortBy,
+                'componentID'    => $componentID,
+                'sourceFolderID' => $sourceFolder->getId(),
+            ],
+            $title,
         );
     }
 
@@ -278,7 +275,7 @@ class Controller extends AbstractController
      */
     public function patchFileInfo(Resource\File\Model $file)
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
         if (isset($data['hidden'])) {
             $file->setHidden($data['hidden']);
         } else {
@@ -298,8 +295,6 @@ class Controller extends AbstractController
             'hidden'        => $file->isHidden(),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput($data)
-        );
+        $this->response = $this->responseAsJson($data);
     }
 }

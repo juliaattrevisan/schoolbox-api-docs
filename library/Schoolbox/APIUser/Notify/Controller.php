@@ -41,14 +41,13 @@ class Controller extends Base
      */
     public function apiUserNotify(User $user): void
     {
-        $data = $this->psr7Request->getParsedBody();
+        $data = $this->request->getParsedBody();
         //check for required fields
         if ('' === ($data['message'] ?? '')) {
-            $problem = (new ApiProblem("'message' is not set"))
+            $problem        = (new ApiProblem("'message' is not set"))
                 ->setStatus(400)
                 ->asArray();
-            $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
             return; //exit early the message field is not set...
         }
         try {
@@ -68,11 +67,10 @@ class Controller extends Base
             );
             $composite->push($bob->build());
         } catch (\Exception $e) {
-            $problem = (new ApiProblem($e->getMessage()))
+            $problem        = (new ApiProblem($e->getMessage()))
                 ->setStatus(500)
                 ->asArray();
-            $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->response = $this->responseAsJson($problem)->withStatus(500);
             return;
         }
     }

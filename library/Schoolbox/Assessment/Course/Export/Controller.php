@@ -64,12 +64,10 @@ class Controller extends Base
         $newAssessment = $this->copyAssessmentToContext($assessment, $unitSpec);
 
         // TODO return the same format as the assessment API?
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'id'    => $newAssessment->getId(),
-                'title' => $newAssessment->getTitle(),
-            ]),
-        );
+        $this->response = $this->responseAsJson([
+            'id'    => $newAssessment->getId(),
+            'title' => $newAssessment->getTitle(),
+        ]);
     }
 
 
@@ -98,12 +96,10 @@ class Controller extends Base
         );
 
         // TODO return the same format as the assessment API?
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'id'    => $updatedSpecAssessment->getId(),
-                'title' => $updatedSpecAssessment->getTitle(),
-            ]),
-        );
+        $this->response = $this->responseAsJson([
+            'id'    => $updatedSpecAssessment->getId(),
+            'title' => $updatedSpecAssessment->getTitle(),
+        ]);
     }
 
     /**

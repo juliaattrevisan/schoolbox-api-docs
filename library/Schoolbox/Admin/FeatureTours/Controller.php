@@ -44,9 +44,7 @@ class Controller extends Base
             'tours' => $this->tourMapper->findAll()
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@featureTours/index.twig", $twigData)
-        );
+        $this->response = $this->responseFromTemplate("@featureTours/index.twig", $twigData);
     }
 
 
@@ -83,6 +81,6 @@ class Controller extends Base
         $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
 
         // Redirect back to the same page
-        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('featureTours.render'));
+        $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('featureTours.render'));
     }
 }

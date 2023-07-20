@@ -59,20 +59,18 @@ class Controller extends Base
     public function getIndex(): void
     {
         [$staffUsers, $studentUsers] = $this->buildUserLists();
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@ltiPrototypePlatform/index.twig',
-                [
-                    'staffUsers'    => $staffUsers,
-                    'studentUsers'  => $studentUsers,
-                    'registrations' => $this->buildRegistrationRepository()->findAll(),
-                    'messageTypes'  => [
-                        LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST => 'Resource Link',
-                        LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST  => 'Deep Linking',
-                    ],
+        $this->response = $this->responseFromTemplate(
+            '@ltiPrototypePlatform/index.twig',
+            [
+                'staffUsers'    => $staffUsers,
+                'studentUsers'  => $studentUsers,
+                'registrations' => $this->buildRegistrationRepository()->findAll(),
+                'messageTypes'  => [
+                    LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST => 'Resource Link',
+                    LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST  => 'Deep Linking',
                 ],
-                self::TITLE,
-            )
+            ],
+            self::TITLE,
         );
     }
 
@@ -104,12 +102,10 @@ class Controller extends Base
                     ->withPath($this->routeGenerator->generate('ltiPrototypePlatform.getDeepLinkingResponse')),
             );
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@ltiPrototypePlatform/generateMessage.twig',
-                ['message' => $message,],
-                self::TITLE,
-            )
+        $this->response = $this->responseFromTemplate(
+            '@ltiPrototypePlatform/generateMessage.twig',
+            ['message' => $message,],
+            self::TITLE,
         );
     }
 
@@ -127,20 +123,16 @@ class Controller extends Base
             $message = (new OidcAuthenticationRequestFactory(
                 $this->buildRegistrationRepository(),
                 new UserAuthenticator($this->userMapper)
-            ))->build($this->psr7Request);
-            $this->response->content->set(
-                $this->buildHtmlOutput(
-                    '@ltiPrototypePlatform/oidcAuthenticationRequest.twig',
-                    ['message' => $message,]
-                )
+            ))->build($this->request);
+            $this->response = $this->responseFromTemplate(
+                '@ltiPrototypePlatform/oidcAuthenticationRequest.twig',
+                ['message' => $message,]
             );
         } catch (LtiExceptionInterface $e) {
-            $this->response->content->set(
-                $this->buildHtmlOutput(
-                    '@ltiPrototypePlatform/oidcAuthenticationRequestException.twig',
-                    ['exception' => $e,],
-                    self::TITLE,
-                )
+            $this->response = $this->responseFromTemplate(
+                '@ltiPrototypePlatform/oidcAuthenticationRequestException.twig',
+                ['exception' => $e,],
+                self::TITLE,
             );
         }
     }
@@ -155,24 +147,22 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->psr7Request);
+        $result = (new ToolOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
 
         // Each content item should be a link, which may be launched as a resource link launch request.
         $contentItems  = $result->getPayload()->getDeepLinkingContentItems();
         $resourceLinks = (new ResourceCollectionFactory())->createFromClaim($contentItems);
 
         [$staffUsers, $studentUsers] = $this->buildUserLists();
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@ltiPrototypePlatform/deepLinkingResponse.twig',
-                [
-                    'result'        => $result,
-                    'staffUsers'    => $staffUsers,
-                    'studentUsers'  => $studentUsers,
-                    'resourceLinks' => $resourceLinks,
-                    'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-                ],
-            )
+        $this->response = $this->responseFromTemplate(
+            '@ltiPrototypePlatform/deepLinkingResponse.twig',
+            [
+                'result'        => $result,
+                'staffUsers'    => $staffUsers,
+                'studentUsers'  => $studentUsers,
+                'resourceLinks' => $resourceLinks,
+                'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+            ],
         );
     }
 

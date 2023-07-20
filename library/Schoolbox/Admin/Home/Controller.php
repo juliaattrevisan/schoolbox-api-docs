@@ -100,15 +100,12 @@ class Controller extends Base
         $configDismissUpgradeReminder->setValue($latestVersionMajor);
         $this->configMapper->save($configDismissUpgradeReminder);
 
-        $this->response->status->set(200);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'success'  => true,
-                    'messages' => []
-                ]
-            )
-        );
+        $this->response = $this->responseAsJson(
+            [
+                'success'  => true,
+                'messages' => []
+            ]
+        )->withStatus(200);
     }
 
     /**
@@ -169,42 +166,40 @@ class Controller extends Base
             $importLogs = $this->importLogMapper->status();
         }
 
-        $this->response->content->set(
-            array(
-                'template' => '@adminHome/index.twig',
-                'data' => array(
-                    'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
-                    'usageInGraph' => $usageInGraph,
-                    'showUpgradeReminder'  => $version->showUpgradeReminder(),
-                    'major_site_version'   => $version->getMajor(),
-                    'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
-                    'disk_used' => $disk_used,
+        $this->response = $this->responseFromTemplate(
+            '@adminHome/index.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
+                'usageInGraph' => $usageInGraph,
+                'showUpgradeReminder'  => $version->showUpgradeReminder(),
+                'major_site_version'   => $version->getMajor(),
+                'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
+                'disk_used' => $disk_used,
             //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
-                    'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
-                    'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
-                    'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
-                    'memory_total' => Alaress_Byte_Format::bytesToString($memory_total),
-                    'memory_percentage' => $memory_percentage,
-                    'memory_gradient' => $memory_gradient,
-                    'external_db' => ucfirst($this->getConfigLoader()->get('external_type')),
-                    'ldap_enabled' => $this->getConfigLoader()->get('ldap_enable'),
-                    'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
-                    'collabDocsEnabled' => $this->collabDocsEnabled(),
-                    'turnitinEnabled' => (new Helper($this->getConfigLoader()))->isConfigured(),
-                    'is_cloud'  => $this->isCloudHosted(),
-                    "hostnames" => $this->instanceHostnames(),
-                    'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
-                    'kami_enabled' => $this->getConfigLoader()->get('kami_enabled'),
+                'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
+                'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
+                'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
+                'memory_total' => Alaress_Byte_Format::bytesToString($memory_total),
+                'memory_percentage' => $memory_percentage,
+                'memory_gradient' => $memory_gradient,
+                'external_db' => ucfirst($this->getConfigLoader()->get('external_type')),
+                'ldap_enabled' => $this->getConfigLoader()->get('ldap_enable'),
+                'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
+                'collabDocsEnabled' => $this->collabDocsEnabled(),
+                'turnitinEnabled' => (new Helper($this->getConfigLoader()))->isConfigured(),
+                'is_cloud'  => $this->isCloudHosted(),
+                "hostnames" => $this->instanceHostnames(),
+                'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
+                'kami_enabled' => $this->getConfigLoader()->get('kami_enabled'),
 
-                    /* SUDS panel
-                     */
-                    'suds_import_data_enabled' => $sudsEnabled,
-                    'suds_import_logs' => $importLogs,
-                    'show_port_80_availability_check' => $this->getConfigLoader()->get('show_port_80_availability_check'),
-                    'show_saml_widget' => $this->shouldSamlWidgetBeShown(),
-                ),
-            )
+                /* SUDS panel
+                 */
+                'suds_import_data_enabled' => $sudsEnabled,
+                'suds_import_logs' => $importLogs,
+                'show_port_80_availability_check' => $this->getConfigLoader()->get('show_port_80_availability_check'),
+                'show_saml_widget' => $this->shouldSamlWidgetBeShown(),
+            ],
         );
     }
 
@@ -215,18 +210,16 @@ class Controller extends Base
      */
     public function getSslRenewalHelp(): void
     {
-        $this->response->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@adminHome/ssl-renewal-help.twig',
             [
-                'template' => '@adminHome/ssl-renewal-help.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
-                    'is_cloud'       => $this->isCloudHosted(),
-                    'api_url'        => $this->getConfigLoader()->get('schoolbox_api_url'),
-                    "hostnames"      => $this->instanceHostnames(),
-                    "primaryDomain"  => $this->getConfigLoader()->get('site_hostname') . '.' . $this->getConfigLoader()->get('site_domain'),
-                ],
-            ]
+                'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
+                'is_cloud'       => $this->isCloudHosted(),
+                'api_url'        => $this->getConfigLoader()->get('schoolbox_api_url'),
+                "hostnames"      => $this->instanceHostnames(),
+                "primaryDomain"  => $this->getConfigLoader()->get('site_hostname') . '.' . $this->getConfigLoader()->get('site_domain'),
+            ],
         );
     }
 
@@ -267,15 +260,13 @@ class Controller extends Base
             ];
         }
 
-        $this->response->content->set(
-            array(
-                'template' => '@adminHome/healthcheck.twig',
-                'data' => array(
-                    'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
-                    'output' => $output
-                )
-            )
+        $this->response = $this->responseFromTemplate(
+            '@adminHome/healthcheck.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
+                'output' => $output
+            ]
         );
     }
 
@@ -298,18 +289,16 @@ class Controller extends Base
             $enabledData = [];
         }
 
-        $this->response->content->set(
-            [
-                'template' => '@adminHome/disaster-recovery.twig',
-                'data'     => array_merge(
-                    [
-                        'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
-                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
-                        'enabled'        => $isEnabled,
-                    ],
-                    $enabledData
-                ),
-            ]
+        $this->response = $this->responseFromTemplate(
+            '@adminHome/disaster-recovery.twig',
+            array_merge(
+                [
+                    'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
+                    'enabled'        => $isEnabled,
+                ],
+                $enabledData
+            ),
         );
     }
 

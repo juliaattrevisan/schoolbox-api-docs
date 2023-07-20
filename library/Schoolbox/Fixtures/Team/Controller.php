@@ -112,11 +112,11 @@ class Controller extends AbstractController
         // Load coaches into entity
         $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesTeam/entity.twig', [
             'sport'    => $sport,
             'division' => $division,
             'team'     => $entity
-        ]));
+        ]);
     }
 
     /**
@@ -128,7 +128,7 @@ class Controller extends AbstractController
     public function getList($context = null)
     {
         // ajax a list of Teams for a particular Division
-        if (str_contains($this->psr7Request->getHeaderLine('accept'), 'application/json')) {
+        if (str_contains($this->request->getHeaderLine('accept'), 'application/json')) {
             $this->getJsonList($context);
         } else {
             $this->getHtmlList($context);
@@ -162,12 +162,12 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/create.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesTeam/create.twig', [
             'sport'    => $sport,
             'division' => $context,
             'team'     => $entity,
             'action'   => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        ]);
     }
 
     /**
@@ -192,7 +192,7 @@ class Controller extends AbstractController
             $entity
         );
 
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesDivision.getLobby', [
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('sportsfixturesDivision.getLobby', [
             'entityId' => $divisionId
         ]));
     }
@@ -304,7 +304,7 @@ class Controller extends AbstractController
 
             // Output a XHR data model + HTML output
             $dataModel = $this->getTeamTranslator()->translateTeam($team);
-            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/teamPlayerList.twig', $dataModel)->getAsString();
+            $dataModel['html'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/teamPlayerList.twig', $dataModel)->getBody()->getContents();
 
 
             /* this is stupid
@@ -315,15 +315,13 @@ class Controller extends AbstractController
             $divisionCollector->collectPlayers($team->getDivision());
             $divisionCollector->collectTeams($team->getDivision());
             $divisionLobby = $divisionTranslator->translateDivision($team->getDivision());
-            $dataModel['divisionLobby'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $divisionLobby)->getAsString();
+            $dataModel['divisionLobby'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $divisionLobby)->getBody()->getContents();
 
 
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($dataModel)
-            );
+            $this->response = $this->responseAsJson($dataModel);
         } else {
             // Redirect back to lobby
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(
                     'sportsfixturesDivision.getLobby',
                     ['entityId' => $team->getDivision()->getId()]
@@ -353,8 +351,8 @@ class Controller extends AbstractController
                 //empty query exit early
                 $problem = new ApiProblem('Empty Search');
                 $problem->setStatus(400);
-                $this->getResponse()->status->setCode(400);
-                return $this->getResponse()->content->set($this->buildJsonOutput($problem->asArray()));
+                $this->response = $this->responseAsJson($problem->asArray())->withStatus(400);
+                return;
             }
             $database = $this->getMapper()->getDatabase();
             $queryLike = "%{$database->getQuoter()->escapeForLike($query)}%";
@@ -418,7 +416,7 @@ class Controller extends AbstractController
             });
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($teams));
+        $this->response = $this->responseAsJson($teams);
     }
 
 
@@ -446,15 +444,13 @@ class Controller extends AbstractController
             ]
         );
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesTeam/list.twig',
-                [
-                    'sport'    => $sport,
-                    'division' => $context,
-                    'allTeams' => $allTeams,
-                ]
-            )
+        $this->response = $this->responseFromTemplate(
+            '@sportsfixturesTeam/list.twig',
+            [
+                'sport'    => $sport,
+                'division' => $context,
+                'allTeams' => $allTeams,
+            ]
         );
     }
 

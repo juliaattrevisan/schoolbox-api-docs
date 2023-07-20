@@ -33,13 +33,11 @@ class MyController extends \Alaress\Web\Controller\Base
 {
     public function myAction(): void
     {
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@myModule/template.twig',
-                $data,
-                $title,
-                $tab,
-            ),
+        $this->response = $this->responseFromTemplate(
+            '@myModule/template.twig',
+            $data,
+            $title,
+            $tab,
         );
     }
 }

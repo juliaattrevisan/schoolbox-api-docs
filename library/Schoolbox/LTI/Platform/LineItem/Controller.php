@@ -122,7 +122,7 @@ class Controller extends BaseController
             new AccessTokenRepository($this->accessTokenCache),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
-        $request = $resourceServerValidator->validateAuthenticatedRequest($this->psr7Request);
+        $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
 
         // Line item repository: consists only of a single assessment
         $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator);
@@ -136,8 +136,8 @@ class Controller extends BaseController
         );
 
         // Handle the request: this validates the request body
-        $handler = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
-        $server  = new ServiceServer($validator, $handler);
-        $this->populateResponseFromPsr7Response($server->handle($request));
+        $handler            = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
+        $server             = new ServiceServer($validator, $handler);
+        $this->response = $server->handle($request);
     }
 }

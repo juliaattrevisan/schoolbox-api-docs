@@ -75,7 +75,7 @@ class Controller extends Base
     public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
-        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->getServerParams()));
 
         $data = array_merge([
             'articles' => $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
@@ -85,7 +85,7 @@ class Controller extends Base
         ], $sidebar->generate());
 
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', $data)->setTitle('Requiring Moderation')->setTab('news'));
+        $this->response = $this->responseFromTemplate('@commsNewsModeration/index.twig', $data, 'Requiring Moderation', 'news');
     }
 
     /**
@@ -177,7 +177,7 @@ class Controller extends Base
             if ($this->isXhrRequest()) {
                 $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
             } else {
-                $this->getResponse()->redirect->to($route);
+                $this->response = $this->redirectFound($route);
             }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
@@ -251,7 +251,7 @@ class Controller extends Base
             if ($this->isXhrRequest()) {
                 $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
             } else {
-                $this->getResponse()->redirect->to($route);
+                $this->response = $this->redirectFound($route);
             }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
@@ -350,7 +350,6 @@ class Controller extends Base
             $data['redirect'] = $redirect;
         }
 
-        $this->getResponse()->status->set($httpCode);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->response = $this->responseAsJson($data)->withStatus($httpCode);
     }
 }

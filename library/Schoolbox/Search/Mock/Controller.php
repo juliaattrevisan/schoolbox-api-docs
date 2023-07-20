@@ -42,10 +42,8 @@ class Controller extends BaseController
      */
     public function getSearch(): void
     {
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $this->resultBuilder->generateResultList(random_int(0, 10))
-            )
+        $this->response = $this->responseAsJson(
+            $this->resultBuilder->generateResultList(random_int(0, 10))
         );
     }
 }

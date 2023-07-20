@@ -106,19 +106,17 @@ class Controller extends Base
             $queryArgs
         );
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessmentCalendar/index.twig',
-                [
-                    'user'        => $this->getUser(),
-                    'filterPanel' => $filterPanel,
-                    'termDates'   => $this->getAvailableTermDates(),
-                    'eventTypes'  => $this->eventTypeMapper->findAll(),
-                    'inContext'   =>  $inContext,
-                ],
-                'Assessment Calendar',
-                $pageTitle
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessmentCalendar/index.twig',
+            [
+                'user'        => $this->getUser(),
+                'filterPanel' => $filterPanel,
+                'termDates'   => $this->getAvailableTermDates(),
+                'eventTypes'  => $this->eventTypeMapper->findAll(),
+                'inContext'   =>  $inContext,
+            ],
+            'Assessment Calendar',
+            $pageTitle
         );
     }
 

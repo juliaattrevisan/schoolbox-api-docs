@@ -24,7 +24,6 @@ use function ini_set;
 
 class Controller extends Base
 {
-
     /**
      * @var Error\Mapper
      */
@@ -101,10 +100,10 @@ class Controller extends Base
 
         /* Presentation
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
+        $this->response = $this->responseFromTemplate('@helpHero/hero.twig', [
             'course' => $courseSpecification,
             'duration' => number_format($end - $start, 2),
             'aggregatedData' => $aggregatedData
-        ]));
+        ]);
     }
 }

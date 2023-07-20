@@ -82,21 +82,19 @@ class Controller extends Base
 
         // JSON response:
         // generate from JWT generator
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'token'        => $this->tokenBuilder->generate(
-                        $user,
-                        $userJwtId?->getExpiry(),
-                        $userJwtId?->getJwtId()
-                    ),
-                    'createdAt'    => $userJwtId?->getCreatedAt()->getShort(),
-                    'expiry'       => $userJwtId?->getExpiry()?->getShort(),
-                    'createdBy'    => $userJwtId?->getCreatedBy()->getFullName(),
-                    'jwtId'        => $userJwtId?->getJwtId(),
-                    'showExisting' => $showExisting,
-                ]
-            )
+        $this->response = $this->responseAsJson(
+            [
+                'token'        => $this->tokenBuilder->generate(
+                    $user,
+                    $userJwtId?->getExpiry(),
+                    $userJwtId?->getJwtId()
+                ),
+                'createdAt'    => $userJwtId?->getCreatedAt()->getShort(),
+                'expiry'       => $userJwtId?->getExpiry()?->getShort(),
+                'createdBy'    => $userJwtId?->getCreatedBy()->getFullName(),
+                'jwtId'        => $userJwtId?->getJwtId(),
+                'showExisting' => $showExisting,
+            ]
         );
     }
 
@@ -112,8 +110,6 @@ class Controller extends Base
         if ($jwtId) {
             $this->tokenMapper->deleteByColumn('jwt_id', $jwtId);
         }
-        $this->response->content->set(
-            $this->buildJsonOutput([])
-        );
+        $this->response = $this->responseAsJson([]);
     }
 }

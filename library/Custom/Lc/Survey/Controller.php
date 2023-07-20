@@ -76,13 +76,13 @@ class Controller extends Base
             $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds, 'backpack');
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@surveySnapshot/classSnapshot.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@surveySnapshot/classSnapshot.twig',
+            [
                 'folder' => $folder,
                 'surveys' => $surveys
             ]
-        ]);
+        );
     }
 
 

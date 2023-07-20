@@ -54,10 +54,9 @@ class Controller extends Base
      */
     public function getLogin($error = null, $page = null): void
     {
-
         // If you try to access the login screen but you are already logged in, just go home
         if ($this->getSession()->getAuthUser() instanceof User && $this->getSession()->getAuthUser()->getId()) {
-            $this->getResponse()->redirect->to('/');
+            $this->response = $this->redirectSeeOther('/');
         }
 
         $samlAuth = $this->requestQuery->get('samlAuth');
@@ -66,9 +65,9 @@ class Controller extends Base
 
         // Don't output login screen if XHR request
         if ($this->isJsonRequest() || $this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Unauthenticated']));
-            $this->getResponse()->headers->set('Unauthenticated', 401);
-            exit;
+            $this->response = $this->responseAsJson(['error' => 'Unauthenticated'])
+                                   ->withHeader('Unauthenticated', 401);
+            return;
         }
 
         // is SAML enabled?
@@ -85,7 +84,7 @@ class Controller extends Base
             if ($pageUri && $pageUri->isAbsolutePath()) {
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
             }
-            $this->getResponse()->redirect->to($redirectUrl, 303);
+            $this->response = $this->redirectSeeOther($redirectUrl);
             return;
         }
 
@@ -122,7 +121,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@login/login.twig', $data));
+        $this->response = $this->responseFromTemplateUnthemed('@login/login.twig', $data);
     }
 
 
@@ -187,10 +186,10 @@ class Controller extends Base
                         && $page !== '/login'
                         && $page !== '/login/'
                     ) {
-                        $page = rawurldecode($page);
-                        $this->getResponse()->redirect->to($page, 303);
+                        $page           = rawurldecode($page);
+                        $this->response = $this->redirectSeeOther($page);
                     } else {
-                        $this->getResponse()->redirect->to('/', 303);
+                        $this->response = $this->redirectSeeOther('/');
                     }
                 } else {
                     //get rid of session started earlier to stop it conflicting with next login

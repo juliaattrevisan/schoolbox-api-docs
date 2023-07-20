@@ -102,13 +102,13 @@ class Controller extends Base
     {
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
-            $this->getResponse()->redirect->to($this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', [
+            $this->response = $this->redirectFound($this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', [
                 'studentId' => $this->getUser()->getId(),
             ]));
         }
 
         // If no staff explicitly requested, redirect to current user
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('learning.getPendingAssessmentsForUser', [
+        $this->response = $this->redirectFound($this->routeGenerator->generate('learning.getPendingAssessmentsForUser', [
             'userId' => $this->getUser()->getId(),
             'viewee' => $this->getUser(),
         ]));
@@ -143,12 +143,10 @@ class Controller extends Base
             $title .= " for {$viewee->getFullName()}";
         }
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
+        $this->response = $this->responseFromTemplate('@learning/pendingAssessmentsOuter.twig', [
                 'viewee'      => $viewee,
                 'filterPanel' => $filterPanel,
-            ])->setTab('submission')->setTitle($title)
-        );
+            ], $title, 'submission');
     }
 
     /**
@@ -174,10 +172,10 @@ class Controller extends Base
             $postFilterSelections = $this->requestPost['filter_selection'] ?: [];
             $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $viewee, $postFilterSelections);
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 'status'  => 200,
                 'content' => $content,
-            ]));
+            ]);
         } catch (Exception $e) {
             // TODO - can remove this block when we abandon PHP 5 support
             $this->returnJsonError($e);
@@ -264,14 +262,14 @@ class Controller extends Base
         }
         $assessmentsToChase->sortBy('dueAt', 'asc', null, true);
 
-        return $this->buildUnthemedHtmlOutput('@learning/pendingAssessmentsContent.twig', [
+        return $this->responseFromTemplateUnthemed('@learning/pendingAssessmentsContent.twig', [
             'statistics'                => $assessmentStatistics,
             'totalAssessmentsToMark'    => $totalAssessmentsToMark,
             'totalAssessmentsToChase'   => $totalAssessmentsToChase,
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
-        ])->getAsString();
+        ])->getBody()->getContents();
     }
 
     /**
@@ -281,13 +279,13 @@ class Controller extends Base
      */
     protected function returnJsonError(Throwable $e): void
     {
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->response = $this->responseAsJson([
             'status'  => 500,
             'code'    => $e->getCode(),
             'message' => $e->getMessage(),
             'line'    => $e->getLine(),
             'file'    => $e->getFile(),
-        ]));
+        ]);
     }
 
     /**
@@ -334,7 +332,7 @@ class Controller extends Base
             'hideTimetable' => $hideTimetable,
         ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData)->setTab('classes'));
+        $this->response = $this->responseFromTemplate('@learning/classes.twig', $gridData, '', 'classes');
     }
 
     /**
@@ -359,7 +357,7 @@ class Controller extends Base
             $this->rosettaStone
         ))->getStudentLists();
 
-        $this->getResponse()->content->set($this->buildJsonOutput($students));
+        $this->response = $this->responseAsJson($students);
     }
 
     /**
@@ -367,8 +365,7 @@ class Controller extends Base
      */
     public function getClassListPage(Folder\Model $folder): void
     {
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learning/classLists.twig', [
+        $this->response = $this->responseFromTemplate('@learning/classLists.twig', [
                 'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess(),
@@ -382,8 +379,7 @@ class Controller extends Base
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
-            ])->setTab('classes')->setTitle($folder->getName())
-        );
+            ], $folder->getName(), 'classes');
     }
 
     /**

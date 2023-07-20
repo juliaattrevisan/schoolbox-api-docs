@@ -119,10 +119,10 @@ class Controller extends AbstractController
     {
         $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/entity.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesDivision/entity.twig', [
             'sport'    => $sport,
             'division' => $entity
-        ]));
+        ]);
     }
 
     /**
@@ -139,10 +139,10 @@ class Controller extends AbstractController
                 ]
             ]);
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/list.twig', [
+            $this->response = $this->responseFromTemplate('@sportsfixturesDivision/list.twig', [
                 'sport'        => $context,
                 'allDivisions' => $allDivisions
-            ]));
+            ]);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
@@ -160,12 +160,12 @@ class Controller extends AbstractController
         }
         $entity->setSport($context);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/create.twig', [
+        $this->response = $this->responseFromTemplate('@sportsfixturesDivision/create.twig', [
             'division' => $entity,
             'sport'    => $context,
             'action'   => $entity->getId() ? 'Modify' : 'Create',
-            'referer'  => base64_encode($this->psr7Request->getHeaderLine('Referer'))
-        ]));
+            'referer'  => base64_encode($this->request->getHeaderLine('Referer'))
+        ]);
     }
 
     /**
@@ -193,18 +193,14 @@ class Controller extends AbstractController
 
         if ($this->isXhrRequest()) {
             // Output as XHR data model
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($dataModel)
-            );
+            $this->response = $this->responseAsJson($dataModel);
         } else {
             // Create file upload zone
             $zone = new Zone("uploadZone");
             $zone->setAttachPrompt('upload a list of players');
             $dataModel['user']       = $this->getUser();
             $dataModel['uploadZone'] = $zone;
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
-            );
+            $this->response = $this->responseFromTemplate('@sportsfixturesDivision/lobby.twig', $dataModel);
         }
     }
 
@@ -228,7 +224,7 @@ class Controller extends AbstractController
                 ]);
             }
 
-            $this->getResponse()->redirect->afterPost($return);
+            $this->response = $this->redirectAfterPost($return);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
@@ -347,7 +343,7 @@ class Controller extends AbstractController
                 'division_id' => $division->getId(),
             ])
         );
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'sportsfixturesDivision.getLobby',
                 ['entityId' => $division->getId(),]
@@ -450,7 +446,7 @@ class Controller extends AbstractController
 
         // Return to lobby
 
-        $this->getResponse()->redirect->afterPost(
+        $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate(
                 'sportsfixturesDivision.getLobby',
                 ['entityId' => $entityId]
@@ -493,13 +489,11 @@ class Controller extends AbstractController
             $dataModel = $this->getDivisionTranslator()->translateDivision($division);
 
             $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
-            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($dataModel)
-            );
+            $dataModel['html'] = $this->responseFromTemplateUnthemed('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getBody()->getContents();
+            $this->response = $this->responseAsJson($dataModel);
         } else {
             // Redirect back to lobby
-            $this->getResponse()->redirect->afterPost(
+            $this->response = $this->redirectAfterPost(
                 $this->routeGenerator->generate(
                     'sportsfixturesDivision.getLobby',
                     ['entityId' => $division->getId(),]

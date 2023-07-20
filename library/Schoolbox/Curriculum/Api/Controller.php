@@ -107,7 +107,7 @@ class Controller extends Base
             )
         );
 
-        $this->response->content->set($this->buildJsonOutput($translatedResults));
+        $this->response = $this->responseAsJson($translatedResults);
     }
 
     /**
@@ -123,19 +123,17 @@ class Controller extends Base
             'parent',
             'children',
         );
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $tree->map(
-                    new ModelToArray(
-                        $this->routeGenerator,
-                        $this->authorizer,
-                        $this->getUser(),
-                        0,
-                        self::MAX_DESCENDANTS,
-                        null,
-                    )
+        $this->response = $this->responseAsJson(
+            $tree->map(
+                new ModelToArray(
+                    $this->routeGenerator,
+                    $this->authorizer,
+                    $this->getUser(),
+                    0,
+                    self::MAX_DESCENDANTS,
+                    null,
                 )
-            ),
+            )
         );
     }
 
@@ -202,8 +200,7 @@ class Controller extends Base
     public function deleteNode(Node\Model $node): void
     {
         $this->nodeMapper->delete($node);
-        /** @noinspection PhpUnhandledExceptionInspection - this can't throw an invalid with a 204 */
-        $this->response->status->setCode(204);
+        $this->response = $this->responseEmpty(204);
     }
 
     /**
@@ -217,7 +214,7 @@ class Controller extends Base
      */
     private function persistNode(?Node\Model $previous): Node\Model
     {
-        $data          = $this->psr7Request->getParsedBody();
+        $data          = $this->request->getParsedBody();
         $translator    = new ArrayToModel();
         $persistedNode = $translator($data, $previous);
         $this->nodeMapper->save($persistedNode);
@@ -237,7 +234,7 @@ class Controller extends Base
         $childNodes = $node->getChildren();
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
-        $translator = new ModelToArray(
+        $translator     = new ModelToArray(
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
@@ -245,9 +242,7 @@ class Controller extends Base
             $descendantCount,
             $this->counter->findUsageCounts($this->extractIdsFromNode($node)),
         );
-        $this->response->content->set(
-            $this->buildJsonOutput($translator($node))
-        );
+        $this->response = $this->responseAsJson($translator($node));
     }
 
     /**

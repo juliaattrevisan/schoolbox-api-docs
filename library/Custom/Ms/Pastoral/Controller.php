@@ -47,11 +47,11 @@ class Controller extends Base
 
         if (empty($reportYears)) {
             // 404
-            $this->response->status->setCode(404);
+            $this->response = $this->responseEmpty(404);
         } else {
             // Redirect to current year, or last year in report
             $lastReportYear = max($reportYears);
-            $this->response->redirect->found(
+            $this->response = $this->redirectFound(
                 $this->routeGenerator->generate(
                     'customMeridenPastoral.index',
                     array(
@@ -73,15 +73,13 @@ class Controller extends Base
     {
         try {
             $report = $this->buildReportData($year, $student);
-            $this->response->content->set(
-                [
-                    'template' => $report['template'],
-                    'data'     => $report,
-                    'title'    => 'School Report - ' . $year . ' - ' . $student->formatName()
-                ]
+            $this->response = $this->responseFromTemplate(
+                $report['template'],
+                $report,
+                'School Report - ' . $year . ' - ' . $student->formatName(),
             );
         } catch (RangeException $e) {
-            $this->response->status->setCode(404);
+            $this->response = $this->responseEmpty(404);
         }
     }
 
@@ -101,7 +99,7 @@ class Controller extends Base
         try {
             $baseReportData = $this->buildReportData($year, $student);
         } catch (RangeException $e) {
-            $this->response->status->setCode(404);
+            $this->response = $this->responseEmpty(404);
             return;
         }
 
@@ -120,15 +118,13 @@ class Controller extends Base
             }
         }
 
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@customMeridenPastoral/printableReport.twig',
-                [
-                    'baseReport'     => $baseReportData,
-                    'subjectReports' => $subjectReportDataList,
-                ],
-                'School Report - ' . $year . ' - ' . $student->formatName()
-            )
+        $this->response = $this->responseFromTemplate(
+            '@customMeridenPastoral/printableReport.twig',
+            [
+                'baseReport'     => $baseReportData,
+                'subjectReports' => $subjectReportDataList,
+            ],
+            'School Report - ' . $year . ' - ' . $student->formatName()
         );
     }
 
@@ -146,16 +142,14 @@ class Controller extends Base
             $reportData = $this->buildReportData($year, $student, $subjectCode);
 
             /** @var Subject\Base $subjectReport */
-            $subjectReport = $reportData['report']['subjectReport'];
-            $this->response->content->set(
-                [
-                    'template' => $reportData['template'],
-                    'data'     => $reportData,
-                    'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
-                ]
+            $subjectReport      = $reportData['report']['subjectReport'];
+            $this->response = $this->responseFromTemplate(
+                $reportData['template'],
+                $reportData,
+                $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
             );
         } catch (RangeException $e) {
-            $this->response->status->setCode(404);
+            $this->response = $this->responseEmpty(404);
         }
     }
 

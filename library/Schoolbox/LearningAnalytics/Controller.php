@@ -68,7 +68,7 @@ class Controller extends Base
         $currentTerm = $this->termMapper->findForToday();
 
         $data = ['courseSpecId' => $courseSpecId, 'termCode' => $currentTerm->getCode()];
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.courseWithTerm', $data));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('learningAnalytics.courseWithTerm', $data));
     }
 
 
@@ -121,7 +121,7 @@ class Controller extends Base
             'submissionTypeId' => $submissionTypeId,
             'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.courseWithSubmissionTypeAndTerm', $data));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('learningAnalytics.courseWithSubmissionTypeAndTerm', $data));
     }
 
 
@@ -178,7 +178,7 @@ class Controller extends Base
             'folderId'     => $folderId,
             'termCode'     => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.folderWithTerm', $data));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('learningAnalytics.folderWithTerm', $data));
     }
 
 
@@ -236,7 +236,7 @@ class Controller extends Base
             'submissionTypeId' => $submissionTypeId,
             'termCode'         => $currentTerm->getCode(),
         ];
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('learningAnalytics.folderWithSubmissionTypeAndTerm', $data));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('learningAnalytics.folderWithSubmissionTypeAndTerm', $data));
     }
 
 
@@ -418,9 +418,9 @@ class Controller extends Base
             'termsWithResults'    => $termsWithResults,
         ];
 
-        $this->getResponse()->content->set([
-            'template' => '@learningAnalytics/course.twig',
-            'data'     => $data,
-        ]);
+        $this->response = $this->responseFromTemplate(
+            '@learningAnalytics/course.twig',
+            $data,
+        );
     }
 }

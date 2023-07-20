@@ -37,8 +37,7 @@ class Controller extends Base
             $problem = (new ApiProblem('Assessment not found, ID must be a number'))
                 ->setStatus(404)
                 ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->response = $this->responseAsJson($problem)->withStatus(404);
             return;
         }
 
@@ -49,19 +48,14 @@ class Controller extends Base
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(404)
                 ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->response = $this->responseAsJson($problem)->withStatus(404);
             return;
         }
 
         /**
          * build the whole thing
          */
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->response = $this->responseAsJson($output);
     }
 
     /**
@@ -87,8 +81,7 @@ class Controller extends Base
             $problem = (new ApiProblem('Filter must not be blank'))
                 ->setStatus(401)
                 ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            $this->response = $this->responseAsJson($problem)->withStatus(401);
             return; //exit early there is a malformed keyword for search
         }
 
@@ -105,16 +98,14 @@ class Controller extends Base
          * now we have the user id's that match the search result, create the standard user array with hydration.
          */
 
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'data'  =>  $output,
-                    'metadata'  => [
-                        'count' => $count,
-                        'cursor' => end($output)['id'] ?? null
-                    ]
+        $this->response = $this->responseAsJson(
+            [
+                'data'  =>  $output,
+                'metadata'  => [
+                    'count' => $count,
+                    'cursor' => end($output)['id'] ?? null
                 ]
-            )
+            ]
         );
     }
 }

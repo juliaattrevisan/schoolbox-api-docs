@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Web\Response\Factory;
 use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Resource\Folder;
@@ -36,7 +37,15 @@ $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     $_SESSION['user'],
     $this->getLocalisedTerm('resource', true, true)
 );
-/** @var Alaress\Web\Output\Html $twigRenderer */
-$twigRenderer = $this->getDi()->get('webOutput:nochrome');
-$this->setVar('JS_NODE_TYPE_ICON_MAP', $twigRenderer->setData([DebugTwig::DEBUG_WRAP => false])->setTemplate('@resourceBrowser/jsNodeIconMap.twig')->getAsString());
+
+/** @var Factory $responseFactory */
+$responseFactory = $this->getDi()->get('httpResponseFactory');
+$this->setVar(
+    'JS_NODE_TYPE_ICON_MAP',
+    $responseFactory->buildUnthemedHtml(
+        '@resourceBrowser/jsNodeIconMap.twig',
+        [DebugTwig::DEBUG_WRAP => false],
+        $_SESSION['user'],
+    )->getBody()->getContents()
+);
 $this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));

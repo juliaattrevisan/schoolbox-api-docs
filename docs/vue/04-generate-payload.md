@@ -34,9 +34,12 @@ This is going to produce a lot of data that frontend doesn't actually need. We c
             ];
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/container.twig', [
-            'data' => $data
-        ]));
+        $this->response = $this->responseFromTemplate(
+            '@greenhouse/container.twig',
+            [
+                'data' => $data
+            ]
+        );
     }
 ```
 

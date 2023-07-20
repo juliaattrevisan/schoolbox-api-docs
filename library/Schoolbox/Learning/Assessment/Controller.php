@@ -173,10 +173,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]
         );
         $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => '']);
-        $content    = $this->buildUnthemedHtmlOutput('@learningAssessment/seb.twig', [
+        $content    = $this->responseFromTemplateUnthemed('@learningAssessment/seb.twig', [
             'url' => $defaultUrl,
         ]);
-        $this->getResponse()->content->set($content);
+        $this->response = $content;
     }
 
 
@@ -290,14 +290,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  */
                 if ('' === trim((string)$this->requestQuery->get('part-1'))) {
                     if ($this->isXhrRequest()) {
-                        $content = $this->buildUnthemedHtmlOutput(sprintf(
+                        $content = $this->responseFromTemplateUnthemed(sprintf(
                             '@learningAssessment/%s/selectionContainer.twig',
                             AssessmentType::TYPE_LESSON_PLAN
                         ), $data);
                     } else {
                         /* TODO where is this even used
                          */
-                        $content = $this->buildHtmlOutput(sprintf(
+                        $content = $this->responseFromTemplate(sprintf(
                             '@learningAssessment/%s/selectionContainer.twig',
                             AssessmentType::TYPE_LESSON_PLAN
                         ), $data);
@@ -306,12 +306,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     $data['lessonPlanMeta']['mageAsync'] = true;
 
                     if ($this->isXhrRequest()) {
-                        $content = $this->buildUnthemedHtmlOutput(sprintf(
+                        $content = $this->responseFromTemplateUnthemed(sprintf(
                             '@learningAssessment/%s/selection.twig',
                             AssessmentType::TYPE_LESSON_PLAN
                         ), $data);
                     } else {
-                        $content = $this->buildHtmlOutput(sprintf(
+                        $content = $this->responseFromTemplate(sprintf(
                             '@learningAssessment/%s/selection.twig',
                             AssessmentType::TYPE_LESSON_PLAN
                         ), $data);
@@ -330,24 +330,24 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $data['lessonPlanMeta']['fields'] = $lessonPlanTemplate->getFields();
 
                 if ($this->isXhrRequest()) {
-                    $content = $this->buildUnthemedHtmlOutput(sprintf(
+                    $content = $this->responseFromTemplateUnthemed(sprintf(
                         "@learningAssessment/%s/create.twig",
                         AssessmentType::TYPE_LESSON_PLAN
                     ), $data);
                 } else {
-                    $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
+                    $content = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
                 }
             }
         } else {
             // either output the fragment to the mage, or use the synchronous form
             if ($this->isXhrRequest()) {
-                $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
+                $content = $this->responseFromTemplateUnthemed("@learningAssessment/$type/create.twig", $data);
             } else {
-                $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
+                $content = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
             }
         }
 
-        $this->getResponse()->content->set($content);
+        $this->response = $content;
     }
 
 
@@ -415,7 +415,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/update.twig", $data));
+        $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
 
 
@@ -505,14 +505,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $unitProjects->offsetSet($unitSpec->getId(), $projects);
             }
         }
-        $this->getResponse()->content->set($this->buildContent(
+        $this->response = $this->responseDependentOnRequest(
             '@learningAssessment/fragments/assessmentLocationList.twig',
             [
                 'units'        => $allUnitSpecs,
                 'unitProjects' => $unitProjects,
                 'current'      => $assessment->getContext()->getLocationId()
             ]
-        ));
+        );
     }
 
 
@@ -583,9 +583,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([
+            $this->response = $this->responseAsJson([
                 Redirect::RETURN_URL => $returnUrl
-            ]));
+            ]);
         } else {
             $this->redirect($returnUrl);
         }

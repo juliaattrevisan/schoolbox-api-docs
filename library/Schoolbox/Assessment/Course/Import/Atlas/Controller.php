@@ -68,23 +68,21 @@ class Controller extends BaseController
     public function getImport(): void
     {
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ?? $this->getSession()->getHistory();
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@courseImportAtlas/import.twig',
-                [
-                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
-                    'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
-                    'returnUrl'              => [
-                        'key'   => Redirect::RETURN_URL,
-                        'value' => [
-                            'raw'     => Redirect::decode($returnUrl),
-                            'encoded' => $returnUrl,
-                        ],
+        $this->response = $this->responseFromTemplate(
+            '@courseImportAtlas/import.twig',
+            [
+                'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
+                'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                'returnUrl'              => [
+                    'key'   => Redirect::RETURN_URL,
+                    'value' => [
+                        'raw'     => Redirect::decode($returnUrl),
+                        'encoded' => $returnUrl,
                     ],
                 ],
-                'Atlas Import',
-                'course'
-            )
+            ],
+            'Atlas Import',
+            'course'
         );
     }
 
@@ -96,7 +94,7 @@ class Controller extends BaseController
      */
     public function getCurriculumList(): void
     {
-        $this->getResponse()->content->set($this->buildJsonOutput($this->apiBridge->getCurriculumList()));
+        $this->response = $this->responseAsJson($this->apiBridge->getCurriculumList());
     }
 
 
@@ -108,10 +106,8 @@ class Controller extends BaseController
      */
     public function getCurriculum(int $curriculumId): void
     {
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                $this->apiBridge->getCurriculum($curriculumId, Module::ENABLE_ATTACHMENT_IMPORT)
-            )
+        $this->response = $this->responseAsJson(
+            $this->apiBridge->getCurriculum($curriculumId, Module::ENABLE_ATTACHMENT_IMPORT)
         );
     }
 
@@ -165,16 +161,14 @@ class Controller extends BaseController
 
         $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-1']);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@courseImportAtlas/import/plan.twig',
-                [
-                    'curriculum'             => $curriculumPlan,
-                    'previousPost'           => $previousPost,
-                    'attachmentDefaults'     => $this->importer->buildDefaultSettingsForAttachments($curriculumPlan),
-                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
-                ]
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@courseImportAtlas/import/plan.twig',
+            [
+                'curriculum'             => $curriculumPlan,
+                'previousPost'           => $previousPost,
+                'attachmentDefaults'     => $this->importer->buildDefaultSettingsForAttachments($curriculumPlan),
+                'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
+            ]
         );
     }
 
@@ -209,16 +203,14 @@ class Controller extends BaseController
 
         $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-2']);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@courseImportAtlas/import/facultySelector.twig',
-                [
-                    'curriculum'             => $curriculumPlan,
-                    'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
-                    'previousPost'           => $previousPost,
-                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
-                ]
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@courseImportAtlas/import/facultySelector.twig',
+            [
+                'curriculum'             => $curriculumPlan,
+                'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                'previousPost'           => $previousPost,
+                'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
+            ]
         );
     }
 
@@ -267,16 +259,10 @@ class Controller extends BaseController
                 $baseFolder,
                 $unit
             );
-            $this->response->content->set($this->buildJsonOutput([]));
-            // SHUP.
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(204);
+            $this->response = $this->responseAsJson([])->withStatus(204);
         } catch (SchoolboxException $e) {
             if ($this->isXhrRequest()) {
-                $this->response->status->set(400);
-                $this->response->content->set(
-                    $this->buildJsonOutput($e->getMessage())
-                );
+                $this->response = $this->responseAsJson($e->getMessage())->withStatus(400);
             } else {
                 throw $e;
             }
@@ -289,11 +275,8 @@ class Controller extends BaseController
      */
     private function throwNotSelectedError(string $message): void
     {
-        // SHUP.
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode(400);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
+        $this->response = $this
+            ->responseFromTemplateUnthemed(
                 'sub/mage-error.twig',
                 [
                     'error' => [
@@ -301,7 +284,7 @@ class Controller extends BaseController
                     ],
                 ]
             )
-        );
+            ->withStatus(400);
     }
 
 
@@ -328,11 +311,8 @@ class Controller extends BaseController
         }
 
 
-        // SHUP.
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode($e->getCode() ?: 400);
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
+        $this->response = $this
+            ->responseFromTemplateUnthemed(
                 'sub/mage-error.twig',
                 [
                     'error' => [
@@ -340,6 +320,6 @@ class Controller extends BaseController
                     ],
                 ]
             )
-        );
+            ->withStatus($e->getCode() ?: 400);
     }
 }

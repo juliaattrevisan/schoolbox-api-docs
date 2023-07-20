@@ -17,14 +17,13 @@ use Alaress\Csrf;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Registry;
-use Alaress\Web\Output\Json;
-use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Alaress\Web\Response\Factory;
+use Alaress\Web\Response\Outputter;
 use Aura\Di\Container;
 use Aura\Router\Route;
 use Aura\Router\RouterContainer;
-use Aura\Web\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 use RuntimeException;
@@ -94,7 +93,6 @@ class Kernel extends WebKernelAbstract
      * Execute the main script
      *
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      */
@@ -102,7 +100,7 @@ class Kernel extends WebKernelAbstract
     {
         // First get the request object
         /** @var ServerRequestInterface $request */
-        $request = $this->di->get('request');
+        $request = $this->di->get('httpRequest');
 
         // Run router with requested path (trim trailing /)
         $server  = $request->getServerParams();
@@ -152,9 +150,7 @@ class Kernel extends WebKernelAbstract
             $uri = (new Uri($path))->appendQueryParameters($queryParams);
 
             // Start constructing a response
-            /** @var Response $response */
-            $response = $this->di->get('webFactory')->newResponse();
-            $code     = 401;
+            $code = 401;
 
             // Request was JSON: just let outputError build an ApiProblem response
             if ((new IsJson())->isSatisfiedBy($request)) {
@@ -162,47 +158,45 @@ class Kernel extends WebKernelAbstract
                 return;
             }
 
+            /** @var Factory $responseFactory */
+            $responseFactory = $this->di->get('httpResponseFactory');
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
                 // In fact, get rid of IsXhr completely: modern HTTP clients don't set X-Requested-With
-                $response->status->setCode($code);
-                $response->content->set([
-                    'format' => 'json',
-                    'data'   => ['error' => 'Unauthenticated'],
-                ]);
-                $output = $this->di->get("webOutput:json");
+                $psr7Response = $responseFactory
+                    ->buildJson(['error' => 'Unauthenticated'])
+                    ->withStatus($code);
             } else {
                 /** @var \Alaress\Session\Session $session */
                 $session = $this->di->get('session');
                 $session
                     ->getSegment(LoginController::class)
                     ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
-                $output = $this->di->get("webOutput:noContent");
-                $response->redirect->to($router->getGenerator()->generate('login.getLogin') . '?page=' . urlencode($uri));
+                $psr7Response = $responseFactory->buildRedirect(
+                    $router->getGenerator()->generate('login.getLogin') . '?page=' . urlencode($uri)
+                );
             }
-            $output->output($response);
+            (new Outputter())->output($psr7Response);
         } catch (\Schoolbox\Mapper\Exception\NotFound | Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
             // Output something plain
-            /** @var Response $response */
-            $response = $this->di->get('webFactory')->newResponse();
-            $code     = $e instanceof Deleted ? 410 : 404;
+            $code = $e instanceof Deleted ? 410 : 404;
             if ((new IsJson())->isSatisfiedBy($request)) {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
                 return;
             }
 
+            /** @var Factory $responseFactory */
+            $responseFactory = $this->di->get('httpResponseFactory');
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
-                $response->status->setCode($code);
-                $response->content->set([
-                    'format' => 'json',
-                    'data'   => ['error' => $e->getMessage()],
-                ]);
-                $output = $this->di->get("webOutput:json");
-                $output->output($response);
+                (new Outputter())->output(
+                    $responseFactory
+                        ->buildJson(['error' => 'Unauthenticated'])
+                        ->withStatus($code)
+                );
             } else {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
             }
@@ -241,7 +235,6 @@ class Kernel extends WebKernelAbstract
      * @param User|null $authHeaderUser A user from the `Authorization` header,
      *                                  if provided and valid.
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      * @throws Throwable
@@ -305,14 +298,6 @@ class Kernel extends WebKernelAbstract
         );
         unset($module);
 
-//        // now the preloading is done initialise the controller
-//        $module->initControllers($this->di);
-//        unset($module);
-//
-//        // TODO replace with a create controller method
-//        /** @var \Alaress\Web\Controller\Base $controller */
-//        $controller = $this->di->get('controller:' . $controllerName);
-
         // The user is now injected directly into the controller, instead of the
         // user being loaded from the session within the controller.
         $controller->setUser($user);
@@ -360,41 +345,28 @@ class Kernel extends WebKernelAbstract
         }
 
         $method->invokeArgs($controller, $args);
-        $response = $controller->getResponse();
-        $output   = $response->content->get();
-        if (!$output instanceof OutputInterface) {
-            if (is_array($output)) {
-                // Figure out output type.
-                // In order of preference, output type is:
-                // * set in the response content
-                // * set in route
-                // * default to 'html'
-                $format = $output['format'] ?? null;
-                if (empty($format)) {
-                    // Strip leading . from format
-                    $format = preg_replace('/^\\./', '', $params['format'] ?? '');
-                    if (empty($format)) {
-                        $format = 'html';
-                    }
-                }
-                // Create a different output type (Sitepage, JSON, whatever) based on a
-                // route param, defaulting to HTML
-                $output = $this->di->get("webOutput:$format");
-            } elseif (null === $output) {
-                $output = $this->di->get("webOutput:noContent");
-            } else {
-                // Maybe it has a __toString method, or it IS actually a string.
-                // Ram it into the base output type.
-                $output = $this->di->get("webOutput:base");
-            }
+
+        // Process the response, using a blank one if there is none.
+        $psr7Response = $controller->getResponse();
+        if ($psr7Response) {
+            $redirect = $psr7Response->getHeader('location');
+            $isJson   = str_contains($psr7Response->getHeaderLine('content-type'), 'application/json');
+        } else {
+            trigger_error(
+                sprintf(
+                    'Controller action `%s::%s` returned no response: falling back to empty response',
+                    $controller::class,
+                    $action,
+                ),
+                E_USER_WARNING,
+            );
+            $psr7Response = $controller->getResponseFactory()->createResponse();
+            $redirect     = false;
+            $isJson       = false;
         }
 
         // Post-processing: if this is a HTML request and not a redirect,
         // store this request in history.
-        $isXhr                = $controller->isXhrRequest();
-        $redirect             = $controller->getResponse()->headers->get('location');
-        $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
-        $isJson               = $output instanceof Json;
 
         /* Push the current url into the session history stack
          * pushHistory() is a more recent version of saveHistory() which exists in sitepage
@@ -404,19 +376,51 @@ class Kernel extends WebKernelAbstract
          * redirects should not be in the history
          * controllers instantiated with "$allowBackToTheFuture = false" should not be in the history
          * json output should not be in the history
-         *
-         * Note that storm will tell you $isJson is always false; this is a bit misleading.
-         * It's because storm can't statically interpret:
-         *
-         * $output = $this->di->get("webOutput:$format");
-         *
-         * ...to potentially overwrite $output into a new var somewhat pseudo-polymorphically
          */
-        if ($session && !($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
+        if (
+            $session && !(
+                $controller->isXhrRequest()
+                || $redirect
+                || !$controller->getAllowBackToTheFuture()
+                || $isJson
+            )
+        ) {
             $session->pushHistory($_SERVER['REQUEST_URI']);
         }
 
-        $output->output($response);
+        // Output whatever kind of response we have
+        /** @var Outputter $outputter */
+        $outputter = $this->di->get('httpResponseOutputter');
+        $outputter->output($psr7Response);
+
+        // Output post-output callbacks
+        $postOutputCallbacks = $controller->getPostOutputCallbacks();
+        if (count($postOutputCallbacks)) {
+            // Earlier implementations used to buffer output so that
+            // "Content-Length" could be set.
+            // I don't think this is necessary; at least I've seen no difference
+            // if it's enabled or not.
+//            header('Content-Encoding: none');
+//            header("Content-Length: " . strlen($output));
+
+            // Finish the request
+            fastcgi_finish_request();
+
+            // Allow the process however long it needs to finish:
+            // 30 minutes should be more than enough.
+            set_time_limit(60 * 30);
+
+            // Callbacks
+            foreach ($postOutputCallbacks as $callback) {
+                if (is_callable($callback)) {
+                    $callback();
+                }
+            }
+
+            // Close session once done
+            // (actions in post-output may require session data)
+            session_write_close();
+        }
     }
 
 

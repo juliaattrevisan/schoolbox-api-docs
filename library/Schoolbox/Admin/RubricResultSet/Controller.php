@@ -42,16 +42,14 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@adminRubricResultSet/index.twig',
             [
-                'template' => '@adminRubricResultSet/index.twig',
-                'data'     => [
-                    'pageCurrent'          => $this->routeGenerator->generate('adminRubricResultSet.getList'),
-                    'rubricsByResultSetId' => $this->mapper->findSets(),
-                    'allBreadcrumbs'       => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
-                    )
-                ]
+                'pageCurrent'          => $this->routeGenerator->generate('adminRubricResultSet.getList'),
+                'rubricsByResultSetId' => $this->mapper->findSets(),
+                'allBreadcrumbs'       => (
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
+                )
             ]
         );
     }
@@ -98,19 +96,17 @@ class Controller extends Base
      */
     public function getUpdate(?int $resultSetId): void
     {
-        $this->getResponse()->content->set(
+        $this->response = $this->responseFromTemplate(
+            '@adminRubricResultSet/create.twig',
             [
-                'template' => '@adminRubricResultSet/create.twig',
-                'data'     => [
-                    'maxCharsPerLabel'    => self::MAX_CHARS_PER_LABEL,
-                    'maxRowsPerResultSet' => self::MAX_ROWS_PER_RESULT_SET,
-                    'pageCurrent'         => $this->routeGenerator->generate('adminRubricResultSet.getList'),
-                    'resultSetId'         => $resultSetId,
-                    'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRows($resultSetId)),
-                    'allBreadcrumbs'      => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
-                    )
-                ]
+                'maxCharsPerLabel'    => self::MAX_CHARS_PER_LABEL,
+                'maxRowsPerResultSet' => self::MAX_ROWS_PER_RESULT_SET,
+                'pageCurrent'         => $this->routeGenerator->generate('adminRubricResultSet.getList'),
+                'resultSetId'         => $resultSetId,
+                'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRows($resultSetId)),
+                'allBreadcrumbs'      => (
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
+                )
             ]
         );
     }
@@ -137,6 +133,6 @@ class Controller extends Base
 
         $this->mapper->saveSet($resultSetId, $indexedLabels); // If $resultSetId is null, a new set will be created.
 
-        $this->getResponse()->redirect->to($this->routeGenerator->generate('adminRubricResultSet.getList'));
+        $this->response = $this->redirectFound($this->routeGenerator->generate('adminRubricResultSet.getList'));
     }
 }

@@ -23,7 +23,6 @@ use Schoolbox\GenericCollection;
  */
 abstract class ConfigController extends Base
 {
-
     /** @var ConfigMapper */
     private $configMapper;
 
@@ -115,12 +114,8 @@ abstract class ConfigController extends Base
         }
 
         if ($rebuildModules) {
-            $this->response->content->set([
-                'format'     => 'noContent',
-                'postOutput' => [
-                    $this->buildRebuildModuleCacheCallback(),
-                ],
-            ]);
+            $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
+            $this->response              = $this->responseEmpty();
         }
     }
 

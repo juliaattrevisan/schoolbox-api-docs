@@ -48,9 +48,8 @@ class Controller extends FullAccessController
         }
 
         // Output something: I guess whatever the contents of the folder are now
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $this->treeBuilder->buildChildNodes($folderId),
-        ]);
+        $this->response = $this->responseAsJson(
+            $this->treeBuilder->buildChildNodes($folderId),
+        );
     }
 }

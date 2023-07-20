@@ -50,14 +50,14 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminLessonPlanTemplate/list.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminLessonPlanTemplate/list.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
                 'lessonPlanTemplates' => $this->templateMapper->findAll()->sortNaturally('title')
             ]
-        ]);
+        );
     }
 
 
@@ -69,9 +69,9 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminLessonPlanTemplate/create.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminLessonPlanTemplate/create.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
@@ -81,7 +81,7 @@ class Controller extends Base
                 'studentRole' => Role::STUDENT,
                 'newKeyword' => self::NEW_KEYWORD
             ]
-        ]);
+        );
     }
 
 
@@ -143,7 +143,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 
@@ -156,9 +156,9 @@ class Controller extends Base
      */
     public function getUpdate(Model $lessonPlanTemplate): void
     {
-        $this->getResponse()->content->set([
-            'template' => '@adminLessonPlanTemplate/create.twig',
-            'data' => [
+        $this->response = $this->responseFromTemplate(
+            '@adminLessonPlanTemplate/create.twig',
+            [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
@@ -168,7 +168,7 @@ class Controller extends Base
                 'studentRole' => Role::STUDENT,
                 'newKeyword' => self::NEW_KEYWORD
             ]
-        ]);
+        );
     }
 
 
@@ -257,7 +257,7 @@ class Controller extends Base
 
         /* Go back to list
          */
-        $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLessonPlanTemplate.getList'));
     }
 
 

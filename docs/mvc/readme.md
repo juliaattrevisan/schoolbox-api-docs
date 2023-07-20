@@ -14,11 +14,15 @@
     * 1.3 Preloads
     * 1.4 Error Handling
     * 1.5 Historical Format
-* [2 Responsibilities of Controller](02-controller.md) 
+* [2 Responsibilities of Controller](02-controller.md)
     * 2.1 Shove details elsewhere
-    * 2.2 getRequest() and getResponse()
-        * 2.2.1 GET and POST vars
+    * 2.2 Requests and Responses
+        * 2.2.1 Reading data from the Request
+            * 2.2.1.1 Helpers for GET and POST vars
         * 2.2.2 Setting The Response for View
+            * 2.2.2.1 Responses generated from a Twig template
+            * 2.2.2.2 JSON Responses
+            * 2.2.2.3 Raw Content Responses
         * 2.2.3 Redirects
     * 2.3 Superglobals
         * 2.3.1 Session Superglobal
@@ -42,7 +46,7 @@
     * 6.2 Twig Syntax
     * 6.3 Reusable Fragments
     * 6.4 The Pantry
-    * 6.5 Compiling CSS and Javascript 
+    * 6.5 Compiling CSS and Javascript
 * [7 Conclusions](07-summary.md)
     * 7.1 Summary of Module
     * 7.2 Summary of Controller

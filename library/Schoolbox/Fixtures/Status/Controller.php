@@ -48,13 +48,11 @@ class Controller extends AbstractController
             ]
         );
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesStatus/list.twig',
-                [
-                    'allStatus' => $allStatus
-                ]
-            )
+        $this->response = $this->responseFromTemplate(
+            '@sportsfixturesStatus/list.twig',
+            [
+                'allStatus' => $allStatus
+            ]
         );
     }
 
@@ -99,7 +97,7 @@ class Controller extends AbstractController
                 ])
             ];
 
-            $this->getResponse()->content->set($this->buildJsonOutput($status));
+            $this->response = $this->responseAsJson($status);
         }
     }
 
