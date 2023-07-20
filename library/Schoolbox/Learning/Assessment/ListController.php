@@ -1029,11 +1029,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningAssessment/lti/return/instructor/iframe.twig',
-                ['returnUrl'   => $returnUrl->__toString(),],
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/lti/return/instructor/iframe.twig',
+            ['returnUrl'   => $returnUrl->__toString(),],
         );
     }
 
@@ -1081,11 +1079,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/return/instructor/window.twig',
-                $params,
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/lti/return/instructor/window.twig',
+            $params,
         );
     }
 
@@ -1172,11 +1168,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningAssessment/lti/return/student/iframe.twig',
-                ['returnUrl' => $returnUrl->__toString(),],
-            )
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/lti/return/student/iframe.twig',
+            ['returnUrl' => $returnUrl->__toString(),],
         );
     }
 
@@ -1226,11 +1220,9 @@ class ListController extends Web\Controller\Base
 
         // Launches:
         // should automatically redirect, but contain a button if they do not
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningAssessment/lti/return/student/window.twig',
-                $params,
-            )
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/lti/return/student/window.twig',
+            $params,
         );
     }
 

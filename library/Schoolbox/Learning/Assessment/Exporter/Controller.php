@@ -123,7 +123,7 @@ class Controller extends BaseController
         ];
 
         $template = '@learningAssessmentExporter/export_assessment.twig';
-        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        $this->response = $this->responseFromTemplate($template, $data);
     }
 
 
@@ -665,9 +665,9 @@ class Controller extends BaseController
         }
 
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
+            $this->response = $this->responseAsJson([Redirect::RETURN_URL => $returnUrl]);
         } else {
-            $this->getResponse()->redirect->afterPost($returnUrl);
+            $this->response = $this->redirectAfterPost($returnUrl);
         }
     }
 }
