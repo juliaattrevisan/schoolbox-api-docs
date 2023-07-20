@@ -134,8 +134,8 @@ class ReadReplicatedProxy implements IConnector
         }
 
         // Anything other than a SELECT statement? Use write connector
-        $notSelect = preg_match("/(UPDATE)|(INSERT)/i", $query);
-        if ($notSelect) {
+        $isSelect = preg_match("/^\s([\(]SELECT)/i", $query);
+        if (!$isSelect) {
             return $this->writeConnector;
         }
 
