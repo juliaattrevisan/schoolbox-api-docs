@@ -293,19 +293,36 @@ class Controller extends Base
      * @return void
      * @throws Deleted
      * @throws NotFound
+     * @throws ValidationException
      * @throws \PDOException
+     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
+        /* Find out what they scored by the automated system
+         */
+        $result = $this->api->dataGetRequest('/sessions/scores', [
+            'session_id' => [
+                $this->request->post['learnosityReference']
+            ]
+        ]);
+
+        $mark = $result['data'][0]['score'];
+        $maxMark = $result['data'][0]['max_score'];
+
+        /* Record it locally for our own usages
+         */
         $existingAttempt = $this->attemptMapper->findOneByColumnList([
             'attempt_id'           => $this->requestPost->get('attemptId'),
             'learnosity_reference' => $this->requestPost->get('learnosityReference'),
             'user_id'              => $student->getId()
         ]);
 
-        $existingAttempt->setFinish(\Alaress_Date_Format::now());
+        $existingAttempt->setMark($mark)
+            ->setMaxMark($maxMark)
+            ->setFinish(\Alaress_Date_Format::now());
 
         $this->attemptMapper->save($existingAttempt);
     }
@@ -360,6 +377,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learnosity/report.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
+            'attempt' => $attempt,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
