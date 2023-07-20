@@ -348,7 +348,7 @@ class Controller extends Base
                      * Author and Items api
                      */
                     'id' => 'schoolbox-result-2',
-                    'type' => 'session-detail-by-item',
+                    'type' => 'session-detail-by-question',
                     'session_id' => $attempt->getLearnosityReference(),
                     'questions_api_init_options' => [
                         'showCorrectAnswers' => false
