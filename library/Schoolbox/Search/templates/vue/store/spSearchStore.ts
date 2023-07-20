@@ -15,17 +15,6 @@ export const useSearchStore = defineStore("spSearch", () => {
     const hasLoadError = window.Vue.ref(false); // to notify of a search error
 
     /**
-     * To collect all the params to send to the search api
-     * @returns {string} - the query params
-     */
-    function getQueryParams() {
-        const newQueryParams = new URLSearchParams();
-        newQueryParams.append("keyword", useQueryStore().activeQuery);
-        newQueryParams.append("filter", useFiltersStore().getFormData());
-        return newQueryParams.toString();
-    }
-
-    /**
      * To record the active query and filters at the time of the search
      */
     function setActive() {
@@ -44,7 +33,7 @@ export const useSearchStore = defineStore("spSearch", () => {
         hasNotSearched.value = false;
         isSearching.value = true;
         try {
-            const response = await fetch(`${useStore().endpoint}?${getQueryParams()}`, {
+            const response = await fetch(useStore().getEndpointWithParams(), {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

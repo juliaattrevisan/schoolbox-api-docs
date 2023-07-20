@@ -3,6 +3,8 @@
  */
 
 import { defineStore } from "pinia";
+import { useQueryStore } from "./spQueryStore";
+import { useFiltersStore } from "../filters/store/spFiltersStore";
 import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
 
 export const useStore = defineStore("searchPage", () => {
@@ -30,8 +32,21 @@ export const useStore = defineStore("searchPage", () => {
         useFilterTypesStore().allTypes = $filterTypes;
     }
 
+    /**
+     * To collect all the params to send to the search api
+     * @returns {string} - the query params
+     */
+    function getEndpointWithParams() {
+        const newQueryParams = new URLSearchParams();
+        newQueryParams.append("keyword", useQueryStore().activeQuery);
+        newQueryParams.append("filter", useFiltersStore().getFormData());
+        const endpointWithParams = `${endpoint.value}?${newQueryParams.toString()}`;
+        return endpointWithParams;
+    }
+
     return {
         endpoint,
         init,
+        getEndpointWithParams,
     };
 });
