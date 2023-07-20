@@ -11,7 +11,7 @@ const DefaultTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                     </div>
                 </div>
@@ -86,7 +86,7 @@ const TopSectionTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                     </div>
                 </div>
@@ -105,7 +105,7 @@ const TopSectionMultiMetaTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                     </div>
                 </div>
@@ -128,7 +128,7 @@ const TopSectionNavActionsVerticalAlignTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                     </div>
                 </div>
@@ -152,7 +152,7 @@ const TopSectionIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -171,7 +171,7 @@ const RoundedImageTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-m img--round">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                     </div>
                 </div>
@@ -190,7 +190,7 @@ const XSImageTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-xs">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
                     </div>
                 </div>
@@ -208,7 +208,7 @@ const SImageTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-s">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
                     </div>
                 </div>
@@ -226,7 +226,7 @@ const MImageTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-m">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
                     </div>
                 </div>
@@ -244,7 +244,7 @@ const LImageTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-l">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
                     </div>
                 </div>
@@ -262,7 +262,7 @@ const XLImageTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-xl">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
                     </div>
                 </div>
@@ -280,7 +280,7 @@ const XSIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-xs">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -298,7 +298,7 @@ const SIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-s">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -316,7 +316,7 @@ const MIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-m">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -334,7 +334,7 @@ const LIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-l">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -352,7 +352,7 @@ const XLIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-xl">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -370,7 +370,7 @@ const SubItemTemplate = (args, { argTypes }) => ({
         <div class="sb-card sb-card--subitem">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
                     </div>
                 </div>
@@ -389,7 +389,7 @@ const SubItemIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card sb-card--subitem">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -408,7 +408,7 @@ const SubItemSIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card sb-card--subitem">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-s">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>
@@ -427,7 +427,7 @@ const SubItemLIconTemplate = (args, { argTypes }) => ({
         <div class="sb-card sb-card--subitem">
             <div class="sb-card__top">
                 <div class="sb-card__primary-img img img-l">
-                    <div class="img__affector">
+                    <div class="img__wrapper">
                         <div class="icon icon-calendar"></div>
                     </div>
                 </div>

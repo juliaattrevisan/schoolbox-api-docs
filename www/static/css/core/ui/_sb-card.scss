@@ -100,7 +100,7 @@
         .sb-card {
             &__primary-img {
                 &.img {
-                    .img__affector {
+                    .img__wrapper {
                         flex: 0 0 40px;
                         width: 40px;
                         height: 40px;
@@ -149,7 +149,7 @@
                 min-height: 100%;
             }
 
-            .img__affector {
+            .img__wrapper {
                 flex: 0 0 64px;
                 width: 64px;
                 height: 64px;
@@ -160,7 +160,7 @@
             }
 
             &-xs {
-                .img__affector,
+                .img__wrapper,
                 .icon {
                     flex: 0 0 40px;
                     width: 40px;
@@ -172,7 +172,7 @@
                 }
             }
             &-s {
-                .img__affector,
+                .img__wrapper,
                 .icon {
                     flex: 0 0 48px;
                     width: 48px;
@@ -184,7 +184,7 @@
                 }
             }
             &-m {
-                .img__affector,
+                .img__wrapper,
                 .icon {
                     flex: 0 0 64px;
                     width: 64px;
@@ -196,7 +196,7 @@
                 }
             }
             &-l {
-                .img__affector,
+                .img__wrapper,
                 .icon {
                     flex: 0 0 72px;
                     width: 72px;
@@ -208,7 +208,7 @@
                 }
             }
             &-xl {
-                .img__affector,
+                .img__wrapper,
                 .icon {
                     flex: 0 0 96px;
                     width: 96px;
@@ -224,7 +224,7 @@
             &--round {
                 padding: var(--whitespace-xs);
 
-                .img__affector {
+                .img__wrapper {
                     border-radius: 50%;
                     overflow: hidden;
                     // Very subtly make the image stand out from the background if there is no background contrast
