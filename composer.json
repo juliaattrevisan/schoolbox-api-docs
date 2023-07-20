@@ -66,7 +66,7 @@
         "ext-posix": "*",
         "firebase/php-jwt": "^6.5.0",
         "ext-openssl": "*",
-        "stomp-php/stomp-php": "~5.0.0",
+        "stomp-php/stomp-php": "^5.1.0",
         "cboden/ratchet": "^0.4.1",
         "react/socket": "^1.2.1",
         "react/promise": "^2.7",

@@ -143,7 +143,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
                 )
             );
             // remove from backup
-            if ($this->jit instanceof \Alaress\Scheduler\Cache\RedisCache) {
+            if ($this->jit) {
                 [$itemKey,] = RedisQueue::getStorage($trigger, $this->instanceId);
                 $this->jit->removeCache($itemKey);
             }
@@ -255,7 +255,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $this->timers[$class][$label][$hash] = $timer;
 
         // Store scheduled trigger key, so that it can be referred when canceled
-        if ($this->instanceId && ($this->jit instanceof \Alaress\Scheduler\Cache\RedisCache)) {
+        if ($this->instanceId && $this->jit) {
             [$storageKey,] = RedisQueue::getStorage($trigger, $this->instanceId);
             $this->redisKeys[$class][$label][$hash] = $storageKey;
             $this->jit->storeCache($trigger);
@@ -286,7 +286,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $hash  = $this->hashObject($model);
         unset($this->timers[$class][$label][$hash]);
         // Removed scheduled trigger from RedisCache
-        if ($this->jit instanceof \Alaress\Scheduler\Cache\RedisCache) {
+        if ($this->jit) {
             $storageKey = $this->redisKeys[$class][$label][$hash];
             $this->jit->removeCache($storageKey);
         }

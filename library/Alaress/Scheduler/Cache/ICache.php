@@ -9,6 +9,7 @@
 
 namespace Alaress\Scheduler\Cache;
 
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Notif\MQ\Connector;
 
 interface ICache
@@ -19,4 +20,16 @@ interface ICache
      * @return bool
      */
     public function restoreSchedule(Connector $mq, string $queueName): bool;
+
+    /**
+     * @param TriggerInterface $trigger
+     * @return bool
+     */
+    public function storeCache(TriggerInterface $trigger): bool;
+
+    /**
+     * @param string $itemKey
+     * @return bool
+     */
+    public function removeCache(string $itemKey): bool;
 }
