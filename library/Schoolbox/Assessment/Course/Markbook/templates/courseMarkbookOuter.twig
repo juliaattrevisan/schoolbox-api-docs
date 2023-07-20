@@ -24,15 +24,8 @@ Usage:
 {% autoescape 'js' %}
     <script type="text/javascript">
         function onResize() {
-            const gridContainers = document.querySelectorAll('.diagonal-headings-table-container');
-            const gridContainer = (gridContainers.length === 1)? gridContainers[0]: null;
-
-            if (gridContainer === null) {
-                return;
-            }
-
-            // Update style rule initially set in _tables.scss.
-            gridContainer.style.maxHeight = 'calc(100vh - ' + Math.round(gridContainer.getBoundingClientRect().top) + 'px)';
+            const container = document.querySelector("[data-diagonal-headings-table-container]");
+            container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
         }
 
         $(function() {
