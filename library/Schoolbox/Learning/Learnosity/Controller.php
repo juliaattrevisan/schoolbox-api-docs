@@ -227,7 +227,7 @@ class Controller extends Base
                     ],
                     /* Go to a nice report screen when you're done, for now
                      */
-                    'onsubmit_redirect_url' => $this->router->getGenerator()->generate('learnosity.getReport', [
+                    'onsubmit_redirect_url' => $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
                         'assessmentId' => $assessment->getId(),
                         'studentId' => $student->getId(),
                         'learnosityReference' => $attempt->getLearnosityReference()
@@ -311,7 +311,7 @@ class Controller extends Base
 
         $mark = $result['data'][0]['score'];
         $maxMark = $result['data'][0]['max_score'];
-        $normalisedMark = 100*$mark/$maxMark;
+        $normalisedMark = 100 * $mark/$maxMark;
 
         /* Record it locally for our own usages
          */
@@ -331,7 +331,50 @@ class Controller extends Base
 
 
     /**
-     * Show some basic stats about your attempt
+     * The outro screen for completing an attempt;
+     * show some basic stats about your attempt
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $attempt
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function getCompleteAttempt(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $payload = [
+            'user_id' => (string)$attempt->getUser()->getId(),
+            'reports' => [
+                [
+                    /* DOM element id, where this goes in
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
+                    'id' => 'schoolbox-result-1',
+                    'type' => 'sessions-summary-by-question',
+                    'session_ids' => [
+                        $attempt->getLearnosityReference()
+                    ]
+                ],
+            ],
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/outro.twig', [
+            'initOptions' => $this->api->initOptions('reports', $payload),
+            'assessment' => $assessment,
+            'attempt' => $attempt,
+            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
+        ])->setTitle("Result for {$assessment->getTitle()}"));
+    }
+
+
+    /**
+     * Show some in-depth stats about your attempt
      *
      * @param IAssessable $assessment
      * @param User        $student
