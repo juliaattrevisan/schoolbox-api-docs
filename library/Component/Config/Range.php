@@ -1,11 +1,6 @@
 <?php
 
-namespace Component\Config;
-
-use Component_ControllerAbstract;
-use SitePage;
-
-class Component_Config_Range extends \Component_Config_Abstract
+class Component_Config_Range extends Component_Config_Abstract
 {
     /**
      * Returns the options to display in the dropdown
@@ -28,14 +23,14 @@ class Component_Config_Range extends \Component_Config_Abstract
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
         // has an internal block for the select element
-        $page->setBlock($keyblock, 'range', 'range_block');
+        $page->setBlock($keyblock, 'range_opt', 'range_block');
         $page->setVar('range_block', '');
 
         foreach ($this->getOptions() as $key => $label) {
             $page->setVar('COMPONENT_CONFIG_RANGE_NAME', $label);
             $page->setVar('COMPONENT_CONFIG_RANGE_VALUE', $key);
             $page->setVar('COMPONENT_CONFIG_RANGE_SELECTED', (string)$key === $configValue ? ' selected="selected"' : '');
-            $page->parse('range_block', 'range', true);
+            $page->parse('range_block', 'range_opt', true);
         }
     }
 }

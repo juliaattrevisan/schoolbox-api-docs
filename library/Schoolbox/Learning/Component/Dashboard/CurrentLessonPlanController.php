@@ -49,7 +49,6 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
     {
 
         $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
-        $this->range = 60;
 
         $dateStart = \Alaress_Date_Format::now()->addDays(-$this->range);
         $dateEnd = \Alaress_Date_Format::now()->addDays($this->range);
