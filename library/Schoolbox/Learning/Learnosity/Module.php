@@ -86,7 +86,7 @@ class Module extends BaseModule
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
-        $this->register('GET', '/{assessmentId}/report/{studentId}/{learnosityReference}', 'getReport', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnosityReference}', 'getReview', $learnerPerms, $preloadAttempt);
 
         /* Archive a set of reference identifiers in Learnosity
          */

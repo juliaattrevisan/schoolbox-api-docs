@@ -374,7 +374,8 @@ class Controller extends Base
 
 
     /**
-     * Show some in-depth stats about your attempt
+     * From a student's perspective,
+     * show some in-depth stats about your attempt
      *
      * @param IAssessable $assessment
      * @param User        $student
@@ -383,7 +384,7 @@ class Controller extends Base
      * @throws ValidationException
      * @throws \JsonException
      */
-    public function getReport(
+    public function getReview(
         IAssessable $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
@@ -391,18 +392,6 @@ class Controller extends Base
         $payload = [
             'user_id' => (string)$attempt->getUser()->getId(),
             'reports' => [
-                [
-                    /* DOM element id, where this goes in
-                     *
-                     * It's configurable by us, unlike the other anchors for
-                     * Author and Items api
-                     */
-                    'id' => 'schoolbox-result-1',
-                    'type' => 'sessions-summary-by-question',
-                    'session_ids' => [
-                        $attempt->getLearnosityReference()
-                    ]
-                ],
                 [
                     /* DOM element id, where this goes in
                      *
