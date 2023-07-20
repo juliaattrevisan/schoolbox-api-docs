@@ -311,6 +311,7 @@ class Controller extends Base
 
         $mark = $result['data'][0]['score'];
         $maxMark = $result['data'][0]['max_score'];
+        $normalisedMark = 100*$mark/$maxMark;
 
         /* Record it locally for our own usages
          */
@@ -322,6 +323,7 @@ class Controller extends Base
 
         $existingAttempt->setMark($mark)
             ->setMaxMark($maxMark)
+            ->setNormalisedMark($normalisedMark)
             ->setFinish(\Alaress_Date_Format::now());
 
         $this->attemptMapper->save($existingAttempt);

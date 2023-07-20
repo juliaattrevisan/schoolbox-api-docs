@@ -78,6 +78,11 @@ class Model implements ISoftDeletable
     private ?float $max_mark = null;
 
     /**
+     * @var float|null
+     */
+    private ?float $normalisedMark = null;
+
+    /**
      * @var string|null
      */
     private ?string $learnosityReference = null;
@@ -302,6 +307,25 @@ class Model implements ISoftDeletable
     {
         return $this->max_mark;
     }
+
+    /**
+     * @return float|null
+     */
+    public function getNormalisedMark(): ?float
+    {
+        return $this->normalisedMark;
+    }
+
+    /**
+     * @param float|null $normalisedMark
+     * @return Model
+     */
+    public function setNormalisedMark(?float $normalisedMark): self
+    {
+        $this->normalisedMark = $normalisedMark;
+        return $this;
+    }
+
 
     /**
      * The total mark value of this attempt which has been graded
