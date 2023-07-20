@@ -11,6 +11,7 @@ export type Result = {
     date: string;
     url: string;
     title: string;
+    meta: string | null;
     image: string | null;
     description: string | null;
     creator?: {

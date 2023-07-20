@@ -34,7 +34,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         isSearching.value = true;
         try {
             const response = await fetch(useStore().getEndpointWithParams(), {
-                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },

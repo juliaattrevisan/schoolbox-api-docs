@@ -6,6 +6,7 @@ export const data = {
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/badge/1/update",
             title: "A badge",
+            meta: "Badge Category 1",
             image: "https://{hostname}.{domain}/static/images/badges/ui/25.svg",
             description: "A badge in this Schoolbox instance. ",
             creator: {
@@ -43,6 +44,7 @@ export const data = {
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/news/1",
             title: "A news article",
+            meta: "News Category 1",
             image: "https://{hostname}.{domain}/storage/image.php?hash=1234567890&size=coverPhoto",
             description: "A news article in this Schoolbox instance. ",
             creator: {
@@ -62,6 +64,7 @@ export const data = {
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/homepage/10",
             title: "A class page (CLASSCODE)",
+            meta: null,
             image: "https://{hostname}.{domain}/storage/image.php?hash=1234567890&size=coverPhoto",
             description: null,
             creator: {
@@ -95,6 +98,7 @@ export const data = {
                         date: "2022-01-30T21:00:00Z",
                         url: "https://{hostname}.{domain}/learning/assessments/1",
                         title: "A due work",
+                        meta: "Assessment Task",
                         image: null,
                         description: "A due work assessment in this Schoolbox instance. ",
                         creator: {
@@ -124,6 +128,7 @@ export const data = {
                         date: "2022-01-30T21:00:00Z",
                         url: "https://{hostname}.{domain}/send.php?id=1&save=1",
                         title: "An audio file",
+                        meta: null,
                         image: null,
                         description: "An audio file in this Schoolbox instance. ",
                         creator: {
@@ -155,6 +160,7 @@ export const data = {
                         date: "2022-01-30T21:00:00Z",
                         url: "https://{hostname}.{domain}/send.php?id=2&save=1",
                         title: "A video file",
+                        meta: null,
                         image: "https://{hostname}.{domain}/cms/videoThumb.php?type=sbfs&id=2",
                         description: "A video file in this Schoolbox instance. ",
                         creator: {
@@ -196,6 +202,7 @@ export const data = {
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/homepage/20",
             title: "A folder page",
+            meta: null,
             image: null,
             description: null,
             creator: {
@@ -232,6 +239,7 @@ export const data = {
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/search/user/2",
             title: "Ms Teacher User",
+            meta: "User Role 1",
             image: "https://{hostname}.{domain}/portrait.php?id=2&size=square72",
             description: null,
             creator: null,
@@ -245,6 +253,7 @@ export const data = {
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/search/user/4",
             title: "Ms Parent User",
+            meta: "User Role 2",
             image: "https://{hostname}.{domain}/portrait.php?id=4&size=square72",
             description: null,
             creator: {
