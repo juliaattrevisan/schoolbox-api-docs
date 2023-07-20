@@ -386,7 +386,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function errorInfo()
     {
-        return $this->determineConnector()->errorInfo();
+        throw new Exception('Not supported.');
     }
 
     /**
@@ -396,7 +396,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function errorCode()
     {
-        return $this->determineConnector()->errorCode();
+        throw new Exception('Not supported.');
     }
 
     /**
@@ -406,7 +406,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function getHostname()
     {
-        return $this->determineConnector()->getHostname();
+        throw new Exception('Not supported.');
     }
 
     /**
@@ -416,7 +416,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function getPort()
     {
-        return $this->determineConnector()->getPort();
+        throw new Exception('Not supported.');
     }
 
     /**
@@ -426,7 +426,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function getUsername()
     {
-        return $this->determineConnector()->getUsername();
+        throw new Exception('Not supported.');
     }
 
     /**
@@ -436,7 +436,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function getPassword()
     {
-        return $this->determineConnector()->getPassword();
+        throw new Exception('Not supported.');
     }
 
     /**
@@ -446,7 +446,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function getDatabase()
     {
-        return $this->determineConnector()->getDatabase();
+        throw new Exception('Not supported.');
     }
 
     /**
