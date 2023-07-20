@@ -128,7 +128,12 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
             ];
         }
 
-//        return true;
+        // sort by dueDate
+        usort($this->visibleLessonPlans, function ($a, $b) {
+            return $a['dueDate'] <=> $b['dueDate'];
+        });
+
+        //        return true;
         return \count($this->visibleLessonPlans) > 0;
         /**
          * return array should be similar to:
