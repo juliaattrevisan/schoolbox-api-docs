@@ -70,7 +70,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         $pb          = $database
             ->buildPredicateBuilder('')
             ->betweenDates('assessment.due_date', $dateStart, $dateEnd)
-            ->in('mv_assessment_relation.folder_id', $student->getSubjectCollection()->getIds() ?? []);
+            ->in('mv_assessment_relation.folder_id', $student->getSubjectCollection()->getIds());
 
         // set visibility check to be student for student...
         if ($this->getUser()->getRole()->isStudent()) {
