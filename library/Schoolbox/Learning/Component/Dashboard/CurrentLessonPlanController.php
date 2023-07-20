@@ -23,9 +23,9 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
     /**
      * The upcoming Quiz + DueWork that are visible to this Student
      *
-     * @var IAssessable[]|Collection
+     * @var array
      */
-    private $visibleLessonPlans = [];
+    private array $visibleLessonPlans = [];
 
     /**
      * @var AssessmentMapperProxy

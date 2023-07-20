@@ -10,9 +10,9 @@ class Component_Config_Range extends \Component_Config_Abstract
     /**
      * Returns the options to display in the dropdown
      *
-     * @return int[]
+     * @return array<int, string>
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [
             0 => 'Today',
