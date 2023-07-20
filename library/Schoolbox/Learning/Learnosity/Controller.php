@@ -423,7 +423,13 @@ class Controller extends Base
 
     /**
      * Provide feedback for an attempt
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $attempt
+     * @throws Exception
+     * @throws ValidationException
      * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function getFeedback(
         IAssessable $assessment,
