@@ -50,8 +50,8 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 
         $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
 
-        $dateStart = \Alaress_Date_Format::now()->addDays(-$this->range);
-        $dateEnd = \Alaress_Date_Format::now()->addDays($this->range);
+        $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
+        $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
 
         $this->assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
