@@ -58,9 +58,13 @@ class Controller extends Base
             $this->getConfigLoader()->get('logs_dir')
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/activityList.twig', [
-            'initOptions' => $api->initOptions('author', $payload)
-        ])->setTitle('Example Activity List'));
+        $this->response = $this->responseFromTemplate(
+            '@learnosity/activityList.twig',
+            [
+                'initOptions' => $api->initOptions('author', $payload)
+            ],
+            'Example Activity List'
+        );
     }
 
 
@@ -181,9 +185,13 @@ class Controller extends Base
             $this->getConfigLoader()->get('logs_dir')
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
-            'initOptions' => $api->initOptions('items', $payload)
-        ])->setTitle('Example Item'));
+        $this->response = $this->responseFromTemplate(
+            '@learnosity/items.twig',
+            [
+                'initOptions' => $api->initOptions('items', $payload)
+            ],
+            'Example Item'
+        );
     }
 
 
@@ -268,9 +276,13 @@ class Controller extends Base
             $this->getConfigLoader()->get('logs_dir')
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/items.twig', [
-            'initOptions' => $api->initOptions('items', $payload)
-        ])->setTitle('Example Item'));
+        $this->response = $this->responseFromTemplate(
+            '@learnosity/items.twig',
+            [
+                'initOptions' => $api->initOptions('items', $payload)
+            ],
+            'Example Item'
+        );
     }
 
 
@@ -315,8 +327,12 @@ class Controller extends Base
             ],
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/sessionList.twig', [
-            'initOptions' => $api->initOptions('reports', $payload)
-        ])->setTitle('Example Session List'));
+        $this->response = $this->responseFromTemplate(
+            '@learnosity/sessionList.twig',
+            [
+                'initOptions' => $api->initOptions('reports', $payload)
+            ],
+            'Example Session List'
+        );
     }
 }
