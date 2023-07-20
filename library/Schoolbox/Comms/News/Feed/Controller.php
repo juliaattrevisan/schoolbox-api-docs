@@ -79,7 +79,7 @@ class Controller extends Base
         $userFeed = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
         $this->renderArticlesAsXml(
             $userFeed->find($user, News\Model::STATE_PUBLISHED, false),
-            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
+            $this->requestQuery->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
         );
     }
 
@@ -107,7 +107,7 @@ class Controller extends Base
 
         $this->renderArticlesAsXml(
             $folderFeed->find($folder->getId()),
-            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
+            $this->requestQuery->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
         );
     }
 
@@ -151,8 +151,12 @@ class Controller extends Base
             'folder'     => $folder,
             'title'      => $this->getConfigLoader()->get('title'),
             'schoolName' => $this->getConfigLoader()->get('school_name'),
-            'baseUrl'    => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
-            'url'        => $this->getRequest()->url->get(),
+            'baseUrl'    => $this->psr7Request->getUri()
+                                              ->withPath('')
+                                              ->withQuery('')
+                                              ->withFragment('')
+                                              ->__toString(),
+            'url'        => $this->psr7Request->getUri()->__toString(),
             'referrer'   => News\Statistics\Mapper::REFERRER_RSS,
             'articles'   => $articles,
         ]));

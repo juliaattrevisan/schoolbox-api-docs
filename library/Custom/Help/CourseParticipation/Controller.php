@@ -11,7 +11,6 @@ namespace Custom\Help\CourseParticipation;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Aura\Web\Request;
 use Custom\Help\CourseParticipation\Exception\ParticipantRolesNotFoundException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -157,7 +156,7 @@ class Controller extends Base
      */
     public function postApiTest()
     {
-        $post = $this->getRequest()->post->getArrayCopy();
+        $post = $this->requestPost->getArrayCopy();
 
         $schoolCode = $post['schoolCode'];
         $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
@@ -205,10 +204,9 @@ class Controller extends Base
      */
     public function getApiTestEnrolmentTable(string $schoolCode)
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
@@ -230,10 +228,9 @@ class Controller extends Base
      */
     public function getFolderAccessBySchool(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
@@ -263,16 +260,13 @@ class Controller extends Base
      */
     public function postFolderAccessBySchool(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
-        $post = $rq->post;
-
-        if (empty($post['course'])) {
+        if (empty($this->requestPost['course'])) {
             // empty payload: do nothing
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "No 'course' parameter found");
             return;
@@ -290,7 +284,7 @@ class Controller extends Base
          *       - a list of email addresses to unenrol from that folder
          */
 
-        foreach ($post['course'] as $folderId => $enrolments) {
+        foreach ($this->requestPost['course'] as $folderId => $enrolments) {
             if (!in_array($folderId, $courseIds)) {
                 /*
                  * Business rule: A request that specifies folder IDs that do not belong to the school given returns 403
@@ -347,14 +341,13 @@ class Controller extends Base
      */
     public function getUsersBySchool(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
-        $fuzzy = $rq->query->getBool('fuzzy', false);
+        $fuzzy = $this->requestQuery->getBool('fuzzy', false);
 
         try {
             $users = $this->handler->getUsersBySchool($schoolCode, $fuzzy);
@@ -377,10 +370,9 @@ class Controller extends Base
      */
     public function postUserRegistrations(string $schoolCode): void
     {
-        $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq, $schoolCode)) {
+        if (!$this->isValidAuth($schoolCode)) {
             return;
         }
 
@@ -397,17 +389,19 @@ class Controller extends Base
 
 
         // process the payload
-        $post = $rq->post;
-
-        if (empty($post['user'])) {
+        if (empty($this->requestPost['user'])) {
             // empty payload: do nothing
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "No 'user' parameter provided");
             return;
         }
 
-        $byUsername = $rq->query->getBool('byUsername', false);
+        $byUsername = $this->requestQuery->getBool('byUsername', false);
 
-        $failedUsers = $this->handler->postUserRegistrations($schoolCode, $byUsername, $post);
+        $failedUsers = $this->handler->postUserRegistrations(
+            $schoolCode,
+            $byUsername,
+            $this->requestPost,
+        );
 
         if (\count($failedUsers)) {
             // just blame the client :P
@@ -451,29 +445,29 @@ class Controller extends Base
      *
      * If not, also sets up a JSON-formatted response.
      *
-     * @param Request $request
      * @param string $schoolCode
      * @return bool
      */
-    private function isValidAuth(Request $request, string $schoolCode): bool
+    private function isValidAuth(string $schoolCode): bool
     {
         // 1. Check we have all the pieces we need
-        if (null !== $request->headers->get('Authentication')) {
-            $authDigest = $request->headers->get('Authentication');
-        } elseif (null !== $request->query->get('digest')) {
+        $authHeader = $this->psr7Request->getHeaderLine('Authentication');
+        if ($authHeader !== '') {
+            $authDigest = $authHeader;
+        } elseif (null !== $this->requestQuery->get('digest')) {
             // to support previous way of authentication
-            $authDigest = $request->query->get('digest');
+            $authDigest = $this->requestQuery->get('digest');
         } else {
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Missing authentication parameter');
             return false;
         }
-        if (null === $request->query->get('ts')) {
+        if (null === $this->requestQuery->get('ts')) {
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Missing timestamp');
             return false;
         }
 
         // 2. Check the request's timestamp
-        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($request->query->get('ts', 0));
+        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($this->requestQuery->get('ts', 0));
 
         // 3. Ensure the route is valid (ie the school-code exists)
         try {

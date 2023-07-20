@@ -14,22 +14,49 @@ use Schoolbox\Permission\Access\UserAccess;
 class ModifyAccessLevel extends GroupMember
 {
     /**
-     * Set the 'Accept' header of the request
-     * @param string $type
+     * Constructor
+     *
+     * @param int $folderId
      */
-    public function setAccepts(string $type)
+    public function __construct(int $folderId)
     {
-        $this->setHeader('Accept', 'application/json');
+        parent::__construct($folderId);
+
+        // This request is JSON
+        $this->setAccepts('application/json');
+        $this->setContentType('application/json');
     }
 
+    /**
+     * This is always PATCH
+     *
+     * @return string
+     */
     public function getMethod(): string
     {
         return 'PATCH';
     }
 
+    /**
+     * Set access level for members.
+     *
+     * @param int $user_id
+     * @param int $accessLevel
+     * @return void
+     */
     public function setMemberAccessLevel(int $user_id, int $accessLevel): void
     {
-        $this->setFormParam("accessTypes[{$user_id}]", ['userId' => $user_id, 'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$accessLevel]]);
+        // Stack access types with previously set ones
+        $existingParam = $this->getFormParam('accessTypes') ?? [];
+        $this->setFormParam(
+            'accessTypes',
+            $existingParam + [
+                $user_id => [
+                    'userId'     => $user_id,
+                    'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$accessLevel],
+                ],
+            ],
+        );
     }
 
     /** @inheritDoc */

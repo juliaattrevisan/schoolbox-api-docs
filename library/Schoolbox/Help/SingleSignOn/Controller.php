@@ -132,7 +132,7 @@ class Controller extends Base
             return;
         }
 
-        $jwt = $this->request->query->get(self::QUERY_STRING_JWT);
+        $jwt = $this->requestQuery->get(self::QUERY_STRING_JWT);
         if (!$jwt) {
             // No JWT: redirect to login
             $this->redirectToLogin($page);
@@ -165,7 +165,7 @@ class Controller extends Base
     private function determinePageQueryStringValue(): string
     {
         $url = new Uri(
-            $this->request->query->get(
+            $this->requestQuery->get(
                 self::QUERY_STRING_PAGE,
                 self::QUERY_STRING_PAGE_DEFAULT
             )

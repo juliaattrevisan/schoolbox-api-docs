@@ -105,7 +105,7 @@ class Controller extends Base
     {
         $code = 200;
 
-        $columnPadding = (int)$this->request->post['column_padding'];
+        $columnPadding = (int)$this->requestPost['column_padding'];
 
         /* If column padding exceeds the maximum, set it to zero
          */
@@ -114,14 +114,14 @@ class Controller extends Base
         }
 
         $layout
-            ->setHeading($this->request->post->get('heading', ''))
-            ->setGridWidth((int)$this->request->post['grid_width'])
-            ->setGridPadding((int)$this->request->post['grid_padding'])
-            ->setColumnCount((int)$this->request->post['column_count'])
+            ->setHeading($this->requestPost->get('heading', ''))
+            ->setGridWidth((int)$this->requestPost['grid_width'])
+            ->setGridPadding((int)$this->requestPost['grid_padding'])
+            ->setColumnCount((int)$this->requestPost['column_count'])
             ->setColumnPadding($columnPadding)
-            ->setAspectRatioX((int)$this->request->post['aspect_ratio_x'])
-            ->setAspectRatioY((int)$this->request->post['aspect_ratio_y']);
-        switch ($this->getRequest()->post['layout_type']) {
+            ->setAspectRatioX((int)$this->requestPost['aspect_ratio_x'])
+            ->setAspectRatioY((int)$this->requestPost['aspect_ratio_y']);
+        switch ($this->requestPost['layout_type']) {
             case 'grid':
                 $layout->setLayoutType(Layout\Model::LAYOUT_TYPE_GRID);
                 break;
@@ -132,7 +132,7 @@ class Controller extends Base
 
         if ($this->layoutMapper->save($layout)) {
             // Rearrange tiles
-            $tilesOrder = $this->getRequest()->post->get('tile', []);
+            $tilesOrder = $this->requestPost->get('tile', []);
             if (!empty($tilesOrder)) {
                 foreach ($layout->getTileList() as $tile) {
                     $order = array_search($tile->getId(), $tilesOrder);
@@ -149,7 +149,7 @@ class Controller extends Base
         }
 
         // XHR: return a simple JSON response
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set(
                 [
                     'format' => 'json',
@@ -161,7 +161,7 @@ class Controller extends Base
         }
 
         // Otherwise: redirect back to a return URL if there is one
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if (!empty($returnUrl)) {
             $href = Redirect::decode($returnUrl);
         } elseif ($layout->getHomepageTemplate()) {
@@ -241,7 +241,7 @@ class Controller extends Base
     {
         /** @var Model $item */
         $item = $this->mapper->createModel();
-        $this->updateItemWithFormValues($item, $this->request->post);
+        $this->updateItemWithFormValues($item, $this->requestPost);
 
         // updateItemWithFormValues() doesn't set the layout item - set it here.
         if (!($layout->getId())) {
@@ -287,7 +287,7 @@ class Controller extends Base
     {
         $this->updateItemWithFormValues(
             $item,
-            $this->getRequest()->post
+            $this->requestPost
         );
 
         $this->mapper->save($item);
@@ -310,7 +310,7 @@ class Controller extends Base
         if (!$this->mapper->delete($item)) {
             $code = 500;
         }
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 [
@@ -450,7 +450,7 @@ class Controller extends Base
      */
     private function buildReturnUrl(): string
     {
-        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if (!isset($encodedReturnUrl)) {
             return '';
         }

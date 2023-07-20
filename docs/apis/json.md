@@ -177,7 +177,7 @@ class MyController extends Base
         $models = MyModelMapper::getInstance()->findAll();
 
         // manually do the check for JSON and pre-compile the JSON output
-        if ((new IsJson())->isSatisfiedBy($this->request)) {
+        if ((new IsJson())->isSatisfiedBy($this->psr7Request)) {
             $data['models'] = $models->jsonSerialize(
                 new PropertyDecorator([ 'propertyA' ]),
                 new LinkDecorator($this->routeGenerator, $this->authorizer, $this->getUser())

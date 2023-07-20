@@ -185,7 +185,7 @@ class Controller extends Base
 
         // Only staff may override role type?
         if ($this->getUser()->getRole()->isStaff()) {
-            $roleTypeOverride = $this->request->query->get('role-type');
+            $roleTypeOverride = $this->requestQuery->get('role-type');
             if (isset($roleTypeOverride) && !in_array($roleTypeOverride, $roleTypes, true)) {
                 throw new RangeException(
                     sprintf("If role type is overridden, it must be one of: %s", implode(', ', $roleTypes))
@@ -253,7 +253,7 @@ class Controller extends Base
                 'roleTypeOverride' => $roleTypeOverride,
             ],
             'template'   => $template,
-            'graphWidth' => $this->request->query->getInt('graph-width'),
+            'graphWidth' => $this->requestQuery->getInt('graph-width'),
         ];
     }
 

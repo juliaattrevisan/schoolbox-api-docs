@@ -31,7 +31,7 @@ class Controller extends FullAccessController
     public function postFiles($folderId): void
     {
         $factory  = new CollectorFactory();
-        $results  = $factory->build($this->request->post->get('attachment'))->getAll();
+        $results  = $factory->build($this->requestPost->get('attachment'))->getAll();
         $baseFile = [
             'parent'      => $folderId,
             'description' => '',

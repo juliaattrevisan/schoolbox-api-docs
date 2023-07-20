@@ -161,7 +161,7 @@ class Controller extends Base
      */
     public function postOrder()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $orderArray = explode(",", $post['order']);
 
         $order = 1;
@@ -185,7 +185,7 @@ class Controller extends Base
      */
     public function postDelete()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $this->getMenuTopMapper()->deleteByColumn("id", $post["id"]);
     }
 
@@ -197,7 +197,7 @@ class Controller extends Base
      */
     public function postModify()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         if (!empty($post->get('id'))) {
             $item = $this->getMenuTopMapper()->findById($post->get('id'));

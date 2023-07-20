@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Translator;
 
-use Aura\Web\Request\Values as RequestValues;
+use Alaress\Web\Request\Values;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\Access\Mapper;
@@ -29,11 +29,11 @@ class VisibilityTranslator
     }
 
     /**
-     * @param RequestValues $post
-     * @param TypeAbstract  $type
+     * @param Values       $post
+     * @param TypeAbstract $type
      * @return GenericCollection
      */
-    public function prepareAccesses(RequestValues $post, TypeAbstract $type): GenericCollection
+    public function prepareAccesses(Values $post, TypeAbstract $type): GenericCollection
     {
         // Save system role permissions, de-duplicating as we go
         $className   = $this->class;

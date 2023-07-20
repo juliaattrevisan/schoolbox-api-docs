@@ -433,21 +433,21 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            $matchId = $this->getRequest()->post['matchId'];
+            $matchId = $this->requestPost['matchId'];
             $matchup = $this->getMatchupMapper()->findById($matchId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
 
         try {
-            $teamId = $this->getRequest()->post['teamId'];
+            $teamId = $this->requestPost['teamId'];
             $team   = $this->getTeamMapper()->findById($teamId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
         // Save status (optional)
-        $statusId = $this->getRequest()->post->get('statusId');
+        $statusId = $this->requestPost->get('statusId');
         if ($statusId) {
             try {
                 $status = $this->getStatusMapper()->findById($statusId);
@@ -458,7 +458,7 @@ class Controller extends AbstractController
             $status = $this->getStatusMapper()->createModel();
         }
 
-        $this->saveResult($matchup, $team, $status, $this->getRequest()->post['description'], $entity);
+        $this->saveResult($matchup, $team, $status, $this->requestPost['description'], $entity);
 
         $this->getResponse()->redirect->afterPost(
             $this->routeGenerator->generate(

@@ -155,7 +155,7 @@ class Controller extends Web\Controller\Base
     {
         $externalStudent = $this->externalUser->getStudent($user->getExternalId());
         $attributes      = new StudentAttributes($this->getConfigLoader(), $user, $externalStudent['StudentIBFlag'], $reportDate);
-        $roleTypeOverride = $this->request->query->get('role-type');
+        $roleTypeOverride = $this->requestQuery->get('role-type');
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);

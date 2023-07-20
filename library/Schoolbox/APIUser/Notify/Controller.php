@@ -41,7 +41,7 @@ class Controller extends Base
      */
     public function apiUserNotify(User $user): void
     {
-        $data = json_decode(json_encode($this->request->content->get()), true);
+        $data = $this->psr7Request->getParsedBody();
         //check for required fields
         if ('' === ($data['message'] ?? '')) {
             $problem = (new ApiProblem("'message' is not set"))

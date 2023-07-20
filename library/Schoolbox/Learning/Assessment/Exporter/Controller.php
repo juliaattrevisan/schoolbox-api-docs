@@ -111,7 +111,7 @@ class Controller extends BaseController
 
         $data = [
             'assessmentSpec'   => $assessment,
-            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrl'        => $this->requestQuery->get(Redirect::RETURN_URL, ''),
             'returnUrlName'    => Redirect::RETURN_URL,
             'unImported'       => $notImported,
             'imported'         => $imported,
@@ -185,7 +185,7 @@ class Controller extends BaseController
 
         $data = [
             'unitSpec'                          => $unitSpec,
-            'returnUrl'                         => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrl'                         => $this->requestQuery->get(Redirect::RETURN_URL, ''),
             'returnUrlName'                     => Redirect::RETURN_URL,
             'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
             'courseImplsInWhichUnitImported'    => $courseImplsInWhichUnitImported,
@@ -263,8 +263,8 @@ class Controller extends BaseController
      */
     public function postExportForAssessment(IAssessable $assessment): void
     {
-        $importedImplementations     = $this->getRequest()->post->get('unitImplementation', []);
-        $importedImplementationDates = $this->getRequest()->post->get('unit', []);
+        $importedImplementations     = $this->requestPost->get('unitImplementation', []);
+        $importedImplementationDates = $this->requestPost->get('unit', []);
         // get corresponding assessment impls in the unit impls selected by the user.
         $assessmentImpls             = $this->buildImplementationsForSpecification($assessment, array_keys($importedImplementations));
         $folderWritePerms            = $this->buildFolderWritePermissionsForAssessment($assessmentImpls);
@@ -365,7 +365,7 @@ class Controller extends BaseController
             ['id' => $unitSpec->getCourse()->getId()]
         ) . "#{$unitSpec->getId()}";
 
-        $courseImplIds = array_keys($this->getRequest()->post->get('courseImplementationIds', []));
+        $courseImplIds = array_keys($this->requestPost->get('courseImplementationIds', []));
 
         if (count($courseImplIds) === 0) {
             // If empty form submitted, do nothing.
@@ -373,7 +373,7 @@ class Controller extends BaseController
             return;
         }
 
-        $unitDatesByCourseId = $this->getRequest()->post->get('unitDatesByCourseId');
+        $unitDatesByCourseId = $this->requestPost->get('unitDatesByCourseId');
 
         $courseImpls = $this->courseImplementationMapper->findByColumn('id', $courseImplIds);
 
@@ -664,14 +664,14 @@ class Controller extends BaseController
     private function redirectToReturnUrlIfSetOrFallbackUrl($fallbackUrl): void
     {
         // Decode the return URL, if it was set
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL, '');
         if ($encodedReturnUrl) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
             $returnUrl = $fallbackUrl;
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
         } else {
             $this->getResponse()->redirect->afterPost($returnUrl);

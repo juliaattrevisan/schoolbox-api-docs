@@ -45,9 +45,9 @@ class Controller extends Base
      */
     public function postAddSchool()
     {
-        $entityId = $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
+        $entityId = $this->getSchoolTagCloudMapper()->getTagId($this->requestPost["name"]);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $status = [
                 'id' => $entityId,
                 'update' => $this->routeGenerator->generate('sportsfixturesSchool.postEditSchool', [
@@ -80,10 +80,10 @@ class Controller extends Base
         /** @var TagCloud $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($entityId);
         $tag->setUpdatedAt(\Alaress_Date_Format::now());
-        $tag->setName($this->getRequest()->post["name"]);
+        $tag->setName($this->requestPost["name"]);
         $this->getSchoolTagCloudMapper()->save($tag);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $status = [
                 'id' => $entityId,
                 'update' => $this->routeGenerator->generate('sportsfixturesSchool.postEditSchool', [

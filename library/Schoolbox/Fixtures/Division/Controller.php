@@ -164,7 +164,7 @@ class Controller extends AbstractController
             'division' => $entity,
             'sport'    => $context,
             'action'   => $entity->getId() ? 'Modify' : 'Create',
-            'referer'  => base64_encode($this->getRequest()->headers->get('Referer'))
+            'referer'  => base64_encode($this->psr7Request->getHeaderLine('Referer'))
         ]));
     }
 
@@ -191,7 +191,7 @@ class Controller extends AbstractController
         $dataModel = $this->getDivisionTranslator()->translateDivision($division);
         $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Output as XHR data model
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($dataModel)
@@ -215,12 +215,12 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            $sport  = $this->getSportMapper()->findById($this->request->post->get('sportId'));
-            $season = $this->getSeasonMapper()->findById($this->request->post->get('seasonId'));
+            $sport  = $this->getSportMapper()->findById($this->requestPost->get('sportId'));
+            $season = $this->getSeasonMapper()->findById($this->requestPost->get('seasonId'));
 
-            $this->saveDivision($sport, $season, $this->request->post->get('name'), $this->request->post->get('url'), $entity);
+            $this->saveDivision($sport, $season, $this->requestPost->get('name'), $this->requestPost->get('url'), $entity);
 
-            $return = base64_decode($this->request->post->get('returnUrl'));
+            $return = base64_decode($this->requestPost->get('returnUrl'));
 
             if (empty($return)) {
                 $return = $this->routeGenerator->generate('sportsfixturesSport.getEntity', [
@@ -244,7 +244,7 @@ class Controller extends AbstractController
      */
     public function postAddPlayers(Division $division): void
     {
-        $selectedUsers = $this->getRequest()->post->get('userId');
+        $selectedUsers = $this->requestPost->get('userId');
 
         /* You didn't add anyone
          */
@@ -343,7 +343,7 @@ class Controller extends AbstractController
     {
         $this->divisionUserMapper->delete(
             $this->divisionUserMapper->findByColumnList([
-                'user_id'     => $this->getRequest()->post->get('userId'),
+                'user_id'     => $this->requestPost->get('userId'),
                 'division_id' => $division->getId(),
             ])
         );
@@ -362,7 +362,7 @@ class Controller extends AbstractController
      */
     public function postReorderPlayers(Division $division)
     {
-        $userIds       = $this->getRequest()->post->get('userId');
+        $userIds       = $this->requestPost->get('userId');
         $divisionUsers = [];
         $sequenceNo    = 1;
 
@@ -391,7 +391,7 @@ class Controller extends AbstractController
      */
     public function postPlayerPositions($entityId)
     {
-        $teamId = $this->request->post->get('team_id');
+        $teamId = $this->requestPost->get('team_id');
         try {
             // Load team
             $team = $this->getTeamMapper()->findById($teamId);
@@ -399,7 +399,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $userId = $this->request->post->get('user_id');
+        $userId = $this->requestPost->get('user_id');
         try {
             // Load player
             $player = $this->getUserMapper()->findById($userId);
@@ -420,7 +420,7 @@ class Controller extends AbstractController
 
         // Iterate through all the position checkboxes that were ticked
 
-        $positions = $this->request->post->get("positions");
+        $positions = $this->requestPost->get("positions");
 
         if (is_array($positions)) {
             foreach ($positions as $position) {
@@ -486,7 +486,7 @@ class Controller extends AbstractController
      */
     protected function renderPostAddPlayersResponse(Division $division)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Output a XHR data model + HTML output
             $division = $this->getDivisionCollector()->collectPlayers($division);
             $division = $this->getDivisionCollector()->collectTeams($division);

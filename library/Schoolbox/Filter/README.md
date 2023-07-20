@@ -352,7 +352,7 @@ of developing for filters.
         [],
         // The query string params for this request:
         // this contains the actually selected filters.
-        $this->request->query->getArrayCopy(),
+        $this->requestQuery->getArrayCopy(),
     );
     ```
   * inject the Twig data into the controller action's Twig template
@@ -407,7 +407,7 @@ Now, you can start writing the controller action which loads the actual content.
 * In your page's controller:
   * add the new action for the `POST` route; within that action:
   ```php
-  $request             = $this->request->post['filter_selection'] ?: [];
+  $request             = $this->requestPost['filter_selection'] ?: [];
   $page                = \Schoolbox\Filter\Page\Model::PAGE_NEW_PAGE;
   $codec               = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
 

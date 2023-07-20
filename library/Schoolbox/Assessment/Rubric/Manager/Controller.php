@@ -98,11 +98,11 @@ class Controller extends BaseController
         // Build a new rowset, and persist it
         $newRowSet = (new Factory($this->nodeMapper))->buildFromPostData(
             $folder,
-            $this->request->post->get('crits', [])
+            $this->requestPost->get('crits', [])
         );
 
         // Done: redirect back to homepage, or AJAX
-        if ($this->request->isXhr()) {
+        if ($this->isXhrRequest()) {
             try {
                 $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
@@ -121,7 +121,7 @@ class Controller extends BaseController
                         'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
                         'status' => $this->response->status->getCode(),
                         'detail' => $e->getMessage(),
-                        'instance' => $this->request->url
+                        'instance' => $this->psr7Request->getUri()->__toString(),
                     ])
                 );
             }

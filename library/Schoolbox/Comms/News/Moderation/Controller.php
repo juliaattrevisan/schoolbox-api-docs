@@ -75,7 +75,7 @@ class Controller extends Base
     public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
-        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
 
         $data = array_merge([
             'articles' => $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
@@ -234,8 +234,8 @@ class Controller extends Base
             // TODO. The client should be responsible for determining what to do after approval.
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
             // TODO. THis should just return the outcome of the request, not a redirect.
-            if ($article->isPublished() && $this->getRequest()->post->get(News\Querystring::RETURN_URL)) {
-                $route = News\Querystring::decode($this->getRequest()->post->get(News\Querystring::RETURN_URL));
+            if ($article->isPublished() && $this->requestPost->get(News\Querystring::RETURN_URL)) {
+                $route = News\Querystring::decode($this->requestPost->get(News\Querystring::RETURN_URL));
             } else {
                 $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
                 if (
@@ -277,7 +277,7 @@ class Controller extends Base
      */
     public function postReject(Model $article): void
     {
-        $rejectionReason = $this->getRequest()->post['rejectedReason'];
+        $rejectionReason = $this->requestPost['rejectedReason'];
 
         if ($article->isRejected()) {
             if ($article->getRejectedReason() === $rejectionReason) {
@@ -313,7 +313,7 @@ class Controller extends Base
         }
 
         if (200 === $httpCode) {
-            $returnUrl = News\Querystring::decode($this->getRequest()->query->get(News\Querystring::RETURN_URL));
+            $returnUrl = News\Querystring::decode($this->requestQuery->get(News\Querystring::RETURN_URL));
             if ($returnUrl) {
                 $route = $returnUrl;
             } else {

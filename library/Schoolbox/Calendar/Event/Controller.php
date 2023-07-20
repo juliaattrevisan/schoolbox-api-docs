@@ -195,15 +195,15 @@ class Controller extends Base
         /* Set up default values
          */
         $event = (new Event())
-            ->setTitle((string)$this->request->query->get('title'))
+            ->setTitle((string)$this->requestQuery->get('title'))
             ->setAuthor($this->getUser())
-            ->setAccess((int)$this->request->query->get('level'))
-            ->setAllDay((int)$this->request->query->get('allDay'))
+            ->setAccess((int)$this->requestQuery->get('level'))
+            ->setAllDay((int)$this->requestQuery->get('allDay'))
             ->setPublishDateTime(Alaress_Date_Format::now());
 
-        $event->getType()->setId((int)$this->request->query->get('type'));
+        $event->getType()->setId((int)$this->requestQuery->get('type'));
 
-        $event->setupDates($this->request->query->get('date'));
+        $event->setupDates($this->requestQuery->get('date'));
 
         if (!$event->getAllDay()) {
             $event->getEndDateTime()->addHours(1);
@@ -280,7 +280,7 @@ class Controller extends Base
             'canInvite' => (new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
 
             'guests' => [],
-            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query->get('returnUrl') ?? Redirect::encode('/')),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
     }
 
@@ -373,7 +373,7 @@ class Controller extends Base
             'canInvite' => (new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
 
             'guests' => $this->attendanceMapper->findAttendances($event),
-            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query->get('returnUrl') ?? Redirect::encode('/')),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
     }
 
@@ -391,7 +391,7 @@ class Controller extends Base
          * Otherwise default to the current user
          */
         $selectedUser = $this->getUser();
-        $userId = (int)$this->request->query->get('userId');
+        $userId = (int)$this->requestQuery->get('userId');
 
         if ($userId) {
             try {
@@ -427,7 +427,7 @@ class Controller extends Base
          * but isn't involved in the homepage used to get here:
          * force the homepage into the checkbox list
          */
-        $homepageId = (int)$this->request->query->get('homepageId');
+        $homepageId = (int)$this->requestQuery->get('homepageId');
 
         if ($homepageId && !in_array($homepageId, $tempFolderIds, false) && FolderAccess::getInstance()->getFolderAccess($this->getUser(), $homepageId) >= UserAccess::ACCESS_WRITE) {
             $tempFolderIds[] = $homepageId;
@@ -520,7 +520,7 @@ class Controller extends Base
 
         foreach ($allFolderList as $currentFolder) {
             $alreadyInCategory = in_array($currentFolder->getId(), $previousInvolvement, false);
-            $fromHomepage      = ((int)$this->request->query->get('level') === Event::ACCESS_GROUP) && ((int)$this->request->query->get('homepageId') === $currentFolder->getId());
+            $fromHomepage      = ((int)$this->requestQuery->get('level') === Event::ACCESS_GROUP) && ((int)$this->requestQuery->get('homepageId') === $currentFolder->getId());
 
             if ($alreadyInCategory || $fromHomepage) {
                 $items['selected'][] = $currentFolder->getId();
@@ -538,7 +538,7 @@ class Controller extends Base
     public function postCreate(): void
     {
         $event = new Event();
-        $event->setOwner($this->userMapper->createModel()->setId($this->request->post['userId']));
+        $event->setOwner($this->userMapper->createModel()->setId($this->requestPost['userId']));
 
         $this->postModify($event);
     }
@@ -572,31 +572,31 @@ class Controller extends Base
          * If not - pass author to the author
          */
         try {
-            $author = $this->userMapper->findById($this->request->post['authorId']);
+            $author = $this->userMapper->findById($this->requestPost['authorId']);
         } catch (Exception $e) {
             $author = $this->getUser();
         }
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $folders     = array_map('intval', $this->request->post['folder'] ?? []);
-        $campuses    = array_map('intval', $this->request->post['campus'] ?? []);
-        $accessLevel = (int)($this->request->post['level'] ?? null);
-        $eventTypeId = (int)($this->request->post['type'] ?? null);
-        $title       = $this->request->post['title'] ?? null;
-        $location    = $this->request->post['location'] ?? null;
-        $detail      = $this->request->post['detail'] ?? null;
-        $allDay      = (int)($this->request->post['allDay'] ?? null);
-        $roles       = $this->request->post['roles'] ?? [];
+        $folders     = array_map('intval', $this->requestPost['folder'] ?? []);
+        $campuses    = array_map('intval', $this->requestPost['campus'] ?? []);
+        $accessLevel = (int)($this->requestPost['level'] ?? null);
+        $eventTypeId = (int)($this->requestPost['type'] ?? null);
+        $title       = $this->requestPost['title'] ?? null;
+        $location    = $this->requestPost['location'] ?? null;
+        $detail      = $this->requestPost['detail'] ?? null;
+        $allDay      = (int)($this->requestPost['allDay'] ?? null);
+        $roles       = $this->requestPost['roles'] ?? [];
 
         /* Recurrence settings
          */
-        $efficacy = $this->request->post['efficacy'] ?? null;
-        $repeat   = $this->request->post['repeat'] ?? null;
+        $efficacy = $this->requestPost['efficacy'] ?? null;
+        $repeat   = $this->requestPost['repeat'] ?? null;
 
         /* Redirects
          */
-        $returnUrl = $this->request->query->get('returnUrl') ?? Redirect::encode('/calendar');
+        $returnUrl = $this->requestQuery->get('returnUrl') ?? Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
@@ -614,18 +614,18 @@ class Controller extends Base
          */
         $publishDate = null;
 
-        if ('' !== ($this->request->post['publishDate'] ?? '')) {
-            $publishDate = Alaress_Date_Format::newLocal($this->request->post['publishDate']);
+        if ('' !== ($this->requestPost['publishDate'] ?? '')) {
+            $publishDate = Alaress_Date_Format::newLocal($this->requestPost['publishDate']);
         }
 
         /* Start and end dates
          */
         if ($allDay === Event::ALL_DAY) {
-            $startDate = Alaress_Date_Format::newLocalShort($this->request->post['startDate'] ?? '')->startOfDay();
-            $endDate   = Alaress_Date_Format::newLocalShort($this->request->post['endDate'] ?? '')->endOfDay();
+            $startDate = Alaress_Date_Format::newLocalShort($this->requestPost['startDate'] ?? '')->startOfDay();
+            $endDate   = Alaress_Date_Format::newLocalShort($this->requestPost['endDate'] ?? '')->endOfDay();
         } else {
-            $startDate = Alaress_Date_Format::newLocal($this->request->post['startDate'] ?? '');
-            $endDate   = Alaress_Date_Format::newLocal($this->request->post['endDate'] ?? '');
+            $startDate = Alaress_Date_Format::newLocal($this->requestPost['startDate'] ?? '');
+            $endDate   = Alaress_Date_Format::newLocal($this->requestPost['endDate'] ?? '');
         }
 
         /* All events recur, due to the dropdown "Repeat" always being set.
@@ -637,7 +637,7 @@ class Controller extends Base
          * if it does not, or if it is malformed (ddmm/yyyy, dd/mmyyyy) just set the repeat date till the endDay->endOfDay
          */
         try {
-            $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'] ?? '')->endOfDay();
+            $untilDate = Alaress_Date_Format::newLocalShort($this->requestPost['repeat_until'] ?? '')->endOfDay();
         } catch (\Carbon\Exceptions\InvalidFormatException $e) {
             $untilDate = (clone $endDate)->endOfDay();
         }
@@ -657,11 +657,11 @@ class Controller extends Base
 
         /* Attendance settings
          */
-        $attendance    = (int)($this->request->post['attendance'] ?? '');
-        $maxAttendees  = '' === ($this->request->post['maxAttendees'] ?? '')
+        $attendance    = (int)($this->requestPost['attendance'] ?? '');
+        $maxAttendees  = '' === ($this->requestPost['maxAttendees'] ?? '')
             ? null
-            : (int)$this->request->post['maxAttendees'];
-        $showAttendees = (bool)($this->request->post['showAttendees'] ?? '');
+            : (int)$this->requestPost['maxAttendees'];
+        $showAttendees = (bool)($this->requestPost['showAttendees'] ?? '');
 
         // As of SA-10697 attendances are not reset on changing event time.
         // Prior to that, they were reset if the start or end time of the event changed.
@@ -672,8 +672,8 @@ class Controller extends Base
         $guests = [];
 
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
-            if ('' !== (string)($this->request->post['guests'] ?? '')) {
-                $guests = explode(',', $this->request->post['guests']);
+            if ('' !== (string)($this->requestPost['guests'] ?? '')) {
+                $guests = explode(',', $this->requestPost['guests']);
             }
         }
 
@@ -743,9 +743,9 @@ class Controller extends Base
     public function postMove(Event $event): void
     {
         // Do not modify anything except the event's start/end/allDay
-        $start  = new Alaress_Date_Format($this->request->post->get('start'), \DateTime::ATOM);
-        $end    = new Alaress_Date_Format($this->request->post->get('end'), \DateTime::ATOM);
-        $allDay = $this->request->post->getBool('allDay');
+        $start  = new Alaress_Date_Format($this->requestPost->get('start'), \DateTime::ATOM);
+        $end    = new Alaress_Date_Format($this->requestPost->get('end'), \DateTime::ATOM);
+        $allDay = $this->requestPost->getBool('allDay');
         if ($allDay) {
             $event->setStartDate($start->getDatabase());
             $event->setEndDate($end->getDatabase());
@@ -794,13 +794,13 @@ class Controller extends Base
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() !== null) {
-            if ($this->request->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
+            if ($this->requestPost['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
                 $allEvents = $this->eventMapper->getAllInSeries($event);
 
                 foreach ($allEvents as $currentEvent) {
                     $this->eventMapper->delete($currentEvent);
                 }
-            } elseif ($this->request->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SELF) {
+            } elseif ($this->requestPost['efficacy'] === EventRecurrenceMapper::EFFICACY_SELF) {
                 $this->eventMapper->delete($event);
             }
         } else {
@@ -809,13 +809,13 @@ class Controller extends Base
 
         /* Redirect
          */
-        $redirect = $this->request->query->get('returnUrl')
-            ? Redirect::decode($this->request->query->get('returnUrl'))
+        $redirect = $this->requestQuery->get('returnUrl')
+            ? Redirect::decode($this->requestQuery->get('returnUrl'))
             : $this->getSession()->getHistory();
 
         /* Calculate redirect for async javascript
          */
-        if ($this->request->isXhr()) {
+        if ($this->isXhrRequest()) {
             /* If you try to return to a place that no longer exists,
              * just go back to the main calendar view; this occurs
              * when you delete from the modify screen

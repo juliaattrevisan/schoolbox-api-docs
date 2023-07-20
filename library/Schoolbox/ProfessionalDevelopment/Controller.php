@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-
     /**
      * Const for when accreditation succeeds
      */
@@ -57,8 +56,8 @@ class Controller extends Base
      */
     public function postUpdate(User $user)
     {
-        $number = $this->getRequest()->post['pdNumber'];
-        $state = $this->getRequest()->post['pdState'];
+        $number = $this->requestPost['pdNumber'];
+        $state = $this->requestPost['pdState'];
 
         $result = (new Repository($this->pdMapper))->save($user, $number, $state);
 

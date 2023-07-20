@@ -69,7 +69,7 @@ class Controller extends Base
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',
-                    ['userIds' => $this->request->query->get('userIds')]
+                    ['userIds' => $this->requestQuery->get('userIds')]
                 ),
                 [Redirect::RETURN_URL, 'momentType']
             )
@@ -102,7 +102,7 @@ class Controller extends Base
         // Which variant is being shown?
         // * text
         // * upload
-        $momentType = $this->request->query->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
+        $momentType = $this->requestQuery->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
         $params = [
             'users'                    => $users,
@@ -179,7 +179,7 @@ class Controller extends Base
      */
     public function getMomentsForUser(User $user): void
     {
-        $encodedCursor = $this->request->query->get('cursor');
+        $encodedCursor = $this->requestQuery->get('cursor');
         $cursor        = new Cursor($this->mapper, $user);
         $data          = $cursor->retrieveResults($encodedCursor);
         $mappedData    = $data
@@ -248,9 +248,7 @@ class Controller extends Base
      */
     public function postMomentForUsers(Collection $users): void
     {
-        // requestBody is a stdclass from JSON, I'd rather work with arrays:
-        // encode then decode
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
 
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
@@ -332,7 +330,7 @@ class Controller extends Base
      */
     public function putEvidence(Model $evidence): void
     {
-        $requestBody       = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody       = $this->psr7Request->getParsedBody();
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());

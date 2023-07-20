@@ -141,7 +141,7 @@ class Controller extends Base
 
         // Add course permissions back
 
-        foreach ($this->getRequest()->post->get('course_group', []) as $roleId => $permission) {
+        foreach ($this->requestPost->get('course_group', []) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('course');
             $model->setPermission($permission);
@@ -151,7 +151,7 @@ class Controller extends Base
 
         // Add unit permissions back
 
-        foreach ($this->getRequest()->post->get('unit_group', []) as $roleId => $permission) {
+        foreach ($this->requestPost->get('unit_group', []) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('unit');
             $model->setPermission($permission);
@@ -162,25 +162,25 @@ class Controller extends Base
         // Update default page templates
 
         $courseTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_course_page_template');
-        $courseTemplate->setValue($this->getRequest()->post['courseTemplate']);
+        $courseTemplate->setValue($this->requestPost['courseTemplate']);
         $this->configMapper->save($courseTemplate);
 
         $unitTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_unit_page_template');
-        $unitTemplate->setValue($this->getRequest()->post['unitTemplate']);
+        $unitTemplate->setValue($this->requestPost['unitTemplate']);
         $this->configMapper->save($unitTemplate);
 
         // Update default inheritance
 
         $courseTemplate = $this->configMapper->findOneByColumn("name", "course_builder_default_course_page_inherit");
-        $courseTemplate->setValue((string)(int)$this->getRequest()->post->get('courseInherit'));
+        $courseTemplate->setValue((string)(int)$this->requestPost->get('courseInherit'));
         $this->configMapper->save($courseTemplate);
 
         $unitTemplate = $this->configMapper->findOneByColumn("name", "course_builder_default_unit_page_inherit");
-        $unitTemplate->setValue((string)(int)$this->getRequest()->post->get('unitInherit'));
+        $unitTemplate->setValue((string)(int)$this->requestPost->get('unitInherit'));
         $this->configMapper->save($unitTemplate);
 
         // Send them back to the admin page
 
-        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' . $this->getRequest()->post["tab"]);
+        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
     }
 }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Util;
 
-use Aura\Web\Request;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
@@ -17,7 +16,9 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder as JwtBuilder;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\LTI\Platform\Context\ConfigurationFactory;
+use Schoolbox\Url\Uri;
 
 /**
  * Factory for OIDC authentication requests.
@@ -51,21 +52,19 @@ class OidcAuthenticationRequestFactory
     /**
      * Build the OIDC authentication request.
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return LtiMessageInterface
      * @throws LtiExceptionInterface if the request couldn't be authenticated
      */
-    public function build(Request $request): LtiMessageInterface
+    public function build(ServerRequestInterface $request): LtiMessageInterface
     {
         // Nonce may be in either $_GET or $_POST
         // If it's not there: use the default nonce generator, I guess
-        if ($request->method->isGet()) {
-            $nonce = $request->query->get('nonce');
-        } elseif ($request->method->isPost()) {
-            $nonce = $request->post->get('nonce');
-        } else {
-            $nonce = null;
-        }
+        $nonce = match (strtolower($request->getMethod())) {
+            'get'   => (new Uri($request->getUri()->__toString()))->getQueryAsArray()['nonce'] ?? null,
+            'post'  => $request->getParsedBody()['nonce'] ?? null,
+            default => null,
+        };
 
         $messagePayloadBuilder = new MessagePayloadBuilder(
             isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
@@ -76,6 +75,6 @@ class OidcAuthenticationRequestFactory
             $this->registrationRepository,
             $this->userAuthenticator,
             $messagePayloadBuilder
-        ))->authenticate((new ServerRequestFactory())->build($request));
+        ))->authenticate($request);
     }
 }

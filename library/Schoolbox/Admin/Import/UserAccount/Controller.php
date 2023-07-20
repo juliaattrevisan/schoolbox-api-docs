@@ -231,7 +231,7 @@ class Controller extends Base
     protected function buildUpload(): Storage\IStorage
     {
         $factory = new CollectorFactory();
-        $attach  = $this->getRequest()->post->get('attachment');
+        $attach  = $this->requestPost->get('attachment');
 
         if (\is_array($attach)) {
             return $factory->build($attach)->getFirst();

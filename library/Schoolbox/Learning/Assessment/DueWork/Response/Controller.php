@@ -196,7 +196,7 @@ class Controller extends Base
             $response->getAllFiles()->sortBy('filename', 'asc');
 
             // The file that's being reviewed
-            $file = $this->getFile($response, $this->getRequest()->query->get('hash'));
+            $file = $this->getFile($response, $this->requestQuery->get('hash'));
 
             // Self-assessed feedback (published only)
             $selfAssessmentFeedback = $response->findMostRecentSelfAssessedPublishedFeedback();
@@ -238,7 +238,7 @@ class Controller extends Base
             'feedback' => $feedback,
             'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'attachzone' => $attachZone->getTwigContext(),
-            'selectedFileHash' => $this->request->query->get('hash'),
+            'selectedFileHash' => $this->requestQuery->get('hash'),
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
 
             /* The Student Carousel is the selectize thing that cycles between the currently
@@ -363,7 +363,7 @@ class Controller extends Base
 
         // Let the browser know that the synchronous request has finished (either success or failure)
         $response = $this->getResponse();
-        $token    = $this->getRequest()->query->get('token');
+        $token    = $this->requestQuery->get('token');
         $response->cookies->set('kamiExportToken', $token, null, '/', null, null, false);
         $response->cookies->set('kamiExportStatus', $export->getStatus(), null, '/', null, null, false);
 
@@ -576,7 +576,7 @@ class Controller extends Base
         if (!$file->getEditableInline()) {
             $this->response->redirect->permanentRedirect(
                 (new Uri('/storage/fetch.php'))
-                    ->appendQueryParameters($this->request->query->getArrayCopy())
+                    ->appendQueryParameters($this->requestQuery->getArrayCopy())
                     ->__toString()
             );
         }
@@ -584,7 +584,7 @@ class Controller extends Base
         // Otherwise: render it in Twig, and output as an attachment if either:
         // * the HTML mimetype is openable inline
         // * the `save` query string param exists
-        if (!$file->getMimetype()->getInline() || $this->request->query->get('save')) {
+        if (!$file->getMimetype()->getInline() || $this->requestQuery->get('save')) {
             $this->response->headers->set(
                 'Content-Disposition',
                 sprintf('attachment; filename="%s"', $file->getBasename()),
@@ -628,7 +628,7 @@ class Controller extends Base
         /* TODO Arguably this should be in a storage controller in a storage route
          */
         (new Fetcher($this->getConfigLoader(), $this->getDi()->get('filesystem.storageProxy')))
-            ->fetch($file->getBasename(), $resource, (bool)$this->request->query->get('cache'), $this->getRequest()->query['save'] ?? false);
+            ->fetch($file->getBasename(), $resource, (bool)$this->requestQuery->get('cache'), $this->requestQuery['save'] ?? false);
         exit;
     }
 

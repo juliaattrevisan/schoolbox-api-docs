@@ -41,7 +41,6 @@ use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
-use Schoolbox\LTI\Util\ServerRequestFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -214,7 +213,7 @@ class Controller extends BaseController
             )
             // If a context was passed in the query string:
             // add it to the return URL
-            ->appendQueryParameters(['context' => $this->request->query->get('context')]);
+            ->appendQueryParameters(['context' => $this->requestQuery->get('context')]);
 
         // Standard deep linking settings
         $deepLinkingSettings = new DeepLinkingSettings(
@@ -276,9 +275,7 @@ class Controller extends BaseController
             new AccessTokenRepository($this->accessTokenCache),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
-        $request = $resourceServerValidator->validateAuthenticatedRequest(
-            (new ServerRequestFactory())->build($this->request)
-        );
+        $request = $resourceServerValidator->validateAuthenticatedRequest($this->psr7Request);
 
         // Handle the request
         $builder = new Builder(

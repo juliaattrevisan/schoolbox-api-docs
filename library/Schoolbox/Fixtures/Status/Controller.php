@@ -86,9 +86,9 @@ class Controller extends AbstractController
      */
     protected function persistEntity($entity)
     {
-        $this->saveStatus($entity, $this->getRequest()->post['name']);
+        $this->saveStatus($entity, $this->requestPost['name']);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $status = [
                 'id' => $entity->getId(),
                 'update' => $this->routeGenerator->generate('sportsfixturesStatus.updateEntity', [

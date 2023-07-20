@@ -84,7 +84,7 @@ class Controller extends Base
      */
     public function search()
     {
-        $search = trim($this->getRequest()->query['query']);
+        $search = trim($this->requestQuery['query']);
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
@@ -179,7 +179,7 @@ class Controller extends Base
 
         // Default learning area and level, or a preselected one?
 
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $code = 200;
 
         // Perform necessary validations, if any.
@@ -206,7 +206,7 @@ class Controller extends Base
         }
 
         // Send something back
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 array(
@@ -233,7 +233,7 @@ class Controller extends Base
      */
     public function update(Node\Model $item)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $code = 200;
 
         // Perform necessary validations, if any.
@@ -259,7 +259,7 @@ class Controller extends Base
         }
 
         // Send something back
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 array(
@@ -293,7 +293,7 @@ class Controller extends Base
         }
 
         // Send something back
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
                 array(

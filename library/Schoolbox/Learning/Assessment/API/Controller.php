@@ -74,14 +74,14 @@ class Controller extends Base
          * check if filter is an array or string and use it like that
          */
         $filter = null;
-        $getFilter = $this->request->query->get('filter', '');
+        $getFilter = $this->requestQuery->get('filter', '');
         if (is_string($getFilter)) {
-            $filter = json_decode($this->request->query->get('filter', ''), true) ?? null;
+            $filter = json_decode($this->requestQuery->get('filter', ''), true) ?? null;
         } elseif (is_array($getFilter)) {
             $filter = $getFilter;
         }
-        $cursor = (int)$this->request->query->get('cursor', null);
-        $limit = (int)$this->request->query->get('limit', 5);
+        $cursor = (int)$this->requestQuery->get('cursor', null);
+        $limit = (int)$this->requestQuery->get('limit', 5);
 
         if (null === $filter) {
             $problem = (new ApiProblem('Filter must not be blank'))

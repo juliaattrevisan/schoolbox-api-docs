@@ -69,8 +69,8 @@ class Controller extends Assessment\Controller
 
         /* Craft a returnUrl, to redirect back to the place from whence you came
          */
-        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         } else {
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }

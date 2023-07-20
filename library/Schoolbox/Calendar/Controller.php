@@ -144,7 +144,7 @@ class Controller extends Base
             );
         }
 
-        if ($this->getRequest()->query->get('s')) {
+        if ($this->requestQuery->get('s')) {
             $route .= '?s=1';
         }
 
@@ -205,7 +205,7 @@ class Controller extends Base
      */
     private function generateSelectedDate(?string $selectedDate): ?string
     {
-        $series = $this->getRequest()->query->get('s');
+        $series = $this->requestQuery->get('s');
 
         if ($series !== null) {
             $event = $this->eventMapper->findNextInSeries($series);

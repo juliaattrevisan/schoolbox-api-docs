@@ -141,10 +141,10 @@ class Controller extends Base
      */
     public function postModify(BlogModel $blog)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
-        $blog->setBody($this->getRequest()->post["body"]);
-        $blog->setHeading($this->getRequest()->post["heading"]);
+        $blog->setBody($this->requestPost["body"]);
+        $blog->setHeading($this->requestPost["heading"]);
         $this->getBlogMapper()->save($blog);
 
         // Process image gallery attachments
@@ -281,7 +281,7 @@ class Controller extends Base
     public function postCommentInsert(BlogModel $blog)
     {
         // Comments must not be empty
-        if (strlen(trim($this->getRequest()->post['commentBody'])) === 0) {
+        if (strlen(trim($this->requestPost['commentBody'])) === 0) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -289,12 +289,12 @@ class Controller extends Base
         $comment = $this->getBlogCommentMapper()->createModel();
         $comment->setOwner($this->getUser());
         $comment->setBlog($blog);
-        $comment->setBody($this->getRequest()->post['commentBody']);
+        $comment->setBody($this->requestPost['commentBody']);
         $comment->setCreatedAt(\Alaress_Date_Format::now());
 
         $this->getBlogCommentMapper()->save($comment);
 
-        $returnUrlEncoded = $this->getRequest()->post['returnUrl'];
+        $returnUrlEncoded = $this->requestPost['returnUrl'];
 
         if ($returnUrlEncoded !== null) {
             $returnUrl = Redirect::decode($returnUrlEncoded);

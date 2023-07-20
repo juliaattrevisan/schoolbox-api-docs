@@ -9,12 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Prototype\Tool;
 
-use Aura\Web\Request;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
-use Schoolbox\LTI\Util\ServerRequestFactory;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Factory for OIDC initiation requests.
@@ -39,12 +38,12 @@ class OidcInitiationRequestFactory
     /**
      * Build the OIDC initiation request.
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return LtiMessageInterface
      * @throws LtiExceptionInterface
      */
-    public function build(Request $request): LtiMessageInterface
+    public function build(ServerRequestInterface $request): LtiMessageInterface
     {
-        return $this->oidcInitiator->initiate((new ServerRequestFactory())->build($request));
+        return $this->oidcInitiator->initiate($request);
     }
 }

@@ -227,7 +227,7 @@ class Controller extends Base
     {
         $linesPerPage = 50;
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $template = 'lines';
             $format   = 'nochrome';
         } elseif ($format == 'html') {
@@ -242,7 +242,7 @@ class Controller extends Base
             $format   = 'html';
         }
 
-        $query    = $this->getRequest()->query;
+        $query    = $this->requestQuery;
         $page     = $query->get('p', 1);
         $filter   = $query->get('filter', '');
         $template = "@upsRuleset/log/$template.twig";
@@ -304,7 +304,7 @@ class Controller extends Base
             exit;
         } catch (OutOfBoundsException $e) {
             // 400: requested a page that doesn't exist
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 // just tell them they're naughty, that will be enough
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set([
@@ -547,7 +547,7 @@ class Controller extends Base
     public function updateRuleset()
     {
         $response = [];
-        $postData = $this->getRequest()->post;
+        $postData = $this->requestPost;
         $roleType = $postData['rulesetId'];
 
         $response['config']     = $this->updateConfig($roleType, $postData['config'][$roleType]);
@@ -571,7 +571,7 @@ class Controller extends Base
     {
 
         $response = [];
-        $postData = $this->getRequest()->post;
+        $postData = $this->requestPost;
 
         foreach ($postData['rule'] as $ruleId => $ruleData) {
             $response['condition'] = $this->updateConditions($ruleId, $ruleData['condition'] ?? null);

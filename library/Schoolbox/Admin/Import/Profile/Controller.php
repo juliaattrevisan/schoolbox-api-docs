@@ -173,17 +173,17 @@ class Controller extends Base
         $logs = [];
         $errors = [];
 
-        if (!$this->getRequest()->post['file']) {
+        if (!$this->requestPost['file']) {
             $errors[] = 'Please choose a csv type.';
         } else {
             /* Process attachment specifically
              */
-            if ($this->getRequest()->post['attachment'] ?? false) {
-                $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
+            if ($this->requestPost['attachment'] ?? false) {
+                $attachment = $collectorFactory->build($this->requestPost['attachment'])->getAll();
 
                 try {
                     $importer = new Importer(
-                        $this->getRequest()->post['file'],
+                        $this->requestPost['file'],
                         $attachment[0],
                         $db,
                         $this->baseProfileMapper,
@@ -197,7 +197,7 @@ class Controller extends Base
 
                     /* Actually persist changes
                      */
-                    if ((bool)$this->getRequest()->query->get('perform')) {
+                    if ((bool)$this->requestQuery->get('perform')) {
                         $importer->setPerform(true);
                     }
 
@@ -223,11 +223,11 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
             'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->routeGenerator),
             'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportProfile')->getAllNodes(),
-            'attachment' => $this->getRequest()->post['attachment'] ?? null,
+            'attachment' => $this->requestPost['attachment'] ?? null,
             'errors' => $errors,
             'logs' => $logs,
-            'file' => $this->getRequest()->post['file'],
-            'perform' => (bool)$this->getRequest()->query->get('perform')
+            'file' => $this->requestPost['file'],
+            'perform' => (bool)$this->requestQuery->get('perform')
         ])->setTitle('Import User Profile'));
     }
 

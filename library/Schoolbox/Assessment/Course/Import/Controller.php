@@ -10,8 +10,8 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Web\Controller as Base;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Request;
 use Component_Definition;
 use Component_Instance;
 use Component_InstanceMapper;
@@ -129,13 +129,13 @@ class Controller extends Base\Base
                 ] : [],
             'componentId'      => $component ? $component->getId() : null,
             'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'encodedReturnUrl' => $this->requestQuery->get(Redirect::RETURN_URL),
 
             /* Go to the redirect destination if you've already imported this course
              * and you chose to cancel what you were doing
              */
             'importedAlready' => $exists,
-            'importedAlreadyRedirect' => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL)),
+            'importedAlreadyRedirect' => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL)),
         ];
 
         if (self::IMPORT_STAGE_UNITS === $initialStage) {
@@ -170,9 +170,9 @@ class Controller extends Base\Base
      */
     public function postClasses()
     {
-        $courseSpecId    = trim($this->getRequest()->post['course_spec_id']);
-        $targetFolderIds = $this->parseFolderIds($this->getRequest()->post['import_folders']);
-        $componentId     = trim($this->getRequest()->post['component_id']);
+        $courseSpecId    = trim($this->requestPost['course_spec_id']);
+        $targetFolderIds = $this->parseFolderIds($this->requestPost['import_folders']);
+        $componentId     = trim($this->requestPost['component_id']);
 
         try {
             $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
@@ -235,7 +235,7 @@ class Controller extends Base\Base
      */
     public function searchClasses()
     {
-        $query          = (string)$this->getRequest()->query->get('query');
+        $query          = (string)$this->requestQuery->get('query');
         $folders        = (new Destinations($this->folderMapper))->findImportable($query);
 
         /* Swap keys for selectize compatibility -_-
@@ -293,11 +293,11 @@ class Controller extends Base\Base
      */
     public function postUnits()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $action           = trim($post['action']);
         $courseSpecId     = trim($post['course_spec_id']);
-        $targetFolderIds  = $this->parseFolderIds($this->getRequest()->post['import_folders']);
+        $targetFolderIds  = $this->parseFolderIds($this->requestPost['import_folders']);
         $courseImplId     = trim($post['course_impl_id']);
         $componentId      = trim($post['component_id']);
         $units            = $post['unit'] ?? [];
@@ -483,7 +483,7 @@ class Controller extends Base\Base
         // Transact this entire request, rolling back if any exception is raised
         try {
             $this->unitImplementationMapper->getDatabase()->transact(function () {
-                $this->persistCourseImplementation($this->request->post);
+                $this->persistCourseImplementation($this->requestPost);
             });
         } catch (\Throwable $e) {
             $this->sendError($e->getMessage());
@@ -493,7 +493,7 @@ class Controller extends Base\Base
         /* Redirect back to wherever you came from...
          * ...hopefully (...your confidence is inspiring)
          */
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if ($encodedReturnUrl) {
             $redirect = Redirect::decode($encodedReturnUrl);
         } else {
@@ -605,7 +605,7 @@ class Controller extends Base\Base
             ],
             'unitsImpls'       => $courseImpl->getUnits(),
             'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'encodedReturnUrl' => $this->requestQuery->get(Redirect::RETURN_URL),
             'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
 
             /* You're modifying an already-imported course so don't worry about this warning
@@ -890,7 +890,7 @@ class Controller extends Base\Base
     /**
      * Persist a course implementation, based upon submitted form data.
      *
-     * @param Request\Values $post POST data
+     * @param Values $post POST data
      *
      * @var string   $post  ['action']                                           {'import' | 'modify'}
      * @var int      $post  ['course_spec_id']
@@ -914,7 +914,7 @@ class Controller extends Base\Base
      * @throws MapperException
      * @throws MapperException\Deleted
      */
-    private function persistCourseImplementation(Request\Values $post): void
+    private function persistCourseImplementation(Values $post): void
     {
         // Parse form data
         $action       = trim($post['action']);

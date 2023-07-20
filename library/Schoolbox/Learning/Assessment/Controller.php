@@ -197,7 +197,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getCreateAssessmentForm(AssessmentContext $context): void
     {
-        $type = $this->getRequest()->query->get('type');
+        $type = $this->requestQuery->get('type');
 
         // build a stub
         $assessment = AssessmentType::stringToObject($type, $context);
@@ -218,7 +218,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['markVisibility'] = $this->getConfigLoader()->get('submission_access');
 
         // Did the caller request a returnUrl?
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
 
         if ($returnUrl) {
             $data[Redirect::RETURN_URL] = $returnUrl;
@@ -261,7 +261,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              *
              * Embrace both the asynchronous and synchronous access mechanisms
              */
-            $templateId = trim((string)$this->getRequest()->query->get('lpt'));
+            $templateId = trim((string)$this->requestQuery->get('lpt'));
 
             /* Some metadata for the Lesson Plan workflow
              * This encapsulates the myriad of combinations which is really really awkward
@@ -288,8 +288,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  * Otherwise you need to load the container itself because you came here
                  * via the Course Creation process...
                  */
-                if ('' === trim((string)$this->getRequest()->query->get('part-1'))) {
-                    if ($this->getRequest()->isXhr()) {
+                if ('' === trim((string)$this->requestQuery->get('part-1'))) {
+                    if ($this->isXhrRequest()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
                             '@learningAssessment/%s/selectionContainer.twig',
                             AssessmentType::TYPE_LESSON_PLAN
@@ -305,7 +305,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 } else {
                     $data['lessonPlanMeta']['mageAsync'] = true;
 
-                    if ($this->getRequest()->isXhr()) {
+                    if ($this->isXhrRequest()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
                             '@learningAssessment/%s/selection.twig',
                             AssessmentType::TYPE_LESSON_PLAN
@@ -329,7 +329,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  */
                 $data['lessonPlanMeta']['fields'] = $lessonPlanTemplate->getFields();
 
-                if ($this->getRequest()->isXhr()) {
+                if ($this->isXhrRequest()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(
                         "@learningAssessment/%s/create.twig",
                         AssessmentType::TYPE_LESSON_PLAN
@@ -340,7 +340,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         } else {
             // either output the fragment to the mage, or use the synchronous form
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
             } else {
                 $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
@@ -369,7 +369,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
         $data['returnUrlName'] = Redirect::RETURN_URL;
-        $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
 
         /* Curriculum Codes prefilled from those associated with the assessment itself
          hide nodes with no codes
@@ -440,7 +440,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         try {
             $assessmentInfo = $this->persistAssessment(
                 $this->getUser(),
-                $this->getRequest()->post,
+                $this->requestPost,
                 $assessment
             );
         } catch (DomainException $e) {
@@ -451,7 +451,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return;
         }
 
-        $postReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
+        $postReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
         $returnUrl     = $this->determineRedirect(
             $assessmentInfo['assessment'],
             $postReturnUrl,
@@ -571,7 +571,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $postReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $postReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
 
         $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, "/homepage/{$folder->getId()}");
 
@@ -582,7 +582,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([
                 Redirect::RETURN_URL => $returnUrl
             ]));

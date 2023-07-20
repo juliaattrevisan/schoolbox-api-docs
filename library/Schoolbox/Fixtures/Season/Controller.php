@@ -75,9 +75,9 @@ class Controller extends AbstractController
 
         /* ajax a list of seasons
          */
-        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+        if (str_contains($this->psr7Request->getHeaderLine('accept'), 'application/json')) {
             // quote the query string to protect against injection and the like
-            $query = $this->getRequest()->query->get('query');
+            $query = $this->requestQuery->get('query');
 
             $pb = $this->getMapper()->getPredicateBuilder();
             $pb->like('name', "%{$this->getMapper()->getDatabase()->getQuoter()->escapeForLike($query)}%");
@@ -184,9 +184,9 @@ class Controller extends AbstractController
         try {
             $this->saveSeason(
                 $entity,
-                $this->getRequest()->post['name'],
-                Alaress_Date_Format::newLocalShort($this->getRequest()->post['start']),
-                Alaress_Date_Format::newLocalShort($this->getRequest()->post['end'])
+                $this->requestPost['name'],
+                Alaress_Date_Format::newLocalShort($this->requestPost['start']),
+                Alaress_Date_Format::newLocalShort($this->requestPost['end'])
             );
 
             $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesSeason.getList'));
@@ -225,7 +225,7 @@ class Controller extends AbstractController
      */
     public function deleteEntity($entity)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // When soft-deleting a season, we must ensure any linked divisions and matches are not left in
         // an invalid state (ie pointing to a soft-deleted season). Hence, if linked entities exist, the caller
@@ -322,7 +322,7 @@ class Controller extends AbstractController
      */
     protected function outputPostSuccess(Season $season)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $divisionCounts = $this->getMapper()->getDivisionCounts([$season->getId()]);
             if (!isset($divisionCounts[$season->getId()])) {
                 $divisionCounts[$season->getId()] = 0;
@@ -357,7 +357,7 @@ class Controller extends AbstractController
      */
     protected function outputPostError(Season $season, Exception $e)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Dump out an AJAX error
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set($this->buildJsonOutput($e->getMessage()));

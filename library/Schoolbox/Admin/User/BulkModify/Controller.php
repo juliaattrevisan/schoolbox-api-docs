@@ -130,7 +130,7 @@ class Controller extends Base
      */
     public function getUserList()
     {
-        $selected = json_decode($this->request->content->get(), true);
+        $selected = $this->psr7Request->getParsedBody();
         /* If there were any search results, display control options
          */
         $userList = $this->userBulkMapper->bulkModifySearch(
@@ -149,7 +149,7 @@ class Controller extends Base
      */
     public function postModify()
     {
-        $params  = $this->request->post;
+        $params  = $this->requestPost;
         $userIds = $params->get('users');
 
         if (!is_array($userIds) || count($userIds) === 0) {
@@ -205,7 +205,7 @@ class Controller extends Base
      */
     public function deleteUsers()
     {
-        $params  = $this->request->post;
+        $params  = $this->requestPost;
         $userIds = $params->get('users');
 
         if (!is_array($userIds) || count($userIds) === 0) {

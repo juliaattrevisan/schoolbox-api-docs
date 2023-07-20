@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
-use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -158,7 +158,7 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         $this->getResponse()->content->set(
             [
@@ -214,7 +214,7 @@ class Controller extends Base
      */
     public function getStudent(User $student): void
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         // Create an audit record of anyone viewing a student record
         // Hydrate user with group membership
@@ -292,7 +292,7 @@ class Controller extends Base
      */
     public function getLinked(User $student, User $linkedStudent): void
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         // Create an audit record of anyone viewing a student record
 
@@ -504,7 +504,7 @@ class Controller extends Base
 
         // When student ids are provided to copy this record to:
         // add all those students and their parents to the role user counts.
-        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
+        $duplicateIds = explode(',', $this->requestQuery->get('duplicates') ?? '');
         /** @var User[] $duplicates */
         $duplicates = $this->userMapper->findByColumnList([
             'id'           => $duplicateIds,
@@ -639,7 +639,7 @@ class Controller extends Base
                     'audiences'         => $audienceDefaults,
                     'students'          => json_encode($students),
                     'returnUrlName'     => Redirect::RETURN_URL,
-                    'encodedReturnUrl'  => $this->request->query->get(Redirect::RETURN_URL),
+                    'encodedReturnUrl'  => $this->requestQuery->get(Redirect::RETURN_URL),
                 ],
                 'title'    => 'Pastoral Record',
             ]
@@ -674,7 +674,7 @@ class Controller extends Base
      */
     public function postCommentInsert(Model $record): void
     {
-        $post = $this->request->post;
+        $post = $this->requestPost;
         /**
          * confirm if the user can view / edit the private part of the record
          */
@@ -767,7 +767,7 @@ class Controller extends Base
      */
     public function postRecordInsert(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $studentId           = (int)$post->get('student_id');
         $duplicateStudentIds = array_filter(
@@ -827,7 +827,7 @@ class Controller extends Base
      */
     public function postRecordUpdate(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Grab the pastoral record we are updating
 
@@ -863,14 +863,14 @@ class Controller extends Base
      * Create/update student records
      *
      * @param int                $primaryStudentId    The primary record's student ID
-     * @param RequestValues      $post                POST parameters passed by the create/update form
+     * @param Values             $post                POST parameters passed by the create/update form
      * @param array              $duplicateStudentIds List of students the primary record should be duplicated on
      * @param PastoralModel|null $parent              Parent record (if we are updating an existing record)
      *
      * @return GenericCollection
      * @throws MapperException
      */
-    private function processPastoralRecords(int $primaryStudentId, RequestValues $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
+    private function processPastoralRecords(int $primaryStudentId, Values $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
     {
         $heading = trim((string)$post->get('heading'));
         if (empty($heading)) {
@@ -1259,11 +1259,11 @@ class Controller extends Base
     /**
      * Prepare pastoral record attachments.
      *
-     * @param RequestValues $post POST request vars
+     * @param Values $post POST request vars
      * @return Collection
      * @throws MapperException
      */
-    private function prepareAttachments(RequestValues $post): Collection
+    private function prepareAttachments(Values $post): Collection
     {
         $newAttachments = $this->pastoralAttachmentMapper->createCollection();
 
@@ -1298,11 +1298,11 @@ class Controller extends Base
 
     /**
      * Returns recordActions from post vars, indexed by luAction id
-     * @param RequestValues $post
+     * @param Values $post
      * @return Collection
      * @throws MapperException
      */
-    private function prepareRecordActions(RequestValues $post): Collection
+    private function prepareRecordActions(Values $post): Collection
     {
         $recordActions = $this->pastoralRecordActionMapper->createCollection();
         if (!$this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
@@ -1343,18 +1343,18 @@ class Controller extends Base
     public function getActions()
     {
         // If subtype id is provided, attempt to get actions of the subtype
-        if (is_numeric($this->request->query->get('subtypeId'))) {
+        if (is_numeric($this->requestQuery->get('subtypeId'))) {
             try {
-                $subtype = $this->pastoralSubTypeMapper->findById((int)$this->request->query->get('subtypeId'));
+                $subtype = $this->pastoralSubTypeMapper->findById((int)$this->requestQuery->get('subtypeId'));
                 $actions = $subtype->getTypeActions();
             } catch (MapperException $e) {
             }
         }
 
         // If type id is provided, attempt to get actions of the type
-        if (!isset($actions) && is_numeric($this->request->query->get('typeId'))) {
+        if (!isset($actions) && is_numeric($this->requestQuery->get('typeId'))) {
             try {
-                $type    = $this->pastoralTypeMapper->findById((int)$this->request->query->get('typeId'));
+                $type    = $this->pastoralTypeMapper->findById((int)$this->requestQuery->get('typeId'));
                 $actions = $type->getTypeActions();
             } catch (MapperException $e) {
             }
@@ -1389,8 +1389,8 @@ class Controller extends Base
      */
     public function postActionUpdate(Model $record): void
     {
-        $recordActionId = (int)$this->request->post->get('recordActionId');
-        $checked        = (bool)$this->request->post->get('checked');
+        $recordActionId = (int)$this->requestPost->get('recordActionId');
+        $checked        = (bool)$this->requestPost->get('checked');
 
         $data = [];
         try {
@@ -1413,7 +1413,7 @@ class Controller extends Base
      */
     public function searchTags()
     {
-        $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->request->query->get('query'));
+        $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->requestQuery->get('query'));
         $data = $tags->map(function ($tag) {
             /** @var Tag\Model $tag */
             return [

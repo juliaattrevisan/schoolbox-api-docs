@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-
     /** @var Mapper $tourMapper */
     private $tourMapper;
 
@@ -72,7 +71,7 @@ class Controller extends Base
     public function saveStatus()
     {
         $this->getResponse()->content->set($this->buildJsonOutput(null));
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         /** @var User $user */
         $user = $this->getUser();

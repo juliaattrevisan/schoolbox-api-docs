@@ -114,7 +114,7 @@ class Controller extends Base
             (new ValidCanInvite())->isSatisfiedBy($this->getUser(), (bool)$this->di->get('config')->get('calendar_student_can_invite'))
             && $event->getAttendance() > Model::LEVEL_NO_ATTENDANCE
         ) {
-            $newGuestIds = $this->request->post->get('guests') ? explode(',', $this->request->post->get('guests')) : [];
+            $newGuestIds = $this->requestPost->get('guests') ? explode(',', $this->requestPost->get('guests')) : [];
 
             $ids = array_diff($newGuestIds, $oldGuestIds);
         }
@@ -167,7 +167,7 @@ class Controller extends Base
     {
         $this->attendanceMapper->deleteByColumnList([
             'event_id' => $event->getId(),
-            'user_id'  => $this->request->post->get('userId'),
+            'user_id'  => $this->requestPost->get('userId'),
         ]);
 
         /* Regenerate a new html fragment for the people currently invited

@@ -21,7 +21,6 @@ use Schoolbox\Sync\Condition\Fragment\Factory as ConditionFragmentFactory;
  */
 class Controller extends Base
 {
-
     /**
      * A meta field for various Condition-specific UI
      */
@@ -95,7 +94,7 @@ class Controller extends Base
      */
     public function delete()
     {
-        $conditionId = $this->getRequest()->post->get('conditionId');
+        $conditionId = $this->requestPost->get('conditionId');
         $deleteCount = Condition\Mapper::getInstance()->deleteByColumn('id', $conditionId);
 
         $this->getResponse()->content->set([

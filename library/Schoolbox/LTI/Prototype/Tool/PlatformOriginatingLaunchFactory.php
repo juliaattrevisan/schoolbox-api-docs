@@ -9,13 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Prototype\Tool;
 
-use Aura\Web\Request;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
-use Schoolbox\LTI\Util\ServerRequestFactory;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Factory for platform originating launches.
@@ -43,11 +42,11 @@ class PlatformOriginatingLaunchFactory
     /**
      * Build the launch.
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return LaunchValidationResultInterface
      */
-    public function build(Request $request): LaunchValidationResultInterface
+    public function build(ServerRequestInterface $request): LaunchValidationResultInterface
     {
-        return $this->validator->validatePlatformOriginatingLaunch((new ServerRequestFactory())->build($request));
+        return $this->validator->validatePlatformOriginatingLaunch($request);
     }
 }

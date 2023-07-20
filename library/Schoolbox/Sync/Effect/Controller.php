@@ -21,7 +21,6 @@ use Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
  */
 class Controller extends Base
 {
-
     /**
      * A meta field for various Condition-specific UI
      */
@@ -183,7 +182,7 @@ class Controller extends Base
      */
     public function change()
     {
-        $queryData = $this->getRequest()->query;
+        $queryData = $this->requestQuery;
 
         $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
 
@@ -232,7 +231,7 @@ class Controller extends Base
      */
     public function delete()
     {
-        $effectId = $this->getRequest()->post->get('effectId');
+        $effectId = $this->requestPost->get('effectId');
         $deleteCount = Effect\Mapper::getInstance()->deleteByColumn('id', $effectId);
 
         $this->getResponse()->content->set([
@@ -249,7 +248,7 @@ class Controller extends Base
      */
     public function newMappedRow()
     {
-        $queryData = $this->getRequest()->query;
+        $queryData = $this->requestQuery;
 
         $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
 

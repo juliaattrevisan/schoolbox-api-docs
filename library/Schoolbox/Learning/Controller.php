@@ -135,7 +135,7 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
         $route       = $this->routeGenerator->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $queryArgs   = $this->getRequest()->query->getArrayCopy();
+        $queryArgs   = $this->requestQuery->getArrayCopy();
         $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $queryArgs);
 
         $title = 'Pending Assessments';
@@ -171,7 +171,7 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         try {
-            $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+            $postFilterSelections = $this->requestPost['filter_selection'] ?: [];
             $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $viewee, $postFilterSelections);
 
             $this->getResponse()->content->set($this->buildJsonOutput([

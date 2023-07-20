@@ -9,7 +9,7 @@
 namespace Schoolbox\Admin\Eportfolio;
 
 use Alaress\Web\Controller\Base;
-use Aura\Web\Request\Values;
+use Alaress\Web\Request\Values;
 use Component\Eportfolio\Textbox as EportfolioTextbox;
 use Component\Eportfolio\TextboxMapper as EportfolioTextboxMapper;
 use Component_Config;
@@ -135,7 +135,7 @@ class Controller extends Base
      */
     public function postDeploy()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Do the import in a detached state so it doesn't time out
 
@@ -165,7 +165,7 @@ class Controller extends Base
      * @param Values $post
      * @param int $id ID of the import for logging purposes
      */
-    private function deployCallback($post, $id)
+    private function deployCallback(Values $post, $id)
     {
         if ($post->getBool('dryRun', false)) {
             $this->log('Starting dry run.', $id);
@@ -305,7 +305,7 @@ class Controller extends Base
 
                     /** @var EportfolioPage $page */
                     /** @var Component_ControllerAbstract[] $componentList */
-                    list($page, $componentList) = $eportfolio;
+                    [$page, $componentList] = $eportfolio;
 
                     // Check this user doesn't already have this page.
 

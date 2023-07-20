@@ -91,7 +91,7 @@ class Controller extends BaseController
     public function postMyGroupAdd(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId = (int)$this->request->post->get('group');
+        $groupFolderId = (int)$this->requestPost->get('group');
         $user          = $this->getUser();
         $group         = $this->getGroup($groupFolderId);
         if (null === $group) {
@@ -154,7 +154,7 @@ class Controller extends BaseController
     public function postMyGroupDelete(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId = (int)$this->request->post->get('group');
+        $groupFolderId = (int)$this->requestPost->get('group');
         $user          = $this->getUser();
         $group         = $this->getGroup($groupFolderId);
         if (null === $group) {
@@ -197,8 +197,8 @@ class Controller extends BaseController
     public function postMyGroupNotify(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId    = (int)$this->request->post->get('group');
-        $isNotificationOn = (bool)$this->request->post->get('isNotificationsOn');
+        $groupFolderId    = (int)$this->requestPost->get('group');
+        $isNotificationOn = (bool)$this->requestPost->get('isNotificationsOn');
         $user             = $this->getUser();
         $group            = $this->getGroup($groupFolderId);
         if (null === $group) {
@@ -242,8 +242,8 @@ class Controller extends BaseController
     public function postMyGroupFavourite(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId = (int)$this->request->post->get('group');
-        $isFavourite   = (bool)$this->request->post->get('isFavourite');
+        $groupFolderId = (int)$this->requestPost->get('group');
+        $isFavourite   = (bool)$this->requestPost->get('isFavourite');
         $user          = $this->getUser();
         $group         = $this->getGroup($groupFolderId);
         if (null === $group) {

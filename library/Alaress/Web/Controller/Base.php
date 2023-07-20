@@ -13,11 +13,11 @@ namespace Alaress\Web\Controller;
 use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
+use Alaress\Web\Request\Values;
 use Aura\Router\Generator;
 use Aura\Router\RouterContainer;
 use Aura\Session\SegmentInterface;
 use Aura\Web\Exception\InvalidStatusCode;
-use Aura\Web\Request;
 use Aura\Web\Response;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
@@ -25,6 +25,7 @@ use Crell\ApiProblem\ApiProblem;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
@@ -34,14 +35,41 @@ use Schoolbox\Url\Uri;
 abstract class Base
 {
     /**
-     * @var Request
+     * A PSR-7 compliant request object, which represents the current incoming
+     * request.
      */
-    protected $request;
+    protected ServerRequestInterface $psr7Request;
 
     /**
-     * @var Response
+     * A values container, representing the parsed query string (a.k.a. $_GET).
+     *
+     * Provided in order to ease the transition from `Aura.Web` to PSR-7 request
+     * objects.
      */
-    protected $response;
+    protected Values $requestQuery;
+
+    /**
+     * A values container, representing $_POST data if provided.
+     */
+    protected Values $requestPost;
+
+    /**
+     * Response object from Aura.Web package.
+     *
+     * @deprecated This will be replaced with a PSR-7 compliant response object
+     *             in `$this->psr7Response`.
+     *             If that object is not set, the output mechanism will fall
+     *             back to this object.
+     */
+    protected Response $response;
+
+    /**
+     * A PSR-7 compliant response object.
+     *
+     * If this is set: a response will be output from this object instead of
+     * from `$this->response`.
+     */
+    protected ?ResponseInterface $psr7Response = null;
 
     /**
      * @deprecated you should be injecting your dependencies from the constructor!
@@ -77,11 +105,24 @@ abstract class Base
     /** @var IExceptionGenerator */
     private $eg;
 
-    /** @var ISpecification */
-    private $isJsonSpec;
+    /**
+     * Specification for determining if this request expects JSON data to be
+     * returned in the response.
+     */
+    private ISpecification $isJsonSpec;
 
-    /** @var ISpecification */
-    private $isXhrSpec;
+    /**
+     * Specification for determining if this request was made as an
+     * XMLHttpRequest.
+     *
+     * @deprecated This header is sent only by older async request clients
+     *             (e.g. jQuery AJAX), and should no longer be relied upon.
+     *             Requests with the `Content-Type: application/json` header get
+     *             their request body into `$this->request->getParsedBody()`,
+     *             and requests which expect JSON to be returned should use
+     *             `$this->isJsonSpec` to determine what to return.
+     */
+    private ISpecification $isXhrSpec;
 
 
     /**
@@ -103,21 +144,57 @@ abstract class Base
     private $allowBackToTheFuture = true;
 
     /**
-     * @param  Request $request
+     * @return ServerRequestInterface
+     */
+    public function getPsr7Request(): ServerRequestInterface
+    {
+        return $this->psr7Request;
+    }
+
+    /**
+     * @param ServerRequestInterface $psr7Request
      * @return $this
      */
-    public function setRequest($request)
+    public function setPsr7Request(ServerRequestInterface $psr7Request): self
     {
-        $this->request = $request;
+        $this->psr7Request = $psr7Request;
         return $this;
     }
 
     /**
-     * @return Request
+     * @return Values
      */
-    public function getRequest()
+    public function getRequestQuery(): Values
     {
-        return $this->request;
+        return $this->requestQuery;
+    }
+
+    /**
+     * @param Values $requestQuery
+     * @return $this
+     */
+    public function setRequestQuery(Values $requestQuery): self
+    {
+        $this->requestQuery = $requestQuery;
+        return $this;
+    }
+
+    /**
+     * @return Values
+     */
+    public function getRequestPost(): Values
+    {
+        return $this->requestPost;
+    }
+
+    /**
+     * @param Values $requestPost
+     * @return $this
+     */
+    public function setRequestPost(Values $requestPost): self
+    {
+        $this->requestPost = $requestPost;
+        return $this;
     }
 
     /**
@@ -139,21 +216,41 @@ abstract class Base
     }
 
     /**
+     * @deprecated use `$this->psr7Response` instead
+     *
      * @param  Response $response
      * @return $this
      */
-    public function setResponse($response)
+    public function setResponse(Response $response): self
     {
         $this->response = $response;
         return $this;
     }
 
     /**
+     * @deprecated use `$this->psr7Response` instead
+     *
      * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
+    }
+
+    /**
+     * @return ResponseInterface|null
+     */
+    public function getPsr7Response(): ?ResponseInterface
+    {
+        return $this->psr7Response;
+    }
+
+    /**
+     * @param ResponseInterface|null $psr7Response
+     */
+    public function setPsr7Response(?ResponseInterface $psr7Response): void
+    {
+        $this->psr7Response = $psr7Response;
     }
 
     /**
@@ -263,15 +360,18 @@ abstract class Base
 
 
     /**
+     * Should this controller's response return JSON?
+     *
      * @return bool
      */
     public function isJsonRequest(): bool
     {
-        return $this->isJsonSpec->isSatisfiedBy($this->request);
+        return $this->isJsonSpec->isSatisfiedBy($this->psr7Request);
     }
 
 
     /**
+     * @deprecated
      * @param ISpecification $isXhrSpec
      * @return $this
      */
@@ -283,11 +383,15 @@ abstract class Base
 
 
     /**
+     * Was this request made as an XMLHttpRequest?
+     *
+     * @deprecated
+     *
      * @return bool
      */
     public function isXhrRequest(): bool
     {
-        return $this->isXhrSpec->isSatisfiedBy($this->request);
+        return $this->isXhrSpec->isSatisfiedBy($this->psr7Request);
     }
 
 
@@ -372,7 +476,7 @@ abstract class Base
     {
         $url = new Uri($path);
         foreach ($queryStringKeys as $queryStringKey) {
-            $queryStringValue = $this->request->query->get($queryStringKey);
+            $queryStringValue = $this->requestQuery->get($queryStringKey);
             if (isset($queryStringValue)) {
                 $url = $url->appendQueryParameters([$queryStringKey => $queryStringValue]);
             }
@@ -607,7 +711,7 @@ abstract class Base
         $this->getResponse()->status->set($statusCode);
 
         // if this isn't XHR, let the kernel and SitePage take care of
-        if (!$this->getRequest()->isXhr()) {
+        if (!$this->isXhrRequest()) {
             throw $this->generateException($errorCode, null, $problem . implode(', ', $resolutions));
         }
 

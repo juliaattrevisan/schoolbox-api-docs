@@ -128,7 +128,7 @@ class Controller extends AbstractController
     public function getList($context = null)
     {
         // ajax a list of Teams for a particular Division
-        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+        if (str_contains($this->psr7Request->getHeaderLine('accept'), 'application/json')) {
             $this->getJsonList($context);
         } else {
             $this->getHtmlList($context);
@@ -178,7 +178,7 @@ class Controller extends AbstractController
     public function persistEntity($entity)
     {
         try {
-            $divisionId = $this->request->post->get('divisionId');
+            $divisionId = $this->requestPost->get('divisionId');
             $division   = $this->getDivisionMapper()->findById($divisionId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
@@ -186,9 +186,9 @@ class Controller extends AbstractController
 
         $this->saveTeam(
             $division,
-            $this->request->post->get('name'),
-            $this->request->post->get('url'),
-            $this->request->post->get('coach', []),
+            $this->requestPost->get('name'),
+            $this->requestPost->get('url'),
+            $this->requestPost->get('coach', []),
             $entity
         );
 
@@ -207,7 +207,7 @@ class Controller extends AbstractController
         $teamPlayerMapper = $this->getTeamPlayerMapper();
 
         $teamUsers = [];
-        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
+        foreach ($this->getUserMapper()->findByColumn('id', $this->requestPost->get('userId')) as $user) {
             if (count($teamPlayerMapper->findByColumnList(['team_id' => $team->getId(), 'user_id' => $user->getId()])) > 0) {
                 // The user already belongs to this team, so skip.
                 continue;
@@ -234,11 +234,11 @@ class Controller extends AbstractController
     public function postRemovePlayers(Team $team)
     {
         $this->getTeamPlayerMapper()->deleteByColumnList([
-            'user_id' => $this->getRequest()->post->get('userId'),
+            'user_id' => $this->requestPost->get('userId'),
             'team_id' => $team->getId(),
         ]);
         $this->getTeamPositionMapper()->deleteByColumnList([
-            'user_id' => $this->getRequest()->post->get('userId'),
+            'user_id' => $this->requestPost->get('userId'),
             'team_id' => $team->getId(),
         ]);
         $this->renderPostAddPlayersResponse($team);
@@ -251,7 +251,7 @@ class Controller extends AbstractController
      */
     public function postReorderPlayers(Team $team)
     {
-        $userIds    = $this->getRequest()->post->get('userId');
+        $userIds    = $this->requestPost->get('userId');
         $teamUsers  = [];
         $sequenceNo = 1;
         foreach ($userIds as $userId) {
@@ -299,7 +299,7 @@ class Controller extends AbstractController
      */
     protected function renderPostAddPlayersResponse(Team $team)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getTeamTranslator()->collectPlayers($team);
 
             // Output a XHR data model + HTML output
@@ -340,7 +340,7 @@ class Controller extends AbstractController
      */
     private function getJsonList(Division $context = null)
     {
-        $query = trim($this->getRequest()->query->get('query'));
+        $query = trim($this->requestQuery->get('query'));
 
         $teams = [];
         if ($context === null) {
@@ -402,7 +402,7 @@ class Controller extends AbstractController
 
         // If the 'schools' parameter is set we also want to add schools from the tag cloud
 
-        if ((int)$this->getRequest()->query->get('schools') === 1) {
+        if ((int)$this->requestQuery->get('schools') === 1) {
             // Add schools from the tag cloud
             $schools = $this->getSchoolTagCloudMapper()->findForTag($this->getUser(), $query);
 

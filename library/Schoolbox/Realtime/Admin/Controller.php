@@ -226,7 +226,7 @@ class Controller extends BaseController
      */
     public function getCreateAppForm()
     {
-        $provider = $this->getRequest()->query->get('provider');
+        $provider = $this->requestQuery->get('provider');
         $data     = ['provider' => $provider];
         switch ($provider) {
             case MobileApp\Registry::PROVIDER_APPLE:
@@ -260,9 +260,7 @@ class Controller extends BaseController
      */
     public function postModifyApp()
     {
-        $rq   = $this->getRequest();
-        $post = $rq->post;
-
+        $post        = $this->requestPost;
         $provider    = $post->get('provider');
         $appId       = trim($post->get('app'));
         $key         = trim($post->get('key'));
@@ -346,7 +344,7 @@ class Controller extends BaseController
                 ->setCertificate($certificate)
         );
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // respond with an empty 200 OK
             $this->getResponse()->content->set($this->buildJsonOutput(null));
             return;
@@ -440,7 +438,7 @@ class Controller extends BaseController
      */
     public function customConfig()
     {
-        $q = $this->getRequest()->query;
+        $q = $this->requestQuery;
 
         $config = $this->getConfig()->find($q['role'], $q['source'], $q['slug']);
 
@@ -489,7 +487,7 @@ class Controller extends BaseController
      */
     public function saveConfig()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $postData = $post['data'];
         $copyTo   = isset($post['copy-to']) ? $post['copy-to'] : null;
@@ -537,7 +535,7 @@ class Controller extends BaseController
      */
     public function testPush($userId = null)
     {
-        $liveMessage = $this->request->query->getBool('live', false);
+        $liveMessage = $this->requestQuery->getBool('live', false);
         $write = fopen('php://memory', 'rb+');
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
@@ -603,9 +601,7 @@ class Controller extends BaseController
     public function postDeleteApp()
     {
         //get the ID to remove
-        $rq   = $this->getRequest();
-        $post = $rq->post;
-        $id = trim($post->get('id', null));
+        $id = trim($this->requestPost->get('id', null));
 
         //lets confirm there is actually an id...
         if ($id === "") {

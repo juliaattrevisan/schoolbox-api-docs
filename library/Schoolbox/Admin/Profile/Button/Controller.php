@@ -213,7 +213,7 @@ class Controller extends Base
      */
     public function postOrder(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $orderArray = explode(',', $post['order']);
 
         $order = 0;
@@ -236,7 +236,7 @@ class Controller extends Base
      */
     public function postDelete(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         if (!empty($post['id'])) {
             $this->profileButtonMapper->deleteByColumn('id', $post['id']);
         }
@@ -250,7 +250,7 @@ class Controller extends Base
      */
     public function postModify(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         if (!empty($post['id'])) {
             $item = $this->profileButtonMapper->findById($post['id']);

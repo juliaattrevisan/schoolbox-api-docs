@@ -313,7 +313,7 @@ class Controller extends Base\Base
     {
         $this->getResponse()->status->set($code);
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput($message));
         } else {
             die(json_encode($message));
@@ -331,7 +331,7 @@ class Controller extends Base\Base
      */
     public function saveAssessmentSequence()
     {
-        $assessmentSequence = $this->getRequest()->post->get('sequence');
+        $assessmentSequence = $this->requestPost->get('sequence');
         $this->returnJson($this->assessmentMapper->sequenceAssessments($assessmentSequence));
     }
 
@@ -465,7 +465,7 @@ class Controller extends Base\Base
      */
     public function createCourse()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Get the default permissions to give to Course Folders
         $rolePermissions = [];
@@ -508,7 +508,7 @@ class Controller extends Base\Base
         }
 
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // respond to XHR with JSON
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'id'              => $courseSpec->getId(),
@@ -620,7 +620,7 @@ class Controller extends Base\Base
      */
     public function updateCourse(CourseSpecification $courseSpec)
     {
-        $post          = $this->getRequest()->post;
+        $post          = $this->requestPost;
         $newCourseName = trim($post->get('name', ''));
         if ($newCourseName === '') {
             $this->sendError(new Base\Exception('You need to give the course a name. ', ['Courses must have names.']));
@@ -725,7 +725,7 @@ class Controller extends Base\Base
             $this->folderMapper->save($courseSpecFolder);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // respond to XHR with JSON
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'id' => $courseSpec->getId(),
@@ -779,7 +779,7 @@ class Controller extends Base\Base
             return;
         }
 
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $name = trim($post->get('name'));
 
         if (!$name) {
@@ -936,7 +936,7 @@ class Controller extends Base\Base
      */
     public function courseList(): void
     {
-        $query = $this->getRequest()->query;
+        $query = $this->requestQuery;
         $data = $this->getCourseData();
         $data['returnUrlKey'] = Redirect::RETURN_URL;
 
@@ -945,7 +945,7 @@ class Controller extends Base\Base
             $data['suggestions'] = $this->getLinkSuggestions($folderModel);
         }
 
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $options = [
                 'hasClose'         => true,
                 'hasAdd'           => false,
@@ -994,7 +994,7 @@ class Controller extends Base\Base
      */
     public function courseListAjax()
     {
-        $query = $this->getRequest()->query;
+        $query = $this->requestQuery;
 
         $search = $query->get('search');
         $folder = $query->get('folder');
@@ -1307,7 +1307,7 @@ class Controller extends Base\Base
      */
     public function listNodes($folderId)
     {
-        $mime = $this->getRequest()->query['mime'];
+        $mime = $this->requestQuery['mime'];
 
         if (empty($mime)) {
             $mime = '*/*';

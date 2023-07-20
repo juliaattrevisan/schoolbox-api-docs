@@ -164,7 +164,7 @@ class Controller extends Base
 
         // Prefill audience
         $audienceSegments = [];
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $folderId = $params->getFolderId();
         $entityType = $params->getEntityType();
 
@@ -222,7 +222,7 @@ class Controller extends Base
      */
     public function getCreateInFolder(int $folderId): void
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $params->setFolderId($folderId);
         $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
         $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
@@ -341,7 +341,7 @@ class Controller extends Base
      */
     public function postUpdate(Model $article): void
     {
-        $data = $this->getRequest()->post->getArrayCopy();
+        $data = $this->requestPost->getArrayCopy();
 
         // Update article with proposed attributes
         $this->updateArticleAttributes($article, $data);
@@ -389,7 +389,7 @@ class Controller extends Base
          * This can occur from either the Create or Update context
          * Update the form action accordingly
          */
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Send the update page route, JS will update the window state to this
             $url = $this->routeGenerator->generate('commsNews.getUpdate', $routeParams);
             if (isset($data[Querystring::RETURN_URL])) {
@@ -467,13 +467,13 @@ class Controller extends Base
             /* Redirect to returnUrl if provided, otherwise to news feed.
              */
 
-            if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
-                $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
+            if ($this->requestQuery->get(Querystring::RETURN_URL)) {
+                $nextStep = Querystring::decode($this->requestQuery->get(Querystring::RETURN_URL));
             } else {
                 $nextStep = $this->routeGenerator->generate('commsNews.getIndex');
             }
 
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                     'redirect' => $nextStep
@@ -482,7 +482,7 @@ class Controller extends Base
                 $this->getResponse()->redirect->to($nextStep);
             }
         } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => false,
@@ -548,7 +548,7 @@ class Controller extends Base
          * Even when you copy/paste a link to someone in email or instant messenger,
          * and they visit it from that place, "we" decided to  consider them as a conversion.
          */
-        $referrer = $this->request->query->get(Querystring::REFERRER);
+        $referrer = $this->requestQuery->get(Querystring::REFERRER);
 
         /* Record this Conversion/Open
          * referrer value determines what kind it was
@@ -631,12 +631,12 @@ class Controller extends Base
      */
     public function getListForHomepage(int $folderId): void
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $params->setFolderId($folderId);
 
         $partialData = $this->generatePartialForHomepage($params);
         // homepage student view
-        $partialData['readonly'] = $this->request->query->get('readonly') ?? false;
+        $partialData['readonly'] = $this->requestQuery->get('readonly') ?? false;
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
@@ -725,7 +725,7 @@ class Controller extends Base
     {
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
 
         /* Merge a whole bunch of other settings too
@@ -764,7 +764,7 @@ class Controller extends Base
             'key' => $this->getUser()->getKey(),
         ];
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
 
         $data = array_merge($data, $sidebar->generate());
 
@@ -795,7 +795,7 @@ class Controller extends Base
      */
     public function getListForIndex(): void
     {
-        $topicSlug = $this->getRequest()->query->get(Querystring::TOPIC_SLUG);
+        $topicSlug = $this->requestQuery->get(Querystring::TOPIC_SLUG);
         $this->assertValidTopic($topicSlug);
 
         $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);
@@ -925,7 +925,7 @@ class Controller extends Base
 
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
 
         $this->assertValidFolder($params->getFolderId());
 
@@ -963,7 +963,7 @@ class Controller extends Base
             ],
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
-            'page' => RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()),
+            'page' => RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()),
             'pageWithoutParams' => $this->routeGenerator->generate('commsNews.getArchive'),
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
@@ -985,7 +985,7 @@ class Controller extends Base
             $pageTitle = $details['label'];
         }
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->request->query->get('page'));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->requestQuery->get('page'));
 
         $data = array_merge($data, $sidebar->generate());
 
@@ -1091,7 +1091,7 @@ class Controller extends Base
      */
     public function getListByTopic(?int $year, ?int $month): void
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
 
         /* The requested data set to load, given the params provided
          */
@@ -1138,7 +1138,7 @@ class Controller extends Base
      */
     public function getAuthored()
     {
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->requestQuery);
         $pageNum = $params->getPageNum();
         $status = $params->getStatus();
 
@@ -1146,7 +1146,7 @@ class Controller extends Base
             $status = 'All';
         }
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->psr7Request->getServerParams()));
 
         $data = array_merge([
             'pageNum' => $pageNum,
@@ -1571,7 +1571,7 @@ class Controller extends Base
      */
     private function getExplicitReturnUrl(): ?string
     {
-        $returnUrl = $this->getRequest()->query->get(Querystring::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Querystring::RETURN_URL);
         if ($returnUrl) {
             return $returnUrl;
         }

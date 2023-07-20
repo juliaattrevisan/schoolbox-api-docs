@@ -495,7 +495,7 @@ class Controller extends Base
      */
     public function postInsertGroup($user)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             $userAccess = new UserAccess();
@@ -518,7 +518,7 @@ class Controller extends Base
      */
     public function postInsertPermission($user)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             $userAccess = new UserAccess();
@@ -541,7 +541,7 @@ class Controller extends Base
      */
     public function postInsertLinked($user)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             foreach ($post['linkUser'] as $userId) {
@@ -629,7 +629,7 @@ class Controller extends Base
      */
     public function postDetails()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $passwordService = new PasswordService();
 
@@ -764,8 +764,8 @@ class Controller extends Base
 
             /* Remove bad data SA-8244
              */
-            if (\is_array($this->getRequest()->post->get('attachment'))) {
-                $attachments = array_filter($this->getRequest()->post['attachment']);
+            if (\is_array($this->requestPost->get('attachment'))) {
+                $attachments = array_filter($this->requestPost['attachment']);
             }
 
             /* If you didn't provide a picture, empty it
@@ -776,7 +776,7 @@ class Controller extends Base
                 // Validate attachment list can actually be built
                 try {
                     /** @var IStorage[] $attachments */
-                    $attachments = $factory->build($this->getRequest()->post['attachment'])->getAll();
+                    $attachments = $factory->build($this->requestPost['attachment'])->getAll();
                 } catch (\InvalidArgumentException $e) {
                     /* Bad data; noop
                      */
@@ -820,7 +820,7 @@ class Controller extends Base
      */
     public function postDeleteList(): void
     {
-        $userList = $this->getRequest()->post['users'];
+        $userList = $this->requestPost['users'];
         if ($this->userMapper->deleteByColumn('id', $userList)) {
             $this->getResponse()->content->set(
                 [
@@ -839,7 +839,7 @@ class Controller extends Base
      */
     public function postAlert($user)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $userId = $user->getId();
 
@@ -874,7 +874,7 @@ class Controller extends Base
      */
     public function postUpdateGroup($user, $folder)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             // If assigning a group admin, demote any existing group admins
@@ -917,7 +917,7 @@ class Controller extends Base
      */
     public function postUpdateService($user)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             $userAccess = $this->userAccessMapper->findOneByColumnList([

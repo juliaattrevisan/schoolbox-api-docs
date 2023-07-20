@@ -9,8 +9,8 @@
 namespace Schoolbox\Admin\Terms;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\Values;
 use Alaress_Date_Format;
-use Aura\Web\Request;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Term;
 use Schoolbox\YearLevel;
@@ -101,7 +101,7 @@ class Controller extends Base
     {
         $term = $this->termMapper->createModel();
         try {
-            $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
+            $term = $this->populateModelFromPostData($term, $this->requestPost);
             $this->termMapper->save($term);
 
             $this->outputPostSuccess($term);
@@ -120,7 +120,7 @@ class Controller extends Base
     public function postUpdateTerm(Term\Model $term): void
     {
         try {
-            $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
+            $term = $this->populateModelFromPostData($term, $this->requestPost);
             $this->termMapper->save($term);
 
             $this->outputPostSuccess($term);
@@ -132,12 +132,12 @@ class Controller extends Base
     /**
      * Sets a model's fields from post data.
      *
-     * @param  Term\Model     $term
-     * @param  Request\Values $postdata
+     * @param  Term\Model $term
+     * @param  Values     $postdata
      * @return Term\Model
      * @throws \Exception if dates aren't valid
      */
-    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata): Term\Model
+    protected function populateModelFromPostData(Term\Model $term, Values $postdata): Term\Model
     {
         $term->setTitle($postdata->get('title'));
         $term->setCode($postdata->get('code'));
@@ -223,7 +223,7 @@ class Controller extends Base
      */
     protected function outputPostSuccess(Term\Model $term)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set([
                 'template' => "@adminTerms/listItem.twig",
                 'format'   => 'nochrome',
@@ -244,7 +244,7 @@ class Controller extends Base
      */
     protected function outputPostError(Term\Model $term, \Exception $e)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             // Dump out an AJAX error
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set([

@@ -24,7 +24,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Controllers organise low-level implementations that produce actual output. [(more)](02-controller.md#2-responsibilities-of-controller)
 * Delegate low-level implementations to Supporting Classes. [(more)](02-controller.md#21-shove-details-elsewhere)
 * Controllers themselves should do very little other than taking the request and arranging the output to give to the View. [(more)](02-controller.md#2-responsibilities-of-controller)
-* Don't access superglobals directly; use abstraction methods `$this->getSession()`, `$this->getRequest()->query` and `$this->getRequest()->post` instead. [(more)](02-controller.md#23-superglobals)
+* Don't access superglobals directly; use abstractions `$this->getSession()`, `$this->requestQuery` and `$this->requestPost` instead. [(more)](02-controller.md#23-superglobals)
 * Use `getResponse()` to set up data for twig. [(more)](02-controller.md#222-setting-the-response-for-view)
 * Use `getResponse()` to redirect to specific urls or Routes. [(more)](02-controller.md#223-redirects)
 * Catch unfriendly exceptions and convert them into user-friendly ones, otherwise users experience a meaningless stack trace. [(more)](02-controller.md#24-error-handling)
@@ -36,7 +36,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Add unit tests. [(more)](03-supporting.md#32-unit-tests)
 * Optionally use existing Design Patterns as starting points when architecting additional classes. [(more)](03-supporting.md#31-design-patterns)
 * Progressively catch and process exceptions from lower-level dependencies. If a Supporting Class can't/shouldn't manage a particular exception, defer it to the caller. [(more)](03-supporting.md#33-error-handling)
- 
+
 ## 4 Mapper
 * Remember that Mappers convert database records into business models. With large data sets this could be costly process. [(more)](04-mapper.md#4-responsibilities-of-mapper)
 * To minimise cost, try to use the least amount of calls to obtain the minimum data size you actually require. [(more)](04-mapper.md#4-mapper-usage)
@@ -55,7 +55,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 
 ## 5 Model
 * Models only know about themselves and their own dependencies. [(more)](05-model.md#5-responsibilities-of-model)
-* Models don't access the database. [(more)](05-model.md#5-responsibilities-of-model) 
+* Models don't access the database. [(more)](05-model.md#5-responsibilities-of-model)
 
 ## 6 View
 * Render the data that Controller provided; don't try to obtain data. [(more)](06-view.md#61-responsibilities-of-view)
@@ -64,4 +64,3 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Use twig macros to your advantage. [(more)](06-view.md#63-reusable-fragments)
 * The Pantry contains samples for user interface elements and basic styling/layout. Use them instead of making up your own, where possible. [(more)](06-view.md#64-the-pantry)
 * Sanitise data on rendering to prevent javascript-based attacks. PHPLib and Twig do this differently. [(more)](06-view.md#66-data-sanitisation-escaping-dangerous-content)
- 

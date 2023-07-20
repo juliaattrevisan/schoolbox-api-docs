@@ -123,7 +123,7 @@ class Controller extends AbstractController
     public function persistEntity($entity)
     {
         try {
-            $post = $this->getRequest()->post;
+            $post = $this->requestPost;
 
             $positions = $this->transposePositionPost($post['positions']);
 

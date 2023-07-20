@@ -292,7 +292,7 @@ class Controller extends Assessment\Controller
             'participant'       => $assessment->getParticipantIfExtant($student),
             'quiz'              => $quiz,
             'attemptInProgress' => $attemptInProgress,
-            'returnUrlEncoded'  => $this->getRequest()->query->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (Already encoded, so encoding/decoding necessary).
+            'returnUrlEncoded'  => $this->requestQuery->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (Already encoded, so encoding/decoding necessary).
             // User may only attempt quiz from here if viewing own summary
             'canAttempt'        => $canAttempt,
             'canReview'         => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),

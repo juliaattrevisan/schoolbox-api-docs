@@ -190,20 +190,20 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            $matchId = $this->getRequest()->post['matchId'];
+            $matchId = $this->requestPost['matchId'];
             $matchup = $this->getMatchupMapper()->findById($matchId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
 
-        if (strlen($this->getRequest()->post['startAtDate'])) {
-            $date    = $this->getRequest()->post['startAtDate'];
+        if (strlen($this->requestPost['startAtDate'])) {
+            $date    = $this->requestPost['startAtDate'];
             $startAt = \Alaress_Date_Format::newLocal($date);
         } else {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $this->saveItineraryItem($matchup, $this->getRequest()->post['description'], $startAt, $entity);
+        $this->saveItineraryItem($matchup, $this->requestPost['description'], $startAt, $entity);
 
         $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesMatch.getModifyForm', [
             'entityId' => $matchId

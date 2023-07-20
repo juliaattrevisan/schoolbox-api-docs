@@ -190,8 +190,8 @@ class Controller extends Assessment\Controller
                     'assessment'  => $assessment,
                     'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                                                        ->add([ $assessment->getTitle(), '' ]),
-                    'message'      => strip_tags($this->request->query->get('lti_msg', '')),
-                    'errorMessage' => strip_tags($this->request->query->get('lti_errormsg', '')),
+                    'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
+                    'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -255,9 +255,9 @@ class Controller extends Assessment\Controller
                     'participant'  => $participant,
                     'student'      => $student,
                     'timeline'     => $timeline,
-                    'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL),
-                    'message'      => strip_tags($this->request->query->get('lti_msg', '')),
-                    'errorMessage' => strip_tags($this->request->query->get('lti_errormsg', '')),
+                    'returnUrl'    => $this->requestQuery->get(Assessment\Redirect::RETURN_URL),
+                    'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
+                    'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -291,15 +291,15 @@ class Controller extends Assessment\Controller
     {
         $scoreModel = $this->ltiAssessmentScoreMapper->createModel()
             ->setStudent($student)
-            ->setIsResponse($this->request->post->getBool('isResponse', false))
-            ->setIsFeedback($this->request->post->getBool('isFeedback', false))
+            ->setIsResponse($this->requestPost->getBool('isResponse', false))
+            ->setIsFeedback($this->requestPost->getBool('isFeedback', false))
             ->setScoreGiven(
-                filter_var($this->request->post->get('scoreGiven'), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE)
+                filter_var($this->requestPost->get('scoreGiven'), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE)
             )
             ->setScoreMaximum(
-                filter_var($this->request->post->get('scoreMaximum'), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE)
+                filter_var($this->requestPost->get('scoreMaximum'), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE)
             )
-            ->setComment($this->request->post->get('comment'))
+            ->setComment($this->requestPost->get('comment'))
             ->setSubmittedAt(Alaress_Date_Format::now());
 
         // Set activity/grading progress dependent on if response/feedback
@@ -322,7 +322,7 @@ class Controller extends Assessment\Controller
             );
 
         // Set marking user (may be anonymous)
-        $markingUserId = $this->request->post->getInt('markingUser');
+        $markingUserId = $this->requestPost->getInt('markingUser');
         $scoreModel->setMarkingUser(
             $markingUserId
                 ? (new User())->setId($markingUserId)
@@ -339,7 +339,7 @@ class Controller extends Assessment\Controller
         }
 
         // Then redir to the return URL, or the assessment's folder
-        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $this->response->redirect->afterPost(
             isset($encodedReturnUrl)
                 ? Redirect::decode($encodedReturnUrl)
@@ -520,6 +520,6 @@ class Controller extends Assessment\Controller
             $this->instance,
             $this->getConfigLoader(),
             $this->userCodec
-        ))->buildForAssessment($assessment, $currentUser, $actingUser, $this->request->query->getInt('height'));
+        ))->buildForAssessment($assessment, $currentUser, $actingUser, $this->requestQuery->getInt('height'));
     }
 }

@@ -412,7 +412,7 @@ class Controller extends Base
      */
     public function postUpload()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // We are going to read each line of the CSV data into arrays, process each line looking to see if a matching record already
         // exists in the corresponding table, creating it if it doesn't and updating its details if it does.

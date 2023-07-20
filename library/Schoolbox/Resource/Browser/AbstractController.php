@@ -165,7 +165,7 @@ abstract class AbstractController extends BaseController
      */
     public function picker($sourceSlug)
     {
-        $mime = $this->request->query->get('mime');
+        $mime = $this->requestQuery->get('mime');
 
         if (empty($mime)) {
             $mime = '*/*';
@@ -278,7 +278,7 @@ abstract class AbstractController extends BaseController
      */
     public function listNodes($folderId)
     {
-        $mime = $this->request->query->get('mime');
+        $mime = $this->requestQuery->get('mime');
 
         if (empty($mime)) {
             $mime = "*/*";
@@ -346,13 +346,17 @@ abstract class AbstractController extends BaseController
         $folderId = $file->getFolder()->getId();
         $folderUrl = sprintf("/%s/$folderId", ($this->nodeType === NodeFactory::MYFILE) ? 'my-files' : 'resources');
 
-        $server = $this->getRequest()->server;
+        $server = $this->psr7Request->getServerParams();
 
         $data = [
             'file'   => $file,
             'type'   => 'file',
             'tree'   => $this->getBreadcrumbs($file->getFolder()),
-            'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_X_FORWARDED_HOST') ?? $server->get('HTTP_HOST')),
+            'host'   => sprintf(
+                'http%s://%s',
+                ($server['HTTPS'] ?? false) ? 's' : '',
+                $server['HTTP_X_FORWARDED_HOST'] ?? $server['HTTP_HOST'] ?? '',
+            ),
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
             'RETURN_URL' => Redirect::RETURN_URL . '=' . Redirect::encode($folderUrl),
@@ -441,10 +445,10 @@ abstract class AbstractController extends BaseController
         /* Uploading an illegal file type causes the attachment key to be null
          * In that case, no files to upload
          */
-        if (null !== $this->request->post->get('attachment')) {
+        if (null !== $this->requestPost->get('attachment')) {
 
             /** @var Resource\AbstractFile[] $results */
-            $results = $factory->build($this->request->post->get('attachment'))->getAll();
+            $results = $factory->build($this->requestPost->get('attachment'))->getAll();
 
             $defaultToHidden = $this->getConfigLoader()->get('file_default_to_hidden');
 

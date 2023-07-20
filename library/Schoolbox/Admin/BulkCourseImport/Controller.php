@@ -110,7 +110,7 @@ class Controller extends Base
     {
         $this->extendExecutionTime(3600);
 
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         if (!\is_array($post->get('attachment'))) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);

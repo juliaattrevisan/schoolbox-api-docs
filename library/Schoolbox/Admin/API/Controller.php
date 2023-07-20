@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Schoolbox\Admin\Import\Profile\Importer;
 use Schoolbox\Admin\Import\Profile\Mapping;
 use Schoolbox\External;
@@ -129,7 +130,7 @@ class Controller extends Web\Controller\Base
      */
     public function postUploadCsv(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $rs = $this->getResponse();
 
         $responseJson = [
@@ -141,14 +142,19 @@ class Controller extends Web\Controller\Base
             $this->authenticate((string)$post->get('key'));
 
             // key validated; you may proceed
-            $file = $this->getRequest()->files->get('file');
+            /** @var UploadedFileInterface|null $file */
+            $file = $this->getPsr7Request()->getUploadedFiles()['file'] ?? null;
 
             if (!$file) {
                 throw new InvalidArgumentException('No CSV was received by the server.', 400);
             }
 
             try {
-                $storage = $this->storageMapper->accept($file['name'], $file['tmp_name'], false);
+                $storage = $this->storageMapper->acceptStream(
+                    $file->getClientFilename(),
+                    $file->getStream()->getContents(),
+                    false,
+                );
             } catch (Mapper\Exception $e) {
                 throw new InvalidArgumentException('The CSV was rejected by the server.', 400);
             }
@@ -175,7 +181,7 @@ class Controller extends Web\Controller\Base
      */
     public function postProcess(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
         $rs   = $this->getResponse();
 
         $errors = [];

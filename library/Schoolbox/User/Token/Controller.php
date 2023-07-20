@@ -60,7 +60,7 @@ class Controller extends Base
      */
     public function getTokenForUser(User $user): void
     {
-        $jwtIdToUse = $this->request->post->get('jwtIdToUse') ?? 'no';
+        $jwtIdToUse = $this->requestPost->get('jwtIdToUse') ?? 'no';
         $userJwtId  = null;
         $showExisting = false;
         switch ($jwtIdToUse) {
@@ -108,7 +108,7 @@ class Controller extends Base
      */
     public function postDeleteToken()
     {
-        $jwtId = $this->request->post->get('jwtIdToken');
+        $jwtId = $this->requestPost->get('jwtIdToken');
         if ($jwtId) {
             $this->tokenMapper->deleteByColumn('jwt_id', $jwtId);
         }

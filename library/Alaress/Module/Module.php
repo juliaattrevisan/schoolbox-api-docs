@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Alaress\Web\Request\Values;
 use Aura\Router\RouterContainer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -22,10 +23,12 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use LogicException;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Url\Uri;
 use Twig\Loader\FilesystemLoader;
 use Twig\Error\LoaderError;
 
@@ -663,9 +666,24 @@ class Module
      */
     public function installControllerDependencies(Base $controller, ContainerInterface $container): Base
     {
+        // Generate a URI here (with Schoolbox's augmentations),
+        // and inject its query params into the controller
+        /** @var ServerRequestInterface $request */
+        $request    = $container->get('request');
+        $requestUri = new Uri($request->getUri()->__toString());
+
+        $requestQuery = new Values($requestUri->getQueryAsArray());
+        $requestPost  = new Values(
+            strtoupper($request->getMethod()) === self::METHOD_POST
+                ? $request->getParsedBody()
+                : []
+        );
+
         $controller
-            ->setRequest($container->get('webFactory')->newRequest())
             ->setResponse($container->get('webFactory')->newResponse())
+            ->setPsr7Request($request)
+            ->setRequestQuery($requestQuery)
+            ->setRequestPost($requestPost)
             ->setSession($container->get('session'))
             ->setRouter($container->get('router'))
             ->setRouteGenerator($container->get('router.generator'))

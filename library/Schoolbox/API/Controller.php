@@ -127,7 +127,7 @@ class Controller extends Base
             // store anything in the registry
             $token = $provider === Registry::PROVIDER_DIGISTORM
                 ? $sessionUser->getUsername()
-                : $this->request->post->get('token');
+                : $this->requestPost->get('token');
             if (!empty($token)) {
                 $now = Alaress_Date_Format::now();
 
@@ -148,14 +148,14 @@ class Controller extends Base
                             ->setUser($sessionUser)
                             ->setToken($token)
                             ->setService($this->serviceMapper->findOneByColumnList([
-                                'app_identifier' => $this->request->post->get('appId'),
+                                'app_identifier' => $this->requestPost->get('appId'),
                                 'provider'       => $provider,
                             ]))
                             ->setCreatedAt($now)
                             ->setTouchedAt($now);
 
                         // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
-                        $deviceId = $this->request->post->get('deviceId');
+                        $deviceId = $this->requestPost->get('deviceId');
                         if (isset($deviceId)) {
                             $registry->setDeviceId($deviceId);
                         }
@@ -204,7 +204,7 @@ class Controller extends Base
             if ($this->isJsonRequest()) {
                 $this->assignJsonResponseForAuthenticatedUser($sessionUser);
             } else {
-                $this->assignRedirectResponseForAuthenticatedUser((string)$this->getRequest()->query->get('redirect'));
+                $this->assignRedirectResponseForAuthenticatedUser((string)$this->requestQuery->get('redirect'));
             }
         }
     }
@@ -238,7 +238,7 @@ class Controller extends Base
      */
     private function authenticate(bool $allowQueryStringJwt): ?User
     {
-        $postData = $this->request->post->getArrayCopy();
+        $postData = $this->requestPost->getArrayCopy();
         try {
             if (isset($postData['username'], $postData['password'])) {
                 return $this->authenticateViaPostData($postData['username'], $postData['password']);
@@ -247,7 +247,7 @@ class Controller extends Base
                 return $this->authenticateViaJwt($postData['jwt']);
             }
             if ($allowQueryStringJwt) {
-                $queryStringJwt = $this->request->query->get('jwt') ?? $this->request->query->get('id_token');
+                $queryStringJwt = $this->requestQuery->get('jwt') ?? $this->requestQuery->get('id_token');
                 if ($queryStringJwt) {
                     return $this->authenticateViaJwt($queryStringJwt);
                 }

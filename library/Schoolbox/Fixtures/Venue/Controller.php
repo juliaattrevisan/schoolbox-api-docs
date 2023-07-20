@@ -48,8 +48,8 @@ class Controller extends AbstractController
 
         /* ajax a list of venues
          */
-        if ($this->getRequest()->isXhr()) {
-            $query = $this->getRequest()->query->get('query');
+        if ($this->isXhrRequest()) {
+            $query = $this->requestQuery->get('query');
 
             /** @var VenueMapper $mapper */
             $mapper    = $this->getMapper();
@@ -157,10 +157,10 @@ class Controller extends AbstractController
         try {
             $this->saveVenue(
                 $entity,
-                $this->getRequest()->post['name'],
-                $this->getRequest()->post['latitude'],
-                $this->getRequest()->post['longitude'],
-                $this->getRequest()->post['address']
+                $this->requestPost['name'],
+                $this->requestPost['latitude'],
+                $this->requestPost['longitude'],
+                $this->requestPost['address']
             );
 
             $this->getResponse()->redirect->afterPost($this->routeGenerator->generate('sportsfixturesVenue.getList'));

@@ -155,7 +155,7 @@ class ListController extends Web\Controller\Base
     {
         $sebPayload = new SebPayload(
             $this->getConfigLoader(),
-            $this->getRequest()->server->get('HTTP_HOST'),
+            $this->psr7Request->getServerParams()['HTTP_HOST'] ?? '',
             $this->routeGenerator
         );
 
@@ -197,11 +197,11 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
-        if ($this->request->query->get(Payload::SEB_KEY)) {
-            $this->session->set(Payload::SEB_KEY, $this->request->query->get(Payload::SEB_KEY));
+        if ($this->requestQuery->get(Payload::SEB_KEY)) {
+            $this->session->set(Payload::SEB_KEY, $this->requestQuery->get(Payload::SEB_KEY));
         }
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
-            $this->request->server->getArrayCopy(),
+            $this->psr7Request->getServerParams(),
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
              */
@@ -210,7 +210,7 @@ class ListController extends Web\Controller\Base
              */
             (new SebPayload(
                 $this->getConfigLoader(),
-                $this->request->server->get('HTTP_HOST'),
+                $this->psr7Request->getServerParams()['HTTP_HOST'] ?? '',
                 $this->routeGenerator
             ))->generateConfigKey($assessment, $this->getUser()),
             $this->session->get(Payload::SEB_KEY)
@@ -237,7 +237,7 @@ class ListController extends Web\Controller\Base
             throw new NotFound();
         }
 
-        $q = $this->getRequest()->query;
+        $q = $this->requestQuery;
 
         if ($readOnly = $q->get('readOnly')) {
             // inject dummy to purposefully fail auth checks
@@ -271,7 +271,7 @@ class ListController extends Web\Controller\Base
             'icon'            => '',
             'readOnly'        => $readOnly,
             'compact'         => false,
-            '_is_xhr'         => $this->getRequest()->isXhr(),
+            '_is_xhr'         => $this->isXhrRequest(),
         ];
 
         $this->tpl('learningAssessment', 'component', $data);
@@ -295,7 +295,7 @@ class ListController extends Web\Controller\Base
     {
         try {
             // we need to perform some surgery on our "post" data before we send it through
-            $post = $this->getRequest()->post->getArrayCopy();
+            $post = $this->requestPost->getArrayCopy();
             $post['context'] = $context;
 
             $assessmentInfo = $this->persistAssessment($this->getUser(), $post);
@@ -303,7 +303,7 @@ class ListController extends Web\Controller\Base
             $type       = AssessmentType::objectToString($assessmentInfo['assessment']);
             $controller = $this->getDelegateController($type);
 
-            $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
+            $explicitReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
 
             /* Update project result cache when an activity is spawned in that project
              */
@@ -350,7 +350,7 @@ class ListController extends Web\Controller\Base
          */
         $allAssessments    = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
         $sortedAssessments = new GenericCollection(IAssessable::class);
-        foreach ($this->getRequest()->post->get('id', []) as $assessmentId) {
+        foreach ($this->requestPost->get('id', []) as $assessmentId) {
             if (isset($allAssessments[$assessmentId])) {
                 // Put it in $sortedAssessments in order
                 $sortedAssessments->add($allAssessments[$assessmentId]);
@@ -368,7 +368,7 @@ class ListController extends Web\Controller\Base
 
         // Redirect to a return URL or something
         // If not provided, redirect to somewhere relevant to context
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         if ($encodedReturnUrl) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
@@ -443,7 +443,7 @@ class ListController extends Web\Controller\Base
      */
     public function updateWeight(IAssessable $assessment): void
     {
-        $weight = (float) $this->getRequest()->post['weight'];
+        $weight = (float) $this->requestPost['weight'];
         if ($weight < 0) {
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid weight value']));
@@ -473,7 +473,7 @@ class ListController extends Web\Controller\Base
      */
     public function updateVisibility(IAssessable $assessment): void
     {
-        $visibility            = (int)$this->getRequest()->post['visibility'];
+        $visibility            = (int)$this->requestPost['visibility'];
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
         if (!in_array($visibility, $availableVisibilities)) {
             $this->getResponse()->status->setCode(500);
@@ -506,7 +506,7 @@ class ListController extends Web\Controller\Base
     public function getCreateAssessmentForm(AssessmentContext $context)
     {
         // check for a valid type declaration
-        if ($type = $this->getRequest()->query->get('type')) {
+        if ($type = $this->requestQuery->get('type')) {
             try {
                 // delegate to the appropriate sub-controller
                 $delegate = $this->getDelegateController($type);
@@ -520,7 +520,7 @@ class ListController extends Web\Controller\Base
         }
 
         // Did the caller request a returnUrl?
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
 
         if ($returnUrl) {
             $data[Redirect::RETURN_URL] = $returnUrl;
@@ -850,7 +850,7 @@ class ListController extends Web\Controller\Base
      */
     protected function redirect($url)
     {
-        if ($this->getRequest()->isXhr()) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $url ]));
         } else {
             $this->getResponse()->redirect->afterPost($url);
@@ -1036,9 +1036,9 @@ class ListController extends Web\Controller\Base
         $returnUrl = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'            => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg'       => $this->request->query->get('lti_errormsg', ''),
-                    Redirect::RETURN_URL => $this->request->query->get(Redirect::RETURN_URL, $statusUrl),
+                    'lti_msg'            => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg'       => $this->requestQuery->get('lti_errormsg', ''),
+                    Redirect::RETURN_URL => $this->requestQuery->get(Redirect::RETURN_URL, $statusUrl),
                 ]
             )
         );
@@ -1076,13 +1076,13 @@ class ListController extends Web\Controller\Base
             ],
         );
         $returnUrl = new Uri(
-            $this->request->query->get(Redirect::RETURN_URL, $statusUrl),
+            $this->requestQuery->get(Redirect::RETURN_URL, $statusUrl),
         );
         $returnUrl = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'      => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
+                    'lti_msg'      => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg' => $this->requestQuery->get('lti_errormsg', ''),
                 ]
             )
         );
@@ -1179,9 +1179,9 @@ class ListController extends Web\Controller\Base
         $returnUrl = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'            => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg'       => $this->request->query->get('lti_errormsg', ''),
-                    Redirect::RETURN_URL => $this->request->query->get(Redirect::RETURN_URL, $summaryUrl),
+                    'lti_msg'            => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg'       => $this->requestQuery->get('lti_errormsg', ''),
+                    Redirect::RETURN_URL => $this->requestQuery->get(Redirect::RETURN_URL, $summaryUrl),
                 ]
             )
         );
@@ -1222,12 +1222,12 @@ class ListController extends Web\Controller\Base
             ],
         );
 
-        $returnUrl  = new Uri($this->request->query->get(Redirect::RETURN_URL, $summaryUrl));
+        $returnUrl  = new Uri($this->requestQuery->get(Redirect::RETURN_URL, $summaryUrl));
         $returnUrl  = $returnUrl->appendQueryParameters(
             array_filter(
                 [
-                    'lti_msg'      => $this->request->query->get('lti_msg', ''),
-                    'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
+                    'lti_msg'      => $this->requestQuery->get('lti_msg', ''),
+                    'lti_errormsg' => $this->requestQuery->get('lti_errormsg', ''),
                 ]
             )
         );

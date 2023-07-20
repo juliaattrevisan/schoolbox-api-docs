@@ -158,7 +158,7 @@ class Controller extends Base
      */
     public function postComponentProvider($provider, $component)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $this->updateComponentValue(
             $component,
@@ -206,7 +206,7 @@ class Controller extends Base
      */
     public function postComponentPicker($component)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         // Make sure we got content items back from the provider
 
@@ -561,7 +561,7 @@ class Controller extends Base
      */
     public function getComponentCallback($component)
     {
-        $get = $this->getRequest()->query;
+        $get = $this->requestQuery;
 
         //null coalesce as if this does not match any 'valid' response, it will throw an exception
         $return_type = $get['return_type'] ?? null;

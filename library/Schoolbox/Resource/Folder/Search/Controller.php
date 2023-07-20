@@ -75,8 +75,8 @@ class Controller extends BaseController
         );
 
         $response = [];
-        $types    = (array)$this->request->query->get('types', []);
-        foreach ($this->folderMapper->searchByName($this->request->query->get('query')) as $folder) {
+        $types    = (array)$this->requestQuery->get('types', []);
+        foreach ($this->folderMapper->searchByName($this->requestQuery->get('query')) as $folder) {
             if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_READ) {
                 continue;
             }

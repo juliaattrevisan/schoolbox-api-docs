@@ -67,7 +67,7 @@ class Controller extends BaseController
      */
     public function getImport(): void
     {
-        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL) ?? $this->getSession()->getHistory();
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ?? $this->getSession()->getHistory();
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@courseImportAtlas/import.twig',
@@ -122,19 +122,19 @@ class Controller extends BaseController
     public function postImport(): void
     {
         // Part 1: I have chosen a curriculum plan, now get its contents
-        if ($this->request->post->getBool('part-1')) {
+        if ($this->requestPost->getBool('part-1')) {
             $this->postImportPart1();
             return;
         }
 
         // Part 2: I have chosen units, now prepare to import them
-        if ($this->request->post->getBool('part-2')) {
+        if ($this->requestPost->getBool('part-2')) {
             $this->postImportPart2();
             return;
         }
 
         // Part 3: I have chosen the folder to import into, now complete the import
-        if ($this->request->post->getBool('part-3')) {
+        if ($this->requestPost->getBool('part-3')) {
             $this->postImportPart3();
             return;
         }
@@ -147,7 +147,7 @@ class Controller extends BaseController
     private function postImportPart1(): void
     {
         // Which plan did I choose?
-        $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
+        $curriculumPlanId = $this->requestPost->getInt('curriculum-plan', 0);
 
         // None: render an error
         if ($curriculumPlanId === 0) {
@@ -163,7 +163,7 @@ class Controller extends BaseController
             return;
         }
 
-        $previousPost = $this->request->post->getArrayCopy();
+        $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-1']);
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
@@ -185,7 +185,7 @@ class Controller extends BaseController
     private function postImportPart2(): void
     {
         // Which curriculum plan got selected?
-        $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
+        $curriculumPlanId = $this->requestPost->getInt('curriculum-plan', 0);
 
         // None: render an error
         if ($curriculumPlanId === 0) {
@@ -201,13 +201,13 @@ class Controller extends BaseController
             return;
         }
 
-        $unit = $this->request->post->get('unit');
+        $unit = $this->requestPost->get('unit');
         if (null === $unit) {
             $this->throwNotSelectedError('You must select a unit.');
             return;
         }
 
-        $previousPost = $this->request->post->getArrayCopy();
+        $previousPost = $this->requestPost->getArrayCopy();
         unset($previousPost['part-2']);
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
@@ -228,7 +228,7 @@ class Controller extends BaseController
     private function postImportPart3(): void
     {
         // Which curriculum plan got selected?
-        $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
+        $curriculumPlanId = $this->requestPost->getInt('curriculum-plan', 0);
 
         // None: render an error
         if ($curriculumPlanId === 0) {
@@ -244,14 +244,14 @@ class Controller extends BaseController
             return;
         }
 
-        $unit = $this->request->post->get('unit');
+        $unit = $this->requestPost->get('unit');
         if (null === $unit) {
             $this->throwNotSelectedError('You must select a unit.');
             return;
         }
 
         // Get the folder the course is to be imported into
-        $parentFolderId = $this->request->post->getInt('parent');
+        $parentFolderId = $this->requestPost->getInt('parent');
         //the UI is marking the folder field as required, so lets check that here
         if (0 === $parentFolderId) {
             $this->throwNotSelectedError('You must select a folder.');
@@ -272,7 +272,7 @@ class Controller extends BaseController
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(204);
         } catch (SchoolboxException $e) {
-            if ($this->request->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->response->status->set(400);
                 $this->response->content->set(
                     $this->buildJsonOutput($e->getMessage())

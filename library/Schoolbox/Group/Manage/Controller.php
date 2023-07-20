@@ -75,7 +75,7 @@ class Controller extends Base
                 'title'    => 'Manage Group',
                 'data'     => [
                     'folder'      => $folder,
-                    'showSetting' => (bool)$this->request->query->get('new'),
+                    'showSetting' => (bool)$this->requestQuery->get('new'),
                     'breadcrumbs' => [
                         [$folder->getTitle(), "/homepage/{$folder->getId()}"],
                         ['Manage Group'],
@@ -118,7 +118,7 @@ class Controller extends Base
             'groupId'   => $folder->getId(),
             'groupName' => $folder->getNameWithCodes(),
             'settings'  => [
-                'new'                    => $this->request->query->get('new') ?? 0,
+                'new'                    => $this->requestQuery->get('new') ?? 0,
                 'access'                 => $group ? $group->getTypeString() : '',
                 'isNotificationsEnabled' => $this->groupsHelper->groupNotificationEnabled($folder->getId()),
                 'isForceFollow'          => $group && $group->getForceFollow(),
@@ -141,7 +141,7 @@ class Controller extends Base
      */
     public function removeMembers(Folder $folder)
     {
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
         $userIds     = array_map('intval', $requestBody['members']);
 
         $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
@@ -164,7 +164,7 @@ class Controller extends Base
      */
     public function updateMembers(Folder $folder)
     {
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
         $newAccesses = array_combine(
             array_map('intval', array_column($requestBody['accessTypes'], 'userId')),
             $requestBody['accessTypes']
@@ -216,7 +216,7 @@ class Controller extends Base
      */
     public function addMembers(Folder $folder)
     {
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
         $users       = $this->getUsersFromRequest($requestBody);
 
         // Find users already in the group
@@ -279,7 +279,7 @@ class Controller extends Base
     public function updateSettings(Folder $folder)
     {
         // access, isNotificationsEnabled, isForceFollow
-        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = $this->psr7Request->getParsedBody();
 
         /** @var Group $group */
         $group = (new ArrayToModel\Group())($requestBody, $folder->getGroup());
@@ -297,7 +297,7 @@ class Controller extends Base
         );
         $data = [
             'settings' => [
-                'new'                    => $this->request->query->get('new') ?? 0,
+                'new'                    => $this->requestQuery->get('new') ?? 0,
                 'access'                 => $group->getTypeString(),
                 'isNotificationsEnabled' => $this->groupsHelper->groupNotificationEnabled($folder->getId()),
                 'isForceFollow'          => $group->getForceFollow(),
@@ -328,7 +328,7 @@ class Controller extends Base
      */
     public function searchGroups()
     {
-        $query  = trim($this->request->query->get('query'));
+        $query  = trim($this->requestQuery->get('query'));
         $return = [];
 
         // folders accessible by role
@@ -363,7 +363,7 @@ class Controller extends Base
      */
     public function searchRoles()
     {
-        $query  = trim($this->request->query->get('query'));
+        $query  = trim($this->requestQuery->get('query'));
         $return = [];
         foreach ($this->roleMapper->findByName($query, ['order' => 'sequence']) as $role) {
             $return[] = [
@@ -384,7 +384,7 @@ class Controller extends Base
      */
     public function searchUsers()
     {
-        $query = trim($this->request->query->get('query'));
+        $query = trim($this->requestQuery->get('query'));
 
         if (str_contains($query, ',')) {
             $searches = array_map('trim', explode(',', $query));

@@ -22,7 +22,6 @@ use Schoolbox\Role;
  */
 class Controller extends Base
 {
-
     /**
      * @var DataSource
      */
@@ -127,7 +126,7 @@ class Controller extends Base
      */
     public function getFilter()
     {
-        $get    = $this->getRequest()->query->getArrayCopy();
+        $get    = $this->requestQuery->getArrayCopy();
         $chunks = [
             'folderId' => $get['folderId'],
         ];

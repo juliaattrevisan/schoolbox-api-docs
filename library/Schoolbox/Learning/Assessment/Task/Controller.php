@@ -207,8 +207,8 @@ class Controller extends Assessment\Controller
              */
         }
 
-        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
         } else {
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
@@ -287,13 +287,13 @@ class Controller extends Assessment\Controller
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // Did user mark (regardless of who they are) the task as incomplete ?
-        $completionStatus = $this->getRequest()->post->getInt('status');
+        $completionStatus = $this->requestPost->getInt('status');
 
         try {
             $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
             $this->getResponse()->status->setCode(200);
 
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                     'message' => 'OK',
@@ -320,7 +320,7 @@ class Controller extends Assessment\Controller
 
             $this->getResponse()->status->setCode(400);
 
-            if ($this->getRequest()->isXhr()) {
+            if ($this->isXhrRequest()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => false,
                     'message' => $e->getMessage(),

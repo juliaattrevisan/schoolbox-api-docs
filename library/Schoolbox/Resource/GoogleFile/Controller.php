@@ -75,8 +75,8 @@ class Controller extends Base
         $message = '';
 
         try {
-            $_SESSION['googleAccessToken'] = $this->request->post->get('accessToken');
-            $_SESSION['googleAccessTokenType'] = $this->request->post->get('tokenType');
+            $_SESSION['googleAccessToken'] = $this->requestPost->get('accessToken');
+            $_SESSION['googleAccessTokenType'] = $this->requestPost->get('tokenType');
         } catch (\Exception) {
             $success = false;
             $message = 'Could not store Google Access Token data.';
@@ -146,15 +146,15 @@ class Controller extends Base
      */
     public function postGoogleFile(Folder $folder): void
     {
-        $googleIdString = $this->request->post->get('googleIds');
+        $googleIdString = $this->requestPost->get('googleIds');
         if (!$googleIdString) {
             $this->getResponse()->redirect->afterPost('/homepage/' . $folder->getId());
             return;
         }
 
         $selectedFiles      = json_decode($googleIdString, true);
-        $editAccessLevel    = is_numeric($this->request->post->get('gfileEdit')) ? (int)$this->request->post->get('gfileEdit') : null;
-        $commentAccessLevel = is_numeric($this->request->post->get('gfileComment')) ? (int)$this->request->post->get('gfileComment') : null;
+        $editAccessLevel    = is_numeric($this->requestPost->get('gfileEdit')) ? (int)$this->requestPost->get('gfileEdit') : null;
+        $commentAccessLevel = is_numeric($this->requestPost->get('gfileComment')) ? (int)$this->requestPost->get('gfileComment') : null;
         if (!$editAccessLevel || !$commentAccessLevel) {
             $this->getResponse()->redirect->afterPost('/homepage/' . $folder->getId());
             return;
@@ -162,7 +162,7 @@ class Controller extends Base
 
         $gDriveFetcher = new GDriveFetcher(
             $this->getConfigLoader(),
-            $this->request->post->get('tokenType') . ' ' . $this->request->post->get('accessToken'),
+            $this->requestPost->get('tokenType') . ' ' . $this->requestPost->get('accessToken'),
             false
         );
 

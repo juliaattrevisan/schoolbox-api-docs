@@ -121,7 +121,7 @@ class Controller extends BaseController
      */
     public function create()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         $formField = $post->get('formField', 'rb');
 
@@ -297,7 +297,7 @@ class Controller extends BaseController
      */
     public function import(File $file)
     {
-        $post = $this->getRequest()->post;
+        $post = $this->requestPost;
 
         try {
             if ($assessmentId = (int)$post->get('assessmentId')) {
@@ -378,7 +378,7 @@ class Controller extends BaseController
      */
     public function download()
     {
-        $post         = $this->request->post->get('rb');
+        $post         = $this->requestPost->get('rb');
         $assessmentId = key($post);
         $assessment   = $this->assessmentDataSource->findById($assessmentId);
 
@@ -393,9 +393,9 @@ class Controller extends BaseController
          */
         $markType = null;
 
-        if ($this->request->post['capability-markType']) {
+        if ($this->requestPost['capability-markType']) {
             try {
-                $markType = MarkTypeMapper::getInstance()->findById($this->request->post['capability-markType']);
+                $markType = MarkTypeMapper::getInstance()->findById($this->requestPost['capability-markType']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability mark type selected');
             }
@@ -405,9 +405,9 @@ class Controller extends BaseController
          */
         $gradeGroup = null;
 
-        if ($this->request->post['capability-gradingScheme'] !== null) {
+        if ($this->requestPost['capability-gradingScheme'] !== null) {
             try {
-                $gradeGroup = Group\Mapper::getInstance()->findById($this->request->post['capability-gradingScheme']);
+                $gradeGroup = Group\Mapper::getInstance()->findById($this->requestPost['capability-gradingScheme']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability grade group selected');
             }
@@ -415,8 +415,7 @@ class Controller extends BaseController
 
         $assessment->setCapabilityMarkType($markType)
                    ->setCapabilityGradeGroup($gradeGroup);
-        // @phpstan-ignore-next-line: getBool can return null
-        $assessment->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
+        $assessment->setUseMarkRange($this->requestPost->getBool('useMarkRange') ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($assessment, false),
@@ -449,7 +448,7 @@ class Controller extends BaseController
      */
     public function determineMarkInvalidation(): void
     {
-        $post         = $this->request->post->get('rb');
+        $post         = $this->requestPost->get('rb');
         $assessmentId = key($post);
 
 
@@ -467,8 +466,8 @@ class Controller extends BaseController
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment)
-            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)($this->request->post['capability-markType'] ?? '')))
-            ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
+            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)($this->requestPost['capability-markType'] ?? '')))
+            ->setUseMarkRange($this->requestPost->getBool('useMarkRange', false));
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),
             $post,
