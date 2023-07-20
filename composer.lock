@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aff62852a1c5114b59dcbde0211e4a5e",
+    "content-hash": "8a059636d82fea2cb763951216657067",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -8502,16 +8502,16 @@
         },
         {
             "name": "stomp-php/stomp-php",
-            "version": "5.0.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stomp-php/stomp-php.git",
-                "reference": "50f6e6e9aa1ba4696faa40cd1cbe180a96679f98"
+                "reference": "cf1fbd79cf48b9701909e42205f1d968cec6ff7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stomp-php/stomp-php/zipball/50f6e6e9aa1ba4696faa40cd1cbe180a96679f98",
-                "reference": "50f6e6e9aa1ba4696faa40cd1cbe180a96679f98",
+                "url": "https://api.github.com/repos/stomp-php/stomp-php/zipball/cf1fbd79cf48b9701909e42205f1d968cec6ff7a",
+                "reference": "cf1fbd79cf48b9701909e42205f1d968cec6ff7a",
                 "shasum": ""
             },
             "require": {
@@ -8559,7 +8559,7 @@
             ],
             "support": {
                 "issues": "https://github.com/stomp-php/stomp-php/issues",
-                "source": "https://github.com/stomp-php/stomp-php/tree/5.0.0"
+                "source": "https://github.com/stomp-php/stomp-php/tree/5.1.0"
             },
             "funding": [
                 {
@@ -8571,7 +8571,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-02-02T19:25:59+00:00"
+            "time": "2023-06-19T17:34:28+00:00"
         },
         {
             "name": "symfony/css-selector",
