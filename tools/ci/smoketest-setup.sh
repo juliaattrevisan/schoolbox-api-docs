@@ -32,6 +32,8 @@ echo "... setting up users and privileges"
 mariadb -e "CREATE DATABASE schoolbox;"
 mariadb -e "CREATE USER 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
 mariadb -e "GRANT ALL PRIVILEGES ON schoolbox.* TO 'schoolboxvagrant'@'%';"
+mariadb -e "CREATE USER 'schoolboxread'@'%' IDENTIFIED BY 'readTest123';"
+mariadb -e "GRANT SELECT ON schoolbox.* TO 'schoolboxread'@'%';"
 
 # initialise the data itself
 echo "... setting up tzdata"
