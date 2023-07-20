@@ -5,8 +5,12 @@ namespace Schoolbox\Learning\Component\Dashboard;
 use Alaress\Database\Connector\IConnector;
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Collection;
+use Schoolbox\External\SubjectCollection;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
+use Schoolbox\Learning\Assessment\Visibility;
 
 class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 {
@@ -54,11 +58,22 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 
         $student = $this->getUser();
 
+        /**
+         * If parent role, or user has no subjects
+         * exit early
+         */
+        if ($student->getRole()->isParent() || 0 === $student->getSubjectCollection()->count()) {
+            return false;
+        }
+
         /** @var IConnector $database */
         $database = $this->getSitePage()->getDi()->get('databaseInternal');
         $pb          = $database
             ->buildPredicateBuilder('')
-            ->betweenDates('assessment.due_date', $dateStart, $dateEnd);
+            ->betweenDates('assessment.due_date', $dateStart, $dateEnd)
+            ->in('mv_assessment_relation.folder_id', $student->getSubjectCollection()->getIds() ?? []);
+
+        // set visibility check to be student for student...
         if ($this->getUser()->getRole()->isStudent()) {
             $pb->equals('lesson_plan.visibility', 'student');
         }
@@ -66,6 +81,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         $query       = "
             SELECT * FROM assessment
             JOIN lesson_plan ON (assessment.id = lesson_plan.assessment_id)
+            JOIN mv_assessment_relation on assessment.id = mv_assessment_relation.assessment_id
             WHERE {$whereClause}
             ";
         $statement   = $database->executeQuery($query, $pb->getParams());
@@ -77,9 +93,21 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 
         $plans = $this->assessmentDataSource->findAllByIds($assessmentIds);
 
-        $route = 'learningAssessment.getSummary';
+        /** @var LessonPlanModel $lessonPlan **/
         foreach ($plans as $lessonPlan) {
             // are all fields visible?
+            $allHidden = true;
+            /** @var LessonPlanFieldModel $field */
+            foreach ($lessonPlan->getFields() as $field) {
+                if ('student' === $field->getVisibility()) {
+                    // if the field is visible, then we should show the lesson plan
+                    $allHidden = false;
+                }
+            }
+            if ($allHidden) {
+                // all fields are hidden, don't show this lesson plan
+                continue;
+            }
 
             $params =  [
                 'assessmentId' => $lessonPlan->getId(),
@@ -94,7 +122,10 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
                 'dueDate' => $lessonPlan->getDueAt(),
                 'className' => $lessonPlan->getContext()->getFolder()->getTitle(),
                 'classColour' => $lessonPlan->getContext()->getFolder()->getColour(),
-                'url' => $this->getRouteGenerator()->generate($route, $params)
+                '_links' => [
+                    'assessment' => $this->getRouteGenerator()->generate('learningAssessment.getSummary', $params),
+                    'folder' => sprintf("/homepage/%s", $lessonPlan->getContext()->getFolder()->getId()),
+                ]
             ];
         }
 
