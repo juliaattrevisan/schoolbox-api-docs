@@ -71,7 +71,13 @@
                             —
                         {% endif %}
                     </td>
-                    <td>grade goes here</td>
+                    <td>
+                        {% if attempt.normalisedMark is not null %}
+                            {{ attempt.mark }}/{{ attempt.maxMark }} ({{ attempt.normalisedMark|number_format(2) }}%)
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
                     <td class="actions-small-2">
                         <nav>
                             {% if not finished %}
