@@ -107,6 +107,11 @@ class MyFolder extends DeprecatedModel
         if (is_array($folderList)) {
             $total = count($folderList);
             for ($i = 0; $i < $total; $i++) {
+                // is this folder deleted?
+                if (null !== $folderList[$i]['deleted_at']) {
+                    continue;
+                }
+
                 if ($folderList[$i]['id'] != $ignore) {
                     $childrenList = $this->getFolderTree($folderList[$i]['id'], $depth + 1, $ignore);
 
