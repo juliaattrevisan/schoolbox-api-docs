@@ -292,10 +292,6 @@ $rotate-span-width: 11rem;
                 background-color: $body-bg !important;
             }
 
-            th:nth-child(2) {
-                background-color: white !important;
-            }
-
             th:nth-child(odd) {
                 filter: hue-rotate(-45deg);
             }
