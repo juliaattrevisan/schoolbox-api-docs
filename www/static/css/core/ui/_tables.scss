@@ -244,14 +244,14 @@ table:not(.no-hover) tbody tr:hover {
     }
 }
 
-$square-grid-td-size: 4rem;
+$diagonal-cell-width: 4rem;
 $rotate-width: 4.5rem;
 $rotate-angle: 45;
-$rotate-th-width: $square-grid-td-size;
+$rotate-th-width: $diagonal-cell-width;
 $rotate-span-width: 11rem;
 
-.square-grid-container {
-    max-height: calc(100vh - 290px); /* 290px is the top offset of the .square-grid-container when the page is in its widest layout.  Updated by Javascript on resize in courseMarkbookInner.twig */
+.diagonal-headings-table-container {
+    max-height: calc(100vh - 290px); /* 290px is the top offset of the .diagonal-headings-table-container when the page is in its widest layout.  Updated by Javascript on resize in courseMarkbookInner.twig */
     overflow: auto;
     width: calc(100vw - 4rem);
 
@@ -262,11 +262,11 @@ $rotate-span-width: 11rem;
     padding-right: 0 !important;
 }
 
-.square-grid-container table {
+.diagonal-headings-table-container table {
     width: 98%; /* Not 100% so that the rightmost column sloped heading is not completely hidden. */
 }
 
-.square-grid {
+.diagonal-headings-table {
     thead {
         tr.rotate-headers {
             th {
@@ -322,7 +322,7 @@ $rotate-span-width: 11rem;
 
     td,
     thead th {
-        min-width: $square-grid-td-size;
+        min-width: $diagonal-cell-width;
         white-space: nowrap;
     }
 }
