@@ -10,14 +10,16 @@
 
         <h2 class="subheader">Result Summary</h2>
         <section class="content">
-            <div id="schoolbox-result-1"></div>
-
             <p>
                 <em>This mark is unconfirmed and may change following teacher review.</em>
             </p>
-            <p class="grade">
-                <span>{{ attempt.mark }}/{{ attempt.maxMark }} ({{ attempt.normalisedMark }})</span>
+            <p class="grade no-pad">
+                <span>{{ attempt.mark }}/{{ attempt.maxMark }} ({{ attempt.normalisedMark|number_format(2) }}%)</span>
             </p>
+        </section>
+
+        <section class="content">
+            <div id="schoolbox-result-1"></div>
         </section>
 
         <h2 class="subheader">Response breakdown</h2>
