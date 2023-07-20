@@ -466,9 +466,9 @@ abstract class Mapper implements IMapper
 
         //Read Only DB
         try {
-            $this->database = Factory::getInstanceInternalRead();
+            $this->databaseRead = Factory::getInstanceInternalRead();
         } catch (DatabaseException $e) {
-            $this->database = new NullConnector();
+            $this->databaseRead = new NullConnector();
         }
     }
 
