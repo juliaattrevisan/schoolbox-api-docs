@@ -430,3 +430,8 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-canvas-lms;
     color: $icon-color-canvas-lms;
 }
+
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_CurrentLessonPlanController:before {
+    @extend .icon-lesson-plan;
+    color: $icon-color-lesson-plan;
+}
