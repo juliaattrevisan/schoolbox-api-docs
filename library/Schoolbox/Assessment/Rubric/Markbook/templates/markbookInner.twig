@@ -97,19 +97,24 @@
         leverage styling, but doesn not use DataTables, so need to undo DataTables specific rules */
         padding-right: 0 !important;
     }
+
+    .rubric-checklist > label {
+        margin-bottom: 0 !important;
+    }
+
     [data-draft-mark] {
         display: none;
     }
 </style>
 
-<div id="report_actions" class="actions-small-1 row">
-    <div class="checklist">
+<div id="report_actions" class="sb-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
+    <div class="checklist rubric-checklist">
         <input type="checkbox" id="show-drafts">
         <label for="show-drafts">
             Show Drafts
         </label>
     </div>
-    <nav>
+    <nav class="sb-nav-actions">
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>

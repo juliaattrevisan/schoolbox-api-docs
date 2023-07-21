@@ -1,0 +1,29 @@
+/**
+ *  sb-nav.scss
+ *
+ *  Nav objects applying styles were previously relying on the existence of an actions-small-4 class above them. Gross.
+ *  This class makes nav control it's own destiny (aka wrap all of the nav specific styles to a class applied to a nav
+ *  rather than have it relying on any external class to dictate when it should behave like a nav...
+*/
+
+.sb-nav-actions {
+    display: flex;
+    flex-direction: row;
+
+    a {
+        color: var(--content-ui-foreground);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 40px;
+        block-size: 40px;
+
+        &:before {
+            padding-right: 0;
+        }
+
+        &:hover {
+            background-color: var(--content-ui-hover);
+        }
+    }
+}
