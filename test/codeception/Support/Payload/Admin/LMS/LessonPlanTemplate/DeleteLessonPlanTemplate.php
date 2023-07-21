@@ -16,7 +16,6 @@ class DeleteLessonPlanTemplate extends \Tests\Support\Payload\Request
     private int $lessonPanTemplateId;
 
     /**
-     * @param int $lessonPanTemplateId
      * This function deletes a lesson plan template by passing its id
      */
     public function __construct(int $lessonPanTemplateId)

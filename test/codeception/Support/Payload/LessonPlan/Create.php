@@ -24,8 +24,11 @@ class Create extends Request
      * @param int    $folderId
      * @param int $lessonPlanTemplateId
      * @param string $title
+     * @param array $lessons
+     * @param array $visibility
+     * lesson plan visibility options are: 'staff' (not visible to students) or 'on' (visible to students)
      */
-    public function __construct(string $contextType, int $contextId, int $folderId, int $lessonPlanTemplateId, string $title, array $lessons)
+    public function __construct(string $contextType, int $contextId, int $folderId, int $lessonPlanTemplateId, string $title, array $lessons, array $visibility)
     {
         $eventTimestamp    = time();
         $this->contextType = $contextType;
@@ -44,10 +47,10 @@ class Create extends Request
 
         for ($i = 1;$i <= count($lessons); $i++) {
             $this->setFormParam('field[new' . $i . '][template]', ''.$i.'');
-            $this->setFormParam('field[new' . $i . '][body]', "<p>test</p>");
+            $this->setFormParam('field[new' . $i . '][body]', "test");
         }
 
-        $this->setFormParam('lessonPlanVisibility', 'staff');
+        $this->setFormParam('lessonPlanVisibility', $visibility[0]);
         $this->setFormParam('publishDate', date('d/m/Y g:ia', strtotime('- 5 day', $eventTimestamp)));
 
     }

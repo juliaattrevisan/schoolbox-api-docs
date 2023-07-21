@@ -131,6 +131,7 @@ class LessonPlanTemplateCest
      *
      *
      * @param IntegrationTester $i
+     * @throws \JsonException
      */
     public function deleteLessonPlanTemplate(IntegrationTester $i): void
     {
@@ -156,6 +157,7 @@ class LessonPlanTemplateCest
         #WHEN
         $lessonPlanTemplateDelete = new DeleteLessonPlanTemplate($lessonPlanName->getId());
         $i->amGoingTo('Send request to delete a lesson plan template');
+        $i->pause();
         $i->sendRequest($lessonPlanTemplateDelete);
 
       #THEN
