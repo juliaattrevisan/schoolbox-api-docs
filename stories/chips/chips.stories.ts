@@ -7,7 +7,7 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
-    title: "Chips/Chips",
+    title: "Form/Chips",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof StorybookSlot>;
  * Using `.sb-chips`
  */
 export const Default: Story = {
-    render: (args: unknown) => ({
+    render: () => ({
         template: `
             <ul class="sb-chips u-gap--xs u-padding-m">
                 <li><input type="checkbox" id="cb-1-1" /><label for="cb-1-1">Apple<span class="sb-chip__icon icon-tick"></span></label></span></li>
@@ -35,7 +35,7 @@ export const Default: Story = {
  * Rounded edges added with `.sb-chips--rounded`
  */
 export const Rounded: Story = {
-    render: (args: unknown) => ({
+    render: () => ({
         template: `
             <ul class="sb-chips sb-chips--rounded u-gap--xs u-padding-m">
                 <li><input type="checkbox" id="cb-7-1" /><label for="cb-7-1">Apple<span class="sb-chip__icon icon-tick"></span></label></span></li>
@@ -54,7 +54,7 @@ export const Rounded: Story = {
  * Background removed with `.sb-chips--no-background`
  */
 export const NoBackground: Story = {
-    render: (args: unknown) => ({
+    render: () => ({
         template: `
             <ul class="sb-chips sb-chips--rounded sb-chips--no-background u-gap--xs u-padding-m">
                 <li><input type="checkbox" id="cb-8-1" /><label for="cb-8-1">Apple<span class="sb-chip__icon icon-tick"></span></label></span></li>
@@ -73,7 +73,7 @@ export const NoBackground: Story = {
  * Border removed with `.sb-chips--no-border`
  */
 export const NoBorder: Story = {
-    render: (args: unknown) => ({
+    render: () => ({
         template: `
             <ul class="sb-chips sb-chips--rounded sb-chips--no-border u-gap--xs u-padding-m">
                 <li><input type="checkbox" id="cb-9-1" /><label for="cb-9-1">Apple<span class="sb-chip__icon icon-tick"></span></label></span></li>
@@ -89,10 +89,10 @@ export const NoBorder: Story = {
 };
 
 /**
- * Chips are under no obligation to use the tick as their selected icon - all Schoolbox icons are supported
+ * Chips are under no obligation to use the tick as their selected icon - all Schoolbox icons are supported `.icon-sunny`
  */
 export const Icons: Story = {
-    render: (args: unknown) => ({
+    render: () => ({
         template: `
             <ul class="sb-chips sb-chips--rounded u-gap--xs u-padding-m">
                 <li><input type="checkbox" id="cb-12-1" /><label for="cb-12-1">Sunny / Clear<span class="sb-chip__icon icon-sunny"></span></label></span></li>
@@ -109,7 +109,7 @@ export const Icons: Story = {
  * For right-to-left languages, add `dir="rtl"` to the parent element
  */
 export const RTL: Story = {
-    render: (args: unknown) => ({
+    render: () => ({
         template: `
             <ul class="sb-chips u-gap--xs u-padding-m" dir="rtl">
                 <li><input type="checkbox" id="cb-10-1" /><label for="cb-10-1">Apple<span class="sb-chip__icon icon-tick"></span></label></span></li>
@@ -128,7 +128,7 @@ export const RTL: Story = {
  * Are you using a scrollable container? Add `.sb-chips--scroll` to the parent element
  */
 export const Scrollable: Story = {
-    render: (args: unknown) => ({
+    render: () => ({
         template: `
             <ul class="sb-chips sb-chips--scroll u-gap--xs u-padding-m">
                 <li><input type="checkbox" id="cb-11-1" /><label for="cb-11-1">Apple<span class="sb-chip__icon icon-tick"></span></label></span></li>
