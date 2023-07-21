@@ -17,7 +17,7 @@ module.exports = {
     },
     staticDirs: ["../stories/assets"],
     stories: [
-        "../stories/**/*.stories.mdx",
+        "../stories/**/*.mdx",
         "../stories/**/*.stories.@(js|jsx|ts|tsx)",
         "../vue/components/**/*.stories.@(js|jsx|ts|tsx)",
     ],
