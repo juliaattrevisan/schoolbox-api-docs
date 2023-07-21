@@ -499,7 +499,8 @@ HELP;
             $recordAttachment = $this->pastoralAttachmentMapper->createModel()
                 ->setPastoral($record)
                 ->setStorage($attachment)
-                ->setPrivate(true);
+                ->setPrivate(true)
+                ->setExternalId(null);
 
             if ($this->perform()) {
                 $this->pastoralAttachmentMapper->save($recordAttachment);

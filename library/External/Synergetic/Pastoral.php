@@ -463,6 +463,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $attachment->setStorage($storageObject);
                                         $attachment->setRealname($storageObject->getFilename());
                                         $attachment->setPrivate(true);
+                                        $attachment->setExternalId($document['external_id']);
                                         $this->pastoralAttachmentMapper->save($attachment);
 
                                         $log = $this->pastoralLogMapper->createModel();
