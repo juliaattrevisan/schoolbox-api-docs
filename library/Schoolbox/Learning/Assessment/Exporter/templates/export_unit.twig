@@ -20,7 +20,6 @@
     'returnUrl'                         string                       - A URL to return to
     'returnUrlName'                     string                       - query arg name
     'courseImplsInWhichUnitNotImported' CourseImplementationModel[]  - Course implementations in which unitSpec has not been imported
-    'courseImplsInWhichUnitImported'    CourseImplementationModel[]  - Course implementations in which unitSpec has been imported
     'folderWritePerms'                  bool[]                       - Does current user have WRITE+ perm to the class folder
     'enableReimport'                    bool                         - Should already imported class assessments be re-importable?
 #}
@@ -54,11 +53,11 @@
     </div>
 </div>
 <div class="row">
-    {% if courseImplsInWhichUnitNotImported|length == 0 and courseImplsInWhichUnitImported|length == 0 %}
+    {% if courseImplsInWhichUnitNotImported|length == 0 %}
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-class-list"></i>
-                <p>There are no open classes that currently use this unit.</p>
+                <p>There are no open classes that contain an implementation of the '{{ unitSpec.course.title }}' course.</p>
             </div>
         </div>
     {% else %}
@@ -91,22 +90,6 @@
                                     courseImpl:       courseImpl,
                                     folderWritePerms: folderWritePerms,
                                     isImported:       false,
-                                    enableReimport:   enableReimport,
-                                } only %}
-                            {% endfor %}
-                        </ul>
-                    </section>
-                {% endif %}
-
-                {% if courseImplsInWhichUnitImported|length %}
-                    <section>
-                        <ul class="information-list card-selectable">
-                            {% for courseImpl in courseImplsInWhichUnitImported %}
-                                {% include '@learningAssessmentExporter/export_unit_row.twig' with {
-                                    unitSpec:         unitSpec,
-                                    courseImpl:       courseImpl,
-                                    folderWritePerms: folderWritePerms,
-                                    isImported:       true,
                                     enableReimport:   enableReimport,
                                 } only %}
                             {% endfor %}
