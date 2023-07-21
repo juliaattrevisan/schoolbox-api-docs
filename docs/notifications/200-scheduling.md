@@ -2,11 +2,11 @@
 
 # Scheduling
 
-The scheduling subsystem is used to generate messages from events, and queue
-those messages to then be sent to recipients.
+The scheduling subsystem is used to generate messages from events, and send
+those messages to their recipients at the appropriate time.
 
 This subsystem is the bridge between the [event propagator](100-propagation.md)
-and the [message router](300-routing.md).
+and the [delivery subsystem](300-delivery.md).
 
 
 ## Sequence Diagram
@@ -177,4 +177,4 @@ correspond to objects that have been deleted).
 
 
 [< Propagation sub-system documentation](100-propagation.md) |
-[Routing sub-system documentation >](300-routing.md)
+[Delivery sub-system documentation >](300-delivery.md)
