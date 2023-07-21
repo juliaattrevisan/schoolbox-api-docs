@@ -15,6 +15,9 @@ use Schoolbox\Realtime\Schedule\Trigger\InstantTriggerInterface;
 
 class CompressedTrigger implements InstantTriggerInterface
 {
+    // This is required for serializer
+    protected ?string $serial;
+
     /**
      * @param InstantTriggerInterface $trigger
      */
