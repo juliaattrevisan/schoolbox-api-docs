@@ -4,7 +4,7 @@ namespace Tests\Support\Payload\LessonPlan;
 
 use Tests\Support\Payload\PostTrait;
 
-class Delete  extends \Tests\Support\Payload\Request
+class Delete extends \Tests\Support\Payload\Request
 {
     use PostTrait;
 

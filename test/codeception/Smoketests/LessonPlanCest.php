@@ -2,16 +2,11 @@
 
 namespace Tests\Smoketests;
 
-
 use Exception;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
-use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\UserAccess;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\CreateLessonPlanTemplate;
-use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\DeleteLessonPlanTemplate;
-use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\EnableDisableLessonPlanTemplate;
 use Schoolbox\Resource\Folder;
 use Tests\Support\Payload;
 use Tests\Support\Payload\Group\AddMembers;
@@ -58,8 +53,7 @@ class LessonPlanCest
             array(2, $lessonPlanTemplateFieldName2, 'on', 'Body 2 ' . $timestamp),
             array(3, $lessonPlanTemplateFieldName3, 'off', 'Body 3 ' . $timestamp)
         );
-        $this->createLessonPlanTemplate($i,$lessonPlanTemplateTitle,$lessons);
-
+        $this->createLessonPlanTemplate($i, $lessonPlanTemplateTitle, $lessons);
         $lessonPlanTemplateName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
         $lessonPlanTemplateFieldName = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanTemplateFieldName1);
 
@@ -86,9 +80,9 @@ class LessonPlanCest
             (array)$visibility
         );
 
-        for ($j = 0;$j < count($lessons); $j++) {
-            $lessonPlanCreate->setFormParam('field[new' . $j + 1 . '][template]', ''.$lessonPlanTemplateFieldId1 + $j);
-            $lessonPlanCreate->setFormParam('field[new' . $j + 1 . '][body]', 'Body field text'. $j + 1 );
+        for ($j = 0; $j < count($lessons); $j++) {
+            $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][template]', '' . ($lessonPlanTemplateFieldId1 + $j));
+            $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
 
         #THEN
@@ -101,7 +95,7 @@ class LessonPlanCest
         $i->amGoingTo('Check the student cannot view the lesson plan as Visible to students is OFF');
         $lessonPlanAssessmentId = $lessonPlanName->getId();
         $i->impersonateUser($student->getId());
-        $i->sendGet('/learning/assessments/' .$lessonPlanAssessmentId .'/'. $student->getId());
+        $i->sendGet('/learning/assessments/' . $lessonPlanAssessmentId . '/' . $student->getId());
 
         #THEN
         $i->seeResponseCodeIs(401);
@@ -109,7 +103,7 @@ class LessonPlanCest
         #WHEN
         $i->amGoingTo('Check the teacher can view the lesson plan as Visible to students is OFF');
         $i->impersonateUser($teacher->getId());
-        $i->sendGet('/learning/assessments/' .$lessonPlanAssessmentId .'/'. $student->getId());
+        $i->sendGet('/learning/assessments/' . $lessonPlanAssessmentId . '/' . $student->getId());
 
         #THEN
         $i->seeResponseCodeIs(200);
@@ -138,9 +132,9 @@ class LessonPlanCest
         $this->createLessonPlanActivity($i, $title, $contextId, $folderId);
         $lessonPlanName = $i->grabFirstAssessmentByTitle($title);
         $lessonPlanAssessmentId = $lessonPlanName->getId();
-        $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan','lesson_plan_template_id',['assessment_id' => $lessonPlanAssessmentId]);
-        $lessonPlanId = $i->grabFromDatabase('lesson_plan','id',['assessment_id' => $lessonPlanAssessmentId]);
-        $fields = $i->grabNumRecords('lesson_plan_field',['lesson_plan_id'=>$lessonPlanId]);
+        $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan', 'lesson_plan_template_id', ['assessment_id' => $lessonPlanAssessmentId]);
+        $lessonPlanId = $i->grabFromDatabase('lesson_plan', 'id', ['assessment_id' => $lessonPlanAssessmentId]);
+        $fields = $i->grabNumRecords('lesson_plan_field', ['lesson_plan_id' => $lessonPlanId]);
 
 
         #WHEN
@@ -156,13 +150,12 @@ class LessonPlanCest
             (array)$visibility
         );
 
-        $lessonPlanFieldId = $i->grabFromDatabase('lesson_plan_field','id',['lesson_plan_id' => $lessonPlanId]);
-        $lessonPlanTemplateFieldId = $i->grabFromDatabase('lesson_plan_template_field','id',['lesson_plan_template_id' => $lessonPlanTemplateId]);
+        $lessonPlanFieldId = $i->grabFromDatabase('lesson_plan_field', 'id', ['lesson_plan_id' => $lessonPlanId]);
+        $lessonPlanTemplateFieldId = $i->grabFromDatabase('lesson_plan_template_field', 'id', ['lesson_plan_template_id' => $lessonPlanTemplateId]);
 
-        for ($j = 0;$j < $fields; $j++) {
-
-            $lessonPlanUpdate->setFormParam('field[' . $lessonPlanFieldId + $j . '][template]', ''.$lessonPlanTemplateFieldId + $j);
-            $lessonPlanUpdate->setFormParam('field[' . $lessonPlanFieldId + $j. '][body]', 'Body field text updated'. $lessonPlanFieldId  + $j);
+        for ($j = 0; $j < $fields; $j++) {
+            $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][template]', '' . ($lessonPlanTemplateFieldId + $j));
+            $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][body]', 'Body field text updated' . ($lessonPlanFieldId  + $j));
         }
 
         $i->amGoingTo('Check the lesson plan is updated');
@@ -173,13 +166,13 @@ class LessonPlanCest
         $i->amGoingTo('Check the student cannot view the lesson plan as Visible to students is OFF');
         $lessonPlanAssessmentId = $lessonPlanName->getId();
         $i->impersonateUser($student->getId());
-        $i->sendGet('/learning/assessments/' .$lessonPlanAssessmentId .'/'. $student->getId());
+        $i->sendGet('/learning/assessments/' . $lessonPlanAssessmentId . '/' . $student->getId());
         $i->seeResponseCodeIs(200);
 
         #THEN
         $i->amGoingTo('Check the teacher can view the lesson plan as Visible to students is OFF');
         $i->impersonateUser($teacher->getId());
-        $i->sendGet('/learning/assessments/' .$lessonPlanAssessmentId .'/'. $student->getId());
+        $i->sendGet('/learning/assessments/' . $lessonPlanAssessmentId . '/' . $student->getId());
         $i->seeResponseCodeIs(200);
     }
 
@@ -202,9 +195,9 @@ class LessonPlanCest
         $this->createLessonPlanActivity($i, $title, $contextId, $folderId);
         $lessonPlanName = $i->grabFirstAssessmentByTitle($title);
         $lessonPlanAssessmentId = $lessonPlanName->getId();
-        $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan','lesson_plan_template_id',['assessment_id' => $lessonPlanAssessmentId]);
-        $lessonPlanId = $i->grabFromDatabase('lesson_plan','id',['assessment_id' => $lessonPlanAssessmentId]);
-        $fields = $i->grabNumRecords('lesson_plan_field',['lesson_plan_id'=>$lessonPlanId]);
+        $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan', 'lesson_plan_template_id', ['assessment_id' => $lessonPlanAssessmentId]);
+        $lessonPlanId = $i->grabFromDatabase('lesson_plan', 'id', ['assessment_id' => $lessonPlanAssessmentId]);
+        $fields = $i->grabNumRecords('lesson_plan_field', ['lesson_plan_id' => $lessonPlanId]);
 
 
         #WHEN
@@ -220,20 +213,18 @@ class LessonPlanCest
             (array)$visibility
         );
 
-        $lessonPlanFieldId = $i->grabFromDatabase('lesson_plan_field','id',['lesson_plan_id' => $lessonPlanId]);
-        $lessonPlanTemplateFieldId = $i->grabFromDatabase('lesson_plan_template_field','id',['lesson_plan_template_id' => $lessonPlanTemplateId]);
+        $lessonPlanFieldId = $i->grabFromDatabase('lesson_plan_field', 'id', ['lesson_plan_id' => $lessonPlanId]);
+        $lessonPlanTemplateFieldId = $i->grabFromDatabase('lesson_plan_template_field', 'id', ['lesson_plan_template_id' => $lessonPlanTemplateId]);
 
-        for ($j = 0;$j < $fields; $j++) {
-
-            $lessonPlanUpdate->setFormParam('field[' . $lessonPlanFieldId + $j . '][template]', ''.$lessonPlanTemplateFieldId + $j);
-            $lessonPlanUpdate->setFormParam('field[' . $lessonPlanFieldId + $j. '][body]', 'Body field text updated'. $lessonPlanFieldId  + $j);
+        for ($j = 0; $j < $fields; $j++) {
+            $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][template]', '' . ($lessonPlanTemplateFieldId + $j));
+            $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][body]', 'Body field text updated' . ($lessonPlanFieldId  + $j));
         }
 
         #THEN
         $i->amGoingTo('Check the lesson plan is not created: response code 400');
         $i->sendRequest($lessonPlanUpdate);
         $i->seeResponseCodeIs(400);
-
     }
 
     /**
@@ -305,8 +296,6 @@ class LessonPlanCest
         $i->sendRequest($setAccessLevels);
 
         return $groupName;
-
-
     }
 
     /**
@@ -325,7 +314,6 @@ class LessonPlanCest
         );
 
         $i->sendRequest($lessonPlanTemplateCreate);
-
     }
 
     /**
@@ -351,11 +339,10 @@ class LessonPlanCest
             array(2, $lessonPlanTemplateFieldName2, 'on', 'Body 2 ' . $timestamp),
             array(3, $lessonPlanTemplateFieldName3, 'off', 'Body 3 ' . $timestamp)
         );
-        $this->createLessonPlanTemplate($i,$lessonPlanTemplateTitle,$lessons);
+        $this->createLessonPlanTemplate($i, $lessonPlanTemplateTitle, $lessons);
 
         $lessonPlanTemplateName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
         $lessonPlanTemplateFieldName = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanTemplateFieldName1);
-
         $i->seeResponseCodeIs(303);
 
         #WHEN
@@ -376,17 +363,14 @@ class LessonPlanCest
             (array)$visibility
         );
 
-        for ($j = 0;$j < count($lessons); $j++) {
-            $lessonPlanCreate->setFormParam('field[new' . $j + 1 . '][template]', ''.$lessonPlanTemplateFieldId1 + $j);
-            $lessonPlanCreate->setFormParam('field[new' . $j + 1 . '][body]', 'Body field text'. $j + 1 );
+        for ($j = 0; $j < count($lessons); $j++) {
+            $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][template]', '' . ($lessonPlanTemplateFieldId1 + $j));
+            $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
 
         #THEN
         $i->amGoingTo('Check the lesson plan is created');
         $i->sendRequest($lessonPlanCreate);
         $i->seeResponseCodeIs(303);
-
     }
-
-
 }

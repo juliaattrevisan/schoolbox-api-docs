@@ -45,14 +45,13 @@ class Create extends Request
         $this->setFormParam('title', $title);
         $this->setFormParam('dueDate', date('d/m/Y g:ia', strtotime('+ 10 day', $eventTimestamp)));
 
-        for ($i = 1;$i <= count($lessons); $i++) {
-            $this->setFormParam('field[new' . $i . '][template]', ''.$i.'');
+        for ($i = 1; $i <= count($lessons); $i++) {
+            $this->setFormParam('field[new' . $i . '][template]', '' . $i . '');
             $this->setFormParam('field[new' . $i . '][body]', "test");
         }
 
         $this->setFormParam('lessonPlanVisibility', $visibility[0]);
         $this->setFormParam('publishDate', date('d/m/Y g:ia', strtotime('- 5 day', $eventTimestamp)));
-
     }
 
 

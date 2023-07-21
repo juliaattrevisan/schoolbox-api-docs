@@ -40,7 +40,6 @@ class Update extends Request
 
         $this->setFormParam('lessonPlanVisibility', $visibility[0]);
         $this->setFormParam('publishDate', date('d/m/Y g:ia', strtotime('- 5 day', $eventTimestamp)));
-
     }
 
 
