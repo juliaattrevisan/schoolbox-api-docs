@@ -301,9 +301,6 @@ class LessonPlanCest
     /**
      * Convenience method to create a lesson plan template
      *
-     * @param IntegrationTester $i
-     * @param string            $lessonPlanTemplateTitle
-     * @return void
      * @throws Exception
      */
     private function createLessonPlanTemplate(IntegrationTester $i, string $lessonPlanTemplateTitle, array $lessons): void
@@ -319,9 +316,6 @@ class LessonPlanCest
     /**
      * Convenience method to create a lesson plan
      *
-     * @param IntegrationTester $i
-     * @param string            $lessonPlanTemplateTitle
-     * @return void
      * @throws Exception
      */
     private function createLessonPlanActivity(IntegrationTester $i, string $title, int $contextId, int $folderId): void
