@@ -1,10 +1,41 @@
+import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
-export default {
-    title: "Chips/Chips",
+/**
+ * Storybook meta data, any default properties that are passed into every story
+ * https://storybook.js.org/docs/vue/writing-stories/introduction
+ */
+const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
+    title: "Chips/Chips",
+};
+export default meta;
+type Story = StoryObj<typeof StorybookSlot>;
+
+/**
+ * The default story, to show the search page
+ */
+export const Default: Story = {
+    render: (args: unknown) => ({
+        components: { StorybookSlot },
+        setup() {
+            return { args };
+        },
+        template: `
+            <ul class="sb-chips u-gap--xs">
+                <li><input type="checkbox" id="cb-1-1" /><label for="cb-1-1">Apple<span class="sb-chip__icon icon-tick"></span></label></span></li>
+                <li><input type="checkbox" checked="checked" id="cb-1-2" /><label for="cb-1-2">Banana<span class="sb-chip__icon icon-tick"></span></label></span></li>
+                <li><input type="checkbox" checked="checked" id="cb-1-3" /><label for="cb-1-3">Carrot<span class="sb-chip__icon icon-tick"></span></label></span></li>
+                <li><input type="checkbox" id="cb-1-4" /><label for="cb-1-4">Durian<span class="sb-chip__icon icon-tick"></span></label></li>
+                <li><input type="checkbox" id="cb-1-5" /><label for="cb-1-5">Endive<span class="sb-chip__icon icon-tick"></span></label></li>
+                <li><input type="checkbox" id="cb-1-6" /><label for="cb-1-6">Fig<span class="sb-chip__icon icon-tick"></span></label></li>
+                <li><input type="checkbox" id="cb-1-7" /><label for="cb-1-7">Grape<span class="sb-chip__icon icon-tick"></span></label></li>
+            </ul>
+            `,
+    }),
 };
 
+/*
 const DefaultTemplate = (args, { argTypes }) => ({
     components: { StorybookSlot },
     template: `
@@ -241,3 +272,4 @@ export const Scrollable = ScrollableTemplate.bind({});
 Scrollable.parameters = {
     controls: { hideNoControlsWarning: true },
 };
+*/
