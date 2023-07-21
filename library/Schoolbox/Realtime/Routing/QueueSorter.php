@@ -74,6 +74,10 @@ class QueueSorter implements FilterInterface
         $userId = $user->getId();
         try {
             $this->validate($instance, $user);
+            $outputLevels = $this->getReroutedLevel($user, $instance);
+            if ($this->permMapper->isMuted($outputLevels)) {
+                throw new FilterException('Reroute level is zero');
+            }
         } catch (FilterException $e) {
             $this->log->notice(
                 sprintf(
@@ -85,11 +89,6 @@ class QueueSorter implements FilterInterface
                 )
             );
             return false;
-        }
-
-        $outputLevels = $this->getReroutedLevel($user, $instance);
-        if ($this->permMapper->isMuted($outputLevels)) {
-            throw new FilterException('Reroute level is zero');
         }
 
         $this->log->info(
