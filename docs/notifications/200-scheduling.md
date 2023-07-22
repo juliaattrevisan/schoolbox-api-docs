@@ -29,14 +29,29 @@ all Schedulers, it:
   * in this case, the scheduling
     [Message Broker](architecture/message-broker.md) as published into by the
     event propagator
-* sends the Triggers to its [Dispatcher](architecture/dispatcher.md) to be
-  processed
+* when the Trigger's time is reached (or immediately, if its time has already
+  been reached), sends the Triggers to its
+  [Dispatcher](architecture/dispatcher.md) to be processed
   * in this case, the Trigger is a call to a `notify` method on a
     `\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface` instance
 * acts as a Response Handler for the response that the Dispatcher returns
-  * in this case, it publishes into the routing Message Broker, for the
-    [routing sub-system](300-routing.md) to handle
+  * in this case, it sends the response to the
+    [delivery sub-system](300-delivery.md) to handle
 
+### Triggers
+
+Triggers are instances of the `\Alaress\Scheduler\Trigger\TriggerInterface`
+interface: this interface defines a `getTimestamp` method, which defines when
+the Trigger's action should happen.
+
+If the Trigger's timestamp has been reached, its event is called immediately:
+otherwise, the Scheduler defers the trigger's execution until its timestamp is
+reached.
+
+> Triggers are durable: if one is deferred, the Scheduler stores it in a
+> persistent Redis instance.
+> Stored triggers are restored upon the daemon's restarting: thus they will
+> survive if the daemon is stopped.
 
 ### Notifier
 
@@ -174,6 +189,12 @@ System `notify` methods are always called, regardless of whether the
 `msg_source` record exists. This is so that backend actions that must occur may
 be processed (for example, the retraction of messages in the routing queue that
 correspond to objects that have been deleted).
+
+
+### Routing
+
+> Routing used to be a separate daemon: however, its responsibilities have been
+> rolled into the scheduling subsystem.
 
 
 [< Propagation sub-system documentation](100-propagation.md) |
