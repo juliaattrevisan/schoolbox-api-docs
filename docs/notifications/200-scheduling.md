@@ -6,7 +6,7 @@ The scheduling subsystem is used to generate messages from events, and send
 those messages to their recipients at the appropriate time.
 
 This subsystem is the bridge between the [event propagator](100-propagation.md)
-and the [delivery subsystem](300-delivery.md).
+and the [message router](300-routing.md).
 
 
 ## Sequence Diagram
@@ -35,8 +35,8 @@ all Schedulers, it:
   * in this case, the Trigger is a call to a `notify` method on a
     `\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface` instance
 * acts as a Response Handler for the response that the Dispatcher returns
-  * in this case, it sends the response to the
-    [delivery sub-system](300-delivery.md) to handle
+  * in this case, it sends the request to a worker, for the
+    [routing sub-system](300-routing.md) to handle
 
 ### Triggers
 
@@ -191,11 +191,7 @@ be processed (for example, the retraction of messages in the routing queue that
 correspond to objects that have been deleted).
 
 
-### Routing
-
-> Routing used to be a separate daemon: however, its responsibilities have been
-> rolled into the scheduling subsystem.
 
 
 [< Propagation sub-system documentation](100-propagation.md) |
-[Delivery sub-system documentation >](300-delivery.md)
+[Routing sub-system documentation >](300-routing.md)

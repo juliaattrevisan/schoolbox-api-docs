@@ -6,7 +6,7 @@ The routing subsystem is used to determine to whom, and by which channel(s), a
 message is to be delivered.
 
 This subsystem is the bridge between the [scheduling](200-scheduling.md) and
-the [delivery](300-delivery.md) subsystems.
+the [delivery](400-delivery.md) subsystems.
 
 ## Sequence Diagram
 
@@ -42,8 +42,8 @@ determines the mechanism via which the message is delivered.
 
 It queries the database to determine the configured delivery mechanisms for
 that message topic, and then adds the message to the queue for the appropriate
-sub-section of the [delivery sub-system](300-delivery.md).
+sub-section of the [delivery sub-system](400-delivery.md).
 
 
 [< Scheduling sub-system documentation](200-scheduling.md) |
-[Delivery sub-system documentation >](300-delivery.md)
+[Delivery sub-system documentation >](400-delivery.md)
