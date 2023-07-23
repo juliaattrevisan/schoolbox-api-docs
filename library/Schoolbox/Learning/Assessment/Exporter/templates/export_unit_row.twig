@@ -2,21 +2,12 @@
     'unitSpec'         CourseUnitSpecificationModel - The unitSpec to export
     'courseImpl'       CourseImplementationModel    - The course implementation into which the unitSpec may be exported
     'folderWritePerms' bool[]                       - Does current user have WRITE+ perm to the class folder
-    'isImported'       bool                         - Has the unitSpec already been imported into this courseImpl?
-    'enableReimport'   bool                         - Should already imported class units be re-importable?
+
+    NOTE: If the ability to overwrite existing units is ever needed, see https://github.com/alaress/schoolbox/pull/28644.
 #}
 {% set unitImpl = null %}
-{% if isImported %}
-    {# Find the already imported unit implementation #}
-    {% for courseUnitImpl in courseImpl.units %}
-        {% if courseUnitImpl.specification.id == unitSpec.id %}
-            {% set unitImpl = courseUnitImpl %}
-        {% endif %}
-    {% endfor %}
-{% endif %}
-
 {% set isInstructor = folderWritePerms[courseImpl.folder.id] %}
-{% set canImport = isInstructor and (not isImported or enableReimport) %}
+{% set canImport = isInstructor %}
 
 <script type="text/javascript">
     $(function () {
@@ -37,30 +28,6 @@
         });
 
         $checkbox.change(); // Run function on page load.
-
-        // Warn user they are about to clobber previous interactions
-        {% if enableReimport %}
-        $('[data-warn-destructive-export]').click(function (e) {
-            const $checkbox = $(this);
-
-            if ($checkbox.prop('checked')) {
-                e.preventDefault();
-                $checkbox.confirmDialog({
-                    text: (
-                        'Are you sure you want to re-export to this class? ' +
-                        'Doing so will overwrite the existing class unit.'
-                    ),
-                    format: 'html',
-                    confirmLabel: 'Delete and re-export',
-                    cancelLabel: 'Cancel',
-                    confirmEvent: function () {
-                        $checkbox.prop('checked', true);
-                        $checkbox.trigger('change')
-                    }
-                });
-            }
-        });
-        {% endif %}
     });
 </script>
 
@@ -72,9 +39,6 @@
                    name="courseImplementationIds[{{ courseImpl.id }}]"
                    value="1"
                    {% if not canImport %}disabled{% endif %}
-                   {% if enableReimport and isImported %}
-                       data-warn-destructive-export
-                   {% endif %}
                    data-course-id="{{ courseImpl.id }}"/>
             <label for="import-{{ courseImpl.id }}" class="checkbox-label"></label>
         </div>
@@ -82,25 +46,10 @@
             <span class="size-32 icon-home"></span>
             <h3><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></h3>
             <p class="meta">
-                {% if isImported %}
-                    Unit duration:
-                    {% apply spaceless %}
-                        <time title="{{ unitImpl.openDate.short }}"
-                              datetime="{{ unitImpl.openDate.databaseDate }}"
-                        >{{ unitImpl.openDate.relativeTime }}</time>
-                        &ndash;
-                        <time title="{{ unitImpl.dueDate.short }}"
-                              datetime="{{ unitImpl.dueDate.databaseDate }}"
-                        >{{ unitImpl.dueDate.relativeTime }}</time>
-                    {% endapply %}
-                {% else %}
                     <br/>
-                {% endif %}
             </p>
             <p class="meta">
-                {% if isImported %}
-                    This unit already exists in this class.
-                {% elseif not isInstructor %}
+                {% if not isInstructor %}
                     You don't have write permission for this class.
                 {% else %}
                     This unit does not exist in this class.

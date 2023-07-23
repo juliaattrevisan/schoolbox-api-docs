@@ -21,7 +21,6 @@
     'returnUrlName'                     string                       - query arg name
     'courseImplsInWhichUnitNotImported' CourseImplementationModel[]  - Course implementations in which unitSpec has not been imported
     'folderWritePerms'                  bool[]                       - Does current user have WRITE+ perm to the class folder
-    'enableReimport'                    bool                         - Should already imported class assessments be re-importable?
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
@@ -57,7 +56,7 @@
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-class-list"></i>
-                <p>There are no open classes that contain an implementation of the '{{ unitSpec.course.title }}' course.</p>
+                <p>There are no open classes that contain an implementation of the '{{ unitSpec.course.title }}' course, but do not contain an implementation of the '{{ unitSpec.title }}' unit.</p>
             </div>
         </div>
     {% else %}
@@ -71,6 +70,7 @@
                 {% if courseImplsInWhichUnitNotImported|length %}
                     <section data-not-imported>
                         <ul class="information-list card-selectable">
+
                             <li>
                                 <div class="small-12 column">
                                     <div class="selector">
@@ -89,8 +89,6 @@
                                     unitSpec:         unitSpec,
                                     courseImpl:       courseImpl,
                                     folderWritePerms: folderWritePerms,
-                                    isImported:       false,
-                                    enableReimport:   enableReimport,
                                 } only %}
                             {% endfor %}
                         </ul>

@@ -182,7 +182,6 @@ class Controller extends BaseController
             'returnUrlName'                     => Redirect::RETURN_URL,
             'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
             'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
-            'enableReimport'                    => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
             'breadcrumbs'                       => [
                 ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
                 [$unitSpec->getTitle(), '/homepage/' . $unitSpec->getFolder()->getId()],
