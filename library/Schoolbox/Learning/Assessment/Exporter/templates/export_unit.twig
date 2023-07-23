@@ -60,6 +60,11 @@
             </div>
         </div>
     {% else %}
+        <div class="small-12 column">
+            <p class="meta">
+                The classes listed here are those that contain an implementation of the '{{ unitSpec.course.title }}' course, but do not contain an implementation of the '{{ unitSpec.title }}' unit.
+            </p>
+        </div>
         <div class="small-12 island">
 
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
