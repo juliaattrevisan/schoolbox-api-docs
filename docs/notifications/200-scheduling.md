@@ -2,8 +2,10 @@
 
 # Scheduling
 
-The scheduling subsystem is used to generate messages from events, and send
-those messages to their recipients at the appropriate time.
+The scheduling subsystem is used to:
+- generate messages from events
+- schedule those messages to be sent at a particular time
+- determine who should receive those messages
 
 This subsystem is the bridge between the [event propagator](100-propagation.md)
 and the [message router](300-routing.md).
@@ -190,7 +192,15 @@ System `notify` methods are always called, regardless of whether the
 be processed (for example, the retraction of messages in the routing queue that
 correspond to objects that have been deleted).
 
+### Resolver
 
+Upon the Trigger's time being reached: the Scheduler uses a
+[Resolver](architecture/resolver.md) to determine to whom a
+message is delivered; it translates the message's topic into an intended
+audience.
+
+Once it has determined the intended audience, it then invokes the routing
+sub-system in a worker process.
 
 
 [< Propagation sub-system documentation](100-propagation.md) |
