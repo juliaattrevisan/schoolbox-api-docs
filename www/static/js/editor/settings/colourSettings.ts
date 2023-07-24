@@ -26,7 +26,7 @@ const globalSwatches = [
             label: "Black",
         },
     ],
-    ...window.sbProps.colourDefaults.skin.slice(0, 5).map((swatch: string) => {
+    ...window.sbProps.colourDefaults.skinUnique.slice(0, 5).map((swatch: string) => {
         return {
             color: swatch,
             label: "School Colours",
