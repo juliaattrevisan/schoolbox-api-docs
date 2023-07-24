@@ -82,6 +82,13 @@ class Model implements ISoftDeletable
      */
     private ?float $normalisedMark = null;
 
+
+    /**
+     * @var string|null
+     */
+    private ?string $comment = null;
+
+
     /**
      * @var string|null
      */
@@ -365,6 +372,26 @@ class Model implements ISoftDeletable
     public function setLearnosityReference(?string $learnosityReference): self
     {
         $this->learnosityReference = $learnosityReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+
+    /**
+     * @param string|null $comment
+     * @return Model
+     */
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
         return $this;
     }
 }

@@ -8,3 +8,7 @@ ALTER TABLE `assess_attempt`
 -- calculate it manually somewhere else
 ALTER TABLE `assess_attempt`
     ADD COLUMN `norm_mark` DECIMAL(14,11) NULL AFTER `max_mark`;
+
+-- A comment about the overall attempt made by the student
+ALTER TABLE `assess_attempt`
+    ADD COLUMN `comment` DECIMAL(14,11) NULL AFTER `norm_mark`;

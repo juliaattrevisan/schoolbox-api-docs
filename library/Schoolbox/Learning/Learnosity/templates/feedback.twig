@@ -15,6 +15,23 @@
         <section class="content">
             <div id="schoolbox-student"></div>
         </section>
+        <section class="content">
+            <label>Overall Comment</label>
+            <textarea id="attempt-feedback"></textarea>
+            <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={SITE_VERSION}"></script>
+
+            <script>
+                $(function() {
+                    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                        detail: {
+                            targetElements: ['#attempt-feedback'],
+                            toolbar: "simple",
+                            addToToolbar: ["|", "blank"],
+                        }
+                    }));
+                });
+            </script>
+        </section>
         <input id='finalise' type="submit" value="Finalise marks" />
     </div>
 </div>
@@ -79,13 +96,18 @@
         /* Collate and pump customisations back into Learnosity
          */
         $('#finalise').on('click', function(event) {
-            let payload = [];
+            let payload = {
+                'learnosity': [],
+                'schoolbox': []
+            }
 
             $.each(attemptScores, function(index, element) {
                 let customIdentifier = 'sb-custom__' + index;
 
-                payload[index] = parseInt($('#' + customIdentifier).val());
+                payload['learnosity'][index] = parseInt($('#' + customIdentifier).val());
             });
+
+            payload['schoolbox'].attemptComnment = window.sbProps.editors['attempt-feedback'].getData();
 
             console.log(payload);
         });
