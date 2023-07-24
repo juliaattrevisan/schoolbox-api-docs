@@ -18,24 +18,21 @@ use Predis\Response\ServerException;
  */
 class EventObjectList extends AbstractList
 {
-
-    private $name;
-
     /**
      * @param ClientInterface $redis
      * @param string          $instanceId
-     * @param int             $identifier
+     * @param string          $identifier
      */
-    public function __construct(ClientInterface $redis, $instanceId, $identifier)
+    public function __construct(ClientInterface $redis, string $instanceId, private string $identifier)
     {
-        parent::__construct($redis, $instanceId, $identifier);
-        $this->name = $identifier;
+        // EventObjectList doesn't use userId, passing 0
+        parent::__construct($redis, $instanceId, 0);
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSuffix()
+    protected function getSuffix(): string
     {
         return 'object';
     }
@@ -44,7 +41,7 @@ class EventObjectList extends AbstractList
      * Deletes all the members of the current event object set
      * and remove the set itself.
      */
-    public function retract()
+    public function retract(): void
     {
         // get all members of the current set
         $idList = $this->redis->smembers($this->getRedisSetKey());
@@ -77,15 +74,13 @@ class EventObjectList extends AbstractList
         } else {
             $this->redis->del([$this->getRedisSetKey()]);
         }
-
-        return;
     }
 
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): string
     {
-        return $this->name;
+        return $this->identifier;
     }
 }

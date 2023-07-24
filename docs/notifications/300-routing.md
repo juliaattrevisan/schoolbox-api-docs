@@ -16,18 +16,8 @@ Source: [routing.plantuml](routing.plantuml)
 
 ## Technical Description and Developer Guide
 
-### Router Daemon
+### Router Transmitter Receiver
 
-The Router daemon (`/tools/notif/route/routed.php`) runs a
-`\Schoolbox\Realtime\Routing\Subscription\Handler` instance as its daemon
-process.
-
-This class is an instance of the [Scheduler](architecture/scheduler.md); like
-all Schedulers, it:
-* consumes Triggers from an external source
-  * in this case, the routing
-    [Message Broker](architecture/message-broker.md) as published into by the
-    [Scheduling sub-system](200-scheduling.md)
 * sends the Triggers to its [Dispatcher](architecture/dispatcher.md) to be
   processed
   * in this case, the Trigger is a call to the Queue Sorter to determine the

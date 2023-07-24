@@ -51,11 +51,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
 
 		-
-			message: "#^Property Alaress\\\\Async\\\\Queue\\\\RedisQueue\\:\\:\\$redis \\(Predis\\\\Client\\) does not accept Predis\\\\ClientInterface\\.$#"
-			count: 1
-			path: library/Alaress/Async/Queue/RedisQueue.php
-
-		-
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Async/Test/Subscription.php
@@ -376,19 +371,9 @@ parameters:
 			path: library/Alaress/Rules/Token/Tokenizer.php
 
 		-
-			message: "#^Property Alaress\\\\Scheduler\\\\AbstractScheduler\\:\\:\\$dispatcher \\(Alaress\\\\WorkerCrew\\\\DispatcherInterface\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/AbstractScheduler.php
-
-		-
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:transaction\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Cache/RedisCache.php
-
-		-
-			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/CronScheduler.php
 
 		-
 			message: "#^Method Alaress\\\\Scheduler\\\\Event\\\\BlankEvent\\:\\:getEffector\\(\\) should return object but returns null\\.$#"
@@ -5116,11 +5101,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Message/RoutePermissionMapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Realtime\\\\MessageList\\\\EventObjectList\\:\\:getName\\(\\) should return string but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/MessageList/EventObjectList.php
-
-		-
 			message: "#^Access to an undefined property Ratchet\\\\ConnectionInterface\\:\\:\\$httpRequest\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/Pipe.php
@@ -5181,11 +5161,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Routing/Filter/FilterFactory.php
 
 		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Realtime/Routing/RouteTXRX.php
-
-		-
 			message: "#^Return type \\(string\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\Subscription\\\\Test\\\\NestTestResolver\\:\\:getValue\\(\\) should be compatible with return type \\(bool\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\Subscription\\\\Resolver\\:\\:getValue\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Routing/Subscription/Test/NestTestResolver.php
@@ -5204,26 +5179,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Module\\\\AbstractModuleNotifier\\:\\:\\$mapper \\(Schoolbox\\\\Mapper\\) does not accept Schoolbox\\\\IMapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Module/AbstractModuleNotifier.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Scheduler.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Scheduler.php
-
-		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
-
-		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
 
 		-
 			message: "#^Dead catch \\- BadMethodCallException is never thrown in the try block\\.$#"
@@ -6126,11 +6081,6 @@ parameters:
 			path: tools/mq/list-redis.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: tools/mq/remove-old-triggers.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: tools/mq/remove-old-triggers.php
@@ -6139,11 +6089,6 @@ parameters:
 			message: "#^Argument of an invalid type DateInterval supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: tools/mq/reset-ttls.php
-
-		-
-			message: "#^Anonymous function has an unused use \\$opts\\.$#"
-			count: 1
-			path: tools/notif/route/routed.php
 
 		-
 			message: "#^Variable \\$d might not be defined\\.$#"

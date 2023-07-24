@@ -44,7 +44,7 @@ class CampusReassignment extends AbstractNotificationTest
      */
     public function requiredDaemons()
     {
-        return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
+        return [ self::DAEMON_SCHEDULE ];
     }
 
 
@@ -119,7 +119,7 @@ class CampusReassignment extends AbstractNotificationTest
                 $this->cacheSubscriptions();
 
                 // signal routed to drop the cache and reload
-                $this->sendSignal('routed', 'reload');
+                $this->sendSignal('scheduled', 'reload');
                 break;
 
             default:

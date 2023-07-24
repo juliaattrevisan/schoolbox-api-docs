@@ -5,7 +5,7 @@ passed from one process to another.
 
 The message broker functions as a publish-consume queue would:
 * Clients may publish messages to them
-* Consumers may listen for new messages published to a them, and act on the
+* Consumers may listen for new messages published to them, and act on the
   message content accordingly
 * Once a Consumer has acted upon a message, it is removed from the queue
 
@@ -83,7 +83,7 @@ how a message broker must work.
 Schoolbox's message brokers are implemented in two parts; the message queue
 itself, and a data store for the queue.
 
-`\Alaress\Async\Broker\StompRedis\Broker` is the abstract implementation of the
+`\Alaress\Async\Broker\StompRedis\Broker` is the implementation of the
 two-part message broker; concrete brokers may extend this abstract class.
 
 
@@ -113,9 +113,9 @@ for registering a Consumer.
 
 Schoolbox uses an instance of `\Alaress\Async\Stomp\Implementation\Stream\Connection`
 for its Message Queue Consumers.
- 
-> This is a client developed by Schoolbox: no off-the-shelf clients under 
-  active development support subscribing to a stream as an event emitter. 
+
+> This is a client developed by Schoolbox: no off-the-shelf clients under
+  active development support subscribing to a stream as an event emitter.
 
 
 #### Why two separate protocols?
@@ -133,7 +133,7 @@ not block.
 
 > This is a peculiarity of the STOMP client in use, not the STOMP protocol.
   It would be possible to develop an AMQP client that is also an event emitter,
-  thus obviating the need for STOMP. 
+  thus obviating the need for STOMP.
 
 RabbitMQ is able to understand both protocols, and can translate a message
 published via AMQP into STOMP when a Consumer receives it.
@@ -164,9 +164,8 @@ In addition, due to performance issues with persisting and reloading RabbitMQ
 instances with large numbers of queues, the decision was made to no longer
 treat RabbitMQ as the single source of truth for queue data.
 
-The current implementation of notifications maintains just two queues: one for
-the [scheduling](../200-scheduling.md) sub-system, and one for
-[routing](../300-routing.md).
+The current implementation of notifications maintains just one queue for
+the [scheduling](../200-scheduling.md) sub-system.
 
 
 #### Why not just Redis?

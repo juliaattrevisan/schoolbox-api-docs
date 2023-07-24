@@ -9,8 +9,11 @@
 
 namespace Alaress\Scheduler;
 
+use Alaress\Async\Broker\IResolver;
+use Alaress\Async\Queue\RedisQueue;
 use Alaress\Async\SignalEmitter;
 use Alaress\Date\IClock;
+use Alaress\Scheduler\Cache\ICache;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
@@ -18,32 +21,39 @@ use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
-
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var LoopInterface */
-    private $loop;
-
     /** @var array */
-    private $timers;
+    private array $timers;
+
+    /**
+     * Redis storage keys for future triggers
+     * This is referred when deleting canceled trigger from RedisCache
+     * @var array
+     */
+    private array $redisKeys;
 
     /** @var DispatcherInterface */
-    private $dispatcher;
-
-    /** @var IClock */
-    private $clock;
+    protected DispatcherInterface $dispatcher;
 
     /** @var int Retry time in seconds to reschedule */
     private const RETRY_TIME = 300;
 
+    /**
+     * JIT handler to take care of unexpected shutdown
+     *
+     * @var ICache|null
+     */
+    protected ?ICache $jit = null;
+
+    /**
+     * @var string|null Instance id
+     */
+    protected ?string $instanceId = null;
 
     /**
      * @param LoopInterface             $loop
@@ -52,51 +62,35 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param IClock                    $clock
      */
     public function __construct(
-        LoopInterface $loop,
+        private LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
-        LoggerInterface $log,
-        IClock $clock
+        protected LoggerInterface $log,
+        private IClock $clock
     ) {
         parent::__construct($loop);
 
-        $this->loop       = $loop;
-        $this->log        = $log;
         $this->dispatcher = new Dispatcher($loop, $this, $log, $dispatchStrategy); // TODO IoC
-        $this->clock      = $clock;
     }
-
-
-    /**
-     * Convenience method to schedule an array of triggers
-     *
-     * @param TriggerInterface[] $triggers
-     * @throws InvalidArgumentException
-     */
-    protected function scheduleNotifications(array $triggers)
-    {
-        foreach ($triggers as $trigger) {
-            $this->scheduleNotification($trigger);
-        }
-    }
-
 
     /**
      * Schedule a trigger for deferred execution
      *
      * @param TriggerInterface $trigger
-     * @throws InvalidArgumentException
+     * @param IResolver|null   $resolver
      * @return void
      */
-    protected function scheduleNotification(TriggerInterface $trigger): void
+    protected function scheduleNotification(TriggerInterface $trigger, ?IResolver $resolver): void
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
             $this->unschedule($trigger);
+            $resolver?->acknowledge();
             return;
         }
 
         if ($trigger->getTimestamp() < 0) {
             $this->log->info("[AbstractScheduler] Trigger with negative timestamp received: {$trigger->getEventObjectId()} {$trigger->getLabel()}"); // FIREFIGHT
             $this->unschedule($trigger);
+            $resolver?->acknowledge();
             return;
         }
 
@@ -108,11 +102,12 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', ['char' => '-']);
 
             $this->dispatchTrigger($trigger);
-
+            $resolver?->acknowledge();
             return;
         }
 
         $this->schedule($trigger, $this->timerCallback($trigger));
+        $resolver?->acknowledge();
     }
 
 
@@ -129,31 +124,29 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
 
     /**
-     * @return DispatcherInterface
-     */
-    public function getDispatcher()
-    {
-        return !isset($this->dispatcher) ? null : $this->dispatcher;
-    }
-
-
-    /**
      * @param TriggerInterface $trigger
      */
-    protected function dispatchTrigger(TriggerInterface $trigger)
+    protected function dispatchTrigger(TriggerInterface $trigger): void
     {
         $event = $trigger->getEvent();
         foreach ($trigger->getCallbacks() as $callback) {
-            $this->getDispatcher()->enqueue(
+            $this->dispatcher->enqueue(
                 $trigger,
                 $this->getMethod(),
-                serialize([
-                    $callback,
-                    $event->getObject(),
-                    $event->getEffector(),
-                    $event->getDiff()
-                ])
+                serialize(
+                    [
+                        $callback,
+                        $event->getObject(),
+                        $event->getEffector(),
+                        $event->getDiff(),
+                    ]
+                )
             );
+            // remove from backup
+            if ($this->jit) {
+                [$itemKey,] = RedisQueue::getStorage($trigger, $this->instanceId);
+                $this->jit->removeCache($itemKey);
+            }
         }
         if (count($trigger->getCallbacks()) === 0) {
             $this->log->warning("Trigger for '{$trigger->getEventObjectId()} {$trigger->getLabel()}' has no callbacks");
@@ -167,10 +160,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param TriggerInterface $trigger
      * @param callable         $callable
      * @param bool             $cancelPrevious
-     * @param null|int         $interval  in seconds
+     * @param null|int         $interval in seconds
      * @return bool
      */
-    protected function schedule(TriggerInterface $trigger, callable $callable, $cancelPrevious = true, ?int $interval = null)
+    protected function schedule(TriggerInterface $trigger, callable $callable, bool $cancelPrevious = true, ?int $interval = null): bool
     {
         // can't schedule a cancel trigger
         if ($trigger instanceof CancelTrigger) {
@@ -187,8 +180,8 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $label = $trigger->getLabel();
 
         $interval = $interval ?: ($trigger->getTimestamp() - $this->clock->time());
-        $timer = $this->loop->addTimer($interval, $callable);
-        $this->putTimer($model, $label, $timer);
+        $timer    = $this->loop->addTimer($interval, $callable);
+        $this->putTimer($model, $label, $timer, $trigger);
 
         $this->log->info(
             sprintf(
@@ -218,14 +211,15 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         if ($this->hasTimer($model, $label)) {
             $timer = $this->getTimer($model, $label);
-            $this->log->info("[AbstractScheduler] Canceling existing timer for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", array('char' => '-'));
+            $this->log->info("[AbstractScheduler] Canceling existing timer for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", ['char' => '-']);
 
             if ($timer instanceof TimerInterface) {
                 $this->loop->cancelTimer($timer);
             } else {
-                $this->log->debug("[AbstractScheduler] Timer is not set properly for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", array('char' => '-'));
+                $this->log->debug("[AbstractScheduler] Timer is not set properly for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", ['char' => '-']);
             }
             $this->removeTimer($model, $label);
+
             return true;
         }
 
@@ -248,16 +242,24 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
 
     /**
-     * @param object         $model
-     * @param string         $label
-     * @param TimerInterface $timer
+     * @param object           $model
+     * @param string           $label
+     * @param TimerInterface   $timer
+     * @param TriggerInterface $trigger
      */
-    private function putTimer($model, $label, TimerInterface $timer)
+    public function putTimer(object $model, string $label, TimerInterface $timer, TriggerInterface $trigger): void
     {
         $class = get_class($model);
         $hash  = $this->hashObject($model);
 
         $this->timers[$class][$label][$hash] = $timer;
+
+        // Store scheduled trigger key, so that it can be referred when canceled
+        if ($this->instanceId && $this->jit) {
+            [$storageKey,] = RedisQueue::getStorage($trigger, $this->instanceId);
+            $this->redisKeys[$class][$label][$hash] = $storageKey;
+            $this->jit->storeCache($trigger);
+        }
     }
 
 
@@ -278,11 +280,16 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param object $model
      * @param string $label
      */
-    public function removeTimer($model, $label)
+    public function removeTimer(object $model, string $label): void
     {
         $class = get_class($model);
         $hash  = $this->hashObject($model);
         unset($this->timers[$class][$label][$hash]);
+        // Removed scheduled trigger from RedisCache
+        if ($this->jit) {
+            $storageKey = $this->redisKeys[$class][$label][$hash];
+            $this->jit->removeCache($storageKey);
+        }
     }
 
 
@@ -322,7 +329,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         // If this is handling ExternalException from a worker, most likely that this is caused by
         // SIS connector outage. Hence, rescheduling it.
         if ($identifier instanceof TriggerInterface && $command === DefaultDispatchStrategy::TASK_PUBLISH) {
-            $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, array('char' => '-'));
+            $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, ['char' => '-']);
             $this->schedule($identifier, $this->timerCallback($identifier), true, self::RETRY_TIME);
         }
     }

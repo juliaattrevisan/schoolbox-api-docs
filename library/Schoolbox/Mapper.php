@@ -39,14 +39,11 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
 use Schoolbox\Mapper\Performance\IMonitor;
 use Schoolbox\Mapper\Performance\LiveMonitor;
-use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
-use Serializable;
 use Traversable;
 use TypeError;
 use UnderflowException;
@@ -715,9 +712,8 @@ abstract class Mapper implements IMapper
                             new NotifierInflector(
                                 new Configurator($this->getDi()),
                             ),
-                            new TriggerFactoryFactory(true),
                         ),
-                        new Broker(
+                        new \Alaress\Async\Broker\StompRedis\Broker(
                             INSTANCE_ID,
                             $this->getDi()->get('amqp'),
                             $this->getDi()->get('redis.storage'),

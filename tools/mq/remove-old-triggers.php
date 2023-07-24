@@ -133,11 +133,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 // CompressedTrigger
                 try {
                     $output = $instance->extractTrigger();
-                    if ($output instanceof TriggerInterface) {
-                        $this->getLogger()->info(self::triggerInfo($output, $instance));
-                    } else {
-                        $this->deleteFromRedis('CompressedTrigger for unknown object', null, $key);
-                    }
+                    $this->getLogger()->info(self::triggerInfo($output, $instance));
                     $triggerDate = \Alaress_Date_Format::newFromTimestamp((int)$output->getTimestamp());
                     $expireTime = (clone $triggerDate)->addSeconds(Instance::DEFAULT_TTL);
 

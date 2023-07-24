@@ -15,7 +15,6 @@ use Alaress\Scheduler\Trigger\TriggerInterface;
 use OutOfRangeException;
 use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger;
 use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTriggerBundle;
 
 class TriggerFactory
@@ -29,19 +28,14 @@ class TriggerFactory
     /** @var TriggerBundleInterface[] */
     protected $bundles;
 
-    /** @var int */
-    protected $level;
-
     /**
      * @param ModuleNotifierInterface $instance
-     * @param EventInterface $event
-     * @param int $compression
+     * @param EventInterface          $event
      */
-    public function __construct(ModuleNotifierInterface $instance, EventInterface $event, $compression = -1)
+    public function __construct(ModuleNotifierInterface $instance, EventInterface $event)
     {
         $this->notifier = $instance;
         $this->event = $event;
-        $this->level = $compression;
         $this->bundles = array();
     }
 
@@ -114,33 +108,13 @@ class TriggerFactory
 
 
     /**
-     * If possible, cleans up triggers
-     *
-     * @param TriggerInterface[] $triggers
-     */
-    public function cleanup($triggers)
-    {
-        foreach ($triggers as $t) {
-            if ($t instanceof CompressedTrigger) {
-                $t->deflate();
-            }
-        }
-    }
-
-    /**
      * @param string $method
      * @return TriggerBundleInterface
      * @throws OutOfRangeException
      */
     protected function newBundle($method)
     {
-        if ($this->level < 0) {
-            return new TriggerBundle($this, $method);
-        }
-        if ($this->level <= 9) {
-            return new CompressedTriggerBundle($this, $method, $this->level);
-        }
-        throw new OutOfRangeException("Invalid bundle compression given");
+        return new CompressedTriggerBundle($this, $method);
     }
 
     /**

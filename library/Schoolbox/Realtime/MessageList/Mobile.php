@@ -39,7 +39,7 @@ class Mobile implements QueueInterface
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return "{$this->userId}:mobile";
     }
@@ -51,7 +51,7 @@ class Mobile implements QueueInterface
      * @param Instance $instance
      * @return bool
      */
-    public function contains(Instance $instance)
+    public function contains(Instance $instance): bool
     {
         // this "list" doesn't contain things
         return false;
@@ -63,7 +63,7 @@ class Mobile implements QueueInterface
      *
      * @return void
      */
-    public function drain()
+    public function drain(): void
     {
         // noop: this "list" doesn't contain things
     }
@@ -75,7 +75,7 @@ class Mobile implements QueueInterface
      * @param Instance $instance
      * @return void
      */
-    public function push(Instance $instance)
+    public function push(Instance $instance): void
     {
         $this->cloudManager->push($this->userId, $instance);
     }
@@ -88,7 +88,7 @@ class Mobile implements QueueInterface
      * @param bool               $dropCache whether or not any internally-held cache should be dropped
      * @return void
      */
-    public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false)
+    public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void
     {
         // noop: this "list" doesn't contain things
     }

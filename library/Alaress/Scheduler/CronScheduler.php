@@ -27,7 +27,6 @@ use RuntimeException;
  */
 abstract class CronScheduler extends AbstractScheduler implements EventListener
 {
-
     /** @var TriggerInterface[] */
     private $triggers = [];
 
@@ -64,7 +63,7 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
             [ 'char' => '+' ]
         );
 
-        $this->scheduleNotification($trigger);
+        $this->scheduleNotification($trigger, null);
     }
 
     /**
@@ -134,7 +133,7 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
 
         foreach ($this->triggers as $id => $trigger) {
             try {
-                $this->scheduleNotification($trigger);
+                $this->scheduleNotification($trigger, null);
             } catch (InvalidArgumentException $e) {
                 $this->logException($e);
             } catch (RuntimeException $e) {

@@ -22,7 +22,6 @@ use SplQueue;
 
 class Dispatcher implements DispatcherInterface
 {
-
     /** @var SplQueue */
     protected $q;
 
@@ -53,7 +52,6 @@ class Dispatcher implements DispatcherInterface
      */
     public function __construct($loop, $msgHandler, $log, $strat = null)
     {
-
         $this->strat = $strat ? : new DefaultDispatchStrategy();
 
         // pool of workers
@@ -69,7 +67,7 @@ class Dispatcher implements DispatcherInterface
         $this->log = $log;
 
         // build the queue, retrieving from storage if that's part of the strat, and execute if it contains stuff
-        $this->q = $this->strat->buildQueue();
+        $this->q = new SplQueue();
 
         if ($this->q->count()) {
             $this->log->notice("Queue is preloaded, draining: queue length is " . $this->q->count());
@@ -102,9 +100,6 @@ class Dispatcher implements DispatcherInterface
             throw new QueueingException("Cannot enqueue, max queue length of $mLength reached");
         }
 
-        // call for persistence
-        $this->strat->penqueue($identifier, $command, [ $data ]);
-
         // store the element locally
         $this->q->enqueue([ $identifier, $command, $data ]);
         $this->log->info("Enqueued '$command': queue length is " . $this->q->count());
@@ -121,20 +116,15 @@ class Dispatcher implements DispatcherInterface
      * Attempts to dequeue and dispatch all elements in the queue.
      * Nothing will happen if the queue is empty.
      *
-     * @param int $rate
+     * @param int|null $rate
      */
-    public function attach($rate = null)
+    public function attach(?int $rate = null)
     {
-        // notify the pool that we're engaged
-        $this->pool->dispatcherEngage();
-
-        // this came from the pool emitting ready
+        // if $rate is null, this came from the pool emitting ready
         if (is_null($rate)) {
             $rate = $this->strat->getQueueDelay();
             $this->detach();
         }
-
-        $rate = (int)$rate;
 
         // if there's a timer, use it, otherwise create it
         if (!($this->timer instanceof TimerInterface)) {
@@ -152,7 +142,6 @@ class Dispatcher implements DispatcherInterface
         // don't try to remove a timer that isn't there
         if ($this->timer instanceof TimerInterface) {
             $this->log->debug("Detaching dispatcher (queue length is {$this->q->count()})");
-            $this->pool->dispatcherIdle();
             $this->loop->cancelTimer($this->timer);
             $this->timer = null;
         }
@@ -179,8 +168,6 @@ class Dispatcher implements DispatcherInterface
             $this->timer = null;
 
             $this->log->debug("Queue is empty: detaching timer");
-
-            $this->pool->dispatcherIdle();
             return;
         }
 
@@ -202,8 +189,6 @@ class Dispatcher implements DispatcherInterface
                 // we need to catch (almost) any and all exception here, lest we explode our reactor
                 $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ 'exception' => $e ]);
             }
-            // regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
-            $this->strat->pdequeue($identifier);
             return;
         }
 

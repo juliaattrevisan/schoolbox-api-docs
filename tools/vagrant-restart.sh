@@ -26,7 +26,6 @@ if [ -f "$SITE_ROOT/tools/notif/syscheck.php" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Restarting daemons in background";
     sleep 5 && service schoolbox-cloud-socketd@vagrantx restart &
-    sleep 5 && service schoolbox-cloud-routed@vagrantx restart &
     sleep 5 && service schoolbox-cloud-digestd@vagrantx restart &
     sleep 5 && service schoolbox-cloud-scheduled@vagrantx restart &
 else

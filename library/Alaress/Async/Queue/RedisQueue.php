@@ -12,27 +12,24 @@ namespace Alaress\Async\Queue;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use ErrorException;
 use InvalidArgumentException;
 use Predis\Client;
 use Predis\ClientInterface;
-use Predis\Collection\Iterator\Keyspace;
 use Predis\Transaction\MultiExec;
 
 abstract class RedisQueue implements QueueInterface
 {
+    public const TTL_EXPIRED = -2;
 
-
-    /** @var Client */
-    protected $redis;
-
+    public const COMPRESSION_LEVEL = 9; // 9 is max, 6 is default, -1 is none
 
     /**
      * @param ClientInterface $redis
      */
-    public function __construct(ClientInterface $redis)
+    public function __construct(protected ClientInterface $redis)
     {
-        $this->redis = $redis;
     }
 
 
@@ -42,7 +39,7 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return bool
      */
-    public function contains(Instance $instance)
+    public function contains(Instance $instance): bool
     {
         $id = $this->getRedisMsgKey($instance);
 
@@ -63,10 +60,10 @@ abstract class RedisQueue implements QueueInterface
      *
      * @return void
      */
-    public function drain()
+    public function drain(): void
     {
         // delete the list, which is a user's reference to the messages. they will be expired automatically (and other users may still be attached)
-        $this->redis->del([ $this->getRedisSetKey() ]);
+        $this->redis->del([$this->getRedisSetKey()]);
     }
 
 
@@ -76,10 +73,14 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return void
      */
-    public function push(Instance $instance)
+    public function push(Instance $instance): void
     {
-        $id    = $this->getRedisMsgKey($instance);
-        $data  = $this->deflate($instance);
+        $id   = $this->getRedisMsgKey($instance);
+        $data = self::deflate($instance);
+
+        if (!$this->redis instanceof Client) {
+            throw new InvalidArgumentException('Unexpected redis client');
+        }
 
         $this->redis->transaction(function (MultiExec $tx) use ($id, $data, $instance) {
             $ttl = $instance->getTTL() > 0 ? $instance->getTTL() : Instance::DEFAULT_TTL;
@@ -94,11 +95,11 @@ abstract class RedisQueue implements QueueInterface
 
     /**
      * @param NotificationBundle $bundle
-     * @param bool $dropCache
-     * @throws InvalidArgumentException
+     * @param bool               $dropCache
      * @return void
+     * @throws InvalidArgumentException
      */
-    public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false)
+    public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void
     {
         $bundle->appendInstances($this->fetch());
     }
@@ -126,7 +127,7 @@ abstract class RedisQueue implements QueueInterface
             $data = $result[$i];
 
             try {
-                $instances[] = $this->inflate($data);
+                $instances[] = self::inflate($data);
             } catch (InvalidArgumentException $e) {
                 // the thing we're pointing at doesn't exist or payload invalid? remove the reference
                 $this->redis->srem($this->getRedisSetKey(), $key);
@@ -140,7 +141,7 @@ abstract class RedisQueue implements QueueInterface
     /**
      * @return array
      */
-    private function fetchIdList()
+    private function fetchIdList(): array
     {
         return $this->redis->smembers($this->getRedisSetKey()) ?: [];
     }
@@ -152,7 +153,7 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return string
      */
-    public function getRedisMsgKey(Instance $instance)
+    public function getRedisMsgKey(Instance $instance): string
     {
         return sprintf(
             $this->getMessageKeyPattern(),
@@ -169,7 +170,7 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return string
      */
-    public function getRedisMsgBaseKey(Instance $instance)
+    public function getRedisMsgBaseKey(Instance $instance): string
     {
         return sprintf(
             $this->getMessageKeyPattern(),
@@ -185,7 +186,7 @@ abstract class RedisQueue implements QueueInterface
      *
      * @return string
      */
-    protected function getRedisSetKey()
+    protected function getRedisSetKey(): string
     {
         return sprintf(
             $this->getSetKeyPattern(),
@@ -198,12 +199,12 @@ abstract class RedisQueue implements QueueInterface
      * Prepare an instance for storage.
      * Inverse of inflate()
      *
-     * @param Instance $instance
+     * @param Instance|TriggerInterface $instance
      * @return string
      */
-    private function deflate(Instance $instance)
+    private static function deflate(Instance|TriggerInterface $instance): string
     {
-        return gzcompress(serialize($instance), 9);
+        return gzcompress(serialize($instance), self::COMPRESSION_LEVEL);
     }
 
 
@@ -212,10 +213,10 @@ abstract class RedisQueue implements QueueInterface
      * Inverse of deflate()
      *
      * @param string $data
-     * @throws InvalidArgumentException if the given payload is unable to be restored into an Instance
      * @return Instance
+     * @throws InvalidArgumentException if the given payload is unable to be restored into an Instance
      */
-    private function inflate($data)
+    private static function inflate(string $data): Instance
     {
         $unserial = false;
 
@@ -232,13 +233,26 @@ abstract class RedisQueue implements QueueInterface
         return $unserial;
     }
 
+    /**
+     * @param TriggerInterface $trigger
+     * @param string           $instanceId
+     * @return array
+     */
+    public static function getStorage(TriggerInterface $trigger, string $instanceId): array
+    {
+        $compressedData = self::deflate($trigger);
+        $hash           = sha1($compressedData);
+        $itemKey        = "msg:{$instanceId}:s:$hash";
+        return [$itemKey, $compressedData];
+    }
+
 
     /**
      * Returns the overall namespace for this queue's data
      *
      * @return string
      */
-    abstract protected function getNamespace();
+    abstract protected function getNamespace(): string;
 
 
     /**
@@ -246,7 +260,7 @@ abstract class RedisQueue implements QueueInterface
      *
      * @return string
      */
-    abstract protected function getSetKeyPattern();
+    abstract protected function getSetKeyPattern(): string;
 
 
     /**
@@ -254,5 +268,5 @@ abstract class RedisQueue implements QueueInterface
      *
      * @return string
      */
-    abstract protected function getMessageKeyPattern();
+    abstract protected function getMessageKeyPattern(): string;
 }

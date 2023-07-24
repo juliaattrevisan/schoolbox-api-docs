@@ -14,13 +14,12 @@ use Alaress\Async\Notification\NotificationBundle;
 
 interface QueueInterface
 {
-
     /**
      * Returns the name of this queue
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
 
     /**
@@ -29,7 +28,7 @@ interface QueueInterface
      * @param Instance $instance
      * @return bool
      */
-    public function contains(Instance $instance);
+    public function contains(Instance $instance): bool;
 
 
     /**
@@ -37,7 +36,7 @@ interface QueueInterface
      *
      * @return void
      */
-    public function drain();
+    public function drain(): void;
 
 
     /**
@@ -46,15 +45,15 @@ interface QueueInterface
      * @param Instance $instance
      * @return void
      */
-    public function push(Instance $instance);
+    public function push(Instance $instance): void;
 
 
     /**
      * Populates the given Bundle with all the notifications this queue contains
      *
-     * @param NotificationBundle $bundle     the bundle to populate
-     * @param bool               $dropCache  whether or not any internally-held cache should be dropped
+     * @param NotificationBundle $bundle    the bundle to populate
+     * @param bool               $dropCache whether or not any internally-held cache should be dropped
      * @return void
      */
-    public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false);
+    public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void;
 }

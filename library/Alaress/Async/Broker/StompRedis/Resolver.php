@@ -26,6 +26,7 @@ class Resolver implements IResolver
      */
     private $resolver;
 
+    private bool $acked = false;
 
     /**
      * @param IAckResolver $resolver
@@ -42,8 +43,12 @@ class Resolver implements IResolver
      */
     public function acknowledge()
     {
+        if ($this->acked) {
+            return;
+        }
         try {
             $this->resolver->ack();
+            $this->acked = true;
         } catch (RuntimeException $e) {
             throw new DuplicateResolutionException($e->getMessage(), $e->getCode(), $e);
         }
@@ -56,8 +61,12 @@ class Resolver implements IResolver
      */
     public function reject()
     {
+        if ($this->acked) {
+            return;
+        }
         try {
             $this->resolver->nack();
+            $this->acked = true;
         } catch (RuntimeException $e) {
             throw new DuplicateResolutionException($e->getMessage(), $e->getCode(), $e);
         }

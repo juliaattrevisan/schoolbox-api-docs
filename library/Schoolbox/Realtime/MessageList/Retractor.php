@@ -23,23 +23,17 @@ class Retractor extends AbstractList
     public const MODE_RETRACT_LIKE = 2;
 
     /**
-     * @var int
-     */
-    private $mode;
-
-    /**
      * Constructor
      *
      * @param ClientInterface $redis
      * @param string          $instanceId
      * @param int             $mode
      */
-    public function __construct(ClientInterface $redis, $instanceId, int $mode)
+    public function __construct(ClientInterface $redis, string $instanceId, private int $mode)
     {
         if (!\in_array($mode, [self::MODE_RETRACT_SINGLE, self::MODE_RETRACT_LIKE], true)) {
             throw new \InvalidArgumentException('$mode must be one of the MODE_RETRACT_* class constants');
         }
-        $this->mode = $mode;
 
         parent::__construct($redis, $instanceId, 0);
     }
@@ -51,7 +45,7 @@ class Retractor extends AbstractList
      * @param Instance $instance
      * @return void
      */
-    public function push(Instance $instance)
+    public function push(Instance $instance): void
     {
         if ($this->mode === self::MODE_RETRACT_SINGLE) {
             $this->retractSingle($instance);
@@ -67,14 +61,14 @@ class Retractor extends AbstractList
      * Surgically retract this message from the queue, if it's there.
      *
      * @param Instance $instance
-     * @return bool
+     * @return void
      */
-    private function retractSingle(Instance $instance): bool
+    private function retractSingle(Instance $instance): void
     {
         // When retracting messages, only the message body need be removed.
         // The pointer in the set need not be removed, as `fetch()` knows how
         // to handle set items with missing message bodies.
-        return $this->redis->del([$this->getRedisMsgKey($instance)]) > 0;
+        $this->redis->del([$this->getRedisMsgKey($instance)]) > 0;
     }
 
 
@@ -106,7 +100,7 @@ class Retractor extends AbstractList
      *
      * @throws BadMethodCallException
      */
-    protected function getSetKeyPattern()
+    protected function getSetKeyPattern(): string
     {
         throw new BadMethodCallException('Retract queues has no access to set');
     }
@@ -117,7 +111,7 @@ class Retractor extends AbstractList
      *
      * @throws BadMethodCallException
      */
-    protected function getSuffix()
+    protected function getSuffix(): string
     {
         throw new BadMethodCallException('Retract queues do not support suffix');
     }

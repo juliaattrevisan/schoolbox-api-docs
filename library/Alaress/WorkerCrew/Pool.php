@@ -33,7 +33,6 @@ use RuntimeException;
  */
 class Pool extends EventEmitter implements PoolInterface
 {
-
     const DATA_IN   = 0;
     const DEBUG_OUT = 1;
     const DEBUG_ERR = 2;
@@ -410,28 +409,6 @@ class Pool extends EventEmitter implements PoolInterface
     public function canDispatcherFlywheel()
     {
         return $this->strat->canDispatcherFlywheel();
-    }
-
-
-    /**
-     * Method to advise the pool that the Dispatcher is idle.
-     *
-     * @return void
-     */
-    public function dispatcherIdle()
-    {
-        $this->strat->dispatcherIdle();
-    }
-
-
-    /**
-     * Method to advise the pool that the Dispatcher is engaged.
-     *
-     * @return void
-     */
-    public function dispatcherEngage()
-    {
-        $this->strat->dispatcherEngage();
     }
 
 

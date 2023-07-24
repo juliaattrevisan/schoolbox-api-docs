@@ -30,7 +30,6 @@ use Schoolbox\RoleMapper;
  */
 class DigestScheduler extends CronScheduler
 {
-
     /**
      * @var DigestTriggerFactory
      */
@@ -87,7 +86,7 @@ class DigestScheduler extends CronScheduler
         $triggers = [];
 
         // gently release workers in case they're digesting
-        $this->getDispatcher()->releaseWorkerPool(Pool::RELEASE_SOFT);
+        $this->dispatcher->releaseWorkerPool(Pool::RELEASE_SOFT);
 
         // read each role entry, and schedule a cron based on it
         foreach ($this->roleMapper->findAll() as $role) {

@@ -14,25 +14,14 @@ use Predis\ClientInterface;
 
 abstract class AbstractList extends RedisQueue
 {
-
-    /** @var string */
-    private $instanceId;
-
-    /** @var int */
-    private $userId;
-
-
     /**
      * @param ClientInterface $redis
      * @param string          $instanceId
      * @param int             $userId
      */
-    public function __construct(ClientInterface $redis, $instanceId, $userId)
+    public function __construct(ClientInterface $redis, private string $instanceId, private int $userId)
     {
         parent::__construct($redis);
-
-        $this->instanceId = $instanceId;
-        $this->userId     = $userId;
     }
 
 
@@ -41,7 +30,7 @@ abstract class AbstractList extends RedisQueue
      *
      * @return string
      */
-    protected function getNamespace()
+    protected function getNamespace(): string
     {
         return "msg:{$this->instanceId}";
     }
@@ -50,7 +39,7 @@ abstract class AbstractList extends RedisQueue
     /**
      * @return string
      */
-    protected function getMessageKeyPattern()
+    protected function getMessageKeyPattern(): string
     {
         return '%s:m:%s:%s';
     }
@@ -59,7 +48,7 @@ abstract class AbstractList extends RedisQueue
     /**
      * @return string
      */
-    protected function getSetKeyPattern()
+    protected function getSetKeyPattern(): string
     {
         return '%s:q:%s';
     }
@@ -68,7 +57,7 @@ abstract class AbstractList extends RedisQueue
     /**
      * @return int
      */
-    protected function getUserId()
+    protected function getUserId(): int
     {
         return $this->userId;
     }
@@ -78,7 +67,7 @@ abstract class AbstractList extends RedisQueue
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return "{$this->userId}:{$this->getSuffix()}";
     }
@@ -87,5 +76,5 @@ abstract class AbstractList extends RedisQueue
     /**
      * @return string
      */
-    abstract protected function getSuffix();
+    abstract protected function getSuffix(): string;
 }

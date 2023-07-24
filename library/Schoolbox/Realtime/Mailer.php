@@ -64,7 +64,7 @@ class Mailer
      */
     public function sendListContents(QueueInterface $list, User $recipient, string $template, string $subject = '', int $sortDir = SORT_ASC): bool
     {
-        $address = trim($recipient->getEmail());
+        $address = trim($recipient->getEmail() ?? '');
 
         if (empty($address)) {
             throw new RfcComplianceException("Empty address for user {$recipient->getId()}");

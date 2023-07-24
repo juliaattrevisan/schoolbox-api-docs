@@ -52,6 +52,6 @@ class Mapper extends BaseMapper
     protected function reloadRouteDaemon()
     {
         $redisClient = Redis::getSignalQueueClientInstance();
-        $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
+        $redisClient->publish('scheduled.' . INSTANCE_ID . '.reload', '');
     }
 }

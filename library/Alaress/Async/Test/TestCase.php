@@ -13,12 +13,9 @@ use Psr\Log\LoggerInterface;
 
 interface TestCase
 {
-
     const DAEMON_SCHEDULE = 'scheduled';
-    const DAEMON_ROUTE    = 'routed';
     const DAEMON_SOCKET   = 'socketd';
     const DAEMON_DIGEST   = 'digestd';
-    const DAEMON_BELL     = 'belld';
 
     /**
      * Provide the list of daemons that need to be attached for this test

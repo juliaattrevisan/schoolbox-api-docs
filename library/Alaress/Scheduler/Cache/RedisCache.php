@@ -9,49 +9,38 @@
 
 namespace Alaress\Scheduler\Cache;
 
-use Alaress\Scheduler\Stomp\ResolutionManager;
+use Alaress\Async\Broker\StompRedis\Broker;
+use Alaress\Async\Queue\RedisQueue;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Predis;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
-use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 
 class RedisCache implements ICache
 {
     const EXPIRY_WINDOW = 345600; // 60s * 60m * 24h * 4d
 
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var Predis\ClientInterface */
-    protected $redis;
-
-    /** @var string */
-    protected $instanceId;
-
-
     /**
-     * @param Predis\ClientInterface $redisClient
-     * @param LoggerInterface $logger
-     * @param string $instanceId
+     * @param ClientInterface $redis
+     * @param LoggerInterface $log
+     * @param string          $instanceId
      */
-    public function __construct(Predis\ClientInterface $redisClient, LoggerInterface $logger, $instanceId = '')
-    {
-        $this->log = $logger;
-        $this->redis = $redisClient;
-        $this->instanceId = $instanceId;
+    public function __construct(
+        private Predis\ClientInterface $redis,
+        private LoggerInterface $log,
+        private string $instanceId,
+    ) {
     }
-
 
     /**
      * @param Connector $mq
-     * @param IPropagator $propagator
-     * @param string $queueName
+     * @param string    $queueName
      * @return bool
      */
-    public function restoreSchedule(Connector $mq, IPropagator $propagator, string $queueName)
+    public function restoreSchedule(Connector $mq, string $queueName): bool
     {
         $this->log->notice("Restoring $queueName from Redis cache");
 
@@ -75,8 +64,9 @@ class RedisCache implements ICache
 
             // Fetch from Redis
             $value = $this->redis->get($itemKey);
-            if (!isset($value)) {
-                $this->log->warning(sprintf("Key %s does not exist: cannot restore", $itemKey));
+            if (!$value || ($this->redis->ttl($itemKey) === RedisQueue::TTL_EXPIRED)) {
+                $this->log->warning(sprintf("Key %s is no longer valid, removing ", $itemKey));
+                $this->redis->srem($this->getNamespacedKey('index'), $itemKey);
                 continue;
             }
 
@@ -88,22 +78,31 @@ class RedisCache implements ICache
             }
 
             // Unserialize
-            $event = unserialize($uncompressedValue, []);
-            if (!$event instanceof CrudEventInterface) {
-                $this->log->warning(
-                    sprintf(
-                        "Error unserializing data in key %s (expected %s, received %s): cannot restore",
-                        $itemKey,
-                        CrudEventInterface::class,
-                        is_object($event) ? get_class($event) : 'non-object',
-                    )
-                );
+            $trigger = unserialize($uncompressedValue, []);
+            if (!$trigger instanceof TriggerInterface) {
+                // TODO: this part can be removed once v23.1 is released
+                if ($trigger instanceof CrudEventInterface) {
+                    // delete
+                    $this->redis->del($itemKey);
+                    $this->log->debug(sprintf("Deleted key %s from v23.0", $itemKey));
+                } else {
+                    $this->log->warning(
+                        sprintf(
+                            "Error unserializing data in key %s (expected %s, received %s): cannot restore",
+                            $itemKey,
+                            TriggerInterface::class,
+                            is_object($trigger) ? get_class($trigger) : 'non-object',
+                        )
+                    );
+                }
                 continue;
             }
 
-            // Restore (by re-propagating)
+            // Restore
+            $context     = ["msg:{$this->instanceId}:"];
+            $amqpPayload = json_encode([$itemKey, $context]);
+            $mq->publish($amqpPayload, Broker::QUEUE, ['exchange' => '']);
             $this->log->debug(sprintf("Restoring event in key %s", $itemKey));
-            $propagator->propagateEvent($event);
             ++$i;
         }
 
@@ -114,119 +113,57 @@ class RedisCache implements ICache
 
 
     /**
-     * Save the schedule held by the given ResolutionManager
-     *
-     * @param ResolutionManager $resolvers
-     * @return bool
-     */
-    public function saveSchedule(ResolutionManager $resolvers)
-    {
-        $i = 0;
-
-        $resolvers = $resolvers->getAllResolvers();
-
-        if (!$resolvers->count()) {
-            // nothing to save; that's a success
-            return true;
-        }
-
-        // clear the cache
-        $this->deleteExisting();
-
-        foreach ($resolvers as $resolver) {
-            foreach ($resolvers->offsetGet($resolver) as $trigger) {
-                /** @var TriggerInterface $trigger */
-
-                $zip = gzcompress(serialize($trigger->getEvent()), 9);
-                $hash = sha1($zip); // this might not be...erm..good.
-                $size = strlen($zip);
-                $timestamp = date('Y-m-d H:i:s', $trigger->getTimestamp());
-                $name = "{$trigger->getEventObjectId()} - {$trigger->getLabel()} ({$timestamp}) as {$this->getNamespacedKey($hash)} [$size bytes]";
-
-                // store this compressed data
-                $stored = $this->storeCache($hash, $zip);
-
-                if ($stored) {
-                    $this->log->debug("Cached $name");
-                    $i++;
-                } else {
-                    $this->log->notice("Event $name already exists in cache, skipping", ['char' => '-']);
-                }
-            }
-        }
-
-        $this->log->debug("Cached $i events");
-
-        return (bool)$i;
-    }
-
-
-    /**
      * @return array
      */
-    protected function fetchItemKeys()
+    protected function fetchItemKeys(): array
     {
         return $this->redis->smembers($this->getNamespacedKey('index'));
     }
 
 
     /**
-     * Delete the existing cache of data
-     */
-    protected function deleteExisting()
-    {
-        $this->log->notice("Clearing existing {$this->getNamespacedKey('')} from redis");
-
-        $itemKeys = $this->fetchItemKeys();
-
-        if (!count($itemKeys)) {
-            $this->log->debug("No data to delete");
-            // nothing to delete
-            return;
-        }
-
-        $i = 0;
-
-        // delete all items
-        foreach ($itemKeys as $itemKey) {
-            $deleted = $this->redis->del($itemKey);
-
-            if ($deleted) {
-                ++$i;
-            } else {
-                $this->log->notice("Redis error: unable to delete $itemKey", ['char' => '?']);
-            }
-        }
-
-        $this->log->debug("$i items deleted");
-
-        // clear the index
-        $this->redis->del($this->getNamespacedKey('index'));
-    }
-
-
-    /**
-     * @param string $key
-     * @param string $compressedData
+     * @param TriggerInterface $trigger
      * @return bool
      */
-    protected function storeCache($key, $compressedData)
+    public function storeCache(TriggerInterface $trigger): bool
     {
-        $itemKey = $this->getNamespacedKey($key);
-
-        [$isset] = $this->redis->transaction(
-            function (Predis\Transaction\MultiExec $tx) use ($itemKey, $compressedData) {
-                // don't override data if it already exists (it probably doesn't matter, but hey. integrity, yo.)
-                $tx->setnx($itemKey, $compressedData)
-                    // REGARDLESS of whether we just set the key, reset its TTL
-                    ->expire($itemKey, self::EXPIRY_WINDOW)
-                    // ensure the key is in the index
-                    ->sadd($this->getNamespacedKey('index'), $itemKey);
-            }
-        );
+        [$itemKey, $compressedData] = RedisQueue::getStorage($trigger, $this->instanceId);
+        $existingData = $this->redis->get($itemKey);
+        if ($existingData) {
+            $this->log->debug("Back up existing key $itemKey for {$trigger->getEventObjectId()} {$trigger->getEvent()->getAction()}");
+            $isset = $this->redis->sadd($this->getNamespacedKey('index'), [$itemKey]);
+        } else {
+            $this->log->debug("Back up new key $itemKey");
+            [$isset] = $this->redis->transaction(
+                function (Predis\Transaction\MultiExec $tx) use ($itemKey, $compressedData) {
+                    // don't override data if it already exists (it probably doesn't matter, but hey. integrity, yo.)
+                    $tx->setnx($itemKey, $compressedData)
+                        // REGARDLESS of whether we just set the key, reset its TTL
+                       ->expire($itemKey, self::EXPIRY_WINDOW)
+                        // ensure the key is in the index
+                       ->sadd($this->getNamespacedKey('index'), [$itemKey]);
+                }
+            );
+        }
         return (bool)$isset;
     }
 
+    /**
+     * @param string $itemKey
+     * @return bool
+     */
+    public function removeCache(string $itemKey): bool
+    {
+        $isset          = 0;
+
+        // it should already
+        $existingData = $this->redis->get($itemKey);
+        if ($existingData) {
+            $this->log->debug("Removing $itemKey from back up");
+            $isset = $this->redis->srem($this->getNamespacedKey('index'), $itemKey);
+        }
+        return (bool)$isset;
+    }
 
     /**
      * Return the given key with a full Redis namespace
@@ -234,7 +171,7 @@ class RedisCache implements ICache
      * @param string $key
      * @return string
      */
-    protected function getNamespacedKey($key)
+    protected function getNamespacedKey(string $key): string
     {
         return $this->implodeFiltered(':', ['schedule', $this->instanceId, $key]);
     }
@@ -242,10 +179,10 @@ class RedisCache implements ICache
 
     /**
      * @param string $glue
-     * @param array $array
+     * @param array  $array
      * @return string
      */
-    protected function implodeFiltered($glue, array $array)
+    protected function implodeFiltered(string $glue, array $array): string
     {
         return implode($glue, array_filter($array));
     }

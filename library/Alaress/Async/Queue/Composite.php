@@ -37,7 +37,7 @@ class Composite implements QueueInterface
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return '';
     }
@@ -48,7 +48,7 @@ class Composite implements QueueInterface
      * @param Instance $instance
      * @return bool
      */
-    public function contains(Instance $instance)
+    public function contains(Instance $instance): bool
     {
         foreach ($this->queues as $queue) {
             if ($queue->contains($instance)) {
@@ -61,7 +61,7 @@ class Composite implements QueueInterface
     /**
      * @inheritdoc
      */
-    public function drain()
+    public function drain(): void
     {
         foreach ($this->queues as $queue) {
             $queue->drain();
@@ -71,7 +71,7 @@ class Composite implements QueueInterface
     /**
      * @inheritdoc
      */
-    public function push(Instance $instance)
+    public function push(Instance $instance): void
     {
         foreach ($this->queues as $queue) {
             $queue->push($instance);
@@ -81,7 +81,7 @@ class Composite implements QueueInterface
     /**
      * @inheritdoc
      */
-    public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false)
+    public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void
     {
         foreach ($this->queues as $queue) {
             $queue->fetchIntoBundle($bundle, $dropCache);

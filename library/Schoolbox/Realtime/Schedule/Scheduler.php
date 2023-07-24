@@ -22,14 +22,11 @@ use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\Scheduler\Cache\ICache;
-use Alaress\Scheduler\Stomp\ResolutionManager;
-use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use ErrorException;
 use InvalidArgumentException;
-use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -49,45 +46,26 @@ use Schoolbox\User;
  */
 class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
-    /** @var ResolutionManager */
-    private $resolvers;
-
-    /** @var Postman */
-    private $postman;
-
-    /**
-     * JIT handler to take care of unexpected shutdown
-     *
-     * @var ICache
-     */
-    private $jit;
-
-    /** @var IConfigLoader */
-    private $conf;
-
-
     /**
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
-     * @param IConfigLoader             $conf
      * @param IClock                    $clock
-     * @param ResolutionManager         $resolutionManager
+     * @param IConfigLoader             $conf
      * @param Postman                   $postman
+     * @param string                    $instanceId
      */
     public function __construct(
         LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
         LoggerInterface $log,
         IClock $clock,
-        IConfigLoader $conf,
-        ResolutionManager $resolutionManager,
-        Postman $postman
+        private IConfigLoader $conf,
+        private Postman $postman,
+        string $instanceId
     ) {
         parent::__construct($loop, $dispatchStrategy, $log, $clock);
-        $this->conf      = $conf;
-        $this->resolvers = $resolutionManager;
-        $this->postman   = $postman;
+        $this->instanceId = $instanceId;
 
         // register signal listeners
         $this->on(SIGHUP, [ $this, 'onHangup' ]);
@@ -100,7 +78,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param ICache $jit
      * @return static
      */
-    public function setJitCache($jit)
+    public function setJitCache(ICache $jit): self
     {
         $this->jit = $jit;
         return $this;
@@ -156,11 +134,14 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         }
 
         // comes in the form 'digestd.vagrantx.reload'
-        list (, , $action) = explode('.', $event->getChannel());
+        [, , $action] = explode('.', $event->getChannel());
 
         if ($action === 'reload') {
+            $this->log->debug('Reloading subscription cache to router');
             // this is the only action we currently know about
+            $this->postman->reloadRouter();
             $this->onHangup();
+            return;
         }
 
         if ($action === 'refreshConfiguration') {
@@ -192,7 +173,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             $this->log->info("[Scheduler] Received trigger to schedule: {$trigger->getEventObjectId()} - {$trigger->getLabel()}", [ 'char' => '>' ]);
 
             $effector = $trigger->getEvent()->getEffector();
-            if ($effector && $effector instanceof User) {
+            if ($effector instanceof User) {
                 $this->log->debug('[Scheduler] triggered by user.' . $effector->getId());
             }
 
@@ -231,7 +212,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         $this->log->debug('Invalidating config cache');
         $this->conf->dropCache();
         $this->log->debug('Releasing workers');
-        $this->getDispatcher()->releaseWorkerPool(false);
+        $this->dispatcher->releaseWorkerPool(false);
     }
 
 
@@ -253,103 +234,11 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     {
         $this->log->error('Cleaning up and terminating');
         // die safely
-        $this->getDispatcher()->releaseWorkerPool(false);
+        $this->dispatcher->releaseWorkerPool(false);
 
         // if possible, rescue the schedule queue from certain destruction
         $this->log->debug('Attempting save of queue');
-
-        // if we have a just-in-time handler, use it
-        if ($this->jit) {
-            if ($this->jit->saveSchedule($this->resolvers)) {
-                $this->log->debug('Queue save successful');
-            } else {
-                $this->log->alert('Failed to save queue!');
-            }
-        }
-
         $this->stop();
-    }
-
-
-    /**
-     * @param TriggerInterface[] $triggers
-     * @param IResolver          $resolver
-     * @throws InvalidArgumentException
-     * @throws DuplicateResolutionException
-     * @return void
-     */
-    public function scheduleNotifications(array $triggers, IResolver $resolver = null)
-    {
-        $c = count($triggers);
-
-        if ($c === 0) {
-            $this->log->info('No triggers to schedule');
-
-            if ($resolver instanceof IResolver) {
-                $resolver->acknowledge();
-                $this->log->debug('Resolver acknowledged');
-            }
-
-            return;
-        }
-
-        $this->log->info(sprintf('Scheduling %s trigger%s', $c, $c === 1 ? '' : 's'));
-
-        foreach ($triggers as $trigger) {
-            $this->scheduleNotification($trigger, $resolver);
-        }
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     * @param IResolver        $resolver
-     * @throws InvalidArgumentException
-     */
-    public function scheduleNotification(TriggerInterface $trigger, $resolver = null): void
-    {
-        // This should come first to clear existing resolver for the trigger
-        parent::scheduleNotification($trigger);
-
-        // if this is a cancel trigger, we're not going to even attempt attaching a resolver for it
-        if (!$trigger instanceof CancelTrigger) {
-            // if we have a resolver, attach it
-            if ($resolver instanceof IResolver) {
-                $this->attachResolverTrigger($resolver, $trigger);
-            } else {
-                // it's not the end of the world, but it might indicate a problem
-                $this->log->warning('No resolver supplied for attaching trigger');
-            }
-        }
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     */
-    public function dispatchTrigger(TriggerInterface $trigger)
-    {
-        if (count($trigger->getCallbacks()) === 0) {
-            $this->log->warning("Trigger '{$trigger->getIdString()}' has no callbacks");
-            $this->detachTrigger($trigger);
-        } else {
-            parent::dispatchTrigger($trigger);
-        }
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     * @return bool
-     */
-    protected function unschedule(TriggerInterface $trigger): bool
-    {
-        // if a trigger was legitimately unscheduled, also attempt to detach it from its resolver
-        if (parent::unschedule($trigger)) {
-            $this->detachTrigger($trigger);
-            return true;
-        }
-        return false;
     }
 
 
@@ -365,9 +254,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     public function handleResponse($trigger, $command, $data)
     {
         $this->log->notice("Received worker response to handle: '$command'");
-
-        // detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
-        $this->processCompletedTrigger($trigger);
 
         // will throw RuntimeException if unserialization fails
         $bundle = unserialize($data[0]);
@@ -408,80 +294,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         $this->log->info(sprintf('%s message%s broadcast', $count, $count === 1 ? '' : 's'), [ 'char' => '<' ]);
     }
-
-
-    /**
-     * Attach a trigger to a resolver
-     *
-     * @param IResolver        $resolver
-     * @param TriggerInterface $trigger
-     */
-    protected function attachResolverTrigger(IResolver $resolver, $trigger)
-    {
-        $this->resolvers->attachTriggerToResolver($resolver, $trigger);
-        $resolverCount = count($this->resolvers->getAllResolvers());
-        $this->log->debug("Attached trigger '{$trigger->getIdString()}' to resolver [Resolver count {$resolverCount}]");
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     * @return int the number of triggers left on the associated resolver, or -1 if not found
-     */
-    protected function detachTrigger($trigger)
-    {
-        try {
-            $count = $this->resolvers->detachTrigger($trigger);
-
-            switch ($count) {
-                case -1:
-                    $msg = 'resolver now empty; acknowledged';
-                    break;
-                case 0:
-                    $msg = 'resolver now empty, but not acknowledged...?';
-                    break;
-                default:
-                    $msg = "resolver still contains $count trigger" . ($count === 1 ? '' : 's');
-                    break;
-            }
-
-            $resolverCount = count($this->resolvers->getAllResolvers());
-            $this->log->debug("Trigger '{$trigger->getIdString()}' detached: $msg [Resolver count {$resolverCount}]");
-            return $count;
-        } catch (OutOfBoundsException $e) {
-            $this->log->debug("Trigger '{$trigger->getIdString()}' not detached: " . $e->getMessage());
-        }
-
-        return -1;
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     * @throws InvalidArgumentException
-     * @return int
-     */
-    protected function processCompletedTrigger(TriggerInterface $trigger)
-    {
-        // this is in the future; reschedule that!
-        if ($trigger->getTimestamp() > $this->getClock()->time()) {
-            $this->log->info('Trigger not complete, rescheduling');
-
-            try {
-                $this->schedule($trigger, $this->timerCallback($trigger), false);
-
-                // don't detach, just return the count
-                $resolver = $this->resolvers->getResolverByTrigger($trigger);
-                return $this->resolvers->getTriggerCount($resolver);
-            } catch (OutOfBoundsException $e) {
-                // resolver was already detached; this isn't good, since a scheduler restart would lose state
-                $this->log->warning("Resolver was already detached for trigger '{$trigger->getIdString()}'");
-            }
-        }
-
-        return $this->detachTrigger($trigger);
-    }
-
 
     /**
      * @return string

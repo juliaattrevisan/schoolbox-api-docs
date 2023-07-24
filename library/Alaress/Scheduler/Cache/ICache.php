@@ -9,27 +9,27 @@
 
 namespace Alaress\Scheduler\Cache;
 
-use Alaress\Scheduler\Stomp\ResolutionManager;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 
 interface ICache
 {
-
-    /**
-     * Save the schedule held by the given ResolutionManager
-     *
-     * @param ResolutionManager $resolvers
-     * @return bool
-     */
-    public function saveSchedule(ResolutionManager $resolvers);
-
-
     /**
      * @param Connector   $mq
-     * @param IPropagator $propagator
      * @param string      $queueName
      * @return bool
      */
-    public function restoreSchedule(Connector $mq, IPropagator $propagator, string $queueName);
+    public function restoreSchedule(Connector $mq, string $queueName): bool;
+
+    /**
+     * @param TriggerInterface $trigger
+     * @return bool
+     */
+    public function storeCache(TriggerInterface $trigger): bool;
+
+    /**
+     * @param string $itemKey
+     * @return bool
+     */
+    public function removeCache(string $itemKey): bool;
 }

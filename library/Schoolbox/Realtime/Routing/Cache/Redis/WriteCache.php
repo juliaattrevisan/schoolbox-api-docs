@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Realtime\Routing\Cache\Redis;
 
+use Alaress\Async\Queue\RedisQueue;
 use Alaress\Async\Synchroniser;
 use Alaress\Routing\FlatRouter;
 use Alaress_Byte_Format;
@@ -21,17 +22,7 @@ use UnderflowException;
  */
 class WriteCache extends ReadCache implements WritableCache
 {
-    const SIGNAL_PATTERN = 'routed.%s.reload';
-
-    /** @var Subscription\Loader\Factory */
-    private $loaderFactory;
-
-    /**
-     * A Redis connection to the publish/subscribe queue.
-     *
-     * This may be a different Redis instance to where the route cache lives.
-     */
-    private ClientInterface $redisQueue;
+    const SIGNAL_PATTERN = 'scheduled.%s.reload';
 
     /**
      * Constructor
@@ -42,12 +33,10 @@ class WriteCache extends ReadCache implements WritableCache
      */
     public function __construct(
         ClientInterface $redis,
-        Subscription\Loader\Factory $loaderFactory,
-        ClientInterface $redisQueue
+        private Subscription\Loader\Factory $loaderFactory,
+        private ClientInterface $redisQueue
     ) {
         parent::__construct($redis);
-        $this->loaderFactory = $loaderFactory;
-        $this->redisQueue    = $redisQueue;
         $this->log = new \Psr\Log\NullLogger();
     }
 
@@ -154,7 +143,7 @@ class WriteCache extends ReadCache implements WritableCache
      *
      * @return Synchroniser
      */
-    private function buildSynchroniser()
+    private function buildSynchroniser(): Synchroniser
     {
         return new Synchroniser($this, $this->redis);
     }
@@ -162,9 +151,10 @@ class WriteCache extends ReadCache implements WritableCache
     /**
      * Build a callback for the synchroniser object for cacheUsers().
      *
+     * @param string $routeStorageKey
      * @return callable
      */
-    private function buildSynchroniserCallback($routeStorageKey)
+    private function buildSynchroniserCallback(string $routeStorageKey): callable
     {
         return function ($userId) use ($routeStorageKey) {
             // this closure will be called multiple times consecutively if there are concurrent requests
@@ -181,9 +171,10 @@ class WriteCache extends ReadCache implements WritableCache
     /**
      * Build an on-complete callback for the synchroniser object for cacheUsers().
      *
+     * @param string $instanceId
      * @return callable
      */
-    private function buildSynchroniserDoneCallback($instanceId)
+    private function buildSynchroniserDoneCallback(string $instanceId): callable
     {
         return function () use ($instanceId) {
             $this->broadcastReload($instanceId);
@@ -194,7 +185,7 @@ class WriteCache extends ReadCache implements WritableCache
     /**
      * @param string $instanceId
      */
-    private function broadcastReload($instanceId)
+    private function broadcastReload(string $instanceId): void
     {
         $reloadChannel = sprintf(self::SIGNAL_PATTERN, $instanceId);
 
@@ -208,10 +199,10 @@ class WriteCache extends ReadCache implements WritableCache
      * @param FlatRouter $router
      * @param string     $routeStorageKey
      */
-    private function writeCache(FlatRouter $router, $routeStorageKey)
+    private function writeCache(FlatRouter $router, string $routeStorageKey): void
     {
         $json = json_encode($router->getAll());
-        $gz = gzcompress($json, 9);
+        $gz = gzcompress($json, RedisQueue::COMPRESSION_LEVEL);
 
         $this->log->info(sprintf('Compressing route tree: %s => %s', Alaress_Byte_Format::bytesToString(strlen($json)), Alaress_Byte_Format::bytesToString(strlen($gz))));
 
@@ -227,7 +218,7 @@ class WriteCache extends ReadCache implements WritableCache
      * @throws UnderflowException
      * @return FlatRouter
      */
-    private function bindIndividual($userId, $routeStorageKey)
+    private function bindIndividual(int $userId, string $routeStorageKey): FlatRouter
     {
         $this->log->info("Calculating bindings for user $userId");
         $allRoutes = $this->fetchCache($routeStorageKey);
@@ -283,7 +274,7 @@ class WriteCache extends ReadCache implements WritableCache
      * @param FlatRouter                  $router
      * @return FlatRouter
      */
-    private function bindEveryone(Subscription\Loader\ILoader $loader, FlatRouter $router)
+    private function bindEveryone(Subscription\Loader\ILoader $loader, FlatRouter $router): FlatRouter
     {
         // this will calculate and load all subscriptions into the router
         $loader->loadSubscriptions($router);
@@ -298,7 +289,7 @@ class WriteCache extends ReadCache implements WritableCache
      * @param int $userId
      * @return array
      */
-    private function generateRoutesForUser($userId)
+    private function generateRoutesForUser(int $userId): array
     {
         return $this->loaderFactory->getNoCache()->getUserSubscriptions($userId);
     }
@@ -308,7 +299,7 @@ class WriteCache extends ReadCache implements WritableCache
      * @param string $routeStorageKey
      * @return string[][]
      */
-    private function fetchCache($routeStorageKey)
+    private function fetchCache(string $routeStorageKey): array
     {
         $router = new FlatRouter();
 

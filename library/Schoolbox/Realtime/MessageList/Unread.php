@@ -18,7 +18,7 @@ class Unread extends AbstractList
     /**
      * @return string
      */
-    protected function getSuffix()
+    protected function getSuffix(): string
     {
         return 'unread';
     }
@@ -30,7 +30,7 @@ class Unread extends AbstractList
      * @param Instance $instance
      * @return void
      */
-    public function push(Instance $instance)
+    public function push(Instance $instance): void
     {
         parent::push($instance);
 

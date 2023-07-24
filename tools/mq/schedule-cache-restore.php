@@ -10,21 +10,15 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\Stomp\IClient;
+use Alaress\Async\Broker\StompRedis\Broker;
 use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
-use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
-use Schoolbox\Di\Configurator;
 use Schoolbox\Notif\MQ\Connector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Realtime\Schedule;
-use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
-use Schoolbox\Realtime\Schedule\Event\Splitter;
-use Schoolbox\Realtime\Schedule\Trigger\Propagator;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -47,7 +41,7 @@ try {
         // the passive part is important:
         // it means the queue won't be created if it doesn't already exist
         $mq = (new ConnectorFactory($di->get('config')))->build(['passive' => true]);
-        $q  = Schedule\Broker::QUEUE;
+        $q  = Broker::QUEUE;
 
         try {
             $mq->declareQueue($q);
@@ -62,25 +56,12 @@ try {
             try {
                 // get the cache handler
                 $jit = new RedisCache(Redis::getStorageClientInstance(), $log, INSTANCE_ID);
-                $tff = new TriggerFactoryFactory(true);
-
-                $splitter = new Splitter(new NotifierInflector(new Configurator($di)), $tff);
 
                 /** @var Connector $amqp */
                 $amqp = $di->get('amqp');
 
-                /** @var ClientInterface $redis */
-                $redis = $di->get('redis.storage');
-
-                /** @var IClient $stomp */
-                $stomp = $di->get('stomp');
-
-                $broker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
-
-                $propagator = new Propagator($splitter, $broker, INSTANCE_ID);
-
                 // restore data if possible
-                $restored = $jit->restoreSchedule($amqp, $propagator, $q);
+                $restored = $jit->restoreSchedule($amqp, $q);
 
                 if (!$restored) {
                     throw new RuntimeException("Could not read cached data");

@@ -104,14 +104,11 @@ Dispatch a Task.
 > `onMessage` will call the Dispatcher's `enqueue` method, either directly or
   via a Scheduler.
 
-Once the Task has finished, the Daemon either:
-* acknowledges the Message if the Task completed successfully
-  * this removes the Message from the Broker
-* re-Publishes the Message if the Task failed to complete successfully
-  * this allows the Message to be handled again by the same Daemon, thus
-    allowing the Daemon to try again in the case of transient failures
+When the Task is enqueued:
+* the Daemon acknowledges the Message. This removes the Message from the Broker.
+* the Message is added to Redis set schedule:<instance_id>:index
 
-Then, the Response is sent to the Response Handler to act upon; the action
+Once the Task has finished, the Response is sent to the Response Handler to act upon; the action
 that the Response Handler takes is implementation-specific.
 
 
