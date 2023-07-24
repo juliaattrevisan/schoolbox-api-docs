@@ -4,7 +4,7 @@
  */
 
 import { useResultsStore } from "../store/spResultsStore";
-import SpResultsListItem from "./sp-results-list-item.vue";
+import SpResultsListResult from "./sp-results-list-result.vue";
 import SpResultsListLoadMore from "./sp-results-list-load-more.vue";
 
 const resultsStore = useResultsStore();
@@ -12,7 +12,7 @@ const resultsStore = useResultsStore();
 
 <template>
     <div class="results" data-test-sp-results-list>
-        <sp-results-list-item v-for="result in resultsStore.results" :key="result.id" :result="result" />
+        <sp-results-list-result v-for="result in resultsStore.results" :key="result.id" :result="result" />
         <sp-results-list-load-more />
     </div>
 </template>
