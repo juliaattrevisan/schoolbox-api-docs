@@ -649,7 +649,10 @@ class Healthcheck
             }
 
             $this->insertTest(array_unique($tablesForInsertTest));
-            if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)) {
+            if (
+                $this->configMapper->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)
+                && $this->configMapper->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_DELETE)
+            ) {
                 $this->deleteTest(array_unique($tablesForInsertTest));
             }
             $this->selectTest(
