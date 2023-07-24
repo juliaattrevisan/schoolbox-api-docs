@@ -97,10 +97,24 @@
         leverage styling, but doesn not use DataTables, so need to undo DataTables specific rules */
         padding-right: 0 !important;
     }
+
+    .rubric-checklist > label {
+        margin-bottom: 0 !important;
+    }
+
+    [data-draft-mark] {
+        display: none;
+    }
 </style>
 
-<div id="report_actions" class="actions-small-1 row">
-    <nav>
+<div id="report_actions" class="sb-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
+    <div class="checklist rubric-checklist">
+        <input type="checkbox" id="show-drafts">
+        <label for="show-drafts">
+            Show Drafts
+        </label>
+    </div>
+    <nav class="sb-nav-actions">
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
@@ -191,15 +205,25 @@
                                         {% elseif studentId in (exclusions[assessmentId] ?? []) %}
                                             <td class="excluded" title="Excluded from assessment"></td>
                                         {% else %}
-                                            {% set capabilityMark           = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
-                                            {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
+                                            {% set capabilityMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
+                                            {% set normalisedCapabilityMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
                                             {% set summaryLink              = student.assessments[assessmentId].summaryLink %}
                                             {% set gradientClass            = urgency.marks(normalisedCapabilityMark) %}
+                                            {# Latest Marks #}
+                                            {% set latestCapabilityMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
+                                            {% set latestNormalisedCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
+                                            {% set latestGradientClass                  = urgency.marks(latestNormalisedCapabilityMark) %}
                                             <td class="mark">
                                                 <a
                                                         href="{{ summaryLink }}"
+                                                        data-actual-mark
                                                         class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"
                                                 >{{ capabilityMark|default('–') }}</a>
+                                                <a
+                                                        href="{{ summaryLink }}"
+                                                        data-draft-mark
+                                                        class="{{ latestGradientClass }} {% if latestCapabilityMark is null %}no-mark{% endif %}"
+                                                >{{ latestCapabilityMark|default('–') }}</a>
                                             </td>
                                         {% endif %}
                                     {% endfor %}
@@ -213,18 +237,32 @@
                                             {% if studentId in (exclusions[assessmentId] ?? []) %}
                                                 <td class="excluded" title="Excluded from assessment"></td>
                                             {% else %}
-                                                {% set indicatorMark           = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
-                                                {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
-                                                {% set descriptorText          = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
+                                                {% set indicatorMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
+                                                {% set normalisedIndicatorMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
+                                                {% set descriptorText          = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
                                                 {% set summaryLink             = student.assessments[assessmentId].summaryLink %}
                                                 {% set gradientClass           = urgency.marks(normalisedIndicatorMark) %}
                                                 {% set renderedIndicatorMark   = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}
+                                                {# Latest Marks #}
+                                                {% set latestIndicatorMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
+                                                {% set latestNormalisedIndicatorMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
+                                                {% set latestDescriptorText          = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
+                                                {% set latestGradientClass           = urgency.marks(latestNormalisedIndicatorMark) %}
+                                                {% set latestRenderedIndicatorMark   = latestDescriptorText ? latestIndicatorMark|default('✓') : latestIndicatorMark|default('–') %}
 
-                                                <td class="mark"{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
+                                                <td class="mark">
                                                     <a
                                                             href="{{ summaryLink }}"
+                                                            {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
+                                                            data-actual-mark
                                                             class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}"
                                                     >{{ renderedIndicatorMark }}</a>
+                                                    <a
+                                                            href="{{ summaryLink }}"
+                                                            {% if latestDescriptorText %} title="{{ latestDescriptorText }}"{% endif %}
+                                                            data-draft-mark
+                                                            class={{ latestGradientClass }} {% if latestIndicatorMark is null %}no-mark{% endif %}"
+                                                    >{{ latestRenderedIndicatorMark }}</a>
                                                 </td>
                                             {% endif %}
                                         {% endfor %}
@@ -237,8 +275,12 @@
                             <tr class="capability-row summated{% if loop.index0 == 0 %} first-summated{% endif %}">
                                 {% for studentId, studentData in students %}
                                     {% if capabilityData.show %}
+                                        <td class="mark">
                                         {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? '') %}
-                                        <td class="mark{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</td>
+                                        <a href="#" data-actual-mark class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
+                                        {% set draftGradientClass = urgency.marks(capabilityData.marks[studentId].latestNormalised ?? '') %}
+                                        <a href="#" data-draft-mark class="{% if draftGradientClass %} {{ draftGradientClass }}{% endif %}">{{ capabilityData.marks[studentId].latestHumanReadable|default('–') }}</a>
+                                        </td>
                                     {% else %}
                                         <td class="excluded"></td>
                                     {% endif %}
@@ -247,8 +289,13 @@
                             {% for indicatorId, indicatorData in capabilityData.indicators %}
                                 <tr class="indicator-row summated">
                                     {% for studentId, studentData in students %}
-                                        {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
-                                        <td class="mark{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</td>
+                                        <td class="mark">
+                                            {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
+                                        <a href="#" data-actual-mark class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
+                                            {% set draftGradientClass = urgency.marks(indicatorData.marks[studentId].latestNormalised ?? '') %}
+                                        <a href="#" data-draft-mark class="{% if draftGradientClass %} {{ draftGradientClass }}{% endif %}">{{ indicatorData.marks[studentId].latestHumanReadable|default('–') }}</a>
+                                        </td>
+
                                     {% endfor %}
                                 </tr>
                             {% endfor %}

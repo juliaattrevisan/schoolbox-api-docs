@@ -459,15 +459,14 @@ class Controller extends Base
      * @param array<int,array> $assessments
      * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
      * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @param array            $students             The array of student values which will already contian latest results, we are adding only the published marks
      * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws UnderflowException
      */
-    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
+    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators, array $students): array
     {
-        $students = [];
-
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -597,12 +596,168 @@ class Controller extends Base
                 'capabilities' => $capabilityMarks,
             ];
 
+            // Stuff everything about the students marks into the existing array
+            $students[$row['student_id']]['assessmentsPublished'] = $assessmentsForStudent;
+
+            $lastObservedAssessmentId = $row['assessment_id'];
+            $lastObservedCapabilityId = $row['capability_id'];
+            $lastObservedStudentId    = $row['student_id'];
+        }
+        return $students;
+    }
+
+    /**
+     * Find each student in a folder and their latest (including draft) marks (if extant), and return an array indexed by student ID
+     *
+     * dupe of retrieveDatabaseMarks
+     *
+     * @param array<int,array> $assessments
+     * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @return array
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function retrieveDatabaseAllMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
+    {
+        $students = [];
+
+        // Don't load marks if no assessments.
+        if (!count($assessments)) {
+            return $students;
+        }
+
+        // Is the rubric usage filter enabled for the page?
+        $filteringByRubricUsage = is_array($selectedCapabilities) || is_array($selectedIndicators);
+
+        // If enabled, but nothing selected? (probably because no options available)
+        if ($filteringByRubricUsage && !count($selectedCapabilities) && !count($selectedIndicators)) {
+            return $assessments;
+        }
+
+        $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
+            ->isNull('sr.deleted_at')
+            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->in('sb.assessment_id', array_keys($assessments));
+
+        $innerWhere = implode(' AND ', $innerPb->getWhere());
+
+        $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
+            ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+
+        if ($filteringByRubricUsage) {
+            $usagePb = new Database\Predicate\Builder($this->internalDb->getQuoter(), '');
+            if (is_array($selectedCapabilities) && count($selectedCapabilities)) {
+                $usagePb->in('vrm.capability_id', $selectedCapabilities);
+            }
+            if (is_array($selectedCapabilities) && count($selectedIndicators)) {
+                $usagePb->in('vrm.indicator_id', $selectedIndicators);
+            }
+            $outerPb->any($usagePb);
+        }
+
+        $outerWhere = implode(' AND ', $outerPb->getWhere());
+
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
+            "
+                SELECT
+                    vrm.assessment_id                  AS assessment_id,
+                    vrm.student_id                     AS student_id,
+                    u.firstname                        AS student_firstname,
+                    u.preferred_name                   AS student_preferred_name,
+                    u.lastname                         AS student_lastname,
+                    vrm.capability_id                  AS capability_id,
+                    vrm.capability_mark                AS capability_mark,
+                    vrm.capability_human_readable_mark AS capability_human_readable_mark,
+                    vrm.capability_max_value           AS capability_max_value,
+                    vrm.capability_mark_type_id        AS capability_mark_type_id,
+                    vrm.capability_grade_group_id      AS capability_grade_group_id,
+                    vrm.descriptor_name                AS descriptor_name,
+                    vrm.indicator_id                   AS indicator_id,
+                    vrm.indicator_mark                 AS indicator_mark,
+                    vrm.indicator_max_value            AS indicator_max_value,
+                    vrm.feedback_date                  AS feedback_date
+                FROM (
+                    SELECT
+                        sb.assessment_id,
+                        sr.owner,
+                        MAX(sr.updated_at) AS max_updated_at
+                    FROM submission_return sr
+                    INNER JOIN submission_box sb on sr.box_id = sb.id
+                    WHERE {$innerWhere}
+                    GROUP BY sb.assessment_id, sr.owner
+                ) latest_feedback
+                INNER JOIN v_most_recent_rubric_mark vrm ON
+                    vrm.updated_date = latest_feedback.max_updated_at AND
+                    vrm.assessment_id = latest_feedback.assessment_id AND
+                    vrm.student_id    = latest_feedback.owner
+                INNER JOIN user u ON vrm.student_id = u.id
+                WHERE {$outerWhere}
+                ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
+            ",
+            array_merge($innerPb->getParams(), $outerPb->getParams()),
+        );
+
+        $assessmentsForStudent = [];
+        $capabilityMarks       = [];
+        $indicatorMarks        = [];
+
+        $lastObservedAssessmentId = null;
+        $lastObservedCapabilityId = null;
+        $lastObservedStudentId    = null;
+
+        foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
+            if ($lastObservedStudentId !== $row['student_id']) {
+                // Has the student we're looking at changed? Reset the list of assessments for them
+                $assessmentsForStudent = [];
+            }
+
+            if ($lastObservedAssessmentId !== $row['assessment_id']) {
+                // Has the assessment we're looking at changed? Reset the capabilities
+                $capabilityMarks = [];
+            }
+
+            if ($lastObservedCapabilityId !== $row['capability_id']) {
+                // Has the capability we're looking at changed? Reset the indicators
+                $indicatorMarks = [];
+            }
+
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                $indicatorMarks[$row['indicator_id']] = [
+                    'databaseMark'           => $row['indicator_mark'],
+                    'maxMark'                => $row['indicator_max_value'],
+                    'selectedDescriptorText' => $row['descriptor_name'],
+                ];
+            }
+
+            $capData = [
+                'indicators' => $indicatorMarks,
+            ];
+            $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
+            if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
+                    $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
+                    $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
+                    $capData['maxMark']           = $row['capability_max_value'];
+
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to
+                     * their Assessments' Mark Type and Grade Group
+                     */
+                    $capData['capabilityMarkTypeId']   = $row['capability_mark_type_id'];
+                    $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
+            }
+            $capabilityMarks[$row['capability_id']] = $capData;
+
+            $assessmentsForStudent[$row['assessment_id']] = [
+                'capabilities' => $capabilityMarks,
+            ];
+
             // Stuff everything about the students marks into an array
             $students[$row['student_id']] = [
                 'firstname'      => $row['student_firstname'],
                 'preferred_name' => $row['student_preferred_name'],
                 'lastname'       => $row['student_lastname'],
-                'assessments'    => $assessmentsForStudent,
+                'assessmentsLatest'    => $assessmentsForStudent,
                 'profileLink'    => '/search/user/' . $row['student_id'],
             ];
 
@@ -628,10 +783,10 @@ class Controller extends Base
         $totalMarkScheme = new MarkScheme\TotalMarkFractional();
 
         foreach ($students as $studentId => $student) {
-            foreach (($student['assessments'] ?? []) as $assessmentId => $assessmentMarks) {
+            foreach (($student['assessmentsLatest'] ?? []) as $assessmentId => $assessmentMarks) {
                 foreach (($assessmentMarks['capabilities'] ?? []) as $capabilityId => $capabilityMarks) {
-                    $capabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['databaseMark'] ?? null);
-                    $capabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['maxMark'] ?? null);
+                    $capabilityDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['databaseMark'] ?? null);
+                    $capabilityMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['maxMark'] ?? null);
                     $humanReadableCapabilityMark = null;
                     $normalisedCapabilityMark    = null;
                     if ($capabilityMaxMark) {
@@ -640,12 +795,25 @@ class Controller extends Base
                             : null;
                         $humanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
                     }
-                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
-                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
+                    $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
+                    $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
+                    // Draft marks
+                    $latestCapabilityDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['databaseMark'] ?? null);
+                    $latestCapabilityMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['maxMark'] ?? null);
+                    $latestHumanReadableCapabilityMark = null;
+                    $latestNormalisedCapabilityMark    = null;
+                    if ($latestCapabilityMaxMark) {
+                        $latestNormalisedCapabilityMark = $latestCapabilityDatabaseMark !== null
+                            ? ($latestCapabilityDatabaseMark / $latestCapabilityMaxMark) * 100
+                            : null;
+                        $latestHumanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
+                    }
+                    $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $latestHumanReadableCapabilityMark;
+                    $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $latestNormalisedCapabilityMark;
 
                     foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
-                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark'] ?? null);
-                        $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark'] ?? null);
+                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['databaseMark'] ?? null);
+                        $indicatorMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['maxMark'] ?? null);
                         $humanReadableIndicatorMark = null;
                         $normalisedIndicatorMark    = null;
 
@@ -656,8 +824,24 @@ class Controller extends Base
                             $humanReadableIndicatorMark = $totalMarkScheme->setTotalMark($indicatorMaxMark)->getHumanReadableMark($normalisedIndicatorMark);
                         }
 
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
+                        $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
+                        $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
+
+                        // Latest Marks
+                        $latestIndicatorDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['databaseMark'] ?? null);
+                        $latestIndicatorMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['maxMark'] ?? null);
+                        $latestHumanReadableIndicatorMark = null;
+                        $latestNormalisedIndicatorMark    = null;
+
+                        if ($latestIndicatorMaxMark) {
+                            $latestNormalisedIndicatorMark    = $latestIndicatorDatabaseMark !== null
+                                ? ($latestIndicatorDatabaseMark / $latestIndicatorMaxMark) * 100
+                                : null;
+                            $latestHumanReadableIndicatorMark = $totalMarkScheme->setTotalMark($latestIndicatorMaxMark)->getHumanReadableMark($latestNormalisedIndicatorMark);
+                        }
+
+                        $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $latestHumanReadableIndicatorMark;
+                        $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $latestNormalisedIndicatorMark;
                     }
                 }
             }
@@ -840,30 +1024,54 @@ class Controller extends Base
 
         foreach ($overallMarks as $capabilityId => $capabilityMarks) {
             foreach ($capabilityMarks['marks'] as $studentId => $sums) {
-                $sumNormalised = $sums['sumNormalised'];
-                $sumWeight     = $sums['sumWeight'];
-                if (!$sumWeight) {
+                $sumNormalised      = $sums['sumNormalised'];
+                $sumWeight          = $sums['sumWeight'];
+                $latestSumNormalised = $sums['latestSumNormalised'];
+                $latestSumWeight     = $sums['latestSumWeight'];
+                if (!$sumWeight && !$latestSumWeight) {
+                    // nothing exists, so remove this...
                     unset($overallMarks[$capabilityId]['marks'][$studentId]);
                 } else {
-                    $normalised                                       = $sumNormalised / $sumWeight;
-                    $overallMarks[$capabilityId]['marks'][$studentId] = [
-                        'normalised'    => $normalised,
-                        'humanReadable' => $markScheme->getHumanReadableMark($normalised),
-                    ];
+                    // only dump things into the array that actually exist...
+                    $overallMarks[$capabilityId]['marks'][$studentId] = [];
+                    if ($sumWeight) {
+                        $normalised = $sumNormalised / $sumWeight;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['normalised'] = $normalised;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $normalised;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                    }
+                    if ($latestSumWeight) {
+                        $latestNormalised                                  = $latestSumNormalised / $latestSumWeight;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
+                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
+                    }
                 }
             }
             foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
                 foreach ($indicatorMarks['marks'] as $studentId => $sums) {
                     $sumNormalised = $sums['sumNormalised'];
                     $sumWeight     = $sums['sumWeight'];
-                    if (!$sumWeight) {
+                    $latestSumNormalised = $sums['latestSumNormalised'];
+                    $latestSumWeight     = $sums['latestSumWeight'];
+                    if (!$sumWeight && !$latestSumWeight) {
+                        // nothing exists, so remove this...
                         unset($overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]);
                     } else {
-                        $normalised                                                                   = $sumNormalised / $sumWeight;
-                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
-                            'normalised'    => $normalised,
-                            'humanReadable' => $markScheme->getHumanReadableMark($normalised),
-                        ];
+                        // only dump things into the array that actually exist...
+                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [];
+                        if ($sumWeight) {
+                            $normalised = $sumNormalised / $sumWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['normalised'] = $normalised;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $normalised;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
+                        }
+                        if ($latestSumWeight) {
+                            $latestNormalised = $latestSumNormalised / $latestSumWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
+                        }
                     }
                 }
             }
@@ -905,15 +1113,25 @@ class Controller extends Base
                         // First time we've see this student for this capability?
                         if (!array_key_exists($studentId, $overallMarks[$capabilityId]['marks'])) {
                             $overallMarks[$capabilityId]['marks'][$studentId] = [
-                                'sumNormalised' => null,
-                                'sumWeight'     => null,
+                                'sumNormalised'      => null,
+                                'sumWeight'          => null,
+                                'latestSumNormalised' => null,
+                                'latestSumWeight'     => null,
                             ];
                         }
                         // Does student have a mark for this capability for this assessment?
-                        $capabilityMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
+                        $capabilityMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
                         if ($capabilityMark !== null) {
                             $overallMarks[$capabilityId]['marks'][$studentId]['sumNormalised'] += $capabilityMark * $assessmentWeight;
                             $overallMarks[$capabilityId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $capabilityMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
+                        }
+                        // Latest Marks
+                        $latestCapabilityMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
+                        if ($latestCapabilityMark !== null) {
+                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $latestCapabilityMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
                         }
                     }
                 }
@@ -935,15 +1153,25 @@ class Controller extends Base
                         // First time we've see this student for this indicator?
                         if (!array_key_exists($studentId, $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'])) {
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
-                                'sumNormalised' => null,
-                                'sumWeight'     => null,
+                                'sumNormalised'      => null,
+                                'sumWeight'          => null,
+                                'latestSumNormalised' => null,
+                                'latestSumWeight'     => null,
                             ];
                         }
                         // Does student have a mark for this indicator for this assessment?
-                        $indicatorMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
+                        $indicatorMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
                         if ($indicatorMark !== null) {
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumNormalised'] += $indicatorMark * $assessmentWeight;
                             $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $indicatorMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
+                        }
+                        // Latest Marks
+                        $latestIndicatorMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
+                        if ($latestIndicatorMark !== null) {
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $latestIndicatorMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
                         }
                     }
                 }
@@ -973,7 +1201,9 @@ class Controller extends Base
     {
         [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
         $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
+        $databaseMarksLatest = $this->retrieveDatabaseAllMarks($assessments, $selectedCapabilities, $selectedIndicators);
+        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarksLatest);
+
         $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);

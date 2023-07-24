@@ -62,3 +62,21 @@
         </div>
     </div>
 </div>
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function() {
+            $('#{{ reportContentId }}').on('filterContentLoaded', function() {
+                $("#show-drafts").click(function () {
+                    if ($(this).is(":checked")) {
+                        $("[data-draft-mark]").show();
+                        $("[data-actual-mark]").hide();
+                    } else {
+                        $("[data-draft-mark]").hide();
+                        $("[data-actual-mark]").show();
+                    }
+                });
+            });
+        });
+    </script>
+{% endautoescape %}
