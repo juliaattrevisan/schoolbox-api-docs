@@ -23,10 +23,4 @@ const resultsStore = useResultsStore();
     flex-direction: column;
     gap: 1rem;
 }
-
-.sub-result {
-    background: #f5f5f5;
-    padding: 1rem;
-    margin-left: 1rem;
-}
 </style>

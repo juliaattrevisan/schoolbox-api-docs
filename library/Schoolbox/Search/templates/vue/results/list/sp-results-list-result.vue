@@ -4,7 +4,7 @@
  */
 
 import { Result } from "../../../js/types/Result";
-import { SpResultsListSubResults } from "./sp-results-list-sub-results.vue";
+import SpResultsListSubResults from "./sp-results-list-sub-results.vue";
 
 interface Props {
     result: Result; // the result to display
