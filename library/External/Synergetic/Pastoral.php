@@ -440,6 +440,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                                 $queryDocuments = $this->connector->getQueryIterator("
                                     SELECT ref.RelatedSeq as external_id,
+                                           doc.tDocumentsSeq as document_external_id,
                                            doc.Description as [filename],
                                            DocumentType as extension,
                                            [Document] as [blob]
@@ -463,6 +464,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $attachment->setStorage($storageObject);
                                         $attachment->setRealname($storageObject->getFilename());
                                         $attachment->setPrivate(true);
+                                        $attachment->setExternalId($document['document_external_id']);
                                         $this->pastoralAttachmentMapper->save($attachment);
 
                                         $log = $this->pastoralLogMapper->createModel();
