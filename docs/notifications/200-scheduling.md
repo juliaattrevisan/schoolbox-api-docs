@@ -2,8 +2,10 @@
 
 # Scheduling
 
-The scheduling subsystem is used to generate messages from events, and queue
-those messages to then be sent to recipients.
+The scheduling subsystem is used to:
+- generate messages from events
+- schedule those messages to be sent at a particular time
+- determine who should receive those messages
 
 This subsystem is the bridge between the [event propagator](100-propagation.md)
 and the [message router](300-routing.md).
@@ -29,14 +31,29 @@ all Schedulers, it:
   * in this case, the scheduling
     [Message Broker](architecture/message-broker.md) as published into by the
     event propagator
-* sends the Triggers to its [Dispatcher](architecture/dispatcher.md) to be
-  processed
+* when the Trigger's time is reached (or immediately, if its time has already
+  been reached), sends the Triggers to its
+  [Dispatcher](architecture/dispatcher.md) to be processed
   * in this case, the Trigger is a call to a `notify` method on a
     `\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface` instance
 * acts as a Response Handler for the response that the Dispatcher returns
-  * in this case, it publishes into the routing Message Broker, for the
+  * in this case, it sends the request to a worker, for the
     [routing sub-system](300-routing.md) to handle
 
+### Triggers
+
+Triggers are instances of the `\Alaress\Scheduler\Trigger\TriggerInterface`
+interface: this interface defines a `getTimestamp` method, which defines when
+the Trigger's action should happen.
+
+If the Trigger's timestamp has been reached, its event is called immediately:
+otherwise, the Scheduler defers the trigger's execution until its timestamp is
+reached.
+
+> Triggers are durable: if one is deferred, the Scheduler stores it in a
+> persistent Redis instance.
+> Stored triggers are restored upon the daemon's restarting: thus they will
+> survive if the daemon is stopped.
 
 ### Notifier
 
@@ -174,6 +191,16 @@ System `notify` methods are always called, regardless of whether the
 `msg_source` record exists. This is so that backend actions that must occur may
 be processed (for example, the retraction of messages in the routing queue that
 correspond to objects that have been deleted).
+
+### Resolver
+
+Upon the Trigger's time being reached: the Scheduler uses a
+[Resolver](architecture/resolver.md) to determine to whom a
+message is delivered; it translates the message's topic into an intended
+audience.
+
+Once it has determined the intended audience, it then invokes the routing
+sub-system in a worker process.
 
 
 [< Propagation sub-system documentation](100-propagation.md) |
