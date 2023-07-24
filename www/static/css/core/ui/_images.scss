@@ -1,0 +1,81 @@
+/*****************************
+ images.scss
+*****************************/
+
+.img {
+    display: flex;
+    overflow: hidden;
+
+    .img__wrapper {
+        // Default images to medium size if no size is specified.
+        flex: 0 0 var(--image-size-m);
+        height: var(--image-size-m);
+        width: var(--image-size-m);
+
+        img {
+            object-fit: cover;
+            min-width: 100%;
+            min-height: 100%;
+        }
+    }
+
+    @each $size in $global-image-sizes {
+        &-#{$size} {
+            .img__wrapper {
+                flex: 0 0 var(--image-size-#{$size});
+                height: var(--image-size-#{$size});
+                width: var(--image-size-#{$size});
+
+                // Icons are weird. Because they rely on font scaling, we have to include that here too,
+                // but we never want icons to go full bleed, hence the calc.
+                .icon:before {
+                    font-size: calc(var(--image-size-#{$size}) - var(--whitespace-m));
+                }
+            }
+        }
+    }
+
+    .img__wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    &--round {
+        @each $size in $global-image-sizes {
+            &.img-#{$size} {
+                .img__wrapper {
+                    flex: 0 0 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                }
+            }
+        }
+    }
+
+    .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    // Peel off inherited styles for icons.
+    .icon:before {
+        padding: 0;
+        margin: 0;
+        font-size: 2.5rem;
+        line-height: normal;
+    }
+
+    // The wrapper basically exists to handle image overflow, positioning and rounding
+    &--round {
+        .img__wrapper {
+            margin: var(--whitespace-xs);
+            border-radius: 50%;
+            overflow: hidden;
+            // Very subtly make the image stand out from the background if there is no background contrast
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    }
+}

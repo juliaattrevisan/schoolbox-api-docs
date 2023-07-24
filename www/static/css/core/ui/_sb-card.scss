@@ -11,65 +11,7 @@
     background-color: white;
 
     &__primary-img {
-        display: flex;
-        overflow: hidden;
         margin-inline-end: var(--whitespace-m);
-
-        &.img {
-            .img__wrapper {
-                // Default images to medium size if no size is specified.
-                flex: 0 0 var(--image-size-m);
-                height: var(--image-size-m);
-                width: var(--image-size-m);
-
-                img {
-                    object-fit: cover;
-                    min-width: 100%;
-                    min-height: 100%;
-                }
-            }
-
-            @each $size in $global-image-sizes {
-                &-#{$size} {
-                    .img__wrapper {
-                        flex: 0 0 var(--image-size-#{$size});
-                        height: var(--image-size-#{$size});
-                        width: var(--image-size-#{$size});
-
-                        .icon:before {
-                            font-size: calc(var(--image-size-#{$size}) - var(--whitespace-m));
-                        }
-                    }
-                }
-            }
-
-            .img__wrapper {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-            }
-
-            &--round {
-                @each $size in $global-image-sizes {
-                    &.img-#{$size} {
-                        .img__wrapper {
-                            flex: 0 0 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                            height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                            width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                        }
-                    }
-                }
-            }
-        }
-
-        // Peel off inherited styles for icons.
-        & .icon:before {
-            padding: 0;
-            margin: 0;
-            font-size: 2.5rem;
-            line-height: normal;
-        }
     }
 
     &__top {
@@ -147,6 +89,7 @@
         padding: var(--whitespace-s);
         background-color: #f6f6f6;
 
+        // TODO - Convert this over to using an img-s instead of what it is.
         .sb-card {
             &__primary-img {
                 &.img {
@@ -170,38 +113,9 @@
         }
     }
 
-    // Disable ellipsis behaviour inside top content for important content that can't overflow
+    // TODO - Disable ellipsis behaviour inside top content for important content that can't overflow
     &--overflow {
         .sb-card__top-content {
-        }
-    }
-
-    // At the end so these rules clobber some of the variant rules above. We do this to avoid having to set higher specificity on these rules.
-    // Once these rules are in their own stylesheet we won't have to do this.
-    &__primary-img {
-        //TODO - Move these into a specific image class. That image class should support the default colour + letter icon for no avatars, etc.
-        //Icons are weird. Because they rely on font scaling, we have to include that here too, but we never want icons to go full bleed...
-
-        &.img {
-            // Move these too.
-            display: flex;
-
-            .icon {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            // The wrapper basically exists to handle image overflow, positioning and rounding
-            &--round {
-                .img__wrapper {
-                    margin: var(--whitespace-xs);
-                    border-radius: 50%;
-                    overflow: hidden;
-                    // Very subtly make the image stand out from the background if there is no background contrast
-                    border: 1px solid rgba(0, 0, 0, 0.05);
-                }
-            }
         }
     }
 }

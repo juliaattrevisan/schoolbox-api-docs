@@ -183,273 +183,6 @@ export const TopSectionIcon: Story = {
     }),
 };
 
-export const RoundedImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-m img--round">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
-                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const XXSImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-xxs">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6 style="margin: 0;">This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const XSImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-xs">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const XSIcon: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-xs">
-                        <div class="img__wrapper">
-                            <div class="icon icon-calendar"></div>
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const SImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-s">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const SIcon: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-s">
-                        <div class="img__wrapper">
-                            <div class="icon icon-calendar"></div>
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const MImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-m">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const MIcon: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-m">
-                        <div class="img__wrapper">
-                            <div class="icon icon-calendar"></div>
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const LImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-l">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const LIcon: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-l">
-                        <div class="img__wrapper">
-                            <div class="icon icon-calendar"></div>
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const XLImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-xl">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const XLIcon: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-xl">
-                        <div class="img__wrapper">
-                            <div class="icon icon-calendar"></div>
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const XXLImage: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-xxl">
-                        <div class="img__wrapper">
-                            <img src="https://placedog.net/200/100" alt="Placedog 200 by 100 image" />
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const XXLIcon: Story = {
-    render: () => ({
-        template: `
-            <div class="sb-card">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img img-xxl">
-                        <div class="img__wrapper">
-                            <div class="icon icon-calendar"></div>
-                        </div>
-                    </div>
-                    <div class="sb-card__top-content">
-                        <a href=""><h6>This is some text here</h6></a>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
 export const SubItem: Story = {
     render: () => ({
         template: `
@@ -483,6 +216,67 @@ export const SubItemIcon: Story = {
                     <div class="sb-card__top-content">
                         <a href=""><h6 class="">How cool is this dog?</h6></a>
                         <span class="meta">Last updated 3 weeks ago</span>
+                    </div>
+                </div>
+            </div>
+        `,
+    }),
+};
+
+export const CardList: Story = {
+    render: () => ({
+        template: `
+            <div class="sb-card-list">
+                <div class="sb-card">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img img">
+                            <div class="img__wrapper">
+                                <div class="icon icon-house"></div>
+                            </div>
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h3 class="">Year 12 Biology (BIO12)</h3></a>
+                            <span class="meta"><a href="">Courses</a> > <a href="">Senior Courses</a> > <a href="">English</a> > <a href="">Year 12 Biology</a></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img img">
+                            <div class="img__wrapper">
+                                <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                            </div>
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">How cool is this dog?</h6></a>
+                            <span class="meta">Last updated 1 week ago</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img img">
+                            <div class="img__wrapper">
+                                <img src="https://placedog.net/96/96" alt="Placedog 64 by 64 image" />
+                            </div>
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">What about this one?</h6></a>
+                            <span class="meta">Last updated 2 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-card sb-card--subitem">
+                    <div class="sb-card__top">
+                        <div class="sb-card__primary-img img">
+                            <div class="img__wrapper">
+                                <img src="https://placedog.net/108/108" alt="Placedog 64 by 64 image" />
+                            </div>
+                        </div>
+                        <div class="sb-card__top-content">
+                            <a href=""><h6 class="">Isn't this one cool too?</h6></a>
+                            <span class="meta">Last updated 3 weeks ago</span>
+                        </div>
                     </div>
                 </div>
             </div>
