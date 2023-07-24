@@ -5,6 +5,8 @@
  *  TODO - Add modern design variants of our card classes (round and drop shadow EVERYTHING).
 */
 
+@use "sass:list";
+
 .sb-card {
     background-color: white;
 
@@ -12,6 +14,54 @@
         display: flex;
         overflow: hidden;
         margin-inline-end: var(--whitespace-m);
+
+        &.img {
+            .img__wrapper {
+                // Default images to medium size if no size is specified.
+                flex: 0 0 var(--image-size-m);
+                height: var(--image-size-m);
+                width: var(--image-size-m);
+
+                img {
+                    object-fit: cover;
+                    min-width: 100%;
+                    min-height: 100%;
+                }
+            }
+
+            @each $size in $global-image-sizes {
+                &-#{$size} {
+                    .img__wrapper {
+                        flex: 0 0 var(--image-size-#{$size});
+                        height: var(--image-size-#{$size});
+                        width: var(--image-size-#{$size});
+
+                        .icon:before {
+                            font-size: calc(var(--image-size-#{$size}) - var(--whitespace-m));
+                        }
+                    }
+                }
+            }
+
+            .img__wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+
+            &--round {
+                @each $size in $global-image-sizes {
+                    &.img-#{$size} {
+                        .img__wrapper {
+                            flex: 0 0 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                            height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                            width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                        }
+                    }
+                }
+            }
+        }
 
         // Peel off inherited styles for icons.
         & .icon:before {
@@ -131,7 +181,6 @@
     &__primary-img {
         //TODO - Move these into a specific image class. That image class should support the default colour + letter icon for no avatars, etc.
         //Icons are weird. Because they rely on font scaling, we have to include that here too, but we never want icons to go full bleed...
-        --icon-size-reduction: 12px;
 
         &.img {
             // Move these too.
@@ -143,88 +192,10 @@
                 justify-content: center;
             }
 
-            & img {
-                object-fit: cover;
-                min-width: 100%;
-                min-height: 100%;
-            }
-
-            .img__wrapper {
-                flex: 0 0 64px;
-                width: 64px;
-                height: 64px;
-
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            &-xs {
-                .img__wrapper,
-                .icon {
-                    flex: 0 0 40px;
-                    width: 40px;
-                    height: 40px;
-                }
-
-                & .icon:before {
-                    font-size: calc(40px - var(--icon-size-reduction));
-                }
-            }
-            &-s {
-                .img__wrapper,
-                .icon {
-                    flex: 0 0 48px;
-                    width: 48px;
-                    height: 48px;
-                }
-
-                & .icon:before {
-                    font-size: calc(48px - var(--icon-size-reduction));
-                }
-            }
-            &-m {
-                .img__wrapper,
-                .icon {
-                    flex: 0 0 64px;
-                    width: 64px;
-                    height: 64px;
-                }
-
-                & > .icon:before {
-                    font-size: calc(64px - var(--icon-size-reduction));
-                }
-            }
-            &-l {
-                .img__wrapper,
-                .icon {
-                    flex: 0 0 72px;
-                    width: 72px;
-                    height: 72px;
-                }
-
-                & .icon:before {
-                    font-size: calc(72px - var(--icon-size-reduction));
-                }
-            }
-            &-xl {
-                .img__wrapper,
-                .icon {
-                    flex: 0 0 96px;
-                    width: 96px;
-                    height: 96px;
-                }
-
-                & .icon:before {
-                    font-size: calc(96px - 16px);
-                }
-            }
-
-            // The affector basically exists to handle image overflow, positioning and rounding
+            // The wrapper basically exists to handle image overflow, positioning and rounding
             &--round {
-                padding: var(--whitespace-xs);
-
                 .img__wrapper {
+                    margin: var(--whitespace-xs);
                     border-radius: 50%;
                     overflow: hidden;
                     // Very subtly make the image stand out from the background if there is no background contrast

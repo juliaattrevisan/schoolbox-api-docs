@@ -38,6 +38,7 @@ $cdn-prefix: "../..";
 @import "layout/login";
 @import "layout/flex";
 @import "layout/whitespace-measurements";
+@import "layout/image-sizes";
 @import "layout/sb-grid";
 @import "layout/sb-flex";
 
@@ -81,11 +82,8 @@ $cdn-prefix: "../..";
 @import "ui/atlas";
 @import "ui/tables";
 @import "ui/weather";
-<<<<<<< HEAD
 @import "ui/chip";
-=======
 @import "ui/sb-card";
->>>>>>> e3b9b5767cf (WIP Set up storybook [SA-15915])
 
 //////////////////////////////////////////////////////////
 // Common UI Elements
