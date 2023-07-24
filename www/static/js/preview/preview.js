@@ -66,83 +66,94 @@
                             // if response.fragment is null, use custom preview and show an error
                             if (response.fragment === null) {
                                 response.type = "custom";
-                                response.fragment = "There was a problem loading the preview, this file may have been deleted."
+                                response.fragment =
+                                    "There was a problem loading the preview, this file may have been deleted.";
                             }
 
                             if (response.type == "redirect") {
                                 window.location.href = response.fragment;
                             } else if (response.type == "image") {
-                                document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
-                                    detail: {
-                                        targetKey: "preview-image",
-                                        options: {
-                                            dynamic: true,
-                                            dynamicEl: [
-                                                {
-                                                    src: response.fragment
-                                                }
-                                            ]
+                                document.dispatchEvent(
+                                    new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                        detail: {
+                                            targetKey: "preview-image",
+                                            options: {
+                                                dynamic: true,
+                                                dynamicEl: [
+                                                    {
+                                                        src: response.fragment,
+                                                    },
+                                                ],
+                                            },
+                                            onCreated: function (gallery) {
+                                                gallery.openGallery();
+                                            },
                                         },
-                                        onCreated: function (gallery) {
-                                            gallery.openGallery();
-                                        }
-                                    }
-                                }));
+                                    })
+                                );
                             } else if (response.type == "iframe") {
-                                document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
-                                    detail: {
-                                        targetKey: "preview-iframe",
-                                        options: {
-                                            dynamic: true,
-                                            dynamicEl: [
-                                                {
-                                                    src: response.fragment,
-                                                    iframe: true
-                                                }
-                                            ],
-                                            iframeWidth: "80%",
-                                            iframeHeight: "80%",
+                                document.dispatchEvent(
+                                    new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                        detail: {
+                                            targetKey: "preview-iframe",
+                                            options: {
+                                                dynamic: true,
+                                                dynamicEl: [
+                                                    {
+                                                        src: response.fragment,
+                                                        iframe: true,
+                                                    },
+                                                ],
+                                                iframeWidth: "80%",
+                                                iframeHeight: "80%",
+                                            },
+                                            onCreated: function (gallery) {
+                                                gallery.openGallery();
+                                            },
                                         },
-                                        onCreated : function(gallery) {
-                                            gallery.openGallery();
-                                        }
-                                    }
-                                }));
+                                    })
+                                );
                             } else {
-                                document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
-                                    detail: {
-                                        targetKey: "preview-custom",
-                                        options: {
-                                            dynamic: true,
-                                            dynamicEl: [
-                                                {
-                                                    src: "/static/images/foundation/preloader.gif"
-                                                }
-                                            ],
-                                        },
-                                        onCreated: function (gallery) {
-                                            // The fragment sent back can contain scripts, so it is important that we
-                                            // append it to the DOM in a way that will execute the scripts as well.
-                                            const fragmentDiv = document.createRange().createContextualFragment(
-                                                `<div class="lg-video-cont" style="width:80%;max-width:100%;max-height:100%;">
+                                document.dispatchEvent(
+                                    new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                        detail: {
+                                            targetKey: "preview-custom",
+                                            options: {
+                                                dynamic: true,
+                                                dynamicEl: [
+                                                    {
+                                                        src: window.cdnPrefix + "/images/foundation/preloader.gif",
+                                                    },
+                                                ],
+                                            },
+                                            onCreated: function (gallery) {
+                                                // The fragment sent back can contain scripts, so it is important that we
+                                                // append it to the DOM in a way that will execute the scripts as well.
+                                                const fragmentDiv = document.createRange().createContextualFragment(
+                                                    `<div class="lg-video-cont" style="width:80%;max-width:100%;max-height:100%;">
                                                     <div class="preview fragment">${response.fragment}</div>
                                                 </div>`
-                                            );
+                                                );
 
-                                            // This is a slight workaround to display the content properly, as LightGallery
-                                            // has no way of adding custom HTML to the lightbox, this replaces the preloader
-                                            // image with the content we want to load.
-                                            gallery.el.addEventListener("lgAfterOpen", function () {
-                                                if (!gallery.$inner.selector.querySelector(".lg-current")) { return; }
+                                                // This is a slight workaround to display the content properly, as LightGallery
+                                                // has no way of adding custom HTML to the lightbox, this replaces the preloader
+                                                // image with the content we want to load.
+                                                gallery.el.addEventListener("lgAfterOpen", function () {
+                                                    if (!gallery.$inner.selector.querySelector(".lg-current")) {
+                                                        return;
+                                                    }
 
-                                                gallery.$inner.selector.querySelector(".lg-current").innerHTML = "";
-                                                gallery.$inner.selector.querySelector(".lg-current").appendChild(fragmentDiv);
-                                            });
+                                                    gallery.$inner.selector.querySelector(".lg-current").innerHTML = "";
+                                                    gallery.$inner.selector
+                                                        .querySelector(".lg-current")
+                                                        .appendChild(fragmentDiv);
+                                                });
 
-                                            gallery.openGallery();
-                                        }
-                                    }
-                                }));
+                                                gallery.openGallery();
+                                            },
+                                        },
+                                    })
+                                );
                             }
                         }).fail(function () {
                             // Did something break?
