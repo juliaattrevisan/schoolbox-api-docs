@@ -7,7 +7,6 @@
 #}
 {% set unitImpl = null %}
 {% set isInstructor = folderWritePerms[courseImpl.folder.id] %}
-{% set canImport = isInstructor %}
 
 <script type="text/javascript">
     $(function () {
@@ -38,7 +37,7 @@
                    id="import-{{ courseImpl.id }}"
                    name="courseImplementationIds[{{ courseImpl.id }}]"
                    value="1"
-                   {% if not canImport %}disabled{% endif %}
+                   {% if not isInstructor %}disabled{% endif %}
                    data-course-id="{{ courseImpl.id }}"/>
             <label for="import-{{ courseImpl.id }}" class="checkbox-label"></label>
         </div>
