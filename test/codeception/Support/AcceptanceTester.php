@@ -166,7 +166,7 @@ class AcceptanceTester extends Actor
     public function searchBar($fullname): void
     {
         $i = $this;
-        $i->click('label.icon-search.no-text');
+        $i->click('button.icon-search.no-text');
         $i->fillField('input#search-field', $fullname);
         $i->click('ul.results.information-list');
         $i->waitForText($fullname, 5);
