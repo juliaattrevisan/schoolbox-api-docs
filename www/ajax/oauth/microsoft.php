@@ -40,7 +40,9 @@ $scheme = $urlArray['scheme'];
 if ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '' === 'https') {
     $scheme = 'https';
 }
-$url = $scheme . '://' . $urlArray['host'] . $urlArray['path'];
+
+$host = $urlArray['host'] ?? $conf->get('site_hostname') . '.' . $conf->get('site_domain');
+$url = $scheme . '://' . $host . $urlArray['path'];
 
 $provider = new Alaress\OAuth2\Client\Provider\Office365([
     'clientId'      => $clientId,
