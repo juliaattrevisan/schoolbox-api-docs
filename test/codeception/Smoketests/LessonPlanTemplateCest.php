@@ -157,7 +157,6 @@ class LessonPlanTemplateCest
         #WHEN
         $lessonPlanTemplateDelete = new DeleteLessonPlanTemplate($lessonPlanName->getId());
         $i->amGoingTo('Send request to delete a lesson plan template');
-        $i->pause();
         $i->sendRequest($lessonPlanTemplateDelete);
 
       #THEN
