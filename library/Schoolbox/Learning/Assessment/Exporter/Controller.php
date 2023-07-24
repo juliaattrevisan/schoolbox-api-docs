@@ -394,24 +394,18 @@ class Controller extends BaseController
             return;
         }
 
-        $reimportIsEnabled = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
-
         foreach ($courseImpls as $courseImpl) {
             $units = $courseImpl->getUnits();
-            $unitToOverwrite = null;
+            $alreadyExistingUnit = null;
 
             foreach ($units as $unit) {
                 if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
-                    $unitToOverwrite = $unit;
+                    $alreadyExistingUnit = $unit;
                 }
             }
 
-            if ($unitToOverwrite !== null) {
-                if ($reimportIsEnabled) {
-                    $this->unitImplementationMapper->delete($unitToOverwrite);
-                } else {
-                    continue; // We cannot overwrite the existing unit, so skip this course implementation.
-                }
+            if ($alreadyExistingUnit !== null) {
+                continue; // Overwriting existing units is never allowed by this tool, so skip this course implementation.
             }
 
             $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
