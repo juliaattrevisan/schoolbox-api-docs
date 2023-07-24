@@ -45,9 +45,6 @@
             <span class="size-32 icon-home"></span>
             <h3><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></h3>
             <p class="meta">
-                    <br/>
-            </p>
-            <p class="meta">
                 {% if not isInstructor %}
                     You don't have write permission for this class.
                 {% endif %}
