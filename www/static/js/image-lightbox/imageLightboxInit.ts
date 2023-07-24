@@ -1,7 +1,10 @@
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
-function initLightGallery() {
-    window.sbProps.lightGalleryInit();
+/**
+ * Overwrite the font and loading images used by lightGallery to ensure we use the CDN,
+ * otherwise they will be loaded from the current domain
+ */
+function overwriteStaticAssets() {
     const newStyle = document.createElement("style");
     newStyle.appendChild(
         document.createTextNode(`
@@ -16,6 +19,11 @@ function initLightGallery() {
         `)
     );
     document.head.appendChild(newStyle);
+}
+
+function initLightGallery() {
+    window.sbProps.lightGalleryInit();
+    overwriteStaticAssets();
 }
 
 /**
