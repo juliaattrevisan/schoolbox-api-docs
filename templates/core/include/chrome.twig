@@ -106,6 +106,7 @@
                 ? uniqueSkinColours.slice(0, 3)
                 : [...uniqueSkinColours, ...window.sbProps.colourDefaults["skin"]].slice(0, 3);
 
+        window.sbProps.colourDefaults["skinUnique"] = uniqueSkinColours;
         window.sbProps.colourDefaults["swatches"] = [...chosenSkinColours, ...window.sbProps.colourDefaults["constant"]];
     </script>
     {% endautoescape %}

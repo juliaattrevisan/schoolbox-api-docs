@@ -1,4 +1,4 @@
-import { defaultSwatches } from "./colourSettings";
+import { fontColourSwatches, fontBackgroundColourSwatches } from "./colourSettings";
 
 /**
  * Returns the settings for the font options
@@ -47,10 +47,10 @@ export function getFontSettings() {
             ],
         },
         fontColor: {
-            colors: defaultSwatches
+            colors: fontColourSwatches,
         },
         fontBackgroundColor: {
-            colors: defaultSwatches
+            colors: fontBackgroundColourSwatches,
         },
     };
 }

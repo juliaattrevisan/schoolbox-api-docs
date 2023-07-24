@@ -1,4 +1,4 @@
-import { defaultSwatches } from "./colourSettings";
+import { tableBorderColourSwatches, tableBackgroundColourSwatches } from "./colourSettings";
 
 /**
  * Returns the settings for the tables
@@ -12,13 +12,13 @@ export function getTableSettings() {
             contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"],
 
             tableProperties: {
-                borderColors: defaultSwatches,
-                backgroundColors: defaultSwatches,
+                borderColors: tableBorderColourSwatches,
+                backgroundColors: tableBackgroundColourSwatches,
             },
 
             tableCellProperties: {
-                borderColors: defaultSwatches,
-                backgroundColors: defaultSwatches,
+                borderColors: tableBorderColourSwatches,
+                backgroundColors: tableBackgroundColourSwatches,
             },
         },
     };
