@@ -26,9 +26,6 @@ export const useSearchStore = defineStore("spSearch", () => {
      * search for nodes that match
      */
     async function search() {
-        if (isSearching.value) {
-            return;
-        }
         setActive();
         hasNotSearched.value = false;
         isSearching.value = true;

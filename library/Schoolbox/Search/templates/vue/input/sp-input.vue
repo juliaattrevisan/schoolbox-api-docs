@@ -13,6 +13,9 @@ const searchStore = useSearchStore();
  * Start a search
  */
 async function onSearch() {
+    if (searchStore.isSearching) {
+        return;
+    }
     await searchStore.search();
 }
 </script>
