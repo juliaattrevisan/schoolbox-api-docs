@@ -17,7 +17,7 @@
         </section>
         <section class="content">
             <label>Overall Comment</label>
-            <textarea id="attempt-feedback"></textarea>
+            <textarea id="attempt-feedback">{{ attempt.comment }}</textarea>
             <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
             <script>
@@ -118,7 +118,7 @@
                 method: 'POST',
                 body: payload
             }).then(response => {
-
+                window.location.reload();
             });
         });
     });

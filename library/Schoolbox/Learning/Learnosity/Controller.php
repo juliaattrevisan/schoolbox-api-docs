@@ -540,13 +540,15 @@ class Controller extends Base
         /* Post back to learnosity
          */
         $this->api->dataUpdateRequest('/sessions/responses/scores', [
-            'sessions' => [[
-                'session_id' => $attempt->getLearnosityReference(),
-                /* TODO Whose id is this?
-                 */
-                'user_id' => (string)$this->getUser()->getId(),
-                'responses' => $responseData
-            ]]
+            'sessions' => [
+                [
+                    'session_id' => $attempt->getLearnosityReference(),
+                    /* TODO Whose id is this?
+                     */
+                    'user_id' => (string)$this->getUser()->getId(),
+                    'responses' => $responseData
+                ]
+            ]
         ]);
 
         /* Get the new result back from learnosity
