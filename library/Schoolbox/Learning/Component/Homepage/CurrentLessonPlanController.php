@@ -111,28 +111,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             //build array
             $this->visibleLessonPlans[] = $lessonPlan;
         }
-
-//        // sort by dueDate
-//        usort($this->visibleLessonPlans, function ($a, $b) {
-//            return $a['dueDate'] <=> $b['dueDate'];
-//        });
-
-                return true;
-//        return \count($this->visibleLessonPlans) > 0;
-        /**
-         * return array should be similar to:
-         * ```
-         * [{
-         * 'title': 'Lesson Plan Title',
-         * 'dueDate': '2023-07-21 11:13:56Z',
-         * 'class': 'class Name',
-         * 'classColour': '#FFFFFF',
-         * 'url': 'https://vagrant.dev.schoolbox.cloud/learning/assessments/434/1'
-         * },
-         * ]
-         * ```
-         *
-         */
+        return true;
     }
 
     /**
