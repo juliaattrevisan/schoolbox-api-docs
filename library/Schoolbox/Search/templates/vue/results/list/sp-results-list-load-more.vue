@@ -33,7 +33,9 @@ async function onLoadMoreSelected() {
 <template>
     <loading-table v-if="loadMoreResultsStore.isLoading" :rows="2" />
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
-    <button v-else-if="showLoadMore" @click.prevent="onLoadMoreSelected">Load more results</button>
+    <button v-else-if="showLoadMore" data-sp-results-list-load-more-button @click.prevent="onLoadMoreSelected">
+        Load more results
+    </button>
 </template>
 
 <style scoped></style>
