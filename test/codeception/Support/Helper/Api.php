@@ -681,9 +681,9 @@ class Api extends \Codeception\Module
      */
     public function getExistingAssessment(?int $assessmentId): ?IAssessable
     {
-        $db            = $this->getDbModule();
+        $db = $this->getDbModule();
         if ($assessmentId) {
-         $assessmentIds = [$assessmentId];
+            $assessmentIds = [$assessmentId];
         } else {
             $assessmentIds = $db->grabColumnFromDatabase('submission_box', 'assessment_id', []);
         }
