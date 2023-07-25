@@ -538,6 +538,7 @@ class Controller extends Base
         }
 
         /* Post back to learnosity
+         * TODO work out persistence issue
          */
         $this->api->dataUpdateRequest('/sessions/responses/scores', [
             'sessions' => [
@@ -558,7 +559,7 @@ class Controller extends Base
                 $attempt->getLearnosityReference()
             ]
         ]);
-        new \Alaress_Probe($result);
+
         $mark = $result['data'][0]['score'];
         $maxMark = $result['data'][0]['max_score'];
         $normalisedMark = 100 * $mark/$maxMark;
