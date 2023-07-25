@@ -34,18 +34,14 @@ $clientSecret = $conf->get('office365_secret');
 $clientName   = $conf->get('office365_tenant');
 /* /CONF */
 
-$urlArray = parse_url($_SERVER['SCRIPT_URI']);
-
-$scheme = $urlArray['scheme'];
-if ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '' === 'https') {
-    $scheme = 'https';
-}
-$url = $scheme . '://' . $urlArray['host'] . $urlArray['path'];
+$urlArray = parse_url($_SERVER['REQUEST_URI']);
+$url      = (new \Schoolbox\Url\Factory($conf))->buildFullyQualified()
+                                               ->withPath($urlArray['path'] ?? '');
 
 $provider = new Alaress\OAuth2\Client\Provider\Office365([
     'clientId'      => $clientId,
     'clientSecret'  => $clientSecret,
-    'redirectUri'   => $url,
+    'redirectUri'   => (string)$url,
     'scopes'        => [ 'MyFiles.Read' ],
 ]);
 
