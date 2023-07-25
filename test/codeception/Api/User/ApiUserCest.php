@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Tests\Api\User;
 
+use Aura\Di\Exception\ServiceNotFound;
 use Tests\Support\ApiTester;
 use Schoolbox\Role;
-use Schoolbox\User;
 
 /**
  * user.yaml
@@ -27,13 +27,12 @@ class ApiUserCest
     /**
      * Get a list of assessments
      * @param ApiTester $i
+     * @throws ServiceNotFound
      */
-    public function testGet(ApiTester $i)
+    public function testGet(ApiTester $i): void
     {
         $users = $i->getUsers();
 
-
-        /** @var User $user */
         foreach ($users as $user) {
             $i->switchUser($user);
 
@@ -41,12 +40,12 @@ class ApiUserCest
                 if (isset($filterData['search'])) {
                     $data = [
                         'search' => $filterData['search'],
-                        'limit' => 7
+                        'limit'  => 7,
                     ];
                 } else {
                     $data = [
                         'filter' => json_encode($filterData['filter']),
-                        'limit' => 7
+                        'limit'  => 7,
                     ];
                 }
                 $i->sendGet('/api/user', $data);
@@ -69,6 +68,34 @@ class ApiUserCest
         }
     }
 
+    /**
+     * Test create user
+     * @param ApiTester $i
+     * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function testCreate(ApiTester $i): void
+    {
+        $users = $i->getUsers();
+
+        foreach ($users as $user) {
+            $i->switchUser($user);
+            foreach ($this->createData($i) as $data) {
+                $i->sendPost('/api/user', $data);
+                if ($user->isSuperuser()) {
+                    $i->seeResponseCodeIs(201);
+                } else {
+                    $i->seeResponseCodeIs(401);
+                }
+            }
+        }
+    }
+
+    /**
+     * Data to test filter
+     * @param ApiTester $i
+     * @return \Generator
+     */
     private function filterData(ApiTester $i)
     {
         yield [
@@ -101,6 +128,68 @@ class ApiUserCest
                 'roleType' => Role::STAFF,
             ],
             'valid'  => true,
+        ];
+    }
+
+    /**
+     * Data to test create user
+     * @param ApiTester $i
+     * @return void
+     */
+    public function createData(ApiTester $i)
+    {
+        yield [
+            'username'  => $i->generateText(10, true),
+            "role"      => [
+                'id' => $i->getRole(Role::STAFF)->getId(),
+            ],
+            'campus'    => [
+                ['id' => $i->getCampuses()->offsetGet(1)->getId()],
+            ],
+            'firstName' => $i->generateText(8, true),
+        ];
+        yield [
+            'campus'           => [
+                ['id' => $i->getCampuses()->offsetGet(0)->getId()],
+                ['id' => $i->getCampuses()->offsetGet(1)->getId()],
+            ],
+            'role'             => [
+                'id' => $i->getRole(Role::STUDENT)->getId(),
+            ],
+            'schoolHouse'      => [
+                'id' => 1,
+            ],
+            'yearLevel'        => [
+                'id' => 1,
+            ],
+            'impersonableUser' => [
+                [
+                    'id' => 22,
+                ],
+            ],
+            'externalId'       => $i->generateText(8, false),
+            'username'         => $i->generateText(8, true),
+            'superuser'        => false,
+            'enabled'          => true,
+            'title'            => null,
+            'firstName'        => $i->generateText(8, true),
+            'lastName'         => $i->generateText(10, true),
+            'preferredName'    => $i->generateText(7, true),
+            'isEmailDerived'   => false,
+            'altEmail'         => null,
+            'positionTitle'    => $i->generateText(20, false),
+//            'isBoarder'        => false,
+            'flags'            => [
+//                'showWebmailTab'         => true,
+                'showContacts'           => true,
+                'enableTimetable'        => true,
+                'showSideNav'            => true,
+                'showNotificationsPanel' => true,
+                'showGradeGraph'         => true,
+                'enableEportfolio'       => true,
+                'useInternalMail'        => false,
+                'calendarView'           => 'agendaWeek',
+            ],
         ];
     }
 }

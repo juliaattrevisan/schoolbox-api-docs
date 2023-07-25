@@ -48,9 +48,9 @@ class Integration extends REST
     }
 
     /**
-     * @param string $sessionID
+     * @param string|null $sessionID
      */
-    public function setSessionCookie(string $sessionID)
+    public function setSessionCookie(?string $sessionID)
     {
         if ($this->client instanceof AbstractBrowser) {
             $this->client->getCookieJar()->set(new Cookie('PHPSESSID', $sessionID));
