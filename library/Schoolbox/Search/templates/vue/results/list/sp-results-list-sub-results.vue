@@ -8,6 +8,7 @@ import { Results } from "../../../js/types/Results";
 import { Result } from "../../../js/types/Result";
 import { useStore } from "../../store/searchPageStore";
 import { useResultsStore, SUB_RESULT_LIMIT } from "../store/spResultsStore";
+import { useHasMoreResults } from "../composable/useHasMoreResults";
 import SpResultsError from "../sp-results-error.vue";
 import SpResultsListSubResult from "./sp-results-list-sub-result.vue";
 
@@ -25,16 +26,12 @@ const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all r
  * To show that there are more results that can be loaded
  * @returns {boolean}
  */
-const hasMoreResults = window.Vue.computed(() => {
-    if (hasLoadedAllResults.value) {
-        return false;
-    }
-    // if we are showing the current limit, its assumed we have more results to show
-    if (props.result._subResults?.data.length === SUB_RESULT_LIMIT * (moreResultsCount.value + 1)) {
-        return true;
-    }
-    return false;
-});
+const { hasMoreResults } = useHasMoreResults(
+    hasLoadedAllResults,
+    window.Vue.ref(props.result._subResults?.data),
+    moreResultsCount,
+    SUB_RESULT_LIMIT
+);
 
 /**
  * To show the load more button when appropriate

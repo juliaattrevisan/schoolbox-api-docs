@@ -5,6 +5,7 @@
 import { defineStore } from "pinia";
 import type { Results } from "../../../js/types/Results";
 import type { Result } from "../../../js/types/Result";
+import { useHasMoreResults } from "../composable/useHasMoreResults";
 
 export const RESULT_LIMIT = 20; // number of results returned by the api on a single call
 export const SUB_RESULT_LIMIT = 10; // number of results returned by the api on a single call
@@ -34,16 +35,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * To show that there are more results that can be loaded
      * @returns {boolean}
      */
-    const hasMoreResults = window.Vue.computed(() => {
-        if (hasLoadedAllResults.value) {
-            return false;
-        }
-        // if we are showing the current limit, its assumed we have more results to show
-        if (results.value.length === RESULT_LIMIT * (moreResultsCount.value + 1)) {
-            return true;
-        }
-        return false;
-    });
+    const { hasMoreResults } = useHasMoreResults(hasLoadedAllResults, results, moreResultsCount, RESULT_LIMIT);
 
     /**
      * Set the first results

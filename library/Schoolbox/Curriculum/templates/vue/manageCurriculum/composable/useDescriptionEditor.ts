@@ -8,6 +8,7 @@
 
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
+import type { Ref } from "vue";
 
 /**
  * Initialise the composable
