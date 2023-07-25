@@ -106,6 +106,8 @@ $app = new class extends CliTool\App {
         'task_file'                                => ['created_at', 'updated_at'],
     ];
 
+    private \Alaress\Database\Connector\IConnector $database;
+
     public function runAsRoot(): ?bool
     {
         return null;
@@ -114,8 +116,11 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
+        // explicitly use teh write db. we aren't reading just writing...
+        $this->database = $this->getDi()->get('databaseFactory')->getInternalWriteDatabase();
         // Get epoch date increment config date_increment_epoch
-        $query = $this->getDatabaseInternal()->prepareQuery("SELECT value FROM config WHERE name = :configName");
+        $query = $this->database->prepareQuery("SELECT value FROM config WHERE name = :configName");
+
         $query->execute(['configName' => 'date_increment_epoch']);
         $epoch_config = $query->fetchAll(PDO::FETCH_COLUMN)[0];
 
@@ -142,15 +147,15 @@ $app = new class extends CliTool\App {
         $diffYears = $epochDate->diffInYears($now);
 
         $this->getLogger()->notice("Incrementing dates by $diffDays days.");
-        $this->getDatabaseInternal()->beginTransaction();
+        $this->database->beginTransaction();
         try {
             $this->incrementDates((int)$diffDays, $diffYears);
         } catch (\Throwable $e) {
             $this->getLogger()->error("Exception caught. Rolling back transaction.");
-            $this->getDatabaseInternal()->rollBack();
+            $this->database->rollBack();
             throw $e;
         }
-        $this->getDatabaseInternal()->commit();
+        $this->database->commit();
     }
 
 
@@ -160,7 +165,7 @@ $app = new class extends CliTool\App {
     private function incrementDates(int $diffDays, int $diffYears): void
     {
         // Fetch all tables
-        $query        = $this->getDatabaseInternal()->executeQuery(
+        $query        = $this->database->executeQuery(
             "
                 SELECT c.TABLE_NAME, c.COLUMN_NAME
                 FROM INFORMATION_SCHEMA.TABLES t
@@ -170,7 +175,7 @@ $app = new class extends CliTool\App {
                 AND c.DATA_TYPE IN ('date','datetime')
                 ORDER BY c.TABLE_NAME, c.COLUMN_NAME
             ",
-            ['schema' => $this->getDatabaseInternal()->getDatabase()],
+            ['schema' => $this->database->getDatabase()],
         );
         $tableColumns = [];
         foreach ($query->fetchAll(PDO::FETCH_NUM) as [$table, $column]) {
@@ -187,7 +192,7 @@ $app = new class extends CliTool\App {
             }
         }
 
-        $this->getDatabaseInternal()->executeQuery(
+        $this->database->executeQuery(
             "
                 UPDATE config
                 SET value = DATE_FORMAT(DATE_ADD(value, INTERVAL :diff DAY), '%Y-%m-%d')
@@ -233,7 +238,7 @@ $app = new class extends CliTool\App {
                 : 'ASC';
 
             $this->getLogger()->info("Incrementing dates for: $tableName.$column");
-            $updateQuery = $this->getDatabaseInternal()->prepareQuery(
+            $updateQuery = $this->database->prepareQuery(
                 "
             UPDATE `$tableName`
             SET `$column` = DATE_ADD(`$column`, INTERVAL :diff DAY)
@@ -268,7 +273,7 @@ $app = new class extends CliTool\App {
         // update name (e.g. Semester 1, 2021 -> Semester 1, 2022) first
         if ($diffYears > 0 && count($nameColumns)) {
             foreach ($nameColumns as $column) {
-                $rows = $this->getDatabaseInternal()->executeQuery(
+                $rows = $this->database->executeQuery(
                     "SELECT
                        REPLACE(`$column`, YEAR(`$dateColumns[0]`), YEAR(`$dateColumns[0]`) + $diffYears) AS new_name,
                        `$column` AS old_name
@@ -277,7 +282,7 @@ $app = new class extends CliTool\App {
                      ORDER BY `$dateColumns[0]` DESC"
                 )->fetchAll();
                 foreach ($rows as $row) {
-                    $this->getDatabaseInternal()->executeQuery(
+                    $this->database->executeQuery(
                         "UPDATE `$tableName` SET `$column` = :newName WHERE `$column` = :oldName",
                         [
                             'newName' => $row['new_name'],
@@ -292,7 +297,7 @@ $app = new class extends CliTool\App {
             $this->getLogger()->info("Incrementing year for: $tableName.$column");
             // name column
 
-            $updateQuery = $this->getDatabaseInternal()->prepareQuery(
+            $updateQuery = $this->database->prepareQuery(
                 "
             UPDATE `$tableName`
             SET `$column` = DATE_ADD(`$column`, INTERVAL :diff YEAR)

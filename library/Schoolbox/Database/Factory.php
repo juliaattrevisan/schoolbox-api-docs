@@ -147,7 +147,7 @@ class Factory
      * @return IConnector
      * @throws DatabaseException
      */
-    private function getInternalWriteDatabase(): IConnector
+    public function getInternalWriteDatabase(): IConnector
     {
         // TODO: use the DB Proxy to correctly route to the correct DB connection...
         $connectorInternal = $this->factory->createMysql();
