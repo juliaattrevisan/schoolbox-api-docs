@@ -39,12 +39,13 @@ class MyFolder extends DeprecatedModel
      */
     public function getFolderList($parent = 0)
     {
-        $fields = [
-            'owner'  => $this->owner,
-            'parent' => $parent,
-        ];
-
-        return $this->getByArray($fields);
+        $query = "SELECT * FROM `myFolder`
+         WHERE
+            `owner` = " . $_SESSION['id'] . "
+            AND `parent` = " . $this->db->smartQuote($parent) . "
+            AND `deleted_at` is null
+        ";
+        return $this->db->getAll($query);
     }
 
 
@@ -107,11 +108,6 @@ class MyFolder extends DeprecatedModel
         if (is_array($folderList)) {
             $total = count($folderList);
             for ($i = 0; $i < $total; $i++) {
-                // is this folder deleted?
-                if (null !== $folderList[$i]['deleted_at']) {
-                    continue;
-                }
-
                 if ($folderList[$i]['id'] != $ignore) {
                     $childrenList = $this->getFolderTree($folderList[$i]['id'], $depth + 1, $ignore);
 
