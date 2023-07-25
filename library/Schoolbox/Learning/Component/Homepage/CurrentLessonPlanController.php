@@ -90,7 +90,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             $assessmentIds[] = $row['assessment_id'];
         }
 
-        $plans = $this->assessmentDataSource->findAllByIds($assessmentIds);
+        $plans = $this->assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
 
         /** @var LessonPlanModel $lessonPlan **/
         foreach ($plans as $lessonPlan) {
@@ -108,30 +108,14 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
                 continue;
             }
 
-            $params =  [
-                'assessmentId' => $lessonPlan->getId(),
-                'assessment'   => $lessonPlan,
-                'studentId'    => $student->getId(),
-                'student'      => $student,
-            ];
-
             //build array
-            $this->visibleLessonPlans[] = [
-                'title' => $lessonPlan->getTitle(),
-                'dueDate' => $lessonPlan->getDueAt(),
-                '_links' => [
-                    'assessment' => $this->getRouteGenerator()->generate('learningAssessment.getSummary', $params),
-                    'modify' => false,
-                    'delete' => false,
-                    'toCourse' => false,
-                ]
-            ];
+            $this->visibleLessonPlans[] = $lessonPlan;
         }
 
-        // sort by dueDate
-        usort($this->visibleLessonPlans, function ($a, $b) {
-            return $a['dueDate'] <=> $b['dueDate'];
-        });
+//        // sort by dueDate
+//        usort($this->visibleLessonPlans, function ($a, $b) {
+//            return $a['dueDate'] <=> $b['dueDate'];
+//        });
 
                 return true;
 //        return \count($this->visibleLessonPlans) > 0;
