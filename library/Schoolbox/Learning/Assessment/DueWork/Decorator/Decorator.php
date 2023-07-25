@@ -53,7 +53,7 @@ class Decorator implements DecoratorInterface
      *
      * @param int          $acceptOnline
      * @param int          $markType
-     * @param int          $gradingScheme
+     * @param int|null     $gradingScheme
      * @param bool         $useRubric
      * @param int          $capabilityMarkType
      * @param int|null     $capabilityGradeGroup
@@ -68,7 +68,7 @@ class Decorator implements DecoratorInterface
     public function __construct(
         int $acceptOnline,
         int $markType,
-        int $gradingScheme,
+        ?int $gradingScheme,
         bool $useRubric,
         int $capabilityMarkType,
         ?int $capabilityGradeGroup,
