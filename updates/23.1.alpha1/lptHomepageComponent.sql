@@ -16,7 +16,7 @@ INSERT INTO component_definition (
              'homepage',
              3, # Learning
              'true',
-             'false',
+             'true',
              null,
              null,
              null

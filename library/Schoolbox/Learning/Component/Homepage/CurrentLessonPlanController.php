@@ -61,7 +61,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
          * If parent role, or user has no subjects
          * exit early
          */
-        if ($student->getRole()->isParent() || 0 === $student->getSubjectCollection()->count()) {
+        if ($student->getRole()->isParent()) {
             return false;
         }
 
@@ -70,7 +70,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         $pb          = $database
             ->buildPredicateBuilder('')
             ->betweenDates('assessment.due_date', $dateStart, $dateEnd)
-            ->in('mv_assessment_relation.folder_id', $student->getSubjectCollection()->getIds());
+            ->equals('mv_assessment_relation.folder_id', $this->getContext()->getFolder()->getId());
 
         // set visibility check to be student for student...
         if ($this->getUser()->getRole()->isStudent()) {
@@ -119,11 +119,11 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             $this->visibleLessonPlans[] = [
                 'title' => $lessonPlan->getTitle(),
                 'dueDate' => $lessonPlan->getDueAt(),
-                'className' => $lessonPlan->getContext()->getFolder()->getTitle(),
-                'classColour' => $lessonPlan->getContext()->getFolder()->getColour(),
                 '_links' => [
                     'assessment' => $this->getRouteGenerator()->generate('learningAssessment.getSummary', $params),
-                    'folder' => sprintf("/homepage/%s", $lessonPlan->getContext()->getFolder()->getId()),
+                    'modify' => false,
+                    'delete' => false,
+                    'toCourse' => false,
                 ]
             ];
         }
@@ -133,8 +133,8 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             return $a['dueDate'] <=> $b['dueDate'];
         });
 
-        //        return true;
-        return \count($this->visibleLessonPlans) > 0;
+                return true;
+//        return \count($this->visibleLessonPlans) > 0;
         /**
          * return array should be similar to:
          * ```

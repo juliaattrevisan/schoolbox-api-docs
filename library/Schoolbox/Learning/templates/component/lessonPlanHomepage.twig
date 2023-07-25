@@ -1,17 +1,9 @@
 <ul class="action-list">
     {% for lesson in lessonPlans %}
         <li>
-            {% if lesson.classColour %}
-                <div class="card small-12" style="border-left: 6px solid {{ lesson.classColour }}">
-            {% else %}
-                <div class="card small-12" style="border-left: 6px solid white">
-            {% endif %}
                 <h3>
                     <a class="title" href="{{ lesson._links.assessment }}">{{ lesson.title }}</a>
                 </h3>
-                <p>
-                    <a href="{{ lesson._links.folder }}">{{ lesson.className }}</a>
-                </p>
                 <p class="meta">
                     <span title="{{ lesson.dueDate.local }}">
                         Scheduled <time datetime="{{ lesson.dueDate.json }}">{{ lesson.dueDate.getRelativeDay }} </time>
