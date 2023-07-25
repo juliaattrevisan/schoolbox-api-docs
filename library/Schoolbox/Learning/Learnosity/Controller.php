@@ -496,6 +496,42 @@ class Controller extends Base
 
 
     /**
+     * Tell Learnosity about what our teachers marked each question
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $attempt
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postFeedback(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $postData = $this->request->post->getArrayCopy();
+
+        /* Updated marks given by our teacher,
+         * including attempt-based commentary
+         */
+        $learnosityData = json_decode($postData['learnosity']);
+        $schoolboxData = json_decode($postData['schoolbox']);
+
+        /* Post back to learnosity
+         */
+
+        /* Get the new result back from learnosity
+         */
+
+        /* Save the comment and new normalised mark
+         */
+        $attempt->setComment($schoolboxData['attemptComment']);
+
+        $this->attemptMapper->save($attempt);
+    }
+
+
+    /**
      * Archive (soft-delete) multiple Learnosity Activities
      *
      * @return void

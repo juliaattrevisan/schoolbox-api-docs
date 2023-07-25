@@ -18,7 +18,7 @@
         <section class="content">
             <label>Overall Comment</label>
             <textarea id="attempt-feedback"></textarea>
-            <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={SITE_VERSION}"></script>
+            <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
             <script>
                 $(function() {
@@ -96,20 +96,36 @@
         /* Collate and pump customisations back into Learnosity
          */
         $('#finalise').on('click', function(event) {
-            let payload = {
-                'learnosity': [],
-                'schoolbox': []
-            }
+            let learnosityData = {};
+            let schoolboxData = {};
 
             $.each(attemptScores, function(index, element) {
                 let customIdentifier = 'sb-custom__' + index;
 
-                payload['learnosity'][index] = parseInt($('#' + customIdentifier).val());
+                learnosityData[index] = parseInt($('#' + customIdentifier).val());
             });
 
-            payload['schoolbox'].attemptComnment = window.sbProps.editors['attempt-feedback'].getData();
+            schoolboxData.attemptComment = window.sbProps.editors['attempt-feedback'].getData();
 
-            console.log(payload);
+            let payload = new FormData();
+            payload.append('learnosity', JSON.stringify(learnosityData));
+            payload.append('schoolbox', JSON.stringify(schoolboxData));
+
+            /* Send it
+             */
+            {% set postFeedbackUrl = routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnosityReference: attempt.learnosityReference}) %}
+            fetch('{{ postFeedbackUrl }}', {
+                method: 'POST',
+                body: payload
+            }).then(response => {
+
+            });
         });
     });
 </script>
+
+
+{#<form action="{{ postFeedbackUrl }}" method="post">#}
+{#    <input type="text" name='zac' value="hablurk" />#}
+{#    <input type="submit" />#}
+{#</form>#}

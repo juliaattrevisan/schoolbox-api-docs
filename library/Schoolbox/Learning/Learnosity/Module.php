@@ -92,6 +92,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'getFeedback', $instructorPerms, $preloadAttempt);
 
+        /* Persist feedback to a student's attempt
+         */
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/mogg/{learnosityReference}', 'postFeedback', $instructorPerms, $preloadAttempt);
+
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
