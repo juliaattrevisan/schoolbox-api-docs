@@ -10,13 +10,20 @@ interface Props {
     result: Result; // the result to display
 }
 const props = defineProps<Props>();
+
+/**
+ * Whether the result has sub results
+ */
+const hasSubResults = window.Vue.computed(() => {
+    return props.result._subResults && props.result._subResults.data.length > 0;
+});
 </script>
 
 <template>
     <div class="result">
         <h2>{{ props.result.title }}</h2>
         <p class="meta">{{ result.meta }}</p>
-        <sp-results-list-sub-results v-if="props.result._subResults" :sub-results="props.result._subResults" />
+        <sp-results-list-sub-results v-if="hasSubResults" :result="result" />
     </div>
 </template>
 

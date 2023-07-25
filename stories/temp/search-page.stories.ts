@@ -13,6 +13,7 @@ let requestCount = 0; // number of times the endpoint has been called, note this
  * Mock Service Worker handlers to load dummy data for testing
  */
 const endpoint = "/search";
+const subResultsEndpoint = "/getSubResults"; // endpoint to get sub results, is stores in dataSearchPage.ts
 const mswHandlers = [
     rest.get(endpoint, (req, res, ctx) => {
         requestCount += 1;
@@ -33,6 +34,35 @@ const mswHandlers = [
                         id: 4,
                         type: "user.parent",
                         title: "More results 2",
+                    },
+                ],
+            })
+        );
+    }),
+    rest.get(subResultsEndpoint, (req, res, ctx) => {
+        return res(
+            ctx.delay(2000),
+            ctx.json({
+                data: [
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 1",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 2",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 3",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 4",
                     },
                 ],
             })

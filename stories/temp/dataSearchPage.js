@@ -20,7 +20,7 @@ export const data = {
             _links: {},
         },
         {
-            id: 1,
+            id: 2,
             type: "event",
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/calendar/event/1",
@@ -39,7 +39,7 @@ export const data = {
             _links: {},
         },
         {
-            id: 1,
+            id: 3,
             type: "news",
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/news/1",
@@ -59,7 +59,7 @@ export const data = {
             _links: {},
         },
         {
-            id: 10,
+            id: 4,
             type: "page.class",
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/homepage/10",
@@ -88,12 +88,12 @@ export const data = {
             ],
             icon: "homepage",
             _links: {
-                subResults: "https://{hostname}.{domain}/api/search/folder/10",
+                subResults: "/getSubResults",
             },
             _subResults: {
                 data: [
                     {
-                        id: 1,
+                        id: 21,
                         type: "assessment.dueWork",
                         date: "2022-01-30T21:00:00Z",
                         url: "https://{hostname}.{domain}/learning/assessments/1",
@@ -123,7 +123,7 @@ export const data = {
                         _links: {},
                     },
                     {
-                        id: 1,
+                        id: 22,
                         type: "file.audio",
                         date: "2022-01-30T21:00:00Z",
                         url: "https://{hostname}.{domain}/send.php?id=1&save=1",
@@ -155,7 +155,7 @@ export const data = {
                         },
                     },
                     {
-                        id: 2,
+                        id: 23,
                         type: "file.video",
                         date: "2022-01-30T21:00:00Z",
                         url: "https://{hostname}.{domain}/send.php?id=2&save=1",
@@ -187,6 +187,41 @@ export const data = {
                             poster: "https://{hostname}.{domain}/cms/videoThumb.php?type=sbfs&id=2&size=poster",
                         },
                     },
+                    {
+                        id: 24,
+                        type: "user.parent",
+                        title: "Another sub result",
+                    },
+                    {
+                        id: 25,
+                        type: "user.parent",
+                        title: "Another sub result",
+                    },
+                    {
+                        id: 26,
+                        type: "user.parent",
+                        title: "Another sub result",
+                    },
+                    {
+                        id: 27,
+                        type: "user.parent",
+                        title: "Another sub result",
+                    },
+                    {
+                        id: 28,
+                        type: "user.parent",
+                        title: "Another sub result",
+                    },
+                    {
+                        id: 29,
+                        type: "user.parent",
+                        title: "Another sub result",
+                    },
+                    {
+                        id: 30,
+                        type: "user.parent",
+                        title: "Another sub result",
+                    },
                 ],
                 metadata: {
                     cursor: {
@@ -197,7 +232,7 @@ export const data = {
             },
         },
         {
-            id: 20,
+            id: 5,
             type: "page.other",
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/homepage/20",
@@ -234,7 +269,7 @@ export const data = {
             },
         },
         {
-            id: 2,
+            id: 6,
             type: "user.staff",
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/search/user/2",
@@ -248,7 +283,7 @@ export const data = {
             _links: {},
         },
         {
-            id: 4,
+            id: 7,
             type: "user.parent",
             date: "2022-01-30T21:00:00Z",
             url: "https://{hostname}.{domain}/search/user/4",
@@ -267,70 +302,70 @@ export const data = {
             _links: {},
         },
         {
-            id: 4,
+            id: 8,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 9,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 10,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 11,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 12,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 13,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 14,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 15,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 16,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 17,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 18,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         {
-            id: 4,
+            id: 19,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
         // 20th result
         {
-            id: 4,
+            id: 20,
             type: "user.parent",
-            title: "Dummy",
+            title: "Another result",
         },
     ],
     metadata: {

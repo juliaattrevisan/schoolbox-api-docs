@@ -22,7 +22,7 @@ const showLoadMore = window.Vue.computed(() => {
 /**
  * Load more results
  */
-async function onLoadMore() {
+async function onLoadMoreSelected() {
     if (loadMoreResultsStore.isLoading) {
         return;
     }
@@ -33,7 +33,7 @@ async function onLoadMore() {
 <template>
     <loading-table v-if="loadMoreResultsStore.isLoading" :rows="2" />
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
-    <button v-else-if="showLoadMore" @click.prevent="onLoadMore">Load more results</button>
+    <button v-else-if="showLoadMore" @click.prevent="onLoadMoreSelected">Load more results</button>
 </template>
 
 <style scoped></style>

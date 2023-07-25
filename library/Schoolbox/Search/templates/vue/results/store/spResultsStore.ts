@@ -1,15 +1,17 @@
 /**
- * Store the current search results when searching from sp-input
+ * Store the current search results when searching
  */
 
 import { defineStore } from "pinia";
+import type { Results } from "../../../js/types/Results";
 import type { Result } from "../../../js/types/Result";
 
-const RESULT_LIMIT = 20; // number of results returned by the api
+export const RESULT_LIMIT = 20; // number of results returned by the api on a single call
+export const SUB_RESULT_LIMIT = 10; // number of results returned by the api on a single call
 
 export const useResultsStore = defineStore("spResults", () => {
     const results = window.Vue.ref<Result[]>([]); // returned search results
-    const moreResultsCount = window.Vue.ref(0); // number of subsequent results that have been loaded
+    const moreResultsCount = window.Vue.ref(0); // number of subsequent result sets that have been loaded
     const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all results have been loaded
 
     /**
@@ -48,16 +50,37 @@ export const useResultsStore = defineStore("spResults", () => {
      * @param {Result[]} firstResults - the results to set
      */
     function setFirstResults(firstResults: Result[]) {
+        // if we have less results than the limit, we have loaded all results
         results.value = firstResults;
+        if (results.value.length < RESULT_LIMIT) {
+            hasLoadedAllResults.value = true;
+        }
     }
 
     /**
-     *  Set the next results
+     * Set the next results
      * @param {Result[]} moreResults - the results to set
      */
     function setMoreResults(moreResults: Result[]) {
         results.value = [...results.value, ...moreResults];
         moreResultsCount.value += 1;
+        // check if we have loaded all results yet
+        if (results.value.length < RESULT_LIMIT * (moreResultsCount.value + 1)) {
+            hasLoadedAllResults.value = true;
+        }
+    }
+
+    /**
+     * Set the next sub results load
+     * @param {Result[]} moreSubResults - the results to set
+     * @param {number} resultId - the parent id of the result the new sub results are from
+     */
+    function setMoreSubResults(moreSubResults: Result[], resultId: number) {
+        const parentResult = results.value.find((result) => result.id === resultId) as Result;
+        (parentResult._subResults as Results).data = [
+            ...(parentResult._subResults?.data as Result[]),
+            ...moreSubResults,
+        ];
     }
 
     /**
@@ -76,6 +99,7 @@ export const useResultsStore = defineStore("spResults", () => {
         hasMoreResults,
         setFirstResults,
         setMoreResults,
+        setMoreSubResults,
         clear,
     };
 });

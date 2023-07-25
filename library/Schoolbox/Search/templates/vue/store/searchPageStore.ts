@@ -8,7 +8,7 @@ import { useFiltersStore } from "../filters/store/spFiltersStore";
 import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
 
 export const useStore = defineStore("searchPage", () => {
-    const endpoint = window.Vue.ref(""); // to display loading note
+    let endpoint = ""; // the endpoint to use for searching
 
     /**
      * When switching between stories, we need to reset the data models
@@ -28,7 +28,7 @@ export const useStore = defineStore("searchPage", () => {
      */
     function init($endpoint: string, $filterTypes: FilterType[]) {
         checkForStorybook();
-        endpoint.value = $endpoint;
+        endpoint = $endpoint;
         useFilterTypesStore().allTypes = $filterTypes;
     }
 
@@ -36,17 +36,26 @@ export const useStore = defineStore("searchPage", () => {
      * To collect all the params to send to the search api
      * @returns {string} - the query params
      */
-    function getEndpointWithParams() {
+    function getQueryParams() {
         const newQueryParams = new URLSearchParams();
         newQueryParams.append("keyword", useQueryStore().activeQuery);
         newQueryParams.append("filter", useFiltersStore().getFormData());
-        const endpointWithParams = `${endpoint.value}?${newQueryParams.toString()}`;
+        return newQueryParams;
+    }
+
+    /**
+     * To collect all the params to send to the search api
+     * @returns {string} - the query params
+     */
+    function getEndpointWithParams() {
+        const newQueryParams = getQueryParams();
+        const endpointWithParams = `${endpoint}?${newQueryParams.toString()}`;
         return endpointWithParams;
     }
 
     return {
-        endpoint,
         init,
+        getQueryParams,
         getEndpointWithParams,
     };
 });
