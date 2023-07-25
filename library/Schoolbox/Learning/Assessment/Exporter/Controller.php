@@ -156,10 +156,7 @@ class Controller extends BaseController
             $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
         }
 
-        // Split $courseImpls into two collections:
-        //  * those in which $unitSpec has been imported, and
-        //  * those in which $unitSpec has not been imported.
-        $courseImplsInWhichUnitImported = new GenericCollection(CourseImplementation\Model::class);
+        // Find the course implementations in which $unitSpec has not been imported.
         $courseImplsInWhichUnitNotImported = new GenericCollection(CourseImplementation\Model::class);
         foreach ($courseImpls as $courseImpl) {
             $found = false;
@@ -169,28 +166,22 @@ class Controller extends BaseController
                 }
             }
 
-            if ($found) {
-                $courseImplsInWhichUnitImported->add($courseImpl);
-            } else {
+            if (!$found) {
                 $courseImplsInWhichUnitNotImported->add($courseImpl);
             }
         }
 
-        // Sort both collections by title.
-        foreach (array($courseImplsInWhichUnitImported, $courseImplsInWhichUnitNotImported) as $collection) {
-            $collection->sortByCallback(static function (CourseImplementation\Model $a, CourseImplementation\Model $b) {
-                return strnatcasecmp($a->getFolder()->getTitle(), $b->getFolder()->getTitle());
-            });
-        }
+        // Sort by title.
+        $courseImplsInWhichUnitNotImported->sortByCallback(static function (CourseImplementation\Model $a, CourseImplementation\Model $b) {
+            return strnatcasecmp($a->getFolder()->getTitle(), $b->getFolder()->getTitle());
+        });
 
         $data = [
             'unitSpec'                          => $unitSpec,
             'returnUrl'                         => $this->requestQuery->get(Redirect::RETURN_URL, ''),
             'returnUrlName'                     => Redirect::RETURN_URL,
             'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
-            'courseImplsInWhichUnitImported'    => $courseImplsInWhichUnitImported,
             'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
-            'enableReimport'                    => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
             'breadcrumbs'                       => [
                 ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
                 [$unitSpec->getTitle(), '/homepage/' . $unitSpec->getFolder()->getId()],
@@ -403,24 +394,18 @@ class Controller extends BaseController
             return;
         }
 
-        $reimportIsEnabled = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
-
         foreach ($courseImpls as $courseImpl) {
             $units = $courseImpl->getUnits();
-            $unitToOverwrite = null;
+            $alreadyExistingUnit = null;
 
             foreach ($units as $unit) {
                 if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
-                    $unitToOverwrite = $unit;
+                    $alreadyExistingUnit = $unit;
                 }
             }
 
-            if ($unitToOverwrite !== null) {
-                if ($reimportIsEnabled) {
-                    $this->unitImplementationMapper->delete($unitToOverwrite);
-                } else {
-                    continue; // We cannot overwrite the existing unit, so skip this course implementation.
-                }
+            if ($alreadyExistingUnit !== null) {
+                continue; // Overwriting existing units is never allowed by this tool, so skip this course implementation.
             }
 
             $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
