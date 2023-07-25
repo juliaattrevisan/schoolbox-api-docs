@@ -558,7 +558,7 @@ class Controller extends Base
                 $attempt->getLearnosityReference()
             ]
         ]);
-
+        new \Alaress_Probe($result);
         $mark = $result['data'][0]['score'];
         $maxMark = $result['data'][0]['max_score'];
         $normalisedMark = 100 * $mark/$maxMark;
@@ -568,6 +568,8 @@ class Controller extends Base
         $schoolboxData = json_decode($postData['schoolbox'], true);
 
         $attempt->setComment($schoolboxData['attemptComment'])
+            ->setMark($mark)
+            ->setMaxMark($maxMark)
             ->setNormalisedMark($normalisedMark);
 
         $this->attemptMapper->save($attempt);
