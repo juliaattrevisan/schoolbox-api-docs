@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Tests\Api\User;
 
 use Aura\Di\Exception\ServiceNotFound;
+use Generator;
 use Tests\Support\ApiTester;
 use Schoolbox\Role;
 
@@ -94,9 +95,9 @@ class ApiUserCest
     /**
      * Data to test filter
      * @param ApiTester $i
-     * @return \Generator
+     * @return Generator
      */
-    private function filterData(ApiTester $i)
+    private function filterData(ApiTester $i): Generator
     {
         yield [
             'search' => "reed",
@@ -134,9 +135,9 @@ class ApiUserCest
     /**
      * Data to test create user
      * @param ApiTester $i
-     * @return void
+     * @return Generator
      */
-    public function createData(ApiTester $i)
+    public function createData(ApiTester $i): Generator
     {
         yield [
             'username'  => $i->generateText(10, true),

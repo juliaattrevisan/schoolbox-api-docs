@@ -27,7 +27,7 @@ class ApiAssessmentCest
     public function _before(ApiTester $i)
     {
         // rely on an existing assessment for now
-        $this->dueWork = $i->getExistingAssessment();
+        $this->dueWork = $i->getExistingAssessment(null);
         $this->folder = $this->dueWork->getBaseContext()->getFolder();
     }
 
