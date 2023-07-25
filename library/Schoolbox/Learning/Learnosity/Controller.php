@@ -503,6 +503,7 @@ class Controller extends Base
      * @param User        $student
      * @param Model       $attempt
      * @return void
+     * @throws ValidationException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function postFeedback(
@@ -512,21 +513,28 @@ class Controller extends Base
     ): void {
         $postData = $this->request->post->getArrayCopy();
 
+        /* These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
+
         /* Updated marks given by our teacher,
          * including attempt-based commentary
          */
-        $learnosityData = json_decode($postData['learnosity']);
+        $learnosityData = json_decode($postData['learnosity'], true);
 
         $responseData = [];
 
-        foreach ($learnosityData as $responseId => $newScore) {
-            $responseData[] = [
-                'response_id' => $responseId,
-                'score' => $newScore,
-                /* TODO Refetch these pieces
-                 */
-                'max_score' => 1
-            ];
+        foreach ($responses as $response) {
+            $responseId = $response['response_id'];
+            $updatedResponse = $response;
+            $updatedResponse['score'] = $learnosityData[$responseId];
+
+            $responseData[] = $updatedResponse;
         }
 
         /* Post back to learnosity
@@ -556,7 +564,9 @@ class Controller extends Base
         /* Save the comment and new normalised mark
          */
         $schoolboxData = json_decode($postData['schoolbox'], true);
-        $attempt->setComment($schoolboxData['attemptComment']);
+
+        $attempt->setComment($schoolboxData['attemptComment'])
+            ->setNormalisedMark($normalisedMark);
 
         $this->attemptMapper->save($attempt);
     }
