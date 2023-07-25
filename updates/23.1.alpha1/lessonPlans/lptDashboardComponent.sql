@@ -31,7 +31,7 @@ INSERT INTO component_config_definition (
              (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Dashboard\\CurrentLessonPlanController'),
              'range',
              0,
-             'Visibility Range',
+             'Display Range',
              null
 #          commented out as the AC does not require additional config options...
 #          ), (

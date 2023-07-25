@@ -31,7 +31,7 @@ INSERT INTO component_config_definition (
              (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Homepage\\CurrentLessonPlanController'),
              'range',
              0,
-             'Visibility Range',
+             'Display Range',
              null
          ), (
              (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Homepage\\CurrentLessonPlanController'),
