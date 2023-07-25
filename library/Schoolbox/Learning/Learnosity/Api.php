@@ -117,6 +117,20 @@ class Api
 
 
     /**
+     * Alias for ActionType "update" endpoints
+     *
+     * @param string $endpoint
+     * @param array  $payload
+     * @return mixed
+     * @throws ValidationException
+     */
+    public function dataUpdateRequest(string $endpoint, array $payload): mixed
+    {
+        return $this->dataRequest($endpoint, $payload, 'update');
+    }
+
+
+    /**
      * Make a specific request to the Data API in Learnosity
      *
      * $actionType corresponds to Action Type in their docs;

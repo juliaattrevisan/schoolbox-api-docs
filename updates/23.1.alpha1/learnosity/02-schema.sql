@@ -11,4 +11,4 @@ ALTER TABLE `assess_attempt`
 
 -- A comment about the overall attempt made by the student
 ALTER TABLE `assess_attempt`
-    ADD COLUMN `comment` DECIMAL(14,11) NULL AFTER `norm_mark`;
+    ADD COLUMN `comment` TEXT NULL AFTER `norm_mark`;

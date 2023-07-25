@@ -423,6 +423,7 @@ class Controller extends Base
 
     /**
      * Provide feedback for an attempt
+     *
      * @param IAssessable $assessment
      * @param User        $student
      * @param Model       $attempt
@@ -515,16 +516,46 @@ class Controller extends Base
          * including attempt-based commentary
          */
         $learnosityData = json_decode($postData['learnosity']);
-        $schoolboxData = json_decode($postData['schoolbox']);
+
+        $responseData = [];
+
+        foreach ($learnosityData as $responseId => $newScore) {
+            $responseData[] = [
+                'response_id' => $responseId,
+                'score' => $newScore,
+                /* TODO Refetch these pieces
+                 */
+                'max_score' => 1
+            ];
+        }
 
         /* Post back to learnosity
          */
+        $this->api->dataUpdateRequest('/sessions/responses/scores', [
+            'sessions' => [[
+                'session_id' => $attempt->getLearnosityReference(),
+                /* TODO Whose id is this?
+                 */
+                'user_id' => (string)$this->getUser()->getId(),
+                'responses' => $responseData
+            ]]
+        ]);
 
         /* Get the new result back from learnosity
          */
+        $result = $this->api->dataGetRequest('/sessions/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ]);
+
+        $mark = $result['data'][0]['score'];
+        $maxMark = $result['data'][0]['max_score'];
+        $normalisedMark = 100 * $mark/$maxMark;
 
         /* Save the comment and new normalised mark
          */
+        $schoolboxData = json_decode($postData['schoolbox'], true);
         $attempt->setComment($schoolboxData['attemptComment']);
 
         $this->attemptMapper->save($attempt);
