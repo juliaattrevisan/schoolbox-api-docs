@@ -62,8 +62,9 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
         $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
 
+        // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $student->getRole()->isStudent());
-
+        // hydrate those assessments
         $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
 
         return true;

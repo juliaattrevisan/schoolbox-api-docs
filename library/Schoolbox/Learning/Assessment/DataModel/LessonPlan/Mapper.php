@@ -268,9 +268,9 @@ class Mapper extends \Schoolbox\Mapper
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
      * @param bool                 $studentOnly should we return only student visible plans? or all plans?
-     * @return array
+     * @return array<int> array of the assessment ID's for the lesson plans
      */
-    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, bool $studentOnly = false)
+    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, bool $studentOnly = false): array
     {
         $pb          = $this->getDatabase()
             ->buildPredicateBuilder('')
