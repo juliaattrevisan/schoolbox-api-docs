@@ -531,9 +531,10 @@ class Bulk_Folder
         }
 
         throw new UnexpectedValueException(
-            "Unable to find unique column heading containing '$search'.\n" .
-            "Column headings found: '" . implode("', '", $headerRow) . "'.\n" .
-            "Please ensure the column headings match those in the template CSV file."
+            "Please ensure the following column headings exist in the CSV file:\n" .
+            // NOTE: The column headings below must those in the template CSV file downloadable from https://vagrant.dev.schoolbox.cloud/adminv2/import/folder.
+            "(Parent ID, Folder Name, Folder Colour, Folder Image, Folder Code 1, Folder Code 2, Folder Code 3, YearLevel, YearLevel, Template).\n\n" .
+            "Note also that extra Folder Code and YearLevel columns may be added."
         );
     }
 
