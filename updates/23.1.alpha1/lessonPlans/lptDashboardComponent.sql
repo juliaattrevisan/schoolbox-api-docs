@@ -12,7 +12,7 @@ INSERT INTO component_definition (
 ) VALUES (
              'Lesson Plans',
              'Schoolbox\\Learning\\Component\\Dashboard\\CurrentLessonPlanController',
-             'Shows the current Lesson Plans for the user',
+             'Shows the current lesson plans for the user',
              'dashboard',
              3, # Learning
              'true',
