@@ -43,7 +43,7 @@ class CourseManagedDecorator implements DecoratorInterface
      * Decorator constructor.
      *
      * @param int          $markType
-     * @param int          $gradingScheme
+     * @param int|null     $gradingScheme
      * @param bool         $useRubric
      * @param int          $capabilityMarkType
      * @param int|null     $capabilityGradeGroup
@@ -55,7 +55,7 @@ class CourseManagedDecorator implements DecoratorInterface
      */
     public function __construct(
         int $markType,
-        int $gradingScheme,
+        ?int $gradingScheme,
         bool $useRubric,
         int $capabilityMarkType,
         ?int $capabilityGradeGroup,

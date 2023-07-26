@@ -15,10 +15,10 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Factory;
 
 trait DueWorkTrait
 {
-
     /**
      * @var int
      */
@@ -122,18 +122,18 @@ trait DueWorkTrait
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    protected function getGradingScheme()
+    protected function getGradingScheme(): ?int
     {
         return $this->gradingScheme;
     }
 
     /**
-     * @param int $gradingScheme
-     * @return $this
+     * @param int|null $gradingScheme
+     * @return static
      */
-    protected function setGradingScheme($gradingScheme)
+    protected function setGradingScheme(?int $gradingScheme): static
     {
         $this->gradingScheme = $gradingScheme;
         return $this;
