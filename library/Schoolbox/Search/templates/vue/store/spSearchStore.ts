@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { useFetch } from "@vueuse/core";
 import { useStore } from "./searchPageStore";
 import { useQueryStore } from "./spQueryStore";
 import { useResultsStore } from "../results/store/spResultsStore";
@@ -10,9 +11,14 @@ import { useFiltersStore } from "../filters/store/spFiltersStore";
 import type { Results } from "../../js/types/Results";
 
 export const useSearchStore = defineStore("spSearch", () => {
-    const hasNotSearched = window.Vue.ref(true); // to determine whether any searches have been made
-    const isSearching = window.Vue.ref(false); // to notify of searching
-    const hasLoadError = window.Vue.ref(false); // to notify of a search error
+    const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
+    const url = window.Vue.ref("");
+    const {
+        execute,
+        data: results,
+        isFetching: isSearching, // to notify of searching
+        error: hasLoadError, // to notify of a search error
+    } = useFetch(url, { immediate: false }).get().json();
 
     /**
      * To record the active query and filters at the time of the search
@@ -28,20 +34,9 @@ export const useSearchStore = defineStore("spSearch", () => {
     async function search() {
         setActive();
         hasNotSearched.value = false;
-        isSearching.value = true;
-        try {
-            const response = await fetch(useStore().getEndpointWithParams(), {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            const resultsData = (await response.json()) as Results;
-            useResultsStore().setFirstResults(resultsData.data);
-        } catch (error) {
-            hasLoadError.value = true;
-        } finally {
-            isSearching.value = false;
-        }
+        url.value = useStore().getEndpointWithParams();
+        await execute();
+        useResultsStore().setFirstResults((results.value as Results).data);
     }
 
     /**
