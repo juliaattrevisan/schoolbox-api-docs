@@ -22,7 +22,10 @@
 /var/log/schoolbox/*/remove-old-triggers.log
 /var/log/schoolbox/*/liss.log
 /var/log/schoolbox/*/saml.log
-/var/log/schoolbox/*/audit.log {
+/var/log/schoolbox/*/audit.log
+/var/log/schoolbox/*/clipboard-importer.log
+/var/log/schoolbox/*/expired-storage-removal.log
+/var/log/schoolbox/*/storage-usageCache.log {
     weekly
     missingok
     rotate 4
