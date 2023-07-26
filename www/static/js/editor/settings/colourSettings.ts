@@ -131,7 +131,7 @@ export const fontBackgroundColourSwatches = [
             color: "hsl(270, 100%, 60%)",
             label: "Purple",
         },
-    ]
+    ],
     ...globalSwatches,
 ];
 
@@ -189,6 +189,6 @@ export const tableBackgroundColourSwatches = [
             color: "hsl(270, 100%, 95%)",
             label: "Purple",
         },
-    ]
+    ],
     ...globalSwatches,
 ];
