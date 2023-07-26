@@ -94,20 +94,6 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 
         /** @var LessonPlanModel $lessonPlan **/
         foreach ($plans as $lessonPlan) {
-            // are all fields visible?
-            $allHidden = true;
-            /** @var LessonPlanFieldModel $field */
-            foreach ($lessonPlan->getFields() as $field) {
-                if ('student' === $field->getVisibility()) {
-                    // if the field is visible, then we should show the lesson plan
-                    $allHidden = false;
-                }
-            }
-            if ($allHidden) {
-                // all fields are hidden, don't show this lesson plan
-                continue;
-            }
-
             $params =  [
                 'assessmentId' => $lessonPlan->getId(),
                 'assessment'   => $lessonPlan,
