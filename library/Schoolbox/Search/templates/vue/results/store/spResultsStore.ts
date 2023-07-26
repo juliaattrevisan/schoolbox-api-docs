@@ -8,7 +8,7 @@ import type { Result } from "../../../js/types/Result";
 import { useHasMoreResults } from "../composable/useHasMoreResults";
 
 export const RESULT_LIMIT = 20; // number of results returned by the api on a single call
-export const SUB_RESULT_LIMIT = 10; // number of results returned by the api on a single call
+export const SUB_RESULT_LIMIT = 10; // number of sub results returned by the api on a single call
 
 export const useResultsStore = defineStore("spResults", () => {
     const results = window.Vue.ref<Result[]>([]); // returned search results
