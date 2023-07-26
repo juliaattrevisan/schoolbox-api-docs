@@ -559,9 +559,7 @@ class Controller extends Base
             'sessions' => [
                 [
                     'session_id' => $attempt->getLearnosityReference(),
-                    /* TODO Whose id is this?
-                     */
-                    'user_id' => (string)$this->getUser()->getId(),
+                    'user_id' => (string)$attempt->getUser()->getId(),
                     'responses' => $responseData
                 ]
             ]
