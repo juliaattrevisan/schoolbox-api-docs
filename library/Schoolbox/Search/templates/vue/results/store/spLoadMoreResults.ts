@@ -14,7 +14,7 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
     const url = window.Vue.ref("");
     const {
         execute,
-        data: moreResults,
+        data,
         isFetching: isLoading,
         error: hasLoadError,
     } = useFetch(url, { immediate: false }).get().json();
@@ -26,10 +26,11 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
         url.value = useStore().getEndpointWithParams();
         await execute();
         // if no results are returned, we've loaded all results already
-        if ((moreResults.value as Results).data.length === 0) {
+        const moreResults = data.value as Results;
+        if (moreResults.data.length === 0) {
             useResultsStore().hasLoadedAllResults = true;
         } else {
-            useResultsStore().setMoreResults((moreResults.value as Results).data);
+            useResultsStore().setMoreResults(moreResults.data);
         }
     }
 

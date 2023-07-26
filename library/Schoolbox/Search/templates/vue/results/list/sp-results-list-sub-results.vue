@@ -4,6 +4,7 @@
  */
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import { useFetch } from "@vueuse/core";
 import { Results } from "../../../js/types/Results";
 import { Result } from "../../../js/types/Result";
 import { useStore } from "../../store/searchPageStore";
@@ -17,10 +18,15 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const isLoading = window.Vue.ref(false); // to notify of loading
-const hasLoadError = window.Vue.ref(false); // to notify of a load error
 const moreResultsCount = window.Vue.ref(0); // number of subsequent result sets that have been loaded
 const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all results have been loaded
+const url = window.Vue.ref("");
+const {
+    execute,
+    data,
+    isFetching: isLoading, // to notify of loading
+    error: hasLoadError, // to notify of a search error
+} = useFetch(url, { immediate: false }).get().json();
 
 /**
  * To show that there are more results that can be loaded
@@ -28,7 +34,7 @@ const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all r
  */
 const { hasMoreResults } = useHasMoreResults(
     hasLoadedAllResults,
-    window.Vue.ref(props.result._subResults?.data),
+    window.Vue.ref((props.result._subResults as Results).data),
     moreResultsCount,
     SUB_RESULT_LIMIT
 );
@@ -56,28 +62,21 @@ function getEndpointWithParams() {
  * load more sub results
  */
 async function loadMore() {
-    isLoading.value = true;
-    try {
-        const response = await fetch(getEndpointWithParams(), {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        const results = (await response.json()) as Results;
-        if (results.data.length === 0) {
+    url.value = getEndpointWithParams();
+    await execute();
+    const loadedResults = data.value as Results;
+    if (loadedResults.data.length === 0) {
+        hasLoadedAllResults.value = true;
+    } else {
+        useResultsStore().setMoreSubResults(loadedResults.data, props.result.id);
+        moreResultsCount.value += 1;
+        // check if we have loaded all results yet
+        if (
+            props.result._subResults &&
+            props.result._subResults.data.length < SUB_RESULT_LIMIT * (moreResultsCount.value + 1)
+        ) {
             hasLoadedAllResults.value = true;
-        } else {
-            useResultsStore().setMoreSubResults(results.data, props.result.id);
-            moreResultsCount.value += 1;
-            // check if we have loaded all results yet
-            if (props.result._subResults?.data.length < SUB_RESULT_LIMIT * (moreResultsCount.value + 1)) {
-                hasLoadedAllResults.value = true;
-            }
         }
-    } catch (error) {
-        hasLoadError.value = true;
-    } finally {
-        isLoading.value = false;
     }
 }
 

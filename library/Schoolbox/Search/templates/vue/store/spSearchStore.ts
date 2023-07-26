@@ -15,7 +15,7 @@ export const useSearchStore = defineStore("spSearch", () => {
     const url = window.Vue.ref("");
     const {
         execute,
-        data: results,
+        data,
         isFetching: isSearching, // to notify of searching
         error: hasLoadError, // to notify of a search error
     } = useFetch(url, { immediate: false }).get().json();
@@ -36,7 +36,7 @@ export const useSearchStore = defineStore("spSearch", () => {
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
         await execute();
-        useResultsStore().setFirstResults((results.value as Results).data);
+        useResultsStore().setFirstResults((data.value as Results).data);
     }
 
     /**
