@@ -99,7 +99,7 @@
             let learnosityData = {};
             let schoolboxData = {};
 
-            $.each(attemptScores, function(index, element) {
+            $.each(attemptScores, function (index, element) {
                 let customIdentifier = 'sb-custom__' + index;
 
                 learnosityData[index] = parseInt($('#' + customIdentifier).val());
@@ -112,14 +112,20 @@
             payload.append('schoolbox', JSON.stringify(schoolboxData));
 
             /* Send it
+             * Both urls are required otherwise this snaps. You could perhaps convert this
+             * to something synchronous, or manage the piece differently
              */
             {% set postFeedbackUrl = routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnosityReference: attempt.learnosityReference}) %}
+            {% set introUrl = routeLookupIfAuthorized('learnosity.getIntro', {assessmentId: assessment.id, studentId: attempt.user.id}) %}
+
+            {% if postFeedbackUrl and introUrl %}
             fetch('{{ postFeedbackUrl }}', {
                 method: 'POST',
                 body: payload
             }).then(response => {
-                console.log(response)
+                window.location.href = '{{ introUrl }}';
             });
+            {% endif %}
         });
     });
 </script>
