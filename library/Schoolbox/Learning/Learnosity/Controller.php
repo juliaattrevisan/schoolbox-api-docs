@@ -511,12 +511,15 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $postData = $this->request->post->getArrayCopy();
-
         /* Updated marks given by our teacher,
          * including attempt-based commentary
          */
-        $learnosityData = $postData;
+        $postData = $this->request->post->getArrayCopy();
+
+        /* We will need this later
+         */
+        $attemptComment = $postData['attempt-comment'];
+        unset($postData['attempt-comment']);
 
         /* These are the scores they obtained for the one session we chose
          * (It'll still come to us as an array of sessions though)
@@ -539,7 +542,7 @@ class Controller extends Base
             $responseId = $response['response_id'];
 
             $updatedResponse = $response;
-            $updatedResponse['score'] = $learnosityData[$responseId];
+            $updatedResponse['score'] = $postData[$responseId];
 
             $responseData[] = $updatedResponse;
         }
@@ -566,30 +569,45 @@ class Controller extends Base
         ]);
 
         /* Get the new result back from learnosity
-         * TODO This occurs too quickly. We refetch the session score before
+         *
+         * FIXME This occurs too quickly. We refetch the session score before
          *  Learnosity had a chance to finish updating it, so we always get
          *  the old value back.
+         *
+            $result = $this->api->dataGetRequest('/sessions/scores', [
+                'session_id' => [
+                    $attempt->getLearnosityReference()
+                ]
+            ]);
          */
-        $result = $this->api->dataGetRequest('/sessions/scores', [
-            'session_id' => [
-                $attempt->getLearnosityReference()
-            ]
-        ]);
 
-        $mark = $result['data'][0]['score'];
-        $maxMark = $result['data'][0]['max_score'];
+        /* FIXME Instead of asking learnosity how it tallied everything, we can
+         *  just...do it ourselves, I guess, and sort-of delete this problem
+         *  We knew the max_mark from the attempt table, so it could potentially
+         *  desync from what Learnosity knows.
+         */
+        $mark = array_sum(array_values($postData));
+        $maxMark = $attempt->getMaxMark();
         $normalisedMark = 100 * $mark/$maxMark;
 
         /* Save the comment and new normalised mark
          */
-        $schoolboxData = json_decode($postData['schoolbox'], true);
-
-        $attempt->setComment($schoolboxData['attemptComment'])
+        $attempt->setComment($attemptComment)
             ->setMark($mark)
             ->setMaxMark($maxMark)
             ->setNormalisedMark($normalisedMark);
 
         $this->attemptMapper->save($attempt);
+
+        /* TODO Redirect back to the index screen for now
+         *  but probably need a returnUrl
+         */
+        $redirect = $this->router->getGenerator()->generate('learnosity.getIntro', [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $student->getId()
+        ]);
+
+        $this->response->redirect->to($redirect);
     }
 
 
