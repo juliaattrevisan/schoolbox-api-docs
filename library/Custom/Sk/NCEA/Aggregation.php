@@ -85,7 +85,8 @@ class Aggregation
         foreach ($allRecords as $current) {
             $subjectKey = $current['subjectSort'];
             $levelKey = "L{$current['nceaLevel']}";
-            $gradeKey = str_replace('+', '', $current['grade']);
+            // taking the first letter as the grade key
+            $gradeKey = substr($current['grade'], 0, 1);
 
             /* Data for Graph: only care about the achievements listed in $this->achievements
              * All others are ignored
