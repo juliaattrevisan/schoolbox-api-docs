@@ -13,9 +13,17 @@
             </ul>
         </div>
     </div>
-    <nav>
-        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
-    </nav>
+    <div class="sb-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
+        <div class="checklist rubric-checklist">
+            <input type="checkbox" id="show-drafts">
+            <label for="show-drafts">
+                Show Drafts
+            </label>
+        </div>
+        <nav class="sb-nav-actions">
+            <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
+        </nav>
+    </div>
 </div>
 
 <div class="row">
@@ -54,10 +62,17 @@
                         {% if dueWork.useRubric %}
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
-                                    {% set mark = marks[participant.id][id] ?? null %}
+                                    {% set markLatest = marks[participant.id][id]['latest'] ?? null %}
+                                    {% set mark = marks[participant.id][id]['published'] ?? null %}
                                     <td class="markdown">
+                                        <div data-actual-mark>
                                         {{ (mark.descriptor.description ?? '') | markdown }}
                                         <p>{{ mark.value ?? '' }}</p>
+                                        </div>
+                                        <div data-draft-mark>
+                                        {{ (markLatest.descriptor.description ?? '') | markdown }}
+                                        <p>{{ markLatest.value ?? '' }}</p>
+                                        </div>
                                     </td>
                                 {% endfor %}
                             {% endfor %}

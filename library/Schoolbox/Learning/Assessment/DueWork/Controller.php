@@ -592,21 +592,32 @@ class Controller extends Assessment\Controller
         $marks = [];
 
         foreach ($participants as $participant) {
-            $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
-            if (!$feedback) {
+            $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+            $publishedFeedback = $latestFeedback;
+            if (!$latestFeedback) {
                 continue;
+            }
+            // if this feedback is a draft, we need to check if there is published feedback...
+            if ($latestFeedback->isDraft()) {
+                $publishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
             }
 
             try {
-                $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                $markedGridLatest = $this->rubricMapper->retrieveMarkedGrid($latestFeedback);
+                $markedGridPublished = $this->rubricMapper->retrieveMarkedGrid($publishedFeedback);
             } catch (MapperException) {
                 // can't really do anything
                 continue;
             }
             $studentId = $participant->getUser()->getId();
-            foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+            foreach ($markedGridPublished->getCapabilityMarks() as $capabilityMark) {
                 foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()] = $indicatorMark;
+                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
+                }
+            }
+            foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
+                foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
                 }
             }
         }
