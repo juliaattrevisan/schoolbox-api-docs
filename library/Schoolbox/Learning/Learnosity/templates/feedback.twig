@@ -19,7 +19,7 @@
          # issue, plus, the one in chrome where you can't see the async response
          #}
         {% set postFeedbackUrl = routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnosityReference: attempt.learnosityReference}) %}
-        <form action="{{ postFeedbackUrl }}" method="post">
+        <form id="feedback-form" action="{{ postFeedbackUrl }}" method="post">
             <section class="content">
                 <div id="schoolbox-student"></div>
             </section>
@@ -40,10 +40,7 @@
                     });
                 </script>
             </section>
-            <input id='finalise' type="submit" value="Finalise marks" />
         </form>
-
-
     </div>
 </div>
 
@@ -94,6 +91,10 @@
                         '');
                     });
                 });
+
+                /* Provide call to action when ready
+                 */
+                $('#feedback-form').append('<input type="submit" value="Finalise marks" />');
             });
         }
     }
