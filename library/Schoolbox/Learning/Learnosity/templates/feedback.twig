@@ -12,27 +12,38 @@
 <div class="row">
     <div class="small-12 island">
         <h1>Feedback for {{ assessment.title }}</h1>
-        <section class="content">
-            <div id="schoolbox-student"></div>
-        </section>
-        <section class="content">
-            <label>Overall Comment</label>
-            <textarea id="attempt-feedback">{{ attempt.comment }}</textarea>
-            <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+        {# Send synchronously
+         # Learnosity does this weird caching behaviour where it remembers old
+         # scores for a short time, forcing you to refresh manually, which isn't nice
+         # Making this form synchronous and redirecting elsewere solves this random
+         # issue, plus, the one in chrome where you can't see the async response
+         #}
+        {% set postFeedbackUrl = routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnosityReference: attempt.learnosityReference}) %}
+        <form action="{{ postFeedbackUrl }}" method="post">
+            <section class="content">
+                <div id="schoolbox-student"></div>
+            </section>
+            <section class="content">
+                <label>Overall Comment</label>
+                <textarea id="attempt-comment" name="attempt-comment">{{ attempt.comment }}</textarea>
+                <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
-            <script>
-                $(function() {
-                    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-                        detail: {
-                            targetElements: ['#attempt-feedback'],
-                            toolbar: "simple",
-                            addToToolbar: ["|", "blank"],
-                        }
-                    }));
-                });
-            </script>
-        </section>
-        <input id='finalise' type="submit" value="Finalise marks" />
+                <script>
+                    $(function() {
+                        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                            detail: {
+                                targetElements: ['#attempt-comment'],
+                                toolbar: "simple",
+                                addToToolbar: ["|", "blank"],
+                            }
+                        }));
+                    });
+                </script>
+            </section>
+            <input id='finalise' type="submit" value="Finalise marks" />
+        </form>
+
+
     </div>
 </div>
 
@@ -65,7 +76,6 @@
                          */
                         let learnosityReference = element.metadata.sheet_reference;
                         let learnosityReferenceTuple = element.response_id;
-                        let customIdentifier = 'sb-custom__' + learnosityReferenceTuple;
 
                         /* Student scoring and metadata
                          */
@@ -79,7 +89,7 @@
                         container.append('' +
                             '<div class="sb-custom-score">' +
                                 '<label>Customise score</label>' +
-                                '<input id="' + customIdentifier + '" type="number" value="' + score + '">' +
+                                '<input name="' + learnosityReferenceTuple + '" type="number" value="' + score + '">' +
                             '</div>' +
                         '');
                     });
@@ -91,47 +101,4 @@
     let reportsApp = LearnosityReports.init(
         {{ reportInitOptions | raw }}, reportCallback
     );
-
-    $(function() {
-        /* Collate and pump customisations back into Learnosity
-         */
-        $('#finalise').on('click', function(event) {
-            let learnosityData = {};
-            let schoolboxData = {};
-
-            $.each(attemptScores, function (index, element) {
-                let customIdentifier = 'sb-custom__' + index;
-
-                learnosityData[index] = parseInt($('#' + customIdentifier).val());
-            });
-
-            schoolboxData.attemptComment = window.sbProps.editors['attempt-feedback'].getData();
-
-            let payload = new FormData();
-            payload.append('learnosity', JSON.stringify(learnosityData));
-            payload.append('schoolbox', JSON.stringify(schoolboxData));
-
-            /* Send it
-             * Both urls are required otherwise this snaps. You could perhaps convert this
-             * to something synchronous, or manage the piece differently
-             */
-            {% set postFeedbackUrl = routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnosityReference: attempt.learnosityReference}) %}
-            {% set introUrl = routeLookupIfAuthorized('learnosity.getIntro', {assessmentId: assessment.id, studentId: attempt.user.id}) %}
-
-            {% if postFeedbackUrl and introUrl %}
-            fetch('{{ postFeedbackUrl }}', {
-                method: 'POST',
-                body: payload
-            }).then(response => {
-                window.location.href = '{{ introUrl }}';
-            });
-            {% endif %}
-        });
-    });
 </script>
-
-
-{#<form action="{{ postFeedbackUrl }}" method="post">#}
-{#    <input type="text" name='zac' value="hablurk" />#}
-{#    <input type="submit" />#}
-{#</form>#}

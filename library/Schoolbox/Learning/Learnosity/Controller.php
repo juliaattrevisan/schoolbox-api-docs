@@ -513,8 +513,17 @@ class Controller extends Base
     ): void {
         $postData = $this->request->post->getArrayCopy();
 
+        /* Updated marks given by our teacher,
+         * including attempt-based commentary
+         */
+        $learnosityData = $postData;
+
         /* These are the scores they obtained for the one session we chose
          * (It'll still come to us as an array of sessions though)
+         *
+         * Learnosity requires multiple fields to update values so you
+         * might as well refetch it all at this point so we can send it
+         * to them in the format it wants
          */
         $responses = $this->api->dataGetRequest('sessions/responses/scores', [
             'session_id' => [
@@ -522,15 +531,13 @@ class Controller extends Base
             ]
         ])['data'][0]['responses'];
 
-        /* Updated marks given by our teacher,
-         * including attempt-based commentary
+        /* Re-collate updated response data
          */
-        $learnosityData = json_decode($postData['learnosity'], true);
-
         $responseData = [];
 
         foreach ($responses as $response) {
             $responseId = $response['response_id'];
+
             $updatedResponse = $response;
             $updatedResponse['score'] = $learnosityData[$responseId];
 
@@ -559,6 +566,9 @@ class Controller extends Base
         ]);
 
         /* Get the new result back from learnosity
+         * TODO This occurs too quickly. We refetch the session score before
+         *  Learnosity had a chance to finish updating it, so we always get
+         *  the old value back.
          */
         $result = $this->api->dataGetRequest('/sessions/scores', [
             'session_id' => [
