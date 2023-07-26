@@ -36,6 +36,13 @@ use UnexpectedValueException;
 class Profile implements IStrategy
 {
     /**
+     * Used in the profile category field to identify teacher or employee users coming from iSAMS into the staff table
+     */
+    public const EMPLOYEE = 'employee';
+    public const TEACHER = 'teacher';
+
+
+    /**
      * Maximum number of chars that a position_title can be
      * In iSAMS this is an aggregation of all the Roles assigned
      * to a guy. We had precedent for a school giving a dummy
@@ -1069,10 +1076,16 @@ class Profile implements IStrategy
                 $campusName = trim((string)$staff->Divisions->Division[0]->Name);
             }
 
+            /**
+             * Staff can be teachers or employees... set that here
+             * The TeachingStaff is a `Bit` `1/0` This Specifies whether this staff member is a teaching member of the staff
+             */
+            $category = '0' === trim((string)$staff->TeachingStaff) ? self::EMPLOYEE : self::TEACHER;
+
             $staffProfile
                 ->setBuilding(null)
                 ->setCampusName($campusName)
-                ->setCategory(null)
+                ->setCategory($category)
                 ->setDepartment(null)
                 ->setEmail(trim((string)$staff->SchoolEmailAddress))
                 ->setPhone(trim((string)$staff->SchoolMobileNumber))
