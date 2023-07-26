@@ -185,6 +185,8 @@ NULLTYPE;
         $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist, $validStrats);
 
         $randomMapper = UserMapper::getInstance();
+
+        // Queries should not be time-limited here
         $randomMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
 
         $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
