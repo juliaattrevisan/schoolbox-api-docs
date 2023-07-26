@@ -335,6 +335,20 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Re-derive the normalised mark from $this->>getMark()
+     * and $this->>getMaxMark(), saving you manually calculating
+     * this percentage everywhere else
+     *
+     * @return self
+     */
+    public function refreshNormalisedMark(): self
+    {
+        $this->setNormalisedMark(100 * $this->getMark()/$this->getMaxMark());
+        return $this;
+    }
+
+
+    /**
      * The total mark value of this attempt which has been graded
      * the total available marks the user could have received.
      *
