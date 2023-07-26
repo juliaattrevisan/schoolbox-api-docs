@@ -931,7 +931,7 @@ class Profile implements IStrategy
                 $number = substr($number, 0, self::PHONE_DB_LIMIT);
                 /* Log it
                  */
-                $this->log->info(sprintf(
+                $this->log->warning(sprintf(
                     'Parent profile for %s. phone number exceeds the %s char limit. Truncated...',
                     $fullname,
                     self::PHONE_DB_LIMIT
