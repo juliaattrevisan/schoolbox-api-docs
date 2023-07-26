@@ -39,7 +39,8 @@
 /var/log/schoolbox/*/turnitin.log
 /var/log/schoolbox/*/docman.log
 /var/log/schoolbox/*/transcode.log
-/var/log/schoolbox/*/image-processor.log {
+/var/log/schoolbox/*/image-processor.log
+/var/log/schoolbox/*/reload-relations.log {
     monthly
     missingok
     rotate 6
