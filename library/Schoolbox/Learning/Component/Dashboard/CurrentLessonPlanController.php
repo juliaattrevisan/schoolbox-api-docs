@@ -7,6 +7,7 @@ use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Collection;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
@@ -59,31 +60,8 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 
         $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
-        /** @var IConnector $database */
-        $database = $this->getSitePage()->getDi()->get('databaseInternal');
-        $pb          = $database
-            ->buildPredicateBuilder('')
-            ->betweenDates('assessment.due_date', $dateStart, $dateEnd)
-            ->in('mv_assessment_relation.folder_id', $student->getSubjectCollection()->getIds());
-
-        // set visibility check to be student for student...
-        if ($this->getUser()->getRole()->isStudent()) {
-            $pb->equals('lesson_plan.visibility', 'student');
-        }
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $query       = "
-            SELECT * FROM assessment
-            JOIN lesson_plan ON (assessment.id = lesson_plan.assessment_id)
-            JOIN mv_assessment_relation on assessment.id = mv_assessment_relation.assessment_id
-            WHERE {$whereClause}
-            ";
-        $statement   = $database->executeQuery($query, $pb->getParams());
-
-        $assessmentIds = [];
-        while ($row = $statement->fetch()) {
-            $assessmentIds[] = $row['assessment_id'];
-        }
-
+        $lessonPlanMapper = Mapper::getInstance();
+        $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $student->getRole()->isStudent());
         $plans = $assessmentDataSource->findAllByIds($assessmentIds);
 
         /** @var LessonPlanModel $lessonPlan **/
