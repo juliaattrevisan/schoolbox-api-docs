@@ -39,12 +39,18 @@ class MyFolder extends DeprecatedModel
      */
     public function getFolderList($parent = 0)
     {
-        $fields = [
-            'owner'  => $this->owner,
-            'parent' => $parent,
+        $quoter = $this->db->getQuoter();
+        $params = [
+            $_SESSION['id'],
+            $parent
         ];
-
-        return $this->getByArray($fields);
+        $query = "SELECT * FROM `myFolder`
+         WHERE
+            `owner` = ?
+            AND `parent` = ?
+            AND `deleted_at` is null
+        ";
+        return $this->db->query($query, $params)->fetchAll();
     }
 
 
