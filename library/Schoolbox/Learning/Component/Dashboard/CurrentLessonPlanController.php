@@ -2,16 +2,9 @@
 
 namespace Schoolbox\Learning\Component\Dashboard;
 
-use Alaress\Database\Connector\IConnector;
 use Component_Dashboard_ControllerAbstract;
-use Schoolbox\Collection;
-use Schoolbox\External\SubjectCollection;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
-use Schoolbox\Learning\Assessment\Visibility;
 
 class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 {
@@ -59,7 +52,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
 
         $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
-        $lessonPlanMapper = Mapper::getInstance();
+        $lessonPlanMapper = LessonPlanMapper::getInstance();
 
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $student->getRole()->isStudent());

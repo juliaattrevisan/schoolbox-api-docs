@@ -2,17 +2,10 @@
 
 namespace Schoolbox\Learning\Component\Homepage;
 
-use Alaress\Database\Connector\IConnector;
 use Component_Homepage_ControllerAbstract;
-use Schoolbox\Collection;
-use Schoolbox\External\SubjectCollection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
-use Schoolbox\Learning\Assessment\Visibility;
 
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
@@ -65,6 +58,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $student->getRole()->isStudent());
         // hydrate those assessments
+        $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
         $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
 
         return true;
