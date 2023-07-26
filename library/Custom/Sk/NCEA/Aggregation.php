@@ -12,7 +12,6 @@ namespace Custom\Sk\NCEA;
 
 class Aggregation
 {
-
     /**
      * @var array
      */
