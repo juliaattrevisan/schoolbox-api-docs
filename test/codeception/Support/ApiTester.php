@@ -49,5 +49,7 @@ class ApiTester extends \Codeception\Actor
         $this->comment("Log in as {$user->getUsername()} ({$user->getId()})");
         $token = $this->getToken($user->getId());
         $this->amBearerAuthenticated($token);
+        $this->haveHttpHeader('Accept', 'application/json');
+        $this->haveHttpHeader('X-Requested-With', 'xmlhttprequest');
     }
 }
