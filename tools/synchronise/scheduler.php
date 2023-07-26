@@ -144,6 +144,9 @@ HELP;
          */
         $randomMapper = UserMapper::getInstance();
 
+        // Queries should not be time-limited here
+        $randomMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
+
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
          */
