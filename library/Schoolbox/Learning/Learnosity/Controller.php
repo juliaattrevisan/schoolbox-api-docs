@@ -538,7 +538,13 @@ class Controller extends Base
         }
 
         /* Post back to learnosity
-         * TODO work out persistence issue
+         * When the learnosity ui reloads again, it'll still be remembering
+         * all the old scores. You have to wait for it to reload, then hit
+         * F5 to get the new updated values to appear. That's what happens
+         * if you just rely on window.location.reload() in frontend.
+         *
+         * Instead, redirect people to a whole other screen afterwards to
+         * artificially force this behaviour
          */
         $this->api->dataUpdateRequest('/sessions/responses/scores', [
             'sessions' => [
