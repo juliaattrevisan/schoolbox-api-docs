@@ -43,14 +43,6 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
      */
     public function execute(): bool
     {
-
-        $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
-
-        $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
-        $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
-
-        $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
-
         $student = $this->getUser();
 
         /**
@@ -60,6 +52,13 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         if ($student->getRole()->isParent()) {
             return false;
         }
+
+        $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
+
+        $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
+        $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
+
+        $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
         /** @var IConnector $database */
         $database = $this->getSitePage()->getDi()->get('databaseInternal');
