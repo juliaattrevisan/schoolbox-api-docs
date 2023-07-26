@@ -260,27 +260,28 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * Get all lesson plans for a list of folders
+     * Get all lesson plans from a list of folders
      * between specified dates
      * and ensuring we are only returning lesson plans that are visible to the user
      *
      * @param array                $folderIDs list of folders to gather all lesson plans from within
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param bool                 $studentOnly should we return only student visible plans? or all plans?
+     * @param bool                 $allowStudents should we return only student visible plans? or all plans?
      * @return array<int> array of the assessment ID's for the lesson plans
      */
-    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, bool $studentOnly = false): array
+    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, bool $allowStudents = false): array
     {
-        $pb          = $this->getDatabase()
+        $pb = $this->getDatabase()
             ->buildPredicateBuilder('')
             ->betweenDates('assessment.due_date', $startDate, $endDate)
             ->in('mv_assessment_relation.folder_id', $folderIDs);
 
-        // set visibility check to be student for student...
-        if ($studentOnly) {
+        // Are we limiting to lesson plans visible to students? or staff only?
+        if ($allowStudents) {
             $pb->equals('lesson_plan.visibility', 'student');
         }
+
         $whereClause = implode(' AND ', $pb->getWhere());
         $query       = "
             SELECT * FROM assessment
@@ -290,11 +291,7 @@ class Mapper extends \Schoolbox\Mapper
             ";
         $statement   = $this->getDatabase()->executeQuery($query, $pb->getParams());
 
-        $assessmentIds = [];
-        while ($row = $statement->fetch()) {
-            $assessmentIds[] = $row['assessment_id'];
-        }
-
-        return $assessmentIds;
+        // Return only the assessment ID's
+        return $statement->fetchColumnArray('assessment_id');
     }
 }
