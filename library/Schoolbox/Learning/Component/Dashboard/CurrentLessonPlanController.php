@@ -22,19 +22,14 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
      *
      * @var int
      */
-    private $range;
+    private int $range;
 
     /**
-     * The upcoming Quiz + DueWork that are visible to this Student
+     * The lesson plans visible to the user
      *
      * @var array
      */
     private array $visibleLessonPlans = [];
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentDataSource;
 
     /**
      * Business logic to collate data ready for output
@@ -53,7 +48,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
         $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
 
-        $this->assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
+        $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
         $student = $this->getUser();
 
@@ -90,7 +85,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
             $assessmentIds[] = $row['assessment_id'];
         }
 
-        $plans = $this->assessmentDataSource->findAllByIds($assessmentIds);
+        $plans = $assessmentDataSource->findAllByIds($assessmentIds);
 
         /** @var LessonPlanModel $lessonPlan **/
         foreach ($plans as $lessonPlan) {
