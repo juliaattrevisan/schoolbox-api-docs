@@ -90,27 +90,8 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             $assessmentIds[] = $row['assessment_id'];
         }
 
-        $plans = $this->assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
+        $this->visibleLessonPlans = $this->assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
 
-        /** @var LessonPlanModel $lessonPlan **/
-        foreach ($plans as $lessonPlan) {
-            // are all fields visible?
-            $allHidden = true;
-            /** @var LessonPlanFieldModel $field */
-            foreach ($lessonPlan->getFields() as $field) {
-                if ('student' === $field->getVisibility()) {
-                    // if the field is visible, then we should show the lesson plan
-                    $allHidden = false;
-                }
-            }
-            if ($allHidden) {
-                // all fields are hidden, don't show this lesson plan
-                continue;
-            }
-
-            //build array
-            $this->visibleLessonPlans[] = $lessonPlan;
-        }
         return true;
     }
 
