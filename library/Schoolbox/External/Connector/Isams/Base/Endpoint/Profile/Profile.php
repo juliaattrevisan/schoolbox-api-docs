@@ -919,9 +919,22 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($parentBaseProfile);
             }
 
+            /**
+             * phone numbers can exceed the 45 char limit...
+             */
+            $number = trim((string)$parent->Telephone);
+            if (45 <= mb_strlen($number)) {
+                $number = substr($number, 0, 45);
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Parent profile for %s. phone number exceeds the 45 char limit. Truncated...',
+                    $fullname
+                ));
+            }
             $parentProfile
-                ->setPhoneHome(trim((string)$parent->Telephone))
-                ->setPhoneWork(trim((string)$parent->Telephone))
+                ->setPhoneHome($number)
+                ->setPhoneWork($number)
                 ->setMobile(trim((string)$parent->Mobile))
                 ->setEmail(trim((string)$parent->EmailAddress))
                 ->setUsername($username);
