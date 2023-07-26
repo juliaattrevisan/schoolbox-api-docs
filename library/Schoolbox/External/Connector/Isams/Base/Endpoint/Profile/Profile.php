@@ -41,6 +41,10 @@ class Profile implements IStrategy
     public const EMPLOYEE = 'employee';
     public const TEACHER = 'teacher';
 
+    /**
+     * Phone number db limit
+     */
+    public const PHONE_DB_LIMIT = 45;
 
     /**
      * Maximum number of chars that a position_title can be
@@ -923,13 +927,14 @@ class Profile implements IStrategy
              * phone numbers can exceed the 45 char limit...
              */
             $number = trim((string)$parent->Telephone);
-            if (45 <= mb_strlen($number)) {
-                $number = substr($number, 0, 45);
+            if (self::PHONE_DB_LIMIT <= mb_strlen($number)) {
+                $number = substr($number, 0, self::PHONE_DB_LIMIT);
                 /* Log it
                  */
                 $this->log->info(sprintf(
-                    'Parent profile for %s. phone number exceeds the 45 char limit. Truncated...',
-                    $fullname
+                    'Parent profile for %s. phone number exceeds the %s char limit. Truncated...',
+                    $fullname,
+                    self::PHONE_DB_LIMIT
                 ));
             }
             $parentProfile
