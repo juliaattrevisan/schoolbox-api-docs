@@ -70,6 +70,7 @@ class Module extends BaseModule
             $this->injector->get('redis.storage'),
             $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\External\ClassEntryMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
         );
     }
 
