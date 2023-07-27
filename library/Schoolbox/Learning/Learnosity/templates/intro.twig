@@ -42,6 +42,7 @@
                     <th>Finish</th>
                     <th>Time Taken</th>
                     <th>Reviewed</th>
+                    <th>Reviewer</th>
                     <th>Grade</th>
                     <th>&nbsp;</th>
                 </tr>
@@ -68,6 +69,13 @@
                     <td>
                         {% if attempt.reviewed %}
                             {{ markVisible.showIfVisible(assessment, attempt.reviewed.short, '—' ) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if attempt.reviewed %}
+                            <a href="/search/user/{{ attempt.reviewer.id }}">{{ attempt.reviewer.fullname }}</a>
                         {% else %}
                             —
                         {% endif %}
