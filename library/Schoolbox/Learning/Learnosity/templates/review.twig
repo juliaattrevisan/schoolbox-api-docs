@@ -1,3 +1,13 @@
+{##
+ # Student reviews their attempt, with teacher feedback if such exists
+ #
+ # @param string|array $reportInitOptions  Learnosity API initialisation object
+ # @param IAssessable $assessment          Our schoolbgox quiz instance
+ # @param Attempt\Model $attempt           The student's attempt from our local db
+ # @param array $scores                    A list of score tuples obtained per question in this attempt
+ # @param array $comments                  A list of comment tuples that contain per-question comments
+ # @param string $returnUrl                A redirect destination we remembered from some previous place
+ #}
 <script src="https://reports.learnosity.com/?v2023.2.LTS"></script>
 
 <div class="row">
@@ -6,7 +16,7 @@
 
         <h2 class="subheader">Response breakdown</h2>
         <section class="content">
-            <div id="schoolbox-result-2"></div>
+            <div id="schoolbox-student"></div>
         </section>
 
         {% if returnUrl %}
@@ -16,7 +26,51 @@
 </div>
 
 <script>
-    let reportsApp = LearnosityReports.init(
-        {{ initOptions | raw }}
-    );
+    {# Show a different report style if feedback was given
+     # This uses a whole different payload compared to the
+     # one where there was no feedback
+     #}
+    {% if attempt.reviewed %}
+        let attemptComments = JSON.parse('{{ comments|raw }}');
+
+        let reportCallback = {
+            readyListener: function() {
+                let attemptReport = reportsApp.getReport('schoolbox-student');
+
+                /* itemsApi only spawns if you used session-detail-by-item
+                 */
+                attemptReport.on('ready:itemsApi', function(itemsApp) {
+                    window.itemsApp = itemsApp;
+
+                    itemsApp.getQuestions(function(questions) {
+                        $.each(questions, function(index, element) {
+                            /* Access different parts of the dom directly, to place
+                             * our input fields etc.
+                             */
+                            let learnosityReference = element.metadata.sheet_reference;
+                            let learnosityReferenceTuple = element.response_id;
+
+                            /* Containers into which we inject things
+                             */
+                            let container = $('[data-reference="' + learnosityReference + '"]');
+
+                            container.append('' +
+                                '<div class="alert-box highlight">' +
+                                    '<article>' + attemptComments[learnosityReferenceTuple] + '</article>' +
+                                '</div>' +
+                            '');
+                        });
+                    });
+                });
+            }
+        }
+
+        let reportsApp = LearnosityReports.init(
+            {{ initOptions | raw }}, reportCallback
+        );
+    {% else %}
+        let reportsApp = LearnosityReports.init(
+            {{ initOptions | raw }}
+        );
+    {% endif %}
 </script>

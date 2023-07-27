@@ -393,33 +393,52 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $payload = [
-            'user_id' => (string)$attempt->getUser()->getId(),
-            'reports' => [
-                [
-                    /* DOM element id, where this goes in
-                     *
-                     * It's configurable by us, unlike the other anchors for
-                     * Author and Items api
-                     */
-                    'id' => 'schoolbox-result-2',
-                    'type' => 'session-detail-by-question',
-                    'session_id' => $attempt->getLearnosityReference(),
-                    'questions_api_init_options' => [
-                        'showCorrectAnswers' => false
-                    ]
-                ]
-            ],
-        ];
-
-        /* If there's a feedback for this attempt, get it
-         * and show the student. At the moment it's just
-         * commentary.
-         */
-        $comments = null;
-
         if (null !== $attempt->getReviewed()) {
+            $payload = [
+                'user_id' => (string)$attempt->getUser()->getId(),
+                'reports' => [
+                    [
+                        /* DOM element id, where this goes in
+                         *
+                         * It's configurable by us, unlike the other anchors for
+                         * Author and Items api
+                         */
+                        'id' => 'schoolbox-student',
+                        'type' => 'session-detail-by-item',
+                        'session_id' => $attempt->getLearnosityReference(),
+                        'questions_api_init_options' => [
+                            'showCorrectAnswers' => false
+                        ]
+                    ]
+                ],
+            ];
+
+            /* If there's a feedback for this attempt, get it
+             * and show the student. At the moment it's just
+             * commentary.
+             */
             $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
+        } else {
+            $payload = [
+                'user_id' => (string)$attempt->getUser()->getId(),
+                'reports' => [
+                    [
+                        /* DOM element id, where this goes in
+                         *
+                         * It's configurable by us, unlike the other anchors for
+                         * Author and Items api
+                         */
+                        'id' => 'schoolbox-student',
+                        'type' => 'session-detail-by-question',
+                        'session_id' => $attempt->getLearnosityReference(),
+                        'questions_api_init_options' => [
+                            'showCorrectAnswers' => false
+                        ]
+                    ]
+                ],
+            ];
+
+            $comments = [];
         }
 
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
