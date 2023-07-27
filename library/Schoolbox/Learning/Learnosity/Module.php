@@ -99,6 +99,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
 
+        /* Livestream
+         */
+        $this->register('GET', '/{assessmentId}/stream', 'getLiveProgress', $instructorPerms, $preloadAssessment);
+
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);

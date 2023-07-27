@@ -244,6 +244,9 @@ class Controller extends Base
                 "title"         => $assessment->getTitle(),
                 "subtitle"      => ''
             ],
+            /* Enable livestreaming lol
+             */
+            'events' => true,
             /* This is our Quiz title, I guess
              */
             'name'                 => $assessment->getTitle(),
@@ -686,6 +689,58 @@ class Controller extends Base
         ]);
 
         $this->response->redirect->to($redirect);
+    }
+
+
+    /**
+     * Live Progress monitor thing for a quiz
+     *
+     * Be sure to hit like and subscribe
+     * It really helps us out a lot
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function getLiveProgress(IAssessable $assessment): void
+    {
+        $users = [];
+
+        foreach ($assessment->getParticipantUsers() as $user) {
+            $users[] = [
+                'id' => $user->getId(),
+                'name' => $user->getFullName(),
+                'hash' => hash('sha256', $user->getId() . $this->learnosityConsumerSecret)
+            ];
+        }
+
+        $payload = [
+            'reports' => [
+                [
+                    'id' => 'live-progress',
+                    'type' => 'live-activitystatus-by-user',
+                    'activity' => [
+                        'id' => $assessment->getLearnosityReference(),
+                        'name' => $assessment->getTitle(),
+                    ],
+                    'show_user_selectors' => true,
+                    'show_action_controls' => true,
+                    'display_activity' => true,
+                    'users' => $users
+                ]
+            ]
+        ];
+
+        new \Alaress_Probe($payload);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/stream.twig', [
+            'initOptions' => $this->api->initOptions('reports', $payload),
+            'assessment' => $assessment,
+        ])->setTitle(sprintf(
+             'Livestream for %s',
+             $assessment->getTitle()
+        )));
     }
 
 

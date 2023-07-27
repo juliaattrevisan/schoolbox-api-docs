@@ -1,0 +1,15 @@
+<script src="https://reports.learnosity.com/?v2023.2.LTS"></script>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div id="live-progress"></div>
+        </section>
+    </div>
+</div>
+
+<script>
+    let reportsApp = LearnosityReports.init(
+        {{ initOptions | raw }}
+    );
+</script>
