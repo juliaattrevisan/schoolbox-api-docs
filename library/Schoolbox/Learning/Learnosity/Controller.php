@@ -567,6 +567,8 @@ class Controller extends Base
         $attempt->setComment(trim($postData['attempt-comment']))
             ->setMark($mark)
             ->setMaxMark($maxMark)
+            ->setReviewer($this->getUser())
+            ->setReviewed(\Alaress_Date_Format::now())
             ->refreshNormalisedMark();
 
         $this->attemptMapper->save($attempt);
