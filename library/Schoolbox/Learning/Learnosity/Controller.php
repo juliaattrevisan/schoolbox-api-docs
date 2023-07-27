@@ -515,12 +515,44 @@ class Controller extends Base
          */
         $postData = $this->request->post->getArrayCopy();
 
-        /* We will need this later
+        /* $postData is a structured array containing all the feedback info
+         * Some of it goes back into learnosity; some is saved locally
+         *
+         * $postData = [
+         *     'scores' => [
+                   '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 2
+         *     ],
+         *     'comments' => [
+         *         '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 'my comment'
+         *     ],
+         *     'attempt-comment' => 'you did a good job, now back to sleep'
+         * ]
          */
-        $attemptComment = $postData['attempt-comment'];
-        unset($postData['attempt-comment']);
 
-        /* These are the scores they obtained for the one session we chose
+        /* FIXME Instead of asking learnosity how it tallied everything, we can
+         *  just...do it ourselves, I guess, and sort-of delete this problem
+         *  We knew the max_mark from the attempt table, so it could potentially
+         *  desync from what Learnosity knows.
+         */
+        $mark = array_sum(array_values($postData));
+        $maxMark = $attempt->getMaxMark();
+
+        /* Save the comment and new normalised mark
+         */
+        $attempt->setComment(trim($postData['attempt-comment']))
+            ->setMark($mark)
+            ->setMaxMark($maxMark)
+            ->refreshNormalisedMark();
+
+        $this->attemptMapper->save($attempt);
+
+        /* TODO Save per-question commentary here
+         */
+
+        /* Start preparing data payload for updating Learnosity
+         * This is so the updated scores appear in their interfaces
+         *
+         * These are the scores they obtained for the one session we chose
          * (It'll still come to us as an array of sessions though)
          *
          * Learnosity requires multiple fields to update values so you
@@ -541,7 +573,7 @@ class Controller extends Base
             $responseId = $response['response_id'];
 
             $updatedResponse = $response;
-            $updatedResponse['score'] = $postData[$responseId];
+            $updatedResponse['score'] = $postData['scores'][$responseId];
 
             $responseData[] = $updatedResponse;
         }
@@ -577,23 +609,6 @@ class Controller extends Base
                 ]
             ]);
          */
-
-        /* FIXME Instead of asking learnosity how it tallied everything, we can
-         *  just...do it ourselves, I guess, and sort-of delete this problem
-         *  We knew the max_mark from the attempt table, so it could potentially
-         *  desync from what Learnosity knows.
-         */
-        $mark = array_sum(array_values($postData));
-        $maxMark = $attempt->getMaxMark();
-
-        /* Save the comment and new normalised mark
-         */
-        $attempt->setComment($attemptComment)
-            ->setMark($mark)
-            ->setMaxMark($maxMark)
-            ->refreshNormalisedMark();
-
-        $this->attemptMapper->save($attempt);
 
         /* TODO Redirect back to the index screen for now
          *  but probably need a returnUrl

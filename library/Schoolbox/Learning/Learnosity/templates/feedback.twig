@@ -51,6 +51,7 @@
 
     .sb-custom-score label {
         font-weight: bold;
+        margin-top: 1rem;
     }
 </style>
 
@@ -86,7 +87,9 @@
                         container.append('' +
                             '<div class="sb-custom-score">' +
                                 '<label>Customise score</label>' +
-                                '<input name="' + learnosityReferenceTuple + '" type="number" value="' + score + '">' +
+                                '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
+                                '<label>Comment</label>' +
+                                '<textarea name="comments[' + learnosityReferenceTuple + ']"></textarea>' +
                             '</div>' +
                         '');
                     });
