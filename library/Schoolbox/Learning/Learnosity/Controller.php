@@ -574,7 +574,7 @@ class Controller extends Base
          *  We knew the max_mark from the attempt table, so it could potentially
          *  desync from what Learnosity knows.
          */
-        $mark = array_sum(array_values($postData));
+        $mark = array_sum(array_values($postData['scores']));
         $maxMark = $attempt->getMaxMark();
 
         /* Save the comment and new normalised mark
