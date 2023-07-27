@@ -31,12 +31,12 @@
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">
-            <table class="rb">
+            <table class="rb rb-report">
                 <tbody>
                     <tr>
                         <th rowspan="2" class="rb-group-name markdown"></th>
                         {% for group, criteria in headers %}
-                            <th colspan="{{ criteria | length }}">{{ group | markdown }}</th>
+                            <th colspan="{{ criteria | length }}" class="markdown">{{ group | markdown }}</th>
                         {% endfor %}
                     </tr>
                     <tr>

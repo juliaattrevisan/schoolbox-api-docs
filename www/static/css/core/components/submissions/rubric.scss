@@ -130,6 +130,11 @@ table.rb {
         border-right: solid 1px $body-bg;
         border-left: 0;
     }
+    tbody th:last-of-type,
+    thead th:first-of-type {
+        border-right: solid 2px $body-bg;
+        border-left: 0;
+    }
     td,
     th {
         border-left: 1px solid $body-bg;
@@ -283,6 +288,17 @@ table.rb {
     ::placeholder {
         color: gray;
         font-weight: normal;
+    }
+
+    /**
+     * Rubric Report specific configs...
+     */
+    &.rb-report {
+        tbody th:last-of-type,
+        thead th:first-of-type {
+            border-right: 0px;
+            border-left: solid 1px $body-bg;
+        }
     }
 }
 .rb-criterion {
