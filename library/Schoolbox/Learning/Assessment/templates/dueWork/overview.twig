@@ -49,8 +49,8 @@
                     {% for participant in participants %}
                     <tr>
                         <td>
-                            <div class="card wrap-down small-12 ">
-                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile">
+                            <div class="wrap-down small-12 ">
+                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="sb-flex sb-flex-col sb-flex-centre">
                                     {% include 'include/portrait.twig' with {user: participant, description: participant.fullName} only %}
                                     <p>{{ participant.fullname}}</p>
                                 </a>
