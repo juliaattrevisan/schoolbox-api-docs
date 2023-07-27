@@ -37,11 +37,6 @@ class Controller extends Base
     private Api $api;
 
 
-    /* TODO inject dep
-     */
-    private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper;
-
-
     /**
      * Controller constructor.
      */
@@ -50,7 +45,8 @@ class Controller extends Base
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
-        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -62,10 +58,6 @@ class Controller extends Base
             $this->learnosityConsumerSecret,
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
-
-        /* TODO inject dep
-         */
-        $this->feedbackMapper = \Schoolbox\Learning\Learnosity\Feedback\Mapper::getInstance();
     }
 
 

@@ -249,9 +249,10 @@ class Module extends BaseModule
         return new Controller(
             $this->getConfig()->get('learnosity_consumer_key'),
             $this->getConfig()->get('learnosity_consumer_secret'),
-            $this->getErrorMapper(),
-            $this->getQuizMapper(),
-            $this->getAttemptMapper()
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class),
         );
     }
 
@@ -282,16 +283,6 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
-    }
-
-
-    /**
-     * @return Mapper|\Schoolbox\Learning\Quiz\Mapper
-     * @throws InvalidArgumentException
-     */
-    protected function getQuizMapper()
-    {
-        return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class);
     }
 
 
