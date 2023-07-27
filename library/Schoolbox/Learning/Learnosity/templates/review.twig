@@ -19,6 +19,13 @@
             <div id="schoolbox-student"></div>
         </section>
 
+        {% if attempt.reviewed %}
+            <h2 class="subheader">Overall comments from {{ attempt.reviewer.fullname }}</h2>
+            <section class="content">
+                <article>{{ attempt.comment|purify }}</article>
+            </section>
+        {% endif %}
+
         {% if returnUrl %}
             <a href="{{ returnUrl }}" class="button">Back to homepage</a>
         {% endif %}
