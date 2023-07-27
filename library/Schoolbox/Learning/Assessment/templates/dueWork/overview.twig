@@ -34,7 +34,6 @@
             <table class="rb">
                 <tbody>
                     <tr>
-                    {% if dueWork.useRubric %}
                         <th rowspan="2" class="rb-group-name markdown"></th>
                         {% for group, criteria in headers %}
                             <th colspan="{{ criteria | length }}">{{ group | markdown }}</th>
@@ -46,10 +45,6 @@
                                 <th class="rb-criterion-name markdown">{{ criterion | markdown }}</th>
                             {% endfor %}
                         {% endfor %}
-                    {% else %}
-                        <th></th>
-                        <th>Marks</th>
-                    {% endif %}
                     </tr>
                     {% for participant in participants %}
                     <tr>
@@ -61,7 +56,6 @@
                                 </a>
                             </div>
                         </td>
-                        {% if dueWork.useRubric %}
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
                                     {% set markLatest = marks[participant.id][id]['latest'] ?? null %}
@@ -78,9 +72,6 @@
                                     </td>
                                 {% endfor %}
                             {% endfor %}
-                        {% else %}
-                            <td>{{ participant.humanReadableMark(true) }}</td>
-                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>
