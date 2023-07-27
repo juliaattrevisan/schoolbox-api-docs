@@ -59,7 +59,6 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $student->getRole()->isStudent());
         // hydrate those assessments
         $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
-        $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'desc');
 
         return true;
     }
