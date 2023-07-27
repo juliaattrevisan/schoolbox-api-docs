@@ -33,7 +33,7 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $this->response = $this->responseFromTemplate('@staffDirectory/index.twig', [], 'Staff Directory');
+        $this->response = $this->responseFromTemplate('modules/report/staff.twig', [], 'Staff Directory');
     }
 
 
