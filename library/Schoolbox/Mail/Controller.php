@@ -338,7 +338,7 @@ class Controller extends Base
             $this->getConfigLoader()->get('recaptcha_private_api_key'),
         );
 
-        if (!$this->getSession()->getId() && !$recaptcha->verify($this->requestPost->get('g-recaptcha-response'))) {
+        if (!$this->getSession()->getId() || !$recaptcha->verify($this->requestPost->get('g-recaptcha-response'))) {
             $this->sendError("The Human Checker (reCAPTCHA) failed.");
         }
 
