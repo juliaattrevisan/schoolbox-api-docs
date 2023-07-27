@@ -145,6 +145,13 @@ abstract class Mapper implements IMapper
     protected IConnector $database;
 
     /**
+     * Read Only Connector
+     *
+     * @var IConnector
+     */
+    protected IConnector $databaseRead;
+
+    /**
      * @var string
      */
     protected $table;
@@ -453,6 +460,13 @@ abstract class Mapper implements IMapper
         } catch (DatabaseException $e) {
             $this->database = new NullConnector();
         }
+
+        //Read Only DB
+        try {
+            $this->databaseRead = Factory::getInstanceInternalRead();
+        } catch (DatabaseException $e) {
+            $this->databaseRead = new NullConnector();
+        }
     }
 
     /**
@@ -640,6 +654,29 @@ abstract class Mapper implements IMapper
      * @return IConnector
      */
     public function getDatabase(): IConnector
+    {
+        return $this->database;
+    }
+
+    /**
+     * Read Only DB
+     *
+     * @param  IConnector $database
+     *
+     * @return $this
+     */
+    public function setDatabaseRead($database)
+    {
+        $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * Read Only DB
+     *
+     * @return IConnector
+     */
+    public function getDatabaseRead(): IConnector
     {
         return $this->database;
     }
@@ -2319,6 +2356,7 @@ abstract class Mapper implements IMapper
             'order'   => $this->getDefaultOrderByParams(),
         );
         $options      = array_merge($defaults, $options);
+
         $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         // filter on soft-deletions if this mapper supports them
@@ -2369,6 +2407,7 @@ abstract class Mapper implements IMapper
         $this->monitor->startExecuteSelectTimer($this, $predicate);
 
         $statement = $this->database->prepare($query);
+
         foreach ($params as $name => $value) {
             $statement->bindValue($name, $value);
         }

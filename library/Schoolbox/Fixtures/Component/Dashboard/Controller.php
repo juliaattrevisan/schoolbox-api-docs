@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Fixtures\Component\Dashboard;
 
-use Alaress\Database\Connector\Base;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Session\Session;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
@@ -29,7 +29,6 @@ use UnexpectedValueException;
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * @var ComponentDelegate
      */
@@ -54,7 +53,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     {
         parent::__construct($instance, $user, $sitepage);
 
-        /** @var Base $databaseInternal */
+        /** @var IConnector $databaseInternal */
         $databaseInternal = $sitepage->getDi()->get('databaseInternal');
         $this->delegate = new ComponentDelegate($databaseInternal);
     }

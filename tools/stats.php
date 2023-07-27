@@ -22,7 +22,7 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         /* @var IConnector $db */
-        $db = $this->getDi()->get('databaseInternal');
+        $db = $this->getDi()->get('databaseInternalRead');
         /** @var IConfigLoader $config */
         $config = $this->getDi()->get('config');
 

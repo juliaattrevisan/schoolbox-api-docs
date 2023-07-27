@@ -487,20 +487,14 @@ class DataSource
      * @param Grid      $grid
      * @param null|Grid $originalGrid If set, this is the state of the
      *                                assessment's grid pre-save
+     * @param SubmissionBox $submissionBox
      * @throws \UnexpectedValueException If a duplicate indicator or capability exists in the folder
      * @throws \UnexpectedValueException If course capability duplicates a unit capability
      * @throws \UnexpectedValueException If a capability or indicator that should not be deleted has been
      * @throws \InvalidArgumentException If an undocumented error occurred whilst persisting
      */
-    public function persistGrid(Grid $grid, ?Grid $originalGrid): void
+    public function persistGrid(Grid $grid, ?Grid $originalGrid, SubmissionBox $submissionBox): void
     {
-        // The mappers still deal in submission boxes, but we deal in levels
-        // If this exceptioned out, it was never meant to be
-        $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn(
-            'assessment_id',
-            $grid->getAssessment()->getId()
-        );
-
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
         $levelMapper      = LevelMapper::getInstance();

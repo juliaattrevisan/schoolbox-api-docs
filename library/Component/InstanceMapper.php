@@ -271,6 +271,7 @@ class Component_InstanceMapper extends BaseMapper
     {
         $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
+
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`id` = :id
 			ORDER BY    {$componentInstanceTable}.`identifier` ASC,
@@ -291,6 +292,7 @@ class Component_InstanceMapper extends BaseMapper
     protected function findByFields($sql, $fields)
     {
         $statement = $this->database->prepare($sql);
+
         $statement->execute($fields);
 
         // Hydrate a whole bunch of stuff here.

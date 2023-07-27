@@ -22,9 +22,9 @@ class Blog
     /**
      * Constructor - sets up database
      */
-    public function __construct()
+    public function __construct(IConnector $database)
     {
-        $this->database = Factory::getInstanceInternal();
+        $this->database = $database;
     }
 
     public function createdPost(\Alaress_Date_Format $start, \Alaress_Date_Format $end)

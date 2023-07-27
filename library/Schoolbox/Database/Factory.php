@@ -4,6 +4,7 @@ namespace Schoolbox\Database;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
+use Alaress\Database\Connector\ReadReplicatedProxy;
 use Alaress\Database\Exception;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
@@ -33,6 +34,13 @@ class Factory
      * @return IConnector
      */
     protected static $connectorInternal;
+
+    /**
+     * Read Only DB
+     *
+     * @return IConnector
+     */
+    protected static $connectorInternalRead;
 
     /**
      * An instance of this object
@@ -96,6 +104,21 @@ class Factory
     }
 
     /**
+     * Retrieves static instance of internal Read only database connection.
+     *
+     * @return IConnector
+     * @throws DatabaseException
+     */
+    public static function getInstanceInternalRead(): IConnector
+    {
+        if (!isset(self::$connectorInternalRead)) {
+            self::$connectorInternalRead = self::getInstance()->getInternalReadDatabase();
+        }
+
+        return self::$connectorInternalRead;
+    }
+
+    /**
      * Factory Constructor
      *
      * @param DatabaseFactory $factory
@@ -114,6 +137,19 @@ class Factory
      */
     public function getInternalDatabase(): IConnector
     {
+        // TODO: use the DB Proxy to correctly route to the correct DB connection...
+        return new ReadReplicatedProxy($this->getInternalWriteDatabase(), $this->getInternalReadDatabase(), 10);
+    }
+
+    /**
+     * Retrieve a writable connection to Schoolbox database
+     *
+     * @return IConnector
+     * @throws DatabaseException
+     */
+    public function getInternalWriteDatabase(): IConnector
+    {
+        // TODO: use the DB Proxy to correctly route to the correct DB connection...
         $connectorInternal = $this->factory->createMysql();
 
         $host = SQL_host;

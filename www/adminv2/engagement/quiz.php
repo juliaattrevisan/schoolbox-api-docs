@@ -10,7 +10,7 @@ $months = $start->diffInMonths($end) + 1;
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;
 
-$report = new Schoolbox\Engagement\Evaluate();
+$report = new Schoolbox\Engagement\Evaluate($this->getDi()->get('databaseInternalRead'));
 
 for ($i = 0; $i < $months; $i++) {
     $this->setVar('MONTH', $currentMonth->getUsingFormat('F Y'));

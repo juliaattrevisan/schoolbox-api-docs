@@ -26,6 +26,7 @@ class SoftDeleteTest extends TestCase
         parent::setUp();
         $this->object = new SoftDeleteTestMapper();
         $this->object->setDatabase(new MockConnector($this));
+        $this->object->setDatabaseRead($this->object->getDatabase());
     }
 
     public function testSoftDeleteNotDeleted()

@@ -1312,7 +1312,7 @@ class MapperProxy
                     $courseManagedFields = new CourseManagedFields($currentUser, $assessable);
 
                     if (!$courseManagedFields->isReadonly()) {
-                        $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
+                        $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid, $subObject);
                     }
                 }
             } else {

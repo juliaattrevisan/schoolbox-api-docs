@@ -1252,6 +1252,7 @@ class ImportFactory
             $configDefinition   = ['importedCourse' => $courseImpl->getId()];
             $courseOutlineClass = HomepageOutlineComponentController::class;
             $compInstance       = $this->componentInstanceMapper->injectNewComponent($folder, $configDefinition, $courseOutlineClass);
+            // needing the hydrated component object unable to use the above, as it is just a stub
             $compInstance       = $this->componentInstanceMapper->findByInstanceId($compInstance->getId());
         }
         $config        = $compInstance->getConfigArray();

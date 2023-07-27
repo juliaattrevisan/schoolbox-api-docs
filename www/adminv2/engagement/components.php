@@ -11,7 +11,7 @@ $months = $start->diffInMonths($end);
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;
 
-$report = new Schoolbox\Engagement\Component();
+$report = new Schoolbox\Engagement\Component($this->getDi()->get('databaseInternalRead'));
 
 $output = $report->componentInstances();
 

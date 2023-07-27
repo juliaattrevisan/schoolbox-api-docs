@@ -216,7 +216,7 @@ class ResultCache
     public function refresh(
         \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         IAssessable $assessment,
-        ?\Schoolbox\User $student = null
+        ?\Schoolbox\User $student = null,
     ): void {
         if ($assessment instanceof Project) {
             /* Dodge the mapper cache maybe. ffs

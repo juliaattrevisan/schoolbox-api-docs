@@ -20,11 +20,11 @@ $months = $start->diffInMonths($end) + 1;
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;
 
-$socialReport = new Schoolbox\Engagement\SocialStream();
-$forumReport = new Schoolbox\Engagement\Forum();
-$blogReport = new Schoolbox\Engagement\Blog();
-$wikiReport = new Schoolbox\Engagement\Wiki();
-$pollReport = new Schoolbox\Engagement\Poll();
+$socialReport = new Schoolbox\Engagement\SocialStream($this->getDi()->get('databaseInternalRead'));
+$forumReport = new Schoolbox\Engagement\Forum($this->getDi()->get('databaseInternalRead'));
+$blogReport = new Schoolbox\Engagement\Blog($this->getDi()->get('databaseInternalRead'));
+$wikiReport = new Schoolbox\Engagement\Wiki($this->getDi()->get('databaseInternalRead'));
+$pollReport = new Schoolbox\Engagement\Poll($this->getDi()->get('databaseInternalRead'));
 
 
 for ($i = 0; $i < $months; $i++) {

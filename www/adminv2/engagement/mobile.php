@@ -10,7 +10,7 @@ $months = $start->diffInMonths($end) + 1;
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;
 
-$report = new Schoolbox\Engagement\Mobile();
+$report = new Schoolbox\Engagement\Mobile($this->getDi()->get('databaseInternalRead'));
 
 $roleMapper = new \Schoolbox\RoleMapper();
 $roleList = $roleMapper->findAll();
