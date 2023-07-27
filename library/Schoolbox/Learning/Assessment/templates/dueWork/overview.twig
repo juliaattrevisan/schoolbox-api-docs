@@ -4,23 +4,25 @@
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="actions-small-1 row">
-    <div class="list-item">
+    <div>
         <div class="small-12 columns">
             <h1>Rubric Report for {{ dueWork.title }}</h1>
-            <ul class="meta">
-                <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
-                <li class="icon-calendar">Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
-            </ul>
-            <div class="sb-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
-                <div class="checklist">
-                    <input type="checkbox" id="show-drafts">
-                    <label for="show-drafts">
-                        Show Drafts
-                    </label>
+            <div class="sb-flex sb-flex--spacious">
+                <ul class="meta">
+                    <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
+                    <li class="icon-calendar">Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
+                </ul>
+                <div class="sb-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
+                    <div class="checklist">
+                        <input type="checkbox" id="show-drafts">
+                        <label for="show-drafts">
+                            Show Drafts
+                        </label>
+                    </div>
+                    <nav class="sb-nav-actions">
+                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
+                    </nav>
                 </div>
-                <nav class="sb-nav-actions">
-                    <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
-                </nav>
             </div>
         </div>
     </div>
