@@ -10,8 +10,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Example;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Mapper
+ *
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
