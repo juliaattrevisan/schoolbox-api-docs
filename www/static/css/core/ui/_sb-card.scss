@@ -11,12 +11,13 @@
     background-color: white;
 
     &__primary-img {
-        margin-inline-end: var(--whitespace-m);
+        //margin-inline-end: var(--whitespace-m);
     }
 
     &__top {
         display: flex;
         flex-direction: row;
+        gap: var(--whitespace-m);
 
         &-content {
             flex: 1;
@@ -86,7 +87,7 @@
     // Add start border and grey background to card.
     &--subitem {
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
-        padding: var(--whitespace-s);
+        padding: var(--whitespace-xs);
         background-color: #f6f6f6;
 
         // TODO - Convert this over to using an img-s instead of what it is.

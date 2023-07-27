@@ -59,14 +59,6 @@ export const Default: Story = {
     }),
 };
 
-export const DummyStory: Story = {
-    render: () => ({
-        template: `
-
-        `,
-    }),
-};
-
 export const NavActions: Story = {
     render: () => ({
         template: `

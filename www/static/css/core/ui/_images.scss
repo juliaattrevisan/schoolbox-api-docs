@@ -6,17 +6,31 @@
     display: flex;
     overflow: hidden;
 
+    // The wrapper basically exists to handle image overflow, centering of the <img> / icon and rounding
     .img__wrapper {
         // Default images to medium size if no size is specified.
         flex: 0 0 var(--image-size-m);
         height: var(--image-size-m);
         width: var(--image-size-m);
 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        position: relative;
+
         img {
             object-fit: cover;
             min-width: 100%;
             min-height: 100%;
         }
+    }
+
+    .img__initials {
+        color: white;
+        font-size: calc(var(--image-size-m) * 0.4);
+        font-weight: 600;
     }
 
     @each $size in $global-image-sizes {
@@ -30,25 +44,6 @@
                 // but we never want icons to go full bleed, hence the calc.
                 .icon:before {
                     font-size: calc(var(--image-size-#{$size}) - var(--whitespace-m));
-                }
-            }
-        }
-    }
-
-    .img__wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    &--round {
-        @each $size in $global-image-sizes {
-            &.img-#{$size} {
-                .img__wrapper {
-                    flex: 0 0 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                    height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                    width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
                 }
             }
         }
@@ -68,14 +63,40 @@
         line-height: normal;
     }
 
-    // The wrapper basically exists to handle image overflow, positioning and rounding
     &--round {
         .img__wrapper {
-            margin: var(--whitespace-xs);
             border-radius: 50%;
             overflow: hidden;
             // Very subtly make the image stand out from the background if there is no background contrast
             border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    &--round,
+    &--badge {
+        .img__wrapper {
+            margin: var(--whitespace-xs);
+        }
+
+        //Apply to default sizes
+        &.img .img__wrapper {
+            flex: 0 0 calc(var(--image-size-m) - var(--whitespace-xs));
+            height: calc(var(--image-size-m) - var(--whitespace-xs));
+            width: calc(var(--image-size-m) - var(--whitespace-xs));
+        }
+
+        @each $size in $global-image-sizes {
+            &.img-#{$size} {
+                .img__wrapper {
+                    flex: 0 0 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                }
+
+                .img__initials {
+                    font-size: calc(var(--image-size-#{$size}) * 0.35);
+                }
+            }
         }
     }
 }
