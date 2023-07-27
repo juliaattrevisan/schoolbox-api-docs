@@ -59,6 +59,7 @@
 <script>
     let attemptScores = JSON.parse('{{ scores|raw }}');
     let attemptComments = JSON.parse('{{ comments|raw }}');
+    let attemptEditorFields = [];
 
     let reportCallback = {
         readyListener: function() {
@@ -91,15 +92,29 @@
                                 '<label>Customise score</label>' +
                                 '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
-                                '<textarea name="comments[' + learnosityReferenceTuple + ']">' + attemptComments[learnosityReferenceTuple] + '</textarea>' +
+                                '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + attemptComments[learnosityReferenceTuple] + '</textarea>' +
                             '</div>' +
                         '');
+
+                        /* We need this for cke replacements
+                         */
+                        attemptEditorFields.push('#comments-' + learnosityReferenceTuple);
                     });
                 });
 
                 /* Provide call to action when ready
                  */
                 $('#feedback-form').append('<input type="submit" value="Finalise marks" />');
+
+                /* cke all the commentary fields
+                 */
+                document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: attemptEditorFields,
+                        toolbar: "simple",
+                        addToToolbar: ["|", "blank"],
+                    }
+                }));
             });
         }
     }
