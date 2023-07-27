@@ -757,6 +757,12 @@ class Controller extends Base
                         'show' => true,
                         'show_reference' => true
                     ]
+                ],
+                'activity_edit' => [
+                    'title' => [
+                        'show' => true,
+                        'show_reference' => true
+                    ]
                 ]
             ],
             'user' => [
