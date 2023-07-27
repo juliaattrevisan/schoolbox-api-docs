@@ -130,11 +130,6 @@ table.rb {
         border-right: solid 1px $body-bg;
         border-left: 0;
     }
-    tbody th:last-of-type,
-    thead th:first-of-type {
-        border-right: solid 2px $body-bg;
-        border-left: 0;
-    }
     td,
     th {
         border-left: 1px solid $body-bg;
