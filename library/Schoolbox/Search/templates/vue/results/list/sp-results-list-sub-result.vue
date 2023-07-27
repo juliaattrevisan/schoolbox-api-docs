@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display a single linked sub results within a result
+ * To display a single linked sub result within a result
  */
 
 import { Result } from "../../../js/types/Result";

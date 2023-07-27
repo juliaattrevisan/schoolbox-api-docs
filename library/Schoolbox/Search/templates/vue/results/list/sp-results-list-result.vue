@@ -22,7 +22,7 @@ const hasSubResults = window.Vue.computed(() => {
 <template>
     <div class="result" data-test-sp-results-list-result>
         <h2>{{ props.result.title }}</h2>
-        <p class="meta">{{ result.meta }}</p>
+        <p class="meta">{{ props.result.meta }}</p>
         <sp-results-list-sub-results v-if="hasSubResults" :result="result" />
     </div>
 </template>

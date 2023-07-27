@@ -1,6 +1,6 @@
 /**
  * Load more results, adding to the end of the existing results.
- * There's currently no method to detect the total query result for a query,
+ * There's currently no method to detect the total result count for a query,
  * so we just keep loading until the results do not exceed the limit or no results are returned.
  */
 

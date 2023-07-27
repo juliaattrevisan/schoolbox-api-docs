@@ -15,7 +15,7 @@ beforeEach(() => {
     });
 });
 
-test("header should not be visible initially", async () => {
+test("header should not be visible until have searched", async () => {
     expect(wrapper.find("[data-test-sp-results-header]").exists()).toBe(false);
 });
 

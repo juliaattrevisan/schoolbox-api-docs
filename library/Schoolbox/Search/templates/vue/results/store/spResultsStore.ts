@@ -42,8 +42,8 @@ export const useResultsStore = defineStore("spResults", () => {
      * @param {Result[]} firstResults - the results to set
      */
     function setFirstResults(firstResults: Result[]) {
-        // if we have less results than the limit, we have loaded all results
         results.value = firstResults;
+        // if we have less results than the limit, we have loaded all results
         if (results.value.length < RESULT_LIMIT) {
             hasLoadedAllResults.value = true;
         }
@@ -63,8 +63,8 @@ export const useResultsStore = defineStore("spResults", () => {
     }
 
     /**
-     * Set the next sub results load
-     * @param {Result[]} moreSubResults - the results to set
+     * Add the loaded sub results into the results
+     * @param {Result[]} moreSubResults - the sub results to set
      * @param {number} resultId - the parent id of the result the new sub results are from
      */
     function setMoreSubResults(moreSubResults: Result[], resultId: number) {
@@ -81,6 +81,7 @@ export const useResultsStore = defineStore("spResults", () => {
     function clear() {
         results.value = [];
         moreResultsCount.value = 0;
+        hasLoadedAllResults.value = false;
     }
 
     return {

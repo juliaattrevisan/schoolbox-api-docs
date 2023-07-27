@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * TTo filter the results by types
+ * To filter the results by types
  */
 
 import { useFilterTypesStore } from "./store/spFilterTypesStore";

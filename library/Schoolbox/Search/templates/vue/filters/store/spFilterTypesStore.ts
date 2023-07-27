@@ -1,5 +1,5 @@
 /**
- * Store the filter types
+ * Store the filter types, which will vary depending on the Schoolbox plan
  */
 
 import { defineStore } from "pinia";
@@ -11,7 +11,7 @@ export type FilterType = {
 };
 
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
-    const allTypes = window.Vue.ref<FilterType[]>([]); //
+    const allTypes = window.Vue.ref<FilterType[]>([]); // all filter types available
     const selectedTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
     const activeTypes = window.Vue.ref<string[]>([]); // the currently active filters, those selected at the time of the latest search
 

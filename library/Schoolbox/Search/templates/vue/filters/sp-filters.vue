@@ -23,6 +23,9 @@ function onClearAllSelected() {
  * apply the selected filters with the current search query
  */
 async function onApplySelected() {
+    if (searchStore.isSearching) {
+        return;
+    }
     await searchStore.search();
 }
 </script>
