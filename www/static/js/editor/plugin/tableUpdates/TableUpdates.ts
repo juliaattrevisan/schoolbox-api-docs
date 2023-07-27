@@ -7,7 +7,6 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 
 export default class TableUpdates extends Plugin {
     isCK5Attribute = "data-is-ckeditor5-table";
-    wasDefaultBorderSet = "data-was-default-border-set";
 
     /**
      * Run when the plugin is initialized
@@ -28,9 +27,6 @@ export default class TableUpdates extends Plugin {
     updateSchema() {
         this.editor.model.schema.extend("table", {
             allowAttributes: [this.isCK5Attribute],
-        });
-        this.editor.model.schema.extend("tableCell", {
-            allowAttributes: [this.wasDefaultBorderSet],
         });
     }
 
@@ -58,26 +54,6 @@ export default class TableUpdates extends Plugin {
             model: {
                 name: "table",
                 key: this.isCK5Attribute,
-            },
-        });
-        conversion.for("downcast").attributeToAttribute({
-            model: {
-                name: "tableCell",
-                key: this.wasDefaultBorderSet,
-            },
-            view: {
-                name: "td",
-                key: this.wasDefaultBorderSet,
-            },
-        });
-        conversion.for("upcast").attributeToAttribute({
-            view: {
-                name: "td",
-                key: this.wasDefaultBorderSet,
-            },
-            model: {
-                name: "tableCell",
-                key: this.wasDefaultBorderSet,
             },
         });
     }
@@ -188,13 +164,12 @@ export default class TableUpdates extends Plugin {
      */
     setCellBorders() {
         const cells = this.getCellElements();
-        const filteredCells = cells.filter((cell) => !cell._attrs.has(this.wasDefaultBorderSet)); // to update only newly inserted cells
+        const filteredCells = cells.filter((cell) => !cell._attrs.has("tableCellBorderStyle")); // to update only newly inserted cells
         this.editor.model.change((writer) => {
             filteredCells.forEach((cell) => {
                 writer.setAttribute("tableCellBorderStyle", "solid", cell);
                 writer.setAttribute("tableCellBorderWidth", "1px", cell);
                 writer.setAttribute("tableCellBorderColor", "#b3b3b3", cell);
-                writer.setAttribute(this.wasDefaultBorderSet, "true", cell);
             });
         });
     }
