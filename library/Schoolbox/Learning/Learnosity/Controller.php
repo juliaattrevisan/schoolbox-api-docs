@@ -699,7 +699,12 @@ class Controller extends Base
     public function getArchiveReferences(): void
     {
         $activityReferences = [
-            'aaabbbbbbcccccddddd',
+            'f0b0a793-7f52-45eb-baba-071e5f12d60b',
+            '9120323f-672f-4e68-8533-94ba8c9abfca',
+            'd1276ea8-5be7-449a-8bea-87ed1a0f7be3',
+            'aed231de-5909-4628-a7e0-c4d5c772d5a8',
+            '8b43fe13-79a1-4ae4-8c08-43e858d9f6d7',
+            'ad45b26f-f3aa-4127-ba59-c61901d9990f',
         ];
 
         $messages = [];
@@ -707,6 +712,8 @@ class Controller extends Base
         foreach ($activityReferences as $activityReference) {
             try {
                 $this->getArchiveReference($activityReference);
+
+                $messages[] = "Archived {$activityReference}";
             } catch (\RuntimeException $e) {
                 $messages[] = $e->getMessage();
             }
