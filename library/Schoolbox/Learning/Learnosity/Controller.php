@@ -37,6 +37,11 @@ class Controller extends Base
     private Api $api;
 
 
+    /* TODO inject dep
+     */
+    private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper;
+
+
     /**
      * Controller constructor.
      */
@@ -57,6 +62,10 @@ class Controller extends Base
             $this->learnosityConsumerSecret,
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
+
+        /* TODO inject dep
+         */
+        $this->feedbackMapper = \Schoolbox\Learning\Learnosity\Feedback\Mapper::getInstance();
     }
 
 
@@ -502,8 +511,12 @@ class Controller extends Base
      * @param User        $student
      * @param Model       $attempt
      * @return void
+     * @throws RouteNotFound
      * @throws ValidationException
+     * @throws \PDOException
+     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postFeedback(
         IAssessable $assessment,
@@ -546,8 +559,33 @@ class Controller extends Base
 
         $this->attemptMapper->save($attempt);
 
-        /* TODO Save per-question commentary here
+        /* For every learnosity question, see if we have a db record for its feedback
+         * If we do, recycle it and update its contents
+         * Otherwise spawn a new one
+         *
+         * TODO make this algorithm cheaper
          */
+        foreach ($postData['comments'] as $learnosityReference => $comment) {
+            try {
+                $feedback = $this->feedbackMapper->findOneByColumnList([
+                    'attempt_id' => $attempt->getId(),
+                    'learnosity_reference' => $learnosityReference
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $feedback = $this->feedbackMapper->createModel()
+                    ->setAttempt($attempt)
+                    ->setLearnosityReference($learnosityReference);
+            }
+
+            /* Update comment
+             *
+             * TODO optionally update score, if we want to store that locally
+             *  at the risk of desyncing with learnosity
+             */
+            $feedback->setComment($comment);
+
+            $this->feedbackMapper->save($feedback);
+        }
 
         /* Start preparing data payload for updating Learnosity
          * This is so the updated scores appear in their interfaces
