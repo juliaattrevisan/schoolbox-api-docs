@@ -271,7 +271,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
     {
-        return $this->determineConnector()->prepareFunctionCall($function, $inputs, $outputs, $return);
+        return $this->writeConnector->prepareFunctionCall($function, $inputs, $outputs, $return);
     }
 
     /**
@@ -285,7 +285,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
     {
-        return $this->determineConnector()->executeFunctionCall($function, $inputs, $outputs, $return);
+        return $this->writeConnector->executeFunctionCall($function, $inputs, $outputs, $return);
     }
 
     /**
@@ -299,7 +299,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
-        return $this->determineConnector()->prepareStoredProcedure($procedure, $inputs, $outputs, $return);
+        return $this->writeConnector->prepareStoredProcedure($procedure, $inputs, $outputs, $return);
     }
 
     /**
@@ -313,7 +313,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
-        return $this->determineConnector()->executeStoredProcedure($procedure, $inputs, $outputs, $return);
+        return $this->writeConnector->executeStoredProcedure($procedure, $inputs, $outputs, $return);
     }
 
     /**
@@ -327,7 +327,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function getStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
-        return $this->determineConnector()->getStoredProcedureIterator($procedure, $inputs, $outputs, $return);
+        return $this->writeConnector->getStoredProcedureIterator($procedure, $inputs, $outputs, $return);
     }
 
     /**
@@ -456,18 +456,21 @@ class ReadReplicatedProxy implements IConnector
      */
     public function getCollector()
     {
-        return $this->determineConnector()->getCollector();
+        return $this->readReplicaConnector->getCollector();
     }
 
     /**
      * Add a post processor to this connection, callable must accept either a string/array and return the same type
      * after whatever processing is required.
      *
+     * Add processor to both connectors, but return the one created on the read conenction.
+     *
      * @param callable $callable
      */
     public function addPostProcessor($callable)
     {
-        return $this->determineConnector()->addPostProcessor($callable);
+        $this->writeConnector->addPostProcessor($callable);
+        return $this->readReplicaConnector->addPostProcessor($callable);
     }
 
     /**
@@ -480,7 +483,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function prepareInBindings($externalIds, $prefix = 'param')
     {
-        return $this->determineConnector()->prepareInBindings($externalIds, $prefix);
+        return $this->readReplicaConnector->prepareInBindings($externalIds, $prefix);
     }
 
     /**
@@ -491,7 +494,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function buildPredicateBuilder($table)
     {
-        return $this->determineConnector()->buildPredicateBuilder($table);
+        return $this->readReplicaConnector->buildPredicateBuilder($table);
     }
 
     /**
@@ -605,8 +608,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function trimAll(array $rowset): array
     {
-        $this->lastWriteTime = microtime(true);
-        return $this->writeConnector->trimAll($rowset);
+        return $this->readReplicaConnector->trimAll($rowset);
     }
 
     /**
@@ -618,8 +620,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function trimRow(array $row): array
     {
-        $this->lastWriteTime = microtime(true);
-        return $this->writeConnector->trimRow($row);
+        return $this->readReplicaConnector->trimRow($row);
     }
 
     /**
@@ -631,8 +632,7 @@ class ReadReplicatedProxy implements IConnector
      */
     public function trimField($fieldValue)
     {
-        $this->lastWriteTime = microtime(true);
-        return $this->writeConnector->trimField($fieldValue);
+        return $this->readReplicaConnector->trimField($fieldValue);
     }
 
     /**
