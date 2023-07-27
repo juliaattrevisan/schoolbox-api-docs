@@ -57,7 +57,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $student->getRole()->isStudent());
         // hydrate those assessments
-        $plans = $assessmentDataSource->findAllByIds($assessmentIds)->sortBy('dueAt', 'asc');
+        $plans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'ASC']]);
 
         /** @var LessonPlanModel $lessonPlan **/
         foreach ($plans as $lessonPlan) {
