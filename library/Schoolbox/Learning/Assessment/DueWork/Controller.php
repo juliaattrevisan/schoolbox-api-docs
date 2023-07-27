@@ -678,10 +678,10 @@ class Controller extends Assessment\Controller
             if (count($marks)) {
                 foreach ($allIndicatorUsageIds as $indicatorUsageId) {
                     if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        $descriptor = $marks[$indicatorUsageId]->getDescriptor();
+                        $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
                         $row[]      = $descriptor ? $descriptor->getDescription() : '';
-                        $row[]      = $marks[$indicatorUsageId]->getValue();
-                        $sum        += $marks[$indicatorUsageId]->getValue();
+                        $row[]      = $marks[$indicatorUsageId]['published']->getValue();
+                        $sum        += $marks[$indicatorUsageId]['published']->getValue();
                     } else {
                         $row[] = '';
                         $row[] = '';
