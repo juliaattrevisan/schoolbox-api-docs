@@ -92,7 +92,7 @@
                                 '<label>Customise score</label>' +
                                 '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
-                                '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + attemptComments[learnosityReferenceTuple] + '</textarea>' +
+                                '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + (attemptComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
                             '</div>' +
                         '');
 
