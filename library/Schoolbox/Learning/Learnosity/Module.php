@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Learnosity;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use OutOfBoundsException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\DefinitionException;
