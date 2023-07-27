@@ -604,15 +604,18 @@ class Controller extends Assessment\Controller
 
             try {
                 $markedGridLatest = $this->rubricMapper->retrieveMarkedGrid($latestFeedback);
-                $markedGridPublished = $this->rubricMapper->retrieveMarkedGrid($publishedFeedback);
+                // if no published feedback default to empty
+                $markedGridPublished = $publishedFeedback ? $this->rubricMapper->retrieveMarkedGrid($publishedFeedback) : null;
             } catch (MapperException) {
                 // can't really do anything
                 continue;
             }
             $studentId = $participant->getUser()->getId();
-            foreach ($markedGridPublished->getCapabilityMarks() as $capabilityMark) {
-                foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
+            if (null !== $markedGridPublished) {
+                foreach ($markedGridPublished->getCapabilityMarks() as $capabilityMark) {
+                    foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
+                    }
                 }
             }
             foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
