@@ -738,8 +738,8 @@ class Controller extends Base
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
         ], sprintf(
-             'Livestream for %s',
-             $assessment->getTitle()
+            'Livestream for %s',
+            $assessment->getTitle()
         ));
     }
 
