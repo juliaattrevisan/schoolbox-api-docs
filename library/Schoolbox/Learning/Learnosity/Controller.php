@@ -225,13 +225,8 @@ class Controller extends Base
                     "idle_timeout"          => [
                         "interval" => 300
                     ],
-                    /* Go to a nice report screen when you're done, for now
-                     */
-                    'onsubmit_redirect_url' => $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
-                        'assessmentId' => $assessment->getId(),
-                        'studentId' => $student->getId(),
-                        'learnosityReference' => $attempt->getLearnosityReference()
-                    ])
+                    'onsubmit_redirect_url' => false,
+                    'onsave_redirect_url' => false,
                 ],
                 "navigation"    => [
                     "auto_save"  => [
@@ -269,9 +264,18 @@ class Controller extends Base
             'initOptions'         => $this->api->initOptions('items', $payload),
             'assessment'          => $assessment,
             'attemptId'           => $attempt->getId(),
+            /* Save results locally
+             */
             'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
                 'assessmentId' => $assessment->getId(),
                 'studentId'    => $student->getId(),
+            ]),
+            /* Redirect to here when we are ready
+             */
+            'outroUrl' => $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+                'learnosityReference' => $attempt->getLearnosityReference()
             ]),
             'learnosityReference' => $attempt->getLearnosityReference(),
         ], "Attempt {$assessment->getTitle()}");

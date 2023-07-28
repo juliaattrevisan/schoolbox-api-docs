@@ -26,9 +26,11 @@
         payload.append('attemptId', '{{ attemptId }}');
         payload.append('learnosityReference','{{ learnosityReference }}');
 
-        const response = fetch('{{ completionUrl }}', {
+        fetch('{{ completionUrl }}', {
             method: 'POST',
             body: payload
+        }).then(response => {
+            window.location.href = '{{ outroUrl }}';
         });
     });
 </script>
