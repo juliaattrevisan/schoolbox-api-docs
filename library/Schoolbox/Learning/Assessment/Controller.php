@@ -205,7 +205,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         /* Inject a Learnosity Reference uuid if that's what we are building here
          */
-        if (AssessmentTYpe::TYPE_QUIZ === $type) {
+        if (AssessmentType::TYPE_QUIZ === $type) {
             $assessment->setLearnosityReference(Uuid::generate());
         }
 
