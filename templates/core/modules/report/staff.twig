@@ -1,5 +1,6 @@
 {# To allow schools to alter whats displayed in the columns #}
 {# Refer to vue/components/dataTable/types/dataTableTypes.ts:ColumnConfig for list of properties that can be used #}
+{% block content %}
 {% set columnsConfig = [
     {
         key: "portrait_url",
@@ -91,6 +92,7 @@
         }
     },
 ] %}
+{% endblock %}
 
 {# Add any options specific to the staff directory table #}
 {# Refer to vue/components/vueTables2/types/vueTables2Types.ts:TableOptions for list of properties that can be used #}
