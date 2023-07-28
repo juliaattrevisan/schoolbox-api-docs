@@ -1,0 +1,80 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Overwriting templates/core/modules/report/staff.twig #}
+{# Changes: Title and Mobile added, Image, Role and Ext removed, Phone renamed to Telephone Extension #}
+{% set columnsConfig = [
+    {
+        key: "StaffTitle",
+        heading: "Title",
+        class: "hide-for-medium-down",
+    },
+    {
+        key: "StaffPreferredName",
+        heading: "First name",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffPreferredName",
+                href: "profile_url",
+                title: "View profile",
+            }
+        },
+    },
+    {
+        key: "StaffSurname",
+        heading: "Surname",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffSurname",
+                href: "profile_url",
+                title: "View profile",
+            }
+        },
+    },
+    {
+        key: "StaffDepartment",
+        heading: "Department",
+        class: "hide-for-medium-down",
+    },
+    {
+        key: "StaffCampusDescription",
+        heading: "Campus",
+        class: "hide-for-medium-down",
+    },
+    {
+        key: "StaffOccupPhone",
+        heading: "Telephone Extension",
+        class: "",
+    },
+    {
+        key: "StaffDefaultMobilePhone",
+        heading: "Mobile",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffDefaultMobilePhone",
+                href: "StaffDefaultMobilePhone",
+                prependHref: "tel:",
+                title: "Phone user",
+            }
+        },
+    },
+    {
+        key: "StaffOccupEmail",
+        heading: "Email",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffOccupEmail",
+                href: "StaffOccupEmail",
+                prependHref: "mailto:",
+                title: "Email user",
+            }
+        }
+    },
+] %}
