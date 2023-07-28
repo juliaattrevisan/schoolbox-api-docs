@@ -17,6 +17,15 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base
 {
     /**
+     * Constructor
+     *
+     * @param ISource $source
+     */
+    public function __construct(private ISource $source)
+    {
+    }
+
+    /**
      * Search for all results which match a keyword.
      *
      * @api GET /api/search
@@ -26,6 +35,18 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $this->response = $this->responseAsJson([]);
+        $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        if (mb_strlen($keyword) >= 2) {
+            $this->response = $this->responseAsJson(
+                $this->source->search(
+                    $keyword,
+                    new Filter(null, null, null, null),
+                    null,
+                    10,
+                )
+            );
+        } else {
+            $this->sendJsonError('Search keyword must be at least 2 characters', 400);
+        }
     }
 }

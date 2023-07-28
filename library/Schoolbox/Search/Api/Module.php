@@ -10,8 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Search\Api\Database\AggregateResult;
+use Schoolbox\Search\Api\Database\ResultType\User\Hydrator;
+use Schoolbox\Search\Api\Database\ResultType\User\Matcher;
+use Schoolbox\Search\Api\Database\Source;
 
 /**
  * Module for the search API.
@@ -34,6 +40,19 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        $config = $this->getConfig();
+
+        /** @var IConnector $database */
+        $database = $this->injector->get('databaseInternalRead');
+
+        return new Controller(
+            new AggregateResult(
+                $database,
+                new Source(
+                    new Matcher($config, $database->getQuoter()),
+                    new Hydrator(),
+                )
+            ),
+        );
     }
 }
