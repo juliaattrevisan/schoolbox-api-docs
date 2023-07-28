@@ -11,7 +11,7 @@ const mswHandlers = [
     rest.get(endpoint, (req, res, ctx) => {
         return res(
             // we grab an endpoint and then modify the data before it's returned
-            ctx.delay(3000),
+            ctx.delay(2000),
             ctx.json(data)
         );
     }),
@@ -59,6 +59,25 @@ const columnsConfig = [
             },
         },
     },
+    {
+        key: "StaffDepartment",
+        heading: "Department",
+        class: "hide-for-medium-down",
+    },
+    {
+        key: "StaffOccupEmail",
+        heading: "Email",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffOccupEmail",
+                href: "StaffOccupEmail",
+                prependHref: "mailto:",
+                title: "Email user",
+            },
+        },
+    },
 ];
 
 const tableOptions = {
@@ -79,7 +98,7 @@ const tableOptions = {
  */
 const meta: Meta<typeof DataTable> = {
     args: {
-        title: "Whoop",
+        title: "Staff Directory",
         endpoint,
         columnsConfig,
         tableOptions,
@@ -88,11 +107,7 @@ const meta: Meta<typeof DataTable> = {
     decorators: [
         () => ({
             template: `
-                <div id="container">
-                    <div id="content">
-                        <story />
-                    </div>
-                </div>
+                <story />
             `,
         }),
     ],
@@ -107,7 +122,7 @@ export default meta;
 type Story = StoryObj<typeof DataTable>;
 
 /**
- * The default story, to show the data table
+ * Displays the default `<data-table/>`
  */
 export const Default: Story = {
     render: (args: unknown) => ({
@@ -117,4 +132,21 @@ export const Default: Story = {
         },
         template: `<data-table v-bind="args" />`,
     }),
+};
+
+/**
+ * What's displayed when there's an error loading the data
+ */
+export const Error: Story = {
+    ...Default,
+    parameters: {
+        msw: {
+            handlers: [
+                rest.get(endpoint, (req, res, ctx) => {
+                    return res(ctx.delay(2000), ctx.status(500));
+                }),
+                ...mswHandlers,
+            ],
+        },
+    },
 };
