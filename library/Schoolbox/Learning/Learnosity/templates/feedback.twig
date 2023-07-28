@@ -5,6 +5,7 @@
  # @param IAssessable $assessment          Our schoolbgox quiz instance
  # @param Attempt\Model $attempt           The student's attempt from our local db
  # @param array $scores                    A list of score tuples obtained per question in this attempt
+ # @param array $comments                  A list of comment tuples that contain per-question comments
  #}
 <script src="https://reports.learnosity.com/?v2023.2.LTS"></script>
 
@@ -57,6 +58,7 @@
 
 <script>
     let attemptScores = JSON.parse('{{ scores|raw }}');
+    let attemptComments = JSON.parse('{{ comments|raw }}');
 
     let reportCallback = {
         readyListener: function() {
@@ -89,7 +91,7 @@
                                 '<label>Customise score</label>' +
                                 '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
-                                '<textarea name="comments[' + learnosityReferenceTuple + ']"></textarea>' +
+                                '<textarea name="comments[' + learnosityReferenceTuple + ']">' + attemptComments[learnosityReferenceTuple] + '</textarea>' +
                             '</div>' +
                         '');
                     });

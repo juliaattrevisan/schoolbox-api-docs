@@ -491,11 +491,23 @@ class Controller extends Base
             ];
         }
 
+        /* Find all the comments for this attempt
+         */
+        $feedbacks = $this->feedbackMapper->findByColumn('attempt_id', $attempt->getId())
+            ->indexBy('learnosityReference');
+
+        $comments = [];
+
+        foreach ($feedbacks as $feedback) {
+            $comments[$feedback->getLearnosityReference()] = $feedback->getComment();
+        }
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'attempt' => $attempt,
-            'scores' => json_encode($scores, JSON_THROW_ON_ERROR)
+            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
+            'comments' => json_encode($comments, JSON_THROW_ON_ERROR),
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
