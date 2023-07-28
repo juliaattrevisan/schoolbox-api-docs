@@ -770,81 +770,18 @@ class Controller extends Base
 
 
     /**
-     * Work out the human readable marks from the raw marks and insert them into the student marks array
+     * Collate the human readable marks for both published and latest (draft) student marks then return them in a student marks array
      *
      * @param array $students
      * @param array $assessments
      * @return array
      * @throws /Aura/Router/Exception/RouteNotFound
      */
-    private function generateHumanReadableMarks(array $students, array $assessments): array
+    private function collateHumanReadableMarks(array $students, array $assessments): array
     {
-        $decimalHydrator = new Decimal();
-        $totalMarkScheme = new MarkScheme\TotalMarkFractional();
-
         foreach ($students as $studentId => $student) {
-            foreach (($student['assessmentsLatest'] ?? []) as $assessmentId => $assessmentMarks) {
-                foreach (($assessmentMarks['capabilities'] ?? []) as $capabilityId => $capabilityMarks) {
-                    $capabilityDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['databaseMark'] ?? null);
-                    $capabilityMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['maxMark'] ?? null);
-                    $humanReadableCapabilityMark = null;
-                    $normalisedCapabilityMark    = null;
-                    if ($capabilityMaxMark) {
-                        $normalisedCapabilityMark = $capabilityDatabaseMark !== null
-                            ? ($capabilityDatabaseMark / $capabilityMaxMark) * 100
-                            : null;
-                        $humanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
-                    }
-                    $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
-                    $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
-                    // Draft marks
-                    $latestCapabilityDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['databaseMark'] ?? null);
-                    $latestCapabilityMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['maxMark'] ?? null);
-                    $latestHumanReadableCapabilityMark = null;
-                    $latestNormalisedCapabilityMark    = null;
-                    if ($latestCapabilityMaxMark) {
-                        $latestNormalisedCapabilityMark = $latestCapabilityDatabaseMark !== null
-                            ? ($latestCapabilityDatabaseMark / $latestCapabilityMaxMark) * 100
-                            : null;
-                        $latestHumanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
-                    }
-                    $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $latestHumanReadableCapabilityMark;
-                    $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $latestNormalisedCapabilityMark;
-
-                    foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
-                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['databaseMark'] ?? null);
-                        $indicatorMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['maxMark'] ?? null);
-                        $humanReadableIndicatorMark = null;
-                        $normalisedIndicatorMark    = null;
-
-                        if ($indicatorMaxMark) {
-                            $normalisedIndicatorMark    = $indicatorDatabaseMark !== null
-                                ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
-                                : null;
-                            $humanReadableIndicatorMark = $totalMarkScheme->setTotalMark($indicatorMaxMark)->getHumanReadableMark($normalisedIndicatorMark);
-                        }
-
-                        $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
-                        $students[$studentId]['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
-
-                        // Latest Marks
-                        $latestIndicatorDatabaseMark      = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['databaseMark'] ?? null);
-                        $latestIndicatorMaxMark           = $decimalHydrator->hydrate($students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['maxMark'] ?? null);
-                        $latestHumanReadableIndicatorMark = null;
-                        $latestNormalisedIndicatorMark    = null;
-
-                        if ($latestIndicatorMaxMark) {
-                            $latestNormalisedIndicatorMark    = $latestIndicatorDatabaseMark !== null
-                                ? ($latestIndicatorDatabaseMark / $latestIndicatorMaxMark) * 100
-                                : null;
-                            $latestHumanReadableIndicatorMark = $totalMarkScheme->setTotalMark($latestIndicatorMaxMark)->getHumanReadableMark($latestNormalisedIndicatorMark);
-                        }
-
-                        $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $latestHumanReadableIndicatorMark;
-                        $students[$studentId]['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $latestNormalisedIndicatorMark;
-                    }
-                }
-            }
+            $students = $this->generateHumanReadableMarks($students, $student['assessmentsPublished'] ?? [], $studentId, 'assessmentsPublished');
+            $students = $this->generateHumanReadableMarks($students, $student['assessmentsLatest'] ?? [], $studentId, 'assessmentsLatest');
         }
 
         return $students;
@@ -1180,6 +1117,53 @@ class Controller extends Base
         return $overallMarks;
     }
 
+    /**
+     * Work out the human readable marks from the raw marks and insert them into the student marks array
+     *
+     * @param array  $students      array of students and marks calculate and build onto
+     * @param array  $studentMarks  array of the database marks for the student
+     * @param int    $studentId     tmp student ID to work out where to put these marks info
+     * @param string $field         string of the mark type (published / latest (draft))
+     * @return array
+     */
+    private function generateHumanReadableMarks(array $students, array $studentMarks, int $studentId, string $field) {
+        $decimalHydrator = new Decimal();
+        $totalMarkScheme = new MarkScheme\TotalMarkFractional();
+        foreach (($studentMarks) as $assessmentId => $assessmentMarks) {
+            foreach (($assessmentMarks['capabilities'] ?? []) as $capabilityId => $capabilityMarks) {
+                $capabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['databaseMark'] ?? null);
+                $capabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['maxMark'] ?? null);
+                $humanReadableCapabilityMark = null;
+                $normalisedCapabilityMark    = null;
+                if ($capabilityMaxMark) {
+                    $normalisedCapabilityMark = $capabilityDatabaseMark !== null
+                        ? ($capabilityDatabaseMark / $capabilityMaxMark) * 100
+                        : null;
+                    $humanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
+                }
+                $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
+                $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
+
+                foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
+                    $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark'] ?? null);
+                    $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark'] ?? null);
+                    $humanReadableIndicatorMark = null;
+                    $normalisedIndicatorMark    = null;
+
+                    if ($indicatorMaxMark) {
+                        $normalisedIndicatorMark    = $indicatorDatabaseMark !== null
+                            ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
+                            : null;
+                        $humanReadableIndicatorMark = $totalMarkScheme->setTotalMark($indicatorMaxMark)->getHumanReadableMark($normalisedIndicatorMark);
+                    }
+
+                    $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
+                    $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
+                }
+            }
+        }
+        return $students;
+    }
 
     /**
      * Build data required by both the HTML and CSV form of the rubric markbook.
@@ -1204,7 +1188,7 @@ class Controller extends Base
         $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
         $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
 
-        $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
+        $derivedMarks  = $this->collateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);
         $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
