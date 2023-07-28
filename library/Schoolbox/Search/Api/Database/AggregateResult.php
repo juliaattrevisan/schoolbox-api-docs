@@ -59,7 +59,9 @@ class AggregateResult implements ISource
                 title ASC,
                 type ASC,
                 id ASC
+            LIMIT :limit
         ';
+        $params['limit'] = $limit;
 
         $rawMatches = [];
         foreach ($this->connector->executeQuery($query, $params) as $row) {

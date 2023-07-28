@@ -42,7 +42,7 @@ class Controller extends Base
                     $keyword,
                     new Filter(null, null, null, null),
                     null,
-                    10,
+                    3,
                 )
             );
         } else {
