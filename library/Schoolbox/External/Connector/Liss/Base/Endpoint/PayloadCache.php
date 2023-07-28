@@ -19,6 +19,9 @@ use Schoolbox\User;
  */
 class PayloadCache
 {
+    public const INPUT_PAYLOAD_PREFIX = 'suds_liss';
+
+
     /**
      * Constructor.
      *
@@ -60,7 +63,8 @@ class PayloadCache
         $expiryAt = \Alaress_Date_Format::now()->addWeeks(1);
 
         $filename = sprintf(
-            'suds_liss_%s_%s.log',
+            '%s_%s_%s.log',
+            self:: INPUT_PAYLOAD_PREFIX,
             $name,
             $now->getUsingFormat('Ymd_His')
         );

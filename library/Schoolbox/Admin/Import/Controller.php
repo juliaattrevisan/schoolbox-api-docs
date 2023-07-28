@@ -33,6 +33,7 @@ use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadList;
 use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
@@ -69,13 +70,14 @@ class Controller extends ConfigController
     /**
      * Constructor
      *
-     * @param ConfigMapper                     $configMapper
-     * @param FieldStrategyFactory             $fieldStrategyFactory
-     * @param Rebuilder                        $rebuilder
-     * @param Mapper                           $importLogMapper
-     * @param ClientInterface                  $redisStorage
-     * @param \Schoolbox\External\Event\Mapper $eventMapper
-     * @param ClassEntryMapper                 $classEntryMapper
+     * @param ConfigMapper                       $configMapper
+     * @param FieldStrategyFactory               $fieldStrategyFactory
+     * @param Rebuilder                          $rebuilder
+     * @param Mapper                             $importLogMapper
+     * @param ClientInterface                    $redisStorage
+     * @param \Schoolbox\External\Event\Mapper   $eventMapper
+     * @param ClassEntryMapper                   $classEntryMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -85,6 +87,7 @@ class Controller extends ConfigController
         private ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
     }
@@ -166,6 +169,9 @@ class Controller extends ConfigController
                 'hasIndicator' => $hasIndicator,
                 'statusIndicatorRoute' => $this->routeGenerator->generate('adminImportIndex.getStatusIndicator'),
                 'importLogs' => $this->importLogMapper->findLogsWithDuration(),
+                /* Find any LISS input payloads that we might have logged
+                 */
+                'lissInputPayloads' => (new PayloadList($this->storageMapper))->generate(),
                 /* Decide if the Perform Live Sync is available based on the current
                  * data source selected (you can't do it if you're using No Data Source
                  * or if you're using CSV Files)

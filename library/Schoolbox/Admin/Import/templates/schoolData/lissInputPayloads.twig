@@ -1,0 +1,20 @@
+<table>
+    <thead>
+        <tr>
+            <th>Filename</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for file in lissInputPayloads %}
+        <tr>
+            <td>
+                <a href="/storage/fetch.php?hash={{ file.hash }}&save=1">{{ file.filename }}</a>
+            </td>
+            <td>
+                {{ file.createdAt.local }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
