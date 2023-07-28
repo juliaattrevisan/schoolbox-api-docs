@@ -540,10 +540,11 @@ class Controller extends Base
     }
 
 
-
-
     /**
-     * Build quiz contents
+     * A list of all the Learnosity Quizzes
+     *
+     * This was an experimental first step, but I ended up using it
+     * to micromanage all our test content (mostly for mass deleting)
      */
     public function getActivityList(): void
     {
