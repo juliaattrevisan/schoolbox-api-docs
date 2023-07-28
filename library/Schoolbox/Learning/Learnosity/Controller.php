@@ -313,7 +313,7 @@ class Controller extends Base
          */
         $result = $this->api->dataGetRequest('/sessions/scores', [
             'session_id' => [
-                $this->request->post['learnosityReference']
+                $this->requestPost->get('learnosityReference')
             ]
         ]);
 
@@ -371,12 +371,12 @@ class Controller extends Base
             ],
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/outro.twig', [
+        $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
             'attempt' => $attempt,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
-        ])->setTitle("Result for {$assessment->getTitle()}"));
+        ], "Result for {$assessment->getTitle()}");
     }
 
 
@@ -556,7 +556,7 @@ class Controller extends Base
         /* Updated marks given by our teacher,
          * including attempt-based commentary
          */
-        $postData = $this->request->post->getArrayCopy();
+        $postData = $this->requestPost->getArrayCopy();
 
         /* $postData is a structured array containing all the feedback info
          * Some of it goes back into learnosity; some is saved locally
@@ -688,7 +688,7 @@ class Controller extends Base
             'studentId' => $student->getId()
         ]);
 
-        $this->response->redirect->to($redirect);
+        $this->response = $this->redirectFound($redirect);
     }
 
 
@@ -734,13 +734,13 @@ class Controller extends Base
 
         new \Alaress_Probe($payload);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/stream.twig', [
+        $this->response = $this->responseFromTemplate('@learnosity/stream.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
-        ])->setTitle(sprintf(
+        ], sprintf(
              'Livestream for %s',
              $assessment->getTitle()
-        )));
+        ));
     }
 
 
