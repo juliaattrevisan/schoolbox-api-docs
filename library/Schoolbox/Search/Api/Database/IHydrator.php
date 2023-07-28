@@ -29,6 +29,8 @@ interface IHydrator
     /**
      * Hydrate this raw match into a proper result.
      *
+     * TODO accept multiple results, hydrate them all
+     *
      * @param RawMatch $match
      * @return Result
      */

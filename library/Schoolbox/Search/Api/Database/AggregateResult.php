@@ -10,23 +10,24 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress_Date_Format;
 use Schoolbox\Search\Api\Cursor;
 use Schoolbox\Search\Api\Filter;
 use Schoolbox\Search\Api\ISource;
-use Schoolbox\Search\Api\Query\ISearchQuery;
+use Schoolbox\Search\Api\Result;
 
 class AggregateResult implements ISource
 {
     /**
-     * @var ISearchQuery[]
+     * @var Source[]
      */
-    private array $queries;
+    private array $sources;
 
     public function __construct(
         private IConnector $connector,
-        ISearchQuery ...$queries,
+        Source ...$queries,
     ) {
-        $this->queries = $queries;
+        $this->sources = $queries;
     }
 
     /**
@@ -34,19 +35,19 @@ class AggregateResult implements ISource
      * @param Filter      $filter
      * @param Cursor|null $cursor
      * @param int         $limit
-     * @return array
+     * @return array<Result>
      */
     public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array
     {
-        if (empty($this->queries)) {
+        if (empty($this->sources)) {
             return [];
         }
         $queries = [];
         $params  = [];
-        foreach ($this->queries as $query) {
-            $result = $query->buildQuery($keyword, $filter, $cursor, $limit);
-            $queries[] = $result['query'];
-            $params = array_merge($params, $result['params']);
+        foreach ($this->sources as $source) {
+            $queryParams = $source->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
+            $queries[]   = $queryParams->query;
+            $params      = array_merge($params, $queryParams->params);
         }
 
         $query  = '(' . implode(') UNION (', $queries) . ')';
@@ -60,7 +61,28 @@ class AggregateResult implements ISource
                 id ASC
         ';
 
-        $result = $this->connector->executeQuery($query, $params);
-        return $result->fetchAll();
+        $rawMatches = [];
+        foreach ($this->connector->executeQuery($query, $params) as $row) {
+            $rawMatches[] = new RawMatch(
+                (int)$row['id'],
+                $row['title'],
+                $row['type'],
+                Alaress_Date_Format::newDatabaseDate($row['date']),
+                $row['relevance'],
+            );
+        }
+
+        $results = [];
+        foreach ($rawMatches as $rawMatch) {
+            // TODO assume each source's raw matches can also accept results
+            foreach ($this->sources as $source) {
+                if ($source->accepts($rawMatch)) {
+                    $results[] = $source->hydrate($rawMatch);
+                    break;
+                }
+            }
+        }
+
+        return $results;
     }
 }

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database;
 
-use DateTimeInterface;
+use Alaress_Date_Format;
 
 /**
  * Data object for a raw match from a database.
@@ -20,7 +20,7 @@ class RawMatch
         public int $id,
         public string $title,
         public string $type,
-        public ?DateTimeInterface $date,
+        public ?Alaress_Date_Format $date,
         public float $relevance,
     ) {
     }

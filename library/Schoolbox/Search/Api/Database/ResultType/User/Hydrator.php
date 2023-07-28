@@ -23,7 +23,7 @@ class Hydrator implements IHydrator
      */
     public function accepts(RawMatch $match): bool
     {
-        return str_starts_with($match->type, 'user:');
+        return str_starts_with($match->type, 'user.');
     }
 
     /**

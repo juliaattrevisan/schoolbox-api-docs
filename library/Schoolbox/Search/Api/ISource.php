@@ -21,7 +21,7 @@ interface ISource
      * @param Filter      $filter  A filter for search results.
      * @param Cursor|null $cursor  A pointer to the last result in the previous search.
      * @param int         $limit   A limit of results to fetch.
-     * @return array
+     * @return array<Result>
      */
     public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array;
 }
