@@ -4,7 +4,7 @@
  # @param string|array $reportInitOptions  Learnosity API initialisation object
  # @param IAssessable $assessment          Our schoolbgox quiz instance
  # @param Attempt\Model $attempt           The student's attempt from our local db
- # @param array $scores                    A list of scores obtained per question in this attempt
+ # @param array $scores                    A list of score tuples obtained per question in this attempt
  #}
 <script src="https://reports.learnosity.com/?v2023.2.LTS"></script>
 
@@ -31,18 +31,37 @@
 <script>
     let reportCallback = {
         readyListener: function() {
-            let report1 = reportsApp.getReport('schoolbox-student');
+            let attemptReport = reportsApp.getReport('schoolbox-student');
+            let attemptScores = JSON.parse('{{ scores|raw }}');
 
             /* itemsApi only spawns if you used session-detail-by-item
              */
-            report1.on('ready:itemsApi', function(itemsApp) {
+            attemptReport.on('ready:itemsApi', function(itemsApp) {
                 window.itemsApp = itemsApp;
 
                 itemsApp.getQuestions(function(questions) {
                     $.each(questions, function(index, element) {
-                        let container = $('[data-reference="' + element.metadata.sheet_reference + '"]');
+                        /* Access different parts of the dom directly, to place
+                         * our input fields etc.
+                         */
+                        let learnosityReference = element.metadata.sheet_reference;
+                        let learnosityReferenceTuple = element.response_id;
 
-                        container.append('<div class="sb-custom-score"><label>Customise score</label><input type="text"></div>');
+                        /* Student scoring and metadata
+                         */
+                        let score = attemptScores[learnosityReferenceTuple].score;
+                        let maxScore = attemptScores[learnosityReferenceTuple].max;
+
+                        /* Containers into which we inject things
+                         */
+                        let container = $('[data-reference="' + learnosityReference + '"]');
+
+                        container.append('' +
+                            '<div class="sb-custom-score">' +
+                                '<label>Customise score</label>' +
+                                '<input type="text" value="' + score + '">' +
+                            '</div>' +
+                        '');
                     });
                 });
             });

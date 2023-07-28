@@ -423,6 +423,7 @@ class Controller extends Base
 
     /**
      * Provide feedback for an attempt
+     * @throws \JsonException
      */
     public function getFeedback(
         IAssessable $assessment,
@@ -452,19 +453,34 @@ class Controller extends Base
             ],
         ];
 
-        /* These are the scores they obtained
+        /* These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
          */
-        $scores = $this->api->dataGetRequest('sessions/responses/scores', [
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
             'session_id' => [
                 $attempt->getLearnosityReference()
             ]
-        ]);
+        ])['data'][0]['responses'];
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+
+        foreach ($responses as $response) {
+            $learnosityReference = $response['response_id'];
+
+            $scores[$learnosityReference] = [
+                'score' => $response['score'],
+                'max' => $response['max_score']
+            ];
+        }
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'attempt' => $attempt,
-            'scores' => $scores
+            'scores' => json_encode($scores, JSON_THROW_ON_ERROR)
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
