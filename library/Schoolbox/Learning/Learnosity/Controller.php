@@ -448,7 +448,7 @@ class Controller extends Base
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
             'attempt' => $attempt,
-            'comments' => $comments ? json_encode($comments, JSON_THROW_ON_ERROR) : null,
+            'comments' => $comments ? base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)) : null,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
@@ -525,7 +525,7 @@ class Controller extends Base
             'assessment' => $assessment,
             'attempt' => $attempt,
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'comments' => json_encode($comments, JSON_THROW_ON_ERROR),
+            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),

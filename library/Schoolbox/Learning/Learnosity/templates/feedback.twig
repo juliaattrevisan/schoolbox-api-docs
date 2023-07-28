@@ -34,8 +34,6 @@
                         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
                             detail: {
                                 targetElements: ['#attempt-comment'],
-                                toolbar: "simple",
-                                addToToolbar: ["|", "blank"],
                             }
                         }));
                     });
@@ -58,7 +56,7 @@
 
 <script>
     let attemptScores = JSON.parse('{{ scores|raw }}');
-    let attemptComments = JSON.parse('{{ comments|raw }}');
+    let attemptComments = JSON.parse(atob('{{ comments|raw }}'));
     let attemptEditorFields = [];
 
     let reportCallback = {
@@ -110,9 +108,7 @@
                  */
                 document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
                     detail: {
-                        targetElements: attemptEditorFields,
-                        toolbar: "simple",
-                        addToToolbar: ["|", "blank"],
+                        targetElements: attemptEditorFields
                     }
                 }));
             });

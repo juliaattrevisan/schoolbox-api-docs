@@ -38,7 +38,7 @@
      # one where there was no feedback
      #}
     {% if attempt.reviewed %}
-        let attemptComments = JSON.parse('{{ comments|raw }}');
+        let attemptComments = JSON.parse(atob('{{ comments|raw }}'));
 
         let reportCallback = {
             readyListener: function() {
