@@ -459,14 +459,14 @@ class Controller extends Base
      * @param array<int,array> $assessments
      * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
      * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
-     * @param array            $students             The array of student values which will already contian latest results, we are adding only the published marks
      * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws UnderflowException
      */
-    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators, array $students): array
+    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
     {
+        $students = [];
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -596,8 +596,14 @@ class Controller extends Base
                 'capabilities' => $capabilityMarks,
             ];
 
-            // Stuff everything about the students marks into the existing array
-            $students[$row['student_id']]['assessmentsPublished'] = $assessmentsForStudent;
+            // Stuff everything about the students marks into an array
+            $students[$row['student_id']] = [
+                'firstname'      => $row['student_firstname'],
+                'preferred_name' => $row['student_preferred_name'],
+                'lastname'       => $row['student_lastname'],
+                'assessmentsPublished'    => $assessmentsForStudent,
+                'profileLink'    => '/search/user/' . $row['student_id'],
+            ];
 
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
@@ -607,22 +613,21 @@ class Controller extends Base
     }
 
     /**
-     * Find each student in a folder and their latest (including draft) marks (if extant), and return an array indexed by student ID
+     * Find each student in a folder and their draft marks (if extant), and return an array indexed by student ID
      *
      * dupe of retrieveDatabaseMarks
      *
      * @param array<int,array> $assessments
      * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
      * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @param array            $students             The array of student values which will already contian published, we are adding only the draft marks
      * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws UnderflowException
      */
-    private function retrieveDatabaseAllMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
+    private function retrieveDatabaseDraftMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators, array $students): array
     {
-        $students = [];
-
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -691,7 +696,8 @@ class Controller extends Base
                 INNER JOIN v_most_recent_rubric_mark vrm ON
                     vrm.updated_date = latest_feedback.max_updated_at AND
                     vrm.assessment_id = latest_feedback.assessment_id AND
-                    vrm.student_id    = latest_feedback.owner
+                    vrm.student_id    = latest_feedback.owner AND
+                    vrm.feedback_date is null
                 INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
@@ -753,13 +759,7 @@ class Controller extends Base
             ];
 
             // Stuff everything about the students marks into an array
-            $students[$row['student_id']] = [
-                'firstname'      => $row['student_firstname'],
-                'preferred_name' => $row['student_preferred_name'],
-                'lastname'       => $row['student_lastname'],
-                'assessmentsLatest'    => $assessmentsForStudent,
-                'profileLink'    => '/search/user/' . $row['student_id'],
-            ];
+            $students[$row['student_id']]['assessmentsLatest'] = $assessmentsForStudent;
 
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
@@ -1201,8 +1201,8 @@ class Controller extends Base
     {
         [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
         $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
-        $databaseMarksLatest = $this->retrieveDatabaseAllMarks($assessments, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarksLatest);
+        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
+        $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
 
         $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
