@@ -68,7 +68,7 @@ async function onLoaded() {
         <div class="small-12 columns">
             <loading-table v-if="isLoading" />
             <data-load-error v-else-if="hasLoadError" :data-title="props.title" />
-            <v-client-table :data="data" :columns="columns" :options="options" @loaded="onLoaded">
+            <v-client-table v-else :data="data" :columns="columns" :options="options" @loaded="onLoaded">
                 <template v-for="slot in templates" :key="slot.key" #[slot.key]="tableData">
                     <template v-if="slot.component === 'image'">
                         <data-table-image
