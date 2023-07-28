@@ -412,10 +412,21 @@ class Controller extends Base
             ],
         ];
 
+        /* If there's a feedback for this attempt, get it
+         * and show the student. At the moment it's just
+         * commentary.
+         */
+        $comments = null;
+
+        if (null !== $attempt->getReviewed()) {
+            $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
+        }
+
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
             'attempt' => $attempt,
+            'comments' => $comments ? json_encode($comments, JSON_THROW_ON_ERROR) : null,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
@@ -485,14 +496,7 @@ class Controller extends Base
 
         /* Find all the comments for this attempt
          */
-        $feedbacks = $this->feedbackMapper->findByColumn('attempt_id', $attempt->getId())
-            ->indexBy('learnosityReference');
-
-        $comments = [];
-
-        foreach ($feedbacks as $feedback) {
-            $comments[$feedback->getLearnosityReference()] = $feedback->getComment();
-        }
+        $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),

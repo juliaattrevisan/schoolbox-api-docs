@@ -39,4 +39,23 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
+
+
+    /**
+     * Find all the comments for this attempt,
+     * indexed by learnosity reference
+     */
+    public function findForAttempt(int $attemptId): array
+    {
+        $feedbacks = $this->findByColumn('attempt_id', $attemptId)
+            ->indexBy('learnosityReference');
+
+        $comments = [];
+
+        foreach ($feedbacks as $feedback) {
+            $comments[$feedback->getLearnosityReference()] = $feedback->getComment();
+        }
+
+        return $comments;
+    }
 }
