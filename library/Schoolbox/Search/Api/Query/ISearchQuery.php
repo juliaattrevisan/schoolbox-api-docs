@@ -20,13 +20,13 @@ interface ISearchQuery
     /**
      * Build a search query and its parameters.
      *
-     * @param string $keyword
-     * @param Filter $filter
-     * @param Cursor $cursor
-     * @param int    $limit
+     * @param string      $keyword
+     * @param Filter      $filter
+     * @param Cursor|null $cursor
+     * @param int         $limit
      * @return array{query: string, params: array} A query and params.
      *                                             Intended to be used in a database query, and joined together with
      *                                             other `buildQuery` results into a `UNION` query.
      */
-    public function buildQuery(string $keyword, Filter $filter, Cursor $cursor, int $limit): array;
+    public function buildQuery(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array;
 }

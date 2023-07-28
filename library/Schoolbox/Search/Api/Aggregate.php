@@ -34,7 +34,7 @@ class Aggregate implements ISource
     /**
      * @inheritdoc
      */
-    public function search(string $keyword, Filter $filter, string $cursor, int $limit): array
+    public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array
     {
         // TODO apply limit and cursor
         return array_merge(

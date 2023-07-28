@@ -17,11 +17,11 @@ interface ISource
     /**
      * Search this source.
      *
-     * @param string $keyword A keyword to search for.
-     * @param Filter $filter  A filter for search results.
-     * @param string $cursor  A pointer to the last result in the previous search.
-     * @param int    $limit   A limit of results to fetch.
+     * @param string      $keyword A keyword to search for.
+     * @param Filter      $filter  A filter for search results.
+     * @param Cursor|null $cursor  A pointer to the last result in the previous search.
+     * @param int         $limit   A limit of results to fetch.
      * @return array
      */
-    public function search(string $keyword, Filter $filter, string $cursor, int $limit): array;
+    public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array;
 }

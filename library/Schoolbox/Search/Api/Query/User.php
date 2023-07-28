@@ -34,7 +34,7 @@ class User implements ISearchQuery
     /**
      * @inheritdoc
      */
-    public function buildQuery(string $keyword, Filter $filter, Cursor $cursor, int $limit): array
+    public function buildQuery(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array
     {
         // Unsure if exact search should be used here?
 //        // test for exact search, and if so return those results instead
@@ -91,18 +91,20 @@ class User implements ISearchQuery
         // Apply cursor
         // (Previous technique: < most relevant field, = most relevant and < next most relevant)
         // This can probably be made generic?
-        $cursorSearchParts = [
-            'relevance < :relevance',
-            '(relevance = :relevance AND title > :title)',
-            '(relevance = :relevance AND title = :title AND type > :type)',
-            '(relevance = :relevance AND title = :title AND type = :type AND id > :id)',
-        ];
+        if ($cursor) {
+            $cursorSearchParts = [
+                'relevance < :relevance',
+                '(relevance = :relevance AND title > :title)',
+                '(relevance = :relevance AND title = :title AND type > :type)',
+                '(relevance = :relevance AND title = :title AND type = :type AND id > :id)',
+            ];
 
-        $whereParts[]        = '(' . implode(' OR ', $cursorSearchParts) . ')';
-        $params['relevance'] = $cursor->relevance;
-        $params['type']      = $cursor->type;
-        $params['title']     = $cursor->title;
-        $params['id']        = $cursor->id;
+            $whereParts[]        = '(' . implode(' OR ', $cursorSearchParts) . ')';
+            $params['relevance'] = $cursor->relevance;
+            $params['type']      = $cursor->type;
+            $params['title']     = $cursor->title;
+            $params['id']        = $cursor->id;
+        }
 
         $where = implode(' AND ', $whereParts);
 
