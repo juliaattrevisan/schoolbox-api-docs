@@ -36,6 +36,8 @@
         // Default images to medium size if no size is specified. This size is the standard image thumbnail size
         // used on the platform currently.
         align-items: center;
+        // Default global roundness
+        border-radius: var(--roundness-images);
         display: flex;
         flex: 0 0 var(--image-size-m);
         height: var(--image-size-m);
@@ -106,10 +108,9 @@
     &--round {
         .img__wrapper {
             // Very subtly make the image stand out from the background if there is no background contrast
-            // TODO - This should ideally be controlled with custom properties inside a borders class somewhere.
+            // TODO - This border should ideally be controlled with custom properties inside a borders class somewhere.
             border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 50%;
-            overflow: hidden;
         }
     }
 

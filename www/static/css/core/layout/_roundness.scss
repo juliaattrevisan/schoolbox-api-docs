@@ -1,0 +1,16 @@
+/*****************************
+    roundness.scss
+ ****************************/
+
+/*
+    Global values to control the roundness of objects within our platform. They're currently broken down into three categories...
+    - images or image-type things
+    - cards (specifically the borders)
+    - interactibles (buttons, chips, etc.)
+*/
+
+:root {
+    --roundness-images: 0px;
+    --roundness-cards: 0px;
+    --roundness-interactibles: 0px;
+}

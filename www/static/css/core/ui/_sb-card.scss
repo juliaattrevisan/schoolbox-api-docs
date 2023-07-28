@@ -17,6 +17,8 @@
 .sb-card {
     // Should this be transparent?
     background-color: white;
+    // Control radius from custom property
+    border-radius: var(--roundness-cards);
 
     // The main section of a card, generally with the most prominent information. Title, meta, actions, thumbnail.
     // In a lot of instances, this is all you need.
