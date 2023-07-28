@@ -1126,7 +1126,8 @@ class Controller extends Base
      * @param string $field         string of the mark type (published / latest (draft))
      * @return array
      */
-    private function generateHumanReadableMarks(array $students, array $studentMarks, int $studentId, string $field) {
+    private function generateHumanReadableMarks(array $students, array $studentMarks, int $studentId, string $field): array
+    {
         $decimalHydrator = new Decimal();
         $totalMarkScheme = new MarkScheme\TotalMarkFractional();
         foreach (($studentMarks) as $assessmentId => $assessmentMarks) {
