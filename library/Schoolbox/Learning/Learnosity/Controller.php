@@ -48,6 +48,14 @@ class Controller extends Base
 
 
     /**
+     * Learnosity API instance is the same for everything afaict
+     *
+     * @var Api
+     */
+    private Api $api;
+
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -55,6 +63,15 @@ class Controller extends Base
         $this->errorMapper   = \Schoolbox\Error\Mapper::getInstance();
         $this->quizMapper    = \Schoolbox\Learning\Quiz\Mapper::getInstance();
         $this->attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
+
+        /* Probably inject this one day, but for now,
+         * I want to avoid dumping Yet Another Thing into the kernel
+         */
+        $this->api = new Api(
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+        );
     }
 
 
@@ -95,16 +112,10 @@ class Controller extends Base
             ]
         ];
 
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learnosity/content.twig', [
                 'assessment'  => $assessment,
-                'initOptions' => $api->initOptions('author', $payload),
+                'initOptions' => $this->api->initOptions('author', $payload),
                 'returnUrl'   => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL) ?? ''),
             ])->setTitle(
                 sprintf(
@@ -230,17 +241,9 @@ class Controller extends Base
             'user_id'              => (string)$this->getUser()->getId(),
         ];
 
-        /* Let the $student do it
-         */
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learnosity/items.twig', [
-                'initOptions'         => $api->initOptions('items', $payload),
+                'initOptions'         => $this->api->initOptions('items', $payload),
                 'assessment'          => $assessment,
                 'attemptId'           => $attempt->getId(),
                 'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
@@ -298,12 +301,6 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
         $payload = [
             'user_id' => (string)$attempt->getUser()->getId(),
             'reports' => [
@@ -336,7 +333,7 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/report.twig', [
-            'initOptions' => $api->initOptions('reports', $payload),
+            'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ])->setTitle("Result for {$assessment->getTitle()}"));
@@ -378,19 +375,9 @@ class Controller extends Base
             ]
         ];
 
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/activityList.twig',
-            [
-                'initOptions' => $api->initOptions('author', $payload)
-            ],
-            'Example Activity List'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/activityList.twig', [
+            'initOptions' => $this->api->initOptions('author', $payload)
+        ], 'Example Activity List');
     }
 
 
@@ -505,19 +492,9 @@ class Controller extends Base
             ],
         ];
 
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/items.twig',
-            [
-                'initOptions' => $api->initOptions('items', $payload)
-            ],
-            'Example Item'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/items.twig', [
+            'initOptions' => $this->api->initOptions('items', $payload)
+        ], 'Example Item');
     }
 
 
@@ -596,19 +573,9 @@ class Controller extends Base
             ],
         ];
 
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/items.twig',
-            [
-                'initOptions' => $api->initOptions('items', $payload)
-            ],
-            'Example Item'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/items.twig', [
+            'initOptions' => $this->api->initOptions('items', $payload)
+        ], 'Example Item');
     }
 
 
@@ -624,12 +591,6 @@ class Controller extends Base
      */
     public function getSessionListReport(): void
     {
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
         $payload = [
             'user_id' => (string)$this->getUser()->getId(),
             'reports' => [
@@ -653,13 +614,9 @@ class Controller extends Base
             ],
         ];
 
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/sessionList.twig',
-            [
-                'initOptions' => $api->initOptions('reports', $payload)
-            ],
-            'Example Session List'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/sessionList.twig', [
+            'initOptions' => $this->api->initOptions('reports', $payload)
+        ], 'Example Session List');
     }
 
     /**
@@ -679,6 +636,7 @@ class Controller extends Base
         if (Quiz::AVAILABILITY_ASSESS !== $quiz->getAvailability()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
+
         return $quiz;
     }
 }
