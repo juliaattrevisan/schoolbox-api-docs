@@ -19,17 +19,17 @@ export const Default: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
-                <div class="sb-card__top">
+                <div class="sb-card__main">
                     <div class="sb-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__top-content">
+                    <div class="sb-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
-                    <div class="sb-card__top-actions">
+                    <div class="sb-card__main-actions">
                         <nav class="sb-nav-actions">
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
@@ -90,13 +90,13 @@ export const TopSection: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
-                <div class="sb-card__top">
+                <div class="sb-card__main">
                     <div class="sb-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__top-content">
+                    <div class="sb-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
@@ -110,13 +110,13 @@ export const TopSectionMultiMeta: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
-                <div class="sb-card__top">
+                <div class="sb-card__main">
                     <div class="sb-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__top-content">
+                    <div class="sb-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
@@ -134,13 +134,13 @@ export const TopSectionNavActionsVerticalAlign: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
-                <div class="sb-card__top">
+                <div class="sb-card__main">
                     <div class="sb-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__top-content">
+                    <div class="sb-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
@@ -159,13 +159,13 @@ export const TopSectionIcon: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
-                <div class="sb-card__top">
+                <div class="sb-card__main">
                     <div class="sb-card__primary-img img">
                         <div class="img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
-                    <div class="sb-card__top-content">
+                    <div class="sb-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
@@ -179,13 +179,13 @@ export const SubItem: Story = {
     render: () => ({
         template: `
             <div class="sb-card sb-card--subitem">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img">
+                <div class="sb-card__main">
+                    <div class="sb-card__primary-img img img-s">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__top-content">
+                    <div class="sb-card__main-content">
                         <a href=""><h6 class="">How cool is this dog?</h6></a>
                         <span class="meta">Last updated 3 weeks ago</span>
                     </div>
@@ -199,13 +199,13 @@ export const SubItemIcon: Story = {
     render: () => ({
         template: `
             <div class="sb-card sb-card--subitem">
-                <div class="sb-card__top">
-                    <div class="sb-card__primary-img img">
+                <div class="sb-card__main">
+                    <div class="sb-card__primary-img img img-s">
                         <div class="img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
-                    <div class="sb-card__top-content">
+                    <div class="sb-card__main-content">
                         <a href=""><h6 class="">How cool is this dog?</h6></a>
                         <span class="meta">Last updated 3 weeks ago</span>
                     </div>
@@ -220,52 +220,52 @@ export const CardList: Story = {
         template: `
             <div class="sb-card-list">
                 <div class="sb-card">
-                    <div class="sb-card__top">
+                    <div class="sb-card__main">
                         <div class="sb-card__primary-img img">
                             <div class="img__wrapper">
                                 <div class="icon icon-house"></div>
                             </div>
                         </div>
-                        <div class="sb-card__top-content">
+                        <div class="sb-card__main-content">
                             <a href=""><h3 class="">Year 12 Biology (BIO12)</h3></a>
                             <span class="meta"><a href="">Courses</a> > <a href="">Senior Courses</a> > <a href="">English</a> > <a href="">Year 12 Biology</a></span>
                         </div>
                     </div>
                 </div>
                 <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img img">
+                    <div class="sb-card__main">
+                        <div class="sb-card__primary-img img img-s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
-                        <div class="sb-card__top-content">
+                        <div class="sb-card__main-content">
                             <a href=""><h6 class="">How cool is this dog?</h6></a>
                             <span class="meta">Last updated 1 week ago</span>
                         </div>
                     </div>
                 </div>
                 <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img img">
+                    <div class="sb-card__main">
+                        <div class="sb-card__primary-img img img-s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/96/96" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
-                        <div class="sb-card__top-content">
+                        <div class="sb-card__main-content">
                             <a href=""><h6 class="">What about this one?</h6></a>
                             <span class="meta">Last updated 2 weeks ago</span>
                         </div>
                     </div>
                 </div>
                 <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__top">
-                        <div class="sb-card__primary-img img">
+                    <div class="sb-card__main">
+                        <div class="sb-card__primary-img img img-s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/108/108" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
-                        <div class="sb-card__top-content">
+                        <div class="sb-card__main-content">
                             <a href=""><h6 class="">Isn't this one cool too?</h6></a>
                             <span class="meta">Last updated 3 weeks ago</span>
                         </div>

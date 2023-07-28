@@ -4,9 +4,9 @@
  *  Modern styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
  *
  *  The standard implementation on a larger card like a news article consists of three parts
- *  -   A 'top' section, which for a lot of slimline card implementations is literally all you'd need.
+ *  -   A 'main' section, which for a lot of slimline card implementations is literally all you'd need.
  *  -   A 'content' section, which is just to house whatever content you might want to display. Let's say
- *      you had an <article> within a news card for example - put it here.
+ *      you had an <article> within a news card for example - put it here. All it does is add padding.
  *  -   An 'actions' section, which can sit at the bottom and have links/actions displayed within it
  *
  *  The current logic here is flexible enough to handle a most standard card uses of cards, but it currently
@@ -15,10 +15,11 @@
 */
 
 .sb-card {
-    // Is this correct or do we want this transparent?
+    // Should this be transparent?
     background-color: white;
 
-    &__top {
+    // The main section of a card, generally with the most prominent information. Title, meta, actions, thumbnail.
+    &__main {
         display: flex;
         flex-direction: row;
         gap: var(--whitespace-m);
@@ -93,38 +94,20 @@
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
         padding: var(--whitespace-xs);
 
-        // TODO - Convert this over to using an img-s instead of what it is.
-        .sb-card {
-            &__primary-img {
-                &.img {
-                    .img__wrapper {
-                        flex: 0 0 40px;
-                        height: 40px;
-                        width: 40px;
-                    }
-                }
-
-                // Increase icon size
-                & .icon:before {
-                    font-size: 1.5rem;
-                }
-            }
-
-            &__top-content {
-                padding-block-start: 0;
-                padding-block-end: 0;
-            }
+        .sb-card__main-content {
+            padding-block-start: 0;
+            padding-block-end: 0;
         }
     }
 }
 
-/* A list to contain all these cards */
+/* A list to contain all these cards. It just adds a bottom border to everything except the last item. */
 .sb-card-list {
     display: flex;
     flex-direction: column;
     margin: 0;
 
-    .sb-card {
+    .sb-card:not(:last-child) {
         border-block-end: 1px solid rgba(0, 0, 0, 0.2);
     }
 }
