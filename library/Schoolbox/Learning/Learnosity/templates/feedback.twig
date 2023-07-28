@@ -1,22 +1,51 @@
 {# Add your own javascript, validation etc. #}
 {# Use pantry for styling #}
 
-<script src="https://items.learnosity.com/?v2023.2.LTS"></script>
+<script src="https://reports.learnosity.com/?v2023.2.LTS"></script>
 
 
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Learnosity Test</h2>
         <section class="content">
-
-            <div id="learnosity_assess"></div>
-
-            <script>
-                let itemsApp = LearnosityItems.init(
-                    {{ initOptions | raw }}
-                );
-            </script>
+            <div id="schoolbox-student"></div>
         </section>
     </div>
 </div>
 
+<style>
+    .sb-custom-score {
+        margin-bottom: 3rem;
+    }
+
+    .sb-custom-score label {
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    let reportCallback = {
+        readyListener: function() {
+            let report1 = reportsApp.getReport('schoolbox-student');
+
+            /* itemsApi only spawns if you used session-detail-by-item
+             */
+            report1.on('ready:itemsApi', function(itemsApp) {
+                window.itemsApp = itemsApp;
+
+                itemsApp.getQuestions(function(questions) {
+                    console.log(questions);
+                    $.each(questions, function(index, element) {
+                        let container = $('[data-reference="' + element.metadata.sheet_reference + '"]');
+
+                        container.append('<div class="sb-custom-score"><label>Customise score</label><input type="text"></div>');
+                    });
+                });
+            });
+        }
+    }
+
+    let reportsApp = LearnosityReports.init(
+        {{ reportInitOptions | raw }}, reportCallback
+    );
+</script>

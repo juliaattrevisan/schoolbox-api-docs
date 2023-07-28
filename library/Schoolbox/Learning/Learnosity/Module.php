@@ -88,6 +88,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/review/{studentId}/{learnosityReference}', 'getReview', $learnerPerms, $preloadAttempt);
 
+        /* Provide feedback to a student's attempt
+         */
+        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'getFeedback', $instructorPerms, $preloadAttempt);
+
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
@@ -96,7 +100,6 @@ class Module extends BaseModule
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
         $this->register('GET', '/items', 'getItems', $instructorPerms, null);
-        $this->register('GET', '/feedback', 'getFeedback', $instructorPerms, null);
         $this->register('GET', '/sessionList', 'getSessionListReport', $instructorPerms, null);
     }
 
