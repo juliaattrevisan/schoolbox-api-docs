@@ -255,8 +255,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getConfig()->get('learnosity_consumer_key'),
-            $this->getConfig()->get('learnosity_consumer_secret'),
+            (string)$this->getConfig()->get('learnosity_consumer_key'),
+            (string)$this->getConfig()->get('learnosity_consumer_secret'),
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),

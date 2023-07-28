@@ -33,6 +33,7 @@ class Api
      * @param string      $consumerKey
      * @param string      $consumerSecret
      * @param Logger|null $logger
+     * @throws \DomainException
      */
     public function __construct(
         private string $serverName,
@@ -40,6 +41,11 @@ class Api
         #[\SensitiveParameter] private string $consumerSecret,
         private ?Logger $logger = null
     ) {
+        /* If not set, I guess loudly announce it
+         */
+        if ('' === $consumerKey || '' === $consumerSecret) {
+            throw new \DomainException('Learnosity is not configured; please check settings');
+        }
     }
 
 
