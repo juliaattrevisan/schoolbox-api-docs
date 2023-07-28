@@ -25,6 +25,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
+use Twig\Error\Error;
 
 class Controller extends Base
 {
@@ -116,18 +117,14 @@ class Controller extends Base
             ]
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learnosity/content.twig', [
-                'assessment'  => $assessment,
-                'initOptions' => $this->api->initOptions('author', $payload),
-                'returnUrl'   => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL) ?? ''),
-            ])->setTitle(
-                sprintf(
-                    'Modify contents of %s',
-                    $assessment->getTitle()
-                )
-            )
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
+            'assessment'  => $assessment,
+            'initOptions' => $this->api->initOptions('author', $payload),
+            'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
+        ], sprintf(
+            'Modify contents of %s',
+            $assessment->getTitle()
+        ));
     }
 
 
@@ -137,15 +134,14 @@ class Controller extends Base
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
+     * @throws Error
      */
     public function getIntro(IAssessable $assessment, \Schoolbox\User $student): void
     {
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learnosity/intro.twig', [
-                'assessment' => $assessment,
-                'student' => $student,
-            ])->setTitle("Start {$assessment->getTitle()}")
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/intro.twig', [
+            'assessment' => $assessment,
+            'student' => $student,
+        ], "Start {$assessment->getTitle()}");
     }
 
 
@@ -248,18 +244,17 @@ class Controller extends Base
             'user_id'              => (string)$this->getUser()->getId(),
         ];
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learnosity/attempt.twig', [
-                'initOptions'         => $this->api->initOptions('items', $payload),
-                'assessment'          => $assessment,
-                'attemptId'           => $attempt->getId(),
-                'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
-                    'assessmentId' => $assessment->getId(),
-                    'studentId'    => $student->getId(),
-                ]),
-                'learnosityReference' => $attempt->getLearnosityReference(),
-            ])->setTitle("Attempt {$assessment->getTitle()}")
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
+            'initOptions'         => $this->api->initOptions('items', $payload),
+            'assessment'          => $assessment,
+            'attemptId'           => $attempt->getId(),
+            'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
+                'assessmentId' => $assessment->getId(),
+                'studentId'    => $student->getId(),
+            ]),
+            'learnosityReference' => $attempt->getLearnosityReference(),
+        ], "Attempt {$assessment->getTitle()}");
+
         /* TODO Record the automated result somewhere (idk where)
          */
     }
@@ -284,8 +279,8 @@ class Controller extends Base
     public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
         $existingAttempt = $this->attemptMapper->findOneByColumnList([
-            'attempt_id'           => $this->request->post['attemptId'],
-            'learnosity_reference' => $this->request->post['learnosityReference'],
+            'attempt_id'           => $this->requestPost->get('attemptId'),
+            'learnosity_reference' => $this->requestPost->get('learnosityReference'),
             'user_id'              => $student->getId()
         ]);
 
@@ -341,11 +336,11 @@ class Controller extends Base
             ],
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learnosity/report.twig', [
+        $this->response = $this->responseFromTemplate('@learnosity/report.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
-        ])->setTitle("Result for {$assessment->getTitle()}"));
+        ], "Result for {$assessment->getTitle()}");
     }
 
 

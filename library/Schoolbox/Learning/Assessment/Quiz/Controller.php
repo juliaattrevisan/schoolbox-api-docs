@@ -241,7 +241,7 @@ class Controller extends Assessment\Controller
             'studentId' => $student->getId()
         ]);
 
-        $this->response->redirect->to($url);
+        $this->response = $this->redirectFound($url);
         return;
 
 //        $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
