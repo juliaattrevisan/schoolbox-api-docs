@@ -61,14 +61,16 @@
                                     {% set markLatest = marks[participant.id][id]['latest'] ?? null %}
                                     {% set mark = marks[participant.id][id]['published'] ?? null %}
                                     <td class="markdown">
-                                        <div data-actual-mark>
+                                        <div {% if markLatest %}data-actual-mark{%endif %}>
                                         {{ (mark.descriptor.description ?? '') | markdown }}
-                                        <p>{{ mark.value ?? '' }}</p>
+                                            <p>{{ mark.value ?? '' }}</p>
                                         </div>
-                                        <div data-draft-mark>
+                                        {% if markLatest %}
+                                        <div data-draft-mark class="meta">
                                         {{ (markLatest.descriptor.description ?? '') | markdown }}
-                                        <p>{{ markLatest.value ?? '' }}</p>
+                                            <p>{{ markLatest.value ?? '' }}</p>
                                         </div>
+                                        {% endif %}
                                     </td>
                                 {% endfor %}
                             {% endfor %}

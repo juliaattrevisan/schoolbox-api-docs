@@ -600,10 +600,13 @@ class Controller extends Assessment\Controller
             // if this feedback is a draft, we need to check if there is published feedback...
             if ($latestFeedback->isDraft()) {
                 $publishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+            } else {
+                // ignore latest feedbacks that are published... we only care about draft latest
+                $latestFeedback = null;
             }
 
             try {
-                $markedGridLatest = $this->rubricMapper->retrieveMarkedGrid($latestFeedback);
+                $markedGridLatest = $latestFeedback ? $this->rubricMapper->retrieveMarkedGrid($latestFeedback) : null;
                 // if no published feedback default to empty
                 $markedGridPublished = $publishedFeedback ? $this->rubricMapper->retrieveMarkedGrid($publishedFeedback) : null;
             } catch (MapperException) {
@@ -618,9 +621,11 @@ class Controller extends Assessment\Controller
                     }
                 }
             }
-            foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
-                foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
+            if (null !== $markedGridLatest) {
+                foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
+                    foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
+                    }
                 }
             }
         }
