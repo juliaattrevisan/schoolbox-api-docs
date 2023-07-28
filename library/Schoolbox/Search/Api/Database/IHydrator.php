@@ -9,8 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database;
 
-use Schoolbox\Search\Api\Cursor;
-use Schoolbox\Search\Api\Filter;
+use Schoolbox\Search\Api\Result;
 
 /**
  * A hydrator for search result matches.
@@ -19,7 +18,19 @@ use Schoolbox\Search\Api\Filter;
  */
 interface IHydrator
 {
-    public function accepts(): bool;
+    /**
+     * Will this hydrator accept this raw match?
+     *
+     * @param RawMatch $match
+     * @return bool
+     */
+    public function accepts(RawMatch $match): bool;
 
-    public function hydrate($match): array;
+    /**
+     * Hydrate this raw match into a proper result.
+     *
+     * @param RawMatch $match
+     * @return Result
+     */
+    public function hydrate(RawMatch $match): Result;
 }
