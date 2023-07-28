@@ -775,7 +775,6 @@ class Controller extends Base
      * @param array $students
      * @param array $assessments
      * @return array
-     * @throws /Aura/Router/Exception/RouteNotFound
      */
     private function collateHumanReadableMarks(array $students, array $assessments): array
     {
