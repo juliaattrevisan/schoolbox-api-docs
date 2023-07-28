@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Query;
 
+use Schoolbox\Search\Api\Cursor;
 use Schoolbox\Search\Api\Filter;
 
 /**
@@ -21,11 +22,11 @@ interface ISearchQuery
      *
      * @param string $keyword
      * @param Filter $filter
-     * @param string $cursor
+     * @param Cursor $cursor
      * @param int    $limit
      * @return array{query: string, params: array} A query and params.
      *                                             Intended to be used in a database query, and joined together with
      *                                             other `buildQuery` results into a `UNION` query.
      */
-    public function buildQuery(string $keyword, Filter $filter, string $cursor, int $limit): array;
+    public function buildQuery(string $keyword, Filter $filter, Cursor $cursor, int $limit): array;
 }
