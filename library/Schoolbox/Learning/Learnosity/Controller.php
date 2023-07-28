@@ -30,6 +30,13 @@ use Twig\Error\Error;
 class Controller extends Base
 {
     /**
+     * TODO Inject this later
+     * @var \Schoolbox\Learning\Quiz\Mapper
+     */
+    private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
+
+
+    /**
      * Learnosity API instance is the same for everything afaict
      *
      * @var Api
