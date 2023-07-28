@@ -107,10 +107,12 @@ class Controller extends AbstractController
      */
     public function getQuizSummary($assessmentId)
     {
-        $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
+        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
         $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
-        $this->response = $this->redirectFound("/assess/summary/$assessId{$redirect}");
+
+        $url = $this->router->getGenerator()->generate('learnosity.getContent', ['assessmentId' => $assessmentId]);
+
+        $this->getResponse()->redirect->to("{$url}{$redirect}");
     }
 
     /**
