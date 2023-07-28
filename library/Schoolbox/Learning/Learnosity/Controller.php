@@ -412,7 +412,7 @@ class Controller extends Base
             ],
         ];
 
-        $this->response = $this->responseFromTemplate('@learnosity/report.twig', [
+        $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
             'attempt' => $attempt,
