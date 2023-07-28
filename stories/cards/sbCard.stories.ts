@@ -204,7 +204,7 @@ export const SubItem: Story = {
         template: `
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
                         </div>
@@ -224,7 +224,7 @@ export const SubItemIcon: Story = {
         template: `
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
@@ -258,7 +258,7 @@ export const CardList: Story = {
                 </div>
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                             </div>
@@ -271,7 +271,7 @@ export const CardList: Story = {
                 </div>
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/96/96" alt="Placedog 64 by 64 image" />
                             </div>
@@ -284,7 +284,7 @@ export const CardList: Story = {
                 </div>
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/108/108" alt="Placedog 64 by 64 image" />
                             </div>

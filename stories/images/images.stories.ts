@@ -27,7 +27,7 @@ export const Default: Story = {
 export const RoundedImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-m img--round">
+            <div class="img img--m img--round">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -51,7 +51,7 @@ export const Initials: Story = {
 export const XXSImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-xxs ">
+            <div class="img img--xxs ">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -63,7 +63,7 @@ export const XXSImage: Story = {
 export const XSImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-xs ">
+            <div class="img img--xs ">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -75,7 +75,7 @@ export const XSImage: Story = {
 export const XSIcon: Story = {
     render: () => ({
         template: `
-            <div class="img img-xs ">
+            <div class="img img--xs ">
                 <div class="img__wrapper">
                     <div class="icon icon-calendar">
                 </div>
@@ -87,7 +87,7 @@ export const XSIcon: Story = {
 export const SImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-s ">
+            <div class="img img--s ">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -99,7 +99,7 @@ export const SImage: Story = {
 export const SIcon: Story = {
     render: () => ({
         template: `
-            <div class="img img-s ">
+            <div class="img img--s ">
                 <div class="img__wrapper">
                     <div class="icon icon-calendar">
                 </div>
@@ -111,7 +111,7 @@ export const SIcon: Story = {
 export const MImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-m ">
+            <div class="img img--m ">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -123,7 +123,7 @@ export const MImage: Story = {
 export const MIcon: Story = {
     render: () => ({
         template: `
-            <div class="img img-m ">
+            <div class="img img--m ">
                 <div class="img__wrapper">
                     <div class="icon icon-calendar">
                 </div>
@@ -135,7 +135,7 @@ export const MIcon: Story = {
 export const LImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-l ">
+            <div class="img img--l ">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -147,7 +147,7 @@ export const LImage: Story = {
 export const LIcon: Story = {
     render: () => ({
         template: `
-            <div class="img img-l ">
+            <div class="img img--l ">
                 <div class="img__wrapper">
                     <div class="icon icon-calendar">
                 </div>
@@ -159,7 +159,7 @@ export const LIcon: Story = {
 export const XLImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-xl ">
+            <div class="img img--xl ">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -171,7 +171,7 @@ export const XLImage: Story = {
 export const XLIcon: Story = {
     render: () => ({
         template: `
-            <div class="img img-xl ">
+            <div class="img img--xl ">
                 <div class="img__wrapper">
                     <div class="icon icon-calendar">
                 </div>
@@ -183,7 +183,7 @@ export const XLIcon: Story = {
 export const XXLImage: Story = {
     render: () => ({
         template: `
-            <div class="img img-xxl ">
+            <div class="img img--xxl ">
                 <div class="img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
@@ -195,7 +195,7 @@ export const XXLImage: Story = {
 export const XXLIcon: Story = {
     render: () => ({
         template: `
-            <div class="img img-xxl">
+            <div class="img img--xxl">
                 <div class="img__wrapper">
                     <div class="icon icon-calendar">
                 </div>
@@ -207,7 +207,7 @@ export const XXLIcon: Story = {
 export const XXSInitials: Story = {
     render: () => ({
         template: `
-            <div class="img img-xxs img--round">
+            <div class="img img--xxs img--round">
                 <div class="img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>
@@ -219,7 +219,7 @@ export const XXSInitials: Story = {
 export const XSInitials: Story = {
     render: () => ({
         template: `
-            <div class="img img-xs img--round">
+            <div class="img img--xs img--round">
                 <div class="img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>
@@ -231,7 +231,7 @@ export const XSInitials: Story = {
 export const SInitials: Story = {
     render: () => ({
         template: `
-            <div class="img img-s img--round">
+            <div class="img img--s img--round">
                 <div class="img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>
@@ -243,7 +243,7 @@ export const SInitials: Story = {
 export const MInitials: Story = {
     render: () => ({
         template: `
-            <div class="img img-m img--round">
+            <div class="img img--m img--round">
                 <div class="img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>
@@ -255,7 +255,7 @@ export const MInitials: Story = {
 export const LInitials: Story = {
     render: () => ({
         template: `
-            <div class="img img-l img--round">
+            <div class="img img--l img--round">
                 <div class="img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>
@@ -267,7 +267,7 @@ export const LInitials: Story = {
 export const XLInitials: Story = {
     render: () => ({
         template: `
-            <div class="img img-xl img--round">
+            <div class="img img--xl img--round">
                 <div class="img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>
@@ -279,7 +279,7 @@ export const XLInitials: Story = {
 export const XXLInitials: Story = {
     render: () => ({
         template: `
-            <div class="img img-xxl img--round">
+            <div class="img img--xxl img--round">
                 <div class="img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>

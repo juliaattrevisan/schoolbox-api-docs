@@ -71,7 +71,7 @@
         the platform and allows us to design solutions with these standardised sizes in mind.
     */
     @each $size in $global-image-sizes {
-        &-#{$size} {
+        &--#{$size} {
             .img__wrapper {
                 flex: 0 0 var(--image-size-#{$size});
                 height: var(--image-size-#{$size});
@@ -133,7 +133,7 @@
         }
 
         @each $size in $global-image-sizes {
-            &.img-#{$size} {
+            &.img--#{$size} {
                 .img__wrapper {
                     flex: 0 0 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
                     height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));

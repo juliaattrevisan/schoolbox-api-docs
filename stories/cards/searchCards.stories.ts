@@ -18,7 +18,7 @@ export const Assessments: Story = {
         <div class="sb-card-list">
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-due-work"></div>
                         </div>
@@ -30,7 +30,7 @@ export const Assessments: Story = {
             </div>
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-quiz"></div>
                         </div>
@@ -42,19 +42,19 @@ export const Assessments: Story = {
             </div>
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-project"></div>
                         </div>
                     </div>
                     <div class="sb-card__main-content">
-                        <a href=""><h6 class="">Romeo and Juliet Project</h6></a>
+                        <a href=""><h6 class=""><mark>Romeo</mark> and Juliet Project</h6></a>
                     </div>
                 </div>
             </div>
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-task"></div>
                         </div>
@@ -66,13 +66,13 @@ export const Assessments: Story = {
             </div>
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-lesson-plan"></div>
                         </div>
                     </div>
                     <div class="sb-card__main-content">
-                        <a href=""><h6 class="">Romeo and Juliet Character Analysis</h6></a>
+                        <a href=""><h6 class=""><mark>Romeo</mark> and Juliet Character Analysis</h6></a>
                     </div>
                 </div>
             </div>
@@ -93,7 +93,7 @@ export const Badge: Story = {
                     </div>
                     <div class="sb-card__main-content">
                         <a href=""><h3 class="">Year 9 English</h3></a>
-                        <span class="meta">Senior Courses > English</span>
+                        <span class="meta">Extra-Curricular</span>
                     </div>
                 </div>
             </div>
@@ -147,7 +147,7 @@ export const Files: Story = {
             <div class="sb-card-list">
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-audio.svg"/>
                             </div>
@@ -160,7 +160,7 @@ export const Files: Story = {
                 </div>
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                             <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-video.svg"/>
                             </div>
@@ -173,7 +173,7 @@ export const Files: Story = {
                 </div>
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-blank.svg"/>
                             </div>
@@ -186,7 +186,7 @@ export const Files: Story = {
                 </div>
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-pdf.svg"/>
                             </div>
@@ -199,7 +199,7 @@ export const Files: Story = {
                 </div>
                 <div class="sb-card sb-card--subitem">
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img-s">
+                        <div class="sb-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/120/120"/>
                             </div>
@@ -220,7 +220,7 @@ export const Forum: Story = {
         template: `
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-forum"></div>
                         </div>
@@ -239,7 +239,7 @@ export const Link: Story = {
         template: `
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-link"></div>
                         </div>
@@ -256,9 +256,9 @@ export const Link: Story = {
 export const News: Story = {
     render: () => ({
         template: `
-            <div class="sb-card sb-card--subitem">
+            <div class="sb-card">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img">
                         <div class="img__wrapper">
                             <div class="icon icon-news"></div>
                         </div>
@@ -278,7 +278,7 @@ export const Unit: Story = {
         template: `
             <div class="sb-card sb-card--subitem">
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img-s">
+                    <div class="sb-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-unit"></div>
                         </div>
