@@ -53,6 +53,11 @@ class Mapper extends \Schoolbox\Mapper
         $comments = [];
 
         foreach ($feedbacks as $feedback) {
+            /* Perform oembed replacements in advance because this gets
+             * injected into the dom directly
+             */
+            $feedback->setComment(\Scrub::html($feedback->getComment()));
+
             $comments[$feedback->getLearnosityReference()] = $feedback->getComment();
         }
 
