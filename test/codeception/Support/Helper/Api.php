@@ -54,6 +54,7 @@ use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -269,7 +270,18 @@ class Api extends \Codeception\Module
         $folder->setHomepage($homepageConfig);
         $this->folderMapper->save($folder);
         HomepageConfigMapper::getInstance()->save($homepageConfig);
+        return $this->setGroup($folder, $groupAdmin, $readMember);
+    }
 
+    /**
+     * @param Folder $folder
+     * @param User   $groupAdmin
+     * @param User   $readMember
+     * @return Folder
+     * @throws MapperException
+     */
+    public function setGroup(Folder $folder, User $groupAdmin, User $readMember): Folder
+    {
         $group = (new Group())->setType(Group::FREE_GROUP)
                               ->setFolder($folder)
                               ->setForceFollow(false)
@@ -635,13 +647,13 @@ class Api extends \Codeception\Module
      * @param int $length
      * @return string
      */
-    public function generateText(int $length): string
+    public function generateText(int $length, bool $alphabetOnly = false): string
     {
-        $characters = 'abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+';
+        $characters = $alphabetOnly ? 'abcdefghijklmnopqrstuvwxyz' : 'abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+';
 
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
-            if ($length > 8 && rand(1, 7) === 5) {
+            if (!$alphabetOnly && $length > 8 && rand(1, 7) === 5) {
                 $randomString .= ' ';
                 $i++;
             }
@@ -663,13 +675,18 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * @param int|null $assessmentId
      * @return IAssessable|null
      * @throws ModuleException
      */
-    public function getExistingAssessment(): ?IAssessable
+    public function getExistingAssessment(?int $assessmentId): ?IAssessable
     {
-        $db            = $this->getDbModule();
-        $assessmentIds = $db->grabColumnFromDatabase('submission_box', 'assessment_id', []);
+        $db = $this->getDbModule();
+        if ($assessmentId) {
+            $assessmentIds = [$assessmentId];
+        } else {
+            $assessmentIds = $db->grabColumnFromDatabase('submission_box', 'assessment_id', []);
+        }
         foreach ($assessmentIds as $assessmentId) {
             try {
                 $assessment = $this->assessmentDataSource->findById($assessmentId);
