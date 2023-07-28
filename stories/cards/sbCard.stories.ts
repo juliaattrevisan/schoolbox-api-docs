@@ -86,7 +86,7 @@ export const CardActions: Story = {
     }),
 };
 
-export const TopSection: Story = {
+export const MainSection: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
@@ -106,7 +106,7 @@ export const TopSection: Story = {
     }),
 };
 
-export const TopSectionMultiMeta: Story = {
+export const MainSectionTall: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
@@ -130,7 +130,31 @@ export const TopSectionMultiMeta: Story = {
     }),
 };
 
-export const TopSectionNavActionsVerticalAlign: Story = {
+export const MainSectionTallCentredImage: Story = {
+    render: () => ({
+        template: `
+            <div class="sb-card">
+                <div class="sb-card__main">
+                    <div class="sb-card__primary-img img sb-flex--center">
+                        <div class="img__wrapper">
+                            <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                        </div>
+                    </div>
+                    <div class="sb-card__main-content">
+                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                    </div>
+                </div>
+            </div>
+        `,
+    }),
+};
+
+export const MainSectionNavActionsVerticalAlign: Story = {
     render: () => ({
         template: `
             <div class="sb-card">
@@ -155,7 +179,7 @@ export const TopSectionNavActionsVerticalAlign: Story = {
     }),
 };
 
-export const TopSectionIcon: Story = {
+export const MainSectionIcon: Story = {
     render: () => ({
         template: `
             <div class="sb-card">

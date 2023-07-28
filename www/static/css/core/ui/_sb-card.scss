@@ -19,6 +19,7 @@
     background-color: white;
 
     // The main section of a card, generally with the most prominent information. Title, meta, actions, thumbnail.
+    // In a lot of instances, this is all you need.
     &__main {
         display: flex;
         flex-direction: row;
@@ -63,10 +64,13 @@
         }
     }
 
+    // A catch-all container. All it does is add default padding. For example, content of a news post goes here...
     &__content {
         padding: var(--whitespace-s) var(--whitespace-m);
     }
 
+    // A bar that sits (generally) at the bottom of the card with actions that a user can take. Left aligned so that
+    // these actions are visually distinct if this card appears in a component and the component has actions.
     &__actions {
         display: flex;
         flex-direction: row;
