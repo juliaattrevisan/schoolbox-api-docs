@@ -85,6 +85,7 @@ class ApiUserCest
                 $i->sendPost('/api/user', $data);
                 if ($user->isSuperuser()) {
                     $i->seeResponseCodeIs(201);
+                    $i->sendPatchAsJson('/api/user/22', ['yearLevel' => ['id' => null]]);
                 } else {
                     $i->seeResponseCodeIs(401);
                 }
