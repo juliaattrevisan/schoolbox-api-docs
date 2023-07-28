@@ -452,11 +452,24 @@ class Controller extends Base
             ],
         ];
 
+        /* These are the scores they obtained
+         */
+        $scores = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ]);
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
-            'attempt' => $attempt
-        ], 'Example Item');
+            'attempt' => $attempt,
+            'scores' => $scores
+        ], sprintf(
+            'Feedback for %s in %s',
+            $student->getFullName(),
+            $assessment->getTitle()
+        ));
     }
 
 
@@ -662,7 +675,6 @@ class Controller extends Base
     }
 
 
-        ], 'Example Item');
     /**
      * Get an overview for all the sessions conducted
      *

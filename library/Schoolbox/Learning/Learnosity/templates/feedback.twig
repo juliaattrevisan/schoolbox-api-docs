@@ -1,12 +1,17 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
-
+{##
+ # Give feedback for an attempt
+ #
+ # @param string|array $reportInitOptions  Learnosity API initialisation object
+ # @param IAssessable $assessment          Our schoolbgox quiz instance
+ # @param Attempt\Model $attempt           The student's attempt from our local db
+ # @param array $scores                    A list of scores obtained per question in this attempt
+ #}
 <script src="https://reports.learnosity.com/?v2023.2.LTS"></script>
 
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Learnosity Test</h2>
+        <h1>Feedback for {{ assessment.title }}</h1>
         <section class="content">
             <div id="schoolbox-student"></div>
         </section>
@@ -34,7 +39,6 @@
                 window.itemsApp = itemsApp;
 
                 itemsApp.getQuestions(function(questions) {
-                    console.log(questions);
                     $.each(questions, function(index, element) {
                         let container = $('[data-reference="' + element.metadata.sheet_reference + '"]');
 
