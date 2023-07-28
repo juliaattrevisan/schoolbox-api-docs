@@ -36,6 +36,17 @@ use UnexpectedValueException;
 class Profile implements IStrategy
 {
     /**
+     * Used in the profile category field to identify teacher or employee users coming from iSAMS into the staff table
+     */
+    public const EMPLOYEE = 'employee';
+    public const TEACHER = 'teacher';
+
+    /**
+     * Phone number db limit
+     */
+    public const PHONE_DB_LIMIT = 45;
+
+    /**
      * Maximum number of chars that a position_title can be
      * In iSAMS this is an aggregation of all the Roles assigned
      * to a guy. We had precedent for a school giving a dummy
@@ -912,9 +923,23 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($parentBaseProfile);
             }
 
+            /**
+             * phone numbers can exceed the 45 char limit...
+             */
+            $number = trim((string)$parent->Telephone);
+            if (self::PHONE_DB_LIMIT <= mb_strlen($number)) {
+                $number = substr($number, 0, self::PHONE_DB_LIMIT);
+                /* Log it
+                 */
+                $this->log->warning(sprintf(
+                    'Parent profile for %s. phone number exceeds the %s char limit. Truncated...',
+                    $fullname,
+                    self::PHONE_DB_LIMIT
+                ));
+            }
             $parentProfile
-                ->setPhoneHome(trim((string)$parent->Telephone))
-                ->setPhoneWork(trim((string)$parent->Telephone))
+                ->setPhoneHome($number)
+                ->setPhoneWork($number)
                 ->setMobile(trim((string)$parent->Mobile))
                 ->setEmail(trim((string)$parent->EmailAddress))
                 ->setUsername($username);
@@ -1069,10 +1094,16 @@ class Profile implements IStrategy
                 $campusName = trim((string)$staff->Divisions->Division[0]->Name);
             }
 
+            /**
+             * Staff can be teachers or employees... set that here
+             * The TeachingStaff is a `Bit` `1/0` This Specifies whether this staff member is a teaching member of the staff
+             */
+            $category = '0' === trim((string)$staff->TeachingStaff) ? self::EMPLOYEE : self::TEACHER;
+
             $staffProfile
                 ->setBuilding(null)
                 ->setCampusName($campusName)
-                ->setCategory(null)
+                ->setCategory($category)
                 ->setDepartment(null)
                 ->setEmail(trim((string)$staff->SchoolEmailAddress))
                 ->setPhone(trim((string)$staff->SchoolMobileNumber))
