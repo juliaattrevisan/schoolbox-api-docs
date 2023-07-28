@@ -1,0 +1,90 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Overwriting templates/core/modules/report/staff.twig #}
+{# Changes: Campus removed and Phone renamed to Contact Phone #}
+{% set columnsConfig = [
+    {
+        key: "portrait_url",
+        heading: "Image",
+        class: "portrait-td",
+        isSortable: false,
+        template: {
+            component: "image",
+            componentData: {
+                src: "portrait_url",
+                href: "profile_url",
+                title: "View profile",
+                alt: "Portrait photo of user",
+            },
+        },
+    },
+    {
+        key: "StaffPreferredName",
+        heading: "First name",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffPreferredName",
+                href: "profile_url",
+                title: "View profile",
+            }
+        },
+    },
+    {
+        key: "StaffSurname",
+        heading: "Surname",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffSurname",
+                href: "profile_url",
+                title: "View profile",
+            }
+        },
+    },
+    {
+        key: "StaffDepartment",
+        heading: "Department",
+        class: "hide-for-medium-down",
+    },
+    {
+        key: "JobPositionDescription",
+        heading: "Role",
+        class: "hide-for-small",
+    },
+    {
+        key: "StaffOccupPhone",
+        heading: "Contact Phone",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffOccupPhone",
+                href: "StaffOccupPhone",
+                prependHref: "tel:",
+                title: "Phone user",
+            }
+        },
+    },
+    {
+        key: "StaffExtension",
+        heading: "Ext",
+        class: "",
+    },
+    {
+        key: "StaffOccupEmail",
+        heading: "Email",
+        class: "",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffOccupEmail",
+                href: "StaffOccupEmail",
+                prependHref: "mailto:",
+                title: "Email user",
+            }
+        }
+    },
+] %}
