@@ -21,7 +21,7 @@ use Schoolbox\Search\Api\Filter;
  * This may match a user on:
  * * their first, preferred, or last name
  * * their username
- * *
+ * * their external ID
  */
 class User implements ISearchQuery
 {
