@@ -1,18 +1,22 @@
 /**
  *  sb-card.scss
  *
- *  Modern styling rework of our card layouts.
- *  TODO - Add modern design variants of our card classes (round and drop shadow EVERYTHING).
+ *  Modern styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
+ *
+ *  The standard implementation on a larger card like a news article consists of three parts
+ *  -   A 'top' section, which for a lot of slimline card implementations is literally all you'd need.
+ *  -   A 'content' section, which is just to house whatever content you might want to display. Let's say
+ *      you had an <article> within a news card for example - put it here.
+ *  -   An 'actions' section, which can sit at the bottom and have links/actions displayed within it
+ *
+ *  The current logic here is flexible enough to handle a most standard card uses of cards, but it currently
+ *  doesn't have any of the logic required to handle the display of large cards (the last row on the cards
+ *  tab in the pantry, for example) and some of the really unique cards we have across the platform
 */
 
-@use "sass:list";
-
 .sb-card {
+    // Is this correct or do we want this transparent?
     background-color: white;
-
-    &__primary-img {
-        //margin-inline-end: var(--whitespace-m);
-    }
 
     &__top {
         display: flex;
@@ -20,13 +24,13 @@
         gap: var(--whitespace-m);
 
         &-content {
-            flex: 1;
             display: flex;
+            flex: 1;
             flex-direction: column;
             justify-content: center;
             overflow: hidden;
-            padding-block-start: var(--whitespace-xs);
             padding-block-end: var(--whitespace-xs);
+            padding-block-start: var(--whitespace-xs);
 
             & span,
             p,
@@ -37,14 +41,13 @@
             h5,
             h6 {
                 overflow-x: hidden;
-                white-space: nowrap;
                 text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
 
         &-actions {
             display: flex;
-            //align-items: center;
             flex: 0;
         }
 
@@ -64,18 +67,18 @@
     }
 
     &__actions {
-        min-inline-size: 100%;
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
+        min-inline-size: 100%;
 
         a {
-            text-transform: uppercase;
+            font-size: 13px;
+            font-weight: 600;
             margin-bottom: 0;
             padding: var(--whitespace-s) var(--whitespace-m);
-            font-weight: 600;
-            font-size: 13px;
             text-align: center;
+            text-transform: uppercase;
 
             &:hover {
                 background-color: var(--content-ui-hover);
@@ -84,11 +87,11 @@
     }
 
     /* MODIFIERS / VARIANTS */
-    // Add start border and grey background to card.
+    // Add inline (default left) border and grey background to card.
     &--subitem {
+        background-color: #f6f6f6;
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
         padding: var(--whitespace-xs);
-        background-color: #f6f6f6;
 
         // TODO - Convert this over to using an img-s instead of what it is.
         .sb-card {
@@ -96,8 +99,8 @@
                 &.img {
                     .img__wrapper {
                         flex: 0 0 40px;
-                        width: 40px;
                         height: 40px;
+                        width: 40px;
                     }
                 }
 
@@ -111,12 +114,6 @@
                 padding-block-start: 0;
                 padding-block-end: 0;
             }
-        }
-    }
-
-    // TODO - Disable ellipsis behaviour inside top content for important content that can't overflow
-    &--overflow {
-        .sb-card__top-content {
         }
     }
 }

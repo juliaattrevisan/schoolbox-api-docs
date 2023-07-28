@@ -1,38 +1,73 @@
 /*****************************
  images.scss
+
+ A class to wrap any styles for images. Currently, it includes...
+
+    - Seven default sizes for square images controlled by custom properties
+    - Support for icons within the same image container classes
+    - The ability to round those images with a modifier class
+    - Styles to enable initials where a user doesn't have a profile image
+    - Automated positioning of images within the front end so the contents are
+    centered even if the image isn't square
+
+    Generally there's three layers to how you implement these images.
+    - A container (the topmost level) that just handles positioning of the object within its parent
+      and acts as a barrier so the wrapper is shielded from being rescaled by rules affecting the parent
+    - A wrapper (the middle layer) that solely handles hiding the overflow of the image, positining it
+      centrally and applying any rounding. The wrapper handles this so that if the container layer above
+      it is scaled in any way, the image rounding won't be modified or stretched.
+    - The image itself (the lowest layer), which is literally just the <img>, an icon, or some initials
+
 *****************************/
 
+@use "sass:list";
+
 .img {
+    /*
+        Though it doesn't seem like this container layer does much, it's absolutely necessary. Having the
+        container means we can encapsulate logic like vertical alignment or have the container scale without
+        impacting the image dimensions below it.
+    */
     display: flex;
     overflow: hidden;
 
     // The wrapper basically exists to handle image overflow, centering of the <img> / icon and rounding
     .img__wrapper {
-        // Default images to medium size if no size is specified.
+        // Default images to medium size if no size is specified. This size is the standard image thumbnail size
+        // used on the platform currently.
+        align-items: center;
+        display: flex;
         flex: 0 0 var(--image-size-m);
         height: var(--image-size-m);
-        width: var(--image-size-m);
-
-        display: flex;
-        align-items: center;
         justify-content: center;
         overflow: hidden;
-
         position: relative;
+        width: var(--image-size-m);
 
         img {
-            object-fit: cover;
-            min-width: 100%;
+            /*
+                Stretch the image. Using object-fit: cover with min-width and min-height 100% means that the image
+                will retain it's aspect ratio and scale to whatever the shortest axis is on it. This means it handles
+                rectangular aspect rations in both dimensions (eg 16:9 and 19:6 are handled)
+            */
             min-height: 100%;
+            min-width: 100%;
+            object-fit: cover;
         }
     }
 
+    // Logic for if we've got a user with no profile image
     .img__initials {
         color: white;
         font-size: calc(var(--image-size-m) * 0.4);
         font-weight: 600;
     }
 
+    /*
+        The idea of having a range of sizes means that developers can talk of components in concepts of small, medium, large and avoid
+        the inevitable urge to scale something outside of a standardised range. This is done to limit the 1/2px variations we have across
+        the platform and allows us to design solutions with these standardised sizes in mind.
+    */
     @each $size in $global-image-sizes {
         &-#{$size} {
             .img__wrapper {
@@ -40,8 +75,11 @@
                 height: var(--image-size-#{$size});
                 width: var(--image-size-#{$size});
 
-                // Icons are weird. Because they rely on font scaling, we have to include that here too,
-                // but we never want icons to go full bleed, hence the calc.
+                /*
+                    Icons are weird. Because they rely on font scaling, we have to include that here too,
+                    but we never want icons to go full bleed, hence the calc. At current, this makes the
+                    icon use full space minus 1rem, which should be 16px, allowing 8px of space around it.
+                */
                 .icon:before {
                     font-size: calc(var(--image-size-#{$size}) - var(--whitespace-m));
                 }
@@ -49,29 +87,37 @@
         }
     }
 
+    // TODO - If we end up writing an icon class, this logic can move to there
     .icon {
-        display: flex;
         align-items: center;
+        display: flex;
         justify-content: center;
     }
 
-    // Peel off inherited styles for icons.
+    // Peel off inherited styles for icons. I guess this is an 'icon reset' and scales it to the default size.
     .icon:before {
-        padding: 0;
-        margin: 0;
         font-size: 2.5rem;
         line-height: normal;
+        margin: 0;
+        padding: 0;
     }
 
+    // Modifier class to round off images.
     &--round {
         .img__wrapper {
+            // Very subtly make the image stand out from the background if there is no background contrast
+            // TODO - This should ideally be controlled with custom properties inside a borders class somewhere.
+            border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 50%;
             overflow: hidden;
-            // Very subtly make the image stand out from the background if there is no background contrast
-            border: 1px solid rgba(0, 0, 0, 0.05);
         }
     }
 
+    /*
+        Some additional rules for rounded images - they need whitespace around them as they generally look bad
+        stretching from edge to edge of their parent. Badges also get this treatment as all badges in our platform
+        are round.
+    */
     &--round,
     &--badge {
         .img__wrapper {

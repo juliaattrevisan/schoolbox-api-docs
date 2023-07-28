@@ -11,12 +11,12 @@
     flex-direction: row;
 
     a {
+        align-items: center;
+        block-size: 40px;
         color: var(--content-ui-foreground);
         display: flex;
-        align-items: center;
-        justify-content: center;
         inline-size: 40px;
-        block-size: 40px;
+        justify-content: center;
 
         &:before {
             padding-right: 0;
