@@ -13,9 +13,20 @@ use Alaress_Date_Format;
 
 /**
  * Data object for a raw match from a database.
+ *
+ * This will later be fleshed out into a full result by a `IHydrator` instance.
  */
 class RawMatch
 {
+    /**
+     * Constructor
+     *
+     * @param int                      $id        The ID of the search result subject.
+     * @param string                   $title     The title of the search result.
+     * @param string                   $type      The type of search result.
+     * @param Alaress_Date_Format|null $date      The date (if any) of the search result.
+     * @param float                    $relevance A relevancy score for this result: should be between 0 and 1
+     */
     public function __construct(
         public int $id,
         public string $title,

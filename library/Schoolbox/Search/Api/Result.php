@@ -22,7 +22,7 @@ class Result
      * Constructor
      *
      * @param int                      $id          The ID of the search result subject.
-     * @param string|null              $title       The title of the search result.
+     * @param string                   $title       The title of the search result.
      * @param string                   $url         A link to the search result.
      * @param string                   $type        The type of search result.
      * @param Alaress_Date_Format|null $date        The date (if any) of the search result.
@@ -39,7 +39,7 @@ class Result
      */
     public function __construct(
         public int $id,
-        public ?string $title,
+        public string $title,
         public string $url,
         public string $type,
         public ?Alaress_Date_Format $date = null,
