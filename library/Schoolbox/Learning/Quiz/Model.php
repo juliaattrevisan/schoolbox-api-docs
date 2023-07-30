@@ -13,7 +13,6 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress_Date_Format;
-use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -147,6 +146,17 @@ class Model implements ISoftDeletable, IAssessableDataModel
 
     /** @var null|string */
     private $externalId;
+
+
+    /**
+     * The Learnosity Reference identifier which associates our quiz
+     * with their quiz. Not to be confused with externalId, which I think
+     * is used specifically for Canvas.
+     *
+     * @var string|null
+     */
+    private ?string $learnosityReference = null;
+
 
     /**
      * Indexed by section.id
@@ -639,6 +649,26 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function setExternalId(?string $externalId): self
     {
         $this->externalId = $externalId;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityReference(): ?string
+    {
+        return $this->learnosityReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityReference
+     * @return Model
+     */
+    public function setLearnosityReference(?string $learnosityReference): self
+    {
+        $this->learnosityReference = $learnosityReference;
         return $this;
     }
 

@@ -20,23 +20,20 @@ class Decorator implements DecoratorInterface
 
     /**
      * Decorator constructor.
-     * @param int $durationHours
-     * @param int $durationMinutes
-     * @param int $maxAttempts
-     * @param string $completionMessage
      */
-    public function __construct($durationHours, $durationMinutes, $maxAttempts, $completionMessage)
-    {
-        $this->setDurationHours($durationHours);
-        $this->setDurationMinutes($durationMinutes);
-        $this->setMaxAttempts($maxAttempts);
-        $this->setCompletionMessage($completionMessage);
+    public function __construct(
+        private string $learnosityReference,
+        protected int $durationHours,
+        protected int $durationMinutes,
+        protected int $maxAttempts,
+        protected string $completionMessage
+    ) {
     }
 
     /**
      * @param Quiz $assessment
      */
-    public function decorate($assessment)
+    public function decorate($assessment): void
     {
         // If hours or minutes field is empty, treat it as 0
         $durationHours = empty($this->getDurationHours()) ? 0 : $this->getDurationHours();
@@ -53,5 +50,6 @@ class Decorator implements DecoratorInterface
         $assessment->setDuration($duration);
         $assessment->setMaxAttempts($this->getMaxAttempts());
         $assessment->setCompletionMessage($this->getCompletionMessage());
+        $assessment->setLearnosityReference($this->getLearnosityReference());
     }
 }

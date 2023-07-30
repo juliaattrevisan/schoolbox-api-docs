@@ -10,21 +10,382 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
+use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
+use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\UserMapper;
-
-require_once __DIR__ . '/../../../../vendor/learnosity/learnosity-sdk-php/bootstrap.php';
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\Attempt\Model;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\User;
+use Twig\Error\Error;
 
 class Controller extends Base
 {
     /**
+     * Learnosity API instance is the same for everything afaict
+     *
+     * @var Api
+     */
+    private Api $api;
+
+
+    /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+    ) {
+        /* Probably inject this one day, but for now,
+         * I want to avoid dumping Yet Another Thing into the kernel
+         * I don't have a convenient means to access SERVER_NAME except like this, sadly
+         */
+        $this->api = new Api(
+            $_SERVER['SERVER_NAME'],
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+        );
+    }
+
+
+    /**
+     * Edit the contents of $assessment using the Learnosity system
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function getContent(IAssessable $assessment): void
     {
+        $payload = [
+            'config'    => [
+                'activity_edit' => [
+                    'back' => false,
+                    'item' => [
+                        'title' => [
+                            'show' => true
+                        ]
+                    ],
+                    'item_search' => [
+                        'title' => [
+                            'show' => true,
+                        ],
+                    ],
+                    'reference' => [
+                        'show' => false,
+                    ]
+                ],
+                'item_edit' => [
+                    'item' => [
+                        'title' => [
+                            'show' => true
+                        ]
+                    ]
+                ]
+            ],
+            'mode'      => 'activity_edit',
+            /* A Learnosity uuid that we arbitrarily prescribed
+             */
+            'reference' => $assessment->getLearnosityReference(),
+            /* Corresponds to a user in the Learnosity Console who will be
+             * considered "the author" of stuff created by the school's teachers
+             * Misconfiguring this leads to Error 10000 which has no definition
+             */
+            'user'      => [
+                'id'        => (string)$this->getConfigLoader()->get('learnosity_author_id'),
+                /* These fields are superfluous and are presumably
+                 * used for auditing; we attribute an individual user's
+                 * name to a collectively-utilised author account
+                 * configured in Learnosity itself (that's the id above)
+                 */
+                'firstname' => $this->getUser()->getFirstname(),
+                'lastname'  => $this->getUser()->getLastname(),
+                'email'     => $this->getUser()->getEmail()
+            ]
+        ];
+
+        $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
+            'assessment'  => $assessment,
+            'initOptions' => $this->api->initOptions('author', $payload),
+            'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
+        ], sprintf(
+            'Modify contents of %s',
+            $assessment->getTitle()
+        ));
+    }
+
+
+    /**
+     * Just use our Welcome screen for now
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws Error
+     */
+    public function getIntro(IAssessable $assessment, \Schoolbox\User $student): void
+    {
+        $this->response = $this->responseFromTemplate('@learnosity/intro.twig', [
+            'assessment' => $assessment,
+            'student' => $student,
+        ], "Start {$assessment->getTitle()}");
+    }
+
+
+    /**
+     * Let a student do an attempt in a Learnosity quiz
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws Deleted
+     * @throws Exception
+     * @throws ValidationException
+     * @throws \Alaress\Database\Exception
+     * @throws RouteNotFound
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function getAttempt(IAssessable $assessment, \Schoolbox\User $student): void
+    {
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        /* Generate a session (attempt) identifier
+         *
+         * First, see if an incomplete attempt exists; if it does,
+         * just reuse it
+         */
+        $attempt = $this->attemptMapper->findExistingUnfinished($assessment->getId(), $student->getId());
+
+        if (null === $attempt) {
+            /* Assign that Learnosity identifier to an assess_attempt
+             */
+            $learnosityReference = Uuid::generate();
+
+            $attempt = $this->attemptMapper->createModel()
+                ->setStart(\Alaress_Date_Format::now())
+                ->setQuiz($quiz)
+                ->setUser($student)
+                ->setLearnosityReference($learnosityReference);
+
+            $this->attemptMapper->save($attempt);
+        }
+
+        /* Initialise Learnosity Quiz player
+         *
+         * You need all the Learnosity items associated with the
+         * $assessment's Learnosity reference, apparently
+         * (how do we do this more cheapishly?)
+         */
+        $payload = [
+            /* Our internal Quiz implementation id, it seems?
+             */
+            'activity_id'          => (string)$assessment->getId(),
+            /* The quiz and its questions
+             */
+            'activity_template_id' => $quiz->getLearnosityReference(),
+            "config"               => [
+                "configuration" => [
+                    "idle_timeout"          => [
+                        "interval" => 300
+                    ],
+                    /* Go to a nice report screen when you're done, for now
+                     */
+                    'onsubmit_redirect_url' => $this->router->getGenerator()->generate('learnosity.getReport', [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId' => $student->getId(),
+                        'learnosityReference' => $attempt->getLearnosityReference()
+                    ])
+                ],
+                "navigation"    => [
+                    "auto_save"  => [
+                        "save_interval_duration" => 300
+                    ],
+                    "show_intro" => false,
+                    "show_outro" => false
+                ],
+                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
+                 */
+                'regions'       => 'main',
+                /* This is our Quiz title, I guess
+                 */
+                "title"         => $assessment->getTitle(),
+                "subtitle"      => ''
+            ],
+            /* This is our Quiz title, I guess
+             */
+            'name'                 => $assessment->getTitle(),
+            'rendering_type'       => 'assess',
+            /* An "attempt identifier", I think
+             */
+            'session_id'           => $attempt->getLearnosityReference(),
+            /* This saves attempt results into Learnosity servers, enabling reporting etc.
+             * You can use 'local_practice' to preview a quiz.
+             * You can use 'feedback' to grade an attempt with feedback etc.
+             */
+            'type'                 => 'submit_practice',
+            /* A uniquely-identifying string for us, I think
+             */
+            'user_id'              => (string)$this->getUser()->getId(),
+        ];
+
+        $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
+            'initOptions'         => $this->api->initOptions('items', $payload),
+            'assessment'          => $assessment,
+            'attemptId'           => $attempt->getId(),
+            'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
+                'assessmentId' => $assessment->getId(),
+                'studentId'    => $student->getId(),
+            ]),
+            'learnosityReference' => $attempt->getLearnosityReference(),
+        ], "Attempt {$assessment->getTitle()}");
+
+        /* TODO Record the automated result somewhere (idk where)
+         */
+    }
+
+
+    /**
+     * Complete an attempt by setting a finish date.
+     *
+     * Uses the (learnosityReference, attemptId) tuple so you can't
+     * randomly shut down some other dude's attempt; knowing their
+     * learnosityReference should not be easily guessed
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws Deleted
+     * @throws NotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
+    {
+        $existingAttempt = $this->attemptMapper->findOneByColumnList([
+            'attempt_id'           => $this->requestPost->get('attemptId'),
+            'learnosity_reference' => $this->requestPost->get('learnosityReference'),
+            'user_id'              => $student->getId()
+        ]);
+
+        $existingAttempt->setFinish(\Alaress_Date_Format::now());
+
+        $this->attemptMapper->save($existingAttempt);
+    }
+
+
+    /**
+     * Show some basic stats about your attempt
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $attempt
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function getReport(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $payload = [
+            'user_id' => (string)$attempt->getUser()->getId(),
+            'reports' => [
+                [
+                    /* DOM element id, where this goes in
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
+                    'id' => 'schoolbox-result-1',
+                    'type' => 'sessions-summary-by-question',
+                    'session_ids' => [
+                        $attempt->getLearnosityReference()
+                    ]
+                ],
+                [
+                    /* DOM element id, where this goes in
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
+                    'id' => 'schoolbox-result-2',
+                    'type' => 'session-detail-by-item',
+                    'session_id' => $attempt->getLearnosityReference(),
+                    'questions_api_init_options' => [
+                        'showCorrectAnswers' => false
+                    ]
+                ]
+            ],
+        ];
+
+        $this->response = $this->responseFromTemplate('@learnosity/report.twig', [
+            'initOptions' => $this->api->initOptions('reports', $payload),
+            'assessment' => $assessment,
+            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
+        ], "Result for {$assessment->getTitle()}");
+    }
+
+
+    /**
+     * Archive (soft-delete) multiple Learnosity Activities
+     *
+     * @return void
+     * @throws ValidationException
+     * @throws DebugBarException
+     */
+    public function getArchiveReferences(): void
+    {
+        $activityReferences = [
+            'aaabbbbbbcccccddddd',
+        ];
+
+        $messages = [];
+
+        foreach ($activityReferences as $activityReference) {
+            try {
+                $this->getArchiveReference($activityReference);
+            } catch (\RuntimeException $e) {
+                $messages[] = $e->getMessage();
+            }
+        }
+
+        new \Alaress_Probe($messages);
+    }
+
+
+    /**
+     * Archive (soft-delete) a particular Learnosity Activity
+     * Activities must have at least one published item before an activity can be archived
+     *
+     * If you can't delete an activity because it tells you that you need a published item,
+     * also check any Welcome/Exit screens - those are Items too
+     *
+     * @param string $learnosityReference
+     * @return void
+     * @throws ValidationException
+     * @throws \RuntimeException
+     */
+    public function getArchiveReference(string $learnosityReference): void
+    {
+        (new Helper($this->api))->archive($learnosityReference);
     }
 
 
@@ -35,6 +396,14 @@ class Controller extends Base
     {
         $payload = [
             'mode' => 'activity_list',
+            'config' => [
+                'activity_list' => [
+                    'title' => [
+                        'show' => true,
+                        'show_reference' => true
+                    ]
+                ]
+            ],
             'user' => [
                 /* Corresponds to a user in the Learnosity Console who will be
                  * considered "the author" of stuff created by the school's teachers
@@ -52,19 +421,9 @@ class Controller extends Base
             ]
         ];
 
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
-        );
-
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/activityList.twig',
-            [
-                'initOptions' => $api->initOptions('author', $payload)
-            ],
-            'Example Activity List'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/activityList.twig', [
+            'initOptions' => $this->api->initOptions('author', $payload)
+        ], 'Example Activity List');
     }
 
 
@@ -179,19 +538,9 @@ class Controller extends Base
             ],
         ];
 
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
-        );
-
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/items.twig',
-            [
-                'initOptions' => $api->initOptions('items', $payload)
-            ],
-            'Example Item'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/items.twig', [
+            'initOptions' => $this->api->initOptions('items', $payload)
+        ], 'Example Item');
     }
 
 
@@ -270,19 +619,9 @@ class Controller extends Base
             ],
         ];
 
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
-        );
-
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/items.twig',
-            [
-                'initOptions' => $api->initOptions('items', $payload)
-            ],
-            'Example Item'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/items.twig', [
+            'initOptions' => $this->api->initOptions('items', $payload)
+        ], 'Example Item');
     }
 
 
@@ -298,12 +637,6 @@ class Controller extends Base
      */
     public function getSessionListReport(): void
     {
-        $api = new Api(
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
-            $this->getConfigLoader()->get('logs_dir')
-        );
-
         $payload = [
             'user_id' => (string)$this->getUser()->getId(),
             'reports' => [
@@ -327,12 +660,29 @@ class Controller extends Base
             ],
         ];
 
-        $this->response = $this->responseFromTemplate(
-            '@learnosity/sessionList.twig',
-            [
-                'initOptions' => $api->initOptions('reports', $payload)
-            ],
-            'Example Session List'
-        );
+        $this->response = $this->responseFromTemplate('@learnosity/sessionList.twig', [
+            'initOptions' => $this->api->initOptions('reports', $payload)
+        ], 'Example Session List');
+    }
+
+    /**
+     * TODO Literally copypasta'd
+     *
+     * Converts an assessment_id to a Quiz
+     *
+     * @param int $assessmentId
+     * @return Quiz
+     * @throws Exception
+     */
+    protected function getQuizForAssessmentId(int $assessmentId): Quiz
+    {
+        /** @var Quiz $quiz */
+        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
+
+        if (Quiz::AVAILABILITY_ASSESS !== $quiz->getAvailability()) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        return $quiz;
     }
 }

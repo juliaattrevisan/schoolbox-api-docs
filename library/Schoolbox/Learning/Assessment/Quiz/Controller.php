@@ -234,84 +234,94 @@ class Controller extends Assessment\Controller
             return;
         }
 
-        $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
-        $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
-        $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
-
-        // Close any expired attempts before checking for in-progress
-        $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now);
-
-        // Is an attempt in progress? Show a CTA to resume that if there is one
-        $attemptInProgress = null;
-        foreach ($quiz->getAttempts() as $attempt) {
-            if (!$attempt->isFinished()) {
-                $attemptInProgress = $attempt;
-                break;
-            }
-        }
-
-        // Can I attempt this?
-        // TODO this should eventually be route permission based
-        $actionValidator = new ActionValidator($now, $this->getAccess());
-
-        // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $canAttempt = (
-            $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId() && (
-                $assessment->isImplementation() || (
-                    // Quizzes that are not yet implemented still need to be attemptable (to allow previewing), but only by those with instructor access.
-                    // @see also the similar access level check in www/assess/init.php.
-                    // @see also the permission rule in Learning/Assessment/Module->buildAuthRuleCanViewStatus().
-                    $assessment->isSpecification() && $this->getAccess()->isInstructor($student, $assessment->getContext()->getFolder())
-                )
-            ) &&
-            $actionValidator->canAttemptQuiz($this->getUser(), $assessment)
-        );
-
-        /**
-         * record view
+        /* FIXME Temporary shim into Learnosity Prototype
          */
-        $lastView = new Assessment\Views\LatestView(
-            $this->latestViewMapper,
-            new \Schoolbox\External\User(
-                $this->getConfigLoader()->get('external_type'),
-                new \External_Class(),
-                new \External_User(),
-                $this->getUserMapper()
-            )
-        );
-        $lastView->addNewView($assessment, $student, $this->getUser());
+        $url = $this->router->getGenerator()->generate('learnosity.getIntro', [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $student->getId()
+        ]);
 
-        $twigData = [
-            'lastViews'         => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
-            'assessment'        => $assessment,
-            'student'           => $student,
-            'participant'       => $assessment->getParticipantIfExtant($student),
-            'quiz'              => $quiz,
-            'attemptInProgress' => $attemptInProgress,
-            'returnUrlEncoded'  => $this->requestQuery->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (Already encoded, so encoding/decoding necessary).
-            // User may only attempt quiz from here if viewing own summary
-            'canAttempt'        => $canAttempt,
-            'canReview'         => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
-            'canStudentReview'  => $actionValidator->canReviewAttemptsReadonly(
-                $this->getUser(),
-                $student,
-                $assessment,
-                $this->getConfigLoader()->get('restrict_student_submissions')
-            ),
+        $this->response = $this->redirectFound($url);
+        return;
 
-            /* External Url for third party apps which might have generated this assessment
-             */
-            'externalRedirectUrl' => $externalRedirectUrl
-        ];
-
-        $this->response = $this->responseFromTemplate(
-            '@learningAssessment/quiz/summary/student.twig',
-            $twigData,
-            "Status of {$assessment->getTitle()}",
-            'submission'
-        );
+//        $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
+//        $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
+//        $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
+//
+//        // Close any expired attempts before checking for in-progress
+//        $now = Alaress_Date_Format::now();
+//        $this->quizMapper->closeExpiredAttempts($quiz, $now);
+//
+//        // Is an attempt in progress? Show a CTA to resume that if there is one
+//        $attemptInProgress = null;
+//        foreach ($quiz->getAttempts() as $attempt) {
+//            if (!$attempt->isFinished()) {
+//                $attemptInProgress = $attempt;
+//                break;
+//            }
+//        }
+//
+//        // Can I attempt this?
+//        // TODO this should eventually be route permission based
+//        $actionValidator = new ActionValidator($now, $this->getAccess());
+//
+//        // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
+//        $canAttempt = (
+//            $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId() && (
+//                $assessment->isImplementation() || (
+//                    // Quizzes that are not yet implemented still need to be attemptable (to allow previewing), but only by those with instructor access.
+//                    // @see also the similar access level check in www/assess/init.php.
+//                    // @see also the permission rule in Learning/Assessment/Module->buildAuthRuleCanViewStatus().
+//                    $assessment->isSpecification() && $this->getAccess()->isInstructor($student, $assessment->getContext()->getFolder())
+//                )
+//            ) &&
+//            $actionValidator->canAttemptQuiz($this->getUser(), $assessment)
+//        );
+//
+//        /**
+//         * record view
+//         */
+//        $lastView = new Assessment\Views\LatestView(
+//            $this->latestViewMapper,
+//            new \Schoolbox\External\User(
+//                $this->getConfigLoader()->get('external_type'),
+//                new \External_Class(),
+//                new \External_User(),
+//                $this->getUserMapper()
+//            )
+//        );
+//        $lastView->addNewView($assessment, $student, $this->getUser());
+//
+//        $twigData = [
+//            'lastViews'         => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
+//            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+//            'assessment'        => $assessment,
+//            'student'           => $student,
+//            'participant'       => $assessment->getParticipantIfExtant($student),
+//            'quiz'              => $quiz,
+//            'attemptInProgress' => $attemptInProgress,
+//            'returnUrlEncoded'  => $this->requestQuery->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (Already encoded, so encoding/decoding necessary).
+//            // User may only attempt quiz from here if viewing own summary
+//            'canAttempt'        => $canAttempt,
+//            'canReview'         => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
+//            'canStudentReview'  => $actionValidator->canReviewAttemptsReadonly(
+//                $this->getUser(),
+//                $student,
+//                $assessment,
+//                $this->getConfigLoader()->get('restrict_student_submissions')
+//            ),
+//
+//            /* External Url for third party apps which might have generated this assessment
+//             */
+//            'externalRedirectUrl' => $externalRedirectUrl
+//        ];
+//
+//        $this->response = $this->responseFromTemplate(
+//            '@learningAssessment/quiz/summary/student.twig',
+//            $twigData,
+//            "Status of {$assessment->getTitle()}",
+//            'submission'
+//        );
     }
 
 
@@ -331,8 +341,7 @@ class Controller extends Assessment\Controller
          * Always go to the screen when a quiz has been created,
          * but send the return url with it
          */
-        $quiz     = $this->getQuizForAssessmentId($assessment->getId());
-        $redirect = "/assess/section/create/{$quiz->getId()}";
+        $redirect = $this->getRouteIfAuthorized('learnosity.getContent', ['assessmentId' => $assessment->getId()]);
 
         if ($postReturnUrl) {
             $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";

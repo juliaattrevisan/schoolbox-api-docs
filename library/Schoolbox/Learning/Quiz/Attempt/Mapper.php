@@ -21,6 +21,8 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -73,6 +75,8 @@ class Mapper extends BaseMapper
             'this_key'  => 'attempt_id',
             'other_key' => 'attempt_id',
         ));
+
+        $this->uses('learnosity_reference', self::TYPE_STRING);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
 
@@ -211,6 +215,48 @@ class Mapper extends BaseMapper
         }
         return $c;
     }
+
+
+    /**
+     * Find an existing but unfinished attempt for a given (assessment, student) tuple
+     * Returns null when one doesn't exist
+     *
+     * @param int $assessmentId
+     * @param int $studentId
+     * @return Model|null
+     * @throws Exception
+     * @throws Deleted
+     * @throws \Alaress\Database\Exception
+     */
+    public function findExistingUnfinished(int $assessmentId, int $studentId): ?Model
+    {
+        $query = "
+            SELECT attempt_id
+            FROM assess_attempt
+            INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
+            WHERE assess.assessment_id = :assessmentId
+            AND assess_attempt.user_id = :userId
+            AND assess_attempt.finish IS NULL
+            AND assess_attempt.deleted_at IS NULL
+            LIMIT 1
+        ";
+
+        $result = $this->getDatabase()->executeQuery($query, [
+            'assessmentId' => $assessmentId,
+            'userId'       => $studentId
+        ]);
+
+        $existingId = $result->fetch()['attempt_id'] ?? null;
+
+        /* Found an incomplete attempt; resume it
+         */
+        if ($existingId) {
+            return $this->findById($existingId);
+        }
+
+        return null;
+    }
+
 
     /**
      * Post-Save callback.

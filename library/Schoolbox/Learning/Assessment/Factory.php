@@ -244,6 +244,7 @@ class Factory
 
         /* Quiz needs this to instantiate correctly
          */
+        $this->setLearnosityReference((string)($post['learnosityReference'] ?? ''));
         $this->setDurationHours(intval($post['durationHours'] ?? 0));
         $this->setDurationMinutes(intval($post['durationMinutes'] ?? 0));
         $this->setMaxAttempts(intval($post['maxAttempts'] ?? 0));
@@ -348,7 +349,7 @@ class Factory
         /* Some facts about Course Managed Fields
          */
         $courseManagedFields = new CourseManagedFields($this->creator, $assessment);
-;
+
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
@@ -401,6 +402,7 @@ class Factory
             );
         } elseif ($assessment instanceof Quiz) {
             $decorator = new QuizDecorator(
+                $this->getLearnosityReference(),
                 $this->getDurationHours(),
                 $this->getDurationMinutes(),
                 $this->getMaxAttempts(),

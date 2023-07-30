@@ -1,0 +1,45 @@
+{##
+ # Modify Learnosity Quiz contents
+ #
+ # @param IAssessable $assessment    Our schoolbgox quiz instance
+ # @param string|array $initOptions  Learnosity API initialisation object
+ # @param string $returnUrl          A redirect back to a place from whence you came.
+ #}
+<script src="https://authorapi.learnosity.com/?v2023.2.LTS"></script>
+
+<style>
+    .lrn-author-activity-intro-outro {
+        display: none !important;
+    }
+</style>
+<div class="actions-small-1 row">
+    <div class="small-12 columns">
+        <h1>Questions in {{ assessment.title }}</h1>
+    </div>
+
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    <nav>
+        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-modify" href="{{ modifyRoute }}">Modify Quiz</a></li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div id="learnosity-author"></div>
+        </section>
+
+        {% if returnUrl %}
+            <a href="{{ returnUrl }}" class="button">Back</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    let authorApp = LearnosityAuthor.init(
+        {{ initOptions | raw }}
+    );
+</script>

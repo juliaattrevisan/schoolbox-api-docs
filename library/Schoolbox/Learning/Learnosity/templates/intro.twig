@@ -1,0 +1,18 @@
+{##
+ # Do an attempt
+ #
+ # @param IAssessable $assessment      Our schoolbgox quiz instance
+ # @param User $student                The guy currently at the intro screen
+ #}
+<script src="https://items.learnosity.com/?v2023.2.LTS"></script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+        <section class="content">
+            <article>{{ assessment.description | purify }}</article>
+        </section>
+
+        <a class="button" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}">Start</a>
+    </div>
+</div>

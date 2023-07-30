@@ -84,7 +84,8 @@ class Quiz implements IAssessmentTypeTranslator
             ->setDuration($domainObject->getDuration())
             ->setMaxAttempts($domainObject->getMaxAttempts())
             ->setMarkVisibility($domainObject->getMarkVisibility())
-            ->setExternalId($domainObject->getExternalId());
+            ->setExternalId($domainObject->getExternalId())
+            ->setLearnosityReference($domainObject->getLearnosityReference());
     }
 
 
@@ -104,6 +105,7 @@ class Quiz implements IAssessmentTypeTranslator
             ->setDuration($dataModel->getDuration())
             ->setCompletionMessage($dataModel->getCompletionMessage())
             ->setCreator($dataModel->getUser())
-            ->setExternalId($dataModel->getExternalId());
+            ->setExternalId($dataModel->getExternalId())
+            ->setLearnosityReference($dataModel->getLearnosityReference());
     }
 }
