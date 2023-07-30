@@ -134,13 +134,34 @@ class Controller extends Base
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
+     * @throws Deleted
      * @throws Error
+     * @throws Exception
+     * @throws \Alaress\Database\Exception
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getIntro(IAssessable $assessment, \Schoolbox\User $student): void
     {
+        /* The intro also has a list of attempts from which you can resume.
+         * We can do this by using the Learnosity session id in getAttempt()
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
+            'order' => [
+                'start' => 'desc'
+            ]
+        ]);
+
+        /* Decide if there was an existing attempt, to rename the call to action
+         */
+        $existingAttempt = $this->attemptMapper->findExistingUnfinished($assessment->getId(), $student->getId());
+
         $this->response = $this->responseFromTemplate('@learnosity/intro.twig', [
             'assessment' => $assessment,
             'student' => $student,
+            'attempts' => $attempts,
+            'existingAttempt' => $existingAttempt
         ], "Start {$assessment->getTitle()}");
     }
 
@@ -327,7 +348,7 @@ class Controller extends Base
                      * Author and Items api
                      */
                     'id' => 'schoolbox-result-2',
-                    'type' => 'session-detail-by-item',
+                    'type' => 'session-detail-by-question',
                     'session_id' => $attempt->getLearnosityReference(),
                     'questions_api_init_options' => [
                         'showCorrectAnswers' => false
