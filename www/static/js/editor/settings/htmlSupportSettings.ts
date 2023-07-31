@@ -92,19 +92,6 @@ export function getHTMLSupportSettings() {
                     name: "div",
                     styles: true,
                 },
-                // Allow specfic styles on p, a, headings and span elements
-                {
-                    name: /^(a|h2|h3|h4|span)$/,
-                    styles: {
-                        "background-color": true,
-                        color: true,
-                        "font-family": true,
-                        "font-size": true,
-                        "font-style": true,
-                        "font-weight": true,
-                        "text-decoration": true,
-                    },
-                },
                 // "object[id,name,width,height];"
                 {
                     name: "object",
