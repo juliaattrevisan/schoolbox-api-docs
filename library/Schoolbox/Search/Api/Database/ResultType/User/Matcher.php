@@ -15,7 +15,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Search\Api\Cursor\DataObject;
 use Schoolbox\Search\Api\Database\IMatcher;
 use Schoolbox\Search\Api\Database\QueryParams;
-use Schoolbox\Search\Api\Filter;
+use Schoolbox\Search\Api\Filter\DataObject;
 
 /**
  * Search for a user which matches a particular keyword and filter.
@@ -42,7 +42,7 @@ class Matcher implements IMatcher
     /**
      * @inheritdoc
      */
-    public function buildMatchQueryParams(string $keyword, Filter $filter, ?DataObject $cursor, int $limit): QueryParams
+    public function buildMatchQueryParams(string $keyword, DataObject $filter, ?DataObject $cursor, int $limit): QueryParams
     {
         // Unsure if exact search should be used here?
 //        // test for exact search, and if so return those results instead

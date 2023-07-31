@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api;
+namespace Schoolbox\Search\Api\Result;
 
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -16,7 +16,7 @@ use Schoolbox\User;
 /**
  * Data object for search results.
  */
-class Result
+class DataObject
 {
     /**
      * Constructor

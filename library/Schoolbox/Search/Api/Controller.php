@@ -46,7 +46,7 @@ class Controller extends Base
             $this->response = $this->responseAsJson(
                 $this->source->search(
                     $keyword,
-                    new Filter(null, null, null, null),
+                    new Filter\DataObject(null, null, null, null),
                     null,
                     3,
                 )

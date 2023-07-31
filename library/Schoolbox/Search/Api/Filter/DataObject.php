@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api;
+namespace Schoolbox\Search\Api\Filter;
 
 use DateTimeInterface;
 use Schoolbox\User;
@@ -15,7 +15,7 @@ use Schoolbox\User;
 /**
  * Data object for a set of search filters.
  */
-class Filter
+class DataObject
 {
     /**
      * Constructor

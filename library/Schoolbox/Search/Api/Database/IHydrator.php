@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database;
 
-use Schoolbox\Search\Api\Result;
+use Schoolbox\Search\Api\Result\DataObject as Result;
 
 /**
  * A hydrator for search result matches.
