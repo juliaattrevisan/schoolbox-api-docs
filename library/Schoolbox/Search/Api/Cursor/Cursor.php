@@ -13,9 +13,9 @@ use Alaress\Codec\ICodec;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Search\Api\Database\RawMatch;
 use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\ISource;
-use Schoolbox\Search\Api\Result\DataObject as ResultDataObject;
 
 class Cursor implements ICursor
 {
@@ -57,7 +57,7 @@ class Cursor implements ICursor
         /** @var DataObject|null $cursor */
         $cursor = $this->codec->decode($encodedCursor);
         return new GenericCollection(
-            ResultDataObject::class,
+            RawMatch::class,
             $this->source->search(
                 $this->keyword,
                 $this->filter,

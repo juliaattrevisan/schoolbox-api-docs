@@ -13,7 +13,6 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Search\Api\Database\AggregateResult;
 use Schoolbox\Search\Api\Database\ResultType\User\Hydrator;
 use Schoolbox\Search\Api\Database\ResultType\User\Matcher;

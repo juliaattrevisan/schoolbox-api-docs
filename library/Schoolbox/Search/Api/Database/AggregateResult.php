@@ -14,20 +14,19 @@ use Alaress_Date_Format;
 use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
 use Schoolbox\Search\Api\Filter\DataObject as Filter;
 use Schoolbox\Search\Api\ISource;
-use Schoolbox\Search\Api\Result\DataObject as Result;
 
 class AggregateResult implements ISource
 {
     /**
-     * @var Source[]
+     * @var IMatcher[]
      */
-    private array $sources;
+    private array $matchers;
 
     public function __construct(
         private IConnector $connector,
-        Source ...$queries,
+        IMatcher ...$matchers,
     ) {
-        $this->sources = $queries;
+        $this->matchers = $matchers;
     }
 
     /**
@@ -35,17 +34,17 @@ class AggregateResult implements ISource
      * @param Filter      $filter
      * @param Cursor|null $cursor
      * @param int         $limit
-     * @return array<Result>
+     * @return array<RawMatch>
      */
     public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array
     {
-        if (empty($this->sources)) {
+        if (empty($this->matchers)) {
             return [];
         }
         $queries = [];
         $params  = [];
-        foreach ($this->sources as $source) {
-            $queryParams = $source->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
+        foreach ($this->matchers as $matcher) {
+            $queryParams = $matcher->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
             $queries[]   = $queryParams->query;
             $params      = array_merge($params, $queryParams->params);
         }
@@ -74,17 +73,6 @@ class AggregateResult implements ISource
             );
         }
 
-        $results = [];
-        foreach ($rawMatches as $rawMatch) {
-            // TODO assume each source's raw matches can also accept results
-            foreach ($this->sources as $source) {
-                if ($source->accepts($rawMatch)) {
-                    $results[] = $source->hydrate($rawMatch);
-                    break;
-                }
-            }
-        }
-
-        return $results;
+        return $rawMatches;
     }
 }

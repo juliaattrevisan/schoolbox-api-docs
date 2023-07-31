@@ -50,6 +50,11 @@ class Controller extends Base
                 3,
             );
             $data           = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+
+            // TODO apply hydrator
+
+            // TODO apply filter
+
             $this->response = $this->responseAsJson(
                 [
                     'data'     => $data,
