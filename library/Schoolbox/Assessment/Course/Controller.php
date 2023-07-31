@@ -840,9 +840,11 @@ class Controller extends Base\Base
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             // quite simple not able to find things we need. bye bye.
             $this->sendError('Could not save because of an internal error.', [], 500);
+            return;
         } catch (\Exception $e) {
             // whatever the exception, recover from it as best you can
             $this->sendError("Could not save because {$e->getMessage()}");
+            return;
         }
     }
 

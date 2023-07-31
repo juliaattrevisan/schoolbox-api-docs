@@ -389,6 +389,7 @@ class Controller extends BaseController
                 $markType = MarkTypeMapper::getInstance()->findById($this->requestPost['capability-markType']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability mark type selected');
+                return;
             }
         }
 
@@ -401,6 +402,7 @@ class Controller extends BaseController
                 $gradeGroup = Group\Mapper::getInstance()->findById($this->requestPost['capability-gradingScheme']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability grade group selected');
+                return;
             }
         }
 

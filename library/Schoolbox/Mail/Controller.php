@@ -226,6 +226,7 @@ class Controller extends Base
 
         if (empty($to) && empty($cc) && empty($bcc)) {
             $this->sendError('No recipient provided');
+            return;
         }
         $attachments = $this->requestPost->get('attachment') ?? [];
         $mail        = $this->emailFactory->buildSimpleEmail($subject, null);
@@ -238,6 +239,7 @@ class Controller extends Base
             $mail->addReplyTo($fromEmail);
         } catch (RfcComplianceException | LogicException $e) {
             $this->sendError('Invalid email from address');
+            return;
         }
 
         //if id is submitted to form convert to email
@@ -247,10 +249,12 @@ class Controller extends Base
                 $toEmail = new Email($toUser->getEmail());
                 if (!$toEmail->isValid()) {
                     $this->sendError('Your email address is not valid.');
+                    return;
                 }
                 $mail->setTo(new Address($toUser->getEmail(), $toUser->formatName()));
             } catch (MapperException | RfcComplianceException | LogicException $e) {
                 $this->sendError('Your email address is not valid.');
+                return;
             }
         } else {
             foreach (imap_rfc822_parse_adrlist($to, '') as $addressObj) {
@@ -269,6 +273,7 @@ class Controller extends Base
                 $mail->setTo(new Address($this->getUser()->getEmail(), $to));
             } catch (RfcComplianceException | LogicException $e) {
                 $this->sendError('Your email address is not valid.');
+                return;
             }
         }
 
@@ -340,6 +345,7 @@ class Controller extends Base
 
         if (!$this->getSession()->getId() || !$recaptcha->verify($this->requestPost->get('g-recaptcha-response'))) {
             $this->sendError("The Human Checker (reCAPTCHA) failed.");
+            return;
         }
 
         $name    = $this->getUser()->getFullName();

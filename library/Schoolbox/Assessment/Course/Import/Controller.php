@@ -781,6 +781,7 @@ class Controller extends Base\Base
             }
         } catch (MapperException $e) {
             $this->sendError('Unable to delete Course Import: ' . $e->getMessage());
+            return;
         }
 
         // Delete any CourseOutline components that display this CourseImport

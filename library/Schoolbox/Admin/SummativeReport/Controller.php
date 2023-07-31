@@ -812,6 +812,7 @@ class Controller extends ConfigController
                         $student->getId(),
                         $student->getExternalId()
                     ));
+                    return;
                 }
 
                 /* View as the first parent in the stack...whoever that might be
