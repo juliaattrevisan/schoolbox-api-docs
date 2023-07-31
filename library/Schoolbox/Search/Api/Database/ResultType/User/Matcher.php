@@ -129,6 +129,7 @@ class Matcher implements IMatcher
             FROM `user` u
             LEFT JOIN `groups` AS r ON u.group_id = r.id
             WHERE $where
+            LIMIT :limit
         ";
         return new QueryParams($query, $params);
     }
