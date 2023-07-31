@@ -1,114 +1,3 @@
-{# To allow schools to alter whats displayed in the columns #}
-{# Refer to vue/components/dataTable/types/dataTableTypes.ts:ColumnConfig for list of properties that can be used #}
-{% block content %}
-{% set columnsConfig = [
-    {
-        key: "portrait_url",
-        heading: "Image",
-        class: "portrait-td",
-        isSortable: false,
-        template: {
-            component: "image",
-            componentData: {
-                src: "portrait_url",
-                href: "profile_url",
-                title: "View profile",
-                alt: "Portrait photo of user",
-            },
-        },
-    },
-    {
-        key: "StaffPreferredName",
-        heading: "First name",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffPreferredName",
-                href: "profile_url",
-                title: "View profile",
-            }
-        },
-    },
-    {
-        key: "StaffSurname",
-        heading: "Surname",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffSurname",
-                href: "profile_url",
-                title: "View profile",
-            }
-        },
-    },
-    {
-        key: "StaffDepartment",
-        heading: "Department",
-        class: "hide-for-medium-down",
-    },
-    {
-        key: "JobPositionDescription",
-        heading: "Role",
-        class: "hide-for-small",
-    },
-    {
-        key: "StaffCampusDescription",
-        heading: "Campus",
-        class: "hide-for-medium-down",
-    },
-    {
-        key: "StaffOccupPhone",
-        heading: "Phone",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffOccupPhone",
-                href: "StaffOccupPhone",
-                prependHref: "tel:",
-                title: "Phone user",
-            }
-        },
-    },
-    {
-        key: "StaffExtension",
-        heading: "Ext",
-        class: "",
-    },
-    {
-        key: "StaffOccupEmail",
-        heading: "Email",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffOccupEmail",
-                href: "StaffOccupEmail",
-                prependHref: "mailto:",
-                title: "Email user",
-            }
-        }
-    },
-] %}
-{% endblock %}
-
-{# Add any options specific to the staff directory table #}
-{# Refer to vue/components/vueTables2/types/vueTables2Types.ts:TableOptions for list of properties that can be used #}
-{% set tableOptions = {
-    orderBy: {
-        ascending: true,
-        column: "StaffSurname",
-    },
-    texts: {
-        count: "{from}-{to} of {count} members|{count} members|1 member",
-        filterPlaceholder: "Search staff members...",
-        noResults: "No matching staff members",
-    },
- } %}
-
-
 {# Add any custom styles linked to the .class property of a column #}
 <style>
 .portrait-td {
@@ -131,7 +20,115 @@
     <data-table
         title="Staff Directory"
         endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
+        {# To allow schools to alter whats displayed in the columns #}
+        {# Refer to vue/components/dataTable/types/dataTableTypes.ts:ColumnConfig for list of properties that can be used #}
+        {% block content %}
+        {% set columnsConfig = [
+            {
+                key: "portrait_url",
+                heading: "Image",
+                class: "portrait-td",
+                isSortable: false,
+                template: {
+                    component: "image",
+                    componentData: {
+                        src: "portrait_url",
+                        href: "profile_url",
+                        title: "View profile",
+                        alt: "Portrait photo of user",
+                    },
+                },
+            },
+            {
+                key: "StaffPreferredName",
+                heading: "First name",
+                class: "",
+                template: {
+                    component: "link",
+                    componentData: {
+                        text: "StaffPreferredName",
+                        href: "profile_url",
+                        title: "View profile",
+                    }
+                },
+            },
+            {
+                key: "StaffSurname",
+                heading: "Surname",
+                class: "",
+                template: {
+                    component: "link",
+                    componentData: {
+                        text: "StaffSurname",
+                        href: "profile_url",
+                        title: "View profile",
+                    }
+                },
+            },
+            {
+                key: "StaffDepartment",
+                heading: "Department",
+                class: "hide-for-medium-down",
+            },
+            {
+                key: "JobPositionDescription",
+                heading: "Role",
+                class: "hide-for-small",
+            },
+            {
+                key: "StaffCampusDescription",
+                heading: "Campus",
+                class: "hide-for-medium-down",
+            },
+            {
+                key: "StaffOccupPhone",
+                heading: "Phone",
+                class: "",
+                template: {
+                    component: "link",
+                    componentData: {
+                        text: "StaffOccupPhone",
+                        href: "StaffOccupPhone",
+                        prependHref: "tel:",
+                        title: "Phone user",
+                    }
+                },
+            },
+            {
+                key: "StaffExtension",
+                heading: "Ext",
+                class: "",
+            },
+            {
+                key: "StaffOccupEmail",
+                heading: "Email",
+                class: "",
+                template: {
+                    component: "link",
+                    componentData: {
+                        text: "StaffOccupEmail",
+                        href: "StaffOccupEmail",
+                        prependHref: "mailto:",
+                        title: "Email user",
+                    }
+                }
+            },
+        ] %}
         :columns-config="{{ columnsConfig|json_encode() }}"
+        {% endblock %}
+        {# Add any options specific to the staff directory table #}
+        {# Refer to vue/components/vueTables2/types/vueTables2Types.ts:TableOptions for list of properties that can be used #}
+        {% set tableOptions = {
+            orderBy: {
+                ascending: true,
+                column: "StaffSurname",
+            },
+            texts: {
+                count: "{from}-{to} of {count} members|{count} members|1 member",
+                filterPlaceholder: "Search staff members...",
+                noResults: "No matching staff members",
+            },
+        } %}
         :table-options="{{ tableOptions|json_encode() }}"
     />
 </div>
