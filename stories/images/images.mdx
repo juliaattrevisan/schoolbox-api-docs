@@ -1,0 +1,29 @@
+import { Canvas, Meta, Stories } from "@storybook/blocks";
+
+import * as ImageStories from "./images.stories";
+
+<Meta of={ImageStories} />
+
+# Images
+
+### Styles available in images.scss
+
+A class to wrap any styles for images. Currently, it includes...
+
+-   Seven default sizes for square images controlled by custom properties
+-   Support for icons within the same image container classes
+-   The ability to round those images with a modifier class
+-   Styles to enable initials where a user doesn't have a profile image
+-   Automated positioning of images within the front end so the contents are
+    centered even if the image isn't square
+
+Generally there's three layers to how you implement these images.
+
+-   A container (the topmost level) that just handles positioning of the object within its parent
+    and acts as a barrier so the wrapper is shielded from being rescaled by rules affecting the parent
+-   A wrapper (the middle layer) that solely handles hiding the overflow of the image, positining it
+    centrally and applying any rounding. The wrapper handles this so that if the container layer above
+    it is scaled in any way, the image rounding won't be modified or stretched.
+-   The image itself (the lowest layer), which is literally just the \<img\>, an icon, or some initials
+
+<Stories />

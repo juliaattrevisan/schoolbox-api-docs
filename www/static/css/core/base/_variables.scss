@@ -119,3 +119,5 @@ $tertiary: $tertiary-color;
 // An array of our global size names. These are used for things like our padding and margin utility classes,
 // and are leveraged in SASS to target some of our global custom properties.
 $global-sizes: "xs", "s", "m", "l", "xl";
+// The same but for images.
+$global-image-sizes: "xxs", "xs", "s", "m", "l", "xl", "xxl";
