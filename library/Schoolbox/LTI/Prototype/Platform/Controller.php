@@ -87,6 +87,7 @@ class Controller extends Base
         $registration = $this->buildRegistrationRepository()->find($this->requestQuery->get('registration'));
         if (!$registration) {
             $this->sendError('Registration not found');
+            return;
         }
 
         // I have a registration: I may now create a message

@@ -297,6 +297,7 @@ class Controller extends Base
         $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
         if (empty($badgeIds) || !$badges->count()) {
             $this->sendError('No badge provided');
+            return;
         }
 
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ??
@@ -334,6 +335,7 @@ class Controller extends Base
         $targetUsers   = $this->userMapper->findByColumn('id', $targetUserIds);
         if (empty($targetUserIds) || !$targetUsers->count()) {
             $this->sendError('No target user provided');
+            return;
         }
 
         $reason   = trim($this->requestPost->get('reason'));
@@ -341,6 +343,7 @@ class Controller extends Base
         $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
         if (empty($badgeIds) || !$badges->count()) {
             $this->sendError('No badge provided');
+            return;
         }
         foreach ($badges as $badge) {
             $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
