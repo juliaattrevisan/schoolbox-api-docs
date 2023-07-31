@@ -13,6 +13,9 @@ use Alaress\Codec\ICodec;
 
 /**
  * Codec for the search API's cursor.
+ *
+ * - encoded format: a base64-encoded string
+ * - decoded format: a `DataObject` instance
  */
 class Codec implements ICodec
 {
@@ -35,7 +38,7 @@ class Codec implements ICodec
     }
 
     /**
-     * @param string $encodedValue
+     * @param string|null $encodedValue
      * @return DataObject|null
      */
     public function decode($encodedValue): ?DataObject

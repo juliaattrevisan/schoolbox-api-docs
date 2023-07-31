@@ -17,18 +17,39 @@ use Schoolbox\Search\Api\Database\RawMatch;
 use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\ISource;
 
+/**
+ * Cursor for the search API.
+ *
+ * Retrieves only raw results: these raw results will be hydrated in a later
+ * step, and then filtered to results which are applicable to the current user.
+ */
 class Cursor implements ICursor
 {
+    /**
+     * A codec for the cursor as passed in the query string.
+     */
+    private Codec $codec;
+
+    /**
+     * Constructor
+     *
+     * @param ISource          $source  A source for search results.
+     * @param string           $keyword A keyword to search for.
+     * @param FilterDataObject $filter  A set of filters to apply to the search.
+     * @param int              $limit   The max number of results to fetch.
+     */
     public function __construct(
         private ISource $source,
         private string $keyword,
         private FilterDataObject $filter,
         private int $limit,
-        private ?ICodec $codec = null,
     ) {
-        $this->codec ??= new Codec();
+        $this->codec = new Codec();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function next(Collection $collection): ?string
     {
         // As usual: if the collection is empty, there is no next
@@ -41,17 +62,32 @@ class Cursor implements ICursor
         return $this->codec->encode($collection->last());
     }
 
+    /**
+     * This returns null for now, until there's a need for the current cursor.
+     *
+     * @return null
+     */
     public function current(Collection $collection): ?string
     {
         return null;
     }
 
+    /**
+     * This cursor cannot return an accurate result count, because its results
+     * are later filtered: thus, it always returns null.
+     *
+     * @return null
+     */
     public function retrieveResultCount(): ?int
     {
         // null for now
         return null;
     }
 
+    /**
+     * @param string|null $encodedCursor
+     * @return GenericCollection<RawMatch>
+     */
     public function retrieveResults(?string $encodedCursor): Collection
     {
         /** @var DataObject|null $cursor */

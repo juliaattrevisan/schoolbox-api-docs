@@ -49,7 +49,7 @@ class Controller extends Base
                 new Filter\DataObject(null, null, null, null),
                 3,
             );
-            $data           = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+            $data = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
 
             // TODO apply hydrator
 
