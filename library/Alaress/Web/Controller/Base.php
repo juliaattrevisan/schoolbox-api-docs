@@ -597,6 +597,23 @@ abstract class Base
     }
 
     /**
+     * Shortcut method for building a HTTP "201 Created" response, with a
+     * redirect to a URL at which the created item may be found.
+     *
+     * Added because redirects with a 201 status code are apparently a common
+     * pattern?
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
+     *
+     * @param string $location The URL to redirect to.
+     * @return ResponseInterface
+     */
+    protected function redirectCreated(string $location): ResponseInterface
+    {
+        return $this->responseFactory->buildRedirect($location, HttpResponse::HTTP_CREATED);
+    }
+
+    /**
      * Shortcut method for building a HTTP "301 Moved Permanently" response.
      *
      * The only difference between a 301 and 308 is that:
