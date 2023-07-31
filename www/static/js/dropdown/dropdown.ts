@@ -28,11 +28,12 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
         e.preventDefault();
         e.stopPropagation();
 
-        // If there's an active dropdown and we haven't clicked on its content, close it
-        //  This check applies when the user clicks on a different dropdown trigger
+        // If there's an active dropdown, close it
+        //  This check applies when the user clicks on any dropdown trigger
+        //  As we have stopped the propagation of the click event, the event listener on the document won't be triggered
         //  If the user clicks anywhere else on the page, the dropdown will be closed by a different event listener
         const activeDropdown = window.sbProps.activeDropdown;
-        if (activeDropdown && !activeDropdown.content.contains(e.target as Node)) {
+        if (activeDropdown) {
             activeDropdown.close();
 
             // Prevent the dropdown from reopening
@@ -51,11 +52,7 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
                 id: dropdownId as string,
                 content: dropdownContent,
                 trigger: dropdownTrigger,
-                close: (e?: MouseEvent) => {
-                    // It is possible to call this function without an event, so we need to check for it
-                    if (e && dropdownContent.contains(e.target as Node)) {
-                        return;
-                    }
+                close: () => {
                     dropdownContent.style.display = "none";
                     dropdownContent.setAttribute("aria-hidden", "true");
                     dropdownTrigger.setAttribute("aria-expanded", "false");
