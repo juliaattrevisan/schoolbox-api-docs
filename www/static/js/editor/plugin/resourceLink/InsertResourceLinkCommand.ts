@@ -84,7 +84,7 @@ export default class InsertResourceLinkCommand extends Command {
     updateLink(value: string) {
         const linkUI = this.editor.plugins.get("LinkUI");
         linkUI.formView.urlInputView.fieldView.focus();
-        linkUI.formView.urlInputView.fieldView.element.value = value;
+        linkUI.formView.urlInputView.fieldView.value = value;
     }
 
     /**
