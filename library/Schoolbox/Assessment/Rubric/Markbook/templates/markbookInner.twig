@@ -216,14 +216,16 @@
                                             <td class="mark">
                                                 <a
                                                         href="{{ summaryLink }}"
-                                                        data-actual-mark
+                                            {% if latestCapabilityMark %}data-actual-mark{% endif %}
                                                         class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"
                                                 >{{ capabilityMark|default('–') }}</a>
+                                                {% if latestCapabilityMark %}
                                                 <a
                                                         href="{{ summaryLink }}"
                                                         data-draft-mark
-                                                        class="{{ latestGradientClass }} {% if latestCapabilityMark is null %}no-mark{% endif %}"
+                                                        class="meta {% if latestCapabilityMark is null %}no-mark{% endif %}"
                                                 >{{ latestCapabilityMark|default('–') }}</a>
+                                                {% endif %}
                                             </td>
                                         {% endif %}
                                     {% endfor %}
@@ -254,15 +256,17 @@
                                                     <a
                                                             href="{{ summaryLink }}"
                                                             {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
-                                                            data-actual-mark
+                                                {% if latestIndicatorMark %}data-actual-mark{% endif %}
                                                             class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}"
                                                     >{{ renderedIndicatorMark }}</a>
+                                                {% if latestIndicatorMark %}
                                                     <a
                                                             href="{{ summaryLink }}"
                                                             {% if latestDescriptorText %} title="{{ latestDescriptorText }}"{% endif %}
                                                             data-draft-mark
-                                                            class={{ latestGradientClass }} {% if latestIndicatorMark is null %}no-mark{% endif %}"
+                                                            class=meta {% if latestIndicatorMark is null %}no-mark{% endif %}"
                                                     >{{ latestRenderedIndicatorMark }}</a>
+                                                {% endif %}
                                                 </td>
                                             {% endif %}
                                         {% endfor %}
@@ -276,10 +280,12 @@
                                 {% for studentId, studentData in students %}
                                     {% if capabilityData.show %}
                                         <td class="mark">
-                                        {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? '') %}
-                                        <a href="#" data-actual-mark class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
-                                        {% set draftGradientClass = urgency.marks(capabilityData.marks[studentId].latestNormalised ?? '') %}
-                                        <a href="#" data-draft-mark class="{% if draftGradientClass %} {{ draftGradientClass }}{% endif %}">{{ capabilityData.marks[studentId].latestHumanReadable|default('–') }}</a>
+                                        {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? null) %}
+                                        {% set draftGradientClass = urgency.marks(capabilityData.marks[studentId].latestNormalised ?? null) %}
+                                        <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
+                                        {% if draftGradientClass %}
+                                        <a href="#" data-draft-mark class="meta">{{ capabilityData.marks[studentId].latestHumanReadable|default('–') }}</a>
+                                            {% endif %}
                                         </td>
                                     {% else %}
                                         <td class="excluded"></td>
@@ -291,9 +297,11 @@
                                     {% for studentId, studentData in students %}
                                         <td class="mark">
                                             {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
-                                        <a href="#" data-actual-mark class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
                                             {% set draftGradientClass = urgency.marks(indicatorData.marks[studentId].latestNormalised ?? '') %}
-                                        <a href="#" data-draft-mark class="{% if draftGradientClass %} {{ draftGradientClass }}{% endif %}">{{ indicatorData.marks[studentId].latestHumanReadable|default('–') }}</a>
+                                        <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
+                                        {% if draftGradientClass %}
+                                        <a href="#" data-draft-mark class="meta">{{ indicatorData.marks[studentId].latestHumanReadable|default('–') }}</a>
+                                        {% endif %}
                                         </td>
 
                                     {% endfor %}
