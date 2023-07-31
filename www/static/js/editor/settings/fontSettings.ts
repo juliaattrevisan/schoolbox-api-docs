@@ -20,6 +20,7 @@ export function getFontSettings() {
                 "Trebuchet MS, Helvetica, sans-serif",
                 "Verdana, Geneva, sans-serif",
             ],
+            supportAllValues: true,
         },
         fontSize: {
             options: [
@@ -45,6 +46,7 @@ export function getFontSettings() {
                     model: "1.125rem",
                 },
             ],
+            supportAllValues: true,
         },
         fontColor: {
             colors: fontColourSwatches,
