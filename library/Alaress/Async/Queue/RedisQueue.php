@@ -125,7 +125,11 @@ abstract class RedisQueue implements QueueInterface
         for ($i = 0; $i < $count; ++$i) {
             $key  = $idList[$i];
             $data = $result[$i];
-
+            if (!$data) {
+                // the thing we're pointing at doesn't exist, remove the reference
+                $this->redis->srem($this->getRedisSetKey(), $key);
+                continue;
+            }
             try {
                 $instances[] = self::inflate($data);
             } catch (InvalidArgumentException $e) {
