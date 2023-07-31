@@ -94,7 +94,7 @@ export function getHTMLSupportSettings() {
                 },
                 // Allow specfic styles on p, a, headings and span elements
                 {
-                    name: /^(p|a|h2|h3|h4|span)$/,
+                    name: /^(a|h2|h3|h4|span)$/,
                     styles: {
                         "background-color": true,
                         color: true,
