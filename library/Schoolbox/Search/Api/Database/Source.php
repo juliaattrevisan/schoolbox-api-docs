@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database;
 
-use Schoolbox\Search\Api\Cursor;
+use Schoolbox\Search\Api\Cursor\DataObject;
 use Schoolbox\Search\Api\Filter;
 use Schoolbox\Search\Api\Result;
 
@@ -32,7 +32,7 @@ class Source implements IMatcher, IHydrator
     /**
      * Proxy for `$this->matcher->buildMatchQueryParams`.
      */
-    public function buildMatchQueryParams(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): QueryParams
+    public function buildMatchQueryParams(string $keyword, Filter $filter, ?DataObject $cursor, int $limit): QueryParams
     {
         return $this->matcher->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
     }

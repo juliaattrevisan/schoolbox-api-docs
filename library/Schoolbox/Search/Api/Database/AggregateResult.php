@@ -11,7 +11,7 @@ namespace Schoolbox\Search\Api\Database;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
-use Schoolbox\Search\Api\Cursor;
+use Schoolbox\Search\Api\Cursor\DataObject;
 use Schoolbox\Search\Api\Filter;
 use Schoolbox\Search\Api\ISource;
 use Schoolbox\Search\Api\Result;
@@ -31,13 +31,13 @@ class AggregateResult implements ISource
     }
 
     /**
-     * @param string      $keyword
-     * @param Filter      $filter
-     * @param Cursor|null $cursor
-     * @param int         $limit
+     * @param string          $keyword
+     * @param Filter          $filter
+     * @param DataObject|null $cursor
+     * @param int             $limit
      * @return array<Result>
      */
-    public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array
+    public function search(string $keyword, Filter $filter, ?DataObject $cursor, int $limit): array
     {
         if (empty($this->sources)) {
             return [];

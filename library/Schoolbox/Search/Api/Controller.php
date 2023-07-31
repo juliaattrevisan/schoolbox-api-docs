@@ -35,6 +35,12 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
+        // Build cursor as in
+//        new Cursor(
+//            $this->source,
+//
+//        );
+
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
         if (mb_strlen($keyword) >= 2) {
             $this->response = $this->responseAsJson(

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Cursor;
 
 use Alaress\Codec\ICodec;
-use Schoolbox\Search\Api\Cursor;
 
 /**
  * Codec for the search API's cursor.
@@ -18,7 +17,7 @@ use Schoolbox\Search\Api\Cursor;
 class Codec implements ICodec
 {
     /**
-     * @param Cursor $rawValue
+     * @param DataObject $rawValue
      * @return string
      */
     public function encode($rawValue): string
@@ -37,14 +36,14 @@ class Codec implements ICodec
 
     /**
      * @param string $encodedValue
-     * @return Cursor|null
+     * @return DataObject|null
      */
-    public function decode($encodedValue): ?Cursor
+    public function decode($encodedValue): ?DataObject
     {
         $value = json_decode(base64_decode($encodedValue));
         if (!is_array($value) && !isset($value[0], $value[1], $value[2], $value[3])) {
             return null;
         }
-        return new Cursor($value[0], $value[1], $value[2], $value[3]);
+        return new DataObject($value[0], $value[1], $value[2], $value[3]);
     }
 }

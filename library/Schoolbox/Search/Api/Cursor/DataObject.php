@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api;
+namespace Schoolbox\Search\Api\Cursor;
 
 /**
  * Data object for a cursor.
@@ -15,7 +15,7 @@ namespace Schoolbox\Search\Api;
  * The cursor is a pointer to the last result returned by the search: it is used
  * to fetch the next page of results.
  */
-class Cursor
+class DataObject
 {
     /**
      * Constructor
