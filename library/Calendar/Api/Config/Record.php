@@ -167,7 +167,7 @@ class Calendar_Api_Config_Record
                 // Do nothing.
         }
 
-        $this->setConfig(json_encode($configArray,JSON_THROW_ON_ERROR));
+        $this->setConfig(json_encode($configArray, JSON_THROW_ON_ERROR));
 
         return $this;
     }
