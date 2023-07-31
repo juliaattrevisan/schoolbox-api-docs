@@ -80,9 +80,6 @@ class ValidUsesSudsTimetableTest extends TestCase
         yield 'SUDS external DB, Wonde timetable' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::WONDE, true,
         ];
-        yield 'SUDS external DB, LISS timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::LISS, true,
-        ];
         yield 'SUDS external DB, CSV timetable' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::CSV, false,
         ];
