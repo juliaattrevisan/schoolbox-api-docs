@@ -82,11 +82,24 @@ export function getHTMLSupportSettings() {
                         right: true,
                     },
                 },
-                // "Allow class and style on all div, p, a, h2, h3, h4, and span elements"
+                // "Allow class on all div, p, a, h2, h3, h4, and span elements"
                 {
                     name: /^(div|p|a|h2|h3|h4|span)$/,
                     classes: true,
+                },
+                // Allow all styles on div elements
+                {
+                    name: "div",
                     styles: true,
+                },
+                // Allow specfic styles on p, a, headings and span elements
+                {
+                    name: /^(p|a|h2|h3|h4|span)$/,
+                    styles: {
+                        "background-color": true,
+                        color: true,
+                        "font-size": true,
+                    },
                 },
                 // "object[id,name,width,height];"
                 {
