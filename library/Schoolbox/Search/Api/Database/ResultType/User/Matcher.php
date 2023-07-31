@@ -99,12 +99,12 @@ class Matcher implements IMatcher
         // Apply cursor
         // (Previous technique: < most relevant field, = most relevant and < next most relevant)
         // This can probably be made generic?
+        // TODO consider reverting to previous, and moving to outside UNION
         if ($cursor) {
             $cursorSearchParts = [
-                'relevance < :relevance',
-                '(relevance = :relevance AND title > :title)',
-                '(relevance = :relevance AND title = :title AND type > :type)',
-                '(relevance = :relevance AND title = :title AND type = :type AND id > :id)',
+                "(CONCAT(u.chosen_name, ' ', u.lastname) > :title)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) = :title AND CONCAT('user.', r.group_type) > :type)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) = :title AND CONCAT('user.', r.group_type) = :type AND u.id > :id)",
             ];
 
             $whereParts[]        = '(' . implode(' OR ', $cursorSearchParts) . ')';
