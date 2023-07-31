@@ -24,9 +24,6 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
     dropdownTrigger.setAttribute("aria-expanded", "false");
     dropdownContent.setAttribute("aria-hidden", "true");
 
-    // Move the dropdown content to the end of the body so it's not affected by any parent elements
-    document.body.appendChild(dropdownContent);
-
     dropdownTrigger.addEventListener("click", (e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
