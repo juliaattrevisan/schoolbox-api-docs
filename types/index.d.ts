@@ -1,9 +1,10 @@
 /**
- * Any global variables that we wont TS to recognise should be set up here:
+ * Any global variables that we want TS to recognise should be set up here:
  * https://ilikekillnerds.com/2022/09/how-to-extend-the-window-object-in-typescript/
  */
 
 import Vue from "vue";
+import { ActiveDropdown } from "@js/dropdown/dropdownTypes";
 
 declare global {
     interface Window {
@@ -16,6 +17,7 @@ declare global {
             imageLightboxLicenseKey: string;
             imageSlideshows: { [key: string]: any };
             colourDefaults: { [key: string]: any };
+            activeDropdown: ActiveDropdown | false;
         };
         siteVersion: string;
         STORYBOOK_ENV: string;
