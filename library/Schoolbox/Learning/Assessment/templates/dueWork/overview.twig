@@ -51,7 +51,7 @@
                         <td>
                             <div class="wrap-down small-12 ">
                                 <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="sb-flex sb-flex-col sb-flex-centre">
-                                    {% include 'include/portrait.twig' with {user: participant, description: participant.fullName} only %}
+                                    {% include 'include/portrait.twig' with {user: participant, description: participant.fullName, class: "rubric-profile"} only %}
                                     <p>{{ participant.fullname}}</p>
                                 </a>
                             </div>
@@ -85,6 +85,9 @@
 <style>
     [data-draft-mark] {
         display: none;
+    }
+    .rubric-profile {
+        max-width: 64px;
     }
 </style>
 {% autoescape 'js' %}
