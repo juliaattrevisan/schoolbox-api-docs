@@ -38,8 +38,10 @@
     </div>
 </div>
 
+{% autoescape 'js' %}
 <script>
     let authorApp = LearnosityAuthor.init(
         {{ initOptions | raw }}
     );
 </script>
+{% endautoescape %}

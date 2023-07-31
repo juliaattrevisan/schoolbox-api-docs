@@ -8,8 +8,10 @@
     </div>
 </div>
 
+{% autoescape 'js' %}
 <script>
     let reportsApp = LearnosityReports.init(
         {{ initOptions | raw }}
     );
 </script>
+{% endautoescape %}

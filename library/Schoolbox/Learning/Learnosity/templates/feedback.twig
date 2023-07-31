@@ -29,6 +29,7 @@
                 <textarea id="attempt-comment" name="attempt-comment">{{ attempt.comment }}</textarea>
                 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
+                {% autoescape 'js' %}
                 <script>
                     $(function() {
                         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
@@ -38,6 +39,7 @@
                         }));
                     });
                 </script>
+                {% endautoescape %}
             </section>
         </form>
     </div>
@@ -54,6 +56,7 @@
     }
 </style>
 
+{% autoescape 'js' %}
 <script>
     let attemptScores = JSON.parse('{{ scores|raw }}');
     let attemptComments = JSON.parse(atob('{{ comments|raw }}'));
@@ -119,3 +122,4 @@
         {{ reportInitOptions | raw }}, reportCallback
     );
 </script>
+{% endautoescape %}

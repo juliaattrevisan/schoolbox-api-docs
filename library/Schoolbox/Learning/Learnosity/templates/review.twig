@@ -32,6 +32,7 @@
     </div>
 </div>
 
+{% autoescape 'js' %}
 <script>
     {# Show a different report style if feedback was given
      # This uses a whole different payload compared to the
@@ -81,3 +82,4 @@
         );
     {% endif %}
 </script>
+{% endautoescape %}

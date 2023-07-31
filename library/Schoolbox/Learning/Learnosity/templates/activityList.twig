@@ -11,11 +11,13 @@
 
             <div id="learnosity-author"></div>
 
+            {% autoescape 'js' %}
             <script>
                 let authorApp = LearnosityAuthor.init(
                     {{ initOptions | raw }}
                 );
             </script>
+            {% endautoescape %}
         </section>
     </div>
 </div>

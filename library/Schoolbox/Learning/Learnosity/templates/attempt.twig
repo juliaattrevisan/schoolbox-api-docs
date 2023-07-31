@@ -17,6 +17,7 @@
     </div>
 </div>
 
+{% autoescape 'js' %}
 <script>
     let itemsApp = LearnosityItems.init({{ initOptions | raw }});
 
@@ -35,3 +36,4 @@
         });
     });
 </script>
+{% endautoescape %}
