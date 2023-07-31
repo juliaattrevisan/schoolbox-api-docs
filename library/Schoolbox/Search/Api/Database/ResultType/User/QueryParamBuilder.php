@@ -13,19 +13,19 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
-use Schoolbox\Search\Api\Database\IMatcher;
+use Schoolbox\Search\Api\Database\IQueryParamBuilder;
 use Schoolbox\Search\Api\Database\QueryParams;
 use Schoolbox\Search\Api\Filter\DataObject as Filter;
 
 /**
- * Search for a user which matches a particular keyword and filter.
+ * Query parameter builder for a search for users.
  *
  * This may match a user on:
  * * their first, preferred, or last name
  * * their username
  * * their external ID
  */
-class Matcher implements IMatcher
+class QueryParamBuilder implements IQueryParamBuilder
 {
     /**
      * Constructor

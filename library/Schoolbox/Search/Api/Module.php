@@ -13,9 +13,9 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Search\Api\Database\AggregateResult;
+use Schoolbox\Search\Api\Database\AggregateSource;
 use Schoolbox\Search\Api\Database\ResultType\User\Hydrator;
-use Schoolbox\Search\Api\Database\ResultType\User\Matcher;
+use Schoolbox\Search\Api\Database\ResultType\User\QueryParamBuilder;
 use Schoolbox\Search\Api\Database\Source;
 
 /**
@@ -45,9 +45,9 @@ class Module extends BaseModule
         $database = $this->injector->get('databaseInternalRead');
 
         return new Controller(
-            new AggregateResult(
+            new AggregateSource(
                 $database,
-                new Matcher($config, $database->getQuoter()),
+                new QueryParamBuilder($config, $database->getQuoter()),
             ),
         );
     }

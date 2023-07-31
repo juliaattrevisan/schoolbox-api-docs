@@ -21,10 +21,10 @@ use Schoolbox\Search\Api\Result\DataObject as Result;
  * * a hydrator, for converting those results into something which will then be
  *   rendered
  */
-class Source implements IMatcher, IHydrator
+class Source implements IQueryParamBuilder, IHydrator
 {
     public function __construct(
-        private IMatcher $matcher,
+        private IQueryParamBuilder $matcher,
         private IHydrator $hydrator,
     ) {
     }

@@ -15,18 +15,27 @@ use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
 use Schoolbox\Search\Api\Filter\DataObject as Filter;
 use Schoolbox\Search\Api\ISource;
 
-class AggregateResult implements ISource
+/**
+ * Source for multiple database search query builders.
+ */
+class AggregateSource implements ISource
 {
     /**
-     * @var IMatcher[]
+     * @var IQueryParamBuilder[]
      */
-    private array $matchers;
+    private array $queryParamBuilders;
 
+    /**
+     * Constructor
+     *
+     * @param IConnector         $connector
+     * @param IQueryParamBuilder ...$matchers
+     */
     public function __construct(
         private IConnector $connector,
-        IMatcher ...$matchers,
+        IQueryParamBuilder ...$matchers,
     ) {
-        $this->matchers = $matchers;
+        $this->queryParamBuilders = $matchers;
     }
 
     /**
@@ -38,13 +47,13 @@ class AggregateResult implements ISource
      */
     public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array
     {
-        if (empty($this->matchers)) {
+        if (empty($this->queryParamBuilders)) {
             return [];
         }
         $queries = [];
         $params  = [];
-        foreach ($this->matchers as $matcher) {
-            $queryParams = $matcher->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
+        foreach ($this->queryParamBuilders as $queryParamBuilder) {
+            $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
             $queries[]   = $queryParams->query;
             $params      = array_merge($params, $queryParams->params);
         }

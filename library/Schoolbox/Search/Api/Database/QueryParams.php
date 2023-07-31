@@ -13,7 +13,12 @@ namespace Schoolbox\Search\Api\Database;
  * Data object for a query + params set, used to populate a `RawMatch` object.
  *
  * This object's `$query` is intended to be joined with other `QueryParams`
- * objects into a single `UNION` query.
+ * objects into a single `UNION` query; thus it should contain these columns:
+ * - id
+ * - title
+ * - type
+ * - date
+ * - relevance
  */
 class QueryParams
 {
