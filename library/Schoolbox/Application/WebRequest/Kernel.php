@@ -352,14 +352,6 @@ class Kernel extends WebKernelAbstract
             $redirect = $psr7Response->getHeader('location');
             $isJson   = str_contains($psr7Response->getHeaderLine('content-type'), 'application/json');
         } else {
-            trigger_error(
-                sprintf(
-                    'Controller action `%s::%s` returned no response: falling back to empty response',
-                    $controller::class,
-                    $action,
-                ),
-                E_USER_WARNING,
-            );
             $psr7Response = $controller->getResponseFactory()->createResponse();
             $redirect     = false;
             $isJson       = false;
