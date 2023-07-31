@@ -35,7 +35,7 @@ class Calendar_Api_Config_Record
             'EOTC' => 'EOTC', // Default.
         ],
         'Event' => [
-            'External' => 'EventExternal', // Override.
+            'External' => 'External', // Default.
             'Schoolbox' => 'Schoolbox', // Default.
             'Vcal' => 'Vcal' // Default.
         ],
