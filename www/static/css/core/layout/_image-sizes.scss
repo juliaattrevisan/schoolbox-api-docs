@@ -1,9 +1,15 @@
 /*****************************
- Image dimensions
+ image-sizes.scss
  ****************************/
 
 /*
-    TODO - Add comment here explaining why this file exists / what it is
+    This file is basically a placeholder for holding references to our image sizes. It's
+    controlled with custom properties to make it easier for developers to write code, as
+    well as making it much easier to adjust all sizes across a platform if we decide we
+    need to at a later date.
+
+    Currently, the default size of medium correlates to the default thumbnail image size
+    on most of our Foundation-based cards.
 */
 
 :root {
