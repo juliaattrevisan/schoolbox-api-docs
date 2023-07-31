@@ -206,9 +206,7 @@ class Data2Connector
         $url = (new Uri())->withScheme('https')->withHost(self::API_HOST)->withPath('/dap' . $command);
         // authenticate
         try {
-            $response = $this->client->request(
-                $method, (string)$url, $options
-            );
+            $response = $this->client->request($method, (string)$url, $options);
             return json_decode($response->getBody()->getContents(), true);
         } catch (GuzzleException $e) {
             throw new External\Exception("Unable to get $url: {$e->getMessage()}");
@@ -235,7 +233,8 @@ class Data2Connector
         // authenticate
         try {
             $response          = $this->client->request(
-                'POST', $url,
+                'POST',
+                $url,
                 [
                     RequestOptions::HEADERS     => $options,
                     RequestOptions::FORM_PARAMS => $formParams,
