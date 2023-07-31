@@ -48,10 +48,10 @@ class External_Isams_Batch_BaseApi
     public function retrieveDocument($filter = '')
     {
         $url = new Uri();
-        $url->withScheme('https')
-            ->withHost($this->getHost())
-            ->withPath('/api/batch/1.0/xml.ashx')
-            ->appendQueryParameters(['apikey' => $this->getApiKey()])
+        $url = $url->withScheme('https')
+                   ->withHost($this->getHost())
+                   ->withPath('/api/batch/1.0/xml.ashx')
+                   ->appendQueryParameters(['apikey' => $this->getApiKey()])
         ;
         $curl         = new Alaress_Curl_Url($url);
         $filterString = "$filter";

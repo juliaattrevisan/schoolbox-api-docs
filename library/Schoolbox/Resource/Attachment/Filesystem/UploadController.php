@@ -58,9 +58,7 @@ class UploadController extends AbstractController
             return $url;
         }
 
-        $urlObject = new Uri($url);
-        $urlObject->appendQueryParameters(['expiryDate' => $this->expiryDate->toRfc3339String()]);
-        return $urlObject;
+        return (new Uri($url))->appendQueryParameters(['expiryDate' => $this->expiryDate->toRfc3339String()]);
     }
 
     /**
