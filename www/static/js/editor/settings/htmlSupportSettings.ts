@@ -98,6 +98,7 @@ export function getHTMLSupportSettings() {
                     styles: {
                         "background-color": true,
                         color: true,
+                        "font-family": true,
                         "font-size": true,
                         "font-style": true,
                         "font-weight": true,
