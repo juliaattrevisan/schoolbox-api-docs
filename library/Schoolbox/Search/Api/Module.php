@@ -47,10 +47,7 @@ class Module extends BaseModule
         return new Controller(
             new AggregateResult(
                 $database,
-                new Source(
-                    new Matcher($config, $database->getQuoter()),
-                    new Hydrator(),
-                ),
+                new Matcher($config, $database->getQuoter()),
             ),
         );
     }
