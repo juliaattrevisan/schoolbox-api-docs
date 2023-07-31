@@ -87,7 +87,16 @@ export default class TableUpdates extends Plugin {
     }
 
     /**
-     * Add the following properties as default to newly created tables
+     * Get the currently selected table
+     */
+    getSelectedTable() {
+        const selection = this.editor.model.document.selection;
+        const table = selection.getFirstPosition().findAncestor("table");
+        return table;
+    }
+
+    /**
+     * Add the following properties as default to newly created tables, columns and rows
      */
     addDefaultProperties() {
         const insertTableCommand = this.editor.commands.get("insertTable");
@@ -107,27 +116,60 @@ export default class TableUpdates extends Plugin {
             this.editor.execute("tableBorderColor", {
                 value: "#b3b3b3",
             });
-            /**
-             * Set the default border style, width and colour for all cells in the table.
-             * This is a bit more involved than setting the table styles above, as we
-             * need to get the table element from the selection, then get all the cell
-             * elements from the table, then set the attributes on each cell.
-             */
-            const selection = this.editor.model.document.selection;
-            const table = selection.getFirstPosition().findAncestor("table");
-            // get all the cell elements from the table, first getting each row, then each cell within each row
-            const cellElements = Array.from(table.getChildren())
-                .filter((row) => row.name === "tableRow")
-                .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
-                .flat();
             this.editor.model.change((writer) => {
-                // add the isNew attribute to the table so we can add .sb-ck-table to the table in the downcast
-                writer.setAttribute(this.isCK5Attribute, "true", table);
-                cellElements.forEach((cell) => {
-                    writer.setAttribute("tableCellBorderStyle", "solid", cell);
-                    writer.setAttribute("tableCellBorderWidth", "1px", cell);
-                    writer.setAttribute("tableCellBorderColor", "#b3b3b3", cell);
-                });
+                // add the isCK5Attribute attribute to the table so we can add .sb-ck-table to the table in the downcast
+                writer.setAttribute(this.isCK5Attribute, "true", this.getSelectedTable());
+            });
+            this.setCellBorders();
+        });
+        const insertColumnAndRowCommands = [
+            "insertTableColumnLeft",
+            "insertTableColumnRight",
+            "insertTableRowAbove",
+            "insertTableRowBelow",
+        ];
+        insertColumnAndRowCommands.forEach((command) => {
+            this.editor.commands.get(command).on("execute", () => {
+                const cells = this.getCellElements();
+                // only add default styles if all cells have not been set to border style none
+                const hasBorderStyles = cells.some(
+                    (cell) =>
+                        cell._attrs.has("tableCellBorderStyle") && cell._attrs.get("tableCellBorderStyle") !== "none"
+                );
+                if (hasBorderStyles) {
+                    this.setCellBorders();
+                }
+            });
+        });
+    }
+
+    /**
+     * Get all the cell elements from the table, first getting each row,
+     * then each cell within each row
+     * @returns {Array} An array of all the cell elements in the table
+     */
+    getCellElements() {
+        const cellElements = Array.from(this.getSelectedTable().getChildren())
+            .filter((row) => row.name === "tableRow")
+            .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
+            .flat();
+        return cellElements;
+    }
+
+    /**
+     * Set the default border style, width and colour for all cells in the table.
+     * This is a bit more involved than setting the table styles above, as we
+     * need to get the table element from the selection, then get all the cell
+     * elements from the table, then set the attributes on each cell.
+     */
+    setCellBorders() {
+        const cells = this.getCellElements();
+        const filteredCells = cells.filter((cell) => !cell._attrs.has("tableCellBorderStyle")); // to update only newly inserted cells
+        this.editor.model.change((writer) => {
+            filteredCells.forEach((cell) => {
+                writer.setAttribute("tableCellBorderStyle", "solid", cell);
+                writer.setAttribute("tableCellBorderWidth", "1px", cell);
+                writer.setAttribute("tableCellBorderColor", "#b3b3b3", cell);
             });
         });
     }
@@ -139,10 +181,8 @@ export default class TableUpdates extends Plugin {
     markAlignedTables() {
         const tableAlignmentCommand = this.editor.commands.get("tableAlignment");
         tableAlignmentCommand.on("execute", () => {
-            const selection = this.editor.model.document.selection;
-            const table = selection.getFirstPosition().findAncestor("table");
             this.editor.model.change((writer) => {
-                writer.setAttribute(this.isCK5Attribute, "true", table);
+                writer.setAttribute(this.isCK5Attribute, "true", this.getSelectedTable());
             });
         });
     }
