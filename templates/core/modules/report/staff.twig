@@ -22,23 +22,24 @@
         endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
         {# To allow schools to alter whats displayed in the columns #}
         {# Refer to vue/components/dataTable/types/dataTableTypes.ts:ColumnConfig for list of properties that can be used #}
-        {% block content %}
-        {% set columnsConfig = [
-            {
-                key: "portrait_url",
-                heading: "Image",
-                class: "portrait-td",
-                isSortable: false,
-                template: {
-                    component: "image",
-                    componentData: {
-                        src: "portrait_url",
-                        href: "profile_url",
-                        title: "View profile",
-                        alt: "Portrait photo of user",
-                    },
+        {% set imageColumn = {
+            key: "portrait_url",
+            heading: "Image",
+            class: "portrait-td",
+            isSortable: false,
+            template: {
+                component: "image",
+                componentData: {
+                    src: "portrait_url",
+                    href: "profile_url",
+                    title: "View profile",
+                    alt: "Portrait photo of user",
                 },
             },
+        } %}
+        {% block content %}
+        {% set columnsConfig = [
+            imageColumn,
             {
                 key: "StaffPreferredName",
                 heading: "First name",

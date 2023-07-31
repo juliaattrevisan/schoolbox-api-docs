@@ -2,22 +2,9 @@
 
 {# Overwriting templates/core/modules/report/staff.twig #}
 {# Changes: Mobile phone column added #}
+{% block content %}
 {% set columnsConfig = [
-    {
-        key: "portrait_url",
-        heading: "Image",
-        class: "portrait-td",
-        isSortable: false,
-        template: {
-            component: "image",
-            componentData: {
-                src: "portrait_url",
-                href: "profile_url",
-                title: "View profile",
-                alt: "Portrait photo of user",
-            },
-        },
-    },
+    imageColumn,
     {
         key: "StaffPreferredName",
         heading: "First name",
@@ -107,3 +94,5 @@
         }
     },
 ] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}
