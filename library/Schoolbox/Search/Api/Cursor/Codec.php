@@ -40,6 +40,9 @@ class Codec implements ICodec
      */
     public function decode($encodedValue): ?DataObject
     {
+        if (!isset($encodedValue)) {
+            return null;
+        }
         $value = json_decode(base64_decode($encodedValue));
         if (!is_array($value) && !isset($value[0], $value[1], $value[2], $value[3])) {
             return null;

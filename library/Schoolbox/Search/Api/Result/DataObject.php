@@ -25,6 +25,7 @@ class DataObject
      * @param string                   $title       The title of the search result.
      * @param string                   $url         A link to the search result.
      * @param string                   $type        The type of search result.
+     * @param float                    $relevance   The relevance score of the search result.
      * @param Alaress_Date_Format|null $date        The date (if any) of the search result.
      * @param string|null              $meta        An optional brief context line for the search result.
      * @param string|null              $image       A link to an image to display next to this search result.
@@ -42,6 +43,7 @@ class DataObject
         public string $title,
         public string $url,
         public string $type,
+        public float $relevance,
         public ?Alaress_Date_Format $date = null,
         public ?string $meta = null,
         public ?string $image = null,

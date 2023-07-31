@@ -51,7 +51,7 @@ class Module extends BaseModule
                 new Source(
                     new Matcher($config, $database->getQuoter()),
                     new Hydrator(),
-                )
+                ),
             ),
         );
     }

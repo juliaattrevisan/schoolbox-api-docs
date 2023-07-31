@@ -37,6 +37,7 @@ class Hydrator implements IHydrator
             $match->title,
             '/search/user/' . $match->id,
             $match->type,
+            $match->relevance,
             $match->date,
         );
     }

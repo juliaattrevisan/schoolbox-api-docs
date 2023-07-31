@@ -35,7 +35,7 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        // Build cursor as in
+        // Build cursor as in \Schoolbox\Learning\Moment\Feed\Controller::getFeedForUser?
 //        new Cursor(
 //            $this->source,
 //
@@ -43,13 +43,24 @@ class Controller extends Base
 
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
         if (mb_strlen($keyword) >= 2) {
+            $cursor = new Cursor\Cursor(
+                $this->source,
+                $keyword,
+                new Filter\DataObject(null, null, null, null),
+                3,
+            );
+            $data           = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
             $this->response = $this->responseAsJson(
-                $this->source->search(
-                    $keyword,
-                    new Filter\DataObject(null, null, null, null),
-                    null,
-                    3,
-                )
+                [
+                    'data'     => $data,
+                    'metadata' => [
+                        'count'  => $cursor->retrieveResultCount(),
+                        'cursor' => [
+                            'current' => null,
+                            'next'    => $cursor->next($data),
+                        ],
+                    ],
+                ]
             );
         } else {
             $this->sendJsonError('Search keyword must be at least 2 characters', 400);
