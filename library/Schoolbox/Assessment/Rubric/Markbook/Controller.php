@@ -758,8 +758,24 @@ class Controller extends Base
                 'capabilities' => $capabilityMarks,
             ];
 
-            // Stuff everything about the students marks into an array
-            $students[$row['student_id']]['assessmentsLatest'] = $assessmentsForStudent;
+            if (isset($students[$row['student_id']])) {
+                /**
+                 * student array already exists (they have some published marks, just add these draft marks)
+                 * Stuff everything about the students marks into an array
+                 */
+                $students[$row['student_id']]['assessmentsLatest'] = $assessmentsForStudent;
+            } else {
+                /**
+                 * Student doesn't exist (only has draft marks, need to build the base student array
+                 */
+                $students[$row['student_id']] = [
+                    'firstname'      => $row['student_firstname'],
+                    'preferred_name' => $row['student_preferred_name'],
+                    'lastname'       => $row['student_lastname'],
+                    'assessmentsLatest'    => $assessmentsForStudent,
+                    'profileLink'    => '/search/user/' . $row['student_id'],
+                ];
+            }
 
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
