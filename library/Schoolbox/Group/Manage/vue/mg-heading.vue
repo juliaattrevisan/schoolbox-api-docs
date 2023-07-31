@@ -22,13 +22,21 @@ window.Vue.watch(
     () => store.hasLoadedOk,
     (hasLoadedOk) => {
         if (hasLoadedOk) {
+            initDropdowns();
             initFoundation();
         }
     }
 );
 
 /**
- * ensure the jelly tot menu works,
+ * ensure the jelly tot menus work,
+ */
+async function initDropdowns() {
+    await window.Vue.nextTick();
+    document.dispatchEvent(new Event("DROPDOWN__INIT"));
+}
+/**
+ * ensure the tooltips work.
  */
 async function initFoundation() {
     await window.Vue.nextTick();

@@ -294,6 +294,7 @@ Usage:
             $reportContent.attr('data-loaded', '1');
             $reportContent.trigger('filterContentLoaded', [decodedSelections]);
             $(document).foundation();
+            document.dispatchEvent(new Event("DROPDOWN__INIT"))
             $toast.toastTimeout({text: 'Loaded successfully', css: 'success'});
         }
 
@@ -955,5 +956,3 @@ Usage:
         </div>
     </div>
 </div>
-
-

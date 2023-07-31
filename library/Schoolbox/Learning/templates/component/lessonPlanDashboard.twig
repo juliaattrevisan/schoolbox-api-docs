@@ -1,11 +1,7 @@
 <ul class="action-list">
     {% for lesson in lessonPlans %}
         <li>
-            {% if lesson.classColour %}
-                <div class="card small-12" style="border-left: 6px solid {{ lesson.classColour }}">
-            {% else %}
-                <div class="card small-12" style="border-left: 6px solid white">
-            {% endif %}
+            <div class="card small-12" style="border-left: 6px solid {{ lesson.classColour ?? 'white' }}">
                 <h3>
                     <a class="title" href="{{ lesson._links.assessment }}">{{ lesson.title }}</a>
                 </h3>

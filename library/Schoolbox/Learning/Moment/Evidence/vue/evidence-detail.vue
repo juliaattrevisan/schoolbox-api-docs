@@ -64,7 +64,12 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {},
+    mounted: function () {
+        // Ensure dropdowns are initialised
+        this.$nextTick(() => {
+            document.dispatchEvent(new Event("DROPDOWN__INIT"));
+        });
+    },
 
     /**
      * Computed properties.

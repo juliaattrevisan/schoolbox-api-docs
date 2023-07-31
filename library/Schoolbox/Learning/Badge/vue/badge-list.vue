@@ -93,6 +93,13 @@ export default {
         document.addEventListener("badge-list__onFilterChange", this.onFilterChange);
     },
 
+    updated() {
+        // Ensure dropdowns are initialised
+        this.$nextTick(() => {
+            document.dispatchEvent(new Event("DROPDOWN__INIT"));
+        });
+    },
+
     methods: {
         /**
          * Opens a modal window for viewing this badge's full details.
@@ -216,17 +223,17 @@ export default {
         async deleteBadge() {
             this.$refs.toast.activate("Deleting badge...");
             try {
-                const response     = await fetch(this.currentBadge._links.delete, {method: 'DELETE'});
+                const response = await fetch(this.currentBadge._links.delete, { method: "DELETE" });
                 const responseText = await response.text();
 
                 // The expected response is blank, with a HTTP status code in the 'success' range (200-299).
                 // Any other response is treated as an error.
-                if (response.ok && responseText === '') {
+                if (response.ok && responseText === "") {
                     this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
                     this.metadata.count -= 1;
-                    this.$refs.toast.timeout('Badge successfully deleted', true);
+                    this.$refs.toast.timeout("Badge successfully deleted", true);
                 } else {
-                    this.$refs.toast.timeout('Failed to delete badge', false);
+                    this.$refs.toast.timeout("Failed to delete badge", false);
                 }
             } catch (error) {
                 console.warn(error);
