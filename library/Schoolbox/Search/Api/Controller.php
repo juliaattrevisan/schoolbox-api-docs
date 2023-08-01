@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Source\ISource;
 
 /**
@@ -20,10 +21,13 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param ISource $source
+     * @param ISource   $source   Source for raw search results.
+     * @param IHydrator $hydrator Hydrates raw search results to full results.
      */
-    public function __construct(private ISource $source)
-    {
+    public function __construct(
+        private ISource $source,
+        private IHydrator $hydrator,
+    ) {
     }
 
     /**
@@ -36,12 +40,6 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        // Build cursor as in \Schoolbox\Learning\Moment\Feed\Controller::getFeedForUser?
-//        new Cursor(
-//            $this->source,
-//
-//        );
-
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
         if (mb_strlen($keyword) >= 2) {
             $cursor = new Cursor\Cursor(
@@ -50,20 +48,19 @@ class Controller extends Base
                 new Filter\DataObject(null, null, null, null),
                 3,
             );
-            $data = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
-
-            // TODO apply hydrator
+            $rawResults  = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+            $fullResults = $this->hydrator->hydrate($rawResults->getAll());
 
             // TODO apply filter
 
             $this->response = $this->responseAsJson(
                 [
-                    'data'     => $data,
+                    'data'     => $fullResults,
                     'metadata' => [
                         'count'  => $cursor->retrieveResultCount(),
                         'cursor' => [
                             'current' => null,
-                            'next'    => $cursor->next($data),
+                            'next'    => $cursor->next($rawResults),
                         ],
                     ],
                 ]

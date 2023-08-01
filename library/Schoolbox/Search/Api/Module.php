@@ -14,9 +14,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Search\Api\Database\AggregateSource;
-use Schoolbox\Search\Api\Database\ResultType\User\Hydrator;
-use Schoolbox\Search\Api\Database\ResultType\User\QueryParamBuilder;
-use Schoolbox\Search\Api\Database\Source;
+use Schoolbox\Search\Api\Database\ResultType\User;
+use Schoolbox\Search\Api\Hydrator;
 
 /**
  * Module for the search API.
@@ -47,7 +46,10 @@ class Module extends BaseModule
         return new Controller(
             new AggregateSource(
                 $database,
-                new QueryParamBuilder($config, $database->getQuoter()),
+                new User\QueryParamBuilder($config, $database->getQuoter()),
+            ),
+            new Hydrator\Aggregate(
+                new User\Hydrator(),
             ),
         );
     }
