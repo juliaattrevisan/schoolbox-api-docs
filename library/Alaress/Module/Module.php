@@ -666,13 +666,10 @@ class Module
      */
     public function installControllerDependencies(Base $controller, ContainerInterface $container): Base
     {
-        // Generate a URI here (with Schoolbox's augmentations),
-        // and inject its query params into the controller
+        // Create values objects from query params and parsed body
         /** @var ServerRequestInterface $request */
-        $request    = $container->get('httpRequest');
-        $requestUri = new Uri($request->getUri()->__toString());
-
-        $requestQuery = new Values($requestUri->getQueryAsArray());
+        $request      = $container->get('httpRequest');
+        $requestQuery = new Values($request->getQueryParams());
         $requestPost  = new Values(
             strtoupper($request->getMethod()) === self::METHOD_POST
                 ? $request->getParsedBody()
