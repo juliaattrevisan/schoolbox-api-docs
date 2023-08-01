@@ -1,60 +1,12 @@
 {% extends '@core/modules/report/staff.twig' %}
 
-{# Overwriting templates/core/modules/report/staff.twig #}
 {# Changes: Building, Room, and House added, Campus removed #}
 {% set columnsConfig = [
-    {
-        key: "portrait_url",
-        heading: "Image",
-        class: "portrait-td",
-        isSortable: false,
-        template: {
-            component: "image",
-            componentData: {
-                src: "portrait_url",
-                href: "profile_url",
-                title: "View profile",
-                alt: "Portrait photo of user",
-            },
-        },
-    },
-    {
-        key: "StaffPreferredName",
-        heading: "First name",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffPreferredName",
-                href: "profile_url",
-                title: "View profile",
-            }
-        },
-    },
-    {
-        key: "StaffSurname",
-        heading: "Surname",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffSurname",
-                href: "profile_url",
-                title: "View profile",
-            }
-        },
-    },
-    {
-        key: "StaffDepartment",
-        heading: "Department",
-        class: "hide-for-medium-down",
-    },
-    {
-        key: "JobPositionDescription",
-        heading: "Role",
-        class: "hide-for-small",
-    },
-
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    departmentColumn,
+    roleColumn,
     {
         key: "StaffBuilding",
         heading: "Building",
@@ -70,43 +22,9 @@
         heading: "House",
         class: "hide-for-small",
     },
-
-    {
-        key: "StaffCampusDescription",
-        heading: "Campus",
-        class: "hide-for-medium-down",
-    },
-    {
-        key: "StaffOccupPhone",
-        heading: "Phone",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffOccupPhone",
-                href: "StaffOccupPhone",
-                prependHref: "tel:",
-                title: "Phone user",
-            }
-        },
-    },
-    {
-        key: "StaffExtension",
-        heading: "Ext",
-        class: "",
-    },
-    {
-        key: "StaffOccupEmail",
-        heading: "Email",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffOccupEmail",
-                href: "StaffOccupEmail",
-                prependHref: "mailto:",
-                title: "Email user",
-            }
-        }
-    },
+    phoneColumn,
+    extColumn,
+    emailColumn,
 ] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}
