@@ -87,26 +87,27 @@ class QueryParamBuilder implements IQueryParamBuilder
             $params['newsToDate'] = $filter->toDate->format(Alaress_Date_Format::DATABASE_FORMAT);
         }
 
+        // Relevance explanation:
+        // * if an article's been published no more than 7 days ago, it is
+        //   maximally relevant
+        // * otherwise, its relevance diminishes linearly to 0.1 at 8 weeks
+        //   old
+        $relevancePart = 'CAST(
+            LEAST(
+                1,
+                GREATEST(
+                    1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 63),
+                    0.1
+                )
+            )
+            AS FLOAT
+        )';
+
         // Apply cursor
         // (Previous technique: < most relevant field, = most relevant and < next most relevant)
         // This can probably be made generic?
         // TODO consider reverting to previous, and moving to outside UNION
         if ($cursor) {
-            // Relevance explanation:
-            // * if an article's been published no more than 7 days ago, it is
-            //   maximally relevant
-            // * otherwise, its relevance diminishes linearly to 0.1 at 8 weeks
-            //   old
-            $relevancePart = 'CAST(
-                LEAST(
-                    1,
-                    GREATEST(
-                        1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 63),
-                        0.1
-                    )
-                )
-                AS FLOAT
-            )';
             $cursorSearchParts = [
                 "($relevancePart < :newsRelevance)",
                 "($relevancePart = :newsRelevance AND n.title > :newsTitle)",
@@ -124,13 +125,7 @@ class QueryParamBuilder implements IQueryParamBuilder
         $where = implode(' AND ', $whereParts);
 
         // retrieve results
-        // Relevance: 1 for articles published within 1 week of today,
-        // sliding scale downward otherwise.
-        // Let's say 6 months ago is the minimum of 0.1?
-        // Also apply a 1/2 weighting for archived items?
-        // GREATEST(0.1, LEAST(1 - DATEDIFF(:newsNow, n.publish_at) / 180), 1)) AS relevance
-        // MAX(1, MIN(1 - (DATEDIFF(:newsNow, n.publish_at) / 180), 0.1))
-        $query               = "
+        $query = "
             SELECT
                 n.id,
                 n.title AS title,
