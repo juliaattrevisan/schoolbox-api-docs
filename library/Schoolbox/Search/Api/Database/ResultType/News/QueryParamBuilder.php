@@ -91,17 +91,22 @@ class QueryParamBuilder implements IQueryParamBuilder
         // (Previous technique: < most relevant field, = most relevant and < next most relevant)
         // This can probably be made generic?
         // TODO consider reverting to previous, and moving to outside UNION
-        $relevancePart = 'CAST(
-            GREATEST(
-                1,
-                LEAST(
-                    1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 187),
-                    0.1
-                )
-            )
-            AS FLOAT
-        )';
         if ($cursor) {
+            // Relevance explanation:
+            // * if an article's been published no more than 7 days ago, it is
+            //   maximally relevant
+            // * otherwise, its relevance diminishes linearly to 0.1 at 8 weeks
+            //   old
+            $relevancePart = 'CAST(
+                LEAST(
+                    1,
+                    GREATEST(
+                        1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 63),
+                        0.1
+                    )
+                )
+                AS FLOAT
+            )';
             $cursorSearchParts = [
                 "($relevancePart < :newsRelevance)",
                 "($relevancePart = :newsRelevance AND n.title > :newsTitle)",
