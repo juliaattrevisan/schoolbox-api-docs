@@ -26,5 +26,10 @@ interface IQueryParamBuilder
      * @param int                   $limit
      * @return QueryParams
      */
-    public function buildMatchQueryParams(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): QueryParams;
+    public function buildMatchQueryParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        int $limit,
+    ): QueryParams;
 }

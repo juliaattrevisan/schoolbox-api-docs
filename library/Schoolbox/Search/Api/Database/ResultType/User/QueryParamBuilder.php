@@ -42,8 +42,12 @@ class QueryParamBuilder implements IQueryParamBuilder
     /**
      * @inheritdoc
      */
-    public function buildMatchQueryParams(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): QueryParams
-    {
+    public function buildMatchQueryParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        int $limit,
+    ): QueryParams {
         // Unsure if exact search should be used here?
 //        // test for exact search, and if so return those results instead
 //        if (preg_match('#".+"#', $keyword)) {
@@ -129,6 +133,10 @@ class QueryParamBuilder implements IQueryParamBuilder
             FROM `user` u
             LEFT JOIN `groups` AS r ON u.group_id = r.id
             WHERE $where
+            ORDER BY
+                CONCAT(u.chosen_name, ' ', u.lastname) ASC,
+                CONCAT('user.', r.group_type) ASC,
+                u.id ASC
             LIMIT :limit
         ";
         return new QueryParams($query, $params);

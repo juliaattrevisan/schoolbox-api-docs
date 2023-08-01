@@ -34,8 +34,12 @@ class Source implements IQueryParamBuilder, IHydrator
     /**
      * Proxy for `$this->matcher->buildMatchQueryParams`.
      */
-    public function buildMatchQueryParams(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): QueryParams
-    {
+    public function buildMatchQueryParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        int $limit,
+    ): QueryParams {
         return $this->matcher->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
     }
 

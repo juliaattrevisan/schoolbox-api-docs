@@ -36,7 +36,7 @@ class Hydrator implements IHydrator
             fn (RawResult $match) => new FullResult(
                 $match->id,
                 $match->title,
-                '/search/user/' . $match->id,
+                '/news/' . $match->id . '?ref=search',
                 $match->type,
                 $match->relevance,
                 $match->date,

@@ -13,7 +13,7 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Search\Api\Database\AggregateSource;
+use Schoolbox\Search\Api\Database\ResultType\News\QueryParamBuilder;
 use Schoolbox\Search\Api\Database\ResultType\User;
 use Schoolbox\Search\Api\Hydrator;
 
@@ -44,12 +44,14 @@ class Module extends BaseModule
         $database = $this->injector->get('databaseInternalRead');
 
         return new Controller(
-            new AggregateSource(
+            new Database\AggregateSource(
                 $database,
-                new User\QueryParamBuilder($config, $database->getQuoter()),
+                new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
+                new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
-                new User\Hydrator(),
+                new Database\ResultType\User\Hydrator(),
+                new Database\ResultType\News\Hydrator(),
             ),
         );
     }
