@@ -62,11 +62,13 @@ class AggregateSource implements ISource
 
         // TODO consider wrapped SELECT
         // seems to be slower, but is more reliable esp. for multiple UNIONs?
-        $query  = '(' . implode(') UNION (', $queries) . ')';
-//        $query  = 'SELECT * FROM ((' . implode(') UNION (', $queries) . ')) AS t';
+        $queryString = '(' . implode(') UNION ALL (', $queries) . ')';
+//        $queryString = 'SELECT * FROM (('
+//            . implode(') UNION ALL (', $queries)
+//            . ')) AS combined';
 
         // Apply ordering here too
-        $query .= '
+        $queryString .= '
             ORDER BY
                 relevance DESC,
                 title ASC,
@@ -77,7 +79,7 @@ class AggregateSource implements ISource
         $params['limit'] = $limit;
 
         $rawMatches = [];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        foreach ($this->connector->executeQuery($queryString, $params) as $row) {
             $rawMatches[] = new RawResult(
                 (int)$row['id'],
                 $row['title'],

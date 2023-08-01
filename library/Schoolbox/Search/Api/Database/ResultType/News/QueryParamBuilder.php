@@ -68,7 +68,7 @@ class QueryParamBuilder implements IQueryParamBuilder
             'n.body LIKE :keywordLike',
             'n.blurb LIKE :keywordLike',
         ];
-        $params['keywordLike'] = $this->quoter->escapeForLike($keyword);
+        $params['keywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
 
 
@@ -109,6 +109,8 @@ class QueryParamBuilder implements IQueryParamBuilder
         $where = implode(' AND ', $whereParts);
 
         // retrieve results
+        // Relevance: 1 for articles published within 1 week of today,
+        // sliding scale downward otherwise
         $query = "
             SELECT
                 n.id,
