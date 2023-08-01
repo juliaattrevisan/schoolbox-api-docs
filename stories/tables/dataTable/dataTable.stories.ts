@@ -36,7 +36,6 @@ const columnsConfig = [
     {
         key: "StaffPreferredName",
         heading: "First name",
-        class: "",
         template: {
             component: "link",
             componentData: {
@@ -49,7 +48,6 @@ const columnsConfig = [
     {
         key: "StaffSurname",
         heading: "Surname",
-        class: "",
         template: {
             component: "link",
             componentData: {
@@ -67,7 +65,6 @@ const columnsConfig = [
     {
         key: "StaffOccupEmail",
         heading: "Email",
-        class: "",
         template: {
             component: "link",
             componentData: {
