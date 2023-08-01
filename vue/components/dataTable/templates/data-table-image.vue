@@ -16,10 +16,18 @@ const props = defineProps<Props>();
 <template>
     <template v-if="componentData.src && componentData.href">
         <a :href="(props.rowData[componentData.href] as string)" :title="componentData.title">
-            <img :src="(props.rowData[componentData.src] as string)" :alt="componentData.alt" />
+            <div :class="`img ${props.componentData.imgClass as string}`">
+                <div class="img__wrapper">
+                    <img :src="(props.rowData[componentData.src] as string)" :alt="componentData.alt" />
+                </div>
+            </div>
         </a>
     </template>
     <template v-else-if="componentData.src">
-        <img :src="(props.rowData[componentData.src] as string)" :alt="componentData.alt" />
+        <div :class="`img ${props.componentData.imgClass as string}`">
+            <div class="img__wrapper">
+                <img :src="(props.rowData[componentData.src] as string)" :alt="componentData.alt" />
+            </div>
+        </div>
     </template>
 </template>

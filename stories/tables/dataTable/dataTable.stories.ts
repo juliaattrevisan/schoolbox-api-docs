@@ -30,6 +30,7 @@ const columnsConfig = [
                 href: "profile_url",
                 title: "View profile",
                 alt: "Portrait photo of user",
+                imgClass: "img--round",
             },
         },
     },
