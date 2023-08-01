@@ -22,16 +22,15 @@ class Calendar_Api_Config_Record
      *     ]
      * ]
      *
-     * This is a hack employed here (in the master branch only) to avoid making bigger changes that might cause more
-     * bugs.  A fix involving some refactoring will be done in the develop branch.
-     * See https://github.com/alaress/schoolbox/pull/28688 for an explanation.
+     * This is a hack employed here as safer alternative to a big refactor.
+     * Context: https://github.com/alaress/schoolbox/pull/28674
      */
     private const CONFIG_RENDERER_INDEX = [
         // Key: event_type from calendar_connection database table row.
         'Custom' => [
             // Key  : connector_class from same calendar_connection database table row.
             // Value: Match hard-coded $connectorClass from Api/Config/Connector/EOTC.php for default behaviour.
-            //        Override to use different class in same directory.
+            //        Override to use different class in the same directory.
             'EOTC' => 'EOTC', // Default.
         ],
         'Event' => [
