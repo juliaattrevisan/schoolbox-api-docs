@@ -22,7 +22,7 @@ class Calendar_Api_Config_Record
      *     ]
      * ]
      *
-     * This is a hack employed here as safer alternative to a big refactor.
+     * This is a hack employed here as safer alternative to a refactor that would require lots of testing.
      * Context: https://github.com/alaress/schoolbox/pull/28674
      */
     private const CONFIG_RENDERER_INDEX = [
