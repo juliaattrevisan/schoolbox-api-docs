@@ -23,18 +23,16 @@ use PDO;
  */
 class CliDatabaseCreator extends CliTool\App
 {
-    use CanvasDatabaseTrait;
-
     private const OPT_SHORT_HELP       = 'h';                 // print help
     private const OPT_LONG_HELP        = 'help';              // print help
     private const OPT_LONG_DB_USER     = 'db-user:';
     private const OPT_LONG_DB_PASSWORD = 'db-password:';
 
-    /** @var string */
-    private $dbRootUser;
+    /** @var string|null */
+    private ?string $dbRootUser = null;
 
-    /** @var string */
-    private $dbRootPassword;
+    /** @var string|null */
+    private ?string $dbRootPassword = null;
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -78,8 +76,16 @@ class CliDatabaseCreator extends CliTool\App
             $this->getLogger()->notice('Running in dry-run mode: use -p to write changes to database');
         }
 
-        // Information
-        $canvasDbName = $this->getCanvasDbName();
+        $this->createDatabase('canvas_data_' . INSTANCE_ID);
+        $this->createDatabase('canvas_data2_' . INSTANCE_ID);
+    }
+
+    /**
+     * @param string $canvasDbName
+     * @return void
+     */
+    private function createDatabase(string $canvasDbName):void
+    {
         $dbSchoolboxUser = SQL_user;
         $dbCredentialFile = '/root/.my.cnf';
 
@@ -92,7 +98,7 @@ class CliDatabaseCreator extends CliTool\App
         $rootDb = new Base(new Broker(), new Transactor(new Strategy\Savepoint()), new Database\Quoter\Mysql\Quoter());
         $quoter = new Database\Quoter\Mysql\Quoter();
         try {
-            $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
+            $rootDb->connect(SQL_host, SQL_db, $this->dbRootUser, $this->dbRootPassword);
         } catch (Database\Exception $e) {
             $this->getLogger()->warning('Could not connect to schoolbox db using the credentials provided: ' . $e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
@@ -100,7 +106,7 @@ class CliDatabaseCreator extends CliTool\App
 
         // Check whether the database already exists.
         try {
-            $rootDb->connect($this->dbHost, $canvasDbName, $this->dbRootUser, $this->dbRootPassword);
+            $rootDb->connect(SQL_host, $canvasDbName, $this->dbRootUser, $this->dbRootPassword);
             $this->getLogger()->notice("Database {$canvasDbName} already exists.");
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         } catch (Database\Exception $e) {
@@ -108,7 +114,7 @@ class CliDatabaseCreator extends CliTool\App
         }
 
         if ($this->perform()) {
-            $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
+            $rootDb->connect(SQL_host, SQL_db, $this->dbRootUser, $this->dbRootPassword);
 
             # Vagrant and on-premises use 'localhost'. Cloud uses '%' wildcard as PHP and MySQL are on different hosts
             # ORDER BY to prefer '%' over 'localhost' if both are available (they shouldn't be)

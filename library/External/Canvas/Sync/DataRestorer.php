@@ -26,6 +26,7 @@ use function substr;
 
 /**
  * Responsible for fetching data from canvas into staging database
+ * @deprecated
  */
 class DataRestorer
 {
@@ -34,13 +35,16 @@ class DataRestorer
      * @param LoggerInterface $log
      * @param string          $canvasDbName
      * @param bool            $persistChanges If false, don't persist changes to staging database
+     * @param array           $tableNames
+     * @param array           $schema
      */
     public function __construct(
         private IConnector $canvasDb,
         private LoggerInterface $log,
         private string $canvasDbName,
         private bool $persistChanges,
-        private array $tableNames
+        private array $tableNames,
+        private array $schema
     ) {
     }
 
@@ -48,19 +52,18 @@ class DataRestorer
     /**
      * Creates schema from schema json file.
      *
-     * @param array $schema
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function restoreSchema(array $schema): void
+    public function restoreSchema(): void
     {
         $this->dropCanvasDbTables();
 
         $this->log->notice("Re-creating DB schema...");
         $errors = false;
-        foreach ($schema as $tableIndex => $tableData) {
-            $columns     = $tableData['columns'];
-            $tableName   = $tableData['tableName'];
+        foreach ($this->schema as $tableIndex => $tableData) {
+            $columns   = $tableData['columns'];
+            $tableName = $tableData['tableName'];
             if (!in_array($tableName, $this->tableNames)) {
                 continue;
             }
@@ -70,7 +73,7 @@ class DataRestorer
             $columnsSqlArray = [];
             $type            = null;
             foreach ($columns as $column) {
-                $type              = $this->getColumnMySqlDataType($column['type'], $column['length'] ?? null);
+                $type              = $this->getColumnMySqlDataType($column['type'], $column['length'] ?? null, null);
                 $comment           = str_replace('"', '\"', $column['description'] ?? '');
                 $columnsSqlArray[] = "`{$column['name']}` $type COMMENT \"{$comment}\"";
             }
@@ -147,9 +150,9 @@ class DataRestorer
     public function addExtraIndexes(): void
     {
         $extra = [
-             'course_section_dim' => [
-                 'sis_source_id',
-             ],
+            'course_section_dim' => [
+                'sis_source_id',
+            ],
         ];
         foreach ($extra as $tableName => $columnNames) {
             foreach ($columnNames as $columnName) {
@@ -254,11 +257,11 @@ class DataRestorer
      *
      * @throws Database\Exception
      */
-    private function dropCanvasDbTables(): void
+    public function dropCanvasDbTables(): void
     {
         $this->log->notice("Dropping all tables from {$this->canvasDbName}");
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 0');
-        $tables = $this->canvasDb->executeQuery(
+        $tables      = $this->canvasDb->executeQuery(
             'SELECT table_name FROM information_schema.tables WHERE table_schema = :db_name',
             ['db_name' => $this->canvasDbName]
         )->fetchAll(PDO::FETCH_COLUMN);
@@ -280,7 +283,7 @@ class DataRestorer
      * @param string $columnName
      * @throws Database\Exception
      */
-    private function addIndex(string $tableName, string $columnName): void
+    public function addIndex(string $tableName, string $columnName): void
     {
         $indexName = "idx_{$tableName}_{$columnName}";
         // If index is too long, shorten it to something that very likely will be sufficiently unique
@@ -298,9 +301,10 @@ class DataRestorer
      * @param string $sql
      * @throws Database\Exception
      */
-    private function executeIfPersisting(string $sql): void
+    public function executeIfPersisting(string $sql): void
     {
         if ($this->persistChanges) {
+            $this->log->debug($sql);
             $this->canvasDb->execute($sql);
         }
     }

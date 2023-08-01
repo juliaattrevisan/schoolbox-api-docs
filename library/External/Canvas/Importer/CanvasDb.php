@@ -27,12 +27,6 @@ use PDO;
 class CanvasDb
 {
     /**
-     * @var string
-     */
-    public string $dbHost = SQL_host;
-
-
-    /**
      * @var Base|null
      */
     private ?Base $connector = null;
@@ -47,7 +41,7 @@ class CanvasDb
      */
     private function getCanvasDbName(): string
     {
-        return 'canvas_data_' . INSTANCE_ID;
+        return 'canvas_data2_' . INSTANCE_ID;
     }
 
 
@@ -72,7 +66,7 @@ class CanvasDb
             ];
 
             $connector->connect(
-                $this->dbHost,
+                SQL_host,
                 $this->getCanvasDbName(),
                 SQL_user,
                 SQL_passwd,

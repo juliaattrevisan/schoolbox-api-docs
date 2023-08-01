@@ -97,6 +97,16 @@ class Data2Connector
     }
 
     /**
+     * @see https://data-access-platform-api.s3.amazonaws.com/index.html#tag/API/paths/~1query~1{namespace}~1table~1{table}~1schema/get
+     * @throws Exception
+     */
+    public function fetchTableSchema(string $tableName): array
+    {
+        $response = $this->executeCanvasDataCmd('GET', "/query/$this->namespace/table/$tableName/schema");
+        return $response['schema'];
+    }
+
+    /**
      * @return array
      * @throws External\Exception
      * @throws InvalidArgumentException
@@ -105,7 +115,6 @@ class Data2Connector
     private function fetchTableNames(): array
     {
         $response = $this->executeCanvasDataCmd('GET', "/query/$this->namespace/table");
-        /** @var array $response ['tables'] */
         return $response['tables'];
     }
 
@@ -135,7 +144,6 @@ class Data2Connector
     public function fetchTableData(string $table): void
     {
         $response = $this->executeCanvasDataCmd('POST', "/query/$this->namespace/table/$table/data", ['format' => 'tsv']);
-        /** @var array $response */
         $this->handleJobResponse($response, $table);
     }
 
@@ -149,7 +157,6 @@ class Data2Connector
     public function fetchJobData(string $table, string $jobId): void
     {
         try {
-            /** @var array $response */
             $response = $this->executeCanvasDataCmd('GET', "/job/$jobId");
             $this->handleJobResponse($response, $table);
         } catch (Exception $e) {
@@ -170,7 +177,6 @@ class Data2Connector
         $response = $this->executeCanvasDataCmd('POST', "/object/url", [['id' => $objectId]]);
         /**
          * Expecting ['url' => url string]
-         * @var array $response ['urls'][$objectId]
          */
         return $response['urls'][$objectId];
     }
@@ -182,10 +188,10 @@ class Data2Connector
      * @param string $method
      * @param string $command
      * @param array  $formParams
-     * @return string
+     * @return array
      * @throws Exception
      */
-    private function executeCanvasDataCmd(string $method, string $command, array $formParams = []): string
+    private function executeCanvasDataCmd(string $method, string $command, array $formParams = []): array
     {
         $headers = [
             'x-instauth' => $this->getAccessToken(),

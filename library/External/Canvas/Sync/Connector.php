@@ -21,6 +21,7 @@ use SensitiveParameter;
 
 /**
  * Responsible for fetching data from canvas api
+ * @deprecated
  */
 class Connector
 {

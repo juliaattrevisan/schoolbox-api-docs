@@ -12,6 +12,7 @@ namespace External\Canvas\Sync;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress_Byte_Format;
+use External\Canvas\Importer\CanvasDb;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp\Client;
@@ -45,7 +46,6 @@ use Schoolbox\Resource\Folder;
 use RuntimeException;
 use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 use function file_exists;
 use function floor;
@@ -63,8 +63,6 @@ use function sprintf;
  */
 class CliImporter extends CliTool\App
 {
-    use CanvasDatabaseTrait;
-
     private const OPT_SHORT_HELP       = 'h';           // print help
     private const OPT_LONG_HELP        = 'help';        // print help
     private const OPT_LONG_SKIP_FETCH  = 'skip-fetch';  // Don't re-fetch files from Canvas API, use previously downloaded
@@ -180,20 +178,40 @@ class CliImporter extends CliTool\App
         $canvasDb = $this->buildCanvasDbConnectionOrExit();
         // Check api config
         if (
-            $this->getConfig()->get('canvas_data2_secret')
-            && $this->getConfig()->get('canvas_data2_client_id')
+            $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_SECRET)
+            && $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)
         ) {
             // TODO LEAVE THIS ONLY - CANVAS DATA 2
             $canvasApi = new Data2Connector(
-                $this->getConfig()->get('canvas_data2_secret'),
-                $this->getConfig()->get('canvas_data2_client_id'),
+                $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_SECRET),
+                $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID),
                 $this->getLogger()
             );
             $tempDir   = $this->createTempDir('canvas-data2');
+            // TODO : CHECK SKIP FETCH FLAG?
             $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT);
             // Download data files
-            $this->getLogger()->notice('Downloading latest data.');
-            $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT);
+            if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
+                $this->getLogger()->notice("File download skipped");
+            } else {
+                $this->getLogger()->notice('Downloading latest data.');
+                $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT);
+            }
+            $dataRestorer = new Data2Restorer(
+                $canvasDb,
+                $this->getLogger(),
+                'canvas_data_' . INSTANCE_ID,
+                $this->perform(),
+                self::TABLES_TO_IMPORT,
+                [],
+                $canvasApi,
+            );
+            if (!$this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
+                $this->getLogger()->notice("Importing schema from json file.");
+                $dataRestorer->restoreSchema();
+            }
+
+            $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT);
         } elseif (
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY)
             && $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)
@@ -218,8 +236,24 @@ class CliImporter extends CliTool\App
             } else {
                 $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi($tempDir, $schemaFile);
                 $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT_DEPRECATED);
-                $this->loadCanvasDataFilesToStagingDatabase($canvasDb, $tempDir, $schemaFile, self::TABLES_TO_IMPORT_DEPRECATED);
             }
+            // Create schema in the staging database
+            $schemaContainer = json_decode(file_get_contents($schemaFile), true);
+            $dataRestorer    = new DataRestorer(
+                $canvasDb,
+                $this->getLogger(),
+                'canvas_data_' . INSTANCE_ID,
+                $this->perform(),
+                self::TABLES_TO_IMPORT_DEPRECATED,
+                $schemaContainer['schema']
+            );
+
+            if (!$this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
+                $this->getLogger()->notice("Importing schema from json file.");
+                $dataRestorer->restoreSchema();
+            }
+
+            $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT_DEPRECATED);
         } else {
             $this->getLogger()->warning('API Key or secret is not set.');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
@@ -238,12 +272,12 @@ class CliImporter extends CliTool\App
     private function buildCanvasDbConnectionOrExit(): IConnector
     {
         try {
-            return $this->buildCanvasDbConnection();
+            return (new CanvasDb())->build();
         } catch (Database\Exception $e) {
             $this->getLogger()->error(
                 sprintf(
                     'Unable to connect to database %s: %s. Use tools/canvas/create_database.php to create database.',
-                    $this->getCanvasDbName(),
+                    'canvas_data2_' . INSTANCE_ID,
                     $e->getMessage()
                 )
             );
@@ -255,25 +289,19 @@ class CliImporter extends CliTool\App
     /**
      * Processes local files to build schema and data in local canvas staging database
      *
-     * @param IConnector $canvasDb
-     * @param string     $tempDir
-     * @param string     $schemaFile
-     * @throws Database\Exception
-     * @throws UnexpectedValueException
+     * @param string       $tempDir
+     * @param DataRestorer $dataRestorer
+     * @param array        $tablesToImport
      */
-    private function loadCanvasDataFilesToStagingDatabase(IConnector $canvasDb, string $tempDir, string $schemaFile, array $tablesToImport): void
+    private function loadCanvasDataFilesToStagingDatabase(
+        string $tempDir,
+        DataRestorer $dataRestorer,
+        array $tablesToImport): void
     {
         if ($this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
             $this->getLogger()->notice("File import to staging database skipped");
             return;
         }
-
-        // Create schema in the staging database
-        $dataRestorer = new DataRestorer($canvasDb, $this->getLogger(), $this->getCanvasDbName(), $this->perform(), $tablesToImport);
-        $this->getLogger()->notice("Importing schema from json file: $schemaFile.");
-        $schemaContainer = json_decode(file_get_contents($schemaFile), true);
-        $schema          = $schemaContainer['schema'];
-        $dataRestorer->restoreSchema($schema);
 
         // Store downloaded data to tables in the staging database
         $this->getLogger()->notice('Restoring data to tables.');
@@ -337,54 +365,54 @@ class CliImporter extends CliTool\App
             return;
         }
 
-        /** @var MapperFactory */
+        /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
         /** @var External_ClassInterface $externalClass */
         $externalClass = $this->getDi()->get('externalClass');
         /** @var External_UserInterface $externalUser */
         $externalUser  = $this->getDi()->get('externalUser');
-        /** @var MarkTypeMapper */
+        /** @var MarkTypeMapper $markTypeMapper */
         $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
         /** @var GradeLevelGroupMapper $gradeLevelGroupMapper */
         $gradeLevelGroupMapper = $mapperFactory->get(GradeLevelGroupMapper::class);
         /** @var GradeLevelMapper $gradeLevelMapper */
         $gradeLevelMapper = $mapperFactory->get(GradeLevelMapper::class);
-        /** @var WorkType\Mapper */
+        /** @var WorkType\Mapper $workTypeMapper */
         $workTypeMapper = $mapperFactory->get(WorkType\Mapper::class);
-        /** @var Quiz\Mapper */
+        /** @var Quiz\Mapper $quizMapper */
         $quizMapper = $mapperFactory->get(Quiz\Mapper::class);
-        /** @var QuizSection\Mapper */
+        /** @var QuizSection\Mapper $quizSectionMapper */
         $quizSectionMapper = $mapperFactory->get(QuizSection\Mapper::class);
-        /** @var QuizQuestion\Mapper */
+        /** @var QuizQuestion\Mapper $quizQuestionMapper */
         $quizQuestionMapper = $mapperFactory->get(QuizQuestion\Mapper::class);
-        /** @var QuestionType\Mapper */
+        /** @var QuestionType\Mapper $quizQuestionTypeMapper */
         $quizQuestionTypeMapper = $mapperFactory->get(QuestionType\Mapper::class);
-        /** @var QuizSolution\Mapper */
+        /** @var QuizSolution\Mapper $quizSolutionMapper */
         $quizSolutionMapper = $mapperFactory->get(QuizSolution\Mapper::class);
         /** @var Quiz\Attempt\Mapper $quizAttemptMapper */
         $quizAttemptMapper = $mapperFactory->get(Quiz\Attempt\Mapper::class);
         /** @var Quiz\Attempt\Answer\Mapper $quizAnswerMapper */
         $quizAnswerMapper = $mapperFactory->get(Quiz\Attempt\Answer\Mapper::class);
-        /** @var SubmissionBoxMapper */
+        /** @var SubmissionBoxMapper $submissionBoxMapper */
         $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
-        /** @var Assessment\Mapper */
+        /** @var Assessment\Mapper $assessmentMapper */
         $assessmentMapper  = $mapperFactory->get(Assessment\Mapper::class);
         $planMapper        = $mapperFactory->get(Participant\Plan\Mapper::class);
         $participantMapper = $mapperFactory->get(Participant\Mapper::class);
-        /** @var Folder\Mapper */
+        /** @var Folder\Mapper $folderMapper */
         $folderMapper = $mapperFactory->get(Folder\Mapper::class);
-        /** @var UserMapper */
+        /** @var UserMapper $userMapper */
         $userMapper = $mapperFactory->get(UserMapper::class);
-        /** @var CourseImpl\Mapper */
+        /** @var CourseImpl\Mapper $courseImplMapper */
         $courseImplMapper = $mapperFactory->get(CourseImpl\Mapper::class);
         $courseSpecMapper = $mapperFactory->get(CourseSpec\Mapper::class);
-        /** @var UnitImpl\Mapper */
+        /** @var UnitImpl\Mapper $unitImplMapper */
         $unitImplMapper     = $mapperFactory->get(UnitImpl\Mapper::class);
         $unitSpecMapper     = $mapperFactory->get(UnitSpec\Mapper::class);
         $returnedWorkMapper = $mapperFactory->get(ReturnedWorkMapper::class);
         /** @var Assessment\MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-        /** @var IConfigLoader */
+        /** @var IConfigLoader $config */
         $config = $this->getDi()->get('config');
 
         $dataSync = new DataSync(
