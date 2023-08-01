@@ -1,85 +1,19 @@
 {% extends '@core/modules/report/staff.twig' %}
 
-{# Overwriting templates/core/modules/report/staff.twig #}
 {# Changes: Category added, Department, Campus and Ext removed #}
+{% block content %}
 {% set columnsConfig = [
-    {
-        key: "portrait_url",
-        heading: "Image",
-        class: "portrait-td",
-        isSortable: false,
-        template: {
-            component: "image",
-            componentData: {
-                src: "portrait_url",
-                href: "profile_url",
-                title: "View profile",
-                alt: "Portrait photo of user",
-            },
-        },
-    },
-    {
-        key: "StaffPreferredName",
-        heading: "First name",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffPreferredName",
-                href: "profile_url",
-                title: "View profile",
-            }
-        },
-    },
-    {
-        key: "StaffSurname",
-        heading: "Surname",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffSurname",
-                href: "profile_url",
-                title: "View profile",
-            }
-        },
-    },
-    {
-        key: "JobPositionDescription",
-        heading: "Role",
-        class: "hide-for-small",
-    },
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    roleColumn,
     {
         key: "StaffCategory",
         heading: "Category",
         class: "hide-for-small",
     },
-    {
-        key: "StaffOccupPhone",
-        heading: "Phone",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffOccupPhone",
-                href: "StaffOccupPhone",
-                prependHref: "tel:",
-                title: "Phone user",
-            }
-        },
-    },
-    {
-        key: "StaffOccupEmail",
-        heading: "Email",
-        class: "",
-        template: {
-            component: "link",
-            componentData: {
-                text: "StaffOccupEmail",
-                href: "StaffOccupEmail",
-                prependHref: "mailto:",
-                title: "Email user",
-            }
-        }
-    },
+    phoneColumn,
+    emailColumn,
 ] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}
