@@ -7,16 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api\Result;
+namespace Schoolbox\Search\Api\Hydrator;
 
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 
 /**
- * Data object for search results.
+ * Data object for a single fully-hydrated search result.
  */
-class DataObject
+class FullResult
 {
     /**
      * Constructor

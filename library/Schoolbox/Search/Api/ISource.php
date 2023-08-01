@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
-use Schoolbox\Search\Api\Cursor\RawMatch;
+use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Filter\DataObject as Filter;
 
 /**
@@ -26,7 +26,7 @@ interface ISource
      * @param Cursor|null $cursor  A pointer to the last result in the previous
      *                             search.
      * @param int         $limit   A limit of results to fetch.
-     * @return array<RawMatch>
+     * @return array<RawResult>
      */
     public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array;
 }

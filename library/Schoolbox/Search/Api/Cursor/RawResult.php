@@ -12,11 +12,13 @@ namespace Schoolbox\Search\Api\Cursor;
 use Alaress_Date_Format;
 
 /**
- * Data object for a raw match from a database.
+ * Data object for a single raw search result from a cursor. (This is classed as
+ * a raw result because it contains no information beyond what is necessary to
+ * find the full result.)
  *
  * This will later be fleshed out into a full result by a `IHydrator` instance.
  */
-class RawMatch
+class RawResult
 {
     /**
      * Constructor

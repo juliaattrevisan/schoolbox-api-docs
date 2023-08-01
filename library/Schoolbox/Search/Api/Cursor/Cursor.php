@@ -84,14 +84,14 @@ class Cursor implements ICursor
 
     /**
      * @param string|null $encodedCursor
-     * @return GenericCollection<RawMatch>
+     * @return GenericCollection<RawResult>
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
         /** @var DataObject|null $cursor */
         $cursor = $this->codec->decode($encodedCursor);
         return new GenericCollection(
-            RawMatch::class,
+            RawResult::class,
             $this->source->search(
                 $this->keyword,
                 $this->filter,

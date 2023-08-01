@@ -7,10 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api\Database;
+namespace Schoolbox\Search\Api\Hydrator;
 
-use Schoolbox\Search\Api\Cursor\RawMatch;
-use Schoolbox\Search\Api\Result\DataObject as Result;
+use Schoolbox\Search\Api\Cursor\RawResult;
 
 /**
  * A hydrator for search result matches.
@@ -22,18 +21,18 @@ interface IHydrator
     /**
      * Will this hydrator accept this raw match?
      *
-     * @param RawMatch $match
+     * @param RawResult $match
      * @return bool
      */
-    public function accepts(RawMatch $match): bool;
+    public function accepts(RawResult $match): bool;
 
     /**
      * Hydrate this raw match into a proper result.
      *
-     * TODO accept multiple results, hydrate them all
+     * TODO accept multiple matches, hydrate them all at once
      *
-     * @param RawMatch $match
-     * @return Result
+     * @param RawResult $match
+     * @return FullResult
      */
-    public function hydrate(RawMatch $match): Result;
+    public function hydrate(RawResult $match): FullResult;
 }

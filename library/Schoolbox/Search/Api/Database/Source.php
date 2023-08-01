@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database;
 
 use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
-use Schoolbox\Search\Api\Cursor\RawMatch;
+use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Filter\DataObject as Filter;
-use Schoolbox\Search\Api\Result\DataObject as Result;
+use Schoolbox\Search\Api\Hydrator\FullResult;
+use Schoolbox\Search\Api\Hydrator\IHydrator;
 
 /**
  * A source for search results fetched from a database.
@@ -41,7 +42,7 @@ class Source implements IQueryParamBuilder, IHydrator
     /**
      * Proxy for `$this->hydrator->accepts`.
      */
-    public function accepts(RawMatch $match): bool
+    public function accepts(RawResult $match): bool
     {
         return $this->hydrator->accepts($match);
     }
@@ -49,7 +50,7 @@ class Source implements IQueryParamBuilder, IHydrator
     /**
      * Proxy for `$this->hydrator->hydrate`.
      */
-    public function hydrate(RawMatch $match): Result
+    public function hydrate(RawResult $match): FullResult
     {
         return $this->hydrator->hydrate($match);
     }

@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\User;
 
-use Schoolbox\Search\Api\Cursor\RawMatch;
-use Schoolbox\Search\Api\Database\IHydrator;
-use Schoolbox\Search\Api\Result\DataObject;
+use Schoolbox\Search\Api\Cursor\RawResult;
+use Schoolbox\Search\Api\Hydrator\FullResult;
+use Schoolbox\Search\Api\Hydrator\IHydrator;
 
 /**
  * Hydrate a user match into an actual search result.
@@ -21,7 +21,7 @@ class Hydrator implements IHydrator
     /**
      * @inheritdoc
      */
-    public function accepts(RawMatch $match): bool
+    public function accepts(RawResult $match): bool
     {
         return str_starts_with($match->type, 'user.');
     }
@@ -29,10 +29,10 @@ class Hydrator implements IHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(RawMatch $match): DataObject
+    public function hydrate(RawResult $match): FullResult
     {
         // TODO use user mapper, etc. to flesh out match into result
-        return new DataObject(
+        return new FullResult(
             $match->id,
             $match->title,
             '/search/user/' . $match->id,
