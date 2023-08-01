@@ -53,23 +53,22 @@ class QueryParamBuilder implements IQueryParamBuilder
         $whereParts = [
             'n.deleted_at IS NULL',
             'n.accepted_at IS NOT NULL',
-            'UNIX_TIMESTAMP(n.publish_at) < :newsNow',
+            'n.publish_at < :newsNow',
             'n.rejected_at IS NULL',
         ];
-        $params = [
-            'newsNow'     => Alaress_Date_Format::now()->getUnixTimeStamp(),
-//            'newsKeyword' => $keyword,
+        $params     = [
+            'newsNow' => Alaress_Date_Format::now()->getDatabase(),
         ];
 
         // Apply keyword
         // TODO replace with match?
-        $keywordSearchParts = [
+        $keywordSearchParts        = [
             'n.title LIKE :newsKeywordLike',
             'n.body LIKE :newsKeywordLike',
             'n.blurb LIKE :newsKeywordLike',
         ];
         $params['newsKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
-        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $whereParts[]              = '(' . implode(' OR ', $keywordSearchParts) . ')';
 
 
         // Apply filter
@@ -80,12 +79,12 @@ class QueryParamBuilder implements IQueryParamBuilder
             $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'newsType'));
         }
         if ($filter->fromDate) {
-            $whereParts[]           = 'UNIX_TIMESTAMP(n.publish_at) >= :newsFromDate';
-            $params['newsFromDate'] = $filter->fromDate->getTimestamp();
+            $whereParts[]           = 'n.publish_at >= :newsFromDate';
+            $params['newsFromDate'] = $filter->fromDate->format(Alaress_Date_Format::DATABASE_FORMAT);
         }
         if ($filter->toDate) {
-            $whereParts[]         = 'UNIX_TIMESTAMP(n.publish_at) <= :newsToDate';
-            $params['newsToDate'] = $filter->toDate->getTimestamp();
+            $whereParts[]         = 'n.publish_at <= :newsToDate';
+            $params['newsToDate'] = $filter->toDate->format(Alaress_Date_Format::DATABASE_FORMAT);
         }
 
         // Apply cursor
@@ -94,13 +93,14 @@ class QueryParamBuilder implements IQueryParamBuilder
         // TODO consider reverting to previous, and moving to outside UNION
         if ($cursor) {
             $cursorSearchParts = [
-                "(n.title > :newsTitle)",
-                "(n.title = :newsTitle AND 'news' > :newsType)",
-                "(n.title = :newsTitle AND 'news' = :newsType AND n.id > :newsId)",
+                "(relevance < :newsRelevance)",
+                "(relevance = :newsRelevance AND n.title > :newsTitle)",
+                "(relevance = :newsRelevance AND n.title = :newsTitle AND 'news' > :newsType)",
+                "(relevance = :newsRelevance AND n.title = :newsTitle AND 'news' = :newsType AND n.id > :newsId)",
             ];
 
-            $whereParts[]        = '(' . implode(' OR ', $cursorSearchParts) . ')';
-//            $params['relevance'] = $cursor->relevance;
+            $whereParts[]            = '(' . implode(' OR ', $cursorSearchParts) . ')';
+            $params['newsRelevance'] = $cursor->relevance;
             $params['newsType']      = $cursor->type;
             $params['newsTitle']     = $cursor->title;
             $params['newsId']        = $cursor->id;
@@ -110,17 +110,31 @@ class QueryParamBuilder implements IQueryParamBuilder
 
         // retrieve results
         // Relevance: 1 for articles published within 1 week of today,
-        // sliding scale downward otherwise
-        $query = "
+        // sliding scale downward otherwise.
+        // Let's say 6 months ago is the minimum of 0.1?
+        // Also apply a 1/2 weighting for archived items?
+        // GREATEST(0.1, LEAST(1 - DATEDIFF(:newsNow, n.publish_at) / 180), 1)) AS relevance
+        // MAX(1, MIN(1 - (DATEDIFF(:newsNow, n.publish_at) / 180), 0.1))
+        $query               = "
             SELECT
                 n.id,
                 n.title AS title,
                 'news' AS type,
                 n.publish_at AS date,
-                1 AS relevance
+                CAST(
+                    GREATEST(
+                        1,
+                        LEAST(
+                            1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 187),
+                            0.1
+                        )
+                    )
+                    AS FLOAT
+                ) AS relevance
             FROM comms_news_article n
             WHERE $where
             ORDER BY
+                relevance DESC,
                 n.title ASC,
                 n.id ASC
             LIMIT :newsLimit
