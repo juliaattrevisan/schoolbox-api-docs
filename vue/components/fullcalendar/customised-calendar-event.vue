@@ -103,6 +103,11 @@ export default {
                 const readableTextColor = tinycolor
                     .mostReadable(this.eventBackgroundColor, ["black", "white"])
                     .toRgbString();
+                // no need to set color, if white
+                if (readableTextColor === tinycolor("white").toRgbString()){
+                    return;
+                }
+
                 if (this.content.timeText !== "") {
                     //not always available
                     this.$refs.timeText.style.color = readableTextColor;
