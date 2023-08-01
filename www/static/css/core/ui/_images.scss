@@ -39,12 +39,12 @@
         // Default global roundness
         border-radius: var(--roundness-images);
         display: flex;
-        flex: 0 0 var(--image-size-m);
-        height: var(--image-size-m);
+        flex: 1 var(--image-size-m);
+        max-height: var(--image-size-m);
         justify-content: center;
         overflow: hidden;
         position: relative;
-        width: var(--image-size-m);
+        max-width: var(--image-size-m);
 
         img {
             /*
@@ -73,9 +73,9 @@
     @each $size in $global-image-sizes {
         &--#{$size} {
             .img__wrapper {
-                flex: 0 0 var(--image-size-#{$size});
-                height: var(--image-size-#{$size});
-                width: var(--image-size-#{$size});
+                flex: 1 var(--image-size-#{$size});
+                max-height: var(--image-size-#{$size});
+                max-width: var(--image-size-#{$size});
 
                 /*
                     Icons are weird. Because they rely on font scaling, we have to include that here too,
@@ -127,17 +127,17 @@
 
         //Apply to default sizes
         &.img .img__wrapper {
-            flex: 0 0 calc(var(--image-size-m) - var(--whitespace-xs));
-            height: calc(var(--image-size-m) - var(--whitespace-xs));
-            width: calc(var(--image-size-m) - var(--whitespace-xs));
+            flex: 1 calc(var(--image-size-m) - var(--whitespace-xs));
+            max-height: calc(var(--image-size-m) - var(--whitespace-xs));
+            max-width: calc(var(--image-size-m) - var(--whitespace-xs));
         }
 
         @each $size in $global-image-sizes {
             &.img--#{$size} {
                 .img__wrapper {
-                    flex: 0 0 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                    height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                    width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    flex: 1 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    max-height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    max-width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
                 }
 
                 .img__initials {
