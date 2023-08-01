@@ -27,6 +27,8 @@ class QueryParams
      *
      * @param string $query  The database query to run.
      * @param array  $params The parameters to pass to the database query.
+     *                       These should be prefixed with a value to ensure
+     *                       that they are unique when merged into one query.
      */
     public function __construct(
         public string $query,

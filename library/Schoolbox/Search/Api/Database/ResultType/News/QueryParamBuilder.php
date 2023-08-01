@@ -53,22 +53,22 @@ class QueryParamBuilder implements IQueryParamBuilder
         $whereParts = [
             'n.deleted_at IS NULL',
             'n.accepted_at IS NOT NULL',
-            'UNIX_TIMESTAMP(n.publish_at) < :now',
+            'UNIX_TIMESTAMP(n.publish_at) < :newsNow',
             'n.rejected_at IS NULL',
         ];
         $params = [
-            'now'     => Alaress_Date_Format::now()->getUnixTimeStamp(),
-            'keyword' => $keyword,
+            'newsNow'     => Alaress_Date_Format::now()->getUnixTimeStamp(),
+//            'newsKeyword' => $keyword,
         ];
 
         // Apply keyword
         // TODO replace with match?
         $keywordSearchParts = [
-            'n.title LIKE :keywordLike',
-            'n.body LIKE :keywordLike',
-            'n.blurb LIKE :keywordLike',
+            'n.title LIKE :newsKeywordLike',
+            'n.body LIKE :newsKeywordLike',
+            'n.blurb LIKE :newsKeywordLike',
         ];
-        $params['keywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
+        $params['newsKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
 
 
@@ -76,16 +76,16 @@ class QueryParamBuilder implements IQueryParamBuilder
         // (This may happen outside of the UNION: unsure as of yet)
         // Some of these params may be generic to all searches: not sure yet
         if ($filter->types) {
-            $whereParts[] = 'type IN ' . Builder::getArrayPlaceholders($filter->types, 'type');
-            $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'type'));
+            $whereParts[] = 'type IN ' . Builder::getArrayPlaceholders($filter->types, 'newsType');
+            $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'newsType'));
         }
         if ($filter->fromDate) {
-            $whereParts[]       = 'UNIX_TIMESTAMP(n.publish_at) >= :fromDate';
-            $params['fromDate'] = $filter->fromDate->getTimestamp();
+            $whereParts[]           = 'UNIX_TIMESTAMP(n.publish_at) >= :newsFromDate';
+            $params['newsFromDate'] = $filter->fromDate->getTimestamp();
         }
         if ($filter->toDate) {
-            $whereParts[]     = 'UNIX_TIMESTAMP(n.publish_at) <= :toDate';
-            $params['toDate'] = $filter->toDate->getTimestamp();
+            $whereParts[]         = 'UNIX_TIMESTAMP(n.publish_at) <= :newsToDate';
+            $params['newsToDate'] = $filter->toDate->getTimestamp();
         }
 
         // Apply cursor
@@ -94,16 +94,16 @@ class QueryParamBuilder implements IQueryParamBuilder
         // TODO consider reverting to previous, and moving to outside UNION
         if ($cursor) {
             $cursorSearchParts = [
-                "(n.title > :title)",
-                "(n.title = :title AND 'news' > :type)",
-                "(n.title = :title AND 'news' = :type AND n.id > :id)",
+                "(n.title > :newsTitle)",
+                "(n.title = :newsTitle AND 'news' > :newsType)",
+                "(n.title = :newsTitle AND 'news' = :newsType AND n.id > :newsId)",
             ];
 
             $whereParts[]        = '(' . implode(' OR ', $cursorSearchParts) . ')';
-            $params['relevance'] = $cursor->relevance;
-            $params['type']      = $cursor->type;
-            $params['title']     = $cursor->title;
-            $params['id']        = $cursor->id;
+//            $params['relevance'] = $cursor->relevance;
+            $params['newsType']      = $cursor->type;
+            $params['newsTitle']     = $cursor->title;
+            $params['newsId']        = $cursor->id;
         }
 
         $where = implode(' AND ', $whereParts);
@@ -123,8 +123,9 @@ class QueryParamBuilder implements IQueryParamBuilder
             ORDER BY
                 n.title ASC,
                 n.id ASC
-            LIMIT :limit
+            LIMIT :newsLimit
         ";
+        $params['newsLimit'] = $limit;
         return new QueryParams($query, $params);
     }
 }

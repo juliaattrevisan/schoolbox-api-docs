@@ -68,19 +68,19 @@ class QueryParamBuilder implements IQueryParamBuilder
         // Don't allow LIKE searches on keywords < 2 chars long
         // Probably shouldn't allow any searches on < 2 chars, but shrug
         // TODO consider injecting predicate builder or database itself
-        $keywordSearchParts = ['u.synergy_id = :keyword'];
-        $params             = ['keyword' => $keyword];
+        $keywordSearchParts = ['u.synergy_id = :userKeyword'];
+        $params             = ['userKeyword' => $keyword];
         if (mb_strlen($keyword, 'UTF-8') >= 2) {
-            $keywordSearchParts[] = "u.username LIKE :keywordLike";
-            $keywordSearchParts[] = "u.firstname LIKE :keywordLike";
-            $keywordSearchParts[] = "u.preferred_name LIKE :keywordLike";
-            $keywordSearchParts[] = "u.lastname LIKE :keywordLike";
-            $keywordSearchParts[] = "CONCAT_WS(' ', u.title, u.firstname, u.lastname) LIKE :keywordLike";
-            $keywordSearchParts[] = "CONCAT_WS(' ', u.firstname, u.lastname) LIKE :keywordLike";
-            $keywordSearchParts[] = "CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) LIKE :keywordLike";
-            $keywordSearchParts[] = "CONCAT_WS(' ', u.preferred_name, u.lastname) LIKE :keywordLike";
-            $keywordSearchParts[] = "CONCAT_WS(' ', u.title, u.lastname) LIKE :keywordLike";
-            $params['keywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
+            $keywordSearchParts[]      = "u.username LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "u.firstname LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "u.preferred_name LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "u.lastname LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.firstname, u.lastname) LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.firstname, u.lastname) LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.preferred_name, u.lastname) LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.lastname) LIKE :userKeywordLike";
+            $params['userKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
         }
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
 
@@ -88,16 +88,16 @@ class QueryParamBuilder implements IQueryParamBuilder
         // (This may happen outside of the UNION: unsure as of yet)
         // Some of these params may be generic to all searches: not sure yet
         if ($filter->types) {
-            $whereParts[] = 'type IN ' . Builder::getArrayPlaceholders($filter->types, 'type');
-            $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'type'));
+            $whereParts[] = 'type IN ' . Builder::getArrayPlaceholders($filter->types, 'userType');
+            $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'userType'));
         }
         if ($filter->fromDate) {
-            $whereParts[]       = 'UNIX_TIMESTAMP(u.created_at) >= :fromDate';
-            $params['fromDate'] = $filter->fromDate->getTimestamp();
+            $whereParts[]           = 'UNIX_TIMESTAMP(u.created_at) >= :userFromDate';
+            $params['userFromDate'] = $filter->fromDate->getTimestamp();
         }
         if ($filter->toDate) {
-            $whereParts[]     = 'UNIX_TIMESTAMP(u.created_at) <= :toDate';
-            $params['toDate'] = $filter->toDate->getTimestamp();
+            $whereParts[]         = 'UNIX_TIMESTAMP(u.created_at) <= :userToDate';
+            $params['userToDate'] = $filter->toDate->getTimestamp();
         }
 
         // Apply cursor
@@ -106,16 +106,16 @@ class QueryParamBuilder implements IQueryParamBuilder
         // TODO consider reverting to previous, and moving to outside UNION
         if ($cursor) {
             $cursorSearchParts = [
-                "(CONCAT(u.chosen_name, ' ', u.lastname) > :title)",
-                "(CONCAT(u.chosen_name, ' ', u.lastname) = :title AND CONCAT('user.', r.group_type) > :type)",
-                "(CONCAT(u.chosen_name, ' ', u.lastname) = :title AND CONCAT('user.', r.group_type) = :type AND u.id > :id)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) > :userTitle)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) = :userTitle AND CONCAT('user.', r.group_type) > :userType)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) = :userTitle AND CONCAT('user.', r.group_type) = :userType AND u.id > :userId)",
             ];
 
             $whereParts[]        = '(' . implode(' OR ', $cursorSearchParts) . ')';
-            $params['relevance'] = $cursor->relevance;
-            $params['type']      = $cursor->type;
-            $params['title']     = $cursor->title;
-            $params['id']        = $cursor->id;
+//            $params['relevance'] = $cursor->relevance;
+            $params['userType']      = $cursor->type;
+            $params['userTitle']     = $cursor->title;
+            $params['userId']        = $cursor->id;
         }
 
         $where = implode(' AND ', $whereParts);
@@ -137,8 +137,9 @@ class QueryParamBuilder implements IQueryParamBuilder
                 CONCAT(u.chosen_name, ' ', u.lastname) ASC,
                 CONCAT('user.', r.group_type) ASC,
                 u.id ASC
-            LIMIT :limit
+            LIMIT :userLimit
         ";
+        $params['userLimit'] = $limit;
         return new QueryParams($query, $params);
     }
 }
