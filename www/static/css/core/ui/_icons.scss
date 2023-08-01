@@ -835,6 +835,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-unlink:before {
+    content: "\e92d";
+    font-family: $font-family-icon;
+}
+
 .icon-unlocked:before {
     content: "\e672";
     font-family: $font-family-icon;
