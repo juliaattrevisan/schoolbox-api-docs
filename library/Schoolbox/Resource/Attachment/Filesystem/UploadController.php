@@ -58,7 +58,7 @@ class UploadController extends AbstractController
             return $url;
         }
 
-        return (new Uri($url))->appendQueryParameters(['expiryDate' => $this->expiryDate->toRfc3339String()]);
+        return (new Uri($url))->appendQueryParameters(['expiryDate' => urlencode($this->expiryDate->toRfc3339String())]);
     }
 
     /**
@@ -74,7 +74,7 @@ class UploadController extends AbstractController
 
         $uploadUrl = new Uri('/storage/asyncUpload.php');
         if ($this->expiryDate) {
-            $uploadUrl = $uploadUrl->appendQueryParameters(['expiryDate' => $this->expiryDate->toRfc3339String()]);
+            $uploadUrl = $uploadUrl->appendQueryParameters(['expiryDate' => urlencode($this->expiryDate->toRfc3339String())]);
         }
 
         $page->setVar([
