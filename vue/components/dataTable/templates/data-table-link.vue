@@ -23,7 +23,7 @@ const href = window.Vue.computed(() => {
 </script>
 
 <template>
-    <a :href="(href as string)" :title="componentData.title">
+    <a :href="(href as string)" :title="props.componentData.title">
         {{ props.rowData[componentData.text] }}
     </a>
 </template>
