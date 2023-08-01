@@ -16,7 +16,7 @@ async function onTryAgainSelected() {
 </script>
 
 <template>
-    <div class="alert-box alert">
+    <div class="alert-box alert" data-test-sp-results-error>
         Sorry, there was an error retrieving your search results. Please
         <button title="try to search again" @click="onTryAgainSelected">try again</button> and contact your support if
         the problem persists.

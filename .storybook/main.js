@@ -7,6 +7,7 @@ module.exports = {
         "@storybook/addon-interactions",
         "@storybook/addon-links",
         "@storybook/addon-storysource",
+        "@storybook/addon-mdx-gfm",
     ],
     features: {
         postcss: false,

@@ -1,71 +1,50 @@
 /**
- * Store the current search results when searching from sp-input
+ * To request a search based on the query and any filters set
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { useFetch } from "@vueuse/core";
 import { useStore } from "./searchPageStore";
+import { useQueryStore } from "./spQueryStore";
 import { useResultsStore } from "../results/store/spResultsStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
-
-const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
+import type { Results } from "../../js/types/Results";
 
 export const useSearchStore = defineStore("spSearch", () => {
-    const hasNotSearched = ref(true); // to determine whether any searches have been made
-    const isSearching = ref(false); // to notify that search results
-    const hasLoadError = ref(false); // to notify of a search error
-    const query = ref("biology"); // current search input
-    const activeQuery = ref(""); // the latest query that was searched
-    const hasSearchedWithActiveFilters = ref(false); // to determine whether the latest search has been made with filters
+    const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
+    const url = window.Vue.ref("");
+    const {
+        execute,
+        data,
+        isFetching: isSearching, // to notify of searching
+        error: hasLoadError, // to notify of a search error
+    } = useFetch(url, { immediate: false }).get().json();
 
     /**
-     * To only start showing search results once enough characters
-     * have been added
-     * @returns {boolean}
+     * To record the active query and filters at the time of the search
      */
-    const isActive = computed(() => activeQuery.value.length >= MIN_QUERY_LENGTH);
-
-    /**
-     * the search string broken into words, to search for each word
-     * @returns {string[]} the search string broken into single words
-     */
-    const queryWordList = computed(() => {
-        const queryTrimmed = activeQuery.value.trim(); // remove any front or back white space
-        const regularExpression = /\s*(?:,|$)\s*/; // adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
-        const commaSeparated = queryTrimmed.split(regularExpression) ?? []; // split the string into a comma separated list
-        return commaSeparated.filter((word) => word.length > 0); // and ensure each contains a character
-    });
+    function setActive() {
+        useQueryStore().setActive();
+        useFiltersStore().setActive();
+    }
 
     /**
      * search for nodes that match
      */
     async function search() {
-        activeQuery.value = query.value;
-        hasSearchedWithActiveFilters.value = useFiltersStore().hasActiveFilters;
+        setActive();
         hasNotSearched.value = false;
-        isSearching.value = true;
-        try {
-            const response = await fetch(`${useStore().endpoint}?query=${activeQuery.value}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            useResultsStore().results = (await response.json()) as unknown[];
-        } catch (error) {
-            hasLoadError.value = true;
-        } finally {
-            isSearching.value = false;
-        }
+        url.value = useStore().getEndpointWithParams();
+        await execute();
+        useResultsStore().setFirstResults((data.value as Results).data);
     }
 
     /**
      * clear the current search
      */
     function clear() {
-        query.value = "";
-        activeQuery.value = "";
         isSearching.value = false;
+        useQueryStore().clear();
         useResultsStore().clear();
     }
 
@@ -81,11 +60,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         hasNotSearched,
         isSearching,
         hasLoadError,
-        query,
-        activeQuery,
-        hasSearchedWithActiveFilters,
-        isActive,
-        queryWordList,
         search,
         clear,
         clearFiltersAndSearch,

@@ -28,7 +28,7 @@ function onClearSearchSelected() {
  * scroll may be at the bottom on change, which is a bit odd
  */
 window.Vue.watch(
-    () => viewNodesStore.nodesWithSearch,
+    () => viewNodesStore.nodes,
     () => {
         if (nodesContainerEl.value) {
             // may not always exists in the dom

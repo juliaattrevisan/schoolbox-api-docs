@@ -8,6 +8,7 @@ import SpResultsHeader from "./sp-results-header.vue";
 import SpResultsPrompt from "./sp-results-prompt.vue";
 import SpResultsError from "./sp-results-error.vue";
 import SpResultsNone from "./sp-results-none.vue";
+import SpResultsList from "./list/sp-results-list.vue";
 import { useSearchStore } from "../store/spSearchStore";
 import { useResultsStore } from "./store/spResultsStore";
 
@@ -21,7 +22,7 @@ const resultsStore = useResultsStore();
     <loading-table v-else-if="searchStore.isSearching" />
     <sp-results-error v-else-if="searchStore.hasLoadError" />
     <sp-results-none v-else-if="resultsStore.hasNoResults" />
-    <div v-else>Show results</div>
+    <sp-results-list v-else-if="resultsStore.hasResults" />
 </template>
 
 <style scoped></style>

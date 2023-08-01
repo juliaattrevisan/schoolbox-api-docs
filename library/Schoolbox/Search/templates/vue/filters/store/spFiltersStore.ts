@@ -1,29 +1,81 @@
 /**
- * Store the current search results when searching from sp-input
+ * Store all the filters.
+ * Selected filters relate to those currently selected
+ * Active filters are those selected at the time of the latest search
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
+import { useFilterCreatorStore } from "./spFilterCreatorStore";
+import { useFilterTypesStore } from "./spFilterTypesStore";
+
+export type FilterData = {
+    filter: {
+        date: {
+            from: string;
+            to: string;
+        };
+        creator: string;
+        types: string[];
+    };
+};
 
 export const useFiltersStore = defineStore("spFilters", () => {
-    const activeFilters = ref([]); // the currently active filters
+    /**
+     * Are there any filters selected
+     * @returns {boolean}
+     */
+    const isSelected = window.Vue.computed(
+        () =>
+            useFilterDateRangeStore().isSelected ||
+            useFilterCreatorStore().isSelected ||
+            useFilterTypesStore().isSelected
+    );
 
     /**
      * Are there any filters active
      * @returns {boolean}
      */
-    const hasActiveFilters = computed(() => activeFilters.value.length > 0);
+    const isActive = window.Vue.computed(
+        () => useFilterDateRangeStore().isActive || useFilterCreatorStore().isActive || useFilterTypesStore().isActive
+    );
 
     /**
-     * clear the current filters
+     * set the active filters, linked to the currently active search
+     */
+    function setActive() {
+        useFilterDateRangeStore().setActive();
+        useFilterCreatorStore().setActive();
+        useFilterTypesStore().setActive();
+    }
+
+    /**
+     * Get the filter data
+     * @returns {FilterData} -
+     */
+    function getFormData() {
+        const filterData = {
+            ...useFilterDateRangeStore().getFormData(),
+            ...useFilterCreatorStore().getFormData(),
+            ...useFilterTypesStore().getFormData(),
+        };
+        return JSON.stringify(filterData);
+    }
+
+    /**
+     * clear all filters
      */
     function clear() {
-        activeFilters.value = [];
+        useFilterDateRangeStore().clear();
+        useFilterCreatorStore().clear();
+        useFilterTypesStore().clear();
     }
 
     return {
-        activeFilters,
-        hasActiveFilters,
+        isSelected,
+        isActive,
+        setActive,
+        getFormData,
         clear,
     };
 });

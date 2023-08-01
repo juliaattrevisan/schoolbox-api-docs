@@ -7,16 +7,65 @@ import { rest } from "msw";
 import SearchPage from "../../library/Schoolbox/Search/templates/vue/search-page.vue";
 import { data } from "./dataSearchPage";
 
+let requestCount = 0; // number of times the endpoint has been called, note this won't be reset between stories
+
 /**
  * Mock Service Worker handlers to load dummy data for testing
  */
 const endpoint = "/search";
+const subResultsEndpoint = "/getSubResults"; // endpoint to get sub results, is stores in dataSearchPage.ts
 const mswHandlers = [
     rest.get(endpoint, (req, res, ctx) => {
+        requestCount += 1;
+        if (requestCount === 1) {
+            return res(ctx.delay(2000), ctx.json(data));
+        }
         return res(
-            // we grab an endpoint and then modify the data before it's returned
-            ctx.delay(3000),
-            ctx.json(data)
+            // on the second call we shorten the results so load more doesn't show anymore
+            ctx.delay(2000),
+            ctx.json({
+                data: [
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More results 1",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More results 2",
+                    },
+                ],
+            })
+        );
+    }),
+    rest.get(subResultsEndpoint, (req, res, ctx) => {
+        return res(
+            ctx.delay(2000),
+            ctx.json({
+                data: [
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 1",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 2",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 3",
+                    },
+                    {
+                        id: 4,
+                        type: "user.parent",
+                        title: "More sub results 4",
+                    },
+                ],
+            })
         );
     }),
 ];
@@ -28,6 +77,34 @@ const mswHandlers = [
 const meta: Meta<typeof SearchPage> = {
     args: {
         endpoint,
+        filterTypes: [
+            {
+                title: "Assessment",
+                value: "assessment",
+                subTypes: [
+                    {
+                        title: "Due Work",
+                        value: "assessment.dueWork",
+                    },
+                    {
+                        title: "Lesson Plan",
+                        value: "assessment.lessonPlan",
+                    },
+                    {
+                        title: "Project",
+                        value: "assessment.project",
+                    },
+                ],
+            },
+            {
+                title: "Badge",
+                value: "event",
+            },
+            {
+                title: "Event",
+                value: "event",
+            },
+        ],
     },
     component: SearchPage,
     decorators: [
@@ -74,7 +151,7 @@ export const NoResults: Story = {
         msw: {
             handlers: [
                 rest.get(endpoint, (req, res, ctx) => {
-                    return res(ctx.delay(2000), ctx.json([]));
+                    return res(ctx.delay(2000), ctx.json({ data: [] }));
                 }),
                 ...mswHandlers,
             ],

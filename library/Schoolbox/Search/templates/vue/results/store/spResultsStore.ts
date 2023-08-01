@@ -1,41 +1,98 @@
 /**
- * Store the current search results when searching from sp-input
+ * Store the current search results when searching
  */
 
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import type { Results } from "../../../js/types/Results";
+import type { Result } from "../../../js/types/Result";
+import { useHasMoreResults } from "../composable/useHasMoreResults";
+
+export const RESULT_LIMIT = 20; // number of results returned by the api on a single call
+export const SUB_RESULT_LIMIT = 10; // number of sub results returned by the api on a single call
 
 export const useResultsStore = defineStore("spResults", () => {
-    const results = ref<unknown[]>([]); // returned search results
+    const results = window.Vue.ref<Result[]>([]); // returned search results
+    const moreResultsCount = window.Vue.ref(0); // number of subsequent result sets that have been loaded
+    const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all results have been loaded
+
     /**
      * To show that there is results that match the current search
      * @returns {boolean}
      */
-    const hasResults = computed(() => {
-        // return !hasNotSearched.value && results.value.length !== 0 && !isSearching.value && !hasLoadError.value;
-        return results.value.length !== 0;
+    const hasResults = window.Vue.computed(() => {
+        return results.value.length > 0;
     });
 
     /**
      * To show that no results match the current search
      * @returns {boolean}
      */
-    const hasNoResults = computed(() => {
-        // return !hasNotSearched.value && results.value.length === 0 && !isSearching.value && !hasLoadError.value;
+    const hasNoResults = window.Vue.computed(() => {
         return results.value.length === 0;
     });
 
     /**
-     * clear the current search
+     * To show that there are more results that can be loaded
+     * @returns {boolean}
+     */
+    const { hasMoreResults } = useHasMoreResults(hasLoadedAllResults, results, moreResultsCount, RESULT_LIMIT);
+
+    /**
+     * Set the first results
+     * @param {Result[]} firstResults - the results to set
+     */
+    function setFirstResults(firstResults: Result[]) {
+        results.value = firstResults;
+        // if we have less results than the limit, we have loaded all results
+        if (results.value.length < RESULT_LIMIT) {
+            hasLoadedAllResults.value = true;
+        }
+    }
+
+    /**
+     * Set the next results
+     * @param {Result[]} moreResults - the results to set
+     */
+    function setMoreResults(moreResults: Result[]) {
+        results.value = [...results.value, ...moreResults];
+        moreResultsCount.value += 1;
+        // check if we have loaded all results yet
+        if (results.value.length < RESULT_LIMIT * (moreResultsCount.value + 1)) {
+            hasLoadedAllResults.value = true;
+        }
+    }
+
+    /**
+     * Add the loaded sub results into the results
+     * @param {Result[]} moreSubResults - the sub results to set
+     * @param {number} resultId - the parent id of the result the new sub results are from
+     */
+    function setMoreSubResults(moreSubResults: Result[], resultId: number) {
+        const parentResult = results.value.find((result) => result.id === resultId) as Result;
+        (parentResult._subResults as Results).data = [
+            ...(parentResult._subResults?.data as Result[]),
+            ...moreSubResults,
+        ];
+    }
+
+    /**
+     * clear the current results
      */
     function clear() {
         results.value = [];
+        moreResultsCount.value = 0;
+        hasLoadedAllResults.value = false;
     }
 
     return {
         results,
+        hasLoadedAllResults,
         hasResults,
         hasNoResults,
+        hasMoreResults,
+        setFirstResults,
+        setMoreResults,
+        setMoreSubResults,
         clear,
     };
 });
