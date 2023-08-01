@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Search\Api\Source\ISource;
 
 /**
  * Controller for the search API.

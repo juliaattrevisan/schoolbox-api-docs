@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database;
 
-use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
+use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Cursor\RawResult;
-use Schoolbox\Search\Api\Filter\DataObject as Filter;
+use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 
@@ -34,7 +34,7 @@ class Source implements IQueryParamBuilder, IHydrator
     /**
      * Proxy for `$this->matcher->buildMatchQueryParams`.
      */
-    public function buildMatchQueryParams(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): QueryParams
+    public function buildMatchQueryParams(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): QueryParams
     {
         return $this->matcher->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
     }

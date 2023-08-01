@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api;
+namespace Schoolbox\Search\Api\Source;
 
-use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
-use Schoolbox\Search\Api\Filter\DataObject as Filter;
+use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
+use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
 
 /**
  * Aggregate of search results from several sources.
@@ -37,7 +37,7 @@ class Aggregate implements ISource
     /**
      * @inheritdoc
      */
-    public function search(string $keyword, Filter $filter, ?Cursor $cursor, int $limit): array
+    public function search(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): array
     {
         // TODO apply limit and cursor
         return array_merge(

@@ -13,7 +13,7 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
-use Schoolbox\Search\Api\ISource;
+use Schoolbox\Search\Api\Source\ISource;
 
 /**
  * Cursor for the search API.
