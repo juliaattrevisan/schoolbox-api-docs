@@ -16,6 +16,27 @@
         "strict": true, // The strict flag enables a wide range of type checking behavior that results in stronger guarantees of program correctness.
         "target": "ES6" // Modern browsers support all ES6 features, so ES6 is a good choice.
     },
-    "exclude": [".vagrant", "conf", "debian", "docs", "node_modules", "packages", "sql", "tools", "updates", "www", "**/*.spec.ts",], // Specifies an array of filenames or patterns that should be skipped when resolving include.
-    "include": ["types/*", "library/**/*", "templates/**/*", "vue/**/*", "www/static/js/**/*", "stories/**/*"] // Specifies an array of filenames or patterns to include in the program.
+    "exclude": [ // Specifies an array of filenames or patterns that should be skipped when resolving include.
+        ".git",
+        ".vagrant",
+        "conf",
+        "debian",
+        "docs",
+        "node_modules",
+        "packages",
+        "sql",
+        "tools",
+        "updates",
+        "vagrantcache",
+        "vendor",
+        "www/static/js/bundle",
+    ],
+    "include": [ // Specifies an array of filenames or patterns where ts files could exist
+        "library/Schoolbox/**/*",
+        "stories/**/*",
+        "templates/core/**/*",
+        "types/**/*",
+        "vue/**/*",
+        "www/static/js/**/*",
+    ]
 }
