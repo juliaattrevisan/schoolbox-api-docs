@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
-use Schoolbox\Search\Api\Database\RawMatch;
+use Schoolbox\Search\Api\Cursor\RawMatch;
 use Schoolbox\Search\Api\Filter\DataObject as Filter;
 
 /**

@@ -12,7 +12,6 @@ namespace Schoolbox\Search\Api\Cursor;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Search\Api\Database\RawMatch;
 use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\ISource;
 

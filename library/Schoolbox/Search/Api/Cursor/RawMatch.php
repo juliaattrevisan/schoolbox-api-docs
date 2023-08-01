@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api\Database;
+namespace Schoolbox\Search\Api\Cursor;
 
 use Alaress_Date_Format;
 

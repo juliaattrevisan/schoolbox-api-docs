@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\User;
 
+use Schoolbox\Search\Api\Cursor\RawMatch;
 use Schoolbox\Search\Api\Database\IHydrator;
-use Schoolbox\Search\Api\Database\RawMatch;
 use Schoolbox\Search\Api\Result\DataObject;
 
 /**

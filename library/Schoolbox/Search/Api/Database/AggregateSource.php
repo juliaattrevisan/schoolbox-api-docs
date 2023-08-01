@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Cursor\DataObject as Cursor;
+use Schoolbox\Search\Api\Cursor\RawMatch;
 use Schoolbox\Search\Api\Filter\DataObject as Filter;
 use Schoolbox\Search\Api\ISource;
 
