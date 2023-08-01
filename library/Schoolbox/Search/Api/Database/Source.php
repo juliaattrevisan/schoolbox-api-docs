@@ -50,8 +50,8 @@ class Source implements IQueryParamBuilder, IHydrator
     /**
      * Proxy for `$this->hydrator->hydrate`.
      */
-    public function hydrate(RawResult $match): FullResult
+    public function hydrate(array $matches): array
     {
-        return $this->hydrator->hydrate($match);
+        return $this->hydrator->hydrate($matches);
     }
 }

@@ -29,16 +29,19 @@ class Hydrator implements IHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(RawResult $match): FullResult
+    public function hydrate(array $matches): array
     {
         // TODO use user mapper, etc. to flesh out match into result
-        return new FullResult(
-            $match->id,
-            $match->title,
-            '/search/user/' . $match->id,
-            $match->type,
-            $match->relevance,
-            $match->date,
+        return array_map(
+            fn (RawResult $match) => new FullResult(
+                $match->id,
+                $match->title,
+                '/search/user/' . $match->id,
+                $match->type,
+                $match->relevance,
+                $match->date,
+            ),
+            array_filter($matches, [$this, 'accepts']),
         );
     }
 }

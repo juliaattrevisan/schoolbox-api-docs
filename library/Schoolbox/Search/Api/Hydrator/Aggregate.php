@@ -1,0 +1,81 @@
+<?php
+
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Search\Api\Hydrator;
+
+use Schoolbox\Search\Api\Cursor\RawResult;
+
+class Aggregate implements IHydrator
+{
+    /**
+     * @var IHydrator[]
+     */
+    private array $hydrators;
+
+    /**
+     * Constructor
+     *
+     * @param IHydrator ...$hydrators
+     */
+    public function __construct(IHydrator ...$hydrators)
+    {
+        $this->hydrators = $hydrators;
+    }
+
+    /**
+     * True if any of this aggregate's hydrators accept this result.
+     *
+     * @param RawResult $match
+     * @return bool
+     */
+    public function accepts(RawResult $match): bool
+    {
+        foreach ($this->hydrators as $hydrator) {
+            if ($hydrator->accepts($match)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Hydrate raw matches into a proper result, by attempting to hydrate the
+     * list of matches with each hydrator in this aggregate.
+     *
+     * @param array<int, RawResult> $matches A set of matches to hydrate.
+     * @return array<int, FullResult>
+     */
+    public function hydrate(array $matches): array
+    {
+        // Group matches by the hydrator which accepts them
+        $groupedRawResults = [];
+        foreach ($matches as $i => $match) {
+            foreach ($this->hydrators as $hydrator) {
+                if ($hydrator->accepts($match)) {
+                    $hydratorId = spl_object_id($hydrator);
+                    $groupedRawResults[$hydratorId] ??= [];
+                    $groupedRawResults[$hydratorId][$i] = $match;
+                }
+            }
+        }
+
+        $fullResults = [];
+        foreach ($this->hydrators as $hydrator) {
+            $hydratorId = spl_object_id($hydrator);
+            if (isset($groupedRawResults[$hydratorId])) {
+                $fullResults += $hydrator->hydrate($groupedRawResults[$hydratorId]);
+            }
+        }
+
+        // $fullResults needs to be key-sorted now
+        ksort($fullResults);
+
+        return $fullResults;
+    }
+}

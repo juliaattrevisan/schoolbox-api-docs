@@ -27,12 +27,14 @@ interface IHydrator
     public function accepts(RawResult $match): bool;
 
     /**
-     * Hydrate this raw match into a proper result.
+     * Hydrate raw matches into a proper result.
      *
-     * TODO accept multiple matches, hydrate them all at once
+     * This need not return a result for all `$matches`, but key associations
+     * should be preserved so that the raw result may be associated with a full
+     * result.
      *
-     * @param RawResult $match
-     * @return FullResult
+     * @param array<int, RawResult> $matches A set of matches to hydrate.
+     * @return array<int, FullResult>
      */
-    public function hydrate(RawResult $match): FullResult;
+    public function hydrate(array $matches): array;
 }
