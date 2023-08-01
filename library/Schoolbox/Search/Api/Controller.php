@@ -53,6 +53,10 @@ class Controller extends Base
 
             // TODO apply filter
 
+            // TODO if there's not enough results: fetch more until done
+
+            // TODO create translator
+
             $this->response = $this->responseAsJson(
                 [
                     'data'     => $fullResults,

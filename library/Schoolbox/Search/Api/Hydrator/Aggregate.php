@@ -75,7 +75,6 @@ class Aggregate implements IHydrator
 
         // $fullResults needs to be key-sorted now
         ksort($fullResults);
-
         return $fullResults;
     }
 }

@@ -16,6 +16,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Search\Api\Database\ResultType\News\QueryParamBuilder;
 use Schoolbox\Search\Api\Database\ResultType\User;
 use Schoolbox\Search\Api\Hydrator;
+use Schoolbox\UserMapper;
 
 /**
  * Module for the search API.
@@ -50,7 +51,7 @@ class Module extends BaseModule
                 new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
-                new Database\ResultType\User\Hydrator(),
+                new Database\ResultType\User\Hydrator($this->getMapperFactory()->get(UserMapper::class)),
                 new Database\ResultType\News\Hydrator(),
             ),
         );
