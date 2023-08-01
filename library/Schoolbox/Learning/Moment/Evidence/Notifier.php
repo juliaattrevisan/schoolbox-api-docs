@@ -141,11 +141,8 @@ class Notifier extends AbstractModuleNotifier
             /** @var Evidence $evidence */
             $evidence = $this->mapper->findById($model->getId());
             $effector = $this->userMapper->findById($effector->getId());
-            $student  = $evidence->getRecipient();
-            if ($effector->getId() !== $student->getId() && $roleType === Role::STAFF) {
-                // hydrate to get teacher collection properly
-                $student = $this->userMapper->findById($evidence->getRecipient()->getId());
-            }
+            // hydrate to get teacher collection properly
+            $student = $this->userMapper->findById($evidence->getRecipient()->getId());
         } catch (MapperException $e) {
             return $envelope;
         }
