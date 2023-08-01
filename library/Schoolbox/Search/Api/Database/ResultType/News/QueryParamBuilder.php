@@ -91,12 +91,22 @@ class QueryParamBuilder implements IQueryParamBuilder
         // (Previous technique: < most relevant field, = most relevant and < next most relevant)
         // This can probably be made generic?
         // TODO consider reverting to previous, and moving to outside UNION
+        $relevancePart = 'CAST(
+            GREATEST(
+                1,
+                LEAST(
+                    1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 187),
+                    0.1
+                )
+            )
+            AS FLOAT
+        )';
         if ($cursor) {
             $cursorSearchParts = [
-                "(relevance < :newsRelevance)",
-                "(relevance = :newsRelevance AND n.title > :newsTitle)",
-                "(relevance = :newsRelevance AND n.title = :newsTitle AND 'news' > :newsType)",
-                "(relevance = :newsRelevance AND n.title = :newsTitle AND 'news' = :newsType AND n.id > :newsId)",
+                "($relevancePart < :newsRelevance)",
+                "($relevancePart = :newsRelevance AND n.title > :newsTitle)",
+                "($relevancePart = :newsRelevance AND n.title = :newsTitle AND 'news' > :newsType)",
+                "($relevancePart = :newsRelevance AND n.title = :newsTitle AND 'news' = :newsType AND n.id > :newsId)",
             ];
 
             $whereParts[]            = '(' . implode(' OR ', $cursorSearchParts) . ')';
@@ -121,16 +131,7 @@ class QueryParamBuilder implements IQueryParamBuilder
                 n.title AS title,
                 'news' AS type,
                 n.publish_at AS date,
-                CAST(
-                    GREATEST(
-                        1,
-                        LEAST(
-                            1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 187),
-                            0.1
-                        )
-                    )
-                    AS FLOAT
-                ) AS relevance
+                $relevancePart AS relevance
             FROM comms_news_article n
             WHERE $where
             ORDER BY
