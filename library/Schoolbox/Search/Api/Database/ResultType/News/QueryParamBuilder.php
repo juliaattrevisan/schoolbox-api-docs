@@ -100,7 +100,7 @@ class QueryParamBuilder implements IQueryParamBuilder
                     0.1
                 )
             )
-            AS FLOAT
+            AS DECIMAL(2,2)
         )';
 
         // Apply cursor
