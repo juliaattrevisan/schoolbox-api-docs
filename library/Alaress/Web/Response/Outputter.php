@@ -61,10 +61,20 @@ class Outputter
             );
         }
 
-        // Output body: stream so that the entire body is not loaded into memory
-        // only to output it.
-        // Important when streaming large content (e.g. logs): see SA-413.
+        // Now output the body stream
         $body = $response->getBody();
+
+        // Rewind the body stream if possible.
+        // Some request bodies created by other libraries are not rewound:
+        // other request bodies (e.g. `TwigCallbackStream`) are not seekable at
+        // all, so accommodate both cases.
+        if ($body->isSeekable()) {
+            $body->rewind();
+        }
+
+        // Finally: output body stream in chunks, so that the entire body is not
+        // loaded into memory at once only to output it.
+        // Important when streaming large content (e.g. logs): see SA-413.
         while (!$body->eof()) {
             echo $body->read(self::RESPONSE_BODY_READ_BYTES);
         }
