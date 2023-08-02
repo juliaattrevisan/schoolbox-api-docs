@@ -20,6 +20,11 @@ use Schoolbox\Search\Api\Source\ISource;
 class Controller extends Base
 {
     /**
+     * Maximum number of search results to return per call.
+     */
+    private const MAX_RESULT_LIMIT = 10;
+
+    /**
      * Constructor
      *
      * @param ISource   $source   Source for raw search results.
@@ -47,13 +52,15 @@ class Controller extends Base
             $cursor = new Cursor\Cursor(
                 $this->source,
                 $keyword,
+                // TODO create filter from result
                 new Filter\DataObject(null, null, null, null),
-                3,
+                (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT),
             );
             $rawResults  = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
             $fullResults = $this->hydrator->hydrate($rawResults->getAll());
 
             // TODO apply filter
+            // Disambiguate filter passed in query string from censor applied to full results
 
             // TODO if there's not enough results: fetch more until done
 

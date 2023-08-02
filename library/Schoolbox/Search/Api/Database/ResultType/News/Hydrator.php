@@ -88,7 +88,7 @@ class Hydrator implements IHydrator
                                         'hash' => $article->getFeatureImage()->getHash(),
                                         'size' => Storage::TRANSFORM_SQUARE64,
                                     ])
-                                )
+                                )->__toString()
                             : null,
                         'news',
                         // Description will be a truncated form of the article:
