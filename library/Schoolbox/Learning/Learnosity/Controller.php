@@ -647,6 +647,21 @@ class Controller extends Base
             $updatedResponse = $response;
             $updatedResponse['score'] = $postData['scores'][$responseId];
 
+            /* "When setting a non-zero score, the response must also be attempted."
+             *    -- https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#updateResponseScores
+             *
+             * This includes responses that cannot be automagically calculated
+             */
+            $updatedResponse['attempted'] = true;
+
+            /* If there's no max score, but the teacher gave a score, I guess
+             * we just assume that to be the max score too...basically bonus
+             * marks in this scenario
+             */
+            if (null === $updatedResponse['max_score']) {
+                $updatedResponse['max_score'] = $updatedResponse['score'];
+            }
+
             $responseData[] = $updatedResponse;
         }
 
