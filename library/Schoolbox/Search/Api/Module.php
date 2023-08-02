@@ -13,9 +13,9 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Search\Api\Database\ResultType\News\QueryParamBuilder;
-use Schoolbox\Search\Api\Database\ResultType\User;
+use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Search\Api\Hydrator;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 
 /**
@@ -53,6 +53,10 @@ class Module extends BaseModule
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator($this->getMapperFactory()->get(UserMapper::class)),
                 new Database\ResultType\News\Hydrator(),
+            ),
+            new Hydrator\Translator\FullResultToArray(
+                new UserTranslator(),
+                new FolderTranslator(0),
             ),
         );
     }

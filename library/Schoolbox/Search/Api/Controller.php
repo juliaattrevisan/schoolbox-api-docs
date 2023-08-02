@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
+use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
 use Schoolbox\Search\Api\Source\ISource;
 
 /**
@@ -27,6 +28,7 @@ class Controller extends Base
     public function __construct(
         private ISource $source,
         private IHydrator $hydrator,
+        private FullResultToArray $fullResultTranslator,
     ) {
     }
 
@@ -55,11 +57,9 @@ class Controller extends Base
 
             // TODO if there's not enough results: fetch more until done
 
-            // TODO create translator
-
             $this->response = $this->responseAsJson(
                 [
-                    'data'     => $fullResults,
+                    'data'     => array_map($this->fullResultTranslator, $fullResults),
                     'metadata' => [
                         'count'  => $cursor->retrieveResultCount(),
                         'cursor' => [
