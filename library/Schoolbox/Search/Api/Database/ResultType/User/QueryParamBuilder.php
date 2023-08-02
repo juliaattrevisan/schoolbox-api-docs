@@ -106,16 +106,15 @@ class QueryParamBuilder implements IQueryParamBuilder
         // TODO consider reverting to previous, and moving to outside UNION
         if ($cursor) {
             $cursorSearchParts = [
-                "(CONCAT(u.chosen_name, ' ', u.lastname) > :userTitle)",
-                "(CONCAT(u.chosen_name, ' ', u.lastname) = :userTitle AND CONCAT('user.', r.group_type) > :userType)",
-                "(CONCAT(u.chosen_name, ' ', u.lastname) = :userTitle AND CONCAT('user.', r.group_type) = :userType AND u.id > :userId)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) > :cursorTitle)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) = :cursorTitle AND CONCAT('user.', r.group_type) > :cursorType)",
+                "(CONCAT(u.chosen_name, ' ', u.lastname) = :cursorTitle AND CONCAT('user.', r.group_type) = :cursorType AND u.id > :cursorId)",
             ];
 
-            $whereParts[]        = '(' . implode(' OR ', $cursorSearchParts) . ')';
-//            $params['relevance'] = $cursor->relevance;
-            $params['userType']      = $cursor->type;
-            $params['userTitle']     = $cursor->title;
-            $params['userId']        = $cursor->id;
+            $whereParts[]          = '(' . implode(' OR ', $cursorSearchParts) . ')';
+            $params['cursorType']  = $cursor->type;
+            $params['cursorTitle'] = $cursor->title;
+            $params['cursorId']    = $cursor->id;
         }
 
         $where = implode(' AND ', $whereParts);

@@ -109,17 +109,17 @@ class QueryParamBuilder implements IQueryParamBuilder
         // TODO consider reverting to previous, and moving to outside UNION
         if ($cursor) {
             $cursorSearchParts = [
-                "($relevancePart < :newsRelevance)",
-                "($relevancePart = :newsRelevance AND n.title > :newsTitle)",
-                "($relevancePart = :newsRelevance AND n.title = :newsTitle AND 'news' > :newsType)",
-                "($relevancePart = :newsRelevance AND n.title = :newsTitle AND 'news' = :newsType AND n.id > :newsId)",
+                "($relevancePart < :cursorRelevance)",
+                "($relevancePart = :cursorRelevance AND n.title > :cursorTitle)",
+                "($relevancePart = :cursorRelevance AND n.title = :cursorTitle AND 'cursor' > :cursorType)",
+                "($relevancePart = :cursorRelevance AND n.title = :cursorTitle AND 'cursor' = :cursorType AND n.id > :cursorId)",
             ];
 
             $whereParts[]            = '(' . implode(' OR ', $cursorSearchParts) . ')';
-            $params['newsRelevance'] = $cursor->relevance;
-            $params['newsType']      = $cursor->type;
-            $params['newsTitle']     = $cursor->title;
-            $params['newsId']        = $cursor->id;
+            $params['cursorRelevance'] = $cursor->relevance;
+            $params['cursorType']      = $cursor->type;
+            $params['cursorTitle']     = $cursor->title;
+            $params['cursorId']        = $cursor->id;
         }
 
         $where = implode(' AND ', $whereParts);
