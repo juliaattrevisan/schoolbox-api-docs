@@ -60,7 +60,7 @@
 {% apply spaceless %}
     {% set dueAt = assessment.dueAt %}
     {% if dueAt %}
-        <span title="{{ dueAt.long }}">Due
+        <span title="{{ dueAt.long }}">{% if assessment is lessonPlan %}Scheduled{% else %}Due{% endif %}
             <time datetime="{{ dueAt }}">{{ dueAt.relativeDay|replace({' at 11:59pm': ''}) }}</time>
             {% if dueAt.isFuture and dueAt.diffInDays(NOW) < 7 %}
                 (<time datetime="{{ dueAt }}">{{ dueAt.relativeTime(null, true) }} remaining</time>)
