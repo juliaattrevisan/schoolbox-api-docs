@@ -80,11 +80,11 @@ class QueryParamBuilder implements IQueryParamBuilder
         }
         if ($filter->fromDate) {
             $whereParts[]           = 'n.publish_at >= :newsFromDate';
-            $params['newsFromDate'] = $filter->fromDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $params['newsFromDate'] = $filter->fromDate->getDatabase();
         }
         if ($filter->toDate) {
             $whereParts[]         = 'n.publish_at <= :newsToDate';
-            $params['newsToDate'] = $filter->toDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $params['newsToDate'] = $filter->toDate->getDatabase();
         }
 
         // Relevance explanation:

@@ -15,6 +15,9 @@ use Schoolbox\User;
 
 /**
  * Data object for a single fully-hydrated search result.
+ *
+ * This is created from a `\Schoolbox\Search\Api\Hydrator\IHydrator::hydrate`
+ * implementation.
  */
 class FullResult
 {

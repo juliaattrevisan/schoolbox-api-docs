@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Filter;
 
-use DateTimeInterface;
+use Alaress_Date_Format;
 use Schoolbox\User;
 
 /**
@@ -20,15 +20,15 @@ class DataObject
     /**
      * Constructor
      *
-     * @param array<string>|null     $types    if defined, return only results of this type.
-     * @param DateTimeInterface|null $fromDate if defined, return only results created after this date.
-     * @param DateTimeInterface|null $toDate   if defined, return only results created before this date.
-     * @param User|null              $creator  if defined, return only results created by this user.
+     * @param array<string>|null       $types    if defined, return only results of this type.
+     * @param Alaress_Date_Format|null $fromDate if defined, return only results created after this date.
+     * @param Alaress_Date_Format|null $toDate   if defined, return only results created before this date.
+     * @param User|null                $creator  if defined, return only results created by this user.
      */
     public function __construct(
         public ?array $types,
-        public ?DateTimeInterface $fromDate,
-        public ?DateTimeInterface $toDate,
+        public ?Alaress_Date_Format $fromDate,
+        public ?Alaress_Date_Format $toDate,
         public ?User $creator,
     ) {
     }
