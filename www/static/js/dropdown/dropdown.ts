@@ -2,7 +2,6 @@ import { computePosition, flip, shift } from "@floating-ui/dom";
 
 /**
  * Initialize a dropdown.
- *
  * @param {HTMLElement} dropdownTrigger The trigger element of the dropdown.
  */
 function initializeDropdown(dropdownTrigger: HTMLElement) {
@@ -12,11 +11,10 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
     }
     dropdownTrigger.setAttribute("data-dropdown-initialized", "true");
 
-    const dropdownId = dropdownTrigger.getAttribute("data-dropdown");
+    const dropdownId = dropdownTrigger.getAttribute("data-dropdown") as string;
     const dropdownContent = document.querySelector(`#${dropdownId}[data-dropdown-content]`) as HTMLElement;
 
     if (!dropdownContent) {
-        console.warn(`Warning: Dropdown content with id ${dropdownId} could not found`);
         return;
     }
 
@@ -32,12 +30,12 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
         //  This check applies when the user clicks on any dropdown trigger
         //  As we have stopped the propagation of the click event, the event listener on the document won't be triggered
         //  If the user clicks anywhere else on the page, the dropdown will be closed by a different event listener
-        const activeDropdown = window.sbProps.activeDropdown;
-        if (activeDropdown) {
-            activeDropdown.close();
+        const currentActiveDropdown = window.sbProps.activeDropdown;
+        if (currentActiveDropdown) {
+            currentActiveDropdown.close();
 
             // Prevent the dropdown from reopening
-            if (activeDropdown.id == dropdownId) {
+            if (currentActiveDropdown.id === dropdownId) {
                 return;
             }
         }
@@ -47,31 +45,35 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
         computePosition(dropdownTrigger, dropdownContent, {
             placement: "bottom-end",
             middleware: [flip(), shift()],
-        }).then(({ x, y }) => {
-            window.sbProps.activeDropdown = {
-                id: dropdownId as string,
-                content: dropdownContent,
-                trigger: dropdownTrigger,
-                close: () => {
-                    dropdownContent.style.display = "none";
-                    dropdownContent.setAttribute("aria-hidden", "true");
-                    dropdownTrigger.setAttribute("aria-expanded", "false");
+        })
+            .then(({ x, y }) => {
+                window.sbProps.activeDropdown = {
+                    id: dropdownId,
+                    content: dropdownContent,
+                    trigger: dropdownTrigger,
+                    close: () => {
+                        dropdownContent.style.display = "none";
+                        dropdownContent.setAttribute("aria-hidden", "true");
+                        dropdownTrigger.setAttribute("aria-expanded", "false");
 
-                    if (window.sbProps.activeDropdown) {
-                        document.removeEventListener("click", window.sbProps.activeDropdown.close);
-                        window.sbProps.activeDropdown = false;
-                    }
-                },
-            };
-            dropdownContent.style.left = `${x}px`;
-            dropdownContent.style.top = `${y}px`;
+                        if (window.sbProps.activeDropdown) {
+                            document.removeEventListener("click", window.sbProps.activeDropdown.close);
+                            window.sbProps.activeDropdown = false;
+                        }
+                    },
+                };
+                dropdownContent.style.left = `${x}px`;
+                dropdownContent.style.top = `${y}px`;
 
-            dropdownContent.setAttribute("aria-hidden", "false");
-            dropdownTrigger.setAttribute("aria-expanded", "true");
+                dropdownContent.setAttribute("aria-hidden", "false");
+                dropdownTrigger.setAttribute("aria-expanded", "true");
 
-            // Add an event listener to close the dropdown when the user clicks anywhere outside the content
-            document.addEventListener("click", window.sbProps.activeDropdown.close);
-        });
+                // Add an event listener to close the dropdown when the user clicks anywhere outside the content
+                document.addEventListener("click", window.sbProps.activeDropdown.close);
+            })
+            .catch(() => {
+                // noop
+            });
     });
 }
 
@@ -82,14 +84,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize the activeDropdown property if it doesn't exist
     window.sbProps.activeDropdown = window.sbProps.activeDropdown ?? false;
 
-    const dropdowns = document.querySelectorAll("[data-dropdown]") as NodeListOf<HTMLElement>;
-    dropdowns.forEach(initializeDropdown);
+    const dropdowns = document.querySelectorAll("[data-dropdown]");
+    dropdowns.forEach((dropdownTrigger) => {
+        initializeDropdown(dropdownTrigger as HTMLElement);
+    });
 });
 
 /*
  * Initialize dropdowns on DROPDOWN__INIT event (In case the dropdown is added to the DOM after DOMContentLoaded)
  */
 document.addEventListener("DROPDOWN__INIT", () => {
-    const dropdowns = document.querySelectorAll("[data-dropdown]") as NodeListOf<HTMLElement>;
-    dropdowns.forEach(initializeDropdown);
+    const dropdowns = document.querySelectorAll("[data-dropdown]");
+    dropdowns.forEach((dropdownTrigger) => {
+        initializeDropdown(dropdownTrigger as HTMLElement);
+    });
 });
