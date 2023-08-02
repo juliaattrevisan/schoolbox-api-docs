@@ -125,6 +125,9 @@
 .fc-theme-standard .fc-list,
 .fc-event {
     border: 0;
+    @media print {
+        border: solid;
+    }
     font-size: 0.75rem;
 }
 
