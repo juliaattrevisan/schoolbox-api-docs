@@ -105,13 +105,16 @@ class QueryParamBuilder implements IQueryParamBuilder
         // This can probably be made generic?
         // TODO consider reverting to previous, and moving to outside UNION
         // TODO relevance/type/title/id parts can be made generic
-        $titlePart = "CONCAT(u.chosen_name, ' ', u.lastname)";
-        $typePart  = "CONCAT('user.', r.group_type)";
+        $relevancePart = '1';
+        $titlePart     = "CONCAT(u.chosen_name, ' ', u.lastname)";
+        $typePart      = "CONCAT('user.', r.group_type)";
+        $idPart        = 'u.id';
         if ($cursor) {
             $cursorSearchParts = [
-                "($titlePart > :cursorTitle)",
-                "($titlePart = :cursorTitle AND $typePart > :cursorType)",
-                "($titlePart = :cursorTitle AND $typePart = :cursorType AND u.id > :cursorId)",
+                "($relevancePart < :cursorRelevance)",
+                "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)",
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)",
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND u.id > $idPart)",
             ];
 
             $whereParts[]          = '(' . implode(' OR ', $cursorSearchParts) . ')';
@@ -127,11 +130,11 @@ class QueryParamBuilder implements IQueryParamBuilder
         // this may be presented differently on the frontend
         $query = "
             SELECT
-                u.id,
+                $idPart AS id,
                 $titlePart AS title,
                 $typePart AS type,
                 u.updated_at AS date,
-                1 AS relevance
+                $relevancePart AS relevance
             FROM `user` u
             LEFT JOIN `groups` AS r ON u.group_id = r.id
             WHERE $where
