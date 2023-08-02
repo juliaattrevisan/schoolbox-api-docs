@@ -16,6 +16,8 @@ use Alaress\Database\Broker\Mysql\Broker;
 use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy;
 use PDO;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
 /**
  * Class CanvasDb
@@ -31,6 +33,14 @@ class CanvasDb
      */
     private ?Base $connector = null;
 
+    private ?string $databaseName = null;
+
+    /**
+     * @param IConfigLoader $config
+     */
+    public function __construct(private IConfigLoader $config)
+    {
+    }
 
     /**
      * The local canvas database is a concatenated instance identifier
@@ -41,7 +51,20 @@ class CanvasDb
      */
     private function getCanvasDbName(): string
     {
-        return 'canvas_data2_' . INSTANCE_ID;
+        if ($this->databaseName) {
+            return $this->databaseName;
+        }
+        if (
+            $this->config->get(ConfigMapper::_CANVAS_DATA2_SECRET)
+            && $this->config->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)
+        ) {
+            return 'canvas_data2_' . INSTANCE_ID;
+        }
+        /**
+         * @deprecated
+         * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
+         */
+        return 'canvas_data_' . INSTANCE_ID;
     }
 
 
@@ -59,9 +82,9 @@ class CanvasDb
             $connector = new Base(new Broker(), new Transactor(new Strategy\Nested()), new Database\Quoter\Mysql\Quoter());
 
             $connectionOptions = [
-                PDO::ATTR_EMULATE_PREPARES => false,
-                PDO::ATTR_STRINGIFY_FETCHES => false,
-                PDO::ATTR_PERSISTENT => true,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+                PDO::ATTR_STRINGIFY_FETCHES  => false,
+                PDO::ATTR_PERSISTENT         => true,
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
             ];
 

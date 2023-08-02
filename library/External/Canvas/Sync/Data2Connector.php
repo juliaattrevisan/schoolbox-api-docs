@@ -12,12 +12,9 @@ namespace External\Canvas\Sync;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\External;
-use Schoolbox\External\Exception;
+use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Url\Uri;
 
 /**
@@ -75,7 +72,7 @@ class Data2Connector
                 }
                 $this->fetchTableData($table);
             }
-        } catch (External\Exception $e) {
+        } catch (ExternalException $e) {
             $this->logger->warning('Could not get dump file.' . $e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
@@ -98,7 +95,7 @@ class Data2Connector
 
     /**
      * @see https://data-access-platform-api.s3.amazonaws.com/index.html#tag/API/paths/~1query~1{namespace}~1table~1{table}~1schema/get
-     * @throws Exception
+     * @throws ExternalException
      */
     public function fetchTableSchema(string $tableName): array
     {
@@ -108,9 +105,7 @@ class Data2Connector
 
     /**
      * @return array
-     * @throws External\Exception
-     * @throws InvalidArgumentException
-     * @throws RuntimeException
+     * @throws ExternalException
      */
     private function fetchTableNames(): array
     {
@@ -139,7 +134,7 @@ class Data2Connector
      *
      * @param string $table
      * @return void
-     * @throws External\Exception
+     * @throws ExternalException
      */
     public function fetchTableData(string $table): void
     {
@@ -159,7 +154,7 @@ class Data2Connector
         try {
             $response = $this->executeCanvasDataCmd('GET', "/job/$jobId");
             $this->handleJobResponse($response, $table);
-        } catch (Exception $e) {
+        } catch (ExternalException $e) {
             $this->logger->warning(sprintf('Failed to fetch job status: table:%s jobId:%s %s', $table, $jobId, $e->getTraceAsString()));
         }
     }
@@ -170,7 +165,7 @@ class Data2Connector
      * @see https://data-access-platform-api.s3.amazonaws.com/index.html#tag/API/paths/~1object~1url/post
      * @param string $objectId
      * @return array
-     * @throws Exception
+     * @throws ExternalException
      */
     public function fetchUrl(string $objectId): array
     {
@@ -189,7 +184,7 @@ class Data2Connector
      * @param string $command
      * @param array  $formParams
      * @return array
-     * @throws Exception
+     * @throws ExternalException
      */
     private function executeCanvasDataCmd(string $method, string $command, array $formParams = []): array
     {
@@ -215,7 +210,7 @@ class Data2Connector
             $response = $this->client->request($method, (string)$url, $options);
             return json_decode($response->getBody()->getContents(), true);
         } catch (GuzzleException $e) {
-            throw new External\Exception("Unable to get $url: {$e->getMessage()}");
+            throw new ExternalException("Unable to get $url: {$e->getMessage()}");
         }
     }
 
@@ -223,7 +218,7 @@ class Data2Connector
      * Generates access token
      *
      * @return string
-     * @throws Exception
+     * @throws ExternalException
      */
     private function getAccessToken(): string
     {
@@ -250,7 +245,7 @@ class Data2Connector
             $this->accessToken = $content['access_token'];
             return $content['access_token'];
         } catch (GuzzleException $e) {
-            throw new External\Exception("Unable to get $url: {$e->getMessage()}");
+            throw new ExternalException("Unable to get $url: {$e->getMessage()}");
         }
     }
 
@@ -259,7 +254,7 @@ class Data2Connector
      * @param array  $response
      * @param string $table
      * @return void
-     * @throws Exception
+     * @throws ExternalException
      */
     private function handleJobResponse(array $response, string $table): void
     {

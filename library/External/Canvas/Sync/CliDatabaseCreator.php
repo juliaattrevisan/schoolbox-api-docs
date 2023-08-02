@@ -108,7 +108,7 @@ class CliDatabaseCreator extends CliTool\App
         try {
             $rootDb->connect(SQL_host, $canvasDbName, $this->dbRootUser, $this->dbRootPassword);
             $this->getLogger()->notice("Database {$canvasDbName} already exists.");
-            exit(CliKernelAbstract::EXIT_STATUS_OK);
+            return;
         } catch (Database\Exception $e) {
             // Expected
         }

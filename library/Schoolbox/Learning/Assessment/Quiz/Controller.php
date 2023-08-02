@@ -212,7 +212,7 @@ class Controller extends Assessment\Controller
         if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getConfigLoader()->get('site_school_code'))) {
             $externalRedirectUrl = (new \Custom\Newic\Redirect(
                 $this->getConfigLoader()->get('canvas_url'),
-                new CanvasDb(),
+                new CanvasDb($this->getConfigLoader()),
                 $this->folderMapper,
             ))->generateAssessmentRedirect(
                 $this->getUser(),

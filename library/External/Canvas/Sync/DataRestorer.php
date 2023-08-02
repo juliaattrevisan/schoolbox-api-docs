@@ -27,6 +27,7 @@ use function substr;
 /**
  * Responsible for fetching data from canvas into staging database
  * @deprecated
+ * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
  */
 class DataRestorer
 {
@@ -113,8 +114,9 @@ class DataRestorer
      * @param string $tableName
      * @param string $tableFile
      * @param bool   $truncateTable
+     * @param bool   $ignoreFirstLine Whether the first row of the data file is header
      */
-    public function restoreTableData(string $tableName, string $tableFile, bool $truncateTable): void
+    public function restoreTableData(string $tableName, string $tableFile, bool $truncateTable, bool $ignoreFirstLine): void
     {
         // truncate table only when requested
         // this should be true, when loading data to this table for the first time
@@ -124,6 +126,9 @@ class DataRestorer
         }
 
         $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
+        if ($ignoreFirstLine) {
+            $sql .= ' IGNORE 1 LINES';
+        }
         try {
             $this->executeIfPersisting($sql);
         } catch (Database\Exception $e) {
@@ -165,7 +170,7 @@ class DataRestorer
     /**
      * Convert a logical data type to a concrete MySQL data type
      *
-     * @param string      $columnType
+     * @param string   $columnType
      * @param null|int $columnLength
      * @return string
      */

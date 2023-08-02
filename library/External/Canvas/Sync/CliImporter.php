@@ -28,6 +28,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
+use Schoolbox\External\Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -72,6 +73,7 @@ class CliImporter extends CliTool\App
     // Canvas tables to import
     /**
      * @deprecated
+     * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
      */
     private const TABLES_TO_IMPORT_DEPRECATED = [
         'account_dim',
@@ -152,6 +154,7 @@ class CliImporter extends CliTool\App
     /**
      * @inheritDoc
      * @throws ContainerExceptionInterface
+     * @throws Exception
      * @throws Mapper\Exception
      * @throws NotFoundExceptionInterface
      */
@@ -181,26 +184,24 @@ class CliImporter extends CliTool\App
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_SECRET)
             && $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)
         ) {
-            // TODO LEAVE THIS ONLY - CANVAS DATA 2
             $canvasApi = new Data2Connector(
                 $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_SECRET),
                 $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID),
                 $this->getLogger()
             );
             $tempDir   = $this->createTempDir('canvas-data2');
-            // TODO : CHECK SKIP FETCH FLAG?
-            $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT);
             // Download data files
             if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
                 $this->getLogger()->notice("File download skipped");
             } else {
+                $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT);
                 $this->getLogger()->notice('Downloading latest data.');
                 $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT);
             }
             $dataRestorer = new Data2Restorer(
                 $canvasDb,
                 $this->getLogger(),
-                'canvas_data_' . INSTANCE_ID,
+                'canvas_data2_' . INSTANCE_ID,
                 $this->perform(),
                 self::TABLES_TO_IMPORT,
                 [],
@@ -211,14 +212,14 @@ class CliImporter extends CliTool\App
                 $dataRestorer->restoreSchema();
             }
 
-            $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT);
+            $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT, true);
         } elseif (
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY)
             && $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)
         ) {
             /**
              * @deprecated
-             * TODO: REMOVE THIS IN V24
+             * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
              */
             $canvasApi = new Connector(
                 $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
@@ -253,7 +254,7 @@ class CliImporter extends CliTool\App
                 $dataRestorer->restoreSchema();
             }
 
-            $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT_DEPRECATED);
+            $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT_DEPRECATED, false);
         } else {
             $this->getLogger()->warning('API Key or secret is not set.');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
@@ -272,7 +273,7 @@ class CliImporter extends CliTool\App
     private function buildCanvasDbConnectionOrExit(): IConnector
     {
         try {
-            return (new CanvasDb())->build();
+            return (new CanvasDb($this->getConfig()))->build();
         } catch (Database\Exception $e) {
             $this->getLogger()->error(
                 sprintf(
@@ -292,11 +293,14 @@ class CliImporter extends CliTool\App
      * @param string       $tempDir
      * @param DataRestorer $dataRestorer
      * @param array        $tablesToImport
+     * @param bool         $ignoreFirstLine  Whether the first row of the data file is header
      */
     private function loadCanvasDataFilesToStagingDatabase(
         string $tempDir,
         DataRestorer $dataRestorer,
-        array $tablesToImport): void
+        array $tablesToImport,
+        bool $ignoreFirstLine
+    ): void
     {
         if ($this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
             $this->getLogger()->notice("File import to staging database skipped");
@@ -333,7 +337,7 @@ class CliImporter extends CliTool\App
             $this->getLogger()->debug("Loading $tableFile.");
 
             exec("gunzip -f -k " . escapeshellarg("$tempDir/$tableGzFile")); // force overwrite of existing files, keep original
-            $dataRestorer->restoreTableData($tableName, $tableFile, !in_array($tableName, $truncatedTables));
+            $dataRestorer->restoreTableData($tableName, $tableFile, !in_array($tableName, $truncatedTables), $ignoreFirstLine);
             $truncatedTables[] = $tableName;
             if (file_exists($tableFile)) {
                 unlink($tableFile);
