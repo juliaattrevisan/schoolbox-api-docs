@@ -114,9 +114,9 @@ class Controller extends Base
                  * name to a collectively-utilised author account
                  * configured in Learnosity itself (that's the id above)
                  */
-                'firstname' => '',
-                'lastname'  => '',
-                'email'     => ''
+                'firstname' => 'Schoolbox',
+                'lastname'  => 'Schoolbox',
+                'email'     => 'schoolbox@schoolbox.com.au'
             ]
         ];
 
