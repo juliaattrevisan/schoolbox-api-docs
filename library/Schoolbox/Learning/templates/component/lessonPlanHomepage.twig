@@ -1,20 +1,33 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
-<ul class="action-list">
-    {% for lesson in lessonPlans %}
-        <li>
-                <h3>
-                    <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
-                </h3>
-                <p class="meta">
-                    {{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}
-                    {{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: lesson.id, assessment: lesson}) }}
-                    library/Schoolbox/Learning/Assessment/templates/outline/unitAssessments.twig
-                    {{ dueDate.forAssessment(lesson) }}
-{#                    <span title="{{ lesson.getAssessmentModel.dueDate.local }}">#}
-{#                        Scheduled <time datetime="{{ lesson.getAssessmentModel.dueDate.json }}">{{ lesson.getAssessmentModel.dueDate.getRelativeDay }} </time>#}
-{#                    </span>#}
-                </p>
-            </div>
-        </li>
-    {% endfor %}
-</ul>
+{% if lessonPlans|length %}
+    <section>
+        <ul class="action-list">
+            {% for lesson in lessonPlans %}
+                {% set updateRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: lesson.id, assessment: lesson}) %}
+                <li>
+                    <div class="card small-12">
+                        <h3>
+                            <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
+                        </h3>
+                        <p class="meta">
+                            {{ lesson.baseContext.course.specification.folder.name }} | {{ lesson.baseContext.title }}
+                        </p>
+                        <p class="meta">
+                            {{ dueDate.forAssessment(lesson) }}
+                        </p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-lesson-plan"></i>
+        <p>You have no current lesson plans.</p>
+    </div>
+{% endif %}
+<div class="component-action">
+    <section>
+        <a href="#" class="button">View All</a> {# Link for this button will be added in SA-15993 #}
+    </section>
+</div>
