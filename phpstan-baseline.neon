@@ -1586,11 +1586,6 @@ parameters:
 			path: library/External/Schoolbox/Class.php
 
 		-
-			message: "#^Method External_Schoolbox_Class\\:\\:getTeacherIterator\\(\\) should return Alaress\\\\Database\\\\Iterator\\\\IIterator but returns null\\.$#"
-			count: 1
-			path: library/External/Schoolbox/Class.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/External/Schoolbox/Timetable.php
