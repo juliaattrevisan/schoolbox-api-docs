@@ -49,7 +49,7 @@ class Aggregate implements IHydrator
      * list of matches with each hydrator in this aggregate.
      *
      * @param array<int, RawResult> $matches A set of matches to hydrate.
-     * @return array<int, FullResult>
+     * @return array<int, FullResult|null>
      */
     public function hydrate(array $matches): array
     {
@@ -61,10 +61,12 @@ class Aggregate implements IHydrator
                     $hydratorId = spl_object_id($hydrator);
                     $groupedRawResults[$hydratorId] ??= [];
                     $groupedRawResults[$hydratorId][$i] = $match;
+                    break;
                 }
             }
         }
 
+        // Hydrate each result, grouping it into the set of full results
         $fullResults = [];
         foreach ($this->hydrators as $hydrator) {
             $hydratorId = spl_object_id($hydrator);

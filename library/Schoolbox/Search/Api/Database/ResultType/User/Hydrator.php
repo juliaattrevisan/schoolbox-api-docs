@@ -58,7 +58,8 @@ class Hydrator implements IHydrator
         );
 
         // Map those users to full results
-        return array_map(
+        // TODO move this to base hydrator?
+        $fullResults = array_map(
             function (RawResult $match) use ($users) {
                 $user = $users->getBy('id', $match->id);
                 if ($user instanceof User) {
@@ -70,7 +71,7 @@ class Hydrator implements IHydrator
                         $match->relevance,
                         $match->date,
                         null,
-                         (new Uri())
+                        (new Uri())
                             ->withPath('/portrait.php')
                             ->withQuery(
                                 http_build_query([
@@ -88,5 +89,6 @@ class Hydrator implements IHydrator
             },
             $acceptedMatches,
         );
+        return array_filter($fullResults, fn (?FullResult $x) => isset($x));
     }
 }

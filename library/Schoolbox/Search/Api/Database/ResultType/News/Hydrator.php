@@ -58,7 +58,7 @@ class Hydrator implements IHydrator
         );
 
         // And map them to an actual article
-        return array_map(
+        $fullResults = array_map(
             function (RawResult $match) use ($articles) {
                 $article = $articles->getBy('id', $match->id);
                 if ($article instanceof News\Model) {
@@ -104,5 +104,6 @@ class Hydrator implements IHydrator
             },
             $matches,
         );
+        return array_filter($fullResults, fn (?FullResult $x) => isset($x));
     }
 }

@@ -34,7 +34,7 @@ interface IHydrator
      * result.
      *
      * @param array<int, RawResult> $matches A set of matches to hydrate.
-     * @return array<int, FullResult>
+     * @return array<int, FullResult|null>
      */
     public function hydrate(array $matches): array;
 }
