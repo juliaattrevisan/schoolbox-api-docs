@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Search\Api\Hydrator;
 use Schoolbox\User\Formatter\Factory;
@@ -41,6 +42,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         $config = $this->getConfig();
+        $mapperFactory = $this->getMapperFactory();
 
         /** @var IConnector $database */
         $database = $this->injector->get('databaseInternalRead');
@@ -56,10 +58,12 @@ class Module extends BaseModule
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
-                    $this->getMapperFactory()->get(UserMapper::class),
+                    $mapperFactory->get(UserMapper::class),
                     $userNameFormatter,
                 ),
-                new Database\ResultType\News\Hydrator(),
+                new Database\ResultType\News\Hydrator(
+                    $mapperFactory->get(NewsMapper::class),
+                ),
             ),
             new Hydrator\Translator\FullResultToArray(
                 new UserTranslator(),

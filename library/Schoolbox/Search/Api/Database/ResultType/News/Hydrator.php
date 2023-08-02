@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
+use Alaress\Image\Transformation\Storage;
+use Schoolbox\Comms\News;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
@@ -18,6 +20,15 @@ use Schoolbox\Search\Api\Hydrator\IHydrator;
  */
 class Hydrator implements IHydrator
 {
+    /**
+     * Constructor
+     *
+     * @param News\Mapper $newsMapper Used for fetching news for hydration.
+     */
+    public function __construct(private News\Mapper $newsMapper)
+    {
+    }
+
     /**
      * @inheritdoc
      */
@@ -31,17 +42,52 @@ class Hydrator implements IHydrator
      */
     public function hydrate(array $matches): array
     {
-        // TODO use news mapper, etc. to flesh out match into result
+        // Find all news articles which match $matches
+        $acceptedMatches = array_filter($matches, [$this, 'accepts']);
+        $articles        = $this->newsMapper->findByColumn(
+            'id',
+            array_map(
+                fn(RawResult $match) => $match->id,
+                $acceptedMatches,
+            )
+        );
+
+        // And map them to an actual article
         return array_map(
-            fn (RawResult $match) => new FullResult(
-                $match->id,
-                $match->title,
-                '/news/' . $match->id . '?ref=search',
-                $match->type,
-                $match->relevance,
-                $match->date,
-            ),
-            array_filter($matches, [$this, 'accepts']),
+            function (RawResult $match) use ($articles) {
+                $article = $articles->getBy('id', $match->id);
+                if ($article instanceof News\Model) {
+                    return new FullResult(
+                        $match->id,
+                        $match->title,
+                        // TODO use route generator
+                        '/news/' . $match->id . '?ref=search',
+                        $match->type,
+                        $match->relevance,
+                        $match->date,
+                        // Meta looks like: x days ago in $category
+                        // TODO fill in metadata
+                        null,
+                        $article->getFeatureImage()
+                            ? sprintf(
+                                '/storage/image.php?hash=%d&size=%s',
+                                $article->getId(),
+                                urlencode(Storage::TRANSFORM_SQUARE64),
+                            )
+                            : null,
+                        'news',
+                        // Description will be a truncated form of the article:
+                        // if there's a match in the content then somewhere
+                        // around that
+                        // TODO fill in description
+                        null,
+                        $article->getAuthor(),
+                        // Context and links: leave blank for now
+                    );
+                }
+                return null;
+            },
+            $matches,
         );
     }
 }
