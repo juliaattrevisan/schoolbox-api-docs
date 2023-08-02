@@ -24,10 +24,13 @@ class Hydrator implements IHydrator
     /**
      * Constructor
      *
-     * @param UserMapper $userMapper Used to fetch users for hydration.
+     * @param UserMapper               $userMapper        Used to fetch users for hydration.
+     * @param User\Formatter\Formatter $userNameFormatter Used to format a user's name on output.
      */
-    public function __construct(private UserMapper $userMapper)
-    {
+    public function __construct(
+        private UserMapper $userMapper,
+        private User\Formatter\Formatter $userNameFormatter,
+    ) {
     }
 
     /**
@@ -43,6 +46,7 @@ class Hydrator implements IHydrator
      */
     public function hydrate(array $matches): array
     {
+        // Find all users which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
         $users           = $this->userMapper->findByColumn(
             'id',
@@ -52,15 +56,14 @@ class Hydrator implements IHydrator
             )
         );
 
-        // TODO use user mapper, etc. to flesh out match into result
+        // Map those users to full results
         return array_map(
             function (RawResult $match) use ($users) {
                 $user = $users->getBy('id', $match->id);
                 if ($user instanceof User) {
                     return new FullResult(
                         $match->id,
-                        // TODO use proper name format
-                        $user->formatName(),
+                        $this->userNameFormatter->formatObject($user),
                         '/search/user/' . $match->id,
                         $match->type,
                         $match->relevance,

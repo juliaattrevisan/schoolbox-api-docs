@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Search\Api\Hydrator;
+use Schoolbox\User\Formatter\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 
@@ -44,6 +45,9 @@ class Module extends BaseModule
         /** @var IConnector $database */
         $database = $this->injector->get('databaseInternalRead');
 
+        // Need a user name formatter
+        $userNameFormatter = (new Factory())->buildFromConfig($config);
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -51,7 +55,10 @@ class Module extends BaseModule
                 new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
-                new Database\ResultType\User\Hydrator($this->getMapperFactory()->get(UserMapper::class)),
+                new Database\ResultType\User\Hydrator(
+                    $this->getMapperFactory()->get(UserMapper::class),
+                    $userNameFormatter,
+                ),
                 new Database\ResultType\News\Hydrator(),
             ),
             new Hydrator\Translator\FullResultToArray(
