@@ -21,11 +21,8 @@ class Uri extends \GuzzleHttp\Psr7\Uri implements UriInterface
     public function appendQueryParameters(array $queryParameters): self
     {
         $parameters = $this->getQueryAsArray();
-        foreach ($queryParameters as $key => $value) {
-            $parameters[$key] = $value;
-        }
         /** @var Uri $uri */
-        $uri = self::withQueryValues($this, $parameters);
+        $uri = $this->withQuery(http_build_query(array_merge($parameters, $queryParameters)));
         return $uri;
     }
 
