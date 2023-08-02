@@ -45,7 +45,8 @@ class Controller extends Base
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
-        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -103,6 +104,8 @@ class Controller extends Base
             /* Corresponds to a user in the Learnosity Console who will be
              * considered "the author" of stuff created by the school's teachers
              * Misconfiguring this leads to Error 10000 which has no definition
+             *
+             * TODO Waiting for learnosity to clarify
              */
             'user'      => [
                 'id'        => (string)$this->getConfigLoader()->get('learnosity_author_id'),
@@ -111,9 +114,9 @@ class Controller extends Base
                  * name to a collectively-utilised author account
                  * configured in Learnosity itself (that's the id above)
                  */
-                'firstname' => $this->getUser()->getFirstname(),
-                'lastname'  => $this->getUser()->getLastname(),
-                'email'     => $this->getUser()->getEmail()
+                'firstname' => 'Schoolbox',
+                'lastname'  => 'Schoolbox',
+                'email'     => 'schoolbox@schoolbox.com.au'
             ]
         ];
 
@@ -225,13 +228,8 @@ class Controller extends Base
                     "idle_timeout"          => [
                         "interval" => 300
                     ],
-                    /* Go to a nice report screen when you're done, for now
-                     */
-                    'onsubmit_redirect_url' => $this->router->getGenerator()->generate('learnosity.getReport', [
-                        'assessmentId' => $assessment->getId(),
-                        'studentId' => $student->getId(),
-                        'learnosityReference' => $attempt->getLearnosityReference()
-                    ])
+                    'onsubmit_redirect_url' => false,
+                    'onsave_redirect_url' => false,
                 ],
                 "navigation"    => [
                     "auto_save"  => [
@@ -248,6 +246,9 @@ class Controller extends Base
                 "title"         => $assessment->getTitle(),
                 "subtitle"      => ''
             ],
+            /* Enable livestreaming lol
+             */
+            'events' => true,
             /* This is our Quiz title, I guess
              */
             'name'                 => $assessment->getTitle(),
@@ -269,9 +270,18 @@ class Controller extends Base
             'initOptions'         => $this->api->initOptions('items', $payload),
             'assessment'          => $assessment,
             'attemptId'           => $attempt->getId(),
+            /* Save results locally
+             */
             'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
                 'assessmentId' => $assessment->getId(),
                 'studentId'    => $student->getId(),
+            ]),
+            /* Redirect to here when we are ready
+             */
+            'outroUrl' => $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+                'learnosityReference' => $attempt->getLearnosityReference()
             ]),
             'learnosityReference' => $attempt->getLearnosityReference(),
         ], "Attempt {$assessment->getTitle()}");
@@ -293,26 +303,45 @@ class Controller extends Base
      * @return void
      * @throws Deleted
      * @throws NotFound
+     * @throws ValidationException
      * @throws \PDOException
+     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
+        /* Find out what they scored by the automated system
+         */
+        $result = $this->api->dataGetRequest('/sessions/scores', [
+            'session_id' => [
+                $this->requestPost->get('learnosityReference')
+            ]
+        ]);
+
+        $mark = $result['data'][0]['score'];
+        $maxMark = $result['data'][0]['max_score'];
+
+        /* Record it locally for our own usages
+         */
         $existingAttempt = $this->attemptMapper->findOneByColumnList([
             'attempt_id'           => $this->requestPost->get('attemptId'),
             'learnosity_reference' => $this->requestPost->get('learnosityReference'),
             'user_id'              => $student->getId()
         ]);
 
-        $existingAttempt->setFinish(\Alaress_Date_Format::now());
+        $existingAttempt->setMark($mark)
+            ->setMaxMark($maxMark)
+            ->refreshNormalisedMark()
+            ->setFinish(\Alaress_Date_Format::now());
 
         $this->attemptMapper->save($existingAttempt);
     }
 
 
     /**
-     * Show some basic stats about your attempt
+     * The outro screen for completing an attempt;
+     * show some basic stats about your attempt
      *
      * @param IAssessable $assessment
      * @param User        $student
@@ -321,7 +350,7 @@ class Controller extends Base
      * @throws ValidationException
      * @throws \JsonException
      */
-    public function getReport(
+    public function getCompleteAttempt(
         IAssessable $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
@@ -341,14 +370,123 @@ class Controller extends Base
                         $attempt->getLearnosityReference()
                     ]
                 ],
+            ],
+        ];
+
+        $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
+            'initOptions' => $this->api->initOptions('reports', $payload),
+            'assessment' => $assessment,
+            'attempt' => $attempt,
+            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
+        ], "Result for {$assessment->getTitle()}");
+    }
+
+
+    /**
+     * From a student's perspective,
+     * show some in-depth stats about your attempt
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $attempt
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function getReview(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        if (null !== $attempt->getReviewed()) {
+            $payload = [
+                'user_id' => (string)$attempt->getUser()->getId(),
+                'reports' => [
+                    [
+                        /* DOM element id, where this goes in
+                         *
+                         * It's configurable by us, unlike the other anchors for
+                         * Author and Items api
+                         */
+                        'id' => 'schoolbox-student',
+                        'type' => 'session-detail-by-item',
+                        'session_id' => $attempt->getLearnosityReference(),
+                        'questions_api_init_options' => [
+                            'showCorrectAnswers' => false
+                        ]
+                    ]
+                ],
+            ];
+
+            /* If there's a feedback for this attempt, get it
+             * and show the student. At the moment it's just
+             * commentary.
+             */
+            $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
+        } else {
+            $payload = [
+                'user_id' => (string)$attempt->getUser()->getId(),
+                'reports' => [
+                    [
+                        /* DOM element id, where this goes in
+                         *
+                         * It's configurable by us, unlike the other anchors for
+                         * Author and Items api
+                         */
+                        'id' => 'schoolbox-student',
+                        'type' => 'session-detail-by-question',
+                        'session_id' => $attempt->getLearnosityReference(),
+                        'questions_api_init_options' => [
+                            'showCorrectAnswers' => false
+                        ]
+                    ]
+                ],
+            ];
+
+            $comments = [];
+        }
+
+        $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
+            'initOptions' => $this->api->initOptions('reports', $payload),
+            'assessment' => $assessment,
+            'attempt' => $attempt,
+            'comments' => $comments ? base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)) : null,
+            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
+        ], "Result for {$assessment->getTitle()}");
+    }
+
+
+    /**
+     * Provide feedback for an attempt
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $attempt
+     * @throws Exception
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function getFeedback(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        /* This is what the student did
+         */
+        $reportPayload = [
+            'user_id' => (string)$attempt->getUser()->getId(),
+            'reports' => [
                 [
                     /* DOM element id, where this goes in
                      *
                      * It's configurable by us, unlike the other anchors for
                      * Author and Items api
                      */
-                    'id' => 'schoolbox-result-2',
-                    'type' => 'session-detail-by-question',
+                    'id' => 'schoolbox-student',
+                    'type' => 'session-detail-by-item',
                     'session_id' => $attempt->getLearnosityReference(),
                     'questions_api_init_options' => [
                         'showCorrectAnswers' => false
@@ -357,11 +495,269 @@ class Controller extends Base
             ],
         ];
 
-        $this->response = $this->responseFromTemplate('@learnosity/report.twig', [
+        /* These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+
+        foreach ($responses as $response) {
+            $learnosityReference = $response['response_id'];
+
+            $scores[$learnosityReference] = [
+                'score' => $response['score'],
+                'max' => $response['max_score']
+            ];
+        }
+
+        /* Find all the comments for this attempt
+         */
+        $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
+
+        $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
+            'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
+            'assessment' => $assessment,
+            'attempt' => $attempt,
+            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
+            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
+        ], sprintf(
+            'Feedback for %s in %s',
+            $student->getFullName(),
+            $assessment->getTitle()
+        ));
+    }
+
+
+    /**
+     * Tell Learnosity about what our teachers marked each question
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $attempt
+     * @return void
+     * @throws RouteNotFound
+     * @throws ValidationException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postFeedback(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* Updated marks given by our teacher,
+         * including attempt-based commentary
+         */
+        $postData = $this->requestPost->getArrayCopy();
+
+        /* $postData is a structured array containing all the feedback info
+         * Some of it goes back into learnosity; some is saved locally
+         *
+         * $postData = [
+         *     'scores' => [
+                   '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 2
+         *     ],
+         *     'comments' => [
+         *         '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 'my comment'
+         *     ],
+         *     'attempt-comment' => 'you did a good job, now back to sleep'
+         * ]
+         */
+
+        /* FIXME Instead of asking learnosity how it tallied everything, we can
+         *  just...do it ourselves, I guess, and sort-of delete this problem
+         *  We knew the max_mark from the attempt table, so it could potentially
+         *  desync from what Learnosity knows.
+         */
+        $mark = array_sum(array_values($postData['scores']));
+        $maxMark = $attempt->getMaxMark();
+
+        /* Save the comment and new normalised mark
+         */
+        $attempt->setComment(trim($postData['attempt-comment']))
+            ->setMark($mark)
+            ->setMaxMark($maxMark)
+            ->setReviewer($this->getUser())
+            ->setReviewed(\Alaress_Date_Format::now())
+            ->refreshNormalisedMark();
+
+        $this->attemptMapper->save($attempt);
+
+        /* For every learnosity question, see if we have a db record for its feedback
+         * If we do, recycle it and update its contents
+         * Otherwise spawn a new one
+         *
+         * TODO make this algorithm cheaper
+         */
+        foreach ($postData['comments'] as $learnosityReference => $comment) {
+            try {
+                $feedback = $this->feedbackMapper->findOneByColumnList([
+                    'attempt_id' => $attempt->getId(),
+                    'learnosity_reference' => $learnosityReference
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $feedback = $this->feedbackMapper->createModel()
+                    ->setAttempt($attempt)
+                    ->setLearnosityReference($learnosityReference);
+            }
+
+            /* Update comment
+             *
+             * TODO optionally update score, if we want to store that locally
+             *  at the risk of desyncing with learnosity
+             */
+            $feedback->setComment($comment);
+
+            $this->feedbackMapper->save($feedback);
+        }
+
+        /* Start preparing data payload for updating Learnosity
+         * This is so the updated scores appear in their interfaces
+         *
+         * These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
+         *
+         * Learnosity requires multiple fields to update values so you
+         * might as well refetch it all at this point so we can send it
+         * to them in the format it wants
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
+
+        /* Re-collate updated response data
+         */
+        $responseData = [];
+
+        foreach ($responses as $response) {
+            $responseId = $response['response_id'];
+
+            $updatedResponse = $response;
+            $updatedResponse['score'] = $postData['scores'][$responseId];
+
+            /* "When setting a non-zero score, the response must also be attempted."
+             *    -- https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#updateResponseScores
+             *
+             * This includes responses that cannot be automagically calculated
+             */
+            $updatedResponse['attempted'] = true;
+
+            /* If there's no max score, but the teacher gave a score, I guess
+             * we just assume that to be the max score too...basically bonus
+             * marks in this scenario
+             */
+            if (null === $updatedResponse['max_score']) {
+                $updatedResponse['max_score'] = $updatedResponse['score'];
+            }
+
+            $responseData[] = $updatedResponse;
+        }
+
+        /* Post back to learnosity
+         * When the learnosity ui reloads again, it'll still be remembering
+         * all the old scores. You have to wait for it to reload, then hit
+         * F5 to get the new updated values to appear. That's what happens
+         * if you just rely on window.location.reload() in frontend.
+         *
+         * Instead, redirect people to a whole other screen afterwards to
+         * artificially force this behaviour
+         */
+        $this->api->dataUpdateRequest('/sessions/responses/scores', [
+            'sessions' => [
+                [
+                    'session_id' => $attempt->getLearnosityReference(),
+                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'responses' => $responseData
+                ]
+            ]
+        ]);
+
+        /* Get the new result back from learnosity
+         *
+         * FIXME This occurs too quickly. We refetch the session score before
+         *  Learnosity had a chance to finish updating it, so we always get
+         *  the old value back.
+         *
+            $result = $this->api->dataGetRequest('/sessions/scores', [
+                'session_id' => [
+                    $attempt->getLearnosityReference()
+                ]
+            ]);
+         */
+
+        /* TODO Redirect back to the index screen for now
+         *  but probably need a returnUrl
+         */
+        $redirect = $this->router->getGenerator()->generate('learnosity.getIntro', [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $student->getId()
+        ]);
+
+        $this->response = $this->redirectFound($redirect);
+    }
+
+
+    /**
+     * Live Progress monitor thing for a quiz
+     *
+     * Be sure to hit like and subscribe
+     * It really helps us out a lot
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function getLiveProgress(IAssessable $assessment): void
+    {
+        $users = [];
+
+        foreach ($assessment->getParticipantUsers() as $user) {
+            $users[] = [
+                'id' => $user->getId(),
+                'name' => $user->getFullName(),
+                'hash' => hash('sha256', $user->getId() . $this->learnosityConsumerSecret)
+            ];
+        }
+
+        $payload = [
+            'reports' => [
+                [
+                    'id' => 'live-progress',
+                    'type' => 'live-activitystatus-by-user',
+                    'activity' => [
+                        'id' => $assessment->getLearnosityReference(),
+                        'name' => $assessment->getTitle(),
+                    ],
+                    'show_user_selectors' => true,
+                    'show_action_controls' => true,
+                    'display_activity' => true,
+                    'users' => $users
+                ]
+            ]
+        ];
+
+        new \Alaress_Probe($payload);
+
+        $this->response = $this->responseFromTemplate('@learnosity/stream.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
-            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
-        ], "Result for {$assessment->getTitle()}");
+        ], sprintf(
+            'Livestream for %s',
+            $assessment->getTitle()
+        ));
     }
 
 
@@ -375,7 +771,12 @@ class Controller extends Base
     public function getArchiveReferences(): void
     {
         $activityReferences = [
-            'aaabbbbbbcccccddddd',
+            'f0b0a793-7f52-45eb-baba-071e5f12d60b',
+            '9120323f-672f-4e68-8533-94ba8c9abfca',
+            'd1276ea8-5be7-449a-8bea-87ed1a0f7be3',
+            'aed231de-5909-4628-a7e0-c4d5c772d5a8',
+            '8b43fe13-79a1-4ae4-8c08-43e858d9f6d7',
+            'ad45b26f-f3aa-4127-ba59-c61901d9990f',
         ];
 
         $messages = [];
@@ -383,6 +784,8 @@ class Controller extends Base
         foreach ($activityReferences as $activityReference) {
             try {
                 $this->getArchiveReference($activityReference);
+
+                $messages[] = "Archived {$activityReference}";
             } catch (\RuntimeException $e) {
                 $messages[] = $e->getMessage();
             }
@@ -411,7 +814,10 @@ class Controller extends Base
 
 
     /**
-     * Build quiz contents
+     * A list of all the Learnosity Quizzes
+     *
+     * This was an experimental first step, but I ended up using it
+     * to micromanage all our test content (mostly for mass deleting)
      */
     public function getActivityList(): void
     {
@@ -419,6 +825,12 @@ class Controller extends Base
             'mode' => 'activity_list',
             'config' => [
                 'activity_list' => [
+                    'title' => [
+                        'show' => true,
+                        'show_reference' => true
+                    ]
+                ],
+                'activity_edit' => [
                     'title' => [
                         'show' => true,
                         'show_reference' => true
@@ -556,87 +968,6 @@ class Controller extends Base
                         '572287db-3764-43be-b2e7-2af2e3ee9c2f'
                     ]
                 ],
-            ],
-        ];
-
-        $this->response = $this->responseFromTemplate('@learnosity/items.twig', [
-            'initOptions' => $this->api->initOptions('items', $payload)
-        ], 'Example Item');
-    }
-
-
-    /**
-     * Do an attempt
-     */
-    public function getFeedback(): void
-    {
-        /* This should be stored in assess_attempt and/or $_SESSION
-         * because this lets you resume your attempt where you left off
-         * Generating a new sessionId here causes you spawn a new attempt
-         * in Learnosity
-         */
-        // 381c864b-cb14-45e3-b901-0d5b493ece47 is one of my test attempts
-//        $sessionId = Uuid::generate();
-        $sessionId = '381c864b-cb14-45e3-b901-0d5b493ece47';
-
-        $quiz = [
-            'id' => '733',
-            'title' => 'schoolbox test quiz'
-        ];
-
-        $payload = [
-            /* Our internal Quiz implementation id, it seems?
-             */
-            'activity_id' => $quiz['id'],
-            "config" => [
-                "configuration" => [
-                    "idle_timeout" => [
-                        "interval" => 300
-                    ]
-                ],
-                "navigation" => [
-                    "auto_save" => [
-                        "save_interval_duration" => 300
-                    ],
-                    "show_intro" => true,
-                    "show_outro" => true
-                ],
-                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
-                 */
-                'regions' => 'main',
-                /* This is our Quiz title, I guess
-                 */
-                "title" =>  $quiz['title'],
-                "subtitle" => "This is a random subtitle"
-            ],
-            /* This is our Quiz title, I guess
-             */
-            'name' => $quiz['title'],
-            'rendering_type' => 'assess',
-            /* An "attempt identifier", I think
-             */
-            'session_id' => $sessionId,
-            /* This saves attempt results into Learnosity servers, enabling reporting etc.
-             * You can use 'local_practice' to preview a quiz.
-             * You can use 'feedback' to grade an attempt with feedback etc.
-             */
-            'type' => 'feedback',
-            /* A uniquely-identifying string for us, I think
-             */
-            'user_id' => (string)$this->getUser()->getId(),
-            'items' => [
-                [
-                    'id' => '7d6b64f9-88af-4e40-b74f-7895cccbff00',
-                    'reference' => '7d6b64f9-88af-4e40-b74f-7895cccbff00',
-                ],
-                [
-                    'id' => '0a64ef3b-eaff-43bc-a2ed-081305c2ee12',
-                    'reference' => '0a64ef3b-eaff-43bc-a2ed-081305c2ee12',
-                ],
-                [
-                    'id' => '572287db-3764-43be-b2e7-2af2e3ee9c2f',
-                    'reference' => '572287db-3764-43be-b2e7-2af2e3ee9c2f',
-                ]
             ],
         ];
 

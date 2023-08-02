@@ -78,6 +78,18 @@ class Model implements ISoftDeletable
     private ?float $max_mark = null;
 
     /**
+     * @var float|null
+     */
+    private ?float $normalisedMark = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $comment = null;
+
+
+    /**
      * @var string|null
      */
     private ?string $learnosityReference = null;
@@ -304,6 +316,46 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * @return float|null
+     */
+    public function getNormalisedMark(): ?float
+    {
+        return $this->normalisedMark;
+    }
+
+    /**
+     * @param float|null $normalisedMark
+     * @return Model
+     */
+    public function setNormalisedMark(?float $normalisedMark): self
+    {
+        $this->normalisedMark = $normalisedMark;
+        return $this;
+    }
+
+
+    /**
+     * Re-derive the normalised mark from $this->>getMark()
+     * and $this->>getMaxMark(), saving you manually calculating
+     * this percentage everywhere else
+     *
+     * @return self
+     */
+    public function refreshNormalisedMark(): self
+    {
+        /* No marks available
+         */
+        if ((float)0 === (float)$this->getMaxMark()) {
+            $this->setNormalisedMark(null);
+        } else {
+            $this->setNormalisedMark(100 * $this->getMark() / $this->getMaxMark());
+        }
+
+        return $this;
+    }
+
+
+    /**
      * The total mark value of this attempt which has been graded
      * the total available marks the user could have received.
      *
@@ -341,6 +393,26 @@ class Model implements ISoftDeletable
     public function setLearnosityReference(?string $learnosityReference): self
     {
         $this->learnosityReference = $learnosityReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+
+    /**
+     * @param string|null $comment
+     * @return Model
+     */
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
         return $this;
     }
 }

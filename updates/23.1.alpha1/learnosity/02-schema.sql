@@ -3,3 +3,23 @@ ADD COLUMN `learnosity_reference` VARCHAR(255) NULL AFTER `external_id`;
 
 ALTER TABLE `assess_attempt`
     ADD COLUMN `learnosity_reference` VARCHAR(255) NULL AFTER `max_mark`;
+
+-- Remember a percentage value so you don't have to
+-- calculate it manually somewhere else
+ALTER TABLE `assess_attempt`
+    ADD COLUMN `norm_mark` DECIMAL(14,11) NULL AFTER `max_mark`;
+
+-- A comment about the overall attempt made by the student
+ALTER TABLE `assess_attempt`
+    ADD COLUMN `comment` TEXT NULL AFTER `norm_mark`;
+
+-- Store per-question commentary locally
+CREATE TABLE `quiz_feedback` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `attempt_id` INT NOT NULL,
+    `comment` TEXT NULL,
+    `learnosity_reference` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME NULL,
+PRIMARY KEY (`id`));

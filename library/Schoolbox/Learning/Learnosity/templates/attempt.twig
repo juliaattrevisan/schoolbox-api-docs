@@ -1,12 +1,13 @@
 {##
  # Do an attempt
  #
+ # @param string|array $initOptions    Learnosity API initialisation object
  # @param IAssessable $assessment      Our schoolbgox quiz instance
  # @param int $attemptId               In int corresponding a row in assess_attempt
  # @param string $completionUrl        A url to the endpoint that records an attempt as "finished"
  # @param string $learnosityReference  A Learnosity UUID corresponding uniquely to this attempt
  #}
-<script src="https://items.learnosity.com/?v2023.2.LTS"></script>
+<script src="https://items-au.learnosity.com/?v2023.2.LTS"></script>
 
 <div class="row">
     <div class="small-12 island">
@@ -16,6 +17,7 @@
     </div>
 </div>
 
+{% autoescape 'js' %}
 <script>
     let itemsApp = LearnosityItems.init({{ initOptions | raw }});
 
@@ -26,9 +28,12 @@
         payload.append('attemptId', '{{ attemptId }}');
         payload.append('learnosityReference','{{ learnosityReference }}');
 
-        const response = fetch('{{ completionUrl }}', {
+        fetch('{{ completionUrl }}', {
             method: 'POST',
             body: payload
+        }).then(response => {
+            window.location.href = '{{ outroUrl }}';
         });
     });
 </script>
+{% endautoescape %}

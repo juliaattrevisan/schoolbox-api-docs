@@ -68,6 +68,8 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
         $this->uses('mark', self::TYPE_DECIMAL);
         $this->uses('max_mark', self::TYPE_DECIMAL);
+        $this->uses('norm_mark', self::TYPE_DECIMAL, null, 'normalisedMark');
+        $this->uses('comment', self::TYPE_STRING);
 
         $this->hasJoin('answers', array(
             'mapper'    => QuizAnswerMapper::class,

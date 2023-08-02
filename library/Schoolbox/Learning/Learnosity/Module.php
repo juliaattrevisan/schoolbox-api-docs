@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Learnosity;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use OutOfBoundsException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\DefinitionException;
@@ -67,13 +66,17 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/content', 'getContent', $instructorPerms, $preloadAssessment);
 
+        /* Welcome screen for an attempt
+         */
+        $this->register('GET', '/{assessmentId}/intro/{studentId}', 'getIntro', $learnerPerms, $preloadParticipant);
+
         /* Async complete an attempt (set finished datetime)
          */
         $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerPerms, $preloadParticipant);
 
-        /* Welcome screen for an attempt
+        /* Conclude an attempt
          */
-        $this->register('GET', '/{assessmentId}/intro/{studentId}', 'getIntro', $learnerPerms, $preloadParticipant);
+        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnosityReference}', 'getCompleteAttempt', $learnerPerms, $preloadAttempt);
 
         /* Start a new attempt
          */
@@ -82,18 +85,34 @@ class Module extends BaseModule
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
-        $this->register('GET', '/{assessmentId}/report/{studentId}/{learnosityReference}', 'getReport', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnosityReference}', 'getReview', $learnerPerms, $preloadAttempt);
+
+        /* Provide feedback to a student's attempt
+         */
+        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'getFeedback', $instructorPerms, $preloadAttempt);
+
+        /* Persist feedback to a student's attempt
+         */
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'postFeedback', $instructorPerms, $preloadAttempt);
 
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
 
+        /* Livestream
+         */
+        $this->register('GET', '/{assessmentId}/stream', 'getLiveProgress', $instructorPerms, $preloadAssessment);
+
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
         $this->register('GET', '/items', 'getItems', $instructorPerms, null);
-        $this->register('GET', '/feedback', 'getFeedback', $instructorPerms, null);
         $this->register('GET', '/sessionList', 'getSessionListReport', $instructorPerms, null);
+
+        /* Schoolbox devs only: mass soft-deleted data that we may have spawned
+         * There's no convenient way except to slap in identifiers yourself
+         */
+        $this->register('GET', '/cleanse', 'getArchiveReferences', $instructorPerms, null);
     }
 
 
@@ -236,11 +255,12 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getConfig()->get('learnosity_consumer_key'),
-            $this->getConfig()->get('learnosity_consumer_secret'),
-            $this->getErrorMapper(),
-            $this->getQuizMapper(),
-            $this->getAttemptMapper()
+            (string)$this->getConfig()->get('learnosity_consumer_key'),
+            (string)$this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class),
         );
     }
 
@@ -271,16 +291,6 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
-    }
-
-
-    /**
-     * @return Mapper|\Schoolbox\Learning\Quiz\Mapper
-     * @throws InvalidArgumentException
-     */
-    protected function getQuizMapper()
-    {
-        return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class);
     }
 
 

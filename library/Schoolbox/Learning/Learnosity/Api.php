@@ -33,6 +33,7 @@ class Api
      * @param string      $consumerKey
      * @param string      $consumerSecret
      * @param Logger|null $logger
+     * @throws \DomainException
      */
     public function __construct(
         private string $serverName,
@@ -40,6 +41,11 @@ class Api
         #[\SensitiveParameter] private string $consumerSecret,
         private ?Logger $logger = null
     ) {
+        /* If not set, I guess loudly announce it
+         */
+        if ('' === $consumerKey || '' === $consumerSecret) {
+            throw new \DomainException('Learnosity is not configured; please check settings');
+        }
     }
 
 
@@ -113,6 +119,20 @@ class Api
     public function dataSetRequest(string $endpoint, array $payload): mixed
     {
         return $this->dataRequest($endpoint, $payload, 'set');
+    }
+
+
+    /**
+     * Alias for ActionType "update" endpoints
+     *
+     * @param string $endpoint
+     * @param array  $payload
+     * @return mixed
+     * @throws ValidationException
+     */
+    public function dataUpdateRequest(string $endpoint, array $payload): mixed
+    {
+        return $this->dataRequest($endpoint, $payload, 'update');
     }
 
 
