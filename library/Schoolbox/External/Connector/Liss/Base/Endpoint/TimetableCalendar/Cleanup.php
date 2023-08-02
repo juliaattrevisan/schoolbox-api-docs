@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -24,24 +23,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class Cleanup implements IStrategy
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
      * Cleanup constructor.
      *
      * @param LoggerInterface $log
@@ -50,14 +31,11 @@ class Cleanup implements IStrategy
      * @param Mapper          $eventMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
+        private LoggerInterface $log,
+        private bool $perform,
         private string $sourceName,
-        \Schoolbox\External\Event\Mapper $eventMapper
+        private \Schoolbox\External\Event\Mapper $eventMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->eventMapper = $eventMapper;
     }
 
 
