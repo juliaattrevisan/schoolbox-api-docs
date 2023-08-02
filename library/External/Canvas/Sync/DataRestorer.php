@@ -74,7 +74,7 @@ class DataRestorer
             $columnsSqlArray = [];
             $type            = null;
             foreach ($columns as $column) {
-                $type              = $this->getColumnMySqlDataType($column['type'], $column['length'] ?? null, null);
+                $type              = $this->getColumnMySqlDataType($column['type'], $column['length'] ?? null);
                 $comment           = str_replace('"', '\"', $column['description'] ?? '');
                 $columnsSqlArray[] = "`{$column['name']}` $type COMMENT \"{$comment}\"";
             }

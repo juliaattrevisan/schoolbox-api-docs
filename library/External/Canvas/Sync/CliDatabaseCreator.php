@@ -84,7 +84,7 @@ class CliDatabaseCreator extends CliTool\App
      * @param string $canvasDbName
      * @return void
      */
-    private function createDatabase(string $canvasDbName):void
+    private function createDatabase(string $canvasDbName): void
     {
         $dbSchoolboxUser = SQL_user;
         $dbCredentialFile = '/root/.my.cnf';

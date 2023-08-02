@@ -300,8 +300,7 @@ class CliImporter extends CliTool\App
         DataRestorer $dataRestorer,
         array $tablesToImport,
         bool $ignoreFirstLine
-    ): void
-    {
+    ): void {
         if ($this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
             $this->getLogger()->notice("File import to staging database skipped");
             return;
