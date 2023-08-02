@@ -84,7 +84,9 @@ class Receiver
     private LoggerInterface $log;
 
 
-    /* These properties are used specifically to support by a legacy LISS implementation.
+    /* Legacy LISS Implementation w/ the Cyclic Timetable
+     *
+     * These properties are used specifically to support by a legacy LISS implementation.
      * Data from a LISS push goes into the Cyclic Timetable using the following endpoints
      * in this order:
      *
@@ -285,6 +287,7 @@ class Receiver
      * @throws Exception
      * @throws \JsonException
      * @throws \PDOException
+     * @throws \Throwable
      * @throws \UnexpectedValueException
      */
     public function publishClassMemberships(Request $message): Response
@@ -409,44 +412,6 @@ class Receiver
     }
 
 
-    /**
-     * https://liss.net.au/docs/api/hello/
-     * @param Request $message
-     * @return Response
-     */
-    public function hello(Request $message): Response
-    {
-        return new Response(new Value([
-            'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
-            'LissVersion' => new Value(self::LISS_VERSION, Value::$xmlrpcInt),
-        ], Value::$xmlrpcStruct));
-    }
-
-
-    /**
-     * A xmlrpcresp factory
-     *
-     * @param string $message
-     * @return Response
-     */
-    private function generateResponse(string $message): Response
-    {
-        return new Response(new Value($message, 'string'));
-    }
-
-
-    /**
-     * Get the logger
-     * (This is also used to log random crashes in the liss.php)
-     *
-     * @return LoggerInterface
-     */
-    public function log(): LoggerInterface
-    {
-        return $this->log;
-    }
-
-
     /* Legacy liss implementation
      */
 
@@ -456,7 +421,10 @@ class Receiver
      * @param Request $message
      * @return Response
      * @throws Exception
+     * @throws \InvalidArgumentException
      * @throws \JsonException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function publishBellTimes(Request $message): Response
     {
@@ -484,9 +452,13 @@ class Receiver
 
         $allData = $message->getParam(2)->me['array'];
 
-        /* Truncate everything before re-adding */
-        $timetablePeriodMapper = new TimetablePeriodMapper();
-        $timetablePeriodMapper->truncate();
+        /* Truncate everything before re-adding
+         * Note: This was supposed to already have been done via publishDailyData
+         * which is supposed to go first
+         *
+         * $timetablePeriodMapper->truncate();
+         */
+        $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
 
         foreach ($allData as $currentData) {
             $struct = $currentData->me['struct'];
@@ -563,6 +535,8 @@ class Receiver
      * @return Response
      * @throws Exception
      * @throws \JsonException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function publishClasses(Request $message): Response
     {
@@ -584,9 +558,12 @@ class Receiver
         $this->log()->info('publishClasses: processing request');
 
         /* Truncate everything before re-adding
+         * Note: This was supposed to already have been done via publishDailyData
+         * which is supposed to go first
+         *
+         * $classEntryMapper->truncate();
          */
-        $classEntryMapper = new ClassEntryMapper();
-        $classEntryMapper->truncate();
+        $classEntryMapper = ClassEntryMapper::getInstance();
 
         $allData = $message->getParam(2)->me['array'];
         $classCount = 0;
@@ -615,6 +592,8 @@ class Receiver
      * @return Response
      * @throws Exception
      * @throws \JsonException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function publishTimetable(Request $message): Response
     {
@@ -635,13 +614,16 @@ class Receiver
 
         $this->log()->info('publishTimetable: processing request');
 
-        $timetablePeriodMapper = new TimetablePeriodMapper();
-        $classEntryMapper = new ClassEntryMapper();
+        $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
+        $classEntryMapper = ClassEntryMapper::getInstance();
 
         /* Truncate everything before re-adding
+         * Note: This was supposed to already have been done via publishDailyData
+         * which is supposed to go first
+         *
+         * $classPeriodMapper->truncate();
          */
-        $classPeriodMapper = new ClassPeriodMapper();
-        $classPeriodMapper->truncate();
+        $classPeriodMapper = ClassPeriodMapper::getInstance();
 
         /* Decide which externalId format to use via config var
          */
@@ -681,11 +663,12 @@ class Receiver
              * Save it!
              */
             if ($allPeriods->count() && $allClasses->count()) {
-                $classPeriod = $classPeriodMapper->createModel();
-                $classPeriod->setClass($allClasses->first()->getId());
-                $classPeriod->setPeriod($allPeriods->first()->getId());
-                $classPeriod->setTeacher($externalId);
-                $classPeriod->setRoom(trim((string)$struct['RoomCode']->me['string']));
+                $classPeriod = $classPeriodMapper->createModel()
+                    ->setClass($allClasses->first()->getId())
+                    ->setPeriod($allPeriods->first()->getId())
+                    ->setTeacher($externalId)
+                    ->setRoom(trim((string)$struct['RoomCode']->me['string']));
+
                 $classPeriodMapper->save($classPeriod);
             } else {
                 /* These ones are broken */
@@ -713,6 +696,8 @@ class Receiver
      * @param string $identifier
      * @return TimetableCycle
      * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function getCycle(string $identifier): TimetableCycle
     {
@@ -879,5 +864,46 @@ class Receiver
         }
 
         return $this->generateResponse('publishRooms finished but unused.');
+    }
+
+
+    /* Generic/misc stuff
+     */
+
+    /**
+     * https://liss.net.au/docs/api/hello/
+     * @param Request $message
+     * @return Response
+     */
+    public function hello(Request $message): Response
+    {
+        return new Response(new Value([
+            'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
+            'LissVersion' => new Value(self::LISS_VERSION, Value::$xmlrpcInt),
+        ], Value::$xmlrpcStruct));
+    }
+
+
+    /**
+     * A xmlrpcresp factory
+     *
+     * @param string $message
+     * @return Response
+     */
+    private function generateResponse(string $message): Response
+    {
+        return new Response(new Value($message, 'string'));
+    }
+
+
+    /**
+     * Get the logger
+     * (This is also used to log random crashes in the liss.php)
+     *
+     * @return LoggerInterface
+     */
+    public function log(): LoggerInterface
+    {
+        return $this->log;
     }
 }
