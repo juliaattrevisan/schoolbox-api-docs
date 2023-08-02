@@ -87,6 +87,19 @@ export default {
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
         await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
         this.onChangeFilters(this.selectedTag, false);
+
+        // Ensure dropdowns are initialised
+        this.$nextTick(() => {
+            document.dispatchEvent(new Event("DROPDOWN__INIT"));
+        });
+    },
+    /**
+     * Ensure dropdowns are initialised when we create them
+     */
+    updated() {
+        this.$nextTick(() => {
+            document.dispatchEvent(new Event("DROPDOWN__INIT"));
+        });
     },
     methods: {
         /**

@@ -116,13 +116,7 @@
                     paginate();
                     updateStyles();
 
-                    /* dropdown doesn't apply to ajaxed html
-                     * This may be a result of a Foundation update
-                     * Repaired by reflowing dropdown upon ajax completion
-                     *
-                     * http://stackoverflow.com/questions/18194454/foundation-3-post-ajax-drop-down-buttons
-                     * http://foundation.zurb.com/forum/posts/1766-reflow
-                     */
+                    /* dropdown doesn't apply to ajaxed html and needs to be reinitialized */
                     reflow();
                 });
             } else {
@@ -209,10 +203,10 @@
         }
 
         /**
-         * Reflow Foundation UI elements
+         * Reinit dropdown elements
          */
         function reflow() {
-            $(config.targetDiv).foundation("dropdown", "reflow");
+            document.dispatchEvent(new Event("DROPDOWN__INIT"));
         }
 
         /**

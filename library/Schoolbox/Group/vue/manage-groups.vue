@@ -108,13 +108,12 @@ export default {
         },
 
         /**
-         * If there's no groups visible on the page on initial display, foundations dropdowns won't work
+         * If there's no groups visible on the page on initial display, dropdowns won't work
          * So we need to check for them on every select / filter change to ensure they work properly
          */
         checkForDropdowns() {
             this.$nextTick(() => {
-                Foundation.global.namespace = "";
-                $(document).foundation("dropdown", "reflow");
+                document.dispatchEvent(new Event("DROPDOWN__INIT"));
             });
         },
 

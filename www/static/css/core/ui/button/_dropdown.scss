@@ -66,7 +66,9 @@ $f-dropdown-radius: $global-radius !default;
 // $max-width - Default: $f-dropdown-max-width || 200px.
 @mixin dropdown-container($content: list, $triangle: true, $max-width: $f-dropdown-max-width) {
     display: none;
-    left: -9999px;
+    top: 0;
+    left: 0;
+    z-index: 9999; // Show on top
     list-style: $f-dropdown-list-style;
     margin-#{$default-float}: 0;
     position: absolute;
@@ -89,7 +91,6 @@ $f-dropdown-radius: $global-radius !default;
         height: $f-dropdown-height;
         max-height: $f-dropdown-max-height;
         width: 100%;
-        z-index: 89;
     } @else if $content == content {
         background: $f-dropdown-bg;
         border: $f-dropdown-border-style $f-dropdown-border-width $f-dropdown-border-color;
@@ -98,7 +99,6 @@ $f-dropdown-radius: $global-radius !default;
         max-height: $f-dropdown-max-height;
         padding: $f-dropdown-content-padding;
         width: 100%;
-        z-index: 89;
     }
 
     @if $triangle == bottom {
