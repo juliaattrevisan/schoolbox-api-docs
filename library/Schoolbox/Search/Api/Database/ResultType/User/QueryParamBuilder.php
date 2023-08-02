@@ -92,12 +92,12 @@ class QueryParamBuilder implements IQueryParamBuilder
             $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'userType'));
         }
         if ($filter->fromDate) {
-            $whereParts[]           = 'UNIX_TIMESTAMP(u.created_at) >= :userFromDate';
-            $params['userFromDate'] = $filter->fromDate->getTimestamp();
+            $whereParts[]           = 'u.created_at >= :userFromDate';
+            $params['userFromDate'] = $filter->fromDate->getDatabase();
         }
         if ($filter->toDate) {
-            $whereParts[]         = 'UNIX_TIMESTAMP(u.created_at) <= :userToDate';
-            $params['userToDate'] = $filter->toDate->getTimestamp();
+            $whereParts[]         = 'u.created_at <= :userToDate';
+            $params['userToDate'] = $filter->toDate->getDatabase();
         }
 
         // Apply cursor
