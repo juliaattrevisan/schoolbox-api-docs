@@ -26,8 +26,15 @@ $superuser = \Schoolbox\UserMapper::getInstance()->findByUsername(\Schoolbox\Use
  *
  * This $sourceName is optional and is derived from the querystring param. It's a unique
  * usage that isn't really nice.
+ *
+ * Super important note about the LISS SDK:
+ * ********************
+ * When you change the host url to append ?source=whatever, you ***must*** reconnect
+ * otherwise it will not transmit with your changes; clicking OK is not enough.
+ * You must specifically reconnect in the sdk by clicking the Connect button again
+ * after you make your change.
  */
-$sourceName = $_REQUESTT['source'] ?? Factory::SOURCE_NAME;
+$sourceName = $_GET['source'] ?? Factory::SOURCE_NAME;
 
 $liss = new Receiver(
     (int)$config->get('external_enable'),
