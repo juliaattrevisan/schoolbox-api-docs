@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
 use Alaress\Image\Transformation\Storage;
+use Aura\Router\Generator;
 use Schoolbox\Comms\News;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
+use Schoolbox\Url\Uri;
 
 /**
  * Hydrate a news match into an actual search result.
@@ -23,10 +25,13 @@ class Hydrator implements IHydrator
     /**
      * Constructor
      *
-     * @param News\Mapper $newsMapper Used for fetching news for hydration.
+     * @param News\Mapper $newsMapper     Used for fetching news for hydration.
+     * @param Generator   $routeGenerator Used for building routes to news articles.
      */
-    public function __construct(private News\Mapper $newsMapper)
-    {
+    public function __construct(
+        private News\Mapper $newsMapper,
+        private Generator $routeGenerator,
+    ) {
     }
 
     /**
@@ -60,8 +65,15 @@ class Hydrator implements IHydrator
                     return new FullResult(
                         $match->id,
                         $match->title,
-                        // TODO use route generator
-                        '/news/' . $match->id . '?ref=search',
+                        (new Uri())
+                            ->withPath(
+                                $this->routeGenerator->generate(
+                                    'commsNews.getDetail',
+                                    ['articleId' => $article->getId()],
+                                )
+                            )
+                            ->withQuery(http_build_query(['ref' => 'search']))
+                            ->__toString(),
                         $match->type,
                         $match->relevance,
                         $match->date,
@@ -69,11 +81,14 @@ class Hydrator implements IHydrator
                         // TODO fill in metadata
                         null,
                         $article->getFeatureImage()
-                            ? sprintf(
-                                '/storage/image.php?hash=%d&size=%s',
-                                $article->getId(),
-                                urlencode(Storage::TRANSFORM_SQUARE64),
-                            )
+                            ? (new Uri())
+                                ->withPath('/storage/image.php')
+                                ->withQuery(
+                                    http_build_query([
+                                        'hash' => $article->getFeatureImage()->getHash(),
+                                        'size' => Storage::TRANSFORM_SQUARE64,
+                                    ])
+                                )
                             : null,
                         'news',
                         // Description will be a truncated form of the article:

@@ -13,6 +13,7 @@ use Alaress\Image\Transformation\Storage;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -69,11 +70,15 @@ class Hydrator implements IHydrator
                         $match->relevance,
                         $match->date,
                         null,
-                        sprintf(
-                            '/portrait.php?id=%d&size=%s',
-                            $user->getId(),
-                            urlencode(Storage::TRANSFORM_SQUARE64)
-                        ),
+                         (new Uri())
+                            ->withPath('/portrait.php')
+                            ->withQuery(
+                                http_build_query([
+                                    'id'   => $user->getId(),
+                                    'size' => Storage::TRANSFORM_SQUARE64,
+                                ])
+                            )
+                            ->__toString(),
                         'staff-students',
                     );
                 }

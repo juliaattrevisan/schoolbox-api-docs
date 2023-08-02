@@ -50,6 +50,9 @@ class Module extends BaseModule
         // Need a user name formatter
         $userNameFormatter = (new Factory())->buildFromConfig($config);
 
+        // Need a route generator
+        $routeGenerator = $this->getRouter()->getGenerator();
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -63,6 +66,7 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\News\Hydrator(
                     $mapperFactory->get(NewsMapper::class),
+                    $routeGenerator,
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
