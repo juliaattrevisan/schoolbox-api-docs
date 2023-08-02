@@ -343,7 +343,14 @@ class Model implements ISoftDeletable
      */
     public function refreshNormalisedMark(): self
     {
-        $this->setNormalisedMark(100 * $this->getMark() / $this->getMaxMark());
+        /* No marks available
+         */
+        if ((float)0 === (float)$this->getMaxMark()) {
+            $this->setNormalisedMark(null);
+        } else {
+            $this->setNormalisedMark(100 * $this->getMark() / $this->getMaxMark());
+        }
+
         return $this;
     }
 
