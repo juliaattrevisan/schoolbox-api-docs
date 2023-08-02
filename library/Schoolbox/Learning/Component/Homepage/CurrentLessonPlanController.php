@@ -91,6 +91,8 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
                 'returnUrlName'     => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'  => Assessment\Redirect::encode('/homepage/' . $this->getContext()->getFolder()->getId()),
                 'readOnly'          => $this->readOnly,
+                'range'             => $this->range,
+                'lessonPlans'       => $this->visibleLessonPlans,
             ]
         );
     }
