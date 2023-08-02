@@ -216,7 +216,7 @@ class Controller extends Base
      */
     public function calendar(Model $category)
     {
-        $apiFactory = new CalendarApiFactory($this->getUser(), new \External_Timetable(), $this->getConfigLoader(), $this->eventMapper);
+        $apiFactory = new CalendarApiFactory($this->getUser(), new \External_Timetable(), $this->eventMapper);
         $source     = $apiFactory->buildFromResourceCollection(
             ItemMapper::getInstance()->findByColumn(
                 'resource_category_id',

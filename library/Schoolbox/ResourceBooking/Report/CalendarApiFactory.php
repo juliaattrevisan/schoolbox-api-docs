@@ -14,7 +14,6 @@ use Calendar_Api_Composite;
 use Calendar_Api_EventType_Interface;
 use External_TimetableInterface;
 use Schoolbox\External\Event\Mapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
 use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
@@ -39,13 +38,11 @@ class CalendarApiFactory
      *
      * @param User                        $user
      * @param External_TimetableInterface $timetable
-     * @param IConfigLoader               $configLoader
      * @param Mapper                      $eventMapper
      */
     public function __construct(
         User $user,
         External_TimetableInterface $timetable,
-        private \Schoolbox\IConfigLoader $configLoader,
         private \Schoolbox\External\Event\Mapper $eventMapper
     ) {
         $this->user      = $user;
