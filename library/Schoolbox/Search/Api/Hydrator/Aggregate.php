@@ -75,6 +75,8 @@ class Aggregate implements IHydrator
 
         // $fullResults needs to be key-sorted now
         ksort($fullResults);
-        return $fullResults;
+
+        // Filter out any results that are null, and flatten
+        return array_values(array_filter($fullResults, fn ($x) => isset($x)));
     }
 }
