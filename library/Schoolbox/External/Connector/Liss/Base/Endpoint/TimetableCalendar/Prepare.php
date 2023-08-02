@@ -90,6 +90,7 @@ class Prepare implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        private string $sourceName,
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
@@ -127,7 +128,7 @@ class Prepare implements IStrategy
             $statement = $this->overridesMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => Factory::SOURCE_NAME
+                'source' => $this->sourceName
             ]);
 
             $this->log->debug('Purged timetable event overrides');
@@ -137,13 +138,13 @@ class Prepare implements IStrategy
                 INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
                 SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
                 WHERE {$this->eventMapper->getTable()}.classification = :classification
-                AND {$this->eventMapper->getTable()}.`source` = :source  
+                AND {$this->eventMapper->getTable()}.`source` = :source
             ";
 
             $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => Factory::SOURCE_NAME,
+                'source' => $this->sourceName,
             ]);
 
             /* Truncate other data entirely

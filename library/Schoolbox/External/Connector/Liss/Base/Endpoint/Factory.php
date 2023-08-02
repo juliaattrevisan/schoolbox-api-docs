@@ -39,6 +39,7 @@ class Factory
      * @param string          $defaultType
      * @param array           $exclusions
      * @param string          $teacherIdentifier
+     * @param string          $sourceName
      * @param Request         $message
      * @return GenericCollection
      * @throws \UnexpectedValueException
@@ -49,12 +50,14 @@ class Factory
         string $defaultType,
         array $exclusions,
         string $teacherIdentifier,
+        string $sourceName,
         Request $message
     ): GenericCollection {
         return (new GenericCollection(IStrategy::class))
             ->add(new Prepare(
                 $log,
                 $perform,
+                $sourceName,
                 \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                 \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
                 \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
@@ -68,6 +71,7 @@ class Factory
                 $defaultType,
                 $exclusions,
                 $teacherIdentifier,
+                $sourceName,
                 \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
                 \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
@@ -77,6 +81,7 @@ class Factory
             ->add(new Cleanup(
                 $log,
                 $perform,
+                $sourceName,
                 new \Schoolbox\External\Event\Mapper()
             ));
     }

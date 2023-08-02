@@ -46,11 +46,13 @@ class Cleanup implements IStrategy
      *
      * @param LoggerInterface $log
      * @param bool            $perform
+     * @param string          $sourceName
      * @param Mapper          $eventMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        private string $sourceName,
         \Schoolbox\External\Event\Mapper $eventMapper
     ) {
         $this->log = $log;
@@ -70,7 +72,7 @@ class Cleanup implements IStrategy
             /* Remove everything that wasn't touched
              */
             $statement = $this->eventMapper->getDatabase()->prepare("
-                DELETE FROM {$this->eventMapper->getTable()} 
+                DELETE FROM {$this->eventMapper->getTable()}
                 WHERE (updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL)
                 AND classification = :classification
                 AND source = :source
@@ -78,7 +80,7 @@ class Cleanup implements IStrategy
 
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => Factory::SOURCE_NAME
+                'source' => $this->sourceName
             ]);
 
             $this->log->info("Removed stale timetable events.");

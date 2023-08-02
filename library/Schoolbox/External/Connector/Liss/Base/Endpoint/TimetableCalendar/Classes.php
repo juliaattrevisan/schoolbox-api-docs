@@ -152,6 +152,7 @@ class Classes implements IStrategy
         string $defaultType,
         array $exclusions,
         string $teacherIdentifier,
+        private string $sourceName,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         ClassEntryMapper $classEntryMapper,
@@ -380,7 +381,7 @@ class Classes implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource(Factory::SOURCE_NAME);
+            ->setSource($this->sourceName);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
