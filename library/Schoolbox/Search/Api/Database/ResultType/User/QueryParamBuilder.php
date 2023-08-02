@@ -104,11 +104,14 @@ class QueryParamBuilder implements IQueryParamBuilder
         // (Previous technique: < most relevant field, = most relevant and < next most relevant)
         // This can probably be made generic?
         // TODO consider reverting to previous, and moving to outside UNION
+        // TODO relevance/type/title/id parts can be made generic
+        $titlePart = "CONCAT(u.chosen_name, ' ', u.lastname)";
+        $typePart  = "CONCAT('user.', r.group_type)";
         if ($cursor) {
             $cursorSearchParts = [
-                "(CONCAT(u.chosen_name, ' ', u.lastname) > :cursorTitle)",
-                "(CONCAT(u.chosen_name, ' ', u.lastname) = :cursorTitle AND CONCAT('user.', r.group_type) > :cursorType)",
-                "(CONCAT(u.chosen_name, ' ', u.lastname) = :cursorTitle AND CONCAT('user.', r.group_type) = :cursorType AND u.id > :cursorId)",
+                "($titlePart > :cursorTitle)",
+                "($titlePart = :cursorTitle AND $typePart > :cursorType)",
+                "($titlePart = :cursorTitle AND $typePart = :cursorType AND u.id > :cursorId)",
             ];
 
             $whereParts[]          = '(' . implode(' OR ', $cursorSearchParts) . ')';
@@ -125,16 +128,16 @@ class QueryParamBuilder implements IQueryParamBuilder
         $query = "
             SELECT
                 u.id,
-                CONCAT(u.chosen_name, ' ', u.lastname) AS title,
-                CONCAT('user.', r.group_type) AS type,
+                $titlePart AS title,
+                $typePart AS type,
                 u.updated_at AS date,
                 1 AS relevance
             FROM `user` u
             LEFT JOIN `groups` AS r ON u.group_id = r.id
             WHERE $where
             ORDER BY
-                CONCAT(u.chosen_name, ' ', u.lastname) ASC,
-                CONCAT('user.', r.group_type) ASC,
+                $titlePart ASC,
+                $typePart ASC,
                 u.id ASC
             LIMIT :userLimit
         ";
