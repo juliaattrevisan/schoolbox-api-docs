@@ -1,4 +1,5 @@
 <?php
+
 // Front controller for all web requests
 use Schoolbox\Application\WebRequest;
 use Schoolbox\Application\WebRequest\RequestUriParser;
