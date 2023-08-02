@@ -11,10 +11,10 @@ $url = new \Schoolbox\Url\Uri(Config::get('external_portal'));
 /* If the user has already passed by the login, we can go directly to the page */
 if ($_SESSION['communityLogin'] ?? false) {
     if ($_GET['page']) {
-        $url->withPath('/' . $_GET['page'] . '.aspx');
+        $url = $url->withPath('/' . $_GET['page'] . '.aspx');
     } else {
         // This seems to be the default post-login landing page
-        $url->withPath('/stures.aspx');
+        $url = $url->withPath('/stures.aspx');
     }
 
     $query = $url->getQueryAsArray();
@@ -29,13 +29,13 @@ if ($_SESSION['communityLogin'] ?? false) {
     if ($_GET['menu']) {
         $query['menu'] = 0;
     }
-    $url->appendQueryParameters($query);
+    $url = $url->appendQueryParameters($query);
 
     header('Location: ' . $url);
     exit;
 } else {
     /* Setup form variable */
-    $url->withPath('/login.aspx');
+    $url = $url->withPath('/login.aspx');
     $form   = "Form1";
     $action = (string)$url;
 
@@ -83,7 +83,7 @@ if ($_SESSION['communityLogin'] ?? false) {
 
 <html>
 <head>
-<title>Redirecting to <?php echo $to ?></title>
+<title>Redirecting to <?php echo $url ?></title>
 
 </head>
 
@@ -91,6 +91,7 @@ if ($_SESSION['communityLogin'] ?? false) {
 echo "<body>";
 
 echo"<form method='{$method}' name='{$form}' action='{$action}'>";
+$nojs = 0;
 if (is_array($formArray)) {
     foreach ($formArray as $key => $value) {
         if ($key == "submit") {
