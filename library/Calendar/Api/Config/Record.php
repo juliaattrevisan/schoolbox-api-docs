@@ -12,6 +12,56 @@
  */
 class Calendar_Api_Config_Record
 {
+    /* An index of (event_type, connector_class) tuples and their corresponding
+     * config rendering mechanisms. A manually curated list to avoid schema changes
+     * whenever we need to fudge data.
+     *
+     * $configRendererIndex = [
+     *     event_type => [
+     *         connector_class => config_renderer
+     *     ]
+     * ]
+     *
+     * This is a hack employed here as safer alternative to a refactor that would require lots of testing.
+     * Context: https://github.com/alaress/schoolbox/pull/28674
+     */
+    private const CONFIG_RENDERER_INDEX = [
+        // Key: event_type from calendar_connection database table row.
+        'Custom' => [
+            // Key  : connector_class from same calendar_connection database table row.
+            // Value: Match hard-coded $connectorClass from Api/Config/Connector/EOTC.php for default behaviour.
+            //        Override to use different class in the same directory.
+            'EOTC' => 'EOTC', // Default.
+        ],
+        'Event' => [
+            'External' => 'External', // Default.
+            'Schoolbox' => 'Schoolbox', // Default.
+            'Vcal' => 'Vcal' // Default.
+        ],
+        'Fixtures' => [
+            'Schoolbox' => 'Fixtures' // Override.
+        ],
+        'ResourceBooking' => [
+            'Booking' => 'Booking', // Default.
+            'Moderation' => 'Moderation' // Default.
+        ],
+        'Submission' => [
+            'Schoolbox' => 'Schoolbox', // Default.
+        ],
+        'SudsEvent' => [
+            'Schoolbox' => 'SudsEvent', // Override.
+        ],
+        'SudsTimetable' => [
+            'Schoolbox' => 'SudsTimetable' // Override.
+        ],
+        'Timetable' => [
+            'ExternalConstrained' => 'ExternalConstrained' // Default.
+        ],
+        'TimetableDays' => [
+            'External' => 'External' // Default.
+        ],
+    ];
+
     /**
      * Status of a config record
      *
@@ -116,7 +166,7 @@ class Calendar_Api_Config_Record
                 // Do nothing.
         }
 
-        $this->setConfig(json_encode($configArray,JSON_THROW_ON_ERROR));
+        $this->setConfig(json_encode($configArray, JSON_THROW_ON_ERROR));
 
         return $this;
     }
@@ -145,8 +195,10 @@ class Calendar_Api_Config_Record
             $config = [];
         }
 
+        $configRenderer = self::CONFIG_RENDERER_INDEX[$this->getEventType()][$this->getConnectorClass()];
+
         // Instantiate class object given description in $config;
-        $className = 'Calendar_Api_Config_Connector_' . $this->getConnectorClass();
+        $className = 'Calendar_Api_Config_Connector_' . $configRenderer;
         $obj       = new $className();
 
         // These fields are stored in the schoolbox.calendar_connector table in columns other than `config`.
