@@ -28,7 +28,7 @@ const href = window.Vue.computed(() => {
     </a>
 </template>
 
-<style>
+<style scoped>
 /* prevent links from wrapping */
 a {
     white-space: nowrap;

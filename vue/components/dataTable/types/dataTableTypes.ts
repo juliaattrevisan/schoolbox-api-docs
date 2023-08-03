@@ -23,6 +23,7 @@ export interface TemplateConfig {
  */
 export interface LinkComponentData {
     text: string; // the text to display, typically a data key
+    href: string; // the href to link to, typically a data key
     title: string; // the title text for the link
     prependHref?: string; // to prepend the href with something like mailto: or tel:
 }
