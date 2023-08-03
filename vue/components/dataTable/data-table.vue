@@ -15,6 +15,10 @@ import type { ColumnConfig, ImageComponentData, LinkComponentData } from "./type
 
 interface Props {
     /**
+     * The id of the table
+     */
+    id: string;
+    /**
      * The title of the table
      */
     title: string;
@@ -64,6 +68,27 @@ window.Vue.onMounted(() => {
 let isFirstLoad = true;
 
 /**
+ * We need to do a bit of wrangling to properly display table headings
+ * On smaller screens, we want to avoid the table headings and sort icons wrapping,
+ * so we wrap both elements in a div and set the div to display flex
+ */
+function updateTableHeadings() {
+    const thElements = document.querySelectorAll(`#${props.id} table th`);
+    thElements.forEach((thElement) => {
+        const divElement = document.createElement("div");
+        divElement.classList.add("heading-container");
+        const headingChildNodes = thElement.childNodes;
+        headingChildNodes.forEach((childNode) => {
+            divElement.appendChild(childNode);
+        });
+        // VueTables puts the sort icon after the title, but we want them before
+        const firstSpan = divElement.children[0];
+        divElement.appendChild(firstSpan);
+        thElement.appendChild(divElement);
+    });
+}
+
+/**
  * To update the table to show the UI in the footer
  */
 async function onLoaded() {
@@ -71,13 +96,14 @@ async function onLoaded() {
         // loaded gets called on every state change, and we only want to do the below once
         isFirstLoad = false;
         await updateFooterUI();
+        updateTableHeadings();
     }
 }
 </script>
 
 <template>
     <div class="row">
-        <div class="small-12 columns">
+        <div :id="props.id" class="small-12 columns">
             <loading-table v-if="isLoading" />
             <data-load-error v-else-if="hasLoadError" :data-title="props.title" />
             <v-client-table v-else :data="data" :columns="columns" :options="options" @loaded="onLoaded">

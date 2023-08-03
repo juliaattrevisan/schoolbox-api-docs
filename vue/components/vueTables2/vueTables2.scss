@@ -15,6 +15,14 @@ $cdn-prefix: "/static";
     margin-bottom: 0px;
 }
 
+.VueTables table th .heading-container {
+    // On smaller screens, we want to avoid the table headings and sort icons wrapping
+    display: flex;
+    flex-wrap: nowrap;
+    padding-right: 1rem;
+    white-space: nowrap;
+}
+
 .VueTables table td {
     vertical-align: middle;
 }
