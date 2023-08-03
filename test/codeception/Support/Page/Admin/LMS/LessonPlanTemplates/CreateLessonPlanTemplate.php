@@ -79,11 +79,21 @@ class CreateLessonPlanTemplate
 
 
     /**
-     * checkbox field visible to students
+     * checkbox field visible to students when updating a template
      * @param int $templateFieldNumber
      * @return void
      */
-    public function clickCheckboxVisibleStudents(int $templateFieldNumber): void
+    public function clickCheckboxVisibleStudentsCreatingTemplate(int $templateFieldNumber): void
+    {
+        $this->tester->click('label[for="field-visibility-new' . $templateFieldNumber . '"]');
+    }
+
+    /**
+     * checkbox field visible to students when updating a template
+     * @param int $templateFieldNumber
+     * @return void
+     */
+    public function clickCheckboxVisibleStudentsUpdatingTemplate(int $templateFieldNumber): void
     {
         $this->tester->click('label[for="field-new-visibility-' . $templateFieldNumber . '"]');
     }

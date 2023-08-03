@@ -31,6 +31,15 @@ class CourseList
         $this->tester->click(['css' => 'a[class=icon-overflow][data-dropdown=courseDropdown-' . $courseDropdownNumber . ']']);
     }
 
+
+    /**
+     * click a course down arrow by passing the unit specification id
+     */
+    public function clickCourseDownArrow($unitId): void
+    {
+        $this->tester->click(['css' => 'a[class=icon-down-arrow][data-collapser=unit-' . $unitId . ']']);
+    }
+
     /**
      * click import into class
      */

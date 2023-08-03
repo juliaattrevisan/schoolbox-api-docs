@@ -114,7 +114,7 @@ class LessonPlanTemplatesCest
         $i->amGoingTo('Modify a lesson plan template, uncheck the visible to students and save it');
         $templateList->clickModifyLessonPlanTemplateButton($templateId);
         $templateFieldId = $i->grabFromDatabase('lesson_plan_template_field', 'id', ['deleted_at' => null, 'title like' => "Automation Field 2"]);
-        $templates->clickCheckboxVisibleStudents($templateFieldId);
+        $templates->clickCheckboxVisibleStudentsUpdatingTemplate($templateFieldId);
         $templates->clickSaveButton();
         $i->amGoingTo("Click the template is presenting the message invisible to students on the modal");
         $templateList->clickLessonPlanTemplateTitle($templateId);
