@@ -53,7 +53,7 @@ class Controller extends Base
                 $this->source,
                 $keyword,
                 // TODO create filter from result
-                new Filter\DataObject(null, null, null, null),
+                new SearchFilter\DataObject(null, null, null, null),
                 (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT),
             );
             $rawResults  = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);

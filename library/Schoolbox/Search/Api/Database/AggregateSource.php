@@ -13,7 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Cursor\RawResult;
-use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
+use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\Source\ISource;
 
 /**

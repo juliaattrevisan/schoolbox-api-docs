@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api\Filter;
+namespace Schoolbox\Search\Api\SearchFilter;
 
 use Alaress_Date_Format;
 use Schoolbox\User;

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Source;
 
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
-use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
+use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 
 /**
  * Aggregate of search results from several sources.

@@ -16,7 +16,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Database\IQueryParamBuilder;
 use Schoolbox\Search\Api\Database\QueryParams;
-use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
+use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 
 /**
  * Query parameter builder for a search for news.

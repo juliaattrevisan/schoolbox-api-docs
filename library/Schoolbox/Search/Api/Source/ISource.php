@@ -11,7 +11,7 @@ namespace Schoolbox\Search\Api\Source;
 
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Cursor\RawResult;
-use Schoolbox\Search\Api\Filter\DataObject as FilterDataObject;
+use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 
 /**
  * A source for a search.
