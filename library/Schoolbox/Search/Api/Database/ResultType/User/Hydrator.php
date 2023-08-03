@@ -45,7 +45,7 @@ class Hydrator implements IHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(array $matches): array
+    public function hydrate(array $matches, User $viewer): array
     {
         // Find all users which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);

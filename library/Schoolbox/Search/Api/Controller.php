@@ -57,10 +57,7 @@ class Controller extends Base
                 (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT),
             );
             $rawResults  = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
-            $fullResults = $this->hydrator->hydrate($rawResults->getAll());
-
-            // TODO apply filter
-            // Disambiguate filter passed in query string from censor applied to full results
+            $fullResults = $this->hydrator->hydrate($rawResults->getAll(), $this->user);
 
             // TODO if there's not enough results: fetch more until done
 

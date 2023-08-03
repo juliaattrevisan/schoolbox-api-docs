@@ -16,6 +16,7 @@ use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Url\Uri;
+use Schoolbox\User;
 
 /**
  * Hydrate a news match into an actual search result.
@@ -45,7 +46,7 @@ class Hydrator implements IHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(array $matches): array
+    public function hydrate(array $matches, User $viewer): array
     {
         // Find all news articles which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);

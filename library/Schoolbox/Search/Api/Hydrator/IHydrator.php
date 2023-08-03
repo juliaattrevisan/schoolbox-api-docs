@@ -10,11 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Hydrator;
 
 use Schoolbox\Search\Api\Cursor\RawResult;
+use Schoolbox\User;
 
 /**
  * A hydrator for search result matches.
  *
- * Responsible for converting a raw match into an actual result.
+ * Responsible for:
+ * - converting a `RawResult` into a `FullResult`, by populating and fetching
+ *   related data for the subject of the result
+ * - determining whether the result should even be shown to the viewing user
  */
 interface IHydrator
 {
@@ -34,7 +38,8 @@ interface IHydrator
      * result.
      *
      * @param array<int, RawResult> $matches A set of matches to hydrate.
+     * @param User                  $viewer
      * @return array<int, FullResult|null>
      */
-    public function hydrate(array $matches): array;
+    public function hydrate(array $matches, User $viewer): array;
 }
