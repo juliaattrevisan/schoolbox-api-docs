@@ -62,28 +62,60 @@ class ValidUsesSudsTimetableTest extends TestCase
         yield 'SUDS external DB, null timetable' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, null, 'table', false,
         ];
-        yield 'SUDS external DB, iSAMS timetable' => [
+        /* isams forces schedule timetable
+         */
+        yield 'SUDS external DB, iSAMS timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::ISAMS, 'table', true,
         ];
-        yield 'SUDS external DB, Kamar timetable' => [
+        yield 'SUDS external DB, iSAMS timetable, schedule timetable view' => [
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::ISAMS, 'calendar', true,
+        ];
+        /* Kamar requires cyclic
+         * trying to use kamar with schedule timetable is a human mistake and a misuse.
+         */
+        yield 'SUDS external DB, Kamar timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::KAMAR, 'table', false,
         ];
-        yield 'SUDS external DB, Sentral timetable' => [
+        yield 'SUDS external DB, Kamar timetable, schedule timetable view' => [
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::KAMAR, 'calendar', true,
+        ];
+        /* sentral forces schedule timetable
+         */
+        yield 'SUDS external DB, Sentral timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::SENTRAL, 'table', true,
         ];
-        yield 'SUDS external DB, TASS API timetable' => [
+        yield 'SUDS external DB, Sentral timetable, schedule timetable view' => [
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::SENTRAL, 'calendar', true,
+        ];
+        /* tassapi forces schedule timetable
+         */
+        yield 'SUDS external DB, TASS API timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::TASS_API, 'table', true,
         ];
-        yield 'SUDS external DB, Compass timetable' => [
+        yield 'SUDS external DB, TASS API timetable, schedule timetable view' => [
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::TASS_API, 'calendar', true,
+        ];
+        /* compass forces schedule timetable
+         */
+        yield 'SUDS external DB, Compass timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::COMPASS, 'table', true,
         ];
-        yield 'SUDS external DB, Wonde timetable' => [
+        yield 'SUDS external DB, Compass timetable, schedule timetable view' => [
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::COMPASS, 'calendar', true,
+        ];
+        /* wonde forces schedule timetable
+        */
+        yield 'SUDS external DB, Wonde timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::WONDE, 'table', true,
         ];
-        yield 'SUDS external DB, CSV timetable' => [
+        yield 'SUDS external DB, Wonde timetable, schedule timetable view' => [
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::WONDE, 'calendar', true,
+        ];
+
+        yield 'SUDS external DB, CSV timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::CSV, 'table', false,
         ];
-        yield 'SUDS external DB, empty timetable' => [
+        yield 'SUDS external DB, empty timetable, cyclic timetable view' => [
             IConnector::EXTERNAL_TYPE_SCHOOLBOX, '', 'table', false,
         ];
     }
