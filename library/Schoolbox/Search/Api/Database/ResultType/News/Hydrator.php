@@ -75,6 +75,7 @@ class Hydrator implements IHydrator
                 $article = $articles->getBy('id', $match->id);
                 if ($article instanceof News\Model) {
                     return new FullResult(
+                        $match,
                         $match->id,
                         $match->title,
                         (new Uri())

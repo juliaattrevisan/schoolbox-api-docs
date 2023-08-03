@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use DateTimeInterface;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
@@ -72,17 +73,35 @@ class Controller extends Base
             $fullResults   = [];
             $requestCursor = $this->requestQuery['cursor'] ?? null;
             while (count($fullResults) < $limit && $i++ < 100) {
-                $rawResults = $cursor->retrieveResults($requestCursor);
+                // Get next set of raw results, and the cursor for the next
+                // iteration.
+                $nextRawResults = $cursor->retrieveResults($requestCursor);
+                $requestCursor  = $cursor->next($nextRawResults);
 
-                // hydrate, then add to result set
+                // No raw results retrieved:
+                // We're at the end of the result set, so break.
+                if (count($nextRawResults) === 0) {
+                    break;
+                }
+
+                // Otherwise: hydrate raw results into full results,
+                // then add them to the full result set.
                 $fullResults = array_merge(
                     $fullResults,
-                    $this->hydrator->hydrate($rawResults->getAll(), $this->user)
+                    $this->hydrator->hydrate($nextRawResults->getAll(), $this->user)
                 );
 
-                // Get cursor for next iteration.
+                // Too many full results now?
+                // Slice off excess results, get a cursor to the last remaining
+                // full result, then break.
+                if (count($fullResults) > $limit) {
+                    $fullResults    = array_slice($fullResults, 0, $limit);
+                    $lastFullResult = $fullResults[array_key_last($fullResults)];
+                    $requestCursor  = $cursor->next(new Collection([$lastFullResult->rawResult]));
+                    break;
+                }
+
                 // No more results: break
-                $requestCursor = $cursor->next($rawResults);
                 if (!isset($requestCursor)) {
                     break;
                 }

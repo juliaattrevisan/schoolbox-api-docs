@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Hydrator;
 
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\User;
 
 /**
@@ -24,6 +25,8 @@ class FullResult
     /**
      * Constructor
      *
+     * @param RawResult                $rawResult   The raw result from which this full result was derived.
+     *                                              Required so that a cursor may be built to this raw result.
      * @param int                      $id          The ID of the search result subject.
      * @param string                   $title       The title of the search result.
      * @param string                   $url         A link to the search result.
@@ -42,6 +45,7 @@ class FullResult
      *                                              for actions which the search user may perform on or for that result.
      */
     public function __construct(
+        public RawResult $rawResult,
         public int $id,
         public string $title,
         public string $url,

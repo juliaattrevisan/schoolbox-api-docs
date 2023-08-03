@@ -78,6 +78,7 @@ class Hydrator implements IHydrator
                 $user = $users->getBy('id', $match->id);
                 if ($user instanceof User) {
                     return new FullResult(
+                        $match,
                         $match->id,
                         $this->userNameFormatter->formatObject($user),
                         '/search/user/' . $match->id,
