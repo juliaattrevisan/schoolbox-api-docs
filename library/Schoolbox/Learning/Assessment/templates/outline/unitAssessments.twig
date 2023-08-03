@@ -135,6 +135,12 @@
                             <li class="separator">{{ locale.translate('assessment', false, true) }}</li>
                             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
                             {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
+                            {%  if assessment is dueWork and assessment.useRubric %}
+                                <li>
+                                    <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
+                                       class="icon-criteria">Rubric Report</a>
+                                </li>
+                            {% endif %}
                             {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
                             {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
                         {% endif %}

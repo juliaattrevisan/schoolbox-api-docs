@@ -289,6 +289,17 @@ table.rb {
         color: gray;
         font-weight: normal;
     }
+
+    /**
+     * Rubric Report specific configs...
+     */
+    &.rb-report {
+        tbody th:last-of-type,
+        thead th:first-of-type {
+            border-right: 0px;
+            border-left: solid 1px $body-bg;
+        }
+    }
 }
 .rb-criterion {
     margin-bottom: 0;
@@ -470,7 +481,6 @@ select.letter-grade-select {
                 }
 
                 &:first-of-type {
-                    border-right-width: 0;
                     border-bottom-width: 1px;
                 }
             }

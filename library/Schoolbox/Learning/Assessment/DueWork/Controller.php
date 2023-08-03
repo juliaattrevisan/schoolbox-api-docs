@@ -585,28 +585,47 @@ class Controller extends Assessment\Controller
      * Get rubric marks given for each indicator.
      *
      * @param ICollection|Participant[] $participants
-     * @return array<int, array<int, IndicatorMark>> grouped in sets indexed by user.id
+     * @return array<int, array<int, array<string, IndicatorMark>>> grouped in sets indexed by user.id
      */
     private function getMarks(ICollection $participants): array
     {
         $marks = [];
 
         foreach ($participants as $participant) {
-            $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
-            if (!$feedback) {
+            $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+            $publishedFeedback = $latestFeedback;
+            if (!$latestFeedback) {
                 continue;
+            }
+            // if this feedback is a draft, we need to check if there is published feedback...
+            if ($latestFeedback->isDraft()) {
+                $publishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+            } else {
+                // ignore latest feedbacks that are published... we only care about draft latest
+                $latestFeedback = null;
             }
 
             try {
-                $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                $markedGridLatest = $latestFeedback ? $this->rubricMapper->retrieveMarkedGrid($latestFeedback) : null;
+                // if no published feedback default to empty
+                $markedGridPublished = $publishedFeedback ? $this->rubricMapper->retrieveMarkedGrid($publishedFeedback) : null;
             } catch (MapperException) {
                 // can't really do anything
                 continue;
             }
             $studentId = $participant->getUser()->getId();
-            foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
-                foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()] = $indicatorMark;
+            if (null !== $markedGridPublished) {
+                foreach ($markedGridPublished->getCapabilityMarks() as $capabilityMark) {
+                    foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
+                    }
+                }
+            }
+            if (null !== $markedGridLatest) {
+                foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
+                    foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
+                    }
                 }
             }
         }
@@ -667,10 +686,10 @@ class Controller extends Assessment\Controller
             if (count($marks)) {
                 foreach ($allIndicatorUsageIds as $indicatorUsageId) {
                     if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        $descriptor = $marks[$indicatorUsageId]->getDescriptor();
+                        $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
                         $row[]      = $descriptor ? $descriptor->getDescription() : '';
-                        $row[]      = $marks[$indicatorUsageId]->getValue();
-                        $sum        += $marks[$indicatorUsageId]->getValue();
+                        $row[]      = $marks[$indicatorUsageId]['published']->getValue();
+                        $sum        += $marks[$indicatorUsageId]['published']->getValue();
                     } else {
                         $row[] = '';
                         $row[] = '';

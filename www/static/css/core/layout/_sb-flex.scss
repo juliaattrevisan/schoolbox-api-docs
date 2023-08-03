@@ -49,6 +49,9 @@
             flex: 1;
         }
     }
+    &--spacious {
+        justify-content: space-between;
+    }
 
     @each $size in $global-sizes {
         &-gap--#{$size} {

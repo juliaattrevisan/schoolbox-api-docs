@@ -4,30 +4,39 @@
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="actions-small-1 row">
-    <div class="list-item">
+    <div>
         <div class="small-12 columns">
             <h1>Rubric Report for {{ dueWork.title }}</h1>
-            <ul class="meta">
-                <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
-                <li class="icon-calendar">Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
-            </ul>
+            <div class="sb-flex sb-flex--spacious">
+                <ul class="meta">
+                    <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
+                    <li class="icon-calendar">Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
+                </ul>
+                <div class="sb-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
+                    <div class="checklist">
+                        <input type="checkbox" id="show-drafts">
+                        <label for="show-drafts">
+                            Show Drafts
+                        </label>
+                    </div>
+                    <nav class="sb-nav-actions">
+                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
+                    </nav>
+                </div>
+            </div>
         </div>
     </div>
-    <nav>
-        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
-    </nav>
 </div>
 
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">
-            <table class="rb">
+            <table class="rb rb-report">
                 <tbody>
                     <tr>
-                    {% if dueWork.useRubric %}
-                        <th rowspan="2" class="rb-group-name markdown"></th>
+                        <th rowspan="2" class="rb-group-name markdown">&nbsp;</th>
                         {% for group, criteria in headers %}
-                            <th colspan="{{ criteria | length }}">{{ group | markdown }}</th>
+                            <th colspan="{{ criteria | length }}" class="markdown">{{ group | markdown }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
@@ -36,34 +45,39 @@
                                 <th class="rb-criterion-name markdown">{{ criterion | markdown }}</th>
                             {% endfor %}
                         {% endfor %}
-                    {% else %}
-                        <th></th>
-                        <th>Marks</th>
-                    {% endif %}
                     </tr>
                     {% for participant in participants %}
                     <tr>
                         <td>
-                            <div class="card wrap-down small-12 ">
-                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile">
-                                    {% include 'include/portrait.twig' with {user: participant, description: participant.fullName} only %}
+                            <div class="wrap-down small-12 ">
+                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="sb-flex sb-flex-col sb-flex--center">
+                                    <div class="img img--m img--round">
+                                        <div class="img__wrapper">
+                                            {% include 'include/portrait.twig' with {user: participant, description: participant.fullName, class: "rubric-profile"} only %}
+                                        </div>
+                                    </div>
                                     <p>{{ participant.fullname}}</p>
                                 </a>
                             </div>
                         </td>
-                        {% if dueWork.useRubric %}
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
-                                    {% set mark = marks[participant.id][id] ?? null %}
+                                    {% set markLatest = marks[participant.id][id]['latest'] ?? null %}
+                                    {% set mark = marks[participant.id][id]['published'] ?? null %}
                                     <td class="markdown">
+                                        <div {% if markLatest %}data-actual-mark{%endif %}>
                                         {{ (mark.descriptor.description ?? '') | markdown }}
-                                        <p>{{ mark.value ?? '' }}</p>
+                                            <p>{{ mark.value ?? '' }}</p>
+                                        </div>
+                                        {% if markLatest %}
+                                        <div data-draft-mark class="meta">
+                                        {{ (markLatest.descriptor.description ?? '') | markdown }}
+                                            <p>{{ markLatest.value ?? '' }}</p>
+                                        </div>
+                                        {% endif %}
                                     </td>
                                 {% endfor %}
                             {% endfor %}
-                        {% else %}
-                            <td>{{ participant.humanReadableMark(true) }}</td>
-                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -72,3 +86,26 @@
         </div>
     </div>
 </div>
+<style>
+    [data-draft-mark] {
+        display: none;
+    }
+    .rubric-profile {
+        max-width: 64px;
+    }
+</style>
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function() {
+            $("#show-drafts").click(function () {
+                if ($(this).is(":checked")) {
+                    $("[data-draft-mark]").show();
+                    $("[data-actual-mark]").hide();
+                } else {
+                    $("[data-draft-mark]").hide();
+                    $("[data-actual-mark]").show();
+                }
+            });
+        });
+    </script>
+{% endautoescape %}
