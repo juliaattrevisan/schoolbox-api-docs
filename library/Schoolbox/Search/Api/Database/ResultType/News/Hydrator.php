@@ -31,12 +31,14 @@ class Hydrator implements IHydrator
     /**
      * Constructor
      *
-     * @param News\Mapper $newsMapper     Used for fetching news for hydration.
-     * @param Generator   $routeGenerator Used for building routes to news articles.
+     * @param News\Mapper                   $newsMapper      Used for fetching news for hydration.
+     * @param Generator                     $routeGenerator  Used for building routes to news articles.
+     * @param News\Audience\ArticleResolver $articleResolver Used for determining user access to news articles.
      */
     public function __construct(
         private News\Mapper $newsMapper,
         private Generator $routeGenerator,
+        private News\Audience\ArticleResolver $articleResolver,
     ) {
     }
 
@@ -55,13 +57,20 @@ class Hydrator implements IHydrator
     {
         // Find all news articles which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
-        $articles        = $this->newsMapper->findByColumn(
-            'id',
-            array_map(
-                fn(RawResult $match) => $match->id,
-                $acceptedMatches,
-            )
+        $articleIds      = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
+        if (empty($articleIds)) {
+            return [];
+        }
+
+        $permittedArticleIds = array_intersect(
+            $articleIds,
+            $this->articleResolver->findArticlesForUser($viewer, null, false),
         );
+        if (empty($permittedArticleIds)) {
+            return [];
+        }
+
+        $articles = $this->newsMapper->findByColumn('id', $permittedArticleIds);
 
         // And map them to an actual article
         $fullResults = array_map(

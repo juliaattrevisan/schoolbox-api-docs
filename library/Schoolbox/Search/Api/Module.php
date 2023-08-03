@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Search\Api\Hydrator;
@@ -53,6 +54,10 @@ class Module extends BaseModule
         // Need a route generator
         $routeGenerator = $this->getRouter()->getGenerator();
 
+        // Need a news article resolver
+        /** @var ArticleResolver $articleResolver */
+        $articleResolver = $this->injector->get('commsNewsArticleResolver');
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -68,6 +73,7 @@ class Module extends BaseModule
                 new Database\ResultType\News\Hydrator(
                     $mapperFactory->get(NewsMapper::class),
                     $routeGenerator,
+                    $articleResolver,
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
