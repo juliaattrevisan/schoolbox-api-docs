@@ -278,12 +278,21 @@ $rotate-span-width: 11rem;
             }
         }
 
+        tr.average-headers,
         tr.course-headers {
             th {
                 position: sticky;
                 top: $rotate-width * 2 + 1; /* To match '.rotate-headers th' height set below. */
             }
+        }
 
+        tr.average-headers {
+            th {
+                background-color: $white !important;
+            }
+        }
+
+        tr.course-headers {
             th:nth-child(1) {
                 background-color: $body-bg !important;
             }
