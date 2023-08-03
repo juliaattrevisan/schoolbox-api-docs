@@ -50,7 +50,7 @@
                     <tr>
                         <td>
                             <div class="wrap-down small-12 ">
-                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="sb-flex sb-flex-col sb-flex-centre">
+                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="sb-flex sb-flex-col sb-flex--centre">
                                     <div class="img img--m img--round">
                                         <div class="img__wrapper">
                                             {% include 'include/portrait.twig' with {user: participant, description: participant.fullName, class: "rubric-profile"} only %}
