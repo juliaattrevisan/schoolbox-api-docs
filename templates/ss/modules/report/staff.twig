@@ -1,0 +1,33 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Title and Mobile added, Image, Role and Ext removed, Phone renamed to Telephone Extension #}
+{% block content %}
+{% set updatedPhoneColumn = phoneColumn|merge({ heading: "Telephone Extension" }) %}
+{% set columnsConfig = [
+    {
+        key: "StaffTitle",
+        heading: "Title",
+        class: "hide-for-medium-down",
+    },
+    firstNameColumn,
+    surnameColumn,
+    departmentColumn,
+    campusColumn,
+    updatedPhoneColumn,
+    {
+        key: "StaffDefaultMobilePhone",
+        heading: "Mobile",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffDefaultMobilePhone",
+                href: "StaffDefaultMobilePhone",
+                prependHref: "tel:",
+                title: "Phone user",
+            }
+        },
+    },
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

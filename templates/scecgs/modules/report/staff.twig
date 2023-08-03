@@ -1,0 +1,17 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Campus removed and Phone renamed to Contact Phone #}
+{% block content %}
+{% set updatedPhoneColumn = phoneColumn|merge({ heading: "Contact Phone" }) %}
+{% set columnsConfig = [
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    departmentColumn,
+    roleColumn,
+    updatedPhoneColumn,
+    extColumn,
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

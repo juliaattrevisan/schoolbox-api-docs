@@ -1,0 +1,17 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Department removed, 'JobPositionDescriptionAlternate' used for Role #}
+{% block content %}
+{% set updatedRoleColumn = roleColumn|merge({ key: "JobPositionDescriptionAlternate" }) %}
+{% set columnsConfig = [
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    roleColumn,
+    campusColumn,
+    phoneColumn,
+    extColumn,
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

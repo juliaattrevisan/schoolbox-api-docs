@@ -1,0 +1,22 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Staff Code added #}
+{% block content %}
+{% set columnsConfig = [
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    {
+        key: "SchoolStaffCode",
+        heading: "Staff Code",
+        class: "hide-for-medium-down",
+    },
+    departmentColumn,
+    roleColumn,
+    campusColumn,
+    phoneColumn,
+    extColumn,
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

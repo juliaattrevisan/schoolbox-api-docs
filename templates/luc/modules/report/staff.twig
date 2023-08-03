@@ -1,0 +1,30 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Building, Room, and House added, Campus removed #}
+{% set columnsConfig = [
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    departmentColumn,
+    roleColumn,
+    {
+        key: "StaffBuilding",
+        heading: "Building",
+        class: "hide-for-small",
+    },
+    {
+        key: "StaffRoom",
+        heading: "Room",
+        class: "hide-for-small",
+    },
+    {
+        key: "StaffHouse",
+        heading: "House",
+        class: "hide-for-small",
+    },
+    phoneColumn,
+    extColumn,
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

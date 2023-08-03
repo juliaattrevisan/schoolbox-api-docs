@@ -1,0 +1,16 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Ext removed #}
+{% block content %}
+{% set columnsConfig = [
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    departmentColumn,
+    roleColumn,
+    campusColumn,
+    phoneColumn,
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

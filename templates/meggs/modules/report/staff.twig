@@ -1,0 +1,29 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Title, Code and Voicemail added #}
+{% block content %}
+{% set columnsConfig = [
+    imageColumn,
+    {
+        key: "StaffTitle",
+        heading: "Title",
+    },
+    firstNameColumn,
+    surnameColumn,
+    {
+        key: "SchoolStaffCode",
+        heading: "Code",
+    },
+    departmentColumn,
+    roleColumn,
+    campusColumn,
+    phoneColumn,
+    extColumn,
+    {
+        key: "StaffVoiceMail",
+        heading: "Voicemail",
+    },
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

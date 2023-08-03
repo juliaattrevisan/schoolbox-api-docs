@@ -35,6 +35,7 @@ export interface ImageComponentData {
     alt: string; // alternative text for the image
     href?: string; // to link the image, typically a data key
     title?: string; // the title text for the link
+    imgClass?: string; // to allow any custom styling of the image
 }
 
 /**

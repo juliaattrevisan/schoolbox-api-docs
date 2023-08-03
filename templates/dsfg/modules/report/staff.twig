@@ -1,0 +1,30 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Mobile phone column added #}
+{% block content %}
+{% set columnsConfig = [
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    departmentColumn,
+    roleColumn,
+    campusColumn,
+    phoneColumn,
+    {
+        key: "StaffDefaultMobilePhone",
+        heading: "Mobile",
+        template: {
+            component: "link",
+            componentData: {
+                text: "StaffDefaultMobilePhone",
+                href: "StaffDefaultMobilePhone",
+                prependHref: "tel:",
+                title: "Phone user",
+            }
+        },
+    },
+    extColumn,
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}

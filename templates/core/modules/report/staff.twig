@@ -1,0 +1,137 @@
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Staff Directory</h1>
+        </div>
+    </div>
+</div>
+
+<div id="data-table-container">
+    <data-table
+        title="Staff Directory"
+        endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
+        {# To allow schools to alter whats displayed in the columns #}
+        {# Refer to vue/components/dataTable/types/dataTableTypes.ts:ColumnConfig for list of properties that can be used #}
+        {% set imageColumn = {
+            key: "portrait_url",
+            heading: "",
+            class: "portrait-td",
+            isSortable: false,
+            template: {
+                component: "image",
+                componentData: {
+                    src: "portrait_url",
+                    href: "profile_url",
+                    title: "View profile",
+                    alt: "Portrait photo of user",
+                    imgClass: "img--round",
+                },
+            },
+        } %}
+        {% set firstNameColumn = {
+            key: "StaffPreferredName",
+            heading: "First name",
+            template: {
+                component: "link",
+                componentData: {
+                    text: "StaffPreferredName",
+                    href: "profile_url",
+                    title: "View profile",
+                },
+            },
+        } %}
+        {% set surnameColumn = {
+            key: "StaffSurname",
+            heading: "Surname",
+            template: {
+                component: "link",
+                componentData: {
+                    text: "StaffSurname",
+                    href: "profile_url",
+                    title: "View profile",
+                },
+            },
+        } %}
+        {% set departmentColumn = {
+            key: "StaffDepartment",
+            heading: "Department",
+            class: "hide-for-medium-down",
+        } %}
+        {% set roleColumn = {
+            key: "JobPositionDescription",
+            heading: "Role",
+            class: "hide-for-small",
+        } %}
+        {% set campusColumn = {
+            key: "StaffCampusDescription",
+            heading: "Campus",
+            class: "hide-for-medium-down",
+        } %}
+        {% set phoneColumn = {
+            key: "StaffOccupPhone",
+            heading: "Phone",
+            template: {
+                component: "link",
+                componentData: {
+                    text: "StaffOccupPhone",
+                    href: "StaffOccupPhone",
+                    prependHref: "tel:",
+                    title: "Phone user",
+                },
+            },
+        } %}
+        {% set extColumn = {
+            key: "StaffExtension",
+            heading: "Ext",
+        } %}
+        {% set emailColumn = {
+            key: "StaffOccupEmail",
+            heading: "Email",
+            template: {
+                component: "link",
+                componentData: {
+                    text: "StaffOccupEmail",
+                    href: "StaffOccupEmail",
+                    prependHref: "mailto:",
+                    title: "Email user",
+                }
+            },
+        } %}
+        {% block content %}
+        {% set columnsConfig = [
+            imageColumn,
+            firstNameColumn,
+            surnameColumn,
+            departmentColumn,
+            roleColumn,
+            campusColumn,
+            phoneColumn,
+            extColumn,
+            emailColumn,
+        ] %}
+        :columns-config="{{ columnsConfig|json_encode() }}"
+        {% endblock %}
+        {# Add any options specific to the staff directory table #}
+        {# Refer to vue/components/vueTables2/types/vueTables2Types.ts:TableOptions for list of properties that can be used #}
+        {% set tableOptions = {
+            orderBy: {
+                ascending: true,
+                column: "StaffSurname",
+            },
+            texts: {
+                count: "{from}-{to} of {count} members|{count} members|1 member",
+                filterPlaceholder: "Search staff members...",
+                noResults: "No matching staff members",
+            },
+        } %}
+        :table-options="{{ tableOptions|json_encode() }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/dataTable.js?v={{ config.site_version }}"></script>
+
+{# Add any custom styles linked to the .class property of a column #}
+<style>
+.portrait-td {
+    max-width: 2.8rem; /* prevent the image column from being too wide */
+}
+</style>

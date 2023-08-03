@@ -1,0 +1,18 @@
+{% extends '@core/modules/report/staff.twig' %}
+
+{# Changes: Voicemail added, Campus and Phone removed #}
+{% set columnsConfig = [
+    imageColumn,
+    firstNameColumn,
+    surnameColumn,
+    departmentColumn,
+    roleColumn,
+    {
+        key: "StaffVoiceMail",
+        heading: "Voicemail",
+    },
+    extColumn,
+    emailColumn,
+] %}
+:columns-config="{{ columnsConfig|json_encode() }}"
+{% endblock %}
