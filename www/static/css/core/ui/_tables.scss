@@ -150,7 +150,7 @@ table {
         }
     }
     .profile-cell {
-        min-width: 160px !important;
+        min-width: 160px !important; /* 160px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
         padding: 0;
 
         .card img {
@@ -318,7 +318,7 @@ $rotate-span-width: 11rem;
     }
 
     th.fixed-left:nth-child(2) {
-        left: 160px;
+        left: 160px; /* 160px to match width of a .profile-cell table cell. */
     }
 
     td,
