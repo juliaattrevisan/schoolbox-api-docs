@@ -17,7 +17,7 @@ use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 /**
  * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable
  */
-class ValidUsesScheduleTimetableTimetableTest extends TestCase
+class ValidUsesScheduleTimetableTest extends TestCase
 {
     /**
      * @dataProvider getTestIsSatisfiedByData
