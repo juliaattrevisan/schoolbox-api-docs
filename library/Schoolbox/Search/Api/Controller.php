@@ -53,23 +53,45 @@ class Controller extends Base
             $cursor = new Cursor\Cursor(
                 $this->source,
                 $keyword,
-                // TODO create filter from result
+                // TODO create filter from search query
                 new SearchFilter\DataObject(null, null, null, null),
                 $limit,
             );
-            $rawResults  = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
-            $fullResults = $this->hydrator->hydrate($rawResults->getAll(), $this->user);
 
-            // TODO if there's not enough results: fetch more until done
+            // Fetch results from cursor and hydrate, until either:
+            // - limit is reached
+            // - the end of cursor is reached
+            // This ensures there is a consistent number of results returned,
+            // even if the hydrator filters out results.
+            $i             = 0;
+            $fullResults   = [];
+            $requestCursor = $this->requestQuery['cursor'] ?? null;
+            while (count($fullResults) < $limit && $i++ < 100) {
+                $rawResults = $cursor->retrieveResults($requestCursor);
 
+                // hydrate, then add to result set
+                $fullResults = array_merge(
+                    $fullResults,
+                    $this->hydrator->hydrate($rawResults->getAll(), $this->user)
+                );
+
+                // Get cursor for next iteration.
+                // No more results: break
+                $requestCursor = $cursor->next($rawResults);
+                if (!isset($requestCursor)) {
+                    break;
+                }
+            }
+
+            // Finally output the response
             $this->response = $this->responseAsJson(
                 [
                     'data'     => array_map($this->fullResultTranslator, $fullResults),
                     'metadata' => [
-                        'count'  => $cursor->retrieveResultCount(),
+                        'count'  => null,
                         'cursor' => [
                             'current' => null,
-                            'next'    => $cursor->next($rawResults),
+                            'next'    => $requestCursor,
                         ],
                     ],
                 ]
