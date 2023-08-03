@@ -62,15 +62,12 @@ class Hydrator implements IHydrator
             return [];
         }
 
-        $permittedArticleIds = array_intersect(
-            $articleIds,
-            $this->articleResolver->findArticlesForUser($viewer, null, false),
-        );
+        $permittedArticleIds = $this->articleResolver->findArticlesForUser($viewer, News\Model::STATE_PUBLIC, false);
         if (empty($permittedArticleIds)) {
             return [];
         }
 
-        $articles = $this->newsMapper->findByColumn('id', $permittedArticleIds);
+        $articles = $this->newsMapper->findByColumn('id', array_intersect($articleIds, $permittedArticleIds));
 
         // And map them to an actual article
         $fullResults = array_map(
