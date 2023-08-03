@@ -14,7 +14,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
@@ -42,73 +41,6 @@ class Classes implements IStrategy
 
 
     /**
-     * Logs the things that happened, in a text file
-     *
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * Since we are receiving a push from schools,
-     * we are always in perform mode
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * A csv list of event types that we should skip
-     *
-     * @var array
-     */
-    private array $exclusions;
-
-
-    /**
-     * A string denoting an arbitrary event type that we attribute
-     * when the supplied type is non-meaningful
-     *
-     * @var string
-     */
-    private string $defaultType;
-
-
-    /**
-     * Decide whether to use teacherIds or teacherCodes
-     * Configured in admin
-     *
-     * @var string
-     */
-    private string $teacherIdentifier;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
      * A list of classEntries that we saw previously
      *
      * @var array
@@ -125,49 +57,33 @@ class Classes implements IStrategy
 
 
     /**
-     * The data sent to us by the school
-     *
-     * @var Request
-     */
-    private Request $message;
-
-
-    /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param string                                     $defaultType
-     * @param array                                      $exclusions
-     * @param string                                     $teacherIdentifier
+     * @param LoggerInterface                            $log               Logs the things that happened, in a text file
+     * @param bool                                       $perform           Since we are receiving a push from schools, we are always in perform mode
+     * @param string                                     $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
+     * @param array                                      $exclusions        A csv list of event types that we should skip
+     * @param string                                     $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
+     * @param string                                     $sourceName
      * @param Mapper                                     $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param Request                                    $message
+     * @param Request                                    $message           The data sent to us by the school
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        string $defaultType,
-        array $exclusions,
-        string $teacherIdentifier,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        Request $message
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $defaultType,
+        private array $exclusions,
+        private string $teacherIdentifier,
+        private string $sourceName,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private Request $message
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->exclusions = $exclusions;
-        $this->defaultType = $defaultType;
-        $this->teacherIdentifier = $teacherIdentifier;
-        $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->message = $message;
     }
 
 
@@ -380,7 +296,7 @@ class Classes implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource(Factory::SOURCE_NAME);
+            ->setSource($this->sourceName);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */

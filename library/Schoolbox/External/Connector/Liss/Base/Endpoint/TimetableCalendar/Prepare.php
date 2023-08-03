@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -28,58 +27,11 @@ use Schoolbox\External\TimetablePeriodMapper;
 class Prepare implements IStrategy
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var ClassPeriodMapper
-     */
-    private ClassPeriodMapper $classPeriodMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $periodMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
      * Prepare constructor.
      *
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
+     * @param string                                     $sourceName
      * @param Mapper                                     $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
@@ -88,23 +40,16 @@ class Prepare implements IStrategy
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        TimetablePeriodMapper $periodMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $sourceName,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private ClassPeriodMapper $classPeriodMapper,
+        private TimetablePeriodMapper $periodMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->eventMapper = $eventMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->classPeriodMapper = $classPeriodMapper;
-        $this->periodMapper = $periodMapper;
-        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -127,7 +72,7 @@ class Prepare implements IStrategy
             $statement = $this->overridesMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => Factory::SOURCE_NAME
+                'source' => $this->sourceName
             ]);
 
             $this->log->debug('Purged timetable event overrides');
@@ -137,13 +82,13 @@ class Prepare implements IStrategy
                 INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
                 SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
                 WHERE {$this->eventMapper->getTable()}.classification = :classification
-                AND {$this->eventMapper->getTable()}.`source` = :source  
+                AND {$this->eventMapper->getTable()}.`source` = :source
             ";
 
             $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => Factory::SOURCE_NAME,
+                'source' => $this->sourceName,
             ]);
 
             /* Truncate other data entirely

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -24,38 +23,19 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class Cleanup implements IStrategy
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
      * Cleanup constructor.
      *
      * @param LoggerInterface $log
      * @param bool            $perform
+     * @param string          $sourceName
      * @param Mapper          $eventMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        \Schoolbox\External\Event\Mapper $eventMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $sourceName,
+        private \Schoolbox\External\Event\Mapper $eventMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->eventMapper = $eventMapper;
     }
 
 
@@ -70,7 +50,7 @@ class Cleanup implements IStrategy
             /* Remove everything that wasn't touched
              */
             $statement = $this->eventMapper->getDatabase()->prepare("
-                DELETE FROM {$this->eventMapper->getTable()} 
+                DELETE FROM {$this->eventMapper->getTable()}
                 WHERE (updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL)
                 AND classification = :classification
                 AND source = :source
@@ -78,7 +58,7 @@ class Cleanup implements IStrategy
 
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => Factory::SOURCE_NAME
+                'source' => $this->sourceName
             ]);
 
             $this->log->info("Removed stale timetable events.");

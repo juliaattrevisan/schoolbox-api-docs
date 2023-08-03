@@ -98,6 +98,7 @@ class Receiver
         private string $defaultType,
         private string $teacherIdentifier,
         private bool $storageLogging,
+        private string $sourceName,
         private \Schoolbox\User $superuser,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
@@ -214,6 +215,7 @@ class Receiver
             $this->defaultType,
             $this->exclusions,
             $this->teacherIdentifier,
+            $this->sourceName,
             $message
         );
 
