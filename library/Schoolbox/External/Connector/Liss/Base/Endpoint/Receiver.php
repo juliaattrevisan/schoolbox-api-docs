@@ -51,7 +51,7 @@ class Receiver
     /**
      * Log message when authentication fails
      */
-    private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/schoolCode in your instance.';
+    private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/connector setting in your instance.';
 
 
     /**
@@ -242,7 +242,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated(false)) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
