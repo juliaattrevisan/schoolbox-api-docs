@@ -6,6 +6,9 @@ use Component_Homepage_ControllerAbstract;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment;
+use Schoolbox\Permission\Access\UserAccess;
+
 
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
@@ -27,6 +30,12 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
     private GenericCollection|array $visibleLessonPlans;
 
     /**
+     * Does the user have edit access to this component / page
+     * @var bool
+     */
+    private bool $readOnly;
+
+    /**
      * Business logic to collate data ready for output
      *
      * @return bool Whether to continue on and attempt Component render
@@ -37,6 +46,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
      */
     public function execute(): bool
     {
+        $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
         $student = $this->getUser();
 
         /**
@@ -54,9 +64,10 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 
         $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
         $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
+        $publishDate = \Alaress_Date_Format::now();
 
         // grab the assessmentID for all lesson plans from the students subject list
-        $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $student->getRole()->isStudent());
+        $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
         // hydrate those assessments
         $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]);
 
@@ -75,8 +86,12 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@learning/component/lessonPlanHomepage.twig',
             [
-                'range'       => $this->range,
-                'lessonPlans' => $this->visibleLessonPlans,
+                'component'         => $this,
+                'range'             => $this->range,
+                'lessonPlans'       => $this->visibleLessonPlans,
+                'returnUrlName'     => Assessment\Redirect::RETURN_URL,
+                'encodedReturnUrl'  => Assessment\Redirect::encode('/homepage/' . $this->getContext()->getFolder()->getId()),
+                'readOnly'          => $this->readOnly,
             ]
         );
     }

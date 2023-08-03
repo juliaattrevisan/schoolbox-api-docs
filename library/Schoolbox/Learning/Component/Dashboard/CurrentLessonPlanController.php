@@ -50,12 +50,13 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 
         $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
         $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
+        $publishDate = \Alaress_Date_Format::now();
 
         $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
         $lessonPlanMapper = LessonPlanMapper::getInstance();
 
         // grab the assessmentID for all lesson plans from the students subject list
-        $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $student->getRole()->isStudent());
+        $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
         // hydrate those assessments
         $plans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'ASC']]);
 

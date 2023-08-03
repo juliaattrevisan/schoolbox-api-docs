@@ -264,17 +264,19 @@ class Mapper extends \Schoolbox\Mapper
      * between specified dates
      * and ensuring we are only returning lesson plans that are visible to the user
      *
-     * @param array                $folderIDs list of folders to gather all lesson plans from within
+     * @param array $folderIDs list of folders to gather all lesson plans from within
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param bool                 $allowStudents should we return only student visible plans? or all plans?
+     * @param \Alaress_Date_Format $publishDate
+     * @param bool $allowStudents should we return only student visible plans? or all plans?
      * @return array<int> array of the assessment ID's for the lesson plans
      */
-    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, bool $allowStudents = false): array
+    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, \Alaress_Date_Format $publishDate, bool $allowStudents = false): array
     {
         $pb = $this->getDatabase()
             ->buildPredicateBuilder('')
             ->betweenDates('assessment.due_date', $startDate, $endDate)
+            ->lessThanOrEqualTo('assessment.publish_date', $publishDate->getDatabase())
             ->in('mv_assessment_relation.folder_id', $folderIDs);
 
         // Are we limiting to lesson plans visible to students? or staff only?
