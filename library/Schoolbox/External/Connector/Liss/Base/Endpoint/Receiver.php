@@ -19,7 +19,6 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Cli\MockMessage;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
