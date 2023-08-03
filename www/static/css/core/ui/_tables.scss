@@ -141,6 +141,7 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
 
 table {
     border-collapse: collapse;
+    width: 100%;
     line-height: 1.4;
     .card {
         padding: 0;
