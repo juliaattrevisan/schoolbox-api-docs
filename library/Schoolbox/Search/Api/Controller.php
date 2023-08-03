@@ -10,9 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
+use DateTimeInterface;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
 use Schoolbox\Search\Api\Source\ISource;
+use Schoolbox\UserMapper;
 
 /**
  * Controller for the search API.
@@ -34,6 +38,7 @@ class Controller extends Base
         private ISource $source,
         private IHydrator $hydrator,
         private FullResultToArray $fullResultTranslator,
+        private UserMapper $userMapper,
     ) {
     }
 
@@ -48,13 +53,13 @@ class Controller extends Base
     public function getSearch(): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null);
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         if (mb_strlen($keyword) >= 2) {
             $cursor = new Cursor\Cursor(
                 $this->source,
                 $keyword,
-                // TODO create filter from search query
-                new SearchFilter\DataObject(null, null, null, null),
+                $filter,
                 $limit,
             );
 
@@ -99,5 +104,42 @@ class Controller extends Base
         } else {
             $this->sendJsonError('Search keyword must be at least 2 characters', 400);
         }
+    }
+
+    /**
+     * Build a search filter data object, for passing into the cursor.
+     *
+     * @param string|null $filterQueryString The filter from the query string, if any.
+     * @return SearchFilter\DataObject
+     * @throws MapperException if the user could not be found
+     */
+    private function buildSearchFilter(?string $filterQueryString): SearchFilter\DataObject
+    {
+        if (!isset($filterQueryString)) {
+            return new SearchFilter\DataObject(null, null, null, null);
+        }
+        $decodedFilter = json_decode($filterQueryString, true);
+
+        $types = null;
+        if (is_array($decodedFilter['types'] ?? null)) {
+            $types = $decodedFilter['types'];
+        }
+
+        $fromDate = null;
+        if (isset($decodedFilter['date']['from'])) {
+            $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], DateTimeInterface::RFC3339);
+        }
+
+        $toDate = null;
+        if (isset($decodedFilter['date']['to'])) {
+            $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], DateTimeInterface::RFC3339);
+        }
+
+        $creator = null;
+        if (isset($decodedFilter['creator']['id'])) {
+            $creator = $this->userMapper->findById($decodedFilter['creator']['id']);
+        }
+
+        return new SearchFilter\DataObject($types, $fromDate, $toDate, $creator);
     }
 }

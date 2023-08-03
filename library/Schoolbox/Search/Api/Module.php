@@ -80,6 +80,7 @@ class Module extends BaseModule
                 new UserTranslator(),
                 new FolderTranslator(0),
             ),
+            $mapperFactory->get(UserMapper::class),
         );
     }
 }
