@@ -12,7 +12,7 @@ namespace Schoolbox\External\Importer\Endpoint;
 use External\IConnector;
 
 /**
- * Decide if the current SUDS connector uses the SUDS Timetable
+ * Decide if the current SUDS connector uses the Schedule Timetable
  * (If it doesn't, then we presume usage of the cyclic grid)
  *
  * The cyclic grid usage in SUDS should eventually shrink to
@@ -23,7 +23,7 @@ use External\IConnector;
 class ValidUsesScheduleTimetable
 {
     /**
-     * These SUDS connectors use SUDS Timetable which is a calendar
+     * These SUDS connectors use Schedule Timetable which is a calendar
      * representation of a timetable
      *
      * Everything outside this set uses (or is presumed to use)
