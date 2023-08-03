@@ -78,9 +78,9 @@ class Controller extends Base
                 $nextRawResults = $cursor->retrieveResults($requestCursor);
                 $requestCursor  = $cursor->next($nextRawResults);
 
-                // No raw results retrieved:
+                // No raw results retrieved and no cursor?
                 // We're at the end of the result set, so break.
-                if (count($nextRawResults) === 0) {
+                if (!isset($requestCursor) && count($nextRawResults) === 0) {
                     break;
                 }
 
