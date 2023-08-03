@@ -48,13 +48,14 @@ class Controller extends Base
     public function getSearch(): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         if (mb_strlen($keyword) >= 2) {
             $cursor = new Cursor\Cursor(
                 $this->source,
                 $keyword,
                 // TODO create filter from result
                 new SearchFilter\DataObject(null, null, null, null),
-                (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT),
+                $limit,
             );
             $rawResults  = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
             $fullResults = $this->hydrator->hydrate($rawResults->getAll(), $this->user);
