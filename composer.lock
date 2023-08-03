@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b8c1090c2598c9fc1ede1d3148a4fde",
+    "content-hash": "3999d12400faa772d6af1c0d6039c796",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
