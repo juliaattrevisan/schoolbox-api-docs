@@ -150,7 +150,7 @@ table {
         }
     }
     .profile-cell {
-        min-width: 160px;
+        min-width: 160px !important;
         padding: 0;
 
         .card img {
@@ -313,7 +313,7 @@ $rotate-span-width: 11rem;
     }
 
     td,
-    thead th {
+    th {
         min-width: $diagonal-cell-width;
         white-space: nowrap;
     }

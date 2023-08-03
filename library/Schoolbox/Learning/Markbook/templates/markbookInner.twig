@@ -50,17 +50,13 @@
 </div>
 {% endif %}
 
-<div class="small-12 island">
+<div class="diagonal-headings-table-container small-12 island" data-diagonal-headings-table-container>
     {% if markbook.assessments|length > 0 %}
-    <table id="marksheet-styles" class="marksheet" data-mark-sheet>
+    <table id="marksheet-styles" class="diagonal-headings-table marksheet" data-mark-sheet>
         <thead>
             <tr class="rotate-headers" data-headers data-hidable-columns>
-                <th>&nbsp;</th>
-                <th>
-                    <div>
-                        <span>Student Weighted Average</span>
-                    </div>
-                </th>
+                <th class="fixed-left"><div></div></th>
+                <th class="fixed-left"><div><span>Student Weighted Average</span></div></th>
                 {% if rankEnabled %}
                 <th>
                     <div>
@@ -83,12 +79,12 @@
             </tr>
 
             <tr data-hidable-columns>
-                <th style="min-width: 200px;width: 200px;">
+                <th class="fixed-left white profile-cell">
                     <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                     Class Average
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
-                <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
+                <th class="fixed-left {{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
                         {{ weightedMean | default('-') }}
                 </th>
                 {% if rankEnabled %}
@@ -122,8 +118,8 @@
             {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Min', key: 'min'} %}
             {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Max', key: 'max'} %}
             <tr class="sub-row">
-                <td>Visibility</td>
-                <td>&nbsp;</td>
+                <th class="fixed-left">Visibility</th>
+                <th class="fixed-left"></th>
                 {% if rankEnabled %}
                 <td>&nbsp;</td>
                 {% endif %}
@@ -157,7 +153,7 @@
             {% apply spaceless %}
             {% for student in markbook.students %}
             <tr data-student="{{ student.id }}">
-                <td class="profile-cell">
+                <th class="fixed-left white profile-cell">
                     <div class="compact card no-pad small-12">
                         <a href="/search/user/{{ student.id }}" title="View Profile">
                             {% if studentCount < functionDegradeLimit %}
@@ -166,7 +162,7 @@
                             <p>{{ student.lastname }}, {{ student.firstname }}</p>
                         </a>
                     </div>
-                </td>
+                </th>
 
                 {% set studentMean         = markbook.studentStatistics[student.id].weightedMean %}
                 {% set draftWeightedMean   = markbook.studentStatistics[student.id].draftWeightedMean %}
@@ -176,7 +172,7 @@
                 {% set draftsOffClass      = studentMean is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
                 {% set draftsOnClass       = draftWeightedMean is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
 
-                <td class="{{ draftsOffClass }} student-grade-cell"
+                <th class="fixed-left white {{ draftsOffClass }} student-grade-cell"
                     {% if draftWeightedMean %}data-student-average{% endif %}
                     data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                     {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
@@ -191,7 +187,7 @@
                            title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('-') }}
                         </a>
                     {% endif %}
-                </td>
+                </th>
                 {% if rankEnabled %}
                 <td>
                     {% if rank[student.id] is defined and meanNormalised %}
