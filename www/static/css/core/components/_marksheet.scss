@@ -9,15 +9,15 @@
     }
 }
 
-#courseMarkbookContent-container {
+#courseMarkbookContent,
+#report_content{
    padding-left: 1rem;
    padding-right: 1rem;
 }
 
-// Course markbook styles
 #courseMarkbookContent,
-.marksheet,
-#report_content {
+#report_content,
+.marksheet {
     // Legend
     .legend {
         .indicators {
