@@ -114,13 +114,14 @@ class QueryParamBuilder implements IQueryParamBuilder
                 "($relevancePart < :cursorRelevance)",
                 "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)",
                 "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)",
-                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND u.id > $idPart)",
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND $idPart > :cursorId)",
             ];
 
-            $whereParts[]          = '(' . implode(' OR ', $cursorSearchParts) . ')';
-            $params['cursorType']  = $cursor->type;
-            $params['cursorTitle'] = $cursor->title;
-            $params['cursorId']    = $cursor->id;
+            $whereParts[]              = '(' . implode(' OR ', $cursorSearchParts) . ')';
+            $params['cursorRelevance'] = $cursor->relevance;
+            $params['cursorType']      = $cursor->type;
+            $params['cursorTitle']     = $cursor->title;
+            $params['cursorId']        = $cursor->id;
         }
 
         $where = implode(' AND ', $whereParts);

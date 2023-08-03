@@ -102,6 +102,9 @@ class QueryParamBuilder implements IQueryParamBuilder
             )
             AS DECIMAL(2,2)
         )';
+        $titlePart     = 'n.title';
+        $typePart      = "'news'";
+        $idPart        = 'n.id';
 
         // Apply cursor
         // (Previous technique: < most relevant field, = most relevant and < next most relevant)
@@ -110,12 +113,14 @@ class QueryParamBuilder implements IQueryParamBuilder
         if ($cursor) {
             $cursorSearchParts = [
                 "($relevancePart < :cursorRelevance)",
-                "($relevancePart = :cursorRelevance AND n.title > :cursorTitle)",
-                "($relevancePart = :cursorRelevance AND n.title = :cursorTitle AND n.id > :cursorId)",
+                "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)",
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)",
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND $idPart > :cursorId)",
             ];
 
             $whereParts[]              = '(' . implode(' OR ', $cursorSearchParts) . ')';
             $params['cursorRelevance'] = $cursor->relevance;
+            $params['cursorType']      = $cursor->type;
             $params['cursorTitle']     = $cursor->title;
             $params['cursorId']        = $cursor->id;
         }
