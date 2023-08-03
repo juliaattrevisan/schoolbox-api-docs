@@ -268,6 +268,7 @@ interface External_UserInterface extends External\IConnector
      *         NetworkLogin,
      *         ActiveFlag,
      *         StaffTitle,
+     *         StaffFirstname,
      *         StaffPreferredName,
      *         StaffSurname,
      *         DefaultEmailCode,

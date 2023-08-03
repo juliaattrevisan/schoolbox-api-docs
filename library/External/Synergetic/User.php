@@ -1062,6 +1062,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStaff.SchoolStaffCode,
                         vStaff.StaffTitle,
                         vStaff.StaffPreferredName,
+                        vStaff.StaffGiven1 as StaffFirstname,
                         vStaff.StaffSurname,
                         vStaff.StaffOccupPhone,
                         vStaff.StaffOccupEmail,

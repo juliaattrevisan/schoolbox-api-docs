@@ -73,6 +73,25 @@ class Payload
                     $staff['profile_url'] = sprintf('/search/user/%s', $userId);
                 }
             }
+
+            /**
+             * Preferred Name Logic...
+             * If both fields exist and contain info (StaffFirstname / StaffPreferredName) use both
+             * only if they do not match... (it doesn't really work when you have `Alaress (Alaress)`
+             * else use the one that does have content
+             */
+            $staffPreferredName = $staff['StaffPreferredName'] ?? '';
+            $staffPreferredName = trim((string)$staffPreferredName);
+            $staffFirstname = $staff['StaffFirstname'] ?? '';
+            $staffFirstname = trim((string)$staffFirstname);
+            if (('' !== $staffPreferredName && '' !== $staffFirstname) && ($staffFirstname !== $staffPreferredName)) {
+                // Combine firstname / preferred name in the standard format
+                $staff['StaffFirstname'] = sprintf("%s (%s)", $staffFirstname, $staffPreferredName);
+            } elseif ('' !== $staffPreferredName) {
+                // Firstname doesn't exist, lets just use / display preferred name
+                $staff['StaffFirstname'] = $staffPreferredName;
+            }
+            // Firstname only exists, so just keep using it...
         }
 
         unset($staff);

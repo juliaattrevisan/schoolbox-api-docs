@@ -64,6 +64,7 @@ class External_Synergetic_Luc_User extends External_Synergetic_User
                         vStaff.SchoolStaffCode,
                         vStaff.StaffTitle,
                         vStaff.StaffPreferredName,
+                        vStaff.StaffGiven1 as StaffFirstname,
                         vStaff.StaffSurname,
                         vStaff.StaffOccupPhone,
                         vStaff.StaffOccupEmail,
