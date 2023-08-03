@@ -27,3 +27,10 @@ const href = window.Vue.computed(() => {
         {{ props.rowData[componentData.text] }}
     </a>
 </template>
+
+<style>
+/* prevent links from wrapping */
+a {
+    white-space: nowrap;
+}
+</style>
