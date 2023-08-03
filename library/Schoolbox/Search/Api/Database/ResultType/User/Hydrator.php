@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\User;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Image\Transformation\Storage;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
@@ -34,10 +37,13 @@ class Hydrator implements IHydrator
      *
      * @param UserMapper               $userMapper        Used to fetch users for hydration.
      * @param User\Formatter\Formatter $userNameFormatter Used to format a user's name on output.
+     * @param IConfigLoader            $config            Used for fetching configuration, which controls user search
+     *                                                    result availability.
      */
     public function __construct(
         private UserMapper $userMapper,
         private User\Formatter\Formatter $userNameFormatter,
+        private IConfigLoader $config,
     ) {
     }
 
@@ -56,13 +62,14 @@ class Hydrator implements IHydrator
     {
         // Find all users which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
-        $users           = $this->userMapper->findByColumn(
-            'id',
-            array_map(
-                fn (RawResult $match) => $match->id,
-                $acceptedMatches,
-            )
-        );
+
+        // Which user IDs?
+        $userIds = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
+        if (empty($userIds)) {
+            return [];
+        }
+
+        $users = $this->userMapper->findByPredicates($this->buildPredicateBuilder($userIds, $viewer));
 
         // Map those users to full results
         // TODO move this to base hydrator?
@@ -98,4 +105,42 @@ class Hydrator implements IHydrator
         );
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
     }
+
+    /**
+     * Build a predicate builder for the user search.
+     *
+     * @param array $userIds A list of user IDs to search for.
+     * @param User  $viewer  The user viewing the search results: this may
+     *                       filter out users from the result set.
+     * @return Builder
+     */
+    private function buildPredicateBuilder(array $userIds, User $viewer): Builder
+    {
+        $pb = $this->userMapper->getPredicateBuilder()->in('id', $userIds);
+
+        // Exclude disabled users if that config isn't on
+        if (!$this->config->get('show_disabled_users')) {
+            $pb = $pb->isTrue('enabled');
+        }
+
+        // Exclude roles from search
+        $excludedRoles = [];
+        if ($viewer->getRole()->isGuest()) {
+            $excludedRoles[] = Role::PARENT;
+            $excludedRoles[] = Role::STUDENT;
+        } elseif (!$viewer->getRole()->isStaff()) {
+            if (!$this->config->get('parent_search_enable')) {
+                $excludedRoles[] = Role::PARENT;
+            }
+            if (!$this->config->get('student_search_enable')) {
+                $excludedRoles[] = Role::STUDENT;
+            }
+        }
+
+        if (!empty($excludedRoles)) {
+            $pb = $pb->notIn('g.group_type', $excludedRoles);
+        }
+        return $pb;
+    }
+
 }
