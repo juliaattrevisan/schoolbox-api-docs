@@ -1,11 +1,4 @@
 .marksheet {
-    thead {
-        tr:first-child th:last-child {
-            // Make room for the final header (with the diagonal style)
-            padding-right: $rotate-span-width !important;
-        }
-    }
-
     .progress-tick {
         // Hack to avoid an unnecessary scrollbar caused by rotated elements
         margin-bottom: 0.8125rem;
@@ -14,6 +7,11 @@
     .excluded {
         background-color: #f9f9f9;
     }
+}
+
+#courseMarkbookContent-container {
+   padding-left: 1rem;
+   padding-right: 1rem;
 }
 
 // Course markbook styles
@@ -122,7 +120,6 @@
             background: $submit-button-bg-color;
             color: $submit-button-color;
             text-transform: uppercase;
-            //font-size: 12px;
             text-align: center;
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
@@ -160,6 +157,8 @@ table.dataTable.marksheet {
      * DataTables sets the width of these elements as an inline style attribute, so we need to use !important to override them.
      *
      * This means when the markbook is filtered, it will remain full-width.
+     *
+     * TODO: Remove this rule once DataTables has been removed from the Class Markbook and Rubric Markbook pages.
      */
     width: 100% !important;
 }

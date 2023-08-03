@@ -5,7 +5,6 @@ Usage:
 #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}
@@ -25,29 +24,7 @@ Usage:
 {% autoescape 'js' %}
     <script type="text/javascript">
         $(function() {
-            $('#{{ reportContentId }}').on('filterContentLoaded', function() {
-                var $table = $('[data-mark-sheet]');
-                // Use datatables to do fixed headers and left column
-                // Only do this on small up
-                var windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
-                if (windowWidthRems >= 40) {
-                    try{
-                        $table.DataTable({
-                            scrollX: true,
-                            scrollCollapse: true,
-                            paging: false,
-                            bFilter: false,
-                            bInfo: false,
-                            ordering: false,
-                            fixedColumns: {
-                                leftColumns: 1
-                            }
-                        });
-                    } catch (e){
-                        console.log(e);
-                    }
-                }
-
+            $('#{{ reportContentId }}').on('filterContentLoaded', function () {
                 $("#show-drafts").click(function () {
                     if ($(this).is(":checked")) {
                         $("[data-draft-mark]").show();
@@ -67,18 +44,30 @@ Usage:
                         });
                     }
                 });
+
+                // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
+                // menu or right notifications window.  Also we cannot listen for resize events on the container,
+                // because resize events only occur on the window.  This is a task for the ResizeObserver.
+                // @see https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
+                const container = document.querySelector("[data-diagonal-headings-table-container]");
+                const resizeObserver = new ResizeObserver(() => {
+                    container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
+                });
+                resizeObserver.observe(container);
             });
         });
     </script>
 {% endautoescape %}
 
 
-<div id="{{ reportContentId }}" class="row" data-loaded="0">
-    <div class="small-12 island" data-placeholder>
-        <section class="content">
-            <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
-        </section>
-    </div>
+<div id="{{ reportContentId }}-container">
+   <div id="{{ reportContentId }}" class="row" data-loaded="0">
+       <div class="small-12 island" data-placeholder>
+           <section class="content">
+               <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+           </section>
+       </div>
+   </div>
 </div>
 
 

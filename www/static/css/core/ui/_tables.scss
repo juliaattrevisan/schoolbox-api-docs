@@ -141,7 +141,6 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
 
 table {
     border-collapse: collapse;
-    width: 100%;
     line-height: 1.4;
     .card {
         padding: 0;
@@ -245,16 +244,76 @@ table:not(.no-hover) tbody tr:hover {
     }
 }
 
-$square-grid-td-size: 4rem;
+$diagonal-cell-width: 4rem;
 $rotate-width: 4.5rem;
 $rotate-angle: 45;
-$rotate-th-width: $square-grid-td-size;
+$rotate-th-width: $diagonal-cell-width;
 $rotate-span-width: 11rem;
 
-.square-grid {
+.diagonal-headings-table-container {
+    max-height: calc(100vh - 290px); /* 290px is the top offset of the .diagonal-headings-table-container when the page is in its widest layout.  Updated by Javascript on resize in courseMarkbookInner.twig */
+    overflow: auto;
+    padding-left: 0 !important;
+    width: 100%;
+}
+
+.diagonal-headings-table-container table {
+    width: 98%; /* Not 100% so that the rightmost column sloped heading is not completely hidden. */
+}
+
+.diagonal-headings-table {
+    thead {
+        tr.rotate-headers {
+            th {
+                border: 0;
+                position: sticky;
+                top: 0;
+            }
+
+            th:nth-child(1),
+            th:nth-child(2),
+            th:nth-child(1) > div {
+                background-color: $body-bg;
+            }
+        }
+
+        tr.course-headers {
+            th {
+                position: sticky;
+                top: $rotate-width * 2 + 1; /* To match '.rotate-headers th' height set below. */
+            }
+
+            th:nth-child(1) {
+                background-color: $body-bg !important;
+            }
+
+            th:nth-child(odd) {
+                filter: hue-rotate(-45deg);
+            }
+        }
+
+        th.fixed-left {
+            z-index: 4 !important; /* Z-index for top-left cells must be greater than z-index for top cells and left cells. */
+        }
+
+        th {
+            z-index: 3; /* Z-index for top cells must be greater than z-index for left cells. */
+        }
+    }
+
+    th.fixed-left {
+        position: sticky;
+        left: 0;
+        z-index: 2; /* Z-index for left cells. */
+    }
+
+    th.fixed-left:nth-child(2) {
+        left: 160px;
+    }
+
     td,
     thead th {
-        width: $square-grid-td-size;
+        min-width: $diagonal-cell-width;
         white-space: nowrap;
     }
 }
@@ -276,7 +335,6 @@ $rotate-span-width: 11rem;
         border-color: $vapor;
         height: $rotate-width * 2 + 1;
         min-width: $rotate-th-width;
-        max-width: $rotate-th-width;
         position: relative;
         vertical-align: bottom;
         padding: 0 !important;
@@ -285,8 +343,8 @@ $rotate-span-width: 11rem;
         > div {
             transform: skew(-#{$rotate-angle}deg, 0deg);
             overflow: hidden;
-            border: 0 solid #eeeeee;
-            border-left-width: 1px;
+            border: 0 solid #ccc;
+            border-right-width: 1px;
             z-index: 1;
             position: relative;
             height: 100%;
