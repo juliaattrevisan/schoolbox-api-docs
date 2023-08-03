@@ -31,14 +31,14 @@ interface IHydrator
     public function accepts(RawResult $match): bool;
 
     /**
-     * Hydrate raw matches into a proper result.
+     * Hydrate a set of raw matches into a proper result.
      *
      * This need not return a result for all `$matches`, but key associations
      * should be preserved so that the raw result may be associated with a full
      * result.
      *
      * @param array<int, RawResult> $matches A set of matches to hydrate.
-     * @param User                  $viewer
+     * @param User                  $viewer  The user viewing the search result.
      * @return array<int, FullResult|null>
      */
     public function hydrate(array $matches, User $viewer): array;

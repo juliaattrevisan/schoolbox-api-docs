@@ -18,7 +18,14 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * Hydrate a user match into an actual search result.
+ * Hydrate a set of raw user results into a set of full user results.
+ *
+ * Restrictions on displaying user results:
+ * - if `config.show_disabled_users` is off, do not show users which are not
+ *   enabled
+ * - guest users do not see parents and students; only staff and guests
+ * - non-staff users may only see parents or students if configured to be
+ *   allowed (`config.parent_search_enable`, `config.student_search_enable`)
  */
 class Hydrator implements IHydrator
 {

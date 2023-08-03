@@ -19,7 +19,12 @@ use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
 /**
- * Hydrate a news match into an actual search result.
+ * Hydrate a set of raw news results into a set of full news results.
+ *
+ * Restrictions on displaying news results:
+ * - any article a user may view may display in the user's search results:
+ *   an article's viewability is defined in
+ *   `\Schoolbox\Comms\News\Audience\ArticleResolver::findArticlesForUser`
  */
 class Hydrator implements IHydrator
 {

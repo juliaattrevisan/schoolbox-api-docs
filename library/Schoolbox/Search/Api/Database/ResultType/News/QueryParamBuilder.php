@@ -12,7 +12,6 @@ namespace Schoolbox\Search\Api\Database\ResultType\News;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Database\IQueryParamBuilder;
 use Schoolbox\Search\Api\Database\QueryParams;
