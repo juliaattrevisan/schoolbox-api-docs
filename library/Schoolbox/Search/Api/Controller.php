@@ -100,11 +100,6 @@ class Controller extends Base
                     $requestCursor  = $cursor->next(new Collection([$lastFullResult->rawResult]));
                     break;
                 }
-
-                // No more results: break
-                if (!isset($requestCursor)) {
-                    break;
-                }
             }
 
             // Finally output the response
