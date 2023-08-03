@@ -239,7 +239,7 @@ class Receiver
     /**
      * publish daily timetable and room changes to schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      * @throws Exception
      * @throws \JsonException
@@ -247,7 +247,7 @@ class Receiver
      * @throws \Throwable
      * @throws \UnexpectedValueException
      */
-    public function publishDailyData(Request|MockMessage $message): Response
+    public function publishDailyData(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -291,7 +291,7 @@ class Receiver
     /**
      * Publish students to the Schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      * @throws Exception
      * @throws \JsonException
@@ -299,7 +299,7 @@ class Receiver
      * @throws \Throwable
      * @throws \UnexpectedValueException
      */
-    public function publishClassMemberships(Request|MockMessage $message): Response
+    public function publishClassMemberships(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -427,7 +427,7 @@ class Receiver
     /**
      * Publish timetable to the Schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      * @throws Exception
      * @throws \InvalidArgumentException
@@ -435,7 +435,7 @@ class Receiver
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function publishBellTimes(Request|MockMessage $message): Response
+    public function publishBellTimes(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -540,14 +540,14 @@ class Receiver
     /**
      * Publish classes to the Schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      * @throws Exception
      * @throws \JsonException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function publishClasses(Request|MockMessage $message): Response
+    public function publishClasses(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -637,14 +637,14 @@ class Receiver
     /**
      * Publish timetable to the Schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      * @throws Exception
      * @throws \JsonException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function publishTimetable(Request|MockMessage $message): Response
+    public function publishTimetable(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -829,10 +829,10 @@ class Receiver
      *
      * Discovered via apache mod_dumpio
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      */
-    public function getRooms(Request|MockMessage $message): Response
+    public function getRooms(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -850,7 +850,7 @@ class Receiver
      * @param Request $message
      * @return Response
      */
-    public function publishTeachers(Request|MockMessage $message): Response
+    public function publishTeachers(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -865,10 +865,10 @@ class Receiver
     /**
      * Publish students to the Schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      */
-    public function publishStudents(Request|MockMessage $message): Response
+    public function publishStudents(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -883,10 +883,10 @@ class Receiver
     /**
      * Publish Calendar to the Schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      */
-    public function publishCalendar(Request|MockMessage $message): Response
+    public function publishCalendar(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -901,10 +901,10 @@ class Receiver
     /**
      * Publish Rooms to the Schoolbox
      *
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      */
-    public function publishRooms(Request|MockMessage $message): Response
+    public function publishRooms(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -921,10 +921,10 @@ class Receiver
 
     /**
      * https://liss.net.au/docs/api/hello/
-     * @param Request|MockMessage $message
+     * @param Request $message
      * @return Response
      */
-    public function hello(Request|MockMessage $message): Response
+    public function hello(Request $message): Response
     {
         return new Response(new Value([
             'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
