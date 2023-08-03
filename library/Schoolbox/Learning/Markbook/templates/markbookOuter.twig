@@ -140,6 +140,19 @@
             /* Controls for Averages and Dynamic updates for input fields
              */
             $('[data-mark-sheet]').marksheetAverages();
+
+            // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
+            // menu or right notifications window.  Also we cannot listen for resize events on the container,
+            // because resize events only occur on the window.  This is a task for the ResizeObserver.
+            // @see https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
+            // @see similar code in courseMarkbookOuter.twig.
+            const container = document.querySelector("[data-diagonal-headings-table-container]");
+            if (container !== null) {
+                const resizeObserver = new ResizeObserver(() => {
+                    container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
+                });
+                resizeObserver.observe(container);
+            }
         }).progressTickForm({
             // Save form for task completion: apply only to report content,
             // allow content to handle save
@@ -170,7 +183,6 @@
                 });
             }
         });
-
     });
 </script>
 {% endautoescape %}
