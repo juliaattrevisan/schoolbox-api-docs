@@ -50,10 +50,13 @@ Usage:
                 // because resize events only occur on the window.  This is a task for the ResizeObserver.
                 // @see https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
                 const container = document.querySelector("[data-diagonal-headings-table-container]");
-                const resizeObserver = new ResizeObserver(() => {
-                    container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
-                });
-                resizeObserver.observe(container);
+
+                if (container !== null) {
+                   const resizeObserver = new ResizeObserver(() => {
+                       container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
+                   });
+                   resizeObserver.observe(container);
+                }
             });
         });
     </script>
