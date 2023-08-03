@@ -9,7 +9,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Permission\Access\UserAccess;
 
-
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
     // Should match the DB value
