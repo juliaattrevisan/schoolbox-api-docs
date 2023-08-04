@@ -23,14 +23,14 @@ const href = window.Vue.computed(() => {
 </script>
 
 <template>
-    <a :href="(href as string)" :title="props.componentData.title">
+    <a :href="(href as string)" :title="props.componentData.title" :data-no-wrap="props.componentData.hasNoWrap">
         {{ props.rowData[componentData.text] }}
     </a>
 </template>
 
 <style scoped>
 /* prevent links from wrapping */
-a {
+[data-no-wrap="true"] {
     white-space: nowrap;
 }
 </style>
