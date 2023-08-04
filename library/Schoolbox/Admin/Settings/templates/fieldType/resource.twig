@@ -9,7 +9,7 @@
             allowedFiles: false,
             allowedFilesystems: 'folder',
             onSelect: function(url, name, mime, dialog) {
-                $('#{{ name }}').val(url);
+                $('#{{ name }}-field').val(url);
             }
         });
     });
