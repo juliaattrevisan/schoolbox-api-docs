@@ -254,11 +254,7 @@ class External_Schoolbox_User implements External_UserInterface
         $overridesTeachers = [];
         $config = \Schoolbox\Config\Loader::getInstance();
 
-        /* Only need to do this if you are using one of the SUDS Timetable connectors
-         * to populate data that we must investigate
-         *
-         * All you classical grid users can skip this step
-         */
+
         $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
         $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
 
