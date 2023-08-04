@@ -43,15 +43,23 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         $di = $page->getDi();
         $ltiEnabled = $di->get('config')->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
 
-//        html_entity_decode()
-        $configValue = ('' !== $configValue) ? json_decode(html_entity_decode($configValue)) : $this->getOptions($ltiEnabled);
+        // if config doesn't exist, then default to the get options...
+        if ('' === $configValue) {
+            $setConfig = $this->getOptions($ltiEnabled);
+        } else {
+            $setConfig = json_decode(html_entity_decode($configValue));
+            // in the event of an error return the blank entries ...
+            if (null === $setConfig) {
+                $setConfig = $this->getOptions($ltiEnabled);
+            }
+        }
 
         // has an internal block for the checkboxes
         $page->setBlock($keyblock, 'filters', 'filters_block');
         $page->setVar('filters_block', '');
 
         /* filter config */
-        foreach ($configValue as $option => $value) {
+        foreach ($setConfig as $option => $value) {
             $page->setVar(array(
                               'COMPONENT_CONFIG_FILTER_VALUE'     => $option,
                               'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($option),
