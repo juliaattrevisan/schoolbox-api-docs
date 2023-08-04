@@ -79,7 +79,7 @@
             </tr>
 
             <tr class="average-headers" data-hidable-columns>
-                <th class="fixed-left white profile-cell">
+                <th class="fixed-left white profile-cell average-expander">
                     <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                     Class Average
                 </th>
@@ -154,14 +154,17 @@
             {% for student in markbook.students %}
             <tr data-student="{{ student.id }}">
                 <th class="fixed-left white profile-cell">
-                    <div class="compact card no-pad small-12">
-                        <a href="/search/user/{{ student.id }}" title="View Profile">
+                    <div class="sb-card">
+                        <div class="sb-card__main">
                             {% if studentCount < functionDegradeLimit %}
-                                {% include 'include/portrait.twig' with {user: student} only %}
+                                {% include 'include/portrait.twig' with {user: student, render: "rounded"} only %}
                             {% endif %}
-                            <p>{{ student.lastname }}, {{ student.firstname }}</p>
-                        </a>
+                            <div class="sb-card__main-content">
+                                <a href="">{{ student.lastname }}, {{ student.firstname }}</a>
+                            </div>
+                        </div>
                     </div>
+
                 </th>
 
                 {% set studentMean         = markbook.studentStatistics[student.id].weightedMean %}

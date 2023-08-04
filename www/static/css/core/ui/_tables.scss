@@ -287,6 +287,10 @@ $rotate-span-width: 11rem;
         }
 
         tr.average-headers {
+            th.average-expander {
+               padding: 0.5rem !important;
+            }
+
             th {
                 background-color: $white !important;
             }
@@ -308,6 +312,12 @@ $rotate-span-width: 11rem;
 
         th {
             z-index: 3; /* Z-index for top cells must be greater than z-index for left cells. */
+        }
+    }
+
+    tbody {
+        th.profile-cell {
+            font-weight: normal;
         }
     }
 

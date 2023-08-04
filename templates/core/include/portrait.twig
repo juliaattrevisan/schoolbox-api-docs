@@ -93,6 +93,11 @@
         {% set sizeParameter = sizeParameter ~ "square64" %}
     {% endif %}
 
+    {% if render == "rounded" %}
+    <div class="img img--s img--round">
+       <div class="img__wrapper">
+    {% endif %}
+
     <img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
         {% if class is not empty %}
             class="{{ class }}"
@@ -111,4 +116,9 @@
             title="{{ userDescription }}"
         {% endif %}
     />
+
+    {% if render == "rounded" %}
+        </div>
+    </div>
+    {% endif %}
 {% endif %}
