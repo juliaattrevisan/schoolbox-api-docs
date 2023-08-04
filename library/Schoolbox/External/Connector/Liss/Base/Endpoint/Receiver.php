@@ -17,8 +17,10 @@ use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
@@ -120,6 +122,14 @@ class Receiver
      * @var TimetableCycle[]
      */
     private array $cycleCache = [];
+
+
+    /**
+     * A list of classEntries that we saw previously
+     *
+     * @var array
+     */
+    private array $classEntries = [];
 
 
     /**
@@ -570,12 +580,29 @@ class Receiver
 
         foreach ($allData as $currentData) {
             $struct = $currentData->me['struct'];
+            $className = trim((string)$struct['CourseName']->me['string']);
+            $classCode = trim((string)$struct['ClassCode']->me['string']);
 
-            $classEntry = $classEntryMapper->createModel()
-                ->setName((string)$struct['CourseName']->me['string'])
-                ->setCode(trim((string)$struct['ClassCode']->me['string']));
+            /* Constraints in the schema are case insensitive, unlike
+             * these array keys - class codes sometimes appear like
+             * "Speech Therapy" and "Speech therapy" so inserting them
+             * twice will cause it to pack a sad. The classEntries array
+             * treats these as unique whereas the db didn't
+             */
+            $existingKey = strtolower($classCode);
 
-            $classEntryMapper->save($classEntry);
+            if (isset($this->classEntries[$existingKey])) {
+                $classEntry = $this->classEntries[$existingKey];
+            } else {
+                $classEntry = $classEntryMapper->createModel()
+                    ->setName($className)
+                    ->setCode($classCode);
+
+                $classEntryMapper->save($classEntry);
+
+                $this->classEntries[$existingKey] = $classEntry;
+            }
+
             $classCount++;
         }
 
