@@ -26,7 +26,7 @@ $app = new class extends CliTool\App
 
         // All instances of the old image slider component
         // We only need to transfer components on the dashboard as the image slider was never used on homepages
-        $this->getLogger()->info("Updating existing Course outline components to contian the new filter config option");
+        $this->getLogger()->info("Updating existing Course outline components to contain the new filter config option");
 
         foreach ($oldInstances as $oldInstance) {
             $this->getLogger()->info("  Updating instance: " . $oldInstance['id'] . "...");
