@@ -263,7 +263,7 @@ export default {
         </div>
 
         <div v-else-if="hasDataLoadError" class="alert-box alert">
-            Sorry, we are currently unable to load the student data. Please contact your support it the problem
+            Sorry, we are currently unable to load the student data. Please contact your support if the problem
             persists.
         </div>
 

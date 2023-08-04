@@ -486,7 +486,7 @@ export default {
             <div v-else-if="hasDataLoadError">
                 <section class="content">
                     <div tableData-alert class="alert-box alert">
-                        Sorry, we are currently unable to load the similarity report. Please contact your support it the
+                        Sorry, we are currently unable to load the similarity report. Please contact your support if the
                         problem persists.
                     </div>
                 </section>
