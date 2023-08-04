@@ -1737,7 +1737,7 @@ class MapperProxy
             );
         }
 
-        // Assessment type filter
+        // Assessment type filter single
         if (isset($options['type'])) {
             switch ($options['type']) {
                 case AssessmentType::TYPE_DUE_WORK:
@@ -1765,6 +1765,40 @@ class MapperProxy
 
                 default:
                     break;
+            }
+        }
+
+        // Assessment type filter multiple
+        if (isset($options['typeList'])) {
+            foreach ($options['typeList'] as $type) {
+                switch ($type) {
+                    case AssessmentType::TYPE_DUE_WORK:
+                        $builder->notNull('d.id');
+                        break;
+
+                    case AssessmentType::TYPE_TASK:
+                        $builder->notNull('t.id');
+                        break;
+
+                    case AssessmentType::TYPE_QUIZ:
+                        $builder->notNull('q.assess_id');
+                        break;
+
+                    case AssessmentType::TYPE_LTI_ASSESSMENT:
+                        $builder->notNull('l.id');
+                        break;
+
+                    case AssessmentType::TYPE_PROJECT:
+                        $builder->notNull('p.id');
+                        break;
+
+                    case AssessmentType::TYPE_LESSON_PLAN:
+                        $builder->notNull('lessonPlan.id');
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
 

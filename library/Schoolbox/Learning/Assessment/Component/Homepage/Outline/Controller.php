@@ -18,6 +18,7 @@ use Component_Instance;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -132,6 +133,39 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $this->courseImplementation = null;
+        $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
+        /** initial hack build for filters... */
+        $assessmentTypes = [];
+        foreach ($filters as $assessment => $value) {
+            if ("0" === $value) {
+                continue;
+            }
+            switch ($assessment) {
+                case AssessmentType::TYPE_DUE_WORK:
+                    $assessmentTypes[] = AssessmentType::TYPE_DUE_WORK;
+                    break;
+
+                case AssessmentType::TYPE_TASK:
+                    $assessmentTypes[] = AssessmentType::TYPE_TASK;
+                    break;
+
+                case AssessmentType::TYPE_QUIZ:
+                    $assessmentTypes[] = AssessmentType::TYPE_QUIZ;
+                    break;
+
+                case AssessmentType::TYPE_LTI_ASSESSMENT:
+                    $assessmentTypes[] = AssessmentType::TYPE_LTI_ASSESSMENT;
+                    break;
+
+                case AssessmentType::TYPE_PROJECT:
+                    $assessmentTypes[] = AssessmentType::TYPE_PROJECT;
+                    break;
+
+                case AssessmentType::TYPE_LESSON_PLAN:
+                    $assessmentTypes[] = AssessmentType::TYPE_LESSON_PLAN;
+                    break;
+            }
+        }
 
         // Don't attempt to load course if not configured.
         if ($courseImplId) {
@@ -156,12 +190,13 @@ class Controller extends Component_Homepage_ControllerAbstract
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
                         $user->getRole()->isParent() ? null : $user,
+                        ['typeList' => $assessmentTypes]
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
             } else {
                 // I'm an instructor - load all participants.
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds);
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds, options: ['typeList' => $assessmentTypes]);
             }
 
             // And then add them to the displayed course impl
