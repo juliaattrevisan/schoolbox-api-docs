@@ -4,7 +4,7 @@
 export interface ColumnConfig {
     key: string; // the key within the row data to display in each column
     heading: string; // the heading of each column
-    class: string; // to allow any custom styling, such as hiding a column on smaller screens
+    class?: string; // to allow any custom styling, such as hiding a column on smaller screens
     isSortable?: boolean; // to disable sorting of a column, by default all columns are sortable
     template?: TemplateConfig; // to allow custom templates to be used in the column
 }
@@ -23,8 +23,10 @@ export interface TemplateConfig {
  */
 export interface LinkComponentData {
     text: string; // the text to display, typically a data key
+    href: string; // the href to link to, typically a data key
     title: string; // the title text for the link
     prependHref?: string; // to prepend the href with something like mailto: or tel:
+    hasNoWrap?: boolean; // to disable wrapping of the text
 }
 
 /**

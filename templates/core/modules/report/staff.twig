@@ -8,6 +8,7 @@
 
 <div id="data-table-container">
     <data-table
+        id="staff-directory-table"
         title="Staff Directory"
         endpoint="{{ routeLookupIfAuthorized('staffDirectory.getPayload') }}"
         {# To allow schools to alter whats displayed in the columns #}
@@ -37,6 +38,7 @@
                     text: "StaffFirstname",
                     href: "profile_url",
                     title: "View profile",
+                    hasNoWrap: true,
                 },
             },
         } %}
@@ -49,6 +51,7 @@
                     text: "StaffSurname",
                     href: "profile_url",
                     title: "View profile",
+                    hasNoWrap: true,
                 },
             },
         } %}
@@ -77,6 +80,7 @@
                     href: "StaffOccupPhone",
                     prependHref: "tel:",
                     title: "Phone user",
+                    hasNoWrap: true,
                 },
             },
         } %}
@@ -94,6 +98,7 @@
                     href: "StaffOccupEmail",
                     prependHref: "mailto:",
                     title: "Email user",
+                    hasNoWrap: true,
                 }
             },
         } %}
@@ -134,6 +139,6 @@
 .portrait-td {
     /* prevent the image column from scaling, keeping it a fixed width */
     max-width: 90px;
-    min-width: 90px;
+    min-width: 70px;
 }
 </style>

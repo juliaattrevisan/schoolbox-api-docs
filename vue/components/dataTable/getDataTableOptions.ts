@@ -8,13 +8,13 @@ import type { TableOptions } from "@schoolboxVue/components/vueTables2/types/vue
 import type { ColumnConfig } from "./types/dataTableTypes";
 
 /**
- * to return an object where each heading is the key and the value is the class
+ * to return an object where each heading is the key and the value is the class if set
  * @param {ColumnConfig[]} columnConfig - the configuration for the columns
  * @returns {TableOptions} the columns that have custom classes linked
  */
 function getColumnsClasses(columnConfig: ColumnConfig[]) {
     const columnsClasses = columnConfig.reduce((accumulator: Record<string, string>, column: ColumnConfig) => {
-        accumulator[column.key] = column.class;
+        accumulator[column.key] = column.class ?? "";
         return accumulator;
     }, {});
     return { columnsClasses };
