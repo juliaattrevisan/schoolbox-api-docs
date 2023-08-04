@@ -10,9 +10,9 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
      *
      * @return array<string, string>
      */
-    protected function getOptions(bool $ltiEnabled): array
+    protected function getOptions(): array
     {
-        $types = [
+        return [
             'dueWork'    => Assessment\DueWork\Model::getDefaultTypeName(),
             'quiz'       => Assessment\Quiz\Model::getDefaultTypeName(),
             'task'       => Assessment\Task\Model::getDefaultTypeName(),
@@ -20,11 +20,6 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
             'lti'        => Assessment\Lti\Model::getDefaultTypeName(),
             'lessonPlan' => Assessment\LessonPlan\Model::getDefaultTypeName(),
         ];
-
-        if (!$ltiEnabled) {
-            unset($types['lti']);
-        }
-        return $types;
     }
 
     /**
@@ -45,13 +40,18 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
 
         // if config doesn't exist, then default to the get options...
         if ('' === $configValue) {
-            $setConfig = $this->getOptions($ltiEnabled);
+            $setConfig = $this->getOptions();
         } else {
-            $setConfig = json_decode(html_entity_decode($configValue));
+            $setConfig = json_decode(html_entity_decode($configValue), true);
             // in the event of an error return the blank entries ...
             if (null === $setConfig) {
-                $setConfig = $this->getOptions($ltiEnabled);
+                $setConfig = $this->getOptions();
             }
+        }
+
+        // if LTI is not enabled then remove that entry
+        if (!$ltiEnabled) {
+            unset($setConfig['lti']);
         }
 
         // has an internal block for the checkboxes
