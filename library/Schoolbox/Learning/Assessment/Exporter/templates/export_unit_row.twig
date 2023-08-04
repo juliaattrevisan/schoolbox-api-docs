@@ -43,7 +43,10 @@
         </div>
         <div class="card small-12">
             <span class="size-32 icon-home"></span>
-            <h3><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></h3>
+            <h3>
+                <a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a>
+                <span class='pipe meta'>Imported on {{ courseImpl.createdAt.long }}</span>
+            </h3>
             <p class="meta">
                 {% if not isInstructor %}
                     You don't have write permission for this class.
