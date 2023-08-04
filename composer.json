@@ -93,7 +93,6 @@
         "oat-sa/lib-lti1p3-core": "^6.2",
         "oat-sa/lib-lti1p3-ags": "^1.1",
         "cache/array-adapter": "^1.1",
-        "lsolesen/pel": "^0.9.10",
         "ext-ldap": "*",
         "oat-sa/lib-lti1p3-deep-linking": "^4.0",
         "oat-sa/lib-lti1p3-nrps": "^7.0",
@@ -110,7 +109,8 @@
         "phlak/splat": "^4.0",
         "gotenberg/gotenberg-php": "^1.1",
         "guzzlehttp/psr7": "^2.4",
-        "learnosity/learnosity-sdk-php": "^1.0"
+        "learnosity/learnosity-sdk-php": "^1.0",
+        "fileeye/pel": "^0.9"
     },
     "autoload-dev": {
       "psr-4": {

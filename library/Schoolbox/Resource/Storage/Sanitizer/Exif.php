@@ -91,44 +91,47 @@ class Exif implements ISanitizer
             return null;
         }
 
-        // quickly check whether this image contains gps info
-        $image = new \Imagick();
-        try {
-            $image->readImageBlob($contents);
-            $gpsProps = $image->getImageProperties('*GPS*');
-            $image->clear();
-            if (empty($gpsProps)) {
-                return null;
-            }
-        } catch (\ImagickException $e) {
-            return null;
-        }
-
         // use PelJpeg to strip GPS data
         $pelImage = new PelJpeg();
         try {
+            /*
+             * Load the data from the PelDataWindow into PelJpeg object.
+             * No copying of data will be done, the PelJpeg object will
+             * simply remember that it is to ask the PelDataWindow for data when
+             * required.
+             */
             $pelImage->load(new PelDataWindow($contents));
         } catch (PelException $e) {
             return null;
         }
 
         $exif = $pelImage->getExif();
-        if ($exif) {
-            $tiff    = $exif->getTiff();
-            $ifd     = $tiff->getIfd();
-            $subIfds = $ifd->getSubIfds();
-            foreach ($subIfds as $subIfd) {
-                foreach (self::GPS_TAGS as $gpsTag) {
-                    if ($subIfd->offsetExists($gpsTag)) {
-                        $subIfd->offsetUnset($gpsTag);
-                    }
-                }
-                $ifd->addSubIfd($subIfd);
-            }
-            $tiff->setIfd($ifd);
-            $exif->setTiff($tiff);
-            $pelImage->setExif($exif);
+        if (!$exif) {
+            // no change required
+            unset($pelImage);
+            return null;
         }
+        $changed = false;
+        $tiff    = $exif->getTiff();
+        $ifd     = $tiff->getIfd();
+        $subIfds = $ifd->getSubIfds();
+        foreach ($subIfds as $subIfd) {
+            foreach (self::GPS_TAGS as $gpsTag) {
+                if ($subIfd->offsetExists($gpsTag)) {
+                    $subIfd->offsetUnset($gpsTag);
+                    $changed = true;
+                }
+            }
+            $ifd->addSubIfd($subIfd);
+        }
+        if (!$changed) {
+            // no change required
+            unset($pelImage);
+            return null;
+        }
+        $tiff->setIfd($ifd);
+        $exif->setTiff($tiff);
+        $pelImage->setExif($exif);
         return $pelImage->getBytes();
     }
 }
