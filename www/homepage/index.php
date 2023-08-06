@@ -81,7 +81,7 @@ if (!empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL))) {
     $redirect    = (new \External\Canvas\Redirect\RedirectFactory(
         (string)$this->getDi()->get('config')->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
         (string)$this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL),
-        new CanvasDb(),
+        new CanvasDb($this->getDi()->get('config')),
         $folderMapper
     ))->produce();
 

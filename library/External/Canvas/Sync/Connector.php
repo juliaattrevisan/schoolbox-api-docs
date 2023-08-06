@@ -13,12 +13,15 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\External;
 use SensitiveParameter;
 
 /**
  * Responsible for fetching data from canvas api
+ * @deprecated
  */
 class Connector
 {
@@ -28,22 +31,72 @@ class Connector
     /** array keys to get specific information from response */
     public const SCHEMA_VERSION = 'schemaVersion';
 
-    /** @var string */
-    private $apiKey;
-
-    /** @var string */
-    private $apiSecret;
-
     /**
-     * @param string $apiKey
-     * @param string $apiSecret
+     * @param string          $apiKey
+     * @param string          $apiSecret
+     * @param LoggerInterface $logger
+     * @param bool            $perform
+     * @deprecated
      */
-    public function __construct(#[SensitiveParameter] string $apiKey, string $apiSecret)
+    public function __construct(#[SensitiveParameter] private string $apiKey, private string $apiSecret, private LoggerInterface $logger, private bool $perform)
     {
-        $this->apiKey = $apiKey;
-        $this->apiSecret = $apiSecret;
     }
 
+    /**
+     * Downloads data from CanvasData API and saves to local temp files
+     * Moved from CLIImporter to easily be replaced with Data2Connector
+     * @param string $tempDir
+     * @param string $schemaFile
+     * @return array
+     */
+    public function fetchCanvasDataFilesFromApi(string $tempDir, string $schemaFile): array
+    {
+        $dumpFile = $tempDir . '/dump.json';
+
+        // Fetch latest dump
+        $this->logger->notice('Getting latest data urls.');
+        try {
+            $dumpResponse = $this->fetchLatestDump();
+        } catch (External\Exception $e) {
+            $this->logger->warning('Could not get dump file.' . $e->getMessage());
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        $dump = json_decode($dumpResponse, true);
+        $this->logger->notice("Getting schema version {$dump[$this::SCHEMA_VERSION]}.");
+
+        try {
+            $schemaResponse = $this->fetchSchema($dump[$this::SCHEMA_VERSION]);
+        } catch (External\Exception $e) {
+            $this->logger->warning('Could not fetch schema.' . $e->getMessage());
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        $this->storeTempFile($dumpResponse, $dumpFile);
+        $this->storeTempFile($schemaResponse, $schemaFile);
+
+        // Download data files
+        $this->logger->notice('Downloading latest data.');
+        return $dump['artifactsByTable'];
+    }
+
+    /**
+     * Stores response to a file
+     *
+     * Will only overwrite a previously saved file if tool running in 'perform' mode
+     *
+     * @param string $response
+     * @param string $path
+     */
+    private function storeTempFile(string $response, string $path): void
+    {
+        $this->logger->debug("Saving temp file to path '$path'");
+        if ($this->perform || !file_exists($path)) {
+            $fp = fopen($path, 'wb');
+            fwrite($fp, $response);
+            fclose($fp);
+        }
+    }
 
     /**
      * @return string

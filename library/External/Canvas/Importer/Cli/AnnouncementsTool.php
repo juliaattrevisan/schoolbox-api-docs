@@ -139,7 +139,7 @@ HELP;
             $strategyFactory = $this->getDi()->get('commsNewsAudienceStrategyFactory');
 
             (new \External\Canvas\Importer\Announcements(
-                new \External\Canvas\Importer\CanvasDb(),
+                new \External\Canvas\Importer\CanvasDb($this->getConfig()),
                 new \External\Canvas\Importer\Api(
                     $this->getConfig()->get('canvas_url'),
                     $bearerToken

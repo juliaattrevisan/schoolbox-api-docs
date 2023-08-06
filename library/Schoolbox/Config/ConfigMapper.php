@@ -117,6 +117,8 @@ class ConfigMapper extends Mapper
     public const _CANVAS_DATA_API_KEY    = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET = 'canvas_data_api_secret';
     public const _CANVAS_URL             = 'canvas_url';
+    public const _CANVAS_DATA2_CLIENT_ID = 'canvas_data2_client_id';
+    public const _CANVAS_DATA2_SECRET    = 'canvas_data2_secret';
 
     public const NAME_OTFS_ADAPTER                   = 'otfs_adapter';
     public const NAME_OTFS_S3_BUCKET                 = 'otfs_s3_bucket';

@@ -26,6 +26,8 @@ use function substr;
 
 /**
  * Responsible for fetching data from canvas into staging database
+ * @deprecated
+ * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
  */
 class DataRestorer
 {
@@ -34,13 +36,16 @@ class DataRestorer
      * @param LoggerInterface $log
      * @param string          $canvasDbName
      * @param bool            $persistChanges If false, don't persist changes to staging database
+     * @param array           $tableNames
+     * @param array           $schema
      */
     public function __construct(
         private IConnector $canvasDb,
         private LoggerInterface $log,
         private string $canvasDbName,
         private bool $persistChanges,
-        private array $tableNames
+        private array $tableNames,
+        private array $schema
     ) {
     }
 
@@ -48,19 +53,18 @@ class DataRestorer
     /**
      * Creates schema from schema json file.
      *
-     * @param array $schema
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function restoreSchema(array $schema): void
+    public function restoreSchema(): void
     {
         $this->dropCanvasDbTables();
 
         $this->log->notice("Re-creating DB schema...");
         $errors = false;
-        foreach ($schema as $tableIndex => $tableData) {
-            $columns     = $tableData['columns'];
-            $tableName   = $tableData['tableName'];
+        foreach ($this->schema as $tableIndex => $tableData) {
+            $columns   = $tableData['columns'];
+            $tableName = $tableData['tableName'];
             if (!in_array($tableName, $this->tableNames)) {
                 continue;
             }
@@ -110,8 +114,9 @@ class DataRestorer
      * @param string $tableName
      * @param string $tableFile
      * @param bool   $truncateTable
+     * @param bool   $ignoreFirstLine Whether the first row of the data file is header
      */
-    public function restoreTableData(string $tableName, string $tableFile, bool $truncateTable): void
+    public function restoreTableData(string $tableName, string $tableFile, bool $truncateTable, bool $ignoreFirstLine): void
     {
         // truncate table only when requested
         // this should be true, when loading data to this table for the first time
@@ -121,6 +126,9 @@ class DataRestorer
         }
 
         $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
+        if ($ignoreFirstLine) {
+            $sql .= ' IGNORE 1 LINES';
+        }
         try {
             $this->executeIfPersisting($sql);
         } catch (Database\Exception $e) {
@@ -147,9 +155,9 @@ class DataRestorer
     public function addExtraIndexes(): void
     {
         $extra = [
-             'course_section_dim' => [
-                 'sis_source_id',
-             ],
+            'course_section_dim' => [
+                'sis_source_id',
+            ],
         ];
         foreach ($extra as $tableName => $columnNames) {
             foreach ($columnNames as $columnName) {
@@ -162,7 +170,7 @@ class DataRestorer
     /**
      * Convert a logical data type to a concrete MySQL data type
      *
-     * @param string      $columnType
+     * @param string   $columnType
      * @param null|int $columnLength
      * @return string
      */
@@ -254,11 +262,11 @@ class DataRestorer
      *
      * @throws Database\Exception
      */
-    private function dropCanvasDbTables(): void
+    public function dropCanvasDbTables(): void
     {
         $this->log->notice("Dropping all tables from {$this->canvasDbName}");
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 0');
-        $tables = $this->canvasDb->executeQuery(
+        $tables      = $this->canvasDb->executeQuery(
             'SELECT table_name FROM information_schema.tables WHERE table_schema = :db_name',
             ['db_name' => $this->canvasDbName]
         )->fetchAll(PDO::FETCH_COLUMN);
@@ -280,7 +288,7 @@ class DataRestorer
      * @param string $columnName
      * @throws Database\Exception
      */
-    private function addIndex(string $tableName, string $columnName): void
+    public function addIndex(string $tableName, string $columnName): void
     {
         $indexName = "idx_{$tableName}_{$columnName}";
         // If index is too long, shorten it to something that very likely will be sufficiently unique
@@ -298,9 +306,10 @@ class DataRestorer
      * @param string $sql
      * @throws Database\Exception
      */
-    private function executeIfPersisting(string $sql): void
+    public function executeIfPersisting(string $sql): void
     {
         if ($this->persistChanges) {
+            $this->log->debug($sql);
             $this->canvasDb->execute($sql);
         }
     }
