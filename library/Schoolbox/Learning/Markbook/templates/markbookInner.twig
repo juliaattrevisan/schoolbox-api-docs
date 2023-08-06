@@ -156,9 +156,9 @@
                 <th class="fixed-left white profile-cell">
                     <div class="sb-card">
                         <div class="sb-card__main">
-                                {% if studentCount < functionDegradeLimit %}
-                                    {% include 'include/portrait.twig' with {user: student, render: "rounded"} only %}
-                                {% endif %}
+                            {% if studentCount < functionDegradeLimit %}
+                                {% include 'include/portrait.twig' with {user: student, render: "rounded"} only %}
+                            {% endif %}
                             <div class="sb-card__main-content">
                                 <a href="/search/user/{{ student.id }}" title="View Profile">{{ student.lastname }}, {{ student.firstname }}</a>
                             </div>
