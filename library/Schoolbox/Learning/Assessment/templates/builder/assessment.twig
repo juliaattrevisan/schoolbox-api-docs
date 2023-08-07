@@ -2,7 +2,8 @@
 Usage:
     {% include '@learningAssessment/builder/unitAssessment.twig' with {
             _writable:   bool,
-            assessment:  IAssessable
+            assessment:  IAssessable,
+            USER:        User
     } only %}
 #}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
