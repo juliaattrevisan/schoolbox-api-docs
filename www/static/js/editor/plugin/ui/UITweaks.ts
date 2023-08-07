@@ -14,6 +14,7 @@ export default class PanelTweaks extends Plugin {
     init() {
         this.editor.sourceElement.addEventListener(EditorEvent.EDITOR__CREATED, () => {
             this.updateDropdownPositions();
+            this.checkForModal();
         });
     }
 
@@ -47,5 +48,26 @@ export default class PanelTweaks extends Plugin {
                 }).name;
             });
         });
+    }
+
+    /**
+     * if the editor is inside a reveal modal, we need to make sure
+     * the balloon is on top of the modal, otherwise it will be hidden underneath
+     */
+    checkForModal() {
+        // a modal is typically set to 1005, so we need to be higher than that
+        const zIndex = "1010";
+        if (this.editor.sourceElement.closest("[data-reveal]")) {
+            const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
+            // fired when the balloon is shown or hidden by any UI
+            contextualBalloon.on("change:visibleView", (eventInfo, name, value) => {
+                const balloonElement = value?.element.parentElement.parentElement.parentElement;
+                if (balloonElement && balloonElement.style.zIndex !== zIndex) {
+                    balloonElement.style.zIndex = zIndex;
+                    // we also need to add the editor id to the balloon so we can potentially access it later
+                    balloonElement.setAttribute("data-baloon-editor-id", this.editor.id);
+                }
+            });
+        }
     }
 }
