@@ -4,10 +4,16 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 
 export default class PanelTweaks extends Plugin {
+    /**
+     * We need to ensure everything has been set up before we can start modifying the panels
+     */
     init() {
-        this.updatePanelPositions();
+        this.editor.sourceElement.addEventListener(EditorEvent.EDITOR__CREATED, () => {
+            this.updatePanelPositions();
+        });
     }
 
     /**
@@ -24,6 +30,7 @@ export default class PanelTweaks extends Plugin {
     updatePanelPositions() {
         const buttonTitles = ["Insert media", "Emoji", "Insert table", "Other"];
         const toolbarItems = this.editor.ui.view.toolbar.items._items;
+        console.warn(toolbarItems.length);
         toolbarItems.forEach((item) => {
             if (buttonTitles.includes(item.buttonView?.label)) {
                 // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#static-member-defaultPanelPositions
