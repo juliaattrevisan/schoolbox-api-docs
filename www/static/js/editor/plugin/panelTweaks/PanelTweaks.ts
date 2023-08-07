@@ -31,12 +31,13 @@ export default class PanelTweaks extends Plugin {
              * When the dropdown is opened, we need to update the position of the dropdown.
              * As these listeners are assigned after the toolbar has been created, they will be executed
              * after the listener assigned within the toolbar item.
+             * We just replicate the logic used in https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#function-render
+             * but add .limiter to the getOptimalPosition util method.
              */
             item.on("change:isOpen", (eventInfo, name, isOpen) => {
                 if (!isOpen) {
                     return;
                 }
-                // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_utils_dom_position.html#function-getOptimalPosition for more info
                 item.panelView.position = getOptimalPosition({
                     element: item.panelView.element!,
                     target: item.buttonView.element!,
