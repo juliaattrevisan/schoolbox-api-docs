@@ -49,6 +49,14 @@ class Replay extends CliTool\App
 
 
     /**
+     * --source
+     *
+     * Optional source name; otherwise defaults to the Factory's const
+     */
+    private const OPT_LONG_SOURCE = 'source:';
+
+
+    /**
      * Payloads state which endpoint they went to, but with a prefix
      * that we don't use.
      */
@@ -63,6 +71,7 @@ class Replay extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_FILE,
+            self::OPT_LONG_SOURCE,
         ];
     }
 
@@ -80,11 +89,15 @@ LISS Payload Replay
 Reloads a saved log file into your vagrant to replicate what schools would have
 done with Edval/Timetabler pushes without needing their human to click the button.
 
+You can specify a string to denote source of data which fulfils sis_event.source,
+but it only works for the publishDailyData endpoint. Leaving it unset will cause
+it to use the default value "suds_liss".
+
 This is a diagnostic tool and always persists changes.
 
-Usage: replay.php --input logfile.log
+Usage: replay.php --file=... [--source=...]
 
-Example: replay.php --input suds_liss_dailydata_20230803_155733.log
+Example: replay.php --file=./suds_liss_dailydata_20230803_155733.log --source=examplesource
 
 
 HELP;
@@ -133,7 +146,14 @@ HELP;
 
         $config = $this->getConfig();
 
-        $sourceName = $_GET['source'] ?? Factory::SOURCE_NAME;
+        /* Decide on the source name, using the specified param if supplied
+         * otherwise default to the Factory's const
+         */
+        $sourceName = trim((string)$this->getOpt(self::OPT_LONG_SOURCE));
+
+        if ('' === $sourceName) {
+            $sourceName = Factory::SOURCE_NAME;
+        }
 
         $liss = new Receiver(
             (int)$config->get('external_enable'),
@@ -171,8 +191,9 @@ HELP;
         /* Send it.
          */
         $this->getLogger()->info(sprintf(
-            'Replaying Receiver method: %s',
-            $method
+            'Replaying Receiver method "%s" using source identifier "%s"',
+            $method,
+            $sourceName
         ));
 
         $liss->$method($mockMessage);
