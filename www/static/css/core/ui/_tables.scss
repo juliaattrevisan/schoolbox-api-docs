@@ -259,6 +259,11 @@ $rotate-span-width: 11rem;
     width: 100%;
 }
 
+/* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
+#rubric-marksheet.diagonal-headings-table thead th:nth-child(2) > div {
+    background-color: $body-bg;
+}
+
 .diagonal-headings-table {
     thead {
         tr.rotate-headers {
@@ -266,10 +271,6 @@ $rotate-span-width: 11rem;
                 border: 0;
                 position: sticky;
                 top: 0;
-            }
-
-            th.filler-cell {
-                width: auto;
             }
 
             th:nth-child(1),

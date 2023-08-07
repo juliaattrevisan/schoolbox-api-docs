@@ -125,8 +125,8 @@
                     <table id="rubric-marksheet" class="diagonal-headings-table marksheet">
                         <thead>
                         <tr class="rotate-headers" data-headers>
-                            <th class="fixed-left filler-cell"></th> {# -+ NOTE: Combining these two cells with colspan=2 complicates styling. #}
-                            <th class="fixed-left filler-cell"></th> {# /        Therefore they are best left separate. #}
+                            <th class="fixed-left"><div></div></th> {# -+ NOTE: Combining these two cells with colspan=2 complicates styling. #}
+                            <th class="fixed-left"><div></div></th> {# /        Therefore they are best left separate. #}
                             {% for studentId, student in students %}
                                 <th>
                                     <div>
@@ -192,7 +192,7 @@
                                 {% for indicatorId, indicator in capability.indicators %}
                                     <tr class="indicator-row">
                                         {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                        <th class="fixed-left second-child indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
+                                        <th class="fixed-left second-child white indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
 
                                         {% for studentId, student in students %}
 
