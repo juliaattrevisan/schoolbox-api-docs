@@ -4,6 +4,7 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { getOptimalPosition } from "@ckeditor/ckeditor5-utils/";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 
 export default class PanelTweaks extends Plugin {
@@ -17,25 +18,33 @@ export default class PanelTweaks extends Plugin {
     }
 
     /**
-     * Some items in the toolbar are panels that display the items within horizontally.
-     * These panels can be hidden underneath the notifications menu when its open.
-     * So we should align them so the right edge of the panel is aligned with the right edge of the button.
-     * Due to the current setup of the toolbar, we can keep this positioning regardless of whether the
-     * notifications panel is pinned or not.
-     * 		         [ Button ]
-     *		+-----------------+
-     *		|      Panel      |
-     *		+-----------------+
+     * Be default the <body> element is used to check if the entire dropown is visible when open.
+     * This is problematic when we have either the side menu or the notifications panel open as
+     * part of the dropdown may appear behind them. To resolve we pass in the #content element
+     * into the getOptimalPosition method used.
      */
     updatePanelPositions() {
-        const buttonTitles = ["Insert media", "Emoji", "Insert table", "Other"];
-        const toolbarItems = this.editor.ui.view.toolbar.items._items;
-        console.warn(toolbarItems.length);
-        toolbarItems.forEach((item) => {
-            if (buttonTitles.includes(item.buttonView?.label)) {
-                // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#static-member-defaultPanelPositions
-                item.panelPosition = "sw";
-            }
+        const toolbarItems = this.editor.ui.view.toolbar.items;
+        const dropDownItems = toolbarItems.filter((item) => item.panelPosition); // get only those toolbar items that are dropdowns
+        dropDownItems.forEach((item) => {
+            /**
+             * When the dropdown is opened, we need to update the position of the dropdown.
+             * As these listeners are assigned after the toolbar has been created, they will be executed
+             * after the listener assigned within the toolbar item.
+             */
+            item.on("change:isOpen", (eventInfo, name, isOpen) => {
+                if (!isOpen) {
+                    return;
+                }
+                // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_utils_dom_position.html#function-getOptimalPosition for more info
+                item.panelView.position = getOptimalPosition({
+                    element: item.panelView.element!,
+                    target: item.buttonView.element!,
+                    fitInViewport: true,
+                    limiter: document.getElementById("content"),
+                    positions: item._panelPositions,
+                }).name;
+            });
         });
     }
 }
