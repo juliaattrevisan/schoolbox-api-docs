@@ -254,7 +254,6 @@ class External_Schoolbox_User implements External_UserInterface
         $overridesTeachers = [];
         $config = \Schoolbox\Config\Loader::getInstance();
 
-
         $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
         $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
 

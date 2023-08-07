@@ -592,14 +592,39 @@ class Receiver
             $existingKey = strtolower($classCode);
 
             if (isset($this->classEntries[$existingKey])) {
+                /* Check if this class was added by this method
+                 */
                 $classEntry = $this->classEntries[$existingKey];
+
+                $this->log->debug(sprintf(
+                    '%s was already added in publishClasses; skipping',
+                    $classCode
+                ));
             } else {
-                $classEntry = $classEntryMapper->createModel()
-                    ->setName($className)
-                    ->setCode($classCode);
+                try {
+                    /* Check if this class was added by a different method
+                     */
+                    $classEntry = $classEntryMapper->findOneByColumn('code', $classCode);
 
-                $classEntryMapper->save($classEntry);
+                    $this->log->debug(sprintf(
+                        '%s was already added by some other means; skipping',
+                        $classCode
+                    ));
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $classEntry = $classEntryMapper->createModel()
+                        ->setName($className)
+                        ->setCode($classCode);
 
+                    $classEntryMapper->save($classEntry);
+
+                    $this->log->debug(sprintf(
+                        'Adding %s',
+                        $classCode
+                    ));
+                }
+
+                /* Remember we saw it, in either outcome
+                 */
                 $this->classEntries[$existingKey] = $classEntry;
             }
 
