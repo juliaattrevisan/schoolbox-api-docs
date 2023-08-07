@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce";
+import { vOnClickOutside } from "@vueuse/components";
 import SearchInput from "@schoolboxVue/components/search/search-input.vue";
 import HeaderSearchResultMeta from "./header-search-result-meta.vue";
 
@@ -115,6 +116,13 @@ function onClicked() {
 }
 
 /**
+ * Only close the search results if the user clicks outside of the entire search component
+ */
+function onClickOutside() {
+    isFocused.value = false;
+}
+
+/**
  * Focus the search input
  * @param { FocusEvent } event - The event object
  */
@@ -154,7 +162,14 @@ function formatPortrait(id: string) {
 </script>
 
 <template>
-    <form id="search" ref="formElement" class="global-search" action="/search" :class="{ focus: isFocused }">
+    <form
+        id="search"
+        ref="formElement"
+        v-on-click-outside="onClickOutside"
+        class="global-search"
+        action="/search"
+        :class="{ focus: isFocused }"
+    >
         <search-input
             @input="onInput"
             @key-down="onArrowDown"
