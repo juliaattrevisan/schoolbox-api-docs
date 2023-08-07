@@ -322,6 +322,7 @@ $rotate-span-width: 11rem;
         z-index: 2; /* Z-index for left cells. */
     }
 
+    th.fixed-left.second-child, /* This class needed because first child is a cell spanning mulitple rows. */
     th.fixed-left:nth-child(2) {
         @media #{$medium-up} {
             left: 180px; /* 180px to match width of a .profile-cell table cell. */

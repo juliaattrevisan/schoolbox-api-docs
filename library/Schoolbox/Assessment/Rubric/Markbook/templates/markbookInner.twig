@@ -92,12 +92,6 @@
         border-top: 2px solid #ededed; /* A gap between the body and overall sections */
     }
 
-    .rubric-marksheet-container #rubric-marksheet.marksheet thead tr:first-child th:last-child {
-        /* The .marksheet class assumes DataTables is in use. This report also uses the .marksheet class to
-        leverage styling, but doesn not use DataTables, so need to undo DataTables specific rules */
-        padding-right: 0 !important;
-    }
-
     .rubric-checklist > label {
         margin-bottom: 0 !important;
     }
@@ -127,59 +121,11 @@
     <div class="small-12 columns">
         {% if assessments|length %}
             <div class="rubric-marksheet-container">
-                <div class="left-columns-wrap">
-                    <table class="left-columns">
-                        <thead>
-                        {% for assessmentId, assessment in assessments %}
-
-                            {% set rowSpan = 0 %}
-                            {% for capabilityId, capability in assessment.capabilities %}
-                                {% set rowSpan = rowSpan + 1 + capability.indicators | length %}
-                            {% endfor %}
-
-                            {% for capabilityId, capability in assessment.capabilities %}
-                                <tr class="capability-row">
-                                    {% if loop.index0 == 0 %}
-                                        <th class="assessment" title="{{ assessment.name }}" rowspan="{{ rowSpan }}">
-                                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
-                                        </th>
-                                    {% endif %}
-                                    <th class="capability" title="{{ capability.name }}">{{ capability.name }}{# TODO SA-9440 | nl2br #}</th>
-                                </tr>
-
-                                {% for indicatorId, indicator in capability.indicators %}
-                                    <tr class="indicator-row">
-                                        <th class="indicator" title="{{ indicator.name }}">{{ indicator.name }}{# TODO SA-9440 | nl2br #}</th>
-                                    </tr>
-                                {% endfor %}
-                            {% endfor %}
-                        {% endfor %}
-
-                        {% set rowSpan = 0 %}
-                        {% for capabilityId, capabilityData in overall %}
-                            {% set rowSpan = rowSpan + 1 + capabilityData.indicators | length %}
-                        {% endfor %}
-                        {% for capabilityId, capabilityData in overall %}
-                            <tr class="capability-row summated{% if loop.index0 == 0 %} first-summated{% endif %}">
-                                {% if loop.index0 == 0 %}
-                                    <th class="overall" rowspan="{{ rowSpan }}">Overall</th>
-                                {% endif %}
-                                <th class="capability">{{ capabilityData.name }}</th>
-                            </tr>
-                            {% for indicatorId, indicatorData in capabilityData.indicators %}
-                                <tr class="indicator-row summated">
-                                    <th class="indicator">{{ indicatorData.name }}</th>
-                                </tr>
-                            {% endfor %}
-                        {% endfor %}
-                        </thead>
-                    </table>
-                </div>
-
-                <div class="scrollable-table-wrap">
-                    <table id="rubric-marksheet" class="marksheet">
+                <div class="diagonal-headings-table-container small-12 island" data-diagonal-headings-table-container>
+                    <table id="rubric-marksheet" class="diagonal-headings-table marksheet">
                         <thead>
                         <tr class="rotate-headers" data-headers>
+                            <th colspan="2"></th>
                             {% for studentId, student in students %}
                                 <th>
                                     <div>
@@ -196,11 +142,24 @@
 
                         <tbody>
                         {% for assessmentId, assessment in assessments %}
-                            {% set markPerCap = assessment.isMarkPerCapability %}
+
+                            {% set rowSpan = 0 %}
+                            {% for capabilityId, capability in assessment.capabilities %}
+                                {% set rowSpan = rowSpan + 1 + capability.indicators | length %}
+                            {% endfor %}
+
                             {% for capabilityId, capability in assessment.capabilities %}
                                 <tr class="capability-row">
+                                    {% if loop.index0 == 0 %}
+                                        <th class="fixed-left white assessment" title="{{ assessment.name }}" rowspan="{{ rowSpan }}">
+                                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
+                                        </th>
+                                    {% endif %}
+                                    {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
+                                    <th class="fixed-left second-child white capability" title="{{ capability.name }}">{{ capability.name }}{# TODO SA-9440 | nl2br #}</th>
+
                                     {% for studentId, student in students %}
-                                        {% if not capability.show or not markPerCap %}
+                                        {% if not capability.show or not assessment.isMarkPerCapability %}
                                             <td class="excluded"></td>
                                         {% elseif studentId in (exclusions[assessmentId] ?? []) %}
                                             <td class="excluded" title="Excluded from assessment"></td>
@@ -214,16 +173,14 @@
                                             {% set latestNormalisedCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
                                             {% set latestGradientClass                  = urgency.marks(latestNormalisedCapabilityMark) %}
                                             <td class="mark">
-                                                <a
-                                                        href="{{ summaryLink }}"
+                                                <a href="{{ summaryLink }}"
                                             {% if latestCapabilityMark %}data-actual-mark{% endif %}
-                                                        class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"
+                                                   class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"
                                                 >{{ capabilityMark|default('–') }}</a>
                                                 {% if latestCapabilityMark %}
-                                                <a
-                                                        href="{{ summaryLink }}"
-                                                        data-draft-mark
-                                                        class="meta {% if latestCapabilityMark is null %}no-mark{% endif %}"
+                                                <a href="{{ summaryLink }}"
+                                                   data-draft-mark
+                                                   class="meta {% if latestCapabilityMark is null %}no-mark{% endif %}"
                                                 >{{ latestCapabilityMark|default('–') }}</a>
                                                 {% endif %}
                                             </td>
@@ -233,11 +190,13 @@
 
                                 {% for indicatorId, indicator in capability.indicators %}
                                     <tr class="indicator-row">
+                                        {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
+                                        <th class="fixed-left second-child indicator" title="{{ indicator.name }}">{{ indicator.name }}{# TODO SA-9440 | nl2br #}</th>
 
                                         {% for studentId, student in students %}
 
                                             {% if studentId in (exclusions[assessmentId] ?? []) %}
-                                                <td class="excluded" title="Excluded from assessment"></td>
+                                                <th class="fixed-left excluded" title="Excluded from assessment"></th>
                                             {% else %}
                                                 {% set indicatorMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
                                                 {% set normalisedIndicatorMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
@@ -253,18 +212,16 @@
                                                 {% set latestRenderedIndicatorMark   = latestDescriptorText ? latestIndicatorMark|default('✓') : latestIndicatorMark|default('–') %}
 
                                                 <td class="mark">
-                                                    <a
-                                                            href="{{ summaryLink }}"
-                                                            {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
+                                                    <a href="{{ summaryLink }}"
+                                                       {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
                                                 {% if latestIndicatorMark %}data-actual-mark{% endif %}
-                                                            class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}"
+                                                       class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}"
                                                     >{{ renderedIndicatorMark }}</a>
                                                 {% if latestIndicatorMark %}
-                                                    <a
-                                                            href="{{ summaryLink }}"
-                                                            {% if latestDescriptorText %} title="{{ latestDescriptorText }}"{% endif %}
-                                                            data-draft-mark
-                                                            class=meta {% if latestIndicatorMark is null %}no-mark{% endif %}"
+                                                    <a href="{{ summaryLink }}"
+                                                       {% if latestDescriptorText %} title="{{ latestDescriptorText }}"{% endif %}
+                                                       data-draft-mark
+                                                       class=meta {% if latestIndicatorMark is null %}no-mark{% endif %}"
                                                     >{{ latestRenderedIndicatorMark }}</a>
                                                 {% endif %}
                                                 </td>
@@ -275,8 +232,19 @@
                             {% endfor %}
                         {% endfor %}
 
+                        {% set rowSpan = 0 %}
+                        {% for capabilityId, capabilityData in overall %}
+                            {% set rowSpan = rowSpan + 1 + capabilityData.indicators | length %}
+                        {% endfor %}
+
                         {% for capabilityId, capabilityData in overall %}
                             <tr class="capability-row summated{% if loop.index0 == 0 %} first-summated{% endif %}">
+                                {% if loop.index0 == 0 %}
+                                    <th class="fixed-left overall" rowspan="{{ rowSpan }}">Overall</th>
+                                {% endif %}
+                                {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
+                                <th class="fixed-left second-child capability">{{ capabilityData.name }}</th>
+
                                 {% for studentId, studentData in students %}
                                     {% if capabilityData.show %}
                                         <td class="mark">
@@ -294,6 +262,8 @@
                             </tr>
                             {% for indicatorId, indicatorData in capabilityData.indicators %}
                                 <tr class="indicator-row summated">
+                                    {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
+                                    <th class="fixed-left second-child indicator">{{ indicatorData.name }}</th>
                                     {% for studentId, studentData in students %}
                                         <td class="mark">
                                             {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}

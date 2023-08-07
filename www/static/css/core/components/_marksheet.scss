@@ -134,8 +134,7 @@
         .course-headers th.white {
             background: $white;
         }
-        .row-header,
-        .island table.dataTable thead th {
+        .row-header {
             border-bottom: none;
         }
 
@@ -150,19 +149,3 @@
         }
     }
 }
-
-
-/* Markbook has a special slanty header th that needs to resize
- * according to its corresponding data td's width
- */
-table.dataTable.marksheet {
-    /* Styles to ensure the markbook remains full-width, even when there are not enough columns to fill the screen.
-     * DataTables sets the width of these elements as an inline style attribute, so we need to use !important to override them.
-     *
-     * This means when the markbook is filtered, it will remain full-width.
-     *
-     * TODO: Remove this rule once DataTables has been removed from the Class Markbook and Rubric Markbook pages.
-     */
-    width: 100% !important;
-}
-
