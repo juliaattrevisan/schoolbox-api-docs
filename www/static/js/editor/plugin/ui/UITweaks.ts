@@ -39,8 +39,8 @@ export default class PanelTweaks extends Plugin {
                     return;
                 }
                 item.panelView.position = getOptimalPosition({
-                    element: item.panelView.element!,
-                    target: item.buttonView.element!,
+                    element: item.panelView.element,
+                    target: item.buttonView.element,
                     fitInViewport: true,
                     limiter: document.getElementById("content"),
                     positions: item._panelPositions,
