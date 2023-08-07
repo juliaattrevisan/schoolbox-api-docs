@@ -116,9 +116,9 @@ function onClicked() {
 
 /**
  * Focus the search input
- * @param { Event } event - The event object
+ * @param { FocusEvent } event - The event object
  */
-function onFocusOver(event: Event) {
+function onFocusOver(event: FocusEvent) {
     if (event.type === "focus") {
         const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
         // If left nav is unpinned and currently open, close it
@@ -161,7 +161,6 @@ function formatPortrait(id: string) {
             @key-up="onArrowUp"
             @key-enter="onEnter"
             @focus-over="onFocusOver"
-            @focus-out="isFocused = false"
             @click="onClicked"
         />
         <ul v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results information-list">
@@ -174,8 +173,7 @@ function formatPortrait(id: string) {
                 <a
                     class="link-row"
                     :class="{ 'is-active': i === arrowCounter }"
-                    @click="goToPath(paths.userPage + result.id)"
-                    @mousedown.left="goToPath(paths.userPage + result.id)"
+                    :href="paths.userPage + result.id"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >

@@ -14,8 +14,8 @@ const emit = defineEmits<{
     keyUp: [];
     keyEnter: [];
     click: [];
-    focusOver: [event: Event];
-    focusOut: [];
+    focusOver: [event: FocusEvent];
+    focusOut: [event: FocusEvent];
 }>();
 
 const currentInput = window.Vue.ref<string>((props.initialInput as string) ?? "");
@@ -66,15 +66,16 @@ function onClicked() {
  * Focus over input
  * @param {Event} event - The event object
  */
-function onFocusOver(event: Event) {
+function onFocusOver(event: FocusEvent) {
     emit("focusOver", event);
 }
 
 /**
  * Focus out input
+ * @param {Event} event - The event object
  */
-function onFocusOut() {
-    emit("focusOut");
+function onFocusOut(event: FocusEvent) {
+    emit("focusOut", event);
 }
 </script>
 
