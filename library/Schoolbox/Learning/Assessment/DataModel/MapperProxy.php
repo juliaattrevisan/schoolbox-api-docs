@@ -1770,36 +1770,38 @@ class MapperProxy
 
         // Assessment type filter multiple
         if (isset($options['typeList'])) {
+            $filterBuilder = $this->baseMapper->getPredicateBuilder();
             foreach ($options['typeList'] as $type) {
                 switch ($type) {
                     case AssessmentType::TYPE_DUE_WORK:
-                        $builder->notNull('d.id');
+                        $filterBuilder->notNull('d.id');
                         break;
 
                     case AssessmentType::TYPE_TASK:
-                        $builder->notNull('t.id');
+                        $filterBuilder->notNull('t.id');
                         break;
 
                     case AssessmentType::TYPE_QUIZ:
-                        $builder->notNull('q.assess_id');
+                        $filterBuilder->notNull('q.assess_id');
                         break;
 
                     case AssessmentType::TYPE_LTI_ASSESSMENT:
-                        $builder->notNull('l.id');
+                        $filterBuilder->notNull('l.id');
                         break;
 
                     case AssessmentType::TYPE_PROJECT:
-                        $builder->notNull('p.id');
+                        $filterBuilder->notNull('p.id');
                         break;
 
                     case AssessmentType::TYPE_LESSON_PLAN:
-                        $builder->notNull('lessonPlan.id');
+                        $filterBuilder->notNull('lessonPlan.id');
                         break;
 
                     default:
                         break;
                 }
             }
+            $builder->any($filterBuilder);
         }
 
         // Work type filter
