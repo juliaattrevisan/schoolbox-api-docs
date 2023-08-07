@@ -42,7 +42,7 @@ import { EditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import Blank from "@js/editor/plugin/blank/Blank";
-import PanelTweaks from "@js/editor/plugin/panelTweaks/PanelTweaks";
+import UITweaks from "@js/editor/plugin/ui/UITweaks";
 
 /**
  * Return the default configuration
@@ -80,7 +80,7 @@ export function getConfig(config: EditorConfig) {
             Eqneditor5,
             Resource,
             Blank,
-            PanelTweaks,
+            UITweaks,
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: getToolbar(config),
