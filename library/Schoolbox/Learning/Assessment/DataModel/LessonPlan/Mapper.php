@@ -74,14 +74,14 @@ class Mapper extends \Schoolbox\Mapper
             ]
         );
 
-        /* Curriculum Nodes
+        /* Linked Assessments
        */
         $this->joinsVia(
             'lesson_plan_assessment',
             AssessmentMapper::class,
             'id',
+            'lesson_plan_id',
             'assessment_id',
-            'id',
             null,
             null,
             null,

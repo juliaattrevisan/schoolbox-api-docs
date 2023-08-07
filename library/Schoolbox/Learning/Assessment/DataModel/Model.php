@@ -251,6 +251,13 @@ class Model implements ISoftDeletable
     /** @var Plan\Model[]|GenericCollection */
     private $plans;
 
+    /**
+     * Lesson Plans linked assessments
+     *
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $linkedAssessments = null;
+
 
     /**
      * Constructor
@@ -975,5 +982,21 @@ class Model implements ISoftDeletable
     {
         $this->sebEnabled = $sebEnabled;
         return $this;
+    }
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getLinkedAssessments(): ?GenericCollection
+    {
+        return $this->linkedAssessments;
+    }
+
+    /**
+     * @param GenericCollection|null $linkedAssessments
+     */
+    public function setLinkedAssessments(?GenericCollection $linkedAssessments): void
+    {
+        $this->linkedAssessments = $linkedAssessments;
     }
 }
