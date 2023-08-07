@@ -43,7 +43,7 @@ use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
+use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
@@ -183,7 +183,7 @@ class Controller extends ConfigController
                 'hasPerformUpdate' => $hasPerformUpdate,
                 /* Decide if the current suds selection uses the cyclic grid
                  */
-                'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource, $timetableView)
+                'cyclicGrid' => !(new ValidUsesScheduleTimetable())->isSatisfiedBy($externalType, $dataSource, $timetableView)
             ],
             'School Data Import'
         );

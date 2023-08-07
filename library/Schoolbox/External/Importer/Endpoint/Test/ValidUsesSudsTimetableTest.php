@@ -12,16 +12,16 @@ namespace Schoolbox\External\Importer\Endpoint\Test;
 use External\IConnector;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Importer\Endpoint\Factory;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
+use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 
 /**
- * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable
+ * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable
  */
-class ValidUsesSudsTimetableTest extends TestCase
+class ValidUsesScheduleTimetableTimetableTest extends TestCase
 {
     /**
      * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable::isSatisfiedBy
+     * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable::isSatisfiedBy
      * @param string|null $externalDb
      * @param string|null $dataSource
      * @param bool        $expected
@@ -29,7 +29,7 @@ class ValidUsesSudsTimetableTest extends TestCase
      */
     public function testIsSatisfiedBy(?string $externalDb, ?string $dataSource, string $timetableView, bool $expected): void
     {
-        $this->assertSame($expected, (new ValidUsesSudsTimetable())->isSatisfiedBy($externalDb, $dataSource, $timetableView));
+        $this->assertSame($expected, (new ValidUsesScheduleTimetable())->isSatisfiedBy($externalDb, $dataSource, $timetableView));
     }
 
     /**

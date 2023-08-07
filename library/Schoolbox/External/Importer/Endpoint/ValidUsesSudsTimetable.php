@@ -20,7 +20,7 @@ use External\IConnector;
  * a SUDS connector and we assume you mean to use the cyclic grid
  * with a live connector instead)
  */
-class ValidUsesSudsTimetable
+class ValidUsesScheduleTimetable
 {
     /**
      * These SUDS connectors use SUDS Timetable which is a calendar

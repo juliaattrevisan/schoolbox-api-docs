@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
+use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 use Schoolbox\MapperFactory;
 use Schoolbox\User;
 
@@ -63,7 +63,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
          * and render it accordingly
          */
         if (
-            (new ValidUsesSudsTimetable())->isSatisfiedBy(
+            (new ValidUsesScheduleTimetable())->isSatisfiedBy(
                 (string)$this->getConfigLoader()->get('external_type'),
                 (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
                 (string)$this->getConfigLoader()->get('timetable_view'),
