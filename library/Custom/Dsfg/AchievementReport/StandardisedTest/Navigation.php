@@ -131,36 +131,6 @@ class Navigation
             ];
         }
 
-        /* Conditional Reading report
-         */
-        $availableNavigation[self::STANDARDISEDTEST_READING_KEY] = [
-            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsReading', [
-                'externalUserId' => $this->externalUser['StudentID'],
-                'year' => $this->year
-            ]),
-            'label' => 'Reading'
-        ];
-
-        /* Conditional Writing report
-         */
-        $availableNavigation[self::STANDARDISEDTEST_WRITING_KEY] = [
-            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsWriting', [
-                'externalUserId' => $this->externalUser['StudentID'],
-                'year' => $this->year
-            ]),
-            'label' => 'Writing'
-        ];
-
-        /* Conditional Mathematics report
-         */
-        $availableNavigation[self::STANDARDISEDTEST_MATHEMATICS_KEY] = [
-            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTestsMathematics', [
-                'externalUserId' => $this->externalUser['StudentID'],
-                'year' => $this->year
-            ]),
-            'label' => 'Mathematics'
-        ];
-
         /* Conditional Literacy/Numeracy report
          */
         if ((new ValidHasLiteracyNumeracy())->isSatisfiedBy($this->user->getYear())) {
