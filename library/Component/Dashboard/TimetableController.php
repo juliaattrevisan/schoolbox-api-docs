@@ -66,6 +66,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             (new ValidUsesSudsTimetable())->isSatisfiedBy(
                 (string)$this->getConfigLoader()->get('external_type'),
                 (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
+                (string)$this->getConfigLoader()->get('timetable_view'),
             )
         ) {
             /* Instead of dependency injecting through the constructor,

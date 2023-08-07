@@ -45,14 +45,31 @@ class ValidUsesSudsTimetable
      *
      * @param string|null $externalDb
      * @param string|null $dataSource
+     * @param string      $timetableView
      * @return bool
      */
-    public function isSatisfiedBy(?string $externalDb, ?string $dataSource): bool
+    public function isSatisfiedBy(?string $externalDb, ?string $dataSource, string $timetableView): bool
     {
         /* You also have to be on the Schoolbox connector, not some other live connector
          * This can occur when you trade SUDS for a Live connector or vice versa,
          * predominantly in testing
          */
-        return IConnector::EXTERNAL_TYPE_SCHOOLBOX === $externalDb && \in_array($dataSource, self::SUDS_TIMETABLE, true);
+        if (IConnector::EXTERNAL_TYPE_SCHOOLBOX === $externalDb) {
+            /* If you're using one of the Schedule Timetable SUDS connectors,
+             * forcibly use the Schedule Timetable
+             */
+            if (\in_array($dataSource, self::SUDS_TIMETABLE, true)) {
+                return true;
+            }
+
+            /* Or, if you're intentionally trying to show the Schedule Timetable
+             * by having selected it in admin
+             */
+            if ($timetableView === \Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

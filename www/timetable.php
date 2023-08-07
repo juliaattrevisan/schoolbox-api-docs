@@ -27,7 +27,7 @@ if (!isset($this)) {
 $sessionUser = $_SESSION['user'];
 if (
     \Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === Config::get('timetable_view')
-    || (new ValidUsesSudsTimetable())->isSatisfiedBy((string)Config::get('external_type'), (string)Config::get('schooldata_import_data_source'))
+    || (new ValidUsesSudsTimetable())->isSatisfiedBy((string)Config::get('external_type'), (string)Config::get('schooldata_import_data_source'), (string)Config::get('timetable_view'))
 ) {
     /** @var SitePage $this */
     if (is_numeric($this->arg[0] ?? null)) {

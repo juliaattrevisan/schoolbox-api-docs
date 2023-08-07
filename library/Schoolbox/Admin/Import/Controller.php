@@ -115,6 +115,7 @@ class Controller extends ConfigController
         $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $dataSource = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
         $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
+        $timetableView = (string)$this->getConfigLoader()->get('timetable_view');
 
         $hasIndicator = $host !== '' && $key !== '';
 
@@ -182,7 +183,7 @@ class Controller extends ConfigController
                 'hasPerformUpdate' => $hasPerformUpdate,
                 /* Decide if the current suds selection uses the cyclic grid
                  */
-                'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource)
+                'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource, $timetableView)
             ],
             'School Data Import'
         );

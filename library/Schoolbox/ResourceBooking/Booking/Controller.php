@@ -675,7 +675,7 @@ class Controller extends Base
 
             /* Load the suds timetable-specific connectivity and grab its events
              */
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
+            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'), $this->getConfigLoader()->get('timetable_view'))) {
                 $roomSource = new \Calendar_Api_EventType_SudsTimetable_Room(
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->getUser(),

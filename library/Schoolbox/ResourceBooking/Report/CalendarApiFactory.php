@@ -76,7 +76,7 @@ class CalendarApiFactory
         if ($roomCode = $resource->getRoomCode()) {
             $roomCodes = [$roomCode => $resource->getId()];
 
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'))) {
+            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'), $this->configLoader->get('timetable_view'))) {
                 $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room(
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->user,
@@ -140,7 +140,7 @@ class CalendarApiFactory
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'))) {
+            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'), $this->configLoader->get('timetable_view'))) {
                 $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room(
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->user,

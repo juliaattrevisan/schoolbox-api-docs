@@ -319,7 +319,7 @@ try {
             break;
 
         case 'timetable':
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($config->get('external_type'), $config->get('schooldata_import_data_source'))) {
+            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($config->get('external_type'), $config->get('schooldata_import_data_source'), (string)Config::get('timetable_view'))) {
                 $api = buildApiClass(
                     Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class,
                     [

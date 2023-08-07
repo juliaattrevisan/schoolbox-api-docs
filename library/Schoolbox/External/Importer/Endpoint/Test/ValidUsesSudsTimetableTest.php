@@ -27,9 +27,9 @@ class ValidUsesSudsTimetableTest extends TestCase
      * @param bool        $expected
      * @return void
      */
-    public function testIsSatisfiedBy(?string $externalDb, ?string $dataSource, bool $expected): void
+    public function testIsSatisfiedBy(?string $externalDb, ?string $dataSource, string $timetableView, bool $expected): void
     {
-        $this->assertSame($expected, (new ValidUsesSudsTimetable())->isSatisfiedBy($externalDb, $dataSource));
+        $this->assertSame($expected, (new ValidUsesSudsTimetable())->isSatisfiedBy($externalDb, $dataSource, $timetableView));
     }
 
     /**
@@ -40,51 +40,51 @@ class ValidUsesSudsTimetableTest extends TestCase
     public function getTestIsSatisfiedByData(): iterable
     {
         yield 'null external DB, null timetable' => [
-            null, null, false,
+            null, null, 'table', false,
         ];
         yield 'null external DB, SUDS timetable' => [
-            null, Factory::COMPASS, false,
+            null, Factory::COMPASS, 'table', false,
         ];
         yield 'null external DB, non-SUDS timetable' => [
-            null, Factory::KAMAR, false,
+            null, Factory::KAMAR, 'table', false,
         ];
 
         yield 'non-SUDS external DB, null timetable' => [
-            IConnector::EXTERNAL_TYPE_SYNERGETIC, null, false,
+            IConnector::EXTERNAL_TYPE_SYNERGETIC, null, 'table', false,
         ];
         yield 'non-SUDS external DB, SUDS timetable' => [
-            IConnector::EXTERNAL_TYPE_SYNERGETIC, Factory::COMPASS, false,
+            IConnector::EXTERNAL_TYPE_SYNERGETIC, Factory::COMPASS, 'table', false,
         ];
         yield 'non-SUDS external DB, non-SUDS timetable' => [
-            IConnector::EXTERNAL_TYPE_SYNERGETIC, Factory::KAMAR, false,
+            IConnector::EXTERNAL_TYPE_SYNERGETIC, Factory::KAMAR, 'table', false,
         ];
 
         yield 'SUDS external DB, null timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, null, false,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, null, 'table', false,
         ];
         yield 'SUDS external DB, iSAMS timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::ISAMS, true,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::ISAMS, 'table', true,
         ];
         yield 'SUDS external DB, Kamar timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::KAMAR, false,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::KAMAR, 'table', false,
         ];
         yield 'SUDS external DB, Sentral timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::SENTRAL, true,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::SENTRAL, 'table', true,
         ];
         yield 'SUDS external DB, TASS API timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::TASS_API, true,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::TASS_API, 'table', true,
         ];
         yield 'SUDS external DB, Compass timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::COMPASS, true,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::COMPASS, 'table', true,
         ];
         yield 'SUDS external DB, Wonde timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::WONDE, true,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::WONDE, 'table', true,
         ];
         yield 'SUDS external DB, CSV timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::CSV, false,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, Factory::CSV, 'table', false,
         ];
         yield 'SUDS external DB, empty timetable' => [
-            IConnector::EXTERNAL_TYPE_SCHOOLBOX, '', false,
+            IConnector::EXTERNAL_TYPE_SCHOOLBOX, '', 'table', false,
         ];
     }
 }
