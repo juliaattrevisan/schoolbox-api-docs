@@ -87,6 +87,11 @@ class Model implements IAssessableDataModel, ISoftDeletable
      */
     private ?string $visibility = null;
 
+    /**
+     * Assessments that are linked to this lesson plan
+     */
+    private ?GenericCollection $linkedAssessments = null;
+
 
     /**
      * @return int|null
@@ -239,5 +244,21 @@ class Model implements IAssessableDataModel, ISoftDeletable
     {
         $this->attachments = $attachments;
         return $this;
+    }
+
+    /**
+     * @param GenericCollection|null $linkedAssessments
+     */
+    public function setLinkedAssessments(?GenericCollection $linkedAssessments): void
+    {
+        $this->linkedAssessments = $linkedAssessments;
+    }
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getLinkedAssessments(): ?GenericCollection
+    {
+        return $this->linkedAssessments;
     }
 }

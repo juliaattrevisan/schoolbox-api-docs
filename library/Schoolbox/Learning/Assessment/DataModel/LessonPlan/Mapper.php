@@ -74,6 +74,21 @@ class Mapper extends \Schoolbox\Mapper
             ]
         );
 
+        /* Curriculum Nodes
+       */
+        $this->joinsVia(
+            'lesson_plan_assessment',
+            AssessmentMapper::class,
+            'id',
+            'assessment_id',
+            'id',
+            null,
+            null,
+            null,
+            'linkedAssessments'
+        );
+
+
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAttachments']);

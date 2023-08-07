@@ -141,6 +141,17 @@ class Mapper extends BaseMapper
             null,
             'contextProject'
         );
+        $this->joinsVia(
+            'lesson_plan_assessment',
+            LessonPlan\Mapper::class,
+            'id',
+            'lesson_plan_id',
+            'assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'linkedAssessments'
+        );
         // the specification of this assessment
         // (if this assessment is within a unit implementation)
         // An implementation may only have one specification,
@@ -502,6 +513,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
+                {$this->getJoinColumnString('lesson_plan_assessment', 'lpa')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
 
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
@@ -528,8 +540,10 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa', true)}
+            LEFT JOIN {$this->getJoinSql('lesson_plan_assessment', '', 'lpa', true)}
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
+        $var = false;
     }
 
 
@@ -937,6 +951,8 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithCurriculumNodes($modelList);
         // Project sub-assessments
         $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+        // Lesson Plan Linked Assessments
+        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
         return $modelList;
     }
 
@@ -1338,6 +1354,50 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             if ($model->getSubObject() instanceof LessonPlan\Model) {
                 $model->getLessonPlan()->setFields($fields->getOffset($model->getLessonPlan()->getId()));
+            }
+        }
+
+        return $modelList;
+    }
+
+    /**
+     * Assign Lesson Plan Linked assessments to each Lesson Plan instance
+     *
+     * @param Collection $modelList
+     * @param array      $lessonPlanIds
+     * @return Collection
+     * @throws Exception
+     * @throws Deleted
+     */
+    private function augmentWithLessonPlanAssessments(Collection $modelList, array $lessonPlanIds): Collection
+    {
+        // Project sub-assessments
+        if (!\count($lessonPlanIds)) {
+            return $modelList;
+        }
+
+        $statement = $this->prepareSelect(
+            $this->getSelectString(),
+            $this->getFromString(),
+            new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
+            ['v_lpa.lesson_plan_id' => $lessonPlanIds],
+            ['order' => ['sequence' => 'asc']]
+        );
+        $statement->execute();
+
+        /* Inject linked assessments into each instance of a Lesson Plan
+         * This is used when grabbing stuff out of the db via the custom query elsewhere in this
+         * class so you have to do all these microhydrations manually
+         */
+        foreach ($modelList as $model) {
+            if ($model->getSubObject() instanceof LessonPlan\Model) {
+                $lessonPlan = $model->getLessonPlan();
+                if (!$lessonPlan->getLinkedAssessments()) {
+                    $lessonPlan->setLinkedAssessments($this->createCollection());
+                }
+                foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
+                    $lessonPlan->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+                }
             }
         }
 
