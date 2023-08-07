@@ -38,11 +38,11 @@ class ClassMemberships implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param Request                                    $message
+     * @param LoggerInterface        $log
+     * @param bool                   $perform
+     * @param ClassEntryMapper       $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param Request                $message
      */
     public function __construct(
         private LoggerInterface $log,

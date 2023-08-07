@@ -18,6 +18,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Calendar\Cli\TrimmerTool;
 use Schoolbox\Clipboard\Cli\ImporterTool;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Cli\Replay;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\Uploader;
@@ -96,6 +97,10 @@ class Inspector extends CliTool\App
         /* Dead Event Trimmer
          */
         TrimmerTool::LOCK_NAME => 'Dead Event Trimmer Tool (./tools/calendar/trimmer.php)',
+
+        /* LISS Replay
+         */
+        Replay::LOCK_NAME => 'LISS Payload Replay (./tools/synchronise/liss/replay.php)',
     ];
 
 

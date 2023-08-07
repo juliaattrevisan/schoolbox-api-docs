@@ -49,15 +49,7 @@ class PayloadCache
         \Schoolbox\User $superuser,
         Request $message
     ): \Schoolbox\Resource\Storage\Model {
-        $payload = json_encode($message, JSON_THROW_ON_ERROR);
-
-        /* Not a parser or reformatter
-         * Just a thing that helps you inspect on the cli
-         */
-        $payload = strtr($payload, [
-            '}' => "}\n",
-            '{' => "\n{"
-        ]);
+        $payload = serialize($message);
 
         $now = \Alaress_Date_Format::now();
         $expiryAt = \Alaress_Date_Format::now()->addWeeks(1);
