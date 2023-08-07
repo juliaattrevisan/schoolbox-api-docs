@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Quoter\IQuoter;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 
@@ -28,53 +27,16 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         ?CursorDataObject $cursor,
         int $limit,
     ): QueryParams {
-        // Unsure if exact search should be used here?
-//        // test for exact search, and if so return those results instead
-//        if (preg_match('#".+"#', $keyword)) {
-//            // strip the prepended and appended quote characters
-//            $keyword = substr($keyword, 1, strlen($keyword) - 2);
-//            return $this->searchExact($keyword, $offset, $limit, $count);
-//        }
-//
-//
-//        // Don't show deleted users
-//        $whereParts = ['u.deleted_at IS NULL'];
-//
-//        // Show disabled users only if ticked (hide when unticked)
-//        if (!$this->config->get('show_disabled_users')) {
-//            $whereParts[] = 'u.enabled = 1';
-//        }
-//
-//        // Don't allow LIKE searches on keywords < 2 chars long
-//        // Probably shouldn't allow any searches on < 2 chars, but shrug
-//        // TODO consider injecting predicate builder or database itself
-//        $keywordSearchParts = ['u.synergy_id = :userKeyword'];
-//        $params             = ['userKeyword' => $keyword];
-//        if (mb_strlen($keyword, 'UTF-8') >= 2) {
-//            $keywordSearchParts[]      = "u.username LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "u.firstname LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "u.preferred_name LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "u.lastname LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.firstname, u.lastname) LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "CONCAT_WS(' ', u.firstname, u.lastname) LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "CONCAT_WS(' ', u.preferred_name, u.lastname) LIKE :userKeywordLike";
-//            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.lastname) LIKE :userKeywordLike";
-//            $params['userKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
-//        }
-//        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
-
         [$whereParts, $params] = $this->buildBaseWhereParams($keyword);
 
-        $relevancePart = $this->buildRelevanceStatement();
-        $titlePart     = $this->buildTitleStatement();
-        $typePart      = $this->buildTypeStatement();
-        $idPart        = $this->buildIdStatement();
-        $datePart      = $this->buildDateStatement();
-        $creatorPart   = $this->buildCreatorStatement();
+        $relevancePart = $this->buildRelevanceExpression();
+        $titlePart     = $this->buildTitleExpression();
+        $typePart      = $this->buildTypeExpression();
+        $idPart        = $this->buildIdExpression();
+        $datePart      = $this->buildDateExpression();
+        $creatorPart   = $this->buildCreatorExpression();
+
         // Apply filter
-        // (This may happen outside of the UNION: unsure as of yet)
-        // Some of these params may be generic to all searches: not sure yet
         if ($filter->types) {
             $whereParts[] = "$typePart IN " . Builder::getArrayPlaceholders($filter->types, 'userType');
             $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'userType'));
@@ -93,10 +55,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
 
         // Apply cursor
-        // (Previous technique: < most relevant field, = most relevant and < next most relevant)
-        // This can probably be made generic?
-        // TODO consider reverting to previous, and moving to outside UNION
-        // TODO relevance/type/title/id parts can be made generic
         if ($cursor) {
             $cursorSearchParts = [
                 "($relevancePart < :cursorRelevance)",
@@ -114,9 +72,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 
         $where = implode(' AND ', $whereParts);
 
-        // retrieve results
-        // Finagle a title together from chosen + last name for cursoring only:
-        // this may be presented differently on the frontend
+        // Build query and params
         $from = $this->buildFromStatement();
         $query = "
             SELECT
@@ -138,19 +94,66 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         return new QueryParams($query, $params);
     }
 
+    /**
+     * Build the base set of WHERE parts and their params.
+     *
+     * @param string $keyword
+     * @return array
+     */
     abstract protected function buildBaseWhereParams(string $keyword): array;
 
-    abstract protected function buildRelevanceStatement(): string;
+    /**
+     * Build the expression for determining the relevance for an item in this
+     * search.
+     *
+     * @return string
+     */
+    abstract protected function buildRelevanceExpression(): string;
 
-    abstract protected function buildTitleStatement(): string;
+    /**
+     * Build the expression for determining the title for an item in this
+     * search.
+     *
+     * @return string
+     */
+    abstract protected function buildTitleExpression(): string;
 
-    abstract protected function buildTypeStatement(): string;
+    /**
+     * Build the expression for determining the type for an item in this
+     * search.
+     *
+     * @return string
+     */
+    abstract protected function buildTypeExpression(): string;
 
-    abstract protected function buildIdStatement(): string;
+    /**
+     * Build the expression for determining the ID for an item in this
+     * search.
+     *
+     * @return string
+     */
+    abstract protected function buildIdExpression(): string;
 
-    abstract protected function buildDateStatement(): string;
+    /**
+     * Build the expression for determining the date for an item in this
+     * search.
+     *
+     * @return string
+     */
+    abstract protected function buildDateExpression(): string;
 
-    abstract protected function buildCreatorStatement(): string;
+    /**
+     * Build the expression for determining the creator for an item in this
+     * search.
+     *
+     * @return string
+     */
+    abstract protected function buildCreatorExpression(): string;
 
+    /**
+     * Build the FROM part of the query, including any joins.
+     *
+     * @return string
+     */
     abstract protected function buildFromStatement(): string;
 }

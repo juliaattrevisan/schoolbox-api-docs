@@ -75,32 +75,32 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
     }
 
-    protected function buildRelevanceStatement(): string
+    protected function buildRelevanceExpression(): string
     {
         return '1';
     }
 
-    protected function buildTitleStatement(): string
+    protected function buildTitleExpression(): string
     {
         return "CONCAT(u.chosen_name, ' ', u.lastname)";
     }
 
-    protected function buildTypeStatement(): string
+    protected function buildTypeExpression(): string
     {
         return "CONCAT('user.', r.group_type)";
     }
 
-    protected function buildIdStatement(): string
+    protected function buildIdExpression(): string
     {
         return 'u.id';
     }
 
-    protected function buildDateStatement(): string
+    protected function buildDateExpression(): string
     {
         return 'u.updated_at';
     }
 
-    protected function buildCreatorStatement(): string
+    protected function buildCreatorExpression(): string
     {
         return 'NULL';
     }
