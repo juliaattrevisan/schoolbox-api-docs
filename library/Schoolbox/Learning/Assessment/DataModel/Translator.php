@@ -482,6 +482,21 @@ class Translator
             }
         }
 
+        // As above:
+        // Ideally this would exist in the Lesson Plan translator, but that would require making this method public.
+        // That is too dangerous, best to perform an instanceof here.
+        if ($dataModel instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model && $dataModel->getLinkedAssessments() !== null) {
+            /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $domainObject */
+            $domainObject->setLinkedAssessments(new GenericCollection(IAssessable::class));
+            foreach ($dataModel->getLinkedAssessments() as $idx => $dataChild) {
+                $subModel = $dataChild->getSubObject();
+                if ($subModel) {
+                    $domainChild = $this->translateToDomainModelRecursive($subModel, $depth + 1);
+                    $domainObject->getLinkedAssessments()[$idx] = $domainChild;
+                }
+            }
+        }
+
         return $domainObject;
     }
 
