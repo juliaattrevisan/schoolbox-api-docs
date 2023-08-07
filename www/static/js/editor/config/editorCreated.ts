@@ -74,30 +74,6 @@ function checkForModal(editor: Editor) {
 }
 
 /**
- * Some items in the toolbar are panels that display the items within horizontally.
- * These panels can be hidden underneath the notifications menu when its open.
- * So we should align them so the right edge of the panel is aligned with the right edge of the button.
- * Due to the current setup of the toolbar, we can keep this positioning regardless of whether the
- * notifications panel is pinned or not.
- * 		         [ Button ]
- *		+-----------------+
- *		|      Panel      |
- *		+-----------------+
- *
- * @param { Editor } editor - the CKEditor instance
- */
-function updatePanelPositions(editor: Editor) {
-    const buttonTitles = ["Insert media", "Emoji", "Insert table", "Other"];
-    const toolbarItems = editor.ui.view.toolbar.items._items;
-    toolbarItems.forEach((item) => {
-        if (buttonTitles.includes(item.buttonView?.label)) {
-            // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#static-member-defaultPanelPositions
-            item.panelPosition = "sw";
-        }
-    });
-}
-
-/**
  * Once the iFramely script has loaded, we can add in the event listener
  *
  * @param { Editor } editor - the CKEditor instance
@@ -183,7 +159,6 @@ export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, c
     disableAutoMedia(editor, config);
     removeValidation();
     checkForModal(editor);
-    updatePanelPositions(editor);
     await addIframelyEmbed(config, editor);
     await attachInspector(editor);
 }
