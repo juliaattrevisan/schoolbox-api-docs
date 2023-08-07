@@ -17,8 +17,11 @@ if (!$_SESSION['user']->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/eportfolio.html');
 $this->setTitle('Admin - ePortfolio Templates');
 
+$this->setBlock(TEMPLATE_content, 'content', 'content_block');
+$this->setBlock(TEMPLATE_content, 'empty', 'empty_block');
+
 /* Group Selector */
-$this->setBlock(TEMPLATE_content, 'template', 'template_block');
+$this->setBlock('content', 'template', 'template_block');
 /* Layout */
 $this->setBlock(TEMPLATE_content, 'layout', 'layout_block');
 $this->setFile('layout', 'adminv2/component/layout.html');
@@ -26,7 +29,9 @@ $this->setBlock('layout', 'position_top', 'position_top_block');
 $this->setBlock('layout', 'position_left', 'position_left_block');
 $this->setBlock('layout', 'position_right', 'position_right_block');
 /* Palette */
-$this->setBlock(TEMPLATE_content, 'component', 'component_block');
+//$this->setBlock('content', 'component_page', 'component_page_block');
+//$this->setBlock('component_page', 'component', 'component_block');
+$this->setBlock('content', 'component', 'component_block');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
@@ -35,15 +40,25 @@ $this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 // Get list of templates
 $templateHandler = new EportfolioTemplate();
-$templateList = $templateHandler->getAll('name');
+$templateList    = $templateHandler->getAll('name') ?: [];
 if (count($templateList)) {
-    foreach ($templateList as $template) {
-        $this->setVar(array(
+    $this->parse('content_block', 'content', true);
+    $this->setVar('empty_block', '');
+} else {
+    $this->parse('empty_block', 'empty', true);
+    $this->setVar('content_block', '');
+    $this->setVar('layout_block', '');
+    return;
+}
+
+foreach ($templateList as $template) {
+    $this->setVar(
+        [
             'template.id'   => $template['id'],
-            'template.name' => $template['name']
-        ));
-        $this->parse('template_block', 'template', true);
-    }
+            'template.name' => $template['name'],
+        ]
+    );
+    $this->parse('template_block', 'template', true);
 }
 
 // Output the components for this template
@@ -57,7 +72,7 @@ foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $compo
     $position      = "position_{$position_no}";
     $defintionId   = $component->getInstance()->getDefinition()->getId();
     $defintionName = $component->getInstance()->getDefinition()->getName();
-    $componentCounts[$defintionId]  = !isset($componentCounts[$defintionId]) ? 0 : $componentCounts[$defintionId]++;
+    $componentCounts[$defintionId] = !isset($componentCounts[$defintionId]) ? 0 : $componentCounts[$defintionId]++;
 
     if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
@@ -94,7 +109,7 @@ $this->parse('layout_block', 'layout');
 // Output the palette
 $definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnList(array(
     'module' => 'eportfolio',
-    'visible' => 'true',
+        'visible' => 'true',
 ));
 $this->setVar('component_block', '');
 foreach ($definitionCollection as $definition) {
@@ -110,13 +125,14 @@ foreach ($definitionCollection as $definition) {
         }
     }
     $this->setVar([
-        'COMPONENT_ID'             => $definitionId,
-        'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
-        'COMPONENT_CLASS'          => $definition->getCssClass(),
-        'COMPONENT_MULTIPLE_STATE' => $multiState,
-        'COMPONENT_NAME'           => $definition->getName(),
-        'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
-        'COMPONENT_COUNT'          => $count,
-    ]);
+                      'COMPONENT_ID'             => $definitionId,
+                      'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
+                      'COMPONENT_CLASS'          => $definition->getCssClass(),
+                      'COMPONENT_MULTIPLE_STATE' => $multiState,
+                      'COMPONENT_NAME'           => $definition->getName(),
+                      'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
+                      'COMPONENT_COUNT'          => $count,
+                  ]);
     $this->parse('component_block', 'component', true);
+//    $this->parse('component_page_block', 'component_page', true);
 }
