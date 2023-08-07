@@ -7,7 +7,9 @@
     - description:      string a descriptor used for alt and title attributes
     - appendQueryParam: string query params you want appended to the image tag
     - class:            string optional class(es) to apply to the img tag
+    - roundedCorners    string "on" or "off".  Default "off".
 #}
+{% apply spaceless %}
 
 {# portrait image tag is composed of... #}
 {# NOTE: Since the variables below are initialised here, they are for internal use only. #}
@@ -15,6 +17,7 @@
 {% set userParameter = '' %}
 {% set limitHeight = '' %}
 {% set limitWidth = '' %}
+
 {% if appendQueryParam is not defined %}
     {% set appendQueryParam = '' %}
 {% endif %}
@@ -22,6 +25,11 @@
 {# there is no default class used on the img tag #}
 {% if class is not defined %}
     {% set class = '' %}
+{% endif %}
+
+{# Rounded corners are off by default. #}
+{% if roundedCorners is not defined %}
+    {% set roundedCorners = "off" %}
 {% endif %}
 
 {# the default render strategy is 'small' #}
@@ -93,9 +101,9 @@
         {% set sizeParameter = sizeParameter ~ "square64" %}
     {% endif %}
 
-    {% if render == "rounded" %}
-    <div class="img img--s img--round">
-       <div class="img__wrapper">
+    {% if roundedCorners == "on" %}
+        <div class="img img--s img--round">
+           <div class="img__wrapper">
     {% endif %}
 
     <img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
@@ -117,8 +125,10 @@
         {% endif %}
     />
 
-    {% if render == "rounded" %}
+    {% if roundedCorners == "on" %}
+            </div>
         </div>
-    </div>
     {% endif %}
 {% endif %}
+
+{% endapply %}
