@@ -594,8 +594,6 @@ class Receiver
             if (isset($this->classEntries[$existingKey])) {
                 /* Check if this class was added by this method
                  */
-                $classEntry = $this->classEntries[$existingKey];
-
                 $this->log->debug(sprintf(
                     '%s was already added in publishClasses; skipping',
                     $classCode
