@@ -156,7 +156,7 @@
                                         </th>
                                     {% endif %}
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left second-child white capability" title="{{ capability.name }}">{{ capability.name }}{# TODO SA-9440 | nl2br #}</th>
+                                    <th class="fixed-left second-child white capability" title="{{ capability.name }}">{{ capability.name }}</th>
 
                                     {% for studentId, student in students %}
                                         {% if not capability.show or not assessment.isMarkPerCapability %}
@@ -191,7 +191,7 @@
                                 {% for indicatorId, indicator in capability.indicators %}
                                     <tr class="indicator-row">
                                         {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                        <th class="fixed-left second-child indicator" title="{{ indicator.name }}">{{ indicator.name }}{# TODO SA-9440 | nl2br #}</th>
+                                        <th class="fixed-left second-child indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
 
                                         {% for studentId, student in students %}
 
