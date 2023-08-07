@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 
 /**
@@ -132,6 +133,8 @@ HELP;
 
         $config = $this->getConfig();
 
+        $sourceName = $_GET['source'] ?? Factory::SOURCE_NAME;
+
         $liss = new Receiver(
             (int)$config->get('external_enable'),
             $config->get('external_type'),
@@ -142,6 +145,7 @@ HELP;
             $config->get('external_liss_teacher_identifier'),
             (bool)$config->get('external_liss_storage_logging'),
             $config->get('logs_dir'),
+            $sourceName,
             $superuser,
             \Schoolbox\External\Connector\Log\Mapper::getInstance(),
             \Schoolbox\Resource\Storage\Mapper::getInstance()
