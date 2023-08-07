@@ -3,6 +3,7 @@
 namespace Schoolbox\Learning\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
 
@@ -21,9 +22,9 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
     /**
      * The lesson plans visible to the user
      *
-     * @var array
+     * @var GenericCollection|IAssessable[]
      */
-    private array $visibleLessonPlans = [];
+    private GenericCollection|array $visibleLessonPlans;
 
     /**
      * Business logic to collate data ready for output
@@ -46,57 +47,21 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
             return false;
         }
 
+        $lessonPlanMapper = LessonPlanMapper::getInstance();
+        $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
+
         $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
 
         $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
         $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
         $publishDate = \Alaress_Date_Format::now();
 
-        $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
-        $lessonPlanMapper = LessonPlanMapper::getInstance();
-
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
         // hydrate those assessments
-        $plans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'ASC']]);
-
-        /** @var LessonPlanModel $lessonPlan **/
-        foreach ($plans as $lessonPlan) {
-            $params =  [
-                'assessmentId' => $lessonPlan->getId(),
-                'assessment'   => $lessonPlan,
-                'studentId'    => $student->getId(),
-                'student'      => $student,
-            ];
-
-            //build array
-            $this->visibleLessonPlans[] = [
-                'title' => $lessonPlan->getTitle(),
-                'dueDate' => $lessonPlan->getDueAt(),
-                'className' => $lessonPlan->getContext()->getFolder()->getTitle(),
-                'classColour' => $lessonPlan->getContext()->getFolder()->getColour(),
-                '_links' => [
-                    'assessment' => $this->getRouteGenerator()->generate('learningAssessment.getSummary', $params),
-                    'folder' => sprintf("/homepage/%s", $lessonPlan->getContext()->getFolder()->getId()),
-                ]
-            ];
-        }
+        $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'ASC']]);
 
         return \count($this->visibleLessonPlans) > 0;
-        /**
-         * return array should be similar to:
-         * ```
-         * [{
-         * 'title': 'Lesson Plan Title',
-         * 'dueDate': '2023-07-21 11:13:56Z',
-         * 'class': 'class Name',
-         * 'classColour': '#FFFFFF',
-         * 'url': 'https://vagrant.dev.schoolbox.cloud/learning/assessments/434/1'
-         * },
-         * ]
-         * ```
-         *
-         */
     }
 
     /**
