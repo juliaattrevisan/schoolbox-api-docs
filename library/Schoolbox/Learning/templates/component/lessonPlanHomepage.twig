@@ -50,7 +50,7 @@
                             <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
                         </h3>
                         <p class="meta">
-                            {{ unit.course.specification.folder.name }} | {{ unit.title }}
+                            {{ unit.specification.course.folder.name }} | {{ unit.title }}
                         </p>
                         <p class="meta">
                             {{ dueDate.forAssessment(lesson) }}
