@@ -63,6 +63,8 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     private $canWrite;
 
+    private bool $hasBeenFiltered = false;
+
     /**
      * @var CourseImplementationMapper
      */
@@ -138,6 +140,10 @@ class Controller extends Component_Homepage_ControllerAbstract
         $assessmentTypes = [];
         foreach ($filters as $assessment => $value) {
             if ("0" === $value) {
+                /**
+                 * Something is being filtered, we should display something on the frontend...
+                 */
+                $this->hasBeenFiltered = true;
                 continue;
             }
             switch ($assessment) {
@@ -271,6 +277,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
+            'hasBeenFiltered'      => $this->hasBeenFiltered,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,
             'context'              => $this->getContext(),
