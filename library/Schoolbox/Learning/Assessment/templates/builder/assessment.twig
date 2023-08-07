@@ -17,6 +17,15 @@ Usage:
         assessmentId: assessment.id,
         assessment: assessment})
     %}
+{% elseif assessment is lessonPlan %}
+{# We should be able to preview the Lesson plans from within the course builder component and page #}
+    {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+        studentId: USER.id,
+        student: USER
+        })
+    %}
 {% else %}
     {% set textLinkRoute = '' %}
 {% endif %}

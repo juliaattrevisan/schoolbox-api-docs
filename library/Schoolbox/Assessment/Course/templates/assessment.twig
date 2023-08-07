@@ -2,6 +2,7 @@
 Usage:
     $data = [
         assessment:       IAssessable,
+        USER:             User
         encodedReturnUrl: string        - only required if '_writable' is true ,
         _writable:        bool
     ]
@@ -9,10 +10,12 @@ Usage:
 {% if _writable %}
     {% include '@course/assessment/writable.twig' with {
         assessment: assessment,
-        encodedReturnUrl: encodedReturnUrl
+        encodedReturnUrl: encodedReturnUrl,
+        USER: USER
     } only %}
 {% else %}
     {% include '@course/assessment/readonly.twig' with {
-        assessment: assessment
+        assessment: assessment,
+        USER: USER
     } only %}
 {% endif %}

@@ -3,6 +3,7 @@ Usage:
     $data = [
         assessment:       IAssessable,
         encodedReturnUrl: string,
+        USER: User
     ]
 #}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
@@ -11,6 +12,9 @@ Usage:
     {% set textLinkRoute = 'learningQuiz.getQuizSummary' %}
 {% elseif assessment is project %}
     {% set textLinkRoute = 'learningAssessment.getStatus' %}
+{% elseif assessment is lessonPlan %}
+{# We should be able to preview the Lesson plans from within the course builder component and page #}
+    {% set textLinkRoute = 'learningAssessment.getSummary' %}
 {% else %}
     {% set textLinkRoute = '' %}
 {% endif %}
@@ -21,7 +25,7 @@ Usage:
         <div class="list-item">
             <div class="compact card small-11 wrap-down">
                 {% if textLinkRoute %}
-                <a href="{{ routeLookup(textLinkRoute, {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}">
+                <a href="{{ routeLookup(textLinkRoute, {assessmentId: assessment.id, studentId: USER.id}) }}?returnUrl={{ encodedReturnUrl }}">
                     {% endif %}
                     <span class="{{ icon.renderClass(assessment) }}"></span>
                     <p>{{ assessment.title }}</p>
