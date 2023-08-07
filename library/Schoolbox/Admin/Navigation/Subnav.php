@@ -594,7 +594,7 @@ class Subnav
                         'name'        => 'Intellischool Admin',
                         'visible'     => ($this->configLoader->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID)),
                         'children'    => [],
-                        'description' => 'Configure Albitros Intellischool Integration.',
+                        'description' => 'Configure Intellischool Analytics Integration.',
                     ],
                 ],
             ],

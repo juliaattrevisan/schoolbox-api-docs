@@ -35,7 +35,7 @@ class Controller extends Base
     }
 
     /**
-     * Display the admin console for Intellischool for admins to edit settings in Albitros themselves
+     * Display the admin console for Intellischool for admins to edit settings in Intellischool Analytics themselves
      *
      */
     public function getConsole()
