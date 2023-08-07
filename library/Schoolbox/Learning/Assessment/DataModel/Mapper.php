@@ -543,7 +543,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('lesson_plan_assessment', '', 'lpa', true)}
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
-        $var = false;
     }
 
 
