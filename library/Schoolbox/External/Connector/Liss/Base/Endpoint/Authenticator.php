@@ -108,18 +108,24 @@ class Authenticator
     /**
      * Determine whether the request contains a valid
      * authentication object (that is always 0th element)
+     *
+     * @param bool $requireSchoolboxConnector
+     * @return bool
      */
-    public function isAuthenticated(): bool
+    public function isAuthenticated(bool $requireSchoolboxConnector = true): bool
     {
-        /* Must be using external database and schoolbox connector
-         */
-        $externalEnable = (bool)$this->externalEnable;
-        $externalType = IConnector::EXTERNAL_TYPE_SCHOOLBOX === $this->externalType;
+        if ($requireSchoolboxConnector) {
+            /* Must be using external database and schoolbox connector, USUALLY.
+             * (except for publishDailyData which doesn't have this requirement)
+             */
+            $externalEnable = (bool)$this->externalEnable;
+            $externalType   = IConnector::EXTERNAL_TYPE_SCHOOLBOX === $this->externalType;
 
-        if (!($externalEnable && $externalType)) {
-            $this->log->info(self::WRONG_CONNECTOR_MESSAGE);
+            if (!($externalEnable && $externalType)) {
+                $this->log->info(self::WRONG_CONNECTOR_MESSAGE);
 
-            return false;
+                return false;
+            }
         }
 
         /* Check the username/password tuple

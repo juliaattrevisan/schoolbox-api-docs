@@ -17,7 +17,12 @@ use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\TimetableCycle;
+use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use SensitiveParameter;
@@ -36,13 +41,17 @@ use SensitiveParameter;
  * toolkit (sigh) so it forces us to use xmlrpc
  *
  * The toolkit is the only thing we have to test/develop this on our own.
+ *
+ * There are two usages of this Receiver: data for the Schedule Timetable
+ * and data for the Cyclic Timetable. Publish Daily Data and Publish Class
+ * List Memberships are shared among both usages.
  */
 class Receiver
 {
     /**
      * Log message when authentication fails
      */
-    private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/schoolCode in your instance.';
+    private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/connector setting in your instance.';
 
 
     /**
@@ -73,6 +82,52 @@ class Receiver
      * @var LoggerInterface
      */
     private LoggerInterface $log;
+
+
+    /* Legacy LISS Implementation w/ the Cyclic Timetable
+     *
+     * These properties are used specifically to support by a legacy LISS implementation.
+     * Data from a LISS push goes into the Cyclic Timetable using the following endpoints
+     * in this order:
+     *
+     * Publish/publishDailyData(); (note this clears a lot of db tables via Prepare.php as per tradition)
+     * Publish/publishBellTimes();
+     * Publish/publishClasses();
+     * Publish/publishClassMemberships();
+     * Publish/publishTimetable(); (this one might take a little while)
+     */
+
+    /**
+     * When TtStructure values are mysteriously empty, use this string
+     * as the cycle's identifier and also its name. TtStructure is
+     * sometimes provided in the input payload to distinguish cycles,
+     * but in its absence we assume a default one instead.
+     */
+    private const DEFAULT_CYCLE_IDENTIFIER = 'Main Timetable';
+
+
+    /**
+     * This const corresponds to the enum for the config var external_liss_default_event_type
+     * This is used to decide if we use numeric teacher ids, or alphanumeric teacher codes
+     * If you're not using teacherId, you're presumed to be using teacherCode instead
+     */
+    private const TEACHER_IDENTIFIER_ID = 'teacherId';
+
+
+    /**
+     * A lookup of cycles
+     *
+     * @var TimetableCycle[]
+     */
+    private array $cycleCache = [];
+
+
+    /**
+     * A list of classEntries that we saw previously
+     *
+     * @var array
+     */
+    private array $classEntries = [];
 
 
     /**
@@ -143,20 +198,25 @@ class Receiver
                 'function' => [$this, 'publishClassMemberships'],
             ],
 
-            /* All these ones fulfil a cyclic timetable afaict
-             * We don't need them
+            /* All these ones fulfil a cyclic timetable to support
+             * legacy liss implementations.
              *
-             * Returns a placeholder Response
+             * The cyclic implementation shares publishDailyData
+             * and publishClassListMemberships with the above
              */
-            'liss.publishTimetable' => [
-                'function' => [$this, 'publishTimetable'],
+            'liss.publishBellTimes' => [
+                'function' => [$this, 'publishBellTimes'],
             ],
             'liss.publishClasses' => [
                 'function' => [$this, 'publishClasses'],
             ],
-            'liss.publishBellTimes' => [
-                'function' => [$this, 'publishBellTimes'],
+            'liss.publishTimetable' => [
+                'function' => [$this, 'publishTimetable'],
             ],
+
+            /* Unused
+             * Returns a placeholder Response
+             */
             'liss.getRooms' => [
                 'function' => [$this,'getRooms'],
             ],
@@ -190,7 +250,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated(false)) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -235,6 +295,7 @@ class Receiver
      * @throws Exception
      * @throws \JsonException
      * @throws \PDOException
+     * @throws \Throwable
      * @throws \UnexpectedValueException
      */
     public function publishClassMemberships(Request $message): Response
@@ -359,19 +420,403 @@ class Receiver
     }
 
 
+    /* Legacy liss implementation
+     */
+
     /**
-     * https://liss.net.au/docs/api/hello/
+     * Publish timetable to the Schoolbox
+     *
      * @param Request $message
      * @return Response
+     * @throws Exception
+     * @throws \InvalidArgumentException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function hello(Request $message): Response
+    public function publishBellTimes(Request $message): Response
     {
-        return new Response(new Value([
-            'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
-            'LissVersion' => new Value(self::LISS_VERSION, Value::$xmlrpcInt),
-        ], Value::$xmlrpcStruct));
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        /* Cache locally whatever liss sent to us
+         * This allows you to replay locally
+         */
+        if ($this->storageLogging) {
+            $this->log()->debug('Logging LISS payload to local storage');
+
+            (new PayloadCache($this->storageMapper))->cache('belltimes', $this->superuser, $message);
+        }
+
+        /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
+         * It turns out schools have multiple cycles of varying day lengths
+         */
+        $lookup = [];
+
+        $this->log()->info('publishBellTimes: processing request');
+
+        $allData = $message->getParam(2)->me['array'];
+
+        /* Truncate everything before re-adding
+         * Note: This was supposed to already have been done via publishDailyData
+         * which is supposed to go first
+         *
+         * $timetablePeriodMapper->truncate();
+         */
+        $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
+
+        foreach ($allData as $currentData) {
+            $struct = $currentData->me['struct'];
+
+            /* Use $currentData['TtStructure']'s value as the cycle identifier
+             * and load that if it exists, creating a new one if it doesn't
+             */
+            $cycleIdentifier = (string)$struct['TtStructure']->me['string'];
+            $cycle           = $this->getCycle($cycleIdentifier);
+
+            $dayNumber = (string)$struct['DayNumber']->me['i4'];
+
+            $timetablePeriod = $timetablePeriodMapper->createModel()
+                ->setCycle($cycle)
+                ->setTitle((string)$struct['Period']->me['string'])
+                ->setDay($dayNumber)
+                ->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'H:i'))
+                ->setFinish(new \Alaress_Date_Format((string)$struct['EndTime']->me['string'], 'H:i'));
+
+            /* TODO: Undo these hardcoded values at some point
+              */
+            $timetablePeriod->setUsable(1);
+
+            /* Build a hash lookup of cycles, days and their periods
+             */
+            if (!isset($lookup[$cycle->getId()][$dayNumber])) {
+                $lookup[$cycle->getId()][$dayNumber] = [];
+            }
+
+            $lookup[$cycle->getId()][$dayNumber][] = $timetablePeriod;
+        }
+
+        /* Now traverse $lookup and assign sequence
+         * Take into account non-uniform day lengths by cross-referencing with $counts
+         */
+        foreach ($lookup as $cycleId => $dayData) {
+            $this->log()->info(sprintf(
+                'publishBellTimes: Cycle %s has %s days',
+                $cycleId,
+                \count($dayData)
+            ));
+
+            foreach ($dayData as $dayIndex => $periods) {
+                $this->log()->info(sprintf(
+                    'publishBellTimes: Cycle %s, day %s has %s periods',
+                    $cycleId,
+                    $dayIndex,
+                    \count($periods)
+                ));
+
+                /* Apply sequencing to every period in this day in this cycle
+                 */
+                $i = 0;
+
+                foreach ($periods as $timetablePeriod) {
+                    $timetablePeriod->setSequence($i);
+                    $timetablePeriodMapper->save($timetablePeriod);
+
+                    $i++;
+                }
+            }
+        }
+
+        $this->log()->info(sprintf("publishBellTimes: Saved timetable periods, process completed"));
+
+        return $this->generateResponse('BellTimes Imported');
     }
 
+
+    /**
+     * Publish classes to the Schoolbox
+     *
+     * @param Request $message
+     * @return Response
+     * @throws Exception
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function publishClasses(Request $message): Response
+    {
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        /* Cache locally whatever liss sent to us
+         * This allows you to replay locally
+         */
+        if ($this->storageLogging) {
+            $this->log()->debug('Logging LISS payload to local storage');
+
+            (new PayloadCache($this->storageMapper))->cache('classes', $this->superuser, $message);
+        }
+
+        $this->log()->info('publishClasses: processing request');
+
+        /* Truncate everything before re-adding
+         * Note: This was supposed to already have been done via publishDailyData
+         * which is supposed to go first
+         *
+         * $classEntryMapper->truncate();
+         */
+        $classEntryMapper = ClassEntryMapper::getInstance();
+
+        $allData = $message->getParam(2)->me['array'];
+        $classCount = 0;
+
+        foreach ($allData as $currentData) {
+            $struct = $currentData->me['struct'];
+            $className = trim((string)$struct['CourseName']->me['string']);
+            $classCode = trim((string)$struct['ClassCode']->me['string']);
+
+            /* Constraints in the schema are case insensitive, unlike
+             * these array keys - class codes sometimes appear like
+             * "Speech Therapy" and "Speech therapy" so inserting them
+             * twice will cause it to pack a sad. The classEntries array
+             * treats these as unique whereas the db didn't
+             */
+            $existingKey = strtolower($classCode);
+
+            if (isset($this->classEntries[$existingKey])) {
+                /* Check if this class was added by this method
+                 */
+                $this->log->debug(sprintf(
+                    '%s was already added in publishClasses; skipping',
+                    $classCode
+                ));
+            } else {
+                try {
+                    /* Check if this class was added by a different method
+                     */
+                    $classEntry = $classEntryMapper->findOneByColumn('code', $classCode);
+
+                    $this->log->debug(sprintf(
+                        '%s was already added by some other means; skipping',
+                        $classCode
+                    ));
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $classEntry = $classEntryMapper->createModel()
+                        ->setName($className)
+                        ->setCode($classCode);
+
+                    $classEntryMapper->save($classEntry);
+
+                    $this->log->debug(sprintf(
+                        'Adding %s',
+                        $classCode
+                    ));
+                }
+
+                /* Remember we saw it, in either outcome
+                 */
+                $this->classEntries[$existingKey] = $classEntry;
+            }
+
+            $classCount++;
+        }
+
+        $this->log()->info(sprintf('publishClasses: completed adding %d classes', $classCount));
+
+        return $this->generateResponse('Classes Imported');
+    }
+
+
+    /**
+     * Publish timetable to the Schoolbox
+     *
+     * @param Request $message
+     * @return Response
+     * @throws Exception
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function publishTimetable(Request $message): Response
+    {
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        /* Cache locally whatever liss sent to us
+         * This allows you to replay locally
+         */
+        if ($this->storageLogging) {
+            $this->log()->debug('Logging LISS payload to local storage');
+
+            (new PayloadCache($this->storageMapper))->cache('timetable', $this->superuser, $message);
+        }
+
+        $this->log()->info('publishTimetable: processing request');
+
+        $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
+        $classEntryMapper = ClassEntryMapper::getInstance();
+
+        /* Truncate everything before re-adding
+         * Note: This was supposed to already have been done via publishDailyData
+         * which is supposed to go first
+         *
+         * $classPeriodMapper->truncate();
+         */
+        $classPeriodMapper = ClassPeriodMapper::getInstance();
+
+        /* Decide which externalId format to use via config var
+         */
+        $isTeacherIds = $this->isTeacherIds();
+
+        $allData = $message->getParam(1)->me['array'];
+
+        foreach ($allData as $currentData) {
+            /* An example $currentData that you can paste into a test.json
+             * so you have a meaningful example of what you're working with
+             * This came straight outta their 2020 devkit
+             *
+             * {"me":{"struct":{"DayNumber":{"me":{"i4":1},"mytype":1,"_php_class":null},"Period":{"me":{"string":"3"},"mytype":1,"_php_class":null},"ClassCode":{"me":{"string":"7PDH 2"},"mytype":1,"_php_class":null},"EdvalClassCode":{"me":{"string":"7PDH2"},"mytype":1,"_php_class":null},"TeacherId":{"me":{"string":"79455"},"mytype":1,"_php_class":null},"TeacherCode":{"me":{"string":"ANDN"},"mytype":1,"_php_class":null},"RoomCode":{"me":{"string":"B3"},"mytype":1,"_php_class":null}}},"mytype":3,"_php_class":null}
+             */
+            $struct = $currentData->me['struct'];
+
+            /* Find the Period data
+             */
+            $allPeriods = $timetablePeriodMapper->findByColumnList([
+                'day' => trim((string)$struct['DayNumber']->me['i4']),
+                'title' => trim((string)$struct['Period']->me['string'])
+            ]);
+
+            /* Find the Class
+             */
+            $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
+
+            /* Decide which externalId format to use via config var
+             */
+            if ($isTeacherIds) {
+                $externalId = trim((string)$struct['TeacherId']->me['string']);
+            } else {
+                $externalId = trim((string)$struct['TeacherCode']->me['string']);
+            }
+
+            /* Check that all three are provided
+             * Save it!
+             */
+            if ($allPeriods->count() && $allClasses->count()) {
+                $classPeriod = $classPeriodMapper->createModel()
+                    ->setClass($allClasses->first()->getId())
+                    ->setPeriod($allPeriods->first()->getId())
+                    ->setTeacher($externalId)
+                    ->setRoom(trim((string)$struct['RoomCode']->me['string']));
+
+                $classPeriodMapper->save($classPeriod);
+            } else {
+                /* These ones are broken */
+                if ($allPeriods->count() === 0) {
+                    $this->log()->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
+                }
+
+                if ($allClasses->count() === 0) {
+                    $this->log()->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
+                }
+            }
+        }
+
+        $this->log()->info("publishTimetable: completed request");
+
+        return $this->generateResponse('Timetable Imported');
+    }
+
+
+    /**
+     * Predefine a sis_timetable_cycle record (this doesn't seem defined/accessible
+     * via liss, for some reason - it might be in TimetableStructure ttStructure
+     * which is not accessible to us)
+     *
+     * @param string $identifier
+     * @return TimetableCycle
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function getCycle(string $identifier): TimetableCycle
+    {
+        /* If the $identifier is somehow an empty string, then it might not have
+         * been set properly in the remote data source - just assume the usual
+         * traditional default identifier in this case, and use that
+         */
+        $cycleIdentifier = $identifier ?: self::DEFAULT_CYCLE_IDENTIFIER;
+
+        /* Return a cycle from the existing cached cycles
+         */
+        if (isset($this->cycleCache[$cycleIdentifier])) {
+            return $this->cycleCache[$cycleIdentifier];
+        }
+
+        /* Try to find a Timetable Cycle matching $identifier
+         * If one exists, load it and reuse it
+         * Otherwise create a new one
+         */
+        $cycleMapper = TimetableCycleMapper::getInstance();
+
+        try {
+            $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $cycleIdentifier);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->log()->warning(sprintf(
+                "publishBellTimes: Did not find a cycle for TtStructure identifier %s; creating a new one for it instead",
+                $cycleIdentifier
+            ));
+
+            /* Assume some basic ideas about this new cycle because we haven't
+             * seen anything warranting changing them yet
+             *      a) It starts on Day 1
+             *      b) It has a 10-day cycle length
+             *      c) Each day has 13 slots in it
+             *      d) Goes for the full calendar year
+             */
+            $cycle = $cycleMapper->createModel()
+                ->setTitle($cycleIdentifier)
+                ->setCycleIdentifier($cycleIdentifier)
+                ->setStart(\Alaress_Date_Format::now()->startOfYear())
+                ->setFinish(\Alaress_Date_Format::now()->endOfYear())
+                /* TODO: Undo these hardcoded values at some point
+                 */
+                ->setStartDay(1)
+                ->setCycleLength(10)
+                ->setDayLength(13);
+
+            $cycleMapper->save($cycle);
+        }
+
+        $this->cycleCache[$cycleIdentifier] = $cycle;
+
+        return $cycle;
+    }
+
+
+    /**
+     * Decide if we're going to use teacherIds as the externalId for staff
+     * or whether we use teacherCodes instead
+     *
+     * @return bool
+     */
+    private function isTeacherIds(): bool
+    {
+        return self::TEACHER_IDENTIFIER_ID === $this->teacherIdentifier;
+    }
+
+
+    /* Unused endpoints but we needed to have them here just
+     * in case people click it in their third party system
+     */
 
     /**
      * getRooms() is required to connect to the LissTester from
@@ -470,57 +915,20 @@ class Receiver
     }
 
 
+    /* Generic/misc stuff
+     */
+
     /**
-     * Publish classes to the Schoolbox
-     *
+     * https://liss.net.au/docs/api/hello/
      * @param Request $message
      * @return Response
      */
-    public function publishClasses(Request $message): Response
+    public function hello(Request $message): Response
     {
-        /* Requires schoolbox connector
-         */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
-            return $this->generateResponse(self::AUTHENTICATION_FAILED);
-        }
-
-        return $this->generateResponse('publishClasses finished but unused.');
-    }
-
-
-    /**
-     * Publish timetable to the Schoolbox
-     *
-     * @param Request $message
-     * @return Response
-     */
-    public function publishTimetable(Request $message): Response
-    {
-        /* Requires schoolbox connector
-         */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
-            return $this->generateResponse(self::AUTHENTICATION_FAILED);
-        }
-
-        return $this->generateResponse('publishTimetable finished but unused.');
-    }
-
-
-    /**
-     * Publish timetable to the Schoolbox
-     *
-     * @param Request $message
-     * @return Response
-     */
-    public function publishBellTimes(Request $message): Response
-    {
-        /* Requires schoolbox connector
-         */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
-            return $this->generateResponse(self::AUTHENTICATION_FAILED);
-        }
-
-        return $this->generateResponse('publishBellTimes finished but unused.');
+        return new Response(new Value([
+            'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
+            'LissVersion' => new Value(self::LISS_VERSION, Value::$xmlrpcInt),
+        ], Value::$xmlrpcStruct));
     }
 
 

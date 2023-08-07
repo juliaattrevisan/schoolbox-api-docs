@@ -18,7 +18,6 @@ use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Collection\VCalExporter;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -319,38 +318,38 @@ try {
             break;
 
         case 'timetable':
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($config->get('external_type'), $config->get('schooldata_import_data_source'))) {
-                $api = buildApiClass(
-                    Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class,
-                    [
-                        $user,
-                        $viewer,
-                        null,
-                        $config,
-                        \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                        \Schoolbox\External\ClassEntryMapper::getInstance(),
-                        \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                        \Schoolbox\External\Event\Mapper::getInstance(),
-                        \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                        \Timetable_ColourMapper::getInstance(),
-                        \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
-                    ],
-                    true,
-                    $sentry
-                );
-            } else {
-                $api = buildApiClass(
-                    Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                    [
-                        $user,
-                        $viewer,
-                        $kernel->getDependencyInjector()->get('config'),
-                        \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                    ],
-                    true,
-                    $sentry
-                );
-            }
+            $api = new Calendar_Api_Composite();
+
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    null,
+                    $config,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\ClassEntryMapper::getInstance(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                    \Timetable_ColourMapper::getInstance(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                ],
+                true,
+                $sentry
+            ));
+
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    $kernel->getDependencyInjector()->get('config'),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                ],
+                true,
+                $sentry
+            ));
 
             $filename       = 'timetable';
             $startTimestamp = $_SERVER['REQUEST_TIME'];

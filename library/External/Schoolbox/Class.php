@@ -10,7 +10,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Role;
 
 /**
@@ -156,27 +155,21 @@ class External_Schoolbox_Class implements External_ClassInterface
             }
         }
 
-        /* Only need to do this if you are using one of the SUDS Timetable connectors
-         * to populate data that we must investigate
-         *
-         * All you classical grid users can skip this step
+        /* Schedule Timetable might contain teacher involvements due to LISS
+         * combining data sets with the cyclic timetable
          */
-        $config = \Schoolbox\Config\Loader::getInstance();
+        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
+        $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
 
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('external_type'), (string)$config->get('schooldata_import_data_source'))) {
-            $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
-            $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
+        $staffExternalIds = (new \Schoolbox\External\Event\TimetableUsers(
+            \Schoolbox\External\ClassEntryMapper::getInstance(),
+            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+            \Schoolbox\External\Event\Mapper::getInstance(),
+            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+            \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+        ))->findTeachersForClassCode($classCode, $pastThreshold, $futureThreshold);
 
-            $staffExternalIds = (new \Schoolbox\External\Event\TimetableUsers(
-                \Schoolbox\External\ClassEntryMapper::getInstance(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-            ))->findTeachersForClassCode($classCode, $pastThreshold, $futureThreshold);
-
-            $teachers = array_merge($teachers, $staffExternalIds);
-        }
+        $teachers = array_merge($teachers, $staffExternalIds);
 
         return array_unique($teachers);
     }
@@ -186,10 +179,10 @@ class External_Schoolbox_Class implements External_ClassInterface
      * {@inheritDoc}
      * @param string $classCodes
      *
-     * @return IIterator
+     * @return IIterator|null
      * @throws \Alaress\Database\Exception
      */
-    protected function getTeacherIterator($classCodes): IIterator
+    protected function getTeacherIterator($classCodes): ?IIterator
     {
         $codes = array_filter(explode(',', $classCodes));
 

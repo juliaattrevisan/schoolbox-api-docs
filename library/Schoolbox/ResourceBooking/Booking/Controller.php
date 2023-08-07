@@ -22,7 +22,6 @@ use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\Event\Mapper;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -31,7 +30,6 @@ use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
-use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 
@@ -673,50 +671,50 @@ class Controller extends Base
         if (!empty($roomCode)) {
             $roomCodes = [$item->getRoomCode() => $item->getId()];
 
-            /* Load the suds timetable-specific connectivity and grab its events
+            /* Load the schedule timetable-specific connectivity and grab its events
              */
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
-                $roomSource = new \Calendar_Api_EventType_SudsTimetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+            $roomSource = new \Calendar_Api_EventType_SudsTimetable_Room(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->getUser(),
+                $this->getUser(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                $roomCodes
+            );
+
+            $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
+
+            foreach ($roomEvents as $event) {
+                $renderer = new \Calendar\Event\Type\SudsTimetable\Renderer\Javascript(
+                    $this->getAuthorizer(),
+                    $this->routeGenerator,
+                    $event,
                     $this->getUser(),
-                    $this->getUser(),
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    $roomCodes
+                    $this->getUser()
                 );
+                $output[] = $renderer->render();
+            }
 
-                $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
+            /* Combine it with the cyclic timetable's data too
+             */
+            $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->getUser(),
+                $this->getUser(),
+                $this->externalTimetableHandler,
+                $roomCodes
+            );
 
-                foreach ($roomEvents as $event) {
-                    $renderer = new \Calendar\Event\Type\SudsTimetable\Renderer\Javascript(
-                        $this->getAuthorizer(),
-                        $this->routeGenerator,
-                        $event,
-                        $this->getUser(),
-                        $this->getUser()
-                    );
-                    $output[] = $renderer->render();
-                }
-            } else {
-                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+            $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
+
+            foreach ($roomEvents as $event) {
+                $renderer = new Javascript(
+                    $this->getAuthorizer(),
+                    $this->routeGenerator,
+                    $event,
                     $this->getUser(),
-                    $this->getUser(),
-                    $this->externalTimetableHandler,
-                    $roomCodes
+                    $this->getUser()
                 );
-
-                $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
-
-                foreach ($roomEvents as $event) {
-                    $renderer = new Javascript(
-                        $this->getAuthorizer(),
-                        $this->routeGenerator,
-                        $event,
-                        $this->getUser(),
-                        $this->getUser()
-                    );
-                    $output[] = $renderer->render();
-                }
+                $output[] = $renderer->render();
             }
         }
 

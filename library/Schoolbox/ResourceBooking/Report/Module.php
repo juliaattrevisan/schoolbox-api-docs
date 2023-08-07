@@ -77,7 +77,6 @@ class Module extends BaseModule
             new CalendarApiFactory(
                 $this->injector->get('user'),
                 new External_Timetable(),
-                $this->getConfig(),
                 $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class)
             ),
         );

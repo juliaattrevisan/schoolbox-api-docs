@@ -21,7 +21,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
+use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -278,7 +278,7 @@ class Controller extends Base
         $user = $this->getUser();
 
         // Only cycle based timetable should be returned
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
+        if ((new ValidUsesScheduleTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'), $this->getConfigLoader()->get('timetable_view'))) {
             return false;
         }
 
