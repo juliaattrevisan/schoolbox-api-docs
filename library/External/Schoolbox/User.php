@@ -11,7 +11,6 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -260,28 +259,26 @@ class External_Schoolbox_User implements External_UserInterface
          *
          * All you classical grid users can skip this step
          */
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('external_type'), (string)$config->get('schooldata_import_data_source'), (string)$config->get('timetable_view'))) {
-            $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
-            $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
+        $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
+        $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
 
-            $events = (new \Schoolbox\External\Event\TimetableUsers(
-                \Schoolbox\External\ClassEntryMapper::getInstance(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-            ))->findClassCodesForUser($user, $pastThreshold, $futureThreshold);
+        $events = (new \Schoolbox\External\Event\TimetableUsers(
+            \Schoolbox\External\ClassEntryMapper::getInstance(),
+            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+            \Schoolbox\External\Event\Mapper::getInstance(),
+            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+            \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+        ))->findClassCodesForUser($user, $pastThreshold, $futureThreshold);
 
-            /* Shank it into the required format
-             */
-            foreach ($events as $event) {
-                $overridesTeachers[] = [
-                    'name' => $event['name'],
-                    'code' => $event['code'],
-                    'classType' => '',
-                    'campusCode' => ''
-                ];
-            }
+        /* Shank it into the required format
+         */
+        foreach ($events as $event) {
+            $overridesTeachers[] = [
+                'name' => $event['name'],
+                'code' => $event['code'],
+                'classType' => '',
+                'campusCode' => ''
+            ];
         }
 
         return array_values(

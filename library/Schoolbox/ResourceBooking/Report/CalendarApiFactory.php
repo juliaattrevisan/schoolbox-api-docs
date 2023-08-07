@@ -14,7 +14,6 @@ use Calendar_Api_Composite;
 use Calendar_Api_EventType_Interface;
 use External_TimetableInterface;
 use Schoolbox\External\Event\Mapper;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\IConfigLoader;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
@@ -76,25 +75,23 @@ class CalendarApiFactory
         if ($roomCode = $resource->getRoomCode()) {
             $roomCodes = [$roomCode => $resource->getId()];
 
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'), $this->configLoader->get('timetable_view'))) {
-                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $this->user,
-                    $this->user,
-                    $this->eventMapper,
-                    $roomCodes
-                );
-            } else {
-                $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $this->user,
-                    $this->user,
-                    $this->timetable,
-                    $roomCodes
-                );
-            }
+            /* Combine schedule and cyclic timetable's data sets
+             */
+            $api->add(new \Calendar_Api_EventType_SudsTimetable_Room(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->user,
+                $this->user,
+                $this->eventMapper,
+                $roomCodes
+            ));
 
-            $api->add($timetableApi);
+            $api->add(new Calendar_Api_EventType_Timetable_Room(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->user,
+                $this->user,
+                $this->timetable,
+                $roomCodes
+            ));
         }
         return $api;
     }
@@ -140,25 +137,23 @@ class CalendarApiFactory
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'), $this->configLoader->get('timetable_view'))) {
-                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $this->user,
-                    $this->user,
-                    $this->eventMapper,
-                    $roomCodes
-                );
-            } else {
-                $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $this->user,
-                    $this->user,
-                    $this->timetable,
-                    $roomCodes
-                );
-            }
+            /* Combine schedule and cyclic timetable's data sets
+             */
+            $api->add(new \Calendar_Api_EventType_SudsTimetable_Room(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->user,
+                $this->user,
+                $this->eventMapper,
+                $roomCodes
+            ));
 
-            $api->add($timetableApi);
+            $api->add(new Calendar_Api_EventType_Timetable_Room(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->user,
+                $this->user,
+                $this->timetable,
+                $roomCodes
+            ));
         }
         return $api;
     }

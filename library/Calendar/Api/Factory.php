@@ -15,7 +15,6 @@
  */
 
 use Calendar\Api\ModuleChecker;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
@@ -203,48 +202,47 @@ class Calendar_Api_Factory
     public function produceForTimetableCalendar(User $user, User $viewer): Calendar_Api_EventType_Interface
     {
         $composite = new Calendar_Api_Composite();
-        if (
-            (new ValidUsesSudsTimetable())->isSatisfiedBy(
-                (string)$this->configLoader->get('external_type'),
-                (string)$this->configLoader->get('schooldata_import_data_source'),
-                (string)$this->configLoader->get('timetable_view'),
+
+        /* Combine all the timetable-related sources of data all together
+         * This means you could potentially run both Schedule and Cyclic
+         * timetable data sets concurrently. Wild.
+         */
+        $composite->add(
+            new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $user,
+                $viewer,
+                null,
+                $this->configLoader,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Timetable_ColourMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
             )
-        ) {
-            $composite->add(
-                new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $user,
-                    $viewer,
-                    null,
-                    $this->configLoader,
-                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                    \Schoolbox\External\ClassEntryMapper::getInstance(),
-                    \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                    \Timetable_ColourMapper::getInstance(),
-                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-                )
-            );
-        } else {
-            $composite->add(
-                new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $user,
-                    $viewer,
-                    $this->configLoader,
-                    \Schoolbox\Calendar\EventTypeMapper::getInstance()
-                )
-            );
-            $composite->add(
-                new Calendar_Api_EventType_TimetableDays_External_Default(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $user,
-                    $viewer,
-                    \Schoolbox\Calendar\EventTypeMapper::getInstance()
-                )
-            );
-        }
+        );
+
+        $composite->add(
+            new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $user,
+                $viewer,
+                $this->configLoader,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance()
+            )
+        );
+
+        $composite->add(
+            new Calendar_Api_EventType_TimetableDays_External_Default(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $user,
+                $viewer,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance()
+            )
+        );
+
         return $composite;
     }
 

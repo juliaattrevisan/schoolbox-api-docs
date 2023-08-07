@@ -23,7 +23,6 @@ use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
-use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -541,13 +540,15 @@ class Validation
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
         $roomCodes = [$roomCode => true];
 
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'), $this->configLoader->get('timetable_view'))) {
-            $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes);
-        } else {
-            $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
-        }
+        /* Combine schedule and cyclic timetable's data sets
+ `       */
+        $timetableRoom = (new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes))
+            ->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
 
-        return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
+        $timetableRoom->merge((new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes))
+            ->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1));
+
+        return $timetableRoom;
     }
 
     /**
