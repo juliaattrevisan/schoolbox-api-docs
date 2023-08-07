@@ -7,7 +7,7 @@
     - description:      string a descriptor used for alt and title attributes
     - appendQueryParam: string query params you want appended to the image tag
     - class:            string optional class(es) to apply to the img tag
-    - roundedCorners    string "on" or "off".  Default "off".
+    - roundedCorners    boolean Default false.
 #}
 {% apply spaceless %}
 
@@ -29,7 +29,7 @@
 
 {# Rounded corners are off by default. #}
 {% if roundedCorners is not defined %}
-    {% set roundedCorners = "off" %}
+    {% set roundedCorners = false %}
 {% endif %}
 
 {# the default render strategy is 'small' #}
@@ -101,7 +101,7 @@
         {% set sizeParameter = sizeParameter ~ "square64" %}
     {% endif %}
 
-    {% if roundedCorners == "on" %}
+    {% if roundedCorners %}
         <div class="img img--s img--round">
            <div class="img__wrapper">
     {% endif %}
@@ -125,7 +125,7 @@
         {% endif %}
     />
 
-    {% if roundedCorners == "on" %}
+    {% if roundedCorners %}
             </div>
         </div>
     {% endif %}
