@@ -39,6 +39,10 @@ class Outputter
             $response = $response->withHeader('X-Puppet-Cert-Name', getenv('puppet_cert_name'));
         }
 
+        // Basic CSP, mimicking what currently exists on on-prem instances.
+        // TODO as above: move to middleware
+        $response = $response->withHeader('Content-Security-Policy', 'frame-ancestors \'self\'');
+
         // Output headers
         foreach ($response->getHeaders() as $name => $values) {
             foreach ($values as $value) {
