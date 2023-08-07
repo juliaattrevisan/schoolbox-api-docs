@@ -13,12 +13,12 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     protected function getOptions(): array
     {
         return [
-            'dueWork'    => Assessment\DueWork\Model::getDefaultTypeName(),
-            'quiz'       => Assessment\Quiz\Model::getDefaultTypeName(),
-            'task'       => Assessment\Task\Model::getDefaultTypeName(),
-            'project'    => Assessment\Project::getDefaultTypeName(),
-            'lti'        => Assessment\Lti\Model::getDefaultTypeName(),
-            'lessonPlan' => Assessment\LessonPlan\Model::getDefaultTypeName(),
+            'dueWork'    => Assessment\AssessmentType::TYPE_DUE_WORK,
+            'quiz'       => Assessment\AssessmentType::TYPE_QUIZ,
+            'task'       => Assessment\AssessmentType::TYPE_TASK,
+            'project'    => Assessment\AssessmentType::TYPE_PROJECT,
+            'lti'        => Assessment\AssessmentType::TYPE_LTI_ASSESSMENT,
+            'lessonPlan' => Assessment\AssessmentType::TYPE_LESSON_PLAN,
         ];
     }
 
@@ -60,11 +60,11 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
 
         /* filter config */
         foreach ($setConfig as $option => $value) {
-            $page->setVar(array(
+            $page->setVar([
                               'COMPONENT_CONFIG_FILTER_VALUE'     => $option,
                               'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($option),
                               'COMPONENT_CONFIG_FILTER_SELECTED'  => $value == 1 ? 'checked="checked"' : '',
-                          ));
+                          ]);
             $page->parse('filters_block', 'filters', true);
         }
     }
