@@ -291,7 +291,7 @@ export default {
         <div v-if="hasLoadError">
             <section class="content">
                 <div tableData-alert class="alert-box alert">
-                    Sorry, we are currently unable to load. Please contact your support it the problem persists.
+                    Sorry, we are currently unable to load. Please contact your support if the problem persists.
                 </div>
             </section>
         </div>
