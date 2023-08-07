@@ -5,7 +5,7 @@ namespace Schoolbox\Learning\Component\Dashboard;
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 {
