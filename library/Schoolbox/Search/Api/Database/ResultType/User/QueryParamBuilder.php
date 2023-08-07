@@ -13,6 +13,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
+use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 use Schoolbox\Search\Api\Database\IQueryParamBuilder;
 use Schoolbox\Search\Api\Database\QueryParams;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
@@ -25,7 +26,7 @@ use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
  * * their username
  * * their external ID
  */
-class QueryParamBuilder implements IQueryParamBuilder
+class QueryParamBuilder extends BaseQueryParamBuilder
 {
     /**
      * Constructor
@@ -39,24 +40,8 @@ class QueryParamBuilder implements IQueryParamBuilder
     ) {
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function buildMatchQueryParams(
-        string $keyword,
-        FilterDataObject $filter,
-        ?CursorDataObject $cursor,
-        int $limit,
-    ): QueryParams {
-        // Unsure if exact search should be used here?
-//        // test for exact search, and if so return those results instead
-//        if (preg_match('#".+"#', $keyword)) {
-//            // strip the prepended and appended quote characters
-//            $keyword = substr($keyword, 1, strlen($keyword) - 2);
-//            return $this->searchExact($keyword, $offset, $limit, $count);
-//        }
-
-
+    protected function buildBaseWhereParams(string $keyword): array
+    {
         // Don't show deleted users
         $whereParts = ['u.deleted_at IS NULL'];
 
@@ -84,68 +69,47 @@ class QueryParamBuilder implements IQueryParamBuilder
         }
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
 
-        // Apply filter
-        // (This may happen outside of the UNION: unsure as of yet)
-        // Some of these params may be generic to all searches: not sure yet
-        if ($filter->types) {
-            $whereParts[] = 'type IN ' . Builder::getArrayPlaceholders($filter->types, 'userType');
-            $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'userType'));
-        }
-        if ($filter->fromDate) {
-            $whereParts[]           = 'u.created_at >= :userFromDate';
-            $params['userFromDate'] = $filter->fromDate->getDatabase();
-        }
-        if ($filter->toDate) {
-            $whereParts[]         = 'u.created_at <= :userToDate';
-            $params['userToDate'] = $filter->toDate->getDatabase();
-        }
+        return [
+            $whereParts,
+            $params,
+        ];
+    }
 
-        // Apply cursor
-        // (Previous technique: < most relevant field, = most relevant and < next most relevant)
-        // This can probably be made generic?
-        // TODO consider reverting to previous, and moving to outside UNION
-        // TODO relevance/type/title/id parts can be made generic
-        $relevancePart = '1';
-        $titlePart     = "CONCAT(u.chosen_name, ' ', u.lastname)";
-        $typePart      = "CONCAT('user.', r.group_type)";
-        $idPart        = 'u.id';
-        if ($cursor) {
-            $cursorSearchParts = [
-                "($relevancePart < :cursorRelevance)",
-                "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)",
-                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)",
-                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND $idPart > :cursorId)",
-            ];
+    protected function buildRelevanceStatement(): string
+    {
+        return '1';
+    }
 
-            $whereParts[]              = '(' . implode(' OR ', $cursorSearchParts) . ')';
-            $params['cursorRelevance'] = $cursor->relevance;
-            $params['cursorType']      = $cursor->type;
-            $params['cursorTitle']     = $cursor->title;
-            $params['cursorId']        = $cursor->id;
-        }
+    protected function buildTitleStatement(): string
+    {
+        return "CONCAT(u.chosen_name, ' ', u.lastname)";
+    }
 
-        $where = implode(' AND ', $whereParts);
+    protected function buildTypeStatement(): string
+    {
+        return "CONCAT('user.', r.group_type)";
+    }
 
-        // retrieve results
-        // Finagle a title together from chosen + last name for cursoring only:
-        // this may be presented differently on the frontend
-        $query = "
-            SELECT
-                $idPart AS id,
-                $titlePart AS title,
-                $typePart AS type,
-                u.updated_at AS date,
-                $relevancePart AS relevance
+    protected function buildIdStatement(): string
+    {
+        return 'u.id';
+    }
+
+    protected function buildDateStatement(): string
+    {
+        return 'u.updated_at';
+    }
+
+    protected function buildCreatorStatement(): string
+    {
+        return 'NULL';
+    }
+
+    protected function buildFromStatement(): string
+    {
+        return "
             FROM `user` u
             LEFT JOIN `groups` AS r ON u.group_id = r.id
-            WHERE $where
-            ORDER BY
-                $titlePart ASC,
-                $typePart ASC,
-                u.id ASC
-            LIMIT :userLimit
         ";
-        $params['userLimit'] = $limit;
-        return new QueryParams($query, $params);
     }
 }

@@ -14,17 +14,11 @@ use Alaress\Database\Quoter\IQuoter;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 
-class BaseQueryParamBuilder implements IQueryParamBuilder
+/**
+ * Abstract base class for query param builders.
+ */
+abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter       $quoter
-     */
-    public function __construct(private IQuoter $quoter)
-    {
-    }
-
     /**
      * @inheritdoc
      */
@@ -129,6 +123,7 @@ class BaseQueryParamBuilder implements IQueryParamBuilder
                 $idPart        AS id,
                 $titlePart     AS title,
                 $typePart      AS type,
+                $datePart      AS date,
                 $relevancePart AS relevance
             $from
             WHERE $where
@@ -143,75 +138,19 @@ class BaseQueryParamBuilder implements IQueryParamBuilder
         return new QueryParams($query, $params);
     }
 
-    protected function buildBaseWhereParams(string $keyword): array
-    {
-        $whereParts = ['u.deleted_at IS NULL'];
+    abstract protected function buildBaseWhereParams(string $keyword): array;
 
-        // Show disabled users only if ticked (hide when unticked)
-//        if (!$this->config->get('show_disabled_users')) {
-//            $whereParts[] = 'u.enabled = 1';
-//        }
+    abstract protected function buildRelevanceStatement(): string;
 
-        // Don't allow LIKE searches on keywords < 2 chars long
-        // Probably shouldn't allow any searches on < 2 chars, but shrug
-        // TODO consider injecting predicate builder or database itself
-        $keywordSearchParts = ['u.synergy_id = :userKeyword'];
-        $params             = ['userKeyword' => $keyword];
-        if (mb_strlen($keyword, 'UTF-8') >= 2) {
-            $keywordSearchParts[]      = "u.username LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "u.firstname LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "u.preferred_name LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "u.lastname LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.firstname, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.firstname, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.preferred_name, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.lastname) LIKE :userKeywordLike";
-            $params['userKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
-        }
-        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
+    abstract protected function buildTitleStatement(): string;
 
-        return [
-            $whereParts,
-            $params,
-        ];
-    }
+    abstract protected function buildTypeStatement(): string;
 
-    protected function buildRelevanceStatement(): string
-    {
-        return '1';
-    }
+    abstract protected function buildIdStatement(): string;
 
-    protected function buildTitleStatement(): string
-    {
-        return "CONCAT(u.chosen_name, ' ', u.lastname)";
-    }
+    abstract protected function buildDateStatement(): string;
 
-    protected function buildTypeStatement(): string
-    {
-        return "CONCAT('user.', r.group_type)";
-    }
+    abstract protected function buildCreatorStatement(): string;
 
-    protected function buildIdStatement(): string
-    {
-        return 'u.id';
-    }
-
-    protected function buildDateStatement(): string
-    {
-        return 'u.updated_at';
-    }
-
-    protected function buildCreatorStatement(): string
-    {
-        return 'NULL';
-    }
-
-    protected function buildFromStatement(): string
-    {
-        return "
-            FROM `user` u
-            LEFT JOIN `groups` AS r ON u.group_id = r.id
-        ";
-    }
+    abstract protected function buildFromStatement(): string;
 }
