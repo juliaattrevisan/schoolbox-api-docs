@@ -1,6 +1,6 @@
 /**
- * As much as possible, allow features no longer available in CKEditor 5 to
- * at least still persist and beave the same way in display view.
+ * Any UI related tweaks that need to be made to the editor to fit
+ * within the SB context should be added here.
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
@@ -13,7 +13,7 @@ export default class PanelTweaks extends Plugin {
      */
     init() {
         this.editor.sourceElement.addEventListener(EditorEvent.EDITOR__CREATED, () => {
-            this.updatePanelPositions();
+            this.updateDropdownPositions();
         });
     }
 
@@ -23,7 +23,7 @@ export default class PanelTweaks extends Plugin {
      * part of the dropdown may appear behind them. To resolve we pass in the #content element
      * into the getOptimalPosition method used.
      */
-    updatePanelPositions() {
+    updateDropdownPositions() {
         const toolbarItems = this.editor.ui.view.toolbar.items;
         const dropDownItems = toolbarItems.filter((item) => item.panelPosition); // get only those toolbar items that are dropdowns
         dropDownItems.forEach((item) => {
