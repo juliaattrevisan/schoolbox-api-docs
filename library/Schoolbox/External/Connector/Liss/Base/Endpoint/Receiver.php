@@ -475,17 +475,20 @@ class Receiver
             /* Use $currentData['TtStructure']'s value as the cycle identifier
              * and load that if it exists, creating a new one if it doesn't
              */
-            $cycleIdentifier = (string)$struct['TtStructure']->me['string'];
+            $cycleIdentifier = trim((string)($struct['TtStructure']->me['string'] ?? null));
             $cycle           = $this->getCycle($cycleIdentifier);
 
-            $dayNumber = (string)$struct['DayNumber']->me['i4'];
+            $dayNumber = trim((string)($struct['DayNumber']->me['i4'] ?? null));
+            $periodName = trim((string)($struct['Period']->me['string'] ?? null));
+            $startTime = trim((string)($struct['StartTime']->me['string'] ?? null));
+            $finishTime = trim((string)($struct['EndTime']->me['string'] ?? null));
 
             $timetablePeriod = $timetablePeriodMapper->createModel()
                 ->setCycle($cycle)
-                ->setTitle((string)$struct['Period']->me['string'])
+                ->setTitle($periodName)
                 ->setDay($dayNumber)
-                ->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'H:i'))
-                ->setFinish(new \Alaress_Date_Format((string)$struct['EndTime']->me['string'], 'H:i'));
+                ->setStart(new \Alaress_Date_Format($startTime, 'H:i'))
+                ->setFinish(new \Alaress_Date_Format($finishTime, 'H:i'));
 
             /* TODO: Undo these hardcoded values at some point
               */
@@ -579,8 +582,8 @@ class Receiver
 
         foreach ($allData as $currentData) {
             $struct = $currentData->me['struct'];
-            $className = trim((string)$struct['CourseName']->me['string']);
-            $classCode = trim((string)$struct['ClassCode']->me['string']);
+            $className = trim((string)($struct['CourseName']->me['string'] ?? null));
+            $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
 
             /* Constraints in the schema are case insensitive, unlike
              * these array keys - class codes sometimes appear like
@@ -689,24 +692,29 @@ class Receiver
              */
             $struct = $currentData->me['struct'];
 
+            /* Decide which externalId format to use via config var
+             */
+            if ($isTeacherIds) {
+                $externalId = trim((string)($struct['TeacherId']->me['string'] ?? null));
+            } else {
+                $externalId = trim((string)($struct['TeacherCode']->me['string'] ?? null));
+            }
+
+            $dayNumber = trim((string)($struct['DayNumber']->me['i4'] ?? null));
+            $periodName = trim((string)($struct['Period']->me['string'] ?? null));
+            $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
+            $room = trim((string)($struct['RoomCode']->me['string'] ?? null));
+
             /* Find the Period data
              */
             $allPeriods = $timetablePeriodMapper->findByColumnList([
-                'day' => trim((string)$struct['DayNumber']->me['i4']),
-                'title' => trim((string)$struct['Period']->me['string'])
+                'day' => $dayNumber,
+                'title' => $periodName
             ]);
 
             /* Find the Class
              */
-            $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
-
-            /* Decide which externalId format to use via config var
-             */
-            if ($isTeacherIds) {
-                $externalId = trim((string)$struct['TeacherId']->me['string']);
-            } else {
-                $externalId = trim((string)$struct['TeacherCode']->me['string']);
-            }
+            $allClasses = $classEntryMapper->findByColumn('code', $classCode);
 
             /* Check that all three are provided
              * Save it!
@@ -716,7 +724,7 @@ class Receiver
                     ->setClass($allClasses->first()->getId())
                     ->setPeriod($allPeriods->first()->getId())
                     ->setTeacher($externalId)
-                    ->setRoom(trim((string)$struct['RoomCode']->me['string']));
+                    ->setRoom($room);
 
                 $classPeriodMapper->save($classPeriod);
             } else {
