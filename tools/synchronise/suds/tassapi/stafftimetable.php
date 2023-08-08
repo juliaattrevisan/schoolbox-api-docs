@@ -217,6 +217,7 @@ HELP;
         return $dates;
     }
 
+
     /**
      * Preview what the timetable structure might be,
      * according to tass data with minimal manipulation from us
