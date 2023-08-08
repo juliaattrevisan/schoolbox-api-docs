@@ -2,6 +2,8 @@
  * Basic DOM manipulation utilities
  */
 
+import { escapeRegExp } from "@js/util/jsUtils";
+
 /**
  * returns an integer indicating the position of the
  * passed element relative to the original collection
@@ -10,14 +12,10 @@
  * @returns {number} - position of the DOM element
  */
 export function getIndex(element: HTMLElement) {
-    if (!element) {
+    if (!element || !element.parentNode) {
         return -1;
     }
-    let i = 0;
-    while ((element = element.previousElementSibling)) {
-        i += 1;
-    }
-    return i;
+    return [...element.parentElement.children].indexOf(element);
 }
 
 /**
@@ -92,9 +90,9 @@ export function getClosestElement(targetElement: HTMLElement, elements: HTMLElem
     elements.forEach((element) => {
         // loop through each element and find the closest element using pythagoras theorem
         const elementsTargetPoint = getElementsLeftAndMidHeightPoint(element);
+        // ** is: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Exponentiation
         const distance = Math.sqrt(
-            Math.pow(elementsTargetPoint.left - targetPoint.left, 2) +
-                Math.pow(elementsTargetPoint.top - targetPoint.top, 2)
+            (elementsTargetPoint.left - targetPoint.left) ** 2 + (elementsTargetPoint.top - targetPoint.top) ** 2
         );
         if (distance < minDistance) {
             minDistance = distance;
@@ -175,6 +173,7 @@ export function setAndGetAttribute(element: HTMLElement, attribute: string, valu
     element.setAttribute(attribute, value);
     return element.getAttribute(attribute);
 }
+
 /**
  * Returns true if the script exists on the page
  * @param {string} src - the src of the script
@@ -196,10 +195,12 @@ export async function getLoadedHTML(htmlString: string) {
     const newScriptTags = Array.from(scriptTags).filter(
         (scriptTag) => !isScriptAdded(scriptTag.getAttribute("src") as string)
     ); // only add those <scripts> that aren't already on the page
-    for (const scriptTag of newScriptTags) {
-        // add each into the document head
-        await injectScript(scriptTag.getAttribute("src"));
-    }
+    const injections: Promise<void>[] = [];
+    newScriptTags.forEach((scriptTag) => {
+        injections.push(injectScript(scriptTag.getAttribute("src") as string));
+    });
+    // add each into the document head
+    await Promise.all(injections);
     if (documentFragment.childElementCount === 1) {
         // should be returning a single div
         return documentFragment.firstElementChild;
@@ -227,4 +228,21 @@ export function getScriptElement(src: string) {
 export function isScriptLoaded(src: string) {
     const scriptElement = document.querySelector(`script[src="${src}"]`);
     return scriptElement && scriptElement.getAttribute("data-is-loaded") === "true";
+}
+
+/**
+ * To add <mark> elements around the input on any of the matches
+ * (?![^>]*>) is used to check we are not inside an element node
+ * @param {string} toMark - the string to find all instanced of the current search string in
+ * @param {string[]} wordList - the list of words to search for
+ * @returns {string} string for v-html with <mark></mark> wrapped around each found result
+ */
+export function addMarks(toMark: string, wordList: string[]) {
+    let marked = toMark;
+    wordList.forEach((wordInSearch) => {
+        marked = marked.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
+            return `<mark>${match}</mark>`;
+        });
+    });
+    return marked;
 }

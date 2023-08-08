@@ -3,7 +3,7 @@
  * Display a single search result
  */
 
-import { escapeRegExp } from "@js/util/jsUtils";
+import { addMarks } from "@js/util/domUtils";
 import { Result } from "../../../js/types/Result";
 import { useQueryStore } from "../../store/spQueryStore";
 import SpResultsListSubResults from "./sp-results-list-sub-results.vue";
@@ -21,23 +21,6 @@ const queryStore = useQueryStore();
 const hasSubResults = window.Vue.computed(() => {
     return props.result._subResults && props.result._subResults.data.length > 0;
 });
-
-/**
- * To add <mark> elements around the input on any of the matches
- * (?![^>]*>) is used to check we are not inside an element node
- * @param {string} toMark - the string to find all instanced of the current search string in
- * @param {string[]} wordList - the list of words to search for
- * @returns {string} string for v-html with <mark></mark> wrapped around each found result
- */
-function addMarks(toMark: string, wordList: string[]) {
-    let marked = toMark;
-    wordList.forEach((wordInSearch) => {
-        marked = marked.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
-            return `<mark>${match}</mark>`;
-        });
-    });
-    return marked;
-}
 </script>
 
 <template>
