@@ -8,6 +8,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -125,6 +126,44 @@ class CampusMapper extends Mapper
         }
 
         return $collection;
+    }
+
+
+    /**
+     * @param GenericCollection $users
+     * @return void
+     * @throws Mapper\Exception
+     */
+    public function populateUserCampus(GenericCollection $users): void
+    {
+        if ($users->count() === 0) {
+            return;
+        }
+        $bindings = Builder::getBindings($users->getPropertyValues('id'), 'u');
+        $stmt = $this->database->prepare(
+            "
+            SELECT
+                uc.uid as user_id, {$this->getColumnString('c')}
+            FROM
+                `{$this->getTable()}` c
+            JOIN userCampus uc ON uc.campus = c.id
+            WHERE uc.uid IN ({$bindings->getPlaceholder()})
+        "
+        );
+
+        $stmt->execute($bindings->getParams());
+
+        $users = $users->indexBy('id');
+
+        foreach ($stmt->fetchAll() as $row) {
+            /** @var User $current */
+            $current = $users->offsetGet($row['user_id']);
+            if (!$current->getCampusCollection()) {
+                $current->setCampusCollection($this->createCollection());
+            }
+            $campus = $this->hydrate($row, 'c');
+            $current->getCampusCollection()->add($campus);
+        }
     }
 
 

@@ -15,6 +15,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -128,6 +129,7 @@ class Module extends BaseModule
             $userTranslator,
             $pastoralTranslator,
             $filterHelper,
+            $this->getMapperFactory()->get(CampusMapper::class),
         );
     }
 

@@ -230,7 +230,7 @@ class Controller extends Base
         // Set the current page number
         $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? (int)$get['pageCurrent'] : 1;
 
-        $recordCount = $this->pastoralDataSource->countRecords($user, $student->getId(), $typeId, $subtypeId);
+        $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $subtypeId);
 
         $maxPage = (int)ceil($recordCount / $resultsPerPage);
         if ($maxPage < 1) {
@@ -243,7 +243,7 @@ class Controller extends Base
             $pageCurrent = 1;
         }
         // populate related records
-        $pageRecords = $this->pastoralDataSource->findRecords($user, $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
+        $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
 
         $pastoralCountHelper = new PastoralCountHelper(
             $this->routeGenerator,
@@ -311,7 +311,7 @@ class Controller extends Base
 
         // Retrieve all of the students pastoral records
         $recordCount  = 0;
-        $linkedCounts = $this->pastoralDataSource->getLinkedStudentRecordCount($this->getUser(), $student->getId(), $typeId, $subtypeId);
+        $linkedCounts = $this->pastoralDataSource->getLinkedStudentRecordCount($this->getUser(), $student, $typeId, $subtypeId);
         foreach ($linkedCounts as $linkedCount) {
             if ((int)$linkedCount['student_id'] === $linkedStudent->getId()) {
                 $recordCount = (int)$linkedCount['count'];
@@ -331,7 +331,7 @@ class Controller extends Base
         }
 
         // populate related records
-        $pageRecords = $this->pastoralDataSource->findRecords($this->getUser(), $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, $linkedStudent->getId());
+        $pageRecords = $this->pastoralDataSource->findRecords($this->getUser(), $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, $linkedStudent);
 
         $this->response = $this->responseFromTemplate(
             '@pastoral/student_linked.twig',

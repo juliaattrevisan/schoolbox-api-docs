@@ -51,11 +51,10 @@ class AccessLevelCensor
      *
      * Public-facing recursive driver.
      *
-     * @param Collection|Model[] $records A list of pastoral records
-     * @param User               $user    The user who is trying to view them
+     * @param Collection $records A list of pastoral records
+     * @param User       $user    The user who is trying to view them
      *
      * @return GenericCollection
-     * @throws InsufficientHydrationException
      */
     public function filterRecordsForUser(Collection $records, User $user): GenericCollection
     {
@@ -241,6 +240,7 @@ class AccessLevelCensor
         // Otherwise start with deny access, and work our way up the permission levels
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
+        /** @var Access\Model $access */
         foreach ($record->getAccess() as $access) {
             $access->setPastoral($record);
             $accessLevelCurrent = $access->getAccessLevel($user);
@@ -252,6 +252,13 @@ class AccessLevelCensor
 
             if ($accessLevelCurrent === PastoralAccessMapper::ACCESS_DENY) {
                 return PastoralAccessMapper::ACCESS_DENY;
+            }
+            if ($access->getStudentCampusOnly()) {
+                $studentCampusIds = $record->getStudent()->getCampusCollection()->getPropertyValues('id');
+                $viewerCampusIds = $user->getCampusCollection()->getPropertyValues('id');
+                if (array_intersect($studentCampusIds, $viewerCampusIds) === []) {
+                    return PastoralAccessMapper::ACCESS_DENY;
+                }
             }
 
             // We want the highest access level
