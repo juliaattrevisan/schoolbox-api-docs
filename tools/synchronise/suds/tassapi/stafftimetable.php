@@ -9,7 +9,6 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
@@ -35,7 +34,7 @@ $app = new class extends CliTool\App
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
-    public const LOCK_NAME = 'SUDS TASS Timetable Analysis';
+    public const LOCK_NAME = 'SUDS TASS Staff Timetable Analysis';
 
 
     /**
@@ -85,7 +84,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-SUDS TASS Timetable Analysis
+SUDS TASS Staff Timetable Analysis
 
 * Find out what (day, period) tuples are expected for the provided staff member
 denoted by externalId
@@ -94,10 +93,10 @@ TASS Academic Period values, or the --semester option if provided.
 
 This does not change any data; it only reports what it finds.
 
-Usage: timetable.php --externalId=... [--semester=...]
+Usage: stafftimetable.php --externalId=... [--semester=...]
 
-Example: timetable.php --externalId=DE
-Example: timetable.php --externalId=DE --semester=3
+Example: stafftimetable.php --externalId=DE
+Example: stafftimetable.php --externalId=DE --semester=3
 
 
 HELP;
