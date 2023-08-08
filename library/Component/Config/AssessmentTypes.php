@@ -57,11 +57,6 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
             }
         }
 
-        // if LTI is not enabled then remove that entry
-        if (!$ltiEnabled) {
-            unset($setConfig['lti']);
-        }
-
         // has an internal block for the checkboxes
         $page->setBlock($keyblock, 'filters', 'filters_block');
         $page->setVar('filters_block', '');
