@@ -125,14 +125,16 @@ function onClickOutside() {
 }
 
 /**
- * Focus the search input
+ * The search input has gained focus
  */
 function onFocusOver() {
     isFocused.value = true;
 }
 
 /**
- * the search input loses focus
+ * The search input has lost focus, however in this scenario,
+ * we want to keep any search results open until the user clicks outside
+ * of the header search component
  */
 function onFocusOut() {
     if (keyword.value.length === 0) {
@@ -167,7 +169,8 @@ function onMouseOver() {
 }
 
 /**
- * The user has left the search bar
+ * The mouse has moved off the search bar, though we want to keep the search input 'active'
+ * if focus is still on the search input
  */
 function onMouseOut() {
     if (!isFocused.value) {

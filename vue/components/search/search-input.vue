@@ -1,10 +1,14 @@
 <script setup lang="ts">
 /**
- * To display the search input field, accompanied by a search button
+ * To display the search input field, accompanied by a search button.
+ * As the input can be part of a larger component, the prop isActive is used to
+ * add the active styles as the input may not always be active if it is
+ * within a larger component. In this instance (header-search.vue), and
+ * the search-input is only revealed when the user moves over the input in the header.
  */
 
 interface Props {
-    isActive: boolean; //
+    isActive: boolean; // to add the active styles
     initialInput?: string; // to prefill the input
 }
 const props = defineProps<Props>();
@@ -82,7 +86,7 @@ function onFocusOut(event: FocusEvent) {
 }
 
 /**
- *
+ * Mouse over either the input or the search button
  * @param {MouseEvent} event - The event object
  */
 function onMouseOver(event: MouseEvent) {
@@ -90,7 +94,7 @@ function onMouseOver(event: MouseEvent) {
 }
 
 /**
- *
+ * Mouse out either the input or the search button
  * @param {Event} event - The event object
  */
 function onMouseOut(event: MouseEvent) {
@@ -130,8 +134,11 @@ function onMouseOut(event: MouseEvent) {
 </template>
 
 <style lang="scss" scoped>
-/* Input field when Search feature is activated
- */
+/*
+* Styles to suggest the input is 'active'
+* As the input can be part of a larger component (header-search.vue)
+* we pass the isActive prop to the component to style it accordingly
+*/
 .search-input-active {
     background-color: white;
     border: 2px solid var(--navigation-hover);
@@ -149,8 +156,7 @@ function onMouseOut(event: MouseEvent) {
     }
 }
 
-/* Search icon in its idle state
- */
+// Search icon in its idle state, it sits on the right of the input field
 .icon-search {
     align-items: center;
     background: none;
