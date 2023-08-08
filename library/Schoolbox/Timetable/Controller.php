@@ -14,6 +14,7 @@ namespace Schoolbox\Timetable;
 use Alaress\Web\Controller\Base;
 use DateTime;
 use External_Timetable;
+use Schoolbox\External\User as ExternalUser;
 
 class Controller extends Base
 {
@@ -52,8 +53,13 @@ class Controller extends Base
          */
         $weekends = 'false';
 
+        $externalUser = new ExternalUser();
+        $externalUser->loadChildren([$user]); // Loads children into $user.
+        $children = $user->getChildren();
+
         $this->response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
-            'user' => $user,
+            'children' => $children,
+            'user' => ((count($children) > 0) ? $children[0] : $user), // If the user is a parent, we are interested in the timetable of the first child.
             'selectedDate' => $selectedDate,
             'weekends' => $weekends
         ], sprintf(

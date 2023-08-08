@@ -19,6 +19,25 @@
     </script>
 {% endautoescape %}
 
+{% if children|length > 0 %}
+    <div class="row ">
+        <div class="small-12 columns">
+            <dl class="sub-nav">
+                {% for child in children %}
+                    {% set childFormattedName = child.formatName %}
+                    {% set campus = child.campusCollection.first %}
+
+                    <dd{% if child.id == user.id %} class="active"{% endif %}>
+                        <a data-timetable-selector="{{ child.id }}-{{ campus.id }}" title="Timetable for {{ childFormattedName }} in {{ campus.name }}">
+                            {{ childFormattedName }} ({{ campus.name }})
+                        </a>
+                    </dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+{% endif %}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Timetable for {{ user.fullname }}{% if user.year and (user.year.longName(locale.year.proper)|length) %}, {{ user.year.longName(locale.year.proper) }}{% endif %}
