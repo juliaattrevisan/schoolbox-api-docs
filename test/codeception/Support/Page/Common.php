@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tests\Support\Page;
 
+use Codeception\Util\Locator;
 use Tests\Support\AcceptanceTester;
 
 class Common
@@ -153,4 +154,13 @@ class Common
     {
         $this->tester->click('a[data-section="' . $tabOption . '"]');
     }
+
+    /**
+     * clicks the submit button by locating the last element in the apge
+     */
+    public function clickSubmitButton(): void
+    {
+        $this->tester->click(Locator::lastElement('a.button.submit'));;
+    }
+
 }

@@ -35,9 +35,9 @@ class CourseList
     /**
      * click a course down arrow by passing the unit specification id
      */
-    public function clickCourseDownArrow($unitId): void
+    public function clickCourseDownArrow($courseId): void
     {
-        $this->tester->click(['css' => 'a[class=icon-down-arrow][data-collapser=unit-' . $unitId . ']']);
+        $this->tester->click(['css' => 'a[class=icon-down-arrow][data-collapser=course-' . $courseId . ']']);
     }
 
     /**

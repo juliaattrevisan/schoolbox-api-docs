@@ -24,6 +24,8 @@ class CourseModify
     public const SELECTOR_USE_FOLDER = '[data-selection] [data-select]';
     public const SELECTOR_SAVE_COURSE = '#update-course-form [type=submit][value="Save Course"]';
 
+    public const NEW_LESSON_PLAN_BUTTON = 'New Lesson Plan';
+
     private AcceptanceTester $tester;
 
     /**
@@ -60,4 +62,14 @@ class CourseModify
     {
         $this->tester->click(['css' => 'a[href="/learning/export/assessment/' . $assessmentNumber . '?returnUrl=L2NvdXJzZS9tb2RpZnkvNiMxNQ%3D%3D"]']);
     }
+
+    /**
+     * click New Lesson Plan button
+     */
+    public function clickNewLessonPlanButton(): void
+    {
+        $this->tester->click(self::NEW_LESSON_PLAN_BUTTON);
+    }
+
+
 }

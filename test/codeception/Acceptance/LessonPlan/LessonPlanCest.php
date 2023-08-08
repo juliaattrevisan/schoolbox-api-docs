@@ -8,10 +8,13 @@ use Exception;
 use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\CreateLessonPlanTemplate;
 use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\LessonPlanTemplateList;
 use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\UpdateLessonPlanTemplate;
+use Tests\Support\Page\Common;
 use Tests\Support\Page\CourseModify;
 use Tests\Support\Page\Courses\CourseList;
 use Tests\Support\Page\Courses\ImportCourseIntoClass;
 use Tests\Support\Page\Folder\CreateFolder;
+use Tests\Support\Page\LessonPlan\CreateLessonPlan;
+use Tests\Support\Page\LessonPlan\TemplateList;
 
 class LessonPlanCest
 {
@@ -46,6 +49,9 @@ class LessonPlanCest
         $courseList = new CourseList($i);
         $courseModify = new CourseModify($i);
         $importCourseIntoClass = new ImportCourseIntoClass($i);
+        $templateList = new TemplateList($i);
+        $common = new Common($i);
+        $createLessonPlan = new CreateLessonPlan($i);
         $templateName = "Automation Template to create a lesson plan";
         $lessonPlanName = 'Lesson Plan Automation Test 1';
         $folderName = 'Test Class Homepage ' . $i->getUuid();
@@ -59,19 +65,22 @@ class LessonPlanCest
         $i->amGoingTo('navigate to the  Year 9 English course modify page');
         $i->amOnPage($courseModify->getURL(6));
         $i->amGoingTo('click the arrow down for Romeo and Juliet unit');
-        $courseList->clickCourseDownArrow('15');
+        $courseModify->clickUnitArrow('15');
         $i->amGoingTo('click New Lesson PLan button');
-        $i->click('New Lesson Plan');
+        $courseModify->clickNewLessonPlanButton();
         $i->waitForText("Create Lesson Plan", 5);
         $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan_template','id',['deleted_at' => null,'title like'=>$templateName]);
-        $i->click(['css' => 'a[data-reveal-id="lpt-preview-' . $lessonPlanTemplateId . '"][title="Preview this template"]']);
+        $templateList->clickTemplateLink($lessonPlanTemplateId);
         $i->wait(2);
-        $i->click(Locator::lastElement('a.button.submit'));
-        $i->fillField('input#title',$lessonPlanName);
-        $i->click('input[type=submit][value=Create]');
+        $common->clickSubmitButton();
+        $createLessonPlan->typeTitle($lessonPlanName);
+        $createLessonPlan->clickCreateButton();
         $i->canSee('Modify Course');
         $i->canSee($lessonPlanName);
 
+
+
+        
         $i->amGoingTo('navigate to course list and click the 3-dot menu for Year 9 English course in the' .$folderName);
         $i->amOnPage($courseList::URL);
         $i->canSee('Course List');
