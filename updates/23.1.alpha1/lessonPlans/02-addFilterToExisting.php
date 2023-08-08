@@ -38,15 +38,16 @@ $app = new class extends CliTool\App
                 VALUES (
                     (
                         SELECT id FROM component_config_definition
-                        WHERE `key` = :new_key AND component_definition_id = :component_definition_id_new
+                        WHERE `key` = "assessmentTypes" AND component_definition_id = :component_definition_id_new
                     ),
                     :old_instance_id,
-                    :new_value
+                    (
+                        SELECT default_value FROM component_config_definition
+                        WHERE `key` = "assessmentTypes" AND component_definition_id = :component_definition_id_new
+                    )
                 )',
                 [
                     'old_instance_id' => $oldInstance['id'],
-                    'new_key' => 'assessmentTypes',
-                    'new_value' => '{"dueWork":"1","quiz":"1","task":"1","project":"1","lti":"1","lessonPlan":"1"}',
                     'component_definition_id_new' => $componentDefinitionId
                 ]
             );
