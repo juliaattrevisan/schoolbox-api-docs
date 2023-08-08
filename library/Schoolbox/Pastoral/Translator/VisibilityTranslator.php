@@ -58,6 +58,7 @@ class VisibilityTranslator
                     $emptyAccess,
                     $post->getInt("roleAccessId{$roleId}"),
                     (int)$accessLevel,
+                    $post->getBool("roleCampus{$roleId}", false),
                     $post->getBool("roleComment{$roleId}", false)
                 );
 
@@ -90,6 +91,7 @@ class VisibilityTranslator
                     $emptyAccess,
                     $post->getInt("groupAccessId{$groupId}"),
                     (int)$accessLevel,
+                    $post->getBool("groupCampus{$groupId}", false),
                     $post->getBool("groupComment{$groupId}", false)
                 );
                 $access->setGroup($groups[$groupId]);
@@ -108,6 +110,7 @@ class VisibilityTranslator
                     $emptyAccess,
                     $post->getInt("userAccessId{$userId}"),
                     (int)$accessLevel,
+                    false,
                     $post->getBool("userComment{$userId}", false)
                 );
                 $access->setUser($users[$userId]);
@@ -122,17 +125,19 @@ class VisibilityTranslator
      * @param IPastoralAccess $emptyAccess
      * @param int|null        $id
      * @param int             $accessLevel
+     * @param bool            $studentCampusOnly
      * @param bool            $commentAllowed
      * @return IPastoralAccess
      */
-    private static function getBaseAccess(IPastoralAccess $emptyAccess, ?int $id, int $accessLevel, bool $commentAllowed): IPastoralAccess
+    private static function getBaseAccess(IPastoralAccess $emptyAccess, ?int $id, int $accessLevel, bool $studentCampusOnly, bool $commentAllowed): IPastoralAccess
     {
         if (!in_array($accessLevel, Mapper::ACCESSES)) {
             throw new SchoolboxException(sprintf("Invalid access %s provided", $accessLevel));
         }
         $access = clone $emptyAccess;
-        $access->setAccess($accessLevel);
-        $access->setCommentsAllowed($accessLevel === Mapper::ACCESS_DENY ? false : $commentAllowed);
+        $access->setAccess($accessLevel)
+            ->setStudentCampusOnly($studentCampusOnly)
+            ->setCommentsAllowed($accessLevel === Mapper::ACCESS_DENY ? false : $commentAllowed);
         if ($id) {
             $access->setId($id);
         }

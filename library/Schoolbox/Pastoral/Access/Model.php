@@ -52,6 +52,12 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
     protected $access;
 
     /**
+     * Whether role / group access is limited to users in student campus only
+     * @var bool
+     */
+    private bool $studentCampusOnly = false;
+
+    /**
      * Whether the user/role is allowed to comment
      * Staff with access can always comment regardless of this flag
      */
@@ -297,6 +303,24 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
     public function getAccess(): ?int
     {
         return $this->access;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getStudentCampusOnly(): bool
+    {
+        return $this->studentCampusOnly;
+    }
+
+    /**
+     * @param bool $studentCampusOnly
+     * @return static
+     */
+    public function setStudentCampusOnly(bool $studentCampusOnly): self
+    {
+        $this->studentCampusOnly = $studentCampusOnly;
+        return $this;
     }
 
     /**

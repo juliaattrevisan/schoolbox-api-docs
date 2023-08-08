@@ -60,7 +60,12 @@
                                    value="2" {{ checkedPrivate }}>
                             <label class="radio-label" for="rolePrivate{{ roleId }}"></label>
                         </td>
-                        <td class="small-2 checklist">
+                        <td class="small-1 checklist">
+                            <input type="checkbox" name="roleCampus{{ roleId }}" id="roleCampus{{ roleId }}"
+                                   value="1" {{ userAccess.studentCampusOnly ? 'checked="checked"' : '' }}>
+                            <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="roleCampus{{ roleId }}"></label>
+                        </td>
+                        <td class="small-1 checklist">
                             <input type="checkbox" name="roleComment{{ roleId }}" id="roleComment{{ roleId }}"
                                    value="1" {{ checkedComment }} {{ readonly }} data-always-read-only="{{ alwaysReadOnly }}">
                             <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="roleComment{{ roleId }}"></label>
@@ -203,10 +208,10 @@
 
             {# Add role to table #}
 
-            window.addRole = function(roleId, roleName, permission, commentsAllowed, locked) {
+            window.addRole = function(roleId, roleName, permission, commentsAllowed, studentCampusOnly, locked) {
 
                 // this line will check if the argument is undefined
-                // if so set it to 1, otherwise set it to it's original value
+                // if so set it to 1, otherwise set it to its original value
                 permission = (typeof permission !== 'undefined') ?  permission : 1;
 
                 if (window.rolesAdded.indexOf(roleId) === -1) {
@@ -223,12 +228,14 @@
 
                     // enable comment checkbox only for student and parent role type
                     let commentCheckbox = $('#roleComment' + roleId);
-                    initCommentCheckbox(
+                    initCheckbox(
                             commentCheckbox,
                             roleId !== 'role-type-parent' && roleId !== 'role-type-student',
                             commentsAllowed,
                             permission
                     );
+
+                    initCheckbox($('#roleCampus' + roleId), false, studentCampusOnly, permission);
 
                     //Check the correct box
                     let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';

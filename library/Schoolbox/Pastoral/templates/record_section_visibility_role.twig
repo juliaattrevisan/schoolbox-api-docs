@@ -4,6 +4,7 @@
     <div class="small-12 card wrap-down">
         <div class="icon-group size-48" title="User Role"></div>
         {{ accessLevelLabel | raw }}
+        <span class="neutral label right">Campus</span>
         {% if (access.role.isParent or access.role.isStudent) and access.commentsAllowed %}
             <span class="neutral label right">Comments</span>
         {% endif %}

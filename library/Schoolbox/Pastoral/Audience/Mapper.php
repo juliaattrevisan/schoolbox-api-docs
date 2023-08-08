@@ -58,6 +58,7 @@ class Mapper extends BaseMapper
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->joins('type_id', TypeMapper::class, 'id', null, null, 'type', 'type');
         $this->joins('subtype_id', SubTypeMapper::class, 'id', null, null, 'subtype', 'subtype');
+        $this->uses('student_campus_only', self::TYPE_BOOLEAN);
         $this->uses('comments_allowed', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

@@ -17,15 +17,17 @@ interface IPastoralAccess
 {
     public function setId(int $id);
 
-    public function setAccess(int $access);
+    public function setAccess(int $access): self;
 
-    public function setCommentsAllowed(bool $commentsAllowed);
+    public function setStudentCampusOnly(bool $studentCampusOnly): self;
 
-    public function setRoleType(string $roleType);
+    public function setCommentsAllowed(bool $commentsAllowed): self;
 
-    public function setRole(Role $role);
+    public function setRoleType(string $roleType): self;
 
-    public function setGroup(\Schoolbox\Pastoral\Group\Model $group);
+    public function setRole(Role $role): self;
 
-    public function setUser(User $user);
+    public function setGroup(\Schoolbox\Pastoral\Group\Model $group): self;
+
+    public function setUser(User $user): self;
 }

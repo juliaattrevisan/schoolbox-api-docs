@@ -48,7 +48,12 @@
                         <label class="radio-label" for="groupPrivate{{ userAccess.group.id }}"></label>
                     </td>
                     {% if not reportPage %}
-                    <td class="small-2 checklist">
+                    <td class="small-1 checklist">
+                        <input type="checkbox" name="groupCampus{{ userAccess.group.id }}" id="groupCampus{{ userAccess.group.id }}"
+                               value="1" checked="checked">
+                        <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="groupCampus{{ userAccess.group.id }}"></label>
+                    </td>
+                    <td class="small-1 checklist">
                         <input type="checkbox" name="groupComment{{ userAccess.group.id }}" id="groupComment{{ userAccess.group.id }}"
                                value="1" checked="checked" readonly="readonly" data-always-read-only="1">
                         <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="groupComment{{ userAccess.group.id }}"></label>
@@ -149,7 +154,7 @@
 
 
 
-            window.addGroup = function(groupId, groupName, permission, locked) {
+            window.addGroup = function(groupId, groupName, permission, studentCampusOnly, locked) {
                 if (window.groupsAdded[groupId] !== true) {
                     $('#empty-groups').remove();
 
@@ -163,8 +168,8 @@
                     let permissionListGroups = $('#permission-groups');
                     permissionListGroups.append(html);
 
-                    let commentCheckbox = $('#groupComment' + groupId);
-                    initCommentCheckbox(commentCheckbox, true, true, permission);
+                    initCheckbox($('#groupComment' + groupId), true, true, permission);
+                    initCheckbox($('#groupCampus' + groupId), false, studentCampusOnly, permission);
 
                     setRadioButtonListener('[data-group-id="' + groupId + '"]');
                     applyLock(['groups'], locked);

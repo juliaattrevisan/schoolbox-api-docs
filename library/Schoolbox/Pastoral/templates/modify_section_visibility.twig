@@ -43,7 +43,8 @@
                     <th class="small-2">Deny</th>
                     <th class="small-2">General</th>
                     <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
-                    <th class="small-2">Comments<span class='hint has-tip tip-top' title="If checked, these users will be able to read and post comments on this record" data-tooltip>?</span></th>
+                    <th class="small-1">Student Campus Only<span class='hint has-tip tip-top' title="If checked, these users in student's campus will be able to access this record" data-tooltip>?</span></th>
+                    <th class="small-1">Comments<span class='hint has-tip tip-top' title="If checked, these users will be able to read and post comments on this record" data-tooltip>?</span></th>
                 {% endif %}
                 <th class="text-right small-1">Delete</th>
             </tr>
@@ -185,7 +186,7 @@
          * @param commentsAllowed bool - Whether comments allowed
          * @param permission int - Deny, General, General + Confidential
          */
-        function initCommentCheckbox(commentCheckbox, alwaysReadOnly, commentsAllowed, permission)
+        function initCheckbox(commentCheckbox, alwaysReadOnly, commentsAllowed, permission)
         {
             let commentCheckboxLabel = $("label[for='" + commentCheckbox.attr('id') +"']");
             if (alwaysReadOnly) {
@@ -288,7 +289,15 @@
                 <label class="radio-label" for="{{ accessType }}Private{ID}"></label>
             </td>
             {% if not reportPage %}
-            <td class="small-{{ colsize }} checklist">
+            <td class="small-1 checklist">
+                {% if accessType == 'user' %}
+                    <input type="hidden" name="{{ accessType }}Campus{ID}" id="{{ accessType }}Campus{ID}" value="0">
+                {% else %}
+                    <input type="checkbox" name="{{ accessType }}Campus{ID}" id="{{ accessType }}Campus{ID}" value="1">
+                    <label class="checkbox-label" for="{{ accessType }}Campus{ID}"></label>
+                {% endif %}
+            </td>
+            <td class="small-1 checklist">
                 <input type="checkbox" name="{{ accessType }}Comment{ID}" id="{{ accessType }}Comment{ID}" value="1">
                 <label class="checkbox-label" for="{{ accessType }}Comment{ID}"></label>
             </td>
