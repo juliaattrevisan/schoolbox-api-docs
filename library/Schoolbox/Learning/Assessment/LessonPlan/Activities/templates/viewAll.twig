@@ -2,7 +2,9 @@
 {% if lessonPlans|length %}
     <section>
         <ul class="action-list">
-            {% for lesson in lessonPlans %}
+        {% for unit, plans in lessonPlans %}
+        <div> {{ unit }} </div>
+            {% for lesson in plans %}
                 {% set unit = lesson.baseContext %}
 
                 {# What action-tot routes are available to this user? #}
@@ -50,7 +52,7 @@
                             <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
                         </h3>
                         <p class="meta">
-                            {{ unit.specification.course.folder.name }} | {{ unit.title }}
+                            {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% endif %} | {{ unit.title }}
                         </p>
                         <p class="meta">
                             {{ dueDate.forAssessment(lesson) }}
@@ -91,6 +93,7 @@
                         </ul>
                     {% endif %}
                 </li>
+            {% endfor %}
             {% endfor %}
         </ul>
     </section>

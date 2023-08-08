@@ -109,8 +109,14 @@ class Controller extends Base
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $this->getUser()->getRole()->isStudent());
         // hydrate those assessments
-        $lessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]);
-
+        $lessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']])
+        ->groupByCallback(
+            function ($lessonPlan) {
+                return $lessonPlan->getContext()->getTitle();
+            }
+        )
+        ;
+        // Schoolbox\Learning\Assessment\LessonPlan\Model
 
         $twigData = [
             'lessonPlans'       => $lessonPlans,
