@@ -20,7 +20,7 @@ const hasSubResults = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="sb-card">
+    <div class="sb-card" data-test-sp-results-list-result>
         <div class="sb-card__main">
             <div class="sb-card__primary-img img img--round">
                 <div class="img__wrapper">
@@ -28,7 +28,7 @@ const hasSubResults = window.Vue.computed(() => {
                 </div>
             </div>
             <div class="sb-card__main-content">
-                <a href=""
+                <a :href="props.result.url"
                     ><h3 class="">{{ props.result.title }}</h3></a
                 >
                 <span v-if="props.result.meta" class="meta">{{ props.result.meta }}</span>

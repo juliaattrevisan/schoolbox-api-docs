@@ -15,7 +15,7 @@ export const useQueryStore = defineStore("spQuery", () => {
      * have been added
      * @returns {boolean}
      */
-    const isActive = window.Vue.computed(() => activeQuery.value.length >= MIN_QUERY_LENGTH);
+    const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH);
 
     /**
      * the search string broken into words, to search for each word
