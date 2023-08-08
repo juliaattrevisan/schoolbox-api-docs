@@ -27,7 +27,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         ?CursorDataObject $cursor,
         int $limit,
     ): QueryParams {
-        [$whereParts, $params] = $this->buildBaseWhereParams($keyword);
+        ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword);
 
         $relevancePart = $this->buildRelevanceExpression();
         $titlePart     = $this->buildTitleExpression();
@@ -97,22 +97,31 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     /**
      * Build the base set of WHERE parts and their params.
      *
-     * @param string $keyword
-     * @return array
+     * @param string $keyword The search term from `buildMatchQueryParams`.
+     * @return array{where: array<string>, params: array}
      */
     abstract protected function buildBaseWhereParams(string $keyword): array;
 
     /**
      * Build the expression for determining the relevance for an item in this
-     * search.
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
      *
-     * @return string
+     * This should evaluate to a number between 0 and 1: the greater the number,
+     * the more relevant the result.
+     *
+     * Currently, the relevance of a result is not dependent on how closely it
+     * matches the search term: thus, this doesn't take the `$keyword` from
+     * `buildMatchQueryParams`.
+     *
+     * @return string An SQL expression for determining
      */
     abstract protected function buildRelevanceExpression(): string;
 
     /**
      * Build the expression for determining the title for an item in this
-     * search.
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to a string value.
      *
      * @return string
      */
@@ -120,7 +129,9 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 
     /**
      * Build the expression for determining the type for an item in this
-     * search.
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to a string value.
      *
      * @return string
      */
@@ -128,7 +139,9 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 
     /**
      * Build the expression for determining the ID for an item in this
-     * search.
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to an integer value.
      *
      * @return string
      */
@@ -136,7 +149,9 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 
     /**
      * Build the expression for determining the date for an item in this
-     * search.
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to a database datetime value.
      *
      * @return string
      */
@@ -144,14 +159,19 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 
     /**
      * Build the expression for determining the creator for an item in this
-     * search.
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to an integer value, corresponding to the creator of
+     * this item: if it has no known creator, 0 (rather than NULL) should be
+     * returned (so that SQL comparisons work reliably).
      *
      * @return string
      */
     abstract protected function buildCreatorExpression(): string;
 
     /**
-     * Build the FROM part of the query, including any joins.
+     * Build the FROM part of the query, including any joins; e.g.:
+     * "FROM table t JOIN other_table ot ON ..."
      *
      * @return string
      */
