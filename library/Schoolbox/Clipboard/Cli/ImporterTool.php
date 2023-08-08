@@ -205,6 +205,10 @@ HELP;
 
             $this->getLogger()->warning($e->getMessage());
 
+            /* Releasing control
+             */
+            $lock->release();
+
             return;
         }
 
@@ -233,6 +237,10 @@ HELP;
             }
 
             $this->getLogger()->warning($e->getMessage());
+
+            /* Releasing control
+             */
+            $lock->release();
 
             return;
         }
