@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -62,6 +63,14 @@ class Module extends BaseModule
             }
         };
 
+        $preloadFolder = function (array $params) {
+            try {
+                return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
+            } catch (Mapper\Exception $e) {
+                throw new NotFound();
+            }
+        };
+
         $preloadLessonPlan = function ($params) {
             return $this->preloadLessonPlan($params);
         };
@@ -72,8 +81,17 @@ class Module extends BaseModule
         $this->register('GET', '/{lessonPlanId}', 'getLink', $perms, $preloadLessonPlan);
         $this->register('POST', '/{lessonPlanId}', 'createLink', $perms, $preloadLessonPlan);
         $this->register('DELETE', '/{lessonPlanId}/{activity}', 'deleteLink', $perms, $preloadLessonPlan);
+        // get lessonplans for homepage
+        $this->register('GET', '/class/{folderId}', 'getHomepage', $perms, $preloadFolder);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
 
 
     /**
@@ -148,5 +166,14 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+    /**
+     * @return Mapper|Folder\Mapper
+     * @throws InvalidArgumentException If class not found
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 }

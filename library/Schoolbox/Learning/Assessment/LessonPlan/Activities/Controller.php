@@ -19,7 +19,10 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -91,5 +94,36 @@ class Controller extends Base
     public function deleteLink(Model $lessonPlan): void
     {
         new \Alaress_Probe($lessonPlan);
+    }
+
+    /**
+     * 
+     */
+    public function getHomepage(Folder\Model $folder): void
+    {
+        $lessonPlanMapper = LessonPlanMapper::getInstance();
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+        $publishDate = \Alaress_Date_Format::now();
+
+        // grab the assessmentID for all lesson plans from the students subject list
+        $assessmentIds = $lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $this->getUser()->getRole()->isStudent());
+        // hydrate those assessments
+        $lessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]);
+
+
+        $twigData = [
+            'lessonPlans'       => $lessonPlans,
+            'folder'            => $folder,
+            'returnUrlName'     => Assessment\Redirect::RETURN_URL,
+            'encodedReturnUrl'  => Assessment\Redirect::encode('/homepage/' . $folder->getId()),
+            // 'readOnly'          => $this->getContentPermission() < UserAccess::ACCESS_WRITE;,
+            'readOnly'          => false
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@lessonPlanActivities/viewAll.twig',
+            $twigData
+        );
     }
 }

@@ -265,19 +265,34 @@ class Mapper extends \Schoolbox\Mapper
      * and ensuring we are only returning lesson plans that are visible to the user
      *
      * @param array $folderIDs list of folders to gather all lesson plans from within
-     * @param \Alaress_Date_Format $startDate
-     * @param \Alaress_Date_Format $endDate
-     * @param \Alaress_Date_Format $publishDate
+     * @param null|\Alaress_Date_Format $startDate
+     * @param null|\Alaress_Date_Format $endDate
+     * @param null|\Alaress_Date_Format $publishDate
      * @param bool $allowStudents should we return only student visible plans? or all plans?
      * @return array<int> array of the assessment ID's for the lesson plans
      */
-    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, \Alaress_Date_Format $publishDate, bool $allowStudents = false): array
+    public function findForFolder(array $folderIDs, ?\Alaress_Date_Format $startDate, ?\Alaress_Date_Format $endDate, ?\Alaress_Date_Format $publishDate, bool $allowStudents = false): array
     {
         $pb = $this->getDatabase()
             ->buildPredicateBuilder('')
-            ->betweenDates('assessment.due_date', $startDate, $endDate)
-            ->lessThanOrEqualTo('assessment.publish_date', $publishDate->getDatabase())
             ->in('mv_assessment_relation.folder_id', $folderIDs);
+
+        /**
+         * if we have dates then we should use them, if not ignore limiting to dates
+        */
+        if (null !== $startDate && null !== $endDate) {
+            $pb->betweenDates('assessment.due_date', $startDate, $endDate);
+        } elseif (null !== $endDate) {
+            // only has an end date use that as an upper limit
+            $pb->lessThanOrEqualTo('assessment.due_date', $endDate->getDatabase());
+        } else {
+            // only has an end date use that as an upper limit
+//            $pb->lessThanOrEqualTo('assessment.due_date', $endDate->getDatabase());
+        }
+        // If we have a published date (student view), ensure we only show lessonplans that have been published
+        if (null !== $publishDate) {
+            $pb->lessThanOrEqualTo('assessment.publish_date', $publishDate->getDatabase());
+        }
 
         // Are we limiting to lesson plans visible to students? or staff only?
         if ($allowStudents) {
