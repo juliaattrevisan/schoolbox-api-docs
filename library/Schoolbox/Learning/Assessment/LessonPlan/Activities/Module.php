@@ -17,6 +17,7 @@ use Component_InstanceMapper;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -100,8 +101,24 @@ class Module extends BaseModule
         };
 
         // Get all activities contained within a course
-        $this->register('GET', '/course/{specId:\d+}{/implId:\d+}', 'getCourse', $perms, $preloadCourseSpec);
+        $preloadLessonPlan = function ($params) {
+            try {
+                $lessonPlan = $this->getLinkedAssessmentsMapper()->findById($params['lessonPlanId']);
+            } catch (MapperException $e) {
+                throw new NotFound();
+            }
 
+            return [
+                'lessonPlan' => $lessonPlan,
+            ];
+        };
+
+        // Get all activities contained within a course
+        $this->register('GET', '/course/{id}', 'getCourse', $perms, $preloadCourseSpec);
+        // routes for lesson plan specifically
+        $this->register('GET', '/{lessonPlanId}', 'getLink', $perms, $preloadLessonPlan);
+        $this->register('POST', '/{lessonPlanId}', 'createLink', $perms, $preloadLessonPlan);
+        $this->register('DELETE', '/{lessonPlanId}/{activity}', 'deleteLink', $perms, $preloadLessonPlan);
         // get lessonplans for homepage
         $this->register('GET', '/class/{folderId:\d+}', 'getHomepage', $permsAll, $preloadFolder);
         $this->register('GET', '/class/{folderId:\d+}/component/{componentId:\d+}', 'getHomepageComponent', $permsAll, $preloadFolder);
@@ -204,5 +221,14 @@ class Module extends BaseModule
     protected function getAccessMapper(): AccessMapper
     {
         return $this->getMapperFactory()->get(AccessMapper::class);
+    }
+
+    /**
+     * @return Mapper|LinkedAssessmentsMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getLinkedAssessmentsMapper()
+    {
+        return $this->getMapperFactory()->get(LinkedAssessmentsMapper::class);
     }
 }

@@ -32,8 +32,19 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('lesson_plan_assessment');
         $this->hasModel(Model::class);
-        $this->uses('lesson_plan_id', self::TYPE_INTEGER, null, 'lessonPlanId');
+        $this->uses('lesson_plan_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'lessonPlanId');
         $this->uses('assessment_id', self::TYPE_INTEGER, null, 'assessmentID');
+    }
+
+    protected function getSelectString()
+    {
+        return
+            "
+            SELECT      {$this->getColumnString()}
+            FROM        {$this->getTable()}
+            INNER JOIN  lesson_plan on lesson_plan.id = {$this->getTable()}.lesson_plan_id
+            INNER JOIN  assessment on assessment.id = {$this->getTable()}.assessment_id
+        ";
     }
 
     /**
