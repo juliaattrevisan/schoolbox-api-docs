@@ -136,7 +136,11 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         $this->courseImplementation = null;
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
-        /** initial hack build for filters... */
+
+        /**
+         * Parse the filter to only the entries that are selected
+         * then compare with the original list to see if we are actually filtering out anything
+         */
         $assessmentTypes = array_keys(array_filter(
             $filters,
             function ($v, $k) {
@@ -147,7 +151,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->hasBeenFiltered = count($assessmentTypes) < count((new \Component_Config_AssessmentTypes(null))->getOptions());
 
         /**
-         * if everything has been filtered out, we should show everything
+         * if everything has been filtered out, we should ignore the filter (and show everything)
          */
         if (empty($assessmentTypes)) {
             $assessmentTypes = null;
