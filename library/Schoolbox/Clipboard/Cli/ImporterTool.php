@@ -132,7 +132,7 @@ Usage: php importer.php --sessions [--perform]
 
 Partial Updates. You can import microchanges (updates, adds) by using the --partial flag.
 This obtains changes between two timestamps: the last time the importer ran in --partial mode
-and the current time. 
+and the current time.
 
 TODO: Clipboard are still working on providing information about the nature of the updates
 so we can facilitate deletions in similar manner.
@@ -214,15 +214,21 @@ HELP;
             $importLog = $importLogMapper->start($runId, $scriptName);
         }
 
-        foreach ($composites as $composite) {
-            $composite->import();
+        try {
+            foreach ($composites as $composite) {
+                $this->getLogger()->debug(sprintf(
+                    'Refreshing lock for another %s seconds',
+                    self::LOCK_TTL
+                ));
 
-            $this->getLogger()->debug(sprintf(
-                'Refreshing lock for another %s seconds',
-                self::LOCK_TTL
-            ));
+                $lock->refresh();
 
-            $lock->refresh();
+                $composite->import();
+            }
+        } catch (\Exception $e) {
+            /* Any weird rando errors go here for now, instead of fatally crashing out
+             */
+            $this->getLogger()->warning($e->getMessage());
         }
 
         if ($this->perform()) {
