@@ -20,16 +20,31 @@ const hasSubResults = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="result" data-test-sp-results-list-result>
+    <div class="sb-card">
+        <div class="sb-card__main">
+            <div class="sb-card__primary-img img img--round">
+                <div class="img__wrapper">
+                    <img :src="(props.result.image as string)" />
+                </div>
+            </div>
+            <div class="sb-card__main-content">
+                <a href=""
+                    ><h3 class="">{{ props.result.title }}</h3></a
+                >
+                <span v-if="props.result.meta" class="meta">{{ props.result.meta }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="result" data-test-sp-results-list-result>
         <h2>{{ props.result.title }}</h2>
         <p class="meta">{{ props.result.meta }}</p>
         <sp-results-list-sub-results v-if="hasSubResults" :result="result" />
-    </div>
+    </div> -->
 </template>
 
 <style scoped>
-.result {
+/* .result {
     background: white;
     padding: 1rem;
-}
+} */
 </style>

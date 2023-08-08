@@ -6,7 +6,6 @@
 
 @each $size in $global-sizes {
     .u-gap--#{$size} {
-        grid-gap: var(--whitespace-#{$size});
         gap: var(--whitespace-#{$size});
     }
 }
