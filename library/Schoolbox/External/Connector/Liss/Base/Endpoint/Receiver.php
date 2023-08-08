@@ -168,6 +168,8 @@ class Receiver
         $this->teacherIdentifier = trim($teacherIdentifier);
 
         $this->log = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');
+
+        $this->storageMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
     }
 
 
