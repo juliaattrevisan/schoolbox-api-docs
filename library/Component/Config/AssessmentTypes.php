@@ -8,6 +8,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     /**
      * Returns the list of assessment (activity) types to filter to.
      *
+     * @param bool $ltiEnabled // should we include an LTI entry or not?
      * @return array<string, string>
      */
     public function getOptions(bool $ltiEnabled): array
