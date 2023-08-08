@@ -9,14 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\User;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
-use Schoolbox\Search\Api\Database\IQueryParamBuilder;
-use Schoolbox\Search\Api\Database\QueryParams;
-use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 
 /**
  * Query parameter builder for a search for users.

@@ -106,8 +106,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * Build the expression for determining the relevance for an item in this
      * search, as used in the `SELECT` and `WHERE` parts of the query.
      *
-     * This should evaluate to a number between 0 and 1: the greater the number,
-     * the more relevant the result.
+     * This should evaluate to a decimal number between 0 and 1: the greater the
+     * number, the more relevant the result.
      *
      * Currently, the relevance of a result is not dependent on how closely it
      * matches the search term: thus, this doesn't take the `$keyword` from
