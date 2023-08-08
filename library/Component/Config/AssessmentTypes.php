@@ -10,7 +10,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
      *
      * @return array<string, string>
      */
-    protected function getOptions(): array
+    public function getOptions(): array
     {
         return [
             'dueWork'    => Assessment\AssessmentType::TYPE_DUE_WORK,

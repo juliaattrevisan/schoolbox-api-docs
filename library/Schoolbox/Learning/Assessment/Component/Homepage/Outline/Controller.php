@@ -137,41 +137,14 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->courseImplementation = null;
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
         /** initial hack build for filters... */
-        $assessmentTypes = [];
-        foreach ($filters as $assessment => $value) {
-            if ("0" === $value) {
-                /**
-                 * Something is being filtered, we should display something on the frontend...
-                 */
-                $this->hasBeenFiltered = true;
-                continue;
-            }
-            switch ($assessment) {
-                case AssessmentType::TYPE_DUE_WORK:
-                    $assessmentTypes[] = AssessmentType::TYPE_DUE_WORK;
-                    break;
-
-                case AssessmentType::TYPE_TASK:
-                    $assessmentTypes[] = AssessmentType::TYPE_TASK;
-                    break;
-
-                case AssessmentType::TYPE_QUIZ:
-                    $assessmentTypes[] = AssessmentType::TYPE_QUIZ;
-                    break;
-
-                case AssessmentType::TYPE_LTI_ASSESSMENT:
-                    $assessmentTypes[] = AssessmentType::TYPE_LTI_ASSESSMENT;
-                    break;
-
-                case AssessmentType::TYPE_PROJECT:
-                    $assessmentTypes[] = AssessmentType::TYPE_PROJECT;
-                    break;
-
-                case AssessmentType::TYPE_LESSON_PLAN:
-                    $assessmentTypes[] = AssessmentType::TYPE_LESSON_PLAN;
-                    break;
-            }
-        }
+        $assessmentTypes = array_keys(array_filter(
+            $filters,
+            function ($v, $k) {
+                return $v === "1" && key_exists($k, (new \Component_Config_AssessmentTypes(null))->getOptions());
+            },
+            ARRAY_FILTER_USE_BOTH
+        ));
+        $this->hasBeenFiltered = count($assessmentTypes) < count((new \Component_Config_AssessmentTypes(null))->getOptions());
 
         // Don't attempt to load course if not configured.
         if ($courseImplId) {
