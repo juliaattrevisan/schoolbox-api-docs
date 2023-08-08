@@ -228,7 +228,13 @@ HELP;
         } catch (\Exception $e) {
             /* Any weird rando errors go here for now, instead of fatally crashing out
              */
+            if ($this->perform()) {
+                $importLogMapper->error($importLog, $e->getMessage());
+            }
+
             $this->getLogger()->warning($e->getMessage());
+
+            return;
         }
 
         if ($this->perform()) {
