@@ -39,13 +39,6 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Decide how long this should be based on your usage
-     * You might have to adjust it, but it should cover the cost of an iteration
-     */
-    private const LOCK_TTL = 60;
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -227,7 +220,7 @@ HELP;
      * @param int    $semester
      * @return array
      */
-    private function getTimetableStruct( array $api, string $externalId, int $semester): array
+    private function getTimetableStruct(array $api, string $externalId, int $semester): array
     {
         /* Make a naive guess as to what year and semester we are in
          * The getTeacherTimetable endpoint is different to students' version
