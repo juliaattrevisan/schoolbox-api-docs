@@ -4,12 +4,14 @@
  */
 
 import Vue from "vue";
+import dayjs from "dayjs";
 import { ActiveDropdown } from "@js/dropdown/dropdownTypes";
 
 declare global {
     interface Window {
         cdnPrefix: string;
         CKEDITOR: any;
+        dayjs: typeof dayjs;
         sbProps: {
             lightGallery: Function;
             lightGalleryInit: Function;

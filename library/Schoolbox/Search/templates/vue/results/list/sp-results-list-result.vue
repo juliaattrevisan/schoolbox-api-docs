@@ -33,8 +33,12 @@ const isImgRounded = window.Vue.computed(() => {
     return false;
 });
 
-// to use with date
-// dayjs.duration(props.result.date, "d").humanize(true)
+/**
+ *
+ */
+const relativeTime = window.Vue.computed(() => {
+    return window.dayjs.duration(window.dayjs(props.result.date).diff()).humanize(true);
+});
 </script>
 
 <template>
@@ -53,8 +57,8 @@ const isImgRounded = window.Vue.computed(() => {
                 ></a>
                 <span v-if="props.result.type === ResultTypes.NEWS" class="meta"
                     >Posted by
-                    <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> 2 days
-                    ago</span
+                    <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a>
+                    {{ relativeTime }}</span
                 >
                 <span v-else-if="props.result.meta" class="meta">{{ props.result.meta }}</span>
             </div>
