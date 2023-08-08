@@ -114,8 +114,9 @@ module.exports = {
         highcharts: "./www/static/js/vendors/highcharts/highcharts.js",
         highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
 
-        // Header Search Bar
+        // Search
         headerSearch: "./templates/core/include/vue/headerSearch.js",
+        searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
 
         // Calendars
         sbFullCalendar: "./library/Schoolbox/Calendar/vue/sbFullCalendar.js",
