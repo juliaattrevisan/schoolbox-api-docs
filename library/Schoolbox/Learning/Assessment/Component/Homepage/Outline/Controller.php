@@ -146,6 +146,14 @@ class Controller extends Component_Homepage_ControllerAbstract
         ));
         $this->hasBeenFiltered = count($assessmentTypes) < count((new \Component_Config_AssessmentTypes(null))->getOptions());
 
+        /**
+         * if everything has been filtered out, we should show everything
+         */
+        if (empty($assessmentTypes)) {
+            $assessmentTypes = null;
+            $this->hasBeenFiltered = false;
+        }
+
         // Don't attempt to load course if not configured.
         if ($courseImplId) {
             try {

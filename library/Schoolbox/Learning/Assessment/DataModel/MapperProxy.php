@@ -1769,7 +1769,7 @@ class MapperProxy
         }
 
         // Assessment type filter multiple
-        if (isset($options['typeList'])) {
+        if (isset($options['typeList']) && is_array($options['typeList'])) {
             $filterBuilder = $this->baseMapper->getPredicateBuilder();
             foreach ($options['typeList'] as $type) {
                 switch ($type) {
