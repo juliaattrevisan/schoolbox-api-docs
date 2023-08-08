@@ -1666,6 +1666,7 @@ class MapperProxy
      * * converts "due_before" and "due_after" to due date filters
      * * converts "close_before" and "closed_after" to close date filters
      * * converts "type" to a filter which matches only that assessment type
+     *   Can be an array to filter to multiple assessment types
      *   (see AssessmentType::TYPE_* constants)
      * * converts "window_open" and "window_close" to a window inside which
      *   to find due assessments
@@ -1737,41 +1738,14 @@ class MapperProxy
             );
         }
 
-        // Assessment type filter single
+        // Assessment type filter single or multiple if array
         if (isset($options['type'])) {
-            switch ($options['type']) {
-                case AssessmentType::TYPE_DUE_WORK:
-                    $builder->notNull('d.id');
-                    break;
-
-                case AssessmentType::TYPE_TASK:
-                    $builder->notNull('t.id');
-                    break;
-
-                case AssessmentType::TYPE_QUIZ:
-                    $builder->notNull('q.assess_id');
-                    break;
-
-                case AssessmentType::TYPE_LTI_ASSESSMENT:
-                    $builder->notNull('l.id');
-                    break;
-
-                case AssessmentType::TYPE_PROJECT:
-                    $builder->notNull('p.id');
-                    break;
-
-                /* TODO Does Lesson Plans appear here?
-                 */
-
-                default:
-                    break;
+            // is this an array? then loop, else run once
+            if (!is_array($options['type'])) {
+                $options['type'] = [$options['type']];
             }
-        }
-
-        // Assessment type filter multiple
-        if (isset($options['typeList']) && is_array($options['typeList'])) {
             $filterBuilder = $this->baseMapper->getPredicateBuilder();
-            foreach ($options['typeList'] as $type) {
+            foreach ($options['type'] as $type) {
                 switch ($type) {
                     case AssessmentType::TYPE_DUE_WORK:
                         $filterBuilder->notNull('d.id');

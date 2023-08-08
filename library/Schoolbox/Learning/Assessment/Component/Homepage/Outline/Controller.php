@@ -181,13 +181,13 @@ class Controller extends Component_Homepage_ControllerAbstract
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
                         $user->getRole()->isParent() ? null : $user,
-                        ['typeList' => $assessmentTypes]
+                        ['type' => $assessmentTypes]
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
             } else {
                 // I'm an instructor - load all participants.
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds, options: ['typeList' => $assessmentTypes]);
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds, options: ['type' => $assessmentTypes]);
             }
 
             // And then add them to the displayed course impl
