@@ -24,6 +24,7 @@ export default {
         return {
             videoHeight: 0, //to ensure the parent container is high enough when the video is loaded
             isVideoEncoding: true, //until it's checked at least once or confirmed the video is a blob
+            processingSrc: `${window.cdnPrefix}/images/core/video-processing.gif`, // if the video is still processing, show a processing gif
         };
     },
 
@@ -153,7 +154,7 @@ export default {
 
 <template>
     <div ref="container">
-        <img v-if="isVideoEncoding" class="processing-img" src="`${cdnPrefix}images/core/video-processing.gif`" />
+        <img v-if="isVideoEncoding" class="processing-img" :src="processingSrc" alt="Video is processing" />
         <video v-else ref="videoPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
