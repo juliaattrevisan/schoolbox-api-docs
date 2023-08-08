@@ -16,9 +16,14 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 
 class Module extends BaseModule
 {
@@ -36,46 +41,55 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
+        /**
+         * Same users who can access /course can edit this
          */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
-
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
+        $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF)
+            )
         );
 
-        $preloadUser = function ($params) {
-            return $this->preloadUser($params);
+        $preloadCourseSpec = function (array $params) {
+            try {
+                return ['courseSpec' => $this->getCourseSpecificationMapper()->findById($params['id'])];
+            } catch (MapperException\Deleted $e) {
+                return ['courseSpec' => $e->getDeletedObject()];
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
         };
 
-        // Get all activies contained within a course
-        $this->register('GET', '/learning/lessonplan/course/{id}', 'getCourse', $getPerms, $preloadUser);
+        $preloadLessonPlan = function ($params) {
+            return $this->preloadLessonPlan($params);
+        };
+
+        // Get all activities contained within a course
+        $this->register('GET', '/course/{id}', 'getCourse', $perms, $preloadCourseSpec);
+        // routes for lesson plan specifically
+        $this->register('GET', '/{lessonPlanId}', 'getLink', $perms, $preloadLessonPlan);
+        $this->register('POST', '/{lessonPlanId}', 'createLink', $perms, $preloadLessonPlan);
+        $this->register('DELETE', '/{lessonPlanId}/{activity}', 'deleteLink', $perms, $preloadLessonPlan);
     }
 
 
+
     /**
-     * Preload a User instance
-     *
      * @param array $params
      * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
      */
-    private function preloadUser(array $params): array
+    private function preloadLessonPlan(array $params): array
     {
         try {
-            $user = $this->getUserMapper()->findById($params['id']);
+            $lessonPlan = $this->getLinkedAssessmentsMapper()->findById($params['lessonPlanId']);
         } catch (MapperException $e) {
             throw new NotFound();
         }
 
         return [
-            'user' => $user,
+            'lessonPlan' => $lessonPlan,
         ];
     }
 
@@ -86,8 +100,11 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(UserMapper::class)
+            $this->getErrorMapper(),
+            $this->getLinkedAssessmentsMapper(),
+            $this->getCourseSpecificationMapper(),
+            $this->getUnitSpecificationMapper(),
+            $this->injector->get('assessmentDataSource'),
         );
     }
 
@@ -98,5 +115,38 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return Mapper|LinkedAssessmentsMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getLinkedAssessmentsMapper()
+    {
+        return $this->getMapperFactory()->get(LinkedAssessmentsMapper::class);
+    }
+
+    /**
+     * @return CourseSpecificationMapper
+     */
+    protected function getCourseSpecificationMapper()
+    {
+        return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
+    }
+
+    /**
+     * @return UnitSpecificationMapper
+     */
+    protected function getUnitSpecificationMapper()
+    {
+        return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }

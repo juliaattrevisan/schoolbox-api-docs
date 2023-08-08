@@ -11,6 +11,13 @@ namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Model;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -23,40 +30,66 @@ class Controller extends Base
      * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      */
-    public function __construct(private ErrorMapper $errorMapper, private UserMapper $userMapper)
-    {
+    public function __construct(
+        private ErrorMapper $errorMapper,
+        private Mapper $linkedAssessmentMappper,
+        private CourseSpecificationMapper $courseSpecificationMapper,
+        private UnitSpecificationMapper $unitSpecificationMapper,
+        private AssessmentMapperProxy $assessmentMapperProxy
+    ) {
     }
 
 
     /**
      * Provide form
      *
-     * @param User $user
+     * @param CourseSpecification $course
      */
-    public function getCourse(User $user): void
+    public function getCourse(CourseSpecification $courseSpec): void
     {
-        $this->response = $this->responseAsJson([]);
-    }
+        $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
 
+        /**
+         * Assessments within the course grouped by units
+         */
+        $results = [];
 
-    /**
-     * Process the form vars
-     */
-    public function postExample(): void
-    {
-        try {
-            $user = $this->userMapper->findById($this->requestPost['id']);
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        foreach ($courseSpec->getUnits() as $unitSpec) {
+            $unitSpecId = $unitSpec->getId();
+            $folderId = $unitSpec->getFolder()->getId();
+            $options = ['order' => ['sequence' => 'ASC']];
+            $assessments = $this->assessmentMapperProxy->findAllByUnitSpecificationId($unitSpecId, $options);
+            $unitSpec->setAssessables($assessments);
+            $results[$unitSpecId] = $assessments;
         }
 
-        $this->response = $this->responseFromTemplate(
-            '@example/submit.twig',
-            [
-                'user' => $user,
-                'var1' => $this->requestPost['var1'],
-            ],
-            'Example Form Output',
-        );
+        $this->response = $this->responseAsJson($results);
+    }
+
+    /**
+     * @param Model $lessonPlan
+     * @return void
+     */
+    public function getLink(Model $lessonPlan): void
+    {
+        new \Alaress_Probe($lessonPlan);
+    }
+
+    /**
+     * @param Model $lessonPlan
+     * @return void
+     */
+    public function createLink(Model $lessonPlan): void
+    {
+        new \Alaress_Probe($lessonPlan);
+    }
+
+    /**
+     * @param Model $lessonPlan
+     * @return void
+     */
+    public function deleteLink(Model $lessonPlan): void
+    {
+        new \Alaress_Probe($lessonPlan);
     }
 }
