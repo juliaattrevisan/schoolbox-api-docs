@@ -4,6 +4,7 @@
  */
 
 interface Props {
+    isActive: boolean; //
     initialInput?: string; // to prefill the input
 }
 const props = defineProps<Props>();
@@ -15,7 +16,9 @@ const emit = defineEmits<{
     keyEnter: [];
     click: [];
     focusOver: [event: FocusEvent];
+    mouseOver: [event: MouseEvent];
     focusOut: [event: FocusEvent];
+    mouseOut: [event: MouseEvent];
 }>();
 
 const currentInput = window.Vue.ref<string>((props.initialInput as string) ?? "");
@@ -64,7 +67,7 @@ function onClicked() {
 
 /**
  * Focus over input
- * @param {Event} event - The event object
+ * @param {FocusEvent} event - The event object
  */
 function onFocusOver(event: FocusEvent) {
     emit("focusOver", event);
@@ -72,10 +75,26 @@ function onFocusOver(event: FocusEvent) {
 
 /**
  * Focus out input
- * @param {Event} event - The event object
+ * @param {FocusEvent} event - The event object
  */
 function onFocusOut(event: FocusEvent) {
     emit("focusOut", event);
+}
+
+/**
+ *
+ * @param {MouseEvent} event - The event object
+ */
+function onMouseOver(event: MouseEvent) {
+    emit("mouseOver", event);
+}
+
+/**
+ *
+ * @param {Event} event - The event object
+ */
+function onMouseOut(event: MouseEvent) {
+    emit("mouseOut", event);
 }
 </script>
 
@@ -83,6 +102,7 @@ function onFocusOut(event: FocusEvent) {
     <input
         id="search-field"
         ref="inputElement"
+        :class="props.isActive ? 'search-input-active' : ''"
         type="text"
         name="keyword"
         placeholder="Search"
@@ -94,7 +114,8 @@ function onFocusOut(event: FocusEvent) {
         @keydown.up="onKeyUp"
         @keydown.enter.prevent="onKeyEnter"
         @focus="onFocusOver"
-        @mouseover="onFocusOver"
+        @mouseover="onMouseOver"
+        @mouseout="onMouseOut"
         @blur="onFocusOut"
         @focusout="onFocusOut"
     />
@@ -102,7 +123,8 @@ function onFocusOut(event: FocusEvent) {
         for="search-field"
         class="icon-search no-text"
         title="Search"
-        @mouseover="onFocusOver"
+        @mouseover="onMouseOver"
+        @mouseout="onMouseOut"
         @click.prevent="onClicked"
     ></button>
 </template>

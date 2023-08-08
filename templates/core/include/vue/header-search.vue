@@ -16,6 +16,7 @@ interface AllResults {
 }
 
 const isFocused = window.Vue.ref(false);
+const isActive = window.Vue.ref(false); // If the search input is active, to add the active styles
 const keyword = window.Vue.ref("");
 const results = window.Vue.ref<Result[]>([]);
 const isOpen = window.Vue.ref(false);
@@ -120,20 +121,34 @@ function onClicked() {
  */
 function onClickOutside() {
     isFocused.value = false;
+    isActive.value = false;
 }
 
 /**
  * Focus the search input
- * @param { FocusEvent } event - The event object
  */
-function onFocusOver(event: FocusEvent) {
-    if (event.type === "focus") {
-        const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
-        // If left nav is unpinned and currently open, close it
-        if (offCanvasWrap.classList.contains("move-right")) {
-            offCanvasWrap.classList.remove("move-right");
-        }
-        isFocused.value = true;
+function onFocusOver() {
+    isFocused.value = true;
+}
+
+/**
+ * the search input loses focus
+ */
+function onFocusOut() {
+    if (keyword.value.length === 0) {
+        isFocused.value = false;
+    }
+}
+
+/**
+ * The user has hovered over the search bar
+ */
+function onMouseOver() {
+    isActive.value = true;
+    // If left nav is unpinned and currently open, close it
+    const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
+    if (offCanvasWrap.classList.contains("move-right")) {
+        offCanvasWrap.classList.remove("move-right");
     }
     /**
      * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
@@ -149,6 +164,15 @@ function onFocusOver(event: FocusEvent) {
      * way as this component doesn't have the ability to communicate with the rest of the chrome elements yet.
      */
     document.querySelector("#menu-toggle")?.classList.add("search-is-active");
+}
+
+/**
+ * The user has left the search bar
+ */
+function onMouseOut() {
+    if (!isFocused.value) {
+        isActive.value = false;
+    }
 }
 
 /**
@@ -171,11 +195,15 @@ function formatPortrait(id: string) {
         :class="{ focus: isFocused }"
     >
         <search-input
+            :is-active="isActive"
             @input="onInput"
             @key-down="onArrowDown"
             @key-up="onArrowUp"
             @key-enter="onEnter"
             @focus-over="onFocusOver"
+            @focus-out="onFocusOut"
+            @mouse-over="onMouseOver"
+            @mouse-out="onMouseOut"
             @click="onClicked"
         />
         <ul v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results information-list">
