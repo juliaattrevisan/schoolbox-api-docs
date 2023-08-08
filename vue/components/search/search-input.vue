@@ -102,7 +102,7 @@ function onMouseOut(event: MouseEvent) {
     <input
         id="search-field"
         ref="inputElement"
-        :class="props.isActive ? 'search-input-active' : ''"
+        :class="props.isActive ? 'search-input search-input-active' : 'search-input'"
         type="text"
         name="keyword"
         placeholder="Search"
@@ -129,4 +129,49 @@ function onMouseOut(event: MouseEvent) {
     ></button>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+/* Input field when Search feature is activated
+ */
+.search-input-active {
+    background-color: white;
+    border: 2px solid var(--navigation-hover);
+    color: black;
+    font-size: var(--base-font-size);
+    width: 100%;
+    opacity: 1;
+    .icon-search {
+        width: 4rem;
+        /* Search icon when Search feature is activated
+        */
+        &:before {
+            color: var(--navigation-background);
+        }
+    }
+}
+
+/* Search icon in its idle state
+ */
+.icon-search {
+    align-items: center;
+    background: none;
+    display: flex;
+    justify-content: center;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 5rem;
+    z-index: 1;
+    &:before {
+        transition: color 0.2s ease-in;
+        color: var(--navigation-foreground);
+    }
+    &:hover {
+        &:before {
+            color: black;
+        }
+    }
+}
+</style>

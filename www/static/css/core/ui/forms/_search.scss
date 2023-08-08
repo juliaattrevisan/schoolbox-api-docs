@@ -9,18 +9,6 @@
         color: transparent;
         font-weight: normal;
     }
-
-    input[type="text"] {
-        border: 0;
-        background-color: transparent;
-        color: $body-bg;
-        height: $tabbar-height;
-        width: $tabbar-height;
-        padding: $base-font-size;
-        margin: 0;
-        opacity: 0;
-        line-height: calc($tabbar-height / 2);
-    }
     &:hover,
     &.focus {
         width: 100%;
@@ -31,25 +19,16 @@
         }
     }
 
-    /* Search icon in its idle state
-     */
-    .icon-search {
-        align-items: center;
-        background: none;
-        display: flex;
-        justify-content: center;
-        line-height: inherit;
+    .search-input {
+        border: 0;
+        background-color: transparent;
+        color: $body-bg;
+        height: $tabbar-height;
+        width: $tabbar-height;
+        padding: $base-font-size;
         margin: 0;
-        padding: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-        transition: all 0.3s ease-in;
-        width: 5rem;
-        z-index: 1;
-        &:before {
-            color: $navigation-foreground;
-        }
+        opacity: 0;
+        line-height: calc($tabbar-height / 2);
     }
 
     .loader {
@@ -68,6 +47,7 @@
         padding: 0;
         z-index: 10000;
     }
+
     .result {
         margin-left: 0;
         margin-right: 0;
@@ -104,25 +84,6 @@
 
     .is-active {
         background-color: $content-ui-hover;
-    }
-}
-
-/* Input field when Search feature is activated
- */
-.global-search input[type="text"].search-input-active {
-    background-color: $white;
-    border: 2px solid $navigation-hover;
-    color: $black;
-    font-size: $base-font-size;
-    width: 100%;
-    opacity: 1;
-    .icon-search {
-        width: 4rem;
-        /* Search icon when Search feature is activated
-        */
-        &:before {
-            color: $navigation-background;
-        }
     }
 }
 
