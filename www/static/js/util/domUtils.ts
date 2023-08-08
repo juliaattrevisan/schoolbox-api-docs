@@ -1,24 +1,21 @@
 /*
  * Basic DOM manipulation utilities
- *
  */
 
 /**
  * returns an integer indicating the position of the
  * passed element relative to the original collection
  * replacement for $(el).index
- *
- * @param { Element } the DOM element to find the index of
- *
- * @return { Number } position of the DOM element
+ * @param {HTMLElement} element - the DOM element to find the index of
+ * @returns {number} - position of the DOM element
  */
-export function getIndex(element) {
+export function getIndex(element: HTMLElement) {
     if (!element) {
         return -1;
     }
     let i = 0;
     while ((element = element.previousElementSibling)) {
-        i++;
+        i += 1;
     }
     return i;
 }
@@ -26,11 +23,9 @@ export function getIndex(element) {
 /**
  * empty the element of children
  * replacement for $(el).empty
- *
- * @param { Element } the DOM element to empty
- *
+ * @param {HTMLElement} element - the DOM element to empty
  */
-export function empty(element) {
+export function empty(element: HTMLElement) {
     while (element.firstChild) {
         element.removeChild(element.firstChild);
     }
@@ -38,60 +33,64 @@ export function empty(element) {
 
 /**
  * switch elements, changing stacking order
- *
- * @param { Element } the first DOM element
- * @param { Element } the second DOM element
- *
+ * @param {HTMLElement} firstElement - the first DOM element
+ * @param {HTMLElement} secondElement - the second DOM element
  */
-export function swapElements(firstElement, secondElement) {
-    firstElement.parentNode.insertBefore(firstElement, secondElement);
+export function swapElements(firstElement: HTMLElement, secondElement: HTMLElement) {
+    firstElement.parentNode?.insertBefore(firstElement, secondElement);
 }
 
 /**
  * Insert the target node before the reference
- *
- * @param { Element } element to use as basis
- * @param { Element } element that will be added
+ * @param {HTMLElement} referenceElement - element to use as basis
+ * @param {HTMLElement} targetElement - element that will be added
  */
-export function insertElementBefore(referenceElement, targetElement) {
-    referenceElement.parentNode.insertBefore(targetElement, referenceElement);
+export function insertElementBefore(referenceElement: HTMLElement, targetElement: HTMLElement) {
+    referenceElement.parentNode?.insertBefore(targetElement, referenceElement);
 }
 
 /**
  * Insert the target node after the reference
- *
- * @param { Element } element to use as basis
- * @param { Element } element that will be added
+ * @param {HTMLElement} referenceElement - element to use as basis
+ * @param {HTMLElement} targetElement - element that will be added
  */
-export function insertElementAfter(referenceElement, targetElement) {
-    referenceElement.parentNode.insertBefore(targetElement, referenceElement.nextSibling);
+export function insertElementAfter(referenceElement: HTMLElement, targetElement: HTMLElement) {
+    referenceElement.parentNode?.insertBefore(targetElement, referenceElement.nextSibling);
 }
 
 /**
  * put at the very top of the stack
- *
- * @param { Element } the DOM element
- *
+ * @param {HTMLElement} element - the DOM element
  */
-export function insertBeforeFirstChild(element) {
-    const theFirstChild = element.parentNode.firstChild;
-    element.parentNode.insertBefore(element, theFirstChild);
+export function insertBeforeFirstChild(element: HTMLElement) {
+    const theFirstChild = element.parentNode?.firstChild as ChildNode;
+    element.parentNode?.insertBefore(element, theFirstChild);
+}
+
+/**
+ * To get an elements left and mid height point relative to the document
+ * @param {HTMLElement} element - the element to get the left and mid height point of
+ * @returns {object} - the left and mid height point of the element
+ */
+export function getElementsLeftAndMidHeightPoint(element: HTMLElement) {
+    return {
+        left: element.getBoundingClientRect().left,
+        top: element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2,
+    };
 }
 
 /**
  * Find the closest element (relative to its mid point) in a NodeList, based on a x,y of a targetPoint
- *
- * @param { Element }
- * @param { NodeList }
- *
- * @returns { Element }
+ * @param {HTMLElement} targetElement - the element to find the closest element to
+ * @param {HTMLElement[]} elements - the elements to search through
+ * @returns {HTMLElement} - the closest element
  */
-export function getClosestElement(targetElement, elements) {
+export function getClosestElement(targetElement: HTMLElement, elements: HTMLElement[]) {
     const targetPoint = getElementsLeftAndMidHeightPoint(targetElement);
     let closestElement = elements[0];
-    let minDistance = 99999; //if this doesn't get overwritten we got issues...
+    let minDistance = 99999; // if this doesn't get overwritten we got issues...
     elements.forEach((element) => {
-        //loop through each element and find the closest element using pythagoras theorem
+        // loop through each element and find the closest element using pythagoras theorem
         const elementsTargetPoint = getElementsLeftAndMidHeightPoint(element);
         const distance = Math.sqrt(
             Math.pow(elementsTargetPoint.left - targetPoint.left, 2) +
@@ -106,27 +105,11 @@ export function getClosestElement(targetElement, elements) {
 }
 
 /**
- * To get an elements left and mid height point relative to the document
- *
- * @param { Element }
- *
- * @returns { x, y }
- */
-export function getElementsLeftAndMidHeightPoint(element) {
-    return {
-        left: element.getBoundingClientRect().left,
-        top: element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2,
-    };
-}
-
-/**
  * To get an elements mid point relative to the document
- *
- * @param { Element }
- *
- * @returns { x, y }
+ * @param {HTMLElement} element - the element to get the mid point of
+ * @returns {object} - the mid point of the element
  */
-export function getElementsMidPoint(element) {
+export function getElementsMidPoint(element: HTMLElement) {
     return {
         left: element.getBoundingClientRect().left + element.offsetWidth / 2,
         top: element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2,
@@ -135,43 +118,39 @@ export function getElementsMidPoint(element) {
 
 /**
  * Is the midpoint of an element above the midpoint of another element
- *
- * @param { Element }
- * @param { Element }
- *
- * @returns { Boolean }
+ * @param {HTMLElement} firstElement - the element to check
+ * @param {HTMLElement} secondElement - the element to check against
+ * @returns {boolean} - true if the first element is above the second element
  */
-export function isElementAboveOtherElement(firstElement, secondElement) {
+export function isElementAboveOtherElement(firstElement: HTMLElement, secondElement: HTMLElement) {
     return getElementsMidPoint(firstElement).top > getElementsMidPoint(secondElement).top;
 }
 
 /**
  * Is the midpoint of an element below the midpoint of another element
- *
- * @param { Element }
- * @param { Element }
- *
- * @returns { Boolean }
+ * @param {HTMLElement} firstElement - the element to check
+ * @param {HTMLElement} secondElement - the element to check against
+ * @returns {boolean} - true if the first element is below the second element
  */
-export function isElementBelowOtherElement(firstElement, secondElement) {
+export function isElementBelowOtherElement(firstElement: HTMLElement, secondElement: HTMLElement) {
     return getElementsMidPoint(firstElement).top < getElementsMidPoint(secondElement).top;
 }
 
 /**
  * Add styles to an element
- *
- * @param { Element }
- * @param { Styles } for example { position: 'absolute', top: '20px' }
+ * @param {HTMLElement} element - the element to add styles to
+ * @param {object} styles - for example { position: 'absolute', top: '20px' }
  */
-export function setStylesOnElement(element, styles) {
+export function setStylesOnElement(element: HTMLElement, styles: object) {
     Object.assign(element.style, styles);
 }
 
 /**
  * Async inject a <script> tag into the DOM
  * https://stackoverflow.com/a/39008859
+ * @param {string} src - the src of the script to inject
  */
-export function injectScript(src) {
+export function injectScript(src: string): Promise<void> {
     return new Promise((resolve, reject) => {
         const script = document.createElement("script");
         script.setAttribute("data-is-loaded", "false");
@@ -187,75 +166,65 @@ export function injectScript(src) {
 
 /**
  * Set and get an attribute on an element
- *
- * @param { Element }
- * @param { String }
- * @param { String }
- *
- * @returns { String }
+ * @param {HTMLElement} element - the element to set the attribute on
+ * @param {string} attribute - the attribute to set
+ * @param {string} value - the value to set the attribute to
+ * @returns {string} - the value of the attribute
  */
-export function setAndGetAttribute(element, attribute, value) {
+export function setAndGetAttribute(element: HTMLElement, attribute: string, value: string) {
     element.setAttribute(attribute, value);
     return element.getAttribute(attribute);
+}
+/**
+ * Returns true if the script exists on the page
+ * @param {string} src - the src of the script
+ * @returns {boolean} - true if the script exists on the page
+ */
+export function isScriptAdded(src: string) {
+    return Boolean(document.querySelector(`script[src="${src}"]`));
 }
 
 /**
  * When new HTML is added dynamically to page, we need to ensure any <script> tags
  * have been loaded prior to adding the new HTML to the page
- *
- * @param { HTMLString }  note: the HTML shouldn't exist in the DOM yet, so we can load properly
- *
- * @return { Element }
+ * @param {string} htmlString - note: the HTML shouldn't exist in the DOM yet, so we can load properly
+ * @returns { Element } - the HTML as a DOM element
  */
-export async function getLoadedHTML(htmlString) {
-    const documentFragment = document.createRange().createContextualFragment(htmlString); //createContextualFragment ensures any </script> tags within the element are run
-    const scriptTags = documentFragment.querySelectorAll("script[src]:not([data-is-vue])"); //get each <script src></script> that isn't a vue component (which don't require preloading)
-    const newScriptTags = Array.from(scriptTags).filter((scriptTag) => !isScriptAdded(scriptTag.getAttribute("src"))); //only add those <scripts> that aren't already on the page
+export async function getLoadedHTML(htmlString: string) {
+    const documentFragment = document.createRange().createContextualFragment(htmlString); // createContextualFragment ensures any </script> tags within the element are run
+    const scriptTags = documentFragment.querySelectorAll("script[src]:not([data-is-vue])"); // get each <script src></script> that isn't a vue component (which don't require preloading)
+    const newScriptTags = Array.from(scriptTags).filter(
+        (scriptTag) => !isScriptAdded(scriptTag.getAttribute("src") as string)
+    ); // only add those <scripts> that aren't already on the page
     for (const scriptTag of newScriptTags) {
-        //add each into the document head
+        // add each into the document head
         await injectScript(scriptTag.getAttribute("src"));
     }
     if (documentFragment.childElementCount === 1) {
-        //should be returning a single div
+        // should be returning a single div
         return documentFragment.firstElementChild;
-    } else {
-        //and if there's not, wrap everything around one
-        const wrappedElement = document.createElement("div");
-        wrappedElement.append(documentFragment);
-        return wrappedElement;
     }
-}
-
-/**
- * Returns true if the script exists on the page
- *
- * @param { String }
- *
- * @returns { Boolean }
- */
-export function isScriptAdded(src) {
-    return Boolean(document.querySelector(`script[src="${src}"]`));
+    // and if there's not, wrap everything around one
+    const wrappedElement = document.createElement("div");
+    wrappedElement.append(documentFragment);
+    return wrappedElement;
 }
 
 /**
  * Returns the script element
- *
- * @param { String }
- *
- * @returns { HTMLScriptElement }
+ * @param {string} src - the src of the script
+ * @returns { HTMLScriptElement } - the script element
  */
-export function getScriptElement(src) {
+export function getScriptElement(src: string) {
     return document.querySelector(`script[src="${src}"]`);
 }
 
 /**
  * Returns true if the script has been loaded
- *
- * @param { String }
- *
- * @returns { Boolean }
+ * @param {string} src - the src of the script
+ * @returns {boolean} - true if the script has been loaded
  */
-export function isScriptLoaded(src) {
+export function isScriptLoaded(src: string) {
     const scriptElement = document.querySelector(`script[src="${src}"]`);
     return scriptElement && scriptElement.getAttribute("data-is-loaded") === "true";
 }
