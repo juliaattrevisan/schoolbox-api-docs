@@ -64,7 +64,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         /* filter config */
         foreach ($this->getOptions($ltiEnabled) as $filter) {
             $page->setVar([
-                              'COMPONENT_CONFIG_FILTER_VALUE'     => $setConfig[$filter] ?? 0,
+                              'COMPONENT_CONFIG_FILTER_VALUE'     => $filter,
                               'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($filter),
                               'COMPONENT_CONFIG_FILTER_SELECTED'  => $setConfig[$filter] ?? 0 == 1 ? 'checked="checked"' : '',
                           ]);
