@@ -10,9 +10,9 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
      *
      * @return array<string, string>
      */
-    public function getOptions(): array
+    public function getOptions(bool $ltiEnabled): array
     {
-        return [
+        $list = [
             'dueWork'    => Assessment\AssessmentType::TYPE_DUE_WORK,
             'quiz'       => Assessment\AssessmentType::TYPE_QUIZ,
             'task'       => Assessment\AssessmentType::TYPE_TASK,
@@ -20,6 +20,13 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
             'lti'        => Assessment\AssessmentType::TYPE_LTI_ASSESSMENT,
             'lessonPlan' => Assessment\AssessmentType::TYPE_LESSON_PLAN,
         ];
+
+        // if LTI is not enabled then remove that entry
+        if (!$ltiEnabled) {
+            unset($list['lti']);
+        }
+
+        return $list;
     }
 
     /**
@@ -40,12 +47,12 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
 
         // if config doesn't exist, then default to the get options...
         if ('' === $configValue) {
-            $setConfig = $this->getOptions();
+            $setConfig = $this->getOptions($ltiEnabled);
         } else {
             $setConfig = json_decode(html_entity_decode($configValue), true);
             // in the event of an error return the blank entries ...
             if (null === $setConfig) {
-                $setConfig = $this->getOptions();
+                $setConfig = $this->getOptions($ltiEnabled);
             }
         }
 
@@ -59,11 +66,11 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         $page->setVar('filters_block', '');
 
         /* filter config */
-        foreach ($setConfig as $option => $value) {
+        foreach ($this->getOptions($ltiEnabled) as $filter) {
             $page->setVar([
-                              'COMPONENT_CONFIG_FILTER_VALUE'     => $option,
-                              'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($option),
-                              'COMPONENT_CONFIG_FILTER_SELECTED'  => $value == 1 ? 'checked="checked"' : '',
+                              'COMPONENT_CONFIG_FILTER_VALUE'     => $setConfig[$filter] ?? 0,
+                              'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($filter),
+                              'COMPONENT_CONFIG_FILTER_SELECTED'  => $setConfig[$filter] ?? 0 == 1 ? 'checked="checked"' : '',
                           ]);
             $page->parse('filters_block', 'filters', true);
         }

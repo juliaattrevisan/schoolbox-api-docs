@@ -144,11 +144,11 @@ class Controller extends Component_Homepage_ControllerAbstract
         $assessmentTypes = array_keys(array_filter(
             $filters,
             function ($v, $k) {
-                return $v === "1" && key_exists($k, (new \Component_Config_AssessmentTypes(null))->getOptions());
+                return $v === "1" && key_exists($k, (new \Component_Config_AssessmentTypes(null))->getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)));
             },
             ARRAY_FILTER_USE_BOTH
         ));
-        $this->hasBeenFiltered = count($assessmentTypes) < count((new \Component_Config_AssessmentTypes(null))->getOptions());
+        $this->hasBeenFiltered = count($assessmentTypes) < count((new \Component_Config_AssessmentTypes(null))->getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)));
 
         /**
          * if everything has been filtered out, we should ignore the filter (and show everything)
