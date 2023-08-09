@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
+use Alaress\Html\ToText;
 use Alaress\Image\Transformation\Storage;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
@@ -56,7 +57,6 @@ class Hydrator implements IHydrator
     }
 
     /**
-     * @param string $keyword
      * @inheritdoc
      */
     public function hydrate(string $keyword, array $matches, User $viewer): array
@@ -151,7 +151,7 @@ class Hydrator implements IHydrator
         if ($article->getBlurb()) {
             $truncatedBlurb = $this->truncateAroundKeyword(
                 $keyword,
-                strip_tags($article->getBlurb()),
+                (new ToText($article->getBlurb()))->getText(),
                 self::DESCRIPTION_LENGTH,
             );
             if ($truncatedBlurb) {
@@ -161,7 +161,7 @@ class Hydrator implements IHydrator
         if ($article->getBody()) {
             return $this->truncateAroundKeyword(
                 $keyword,
-                strip_tags($article->getBody()),
+                (new ToText($article->getBody()))->getText(),
                 self::DESCRIPTION_LENGTH,
             );
         }
@@ -219,7 +219,13 @@ class Hydrator implements IHydrator
             }
 
             // And truncate
-            $truncated = mb_strcut($content, $cutStart, $maxChars, $encoding);
+            $truncated = trim(
+                preg_replace(
+                    '/\s+/',
+                    ' ',
+                    mb_strcut($content, $cutStart, $maxChars, $encoding),
+                )
+            );
             if ($startTruncated) {
                 $truncated = '...' . $truncated;
             }

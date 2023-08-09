@@ -56,7 +56,6 @@ class Hydrator implements IHydrator
     }
 
     /**
-     * @param string $keyword
      * @inheritdoc
      */
     public function hydrate(string $keyword, array $matches, User $viewer): array
