@@ -92,7 +92,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $orderParts[] = "$titlePart ASC";
         $orderParts[] = "$typePart ASC";
         $orderParts[] = "$idPart ASC";
-        $query .= ' ORDER BY ' . implode(', ', $orderParts);
+        if (count($orderParts)) {
+            $query .= ' ORDER BY ' . implode(', ', $orderParts);
+        }
+        $query .= ' LIMIT :limit';
 
         $params['limit'] = $limit;
         return new QueryParams($query, $params);
