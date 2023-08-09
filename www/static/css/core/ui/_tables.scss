@@ -447,11 +447,14 @@ $rotate-span-width: 11rem;
     max-width: 3rem;
 }
 
-#marksheet-styles tbody tr th:first-child {
+// Prevent long names causing first column to be excessively wide.
+#marksheet-styles tbody tr th.profile-cell {
     max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-//prevent grades from wrapping over two lines
+// Prevent grades from wrapping over two lines
 .marksheet .student-grade-cell {
     white-space: nowrap;
 }
