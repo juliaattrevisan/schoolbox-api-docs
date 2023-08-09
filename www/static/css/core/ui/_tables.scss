@@ -253,7 +253,7 @@ $rotate-span-width: 11rem;
 
 .diagonal-headings-table-container {
     max-height: calc(100vh - 290px); /* 290px is the top offset of the .diagonal-headings-table-container when the page is in its widest layout.  Updated by Javascript on resize in courseMarkbookInner.twig */
-    min-height: 500px; /* A min-height is needed to ensure the table is always viewable on mobile devices. */
+    min-height: 600px; /* A min-height is needed to ensure the table is always viewable on mobile devices. */
     overflow: auto;
     padding-left: 0 !important;
     width: 100%;
