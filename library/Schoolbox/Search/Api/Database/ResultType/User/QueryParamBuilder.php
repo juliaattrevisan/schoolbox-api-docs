@@ -55,7 +55,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
         // Don't allow LIKE searches on keywords < 2 chars long
         // Probably shouldn't allow any searches on < 2 chars, but shrug
-        // TODO consider injecting predicate builder or database itself
         $keywordSearchParts = ['u.synergy_id = :userKeyword'];
         $params             = ['userKeyword' => $keyword];
         if (mb_strlen($keyword, 'UTF-8') >= 2) {

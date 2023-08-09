@@ -58,7 +58,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
 
         // Apply keyword
-        // TODO consider replacing with MATCH?
+        // TODO replacing with MATCH may return more accurate results?
+        // (see https://mariadb.com/kb/en/full-text-index-overview/)
+        // This match returns any results within strings, whether or not they
+        // actually match a whole word.
         $keywordSearchParts        = [
             'n.title LIKE :newsKeywordLike',
             'n.body LIKE :newsKeywordLike',

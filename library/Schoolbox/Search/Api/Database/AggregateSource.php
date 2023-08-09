@@ -60,12 +60,10 @@ class AggregateSource implements ISource
             $params      = array_merge($params, $queryParams->params);
         }
 
-        // TODO consider wrapped SELECT
-        // seems to be slower, but is more reliable esp. for multiple UNIONs?
-        $queryString = '(' . implode(') UNION ALL (', $queries) . ')';
-//        $queryString = 'SELECT * FROM (('
-//            . implode(') UNION ALL (', $queries)
-//            . ')) AS combined';
+        // UNION all queries together
+        $queryString = 'SELECT * FROM (('
+            . implode(') UNION ALL (', $queries)
+            . ')) AS combined';
 
         // Apply ordering here too
         $queryString .= '

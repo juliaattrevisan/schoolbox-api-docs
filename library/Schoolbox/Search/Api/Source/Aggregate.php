@@ -39,7 +39,6 @@ class Aggregate implements ISource
      */
     public function search(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): array
     {
-        // TODO apply limit and cursor
         return array_merge(
             ...array_map(
                 fn ($source) => $source->search($keyword, $filter, $cursor, $limit),

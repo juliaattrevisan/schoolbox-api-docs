@@ -72,7 +72,6 @@ class Hydrator implements IHydrator
         $users = $this->userMapper->findByPredicates($this->buildPredicateBuilder($userIds, $viewer));
 
         // Map those users to full results
-        // TODO move this to base hydrator?
         $fullResults = array_map(
             function (RawResult $match) use ($users) {
                 $user = $users->getBy('id', $match->id);
