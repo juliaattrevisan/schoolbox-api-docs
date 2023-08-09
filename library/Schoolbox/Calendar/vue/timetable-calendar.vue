@@ -250,6 +250,11 @@ export default {
     },
 
     methods: {
+        changeUserAndReloadEvents(userId) {
+            this.config.userId = userId;
+            this.reloadEvents();
+        },
+
         /**
          * Change the display format depending on viewport size
          */

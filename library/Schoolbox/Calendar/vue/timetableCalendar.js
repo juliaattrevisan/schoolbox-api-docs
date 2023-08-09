@@ -13,35 +13,39 @@ function attachEventListeners() {
         anchor.addEventListener("click", onClickTimetableSelector);
     }
 
-    initCalendar();
+    const vueApp = window.Vue.createApp({
+        components: {
+            TimetableCalendar,
+        },
+    });
+    window.fullCalendarVueAppRoot = vueApp.mount("#timetable-calendar");
 }
 
 function onClickTimetableSelector(ev) {
     const anchor = ev.target;
+
+    if (anchor.parentElement.classList.contains("active")) {
+        // This child is already selected, so do nothing.
+        return;
+    }
+
     const key = anchor.getAttribute("data-timetable-selector");
     const tokens = key.split("-");
     const userId = tokens[0];
     const campusId = tokens[1];
 
-    window.fullCalendarConfig.userId = userId;
-
-    // TODO: Update TimetableCalendar somehow to use updated window.fullCalendarConfig.
-    //       Maybe by:
-    //        * Updating the Vue app's internal data, so it then will update itself?
-    //        * Destroying then recreating the Vue app?
+    // The ref is set as <timetable-calendar ref='timetable-calendar'></timetable-calendar> in timetableCalendar.twig.
+    window.fullCalendarVueAppRoot.$refs["timetable-calendar"].changeUserAndReloadEvents(userId);
 
     // Update state of buttons.
     for (const anchorInner of document.querySelectorAll("[data-timetable-selector]")) {
         anchorInner.parentElement.classList.remove("active");
     }
     anchor.parentElement.classList.add("active");
-}
 
-export function initCalendar() {
-    window.fullCalendarVueApp = window.Vue.createApp({
-        components: {
-            TimetableCalendar,
-        },
-    });
-    const mountResult = window.fullCalendarVueApp.mount("#timetable-calendar");
+    // Update page heading.
+    const childName = anchor.getAttribute("data-childFormattedName");
+    const yearLevel = anchor.getAttribute("data-childYearLevel");
+    document.querySelector("[data-heading-user-fullname]").innerHTML = childName;
+    document.querySelector("[data-heading-user-year]").innerHTML = yearLevel == "" ? "" : ", " + yearLevel;
 }
