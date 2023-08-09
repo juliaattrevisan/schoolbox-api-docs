@@ -14,6 +14,7 @@ use Alaress\Image\Transformation\Storage;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
+use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Url\Uri;
@@ -30,8 +31,13 @@ use Schoolbox\UserMapper;
  * - non-staff users may only see parents or students if configured to be
  *   allowed (`config.parent_search_enable`, `config.student_search_enable`)
  */
-class Hydrator implements IHydrator
+class Hydrator extends BaseHydrator
 {
+    /**
+     * This hydrator's base type.
+     */
+    private const BASE_TYPE = 'user';
+
     /**
      * Constructor
      *
@@ -50,9 +56,9 @@ class Hydrator implements IHydrator
     /**
      * @inheritdoc
      */
-    public function accepts(RawResult $match): bool
+    public function getBaseType(): string
     {
-        return str_starts_with($match->type, 'user.');
+        return self::BASE_TYPE;
     }
 
     /**

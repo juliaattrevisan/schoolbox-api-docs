@@ -14,6 +14,7 @@ use Alaress\Image\Transformation\Storage;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
 use Schoolbox\Search\Api\Cursor\RawResult;
+use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Url\Uri;
@@ -27,12 +28,17 @@ use Schoolbox\User;
  *   an article's viewability is defined in
  *   `\Schoolbox\Comms\News\Audience\ArticleResolver::findArticlesForUser`
  */
-class Hydrator implements IHydrator
+class Hydrator extends BaseHydrator
 {
     /**
      * Maximum length of a description as returned by this hydrator.
      */
     private const DESCRIPTION_LENGTH = 300;
+
+    /**
+     * This hydrator's base type.
+     */
+    private const BASE_TYPE = 'news';
 
     /**
      * Constructor
@@ -51,9 +57,9 @@ class Hydrator implements IHydrator
     /**
      * @inheritdoc
      */
-    public function accepts(RawResult $match): bool
+    public function getBaseType(): string
     {
-        return $match->type === 'news';
+        return self::BASE_TYPE;
     }
 
     /**
