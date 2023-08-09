@@ -79,11 +79,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The relevance of users is always maximum, so return a scalar value.
+     * The relevance of users is always maximum, so return a static value.
      */
     protected function buildRelevanceExpression(): string
     {
         return '1';
+    }
+
+    /**
+     * Since `buildRelevanceExpression` returns a static value, user results are
+     * not ordered by relevance.
+     */
+    protected function isOrderedByRelevance(): bool
+    {
+        return false;
     }
 
     /**

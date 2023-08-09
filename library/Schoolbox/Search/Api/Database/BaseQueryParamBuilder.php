@@ -82,15 +82,19 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $datePart      AS date,
                 $relevancePart AS relevance
             $from
-            WHERE $where
-            ORDER BY
-                $relevancePart DESC,
-                $titlePart ASC,
-                $typePart ASC,
-                $idPart ASC
-            LIMIT :userLimit
-        ";
-        $params['userLimit'] = $limit;
+            WHERE $where";
+
+        // Build order parts
+        $orderParts = [];
+        if ($this->isOrderedByRelevance()) {
+            $orderParts[] = "$relevancePart DESC";
+        }
+        $orderParts[] = "$titlePart ASC";
+        $orderParts[] = "$typePart ASC";
+        $orderParts[] = "$idPart ASC";
+        $query .= ' ORDER BY ' . implode(', ', $orderParts);
+
+        $params['limit'] = $limit;
         return new QueryParams($query, $params);
     }
 
@@ -116,6 +120,17 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * @return string An SQL expression for determining
      */
     abstract protected function buildRelevanceExpression(): string;
+
+    /**
+     * Does the relevance of an item depend on the evaluation of an expression?
+     *
+     * Required because `ORDER BY` on a static expression causes later
+     * conditions in the `ORDER BY` to be ignored.
+     *
+     * @return bool true if `buildRelevanceExpression` is a non-static value:
+     *              false if static.
+     */
+    abstract protected function isOrderedByRelevance(): bool;
 
     /**
      * Build the expression for determining the title for an item in this
