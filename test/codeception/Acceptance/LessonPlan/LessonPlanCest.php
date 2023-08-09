@@ -79,6 +79,7 @@ class LessonPlanCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
+     * @depends createLessonPlan
      *
      * importing the course with a lesson plan  into a homepage
      * check if the teacher can view all the lesson plan fields
