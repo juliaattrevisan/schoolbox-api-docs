@@ -29,7 +29,7 @@
 
                     <dd{% if child.id == user.id %} class="active"{% endif %}>
                         <a title="Timetable for {{ childFormattedName }} in {{ campus.name }}"
-                           data-child-button
+                           data-child-student-button
                            data-userId="{{ child.id }}"
                            data-childFormattedName="{{ childFormattedName }}"
                            {# Format of data-childYearLevel must match format used below in <span data-heading-user-year>. #}
