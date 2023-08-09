@@ -160,7 +160,6 @@ class Common
      */
     public function clickSubmitButton(): void
     {
-        $this->tester->click(Locator::lastElement('a.button.submit'));;
+        $this->tester->click(Locator::lastElement('a.button.submit'));
     }
-
 }

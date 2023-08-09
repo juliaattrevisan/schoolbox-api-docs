@@ -70,6 +70,4 @@ class CourseModify
     {
         $this->tester->click(self::NEW_LESSON_PLAN_BUTTON);
     }
-
-
 }

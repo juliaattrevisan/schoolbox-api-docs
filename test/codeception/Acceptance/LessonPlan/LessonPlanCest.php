@@ -17,7 +17,6 @@ use Tests\Support\Page\LessonPlan\TemplateList;
 
 class LessonPlanCest
 {
-
     /**
      * Preparations
      *
@@ -66,7 +65,7 @@ class LessonPlanCest
         $i->amGoingTo('click New Lesson PLan button to create a lesson plan');
         $courseModify->clickNewLessonPlanButton();
         $i->waitForText("Create Lesson Plan", 5);
-        $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan_template','id',['deleted_at' => null,'title like'=>$templateName]);
+        $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan_template', 'id', ['deleted_at' => null, 'title like' => $templateName]);
         $templateList->clickTemplateLink($lessonPlanTemplateId);
         $i->wait(2);
         $common->clickSubmitButton();
@@ -75,7 +74,6 @@ class LessonPlanCest
         $i->amGoingTo('check if the lesson plan is presented');
         $i->canSee('Modify Course');
         $i->canSee($lessonPlanName);
-
     }
 
     /**
@@ -98,7 +96,7 @@ class LessonPlanCest
         $teacher = 'Jack Coles';
         $student = 'Eden Reed';
 
-        $i->amGoingTo('navigate to course list and click the 3-dot menu for Year 9 English course to import into a class page' .$folderName);
+        $i->amGoingTo('navigate to course list and click the 3-dot menu for Year 9 English course to import into a class page' . $folderName);
         $i->amOnPage($courseList::URL);
         $i->canSee('Course List');
         $courseList->clickCourseDotMenu('6');
@@ -142,7 +140,6 @@ class LessonPlanCest
         $i->amGoingTo('check if teacher can view all the lesson plan fields');
         $i->canSee('Automation Field 1');
         $i->canSee('Automation Field 2 not visible to students');
-
     }
 
     /**
@@ -150,8 +147,7 @@ class LessonPlanCest
      * covenience function to create a homepage and a lesson plan template
      * @throws Exception
      */
-
-    private function createLessonPlanTemplate (AcceptanceTester $i, string $templateName, string $folderName, string $teacher, string $student): void
+    private function createLessonPlanTemplate(AcceptanceTester $i, string $templateName, string $folderName, string $teacher, string $student): void
     {
         $templates = new CreateLessonPlanTemplate($i);
         $templateList = new LessonPlanTemplateList($i);
@@ -212,6 +208,5 @@ class LessonPlanCest
         $manageGroup->selectUser(6);
         $manageGroup->clickFromRadioButton('role');
         $i->click('Add Members');
-
     }
 }

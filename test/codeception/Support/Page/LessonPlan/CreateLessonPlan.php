@@ -33,7 +33,7 @@ class CreateLessonPlan
      */
     public function typeTitle($lessonPlanName): void
     {
-        $this->tester->fillField('input#title',$lessonPlanName);
+        $this->tester->fillField('input#title', $lessonPlanName);
     }
 
     /**
@@ -43,5 +43,4 @@ class CreateLessonPlan
     {
         $this->tester->click(self::CREATE_BUTTON);
     }
-
 }

@@ -33,5 +33,4 @@ class TemplateList
     {
         $this->tester->click(['css' => 'a[data-reveal-id="lpt-preview-' . $lessonPlanTemplateId . '"][title="Preview this template"]']);
     }
-
 }
