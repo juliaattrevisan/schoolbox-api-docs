@@ -447,6 +447,10 @@ $rotate-span-width: 11rem;
     max-width: 3rem;
 }
 
+#marksheet-styles tbody tr th:first-child {
+    max-width: 200px;
+}
+
 //prevent grades from wrapping over two lines
 .marksheet .student-grade-cell {
     white-space: nowrap;
