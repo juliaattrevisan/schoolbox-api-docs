@@ -14,11 +14,15 @@
                     {% set roleName = userAccess.roleType | capitalize %}
                     {% set readonly = '' %}
                     {% set alwaysReadOnly = 0 %}
+                    {% set campusHidden = 1 %}
+                    {% set campusChecked = '' %}
                     {% set checkedComment = userAccess.commentsAllowed ? 'checked="checked"' : '' %}
                 {% elseif userAccess.role %}
                     {% set roleId = userAccess.role.id %}
                     {% set roleName = userAccess.role.name %}
                     {% set readonly = userAccess.role.type == 'staff' ? 'readonly' : '' %}
+                    {% set campusHidden = 0 %}
+                    {% set campusChecked = userAccess.studentCampusOnly ? 'checked="checked"' : '' %}
                     {% set alwaysReadOnly = userAccess.role.type == 'staff' ? 1 : 0 %}
                     {% set checkedComment = userAccess.role.type == 'staff' ? 'checked="checked"' : '' %}
                 {% endif %}
@@ -62,8 +66,8 @@
                         </td>
                         <td class="small-1 checklist">
                             <input type="checkbox" name="roleCampus{{ roleId }}" id="roleCampus{{ roleId }}"
-                                   value="1" {{ userAccess.studentCampusOnly ? 'checked="checked"' : '' }}>
-                            <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="roleCampus{{ roleId }}"></label>
+                                   value="1" {{ campusChecked }}>
+                            <label class="checkbox-label {{ campusHidden == 1 ? 'hide' : ''}}" for="roleCampus{{ roleId }}"></label>
                         </td>
                         <td class="small-1 checklist">
                             <input type="checkbox" name="roleComment{{ roleId }}" id="roleComment{{ roleId }}"
@@ -226,16 +230,18 @@
                     let permissionListRoles = $('#permission-roles');
                     permissionListRoles.append(html);
 
+                    let isStaff = roleId !== 'role-type-parent' && roleId !== 'role-type-student';
+
                     // enable comment checkbox only for student and parent role type
                     let commentCheckbox = $('#roleComment' + roleId);
                     initCheckbox(
                             commentCheckbox,
-                            roleId !== 'role-type-parent' && roleId !== 'role-type-student',
+                            isStaff,
                             commentsAllowed,
                             permission
                     );
 
-                    initCheckbox($('#roleCampus' + roleId), false, studentCampusOnly, permission);
+                    initCheckbox($('#roleCampus' + roleId), false, studentCampusOnly, isStaff ? permission : '0');
 
                     //Check the correct box
                     let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';

@@ -550,10 +550,7 @@ class DataSource
         $inSameCampus = true;
         if (null !== $student) {
             $validPb->equals("{$alias}.student_id", $student->getId());
-            $inSameCampus = !empty(array_intersect(
-                $viewer->getCampusCollection()->getPropertyValues('id'),
-                $student->getCampusCollection()->getPropertyValues('id'),
-            ));
+            $inSameCampus = $viewer->getRole()->isStudent() || $viewer->getRole()->isParent() || AccessLevelCensor::inSameCampus($student, $viewer);
         }
         $validPb->isNull("{$alias}.deleted_at");
         if (null !== $typeId) {

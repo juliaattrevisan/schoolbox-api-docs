@@ -16,6 +16,7 @@ use Schoolbox\Pastoral\Access\Mapper;
 use Schoolbox\Pastoral\Audience\Model as PastoralAudience;
 use Schoolbox\Pastoral\IPastoralAccess;
 use Schoolbox\Pastoral\Type\TypeAbstract;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class VisibilityTranslator
@@ -64,14 +65,24 @@ class VisibilityTranslator
 
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
-                    if (!in_array($matches['roleType'], $allowedRoleTypes)) {
-                        throw new SchoolboxException("Invalid role type: {$matches['roleType']}");
+                    $roleType = $matches['roleType'];
+                    if (!in_array($roleType, $allowedRoleTypes)) {
+                        throw new SchoolboxException("Invalid role type: {$roleType}");
                     }
-                    $access->setRoleType($matches['roleType']);
+                    $access->setRoleType($roleType);
+                    // student campus only is relevant to staff only
+                    if ($roleType !== Role::STAFF) {
+                        $access->setStudentCampusOnly(false);
+                    }
                 } else {
+                    /** @var Role $role */
                     $role = $allowedRoles[$roleId] ?? null;
                     if ($role) {
                         $access->setRole($role);
+                        // student campus only is relevant to staff only
+                        if (!$role->isStaff()) {
+                            $access->setStudentCampusOnly(false);
+                        }
                     } else {
                         throw new SchoolboxException("Invalid role id: $roleId");
                     }

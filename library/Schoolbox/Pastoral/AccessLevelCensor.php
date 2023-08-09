@@ -254,9 +254,7 @@ class AccessLevelCensor
                 return PastoralAccessMapper::ACCESS_DENY;
             }
             if ($access->getStudentCampusOnly()) {
-                $studentCampusIds = $record->getStudent()->getCampusCollection()->getPropertyValues('id');
-                $viewerCampusIds = $user->getCampusCollection()->getPropertyValues('id');
-                if (array_intersect($studentCampusIds, $viewerCampusIds) === []) {
+                if (!self::inSameCampus($record->getStudent(), $user)) {
                     return PastoralAccessMapper::ACCESS_DENY;
                 }
             }
@@ -277,5 +275,18 @@ class AccessLevelCensor
     public function isPastoralModerator(User $user): bool
     {
         return null !== $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
+    }
+
+    /**
+     * @param User $student
+     * @param User $viewer
+     * @return bool
+     */
+    public static function inSameCampus(User $student, User $viewer): bool
+    {
+        return !empty(array_intersect(
+            $student->getCampusCollection()->getPropertyValues('id'),
+            $viewer->getCampusCollection()->getPropertyValues('id')
+        ));
     }
 }
