@@ -68,18 +68,30 @@ class Hydrator implements IHydrator
             return [];
         }
 
+        // Filter out articles which the user doesn't have permission to read
         $permittedArticleIds = $this->articleResolver->findArticlesForUser($viewer, News\Model::STATE_PUBLIC, false);
         if (empty($permittedArticleIds)) {
             return [];
         }
 
+        // Find the given articles
         $articles = $this->newsMapper->findByColumn('id', array_intersect($articleIds, $permittedArticleIds));
 
-        // And map them to an actual article
+        // And map them to a full result
         $fullResults = array_map(
             function (RawResult $match) use ($articles, $keyword) {
                 $article = $articles->getBy('id', $match->id);
                 if ($article instanceof News\Model) {
+                    // The article may have been found if the keyword matched a
+                    // HTML attribute or its value in the blurb or body.
+                    // Filter out matches which were found to match the keyword
+                    // on the query, but were found to not match either:
+                    // * the title
+                    // * the generated description
+                    $description = $this->generateDescriptionForArticle($keyword, $article);
+                    if (!isset($description) && !str_contains($match->title, $keyword)) {
+                        return null;
+                    }
                     return new FullResult(
                         $match,
                         $match->id,
@@ -110,7 +122,7 @@ class Hydrator implements IHydrator
                                 )->__toString()
                             : null,
                         'news',
-                        $this->generateDescriptionForArticle($keyword, $article),
+                        $description,
                         $article->getAuthor(),
                         // Links: leave blank for now
                         // TODO fill in context
