@@ -75,7 +75,7 @@ class VisibilityTranslator
                         $access->setStudentCampusOnly(false);
                     }
                 } else {
-                    /** @var Role $role */
+                    /** @var Role|null $role */
                     $role = $allowedRoles[$roleId] ?? null;
                     if ($role) {
                         $access->setRole($role);

@@ -385,12 +385,18 @@ class Controller extends Base
 
         // Hydrate group members and their roles so we can display them in the visibility section
         if ($record->getAccess()) {
+            /** @var Access\Model $access */
             foreach ($record->getAccessWithPermission() as $access) {
                 if ($access->getGroup() instanceof PastoralGroup) {
                     $this->pastoralGroupMapper->findById($access->getGroup()->getId());
+                    $members = $this->pastoralGroupMemberMapper->createCollection();
                     foreach ($access->getGroup()->getMembersWithPermission() as $member) {
-                        $this->userMapper->findById($member->getUser()->getId());
+                        $memberUser = $this->userMapper->findById($member->getUser()->getId());
+                        if (!$access->getStudentCampusOnly() || AccessLevelCensor::inSameCampus($student, $memberUser)) {
+                            $members->add($member);
+                        }
                     }
+                    $access->getGroup()->setMembers($members);
                 }
             }
         }
