@@ -209,49 +209,54 @@ function formatPortrait(id: string) {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <ul v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results information-list">
-            <li v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
+        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="">
+            <div v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
                 <header-search-result-meta
                     >Showing {{ results.length }} of {{ totalCount }} matching users</header-search-result-meta
                 >
-            </li>
-            <li v-for="(result, i) in results" :key="i" class="result">
+            </div>
+            <div v-for="(result, i) in results" :key="i" class="sb-card">
                 <a
-                    class="link-row"
-                    :class="{ 'is-active': i === arrowCounter }"
+                    :class="`sb-card__main sb-card__main--link ${i === arrowCounter ? 'sb-card__main--active' : ''}`"
                     :href="paths.userPage + result.id"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="card small-12">
-                        <img :src="formatPortrait(result.id)" alt="portrait photo" />
-                        <h3 class="name">{{ result.formattedName }}</h3>
-                        <p class="meta">{{ result.metadata }}</p>
+                    <div class="sb-card__primary-img img img--round">
+                        <div class="img__wrapper">
+                            <img :src="formatPortrait(result.id)" alt="portrait photo" />
+                        </div>
+                    </div>
+                    <div class="sb-card__main-content">
+                        <a href="paths.userPage + result.id"
+                            ><h3 class="">{{ result.formattedName }}</h3></a
+                        >
+                        <span class="meta">{{ result.metadata }}</span>
                     </div>
                 </a>
-            </li>
-            <li v-if="isLoading" class="result-meta">
+            </div>
+            <div v-if="isLoading" class="result-meta">
                 <header-search-result-meta><div class="loader"></div></header-search-result-meta>
-            </li>
-            <li
+            </div>
+            <div
                 v-if="results.length && totalCount > results.length"
                 class="result-meta with-bg"
                 @mousedown.left="goToPath(paths.searchPage + keyword + '#user')"
             >
                 <header-search-result-meta> View all {{ totalCount }} users </header-search-result-meta>
-            </li>
-            <li v-if="!isLoading && !results.length" class="result-meta">
+            </div>
+            <div v-if="!isLoading && !results.length" class="result-meta">
                 <header-search-result-meta>No users were found matching "{{ keyword }}"</header-search-result-meta>
-            </li>
-            <li
+            </div>
+            <div
                 v-if="!isLoading && !results.length"
                 class="result-meta with-bg"
                 @click="goToPath(paths.searchPage + keyword + '#all')"
                 @mousedown.left="goToPath(paths.searchPage + keyword + '#all')"
             >
                 <header-search-result-meta> Search everything for "{{ keyword }}" </header-search-result-meta>
-            </li>
-        </ul>
+            </div>
+        </div>
     </form>
 </template>
 

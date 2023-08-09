@@ -44,7 +44,9 @@
             h4,
             h5,
             h6 {
+                line-height: var(--base-line-height);
                 overflow-x: hidden;
+                text-align: start;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
@@ -62,7 +64,22 @@
         h5,
         h6,
         span {
+            margin: 0;
             margin-block-end: 0;
+        }
+
+        // If __main is an <a> tag, we can add hover styles to it.
+        &--link {
+            transition: background-color 0.2s ease-in-out;
+            &:hover,
+            :focus {
+                background-color: var(--content-ui-hover);
+            }
+        }
+
+        // To highlight that the card is active, could be used when the card is selected via arrow navigation for example
+        &--active {
+            background-color: var(--content-ui-hover);
         }
     }
 
