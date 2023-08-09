@@ -37,11 +37,11 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         $page->setVar('filters_block', '');
 
         /* filter config */
-        foreach (Assessment\AssessmentType::getOptions($ltiEnabled) as $filter) {
+        foreach (Assessment\AssessmentType::getOptions($ltiEnabled) as $key => $filter) {
             $page->setVar([
-                              'COMPONENT_CONFIG_FILTER_VALUE'     => $filter,
+                              'COMPONENT_CONFIG_FILTER_VALUE'     => $key,
                               'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($filter),
-                              'COMPONENT_CONFIG_FILTER_SELECTED'  => $setConfig[$filter] ?? 0 == 1 ? 'checked="checked"' : '',
+                              'COMPONENT_CONFIG_FILTER_SELECTED'  => $setConfig[$key] ?? 0 == 1 ? 'checked="checked"' : '',
                           ]);
             $page->parse('filters_block', 'filters', true);
         }
