@@ -12,6 +12,9 @@ namespace Schoolbox\Search\Api;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use DateTimeInterface;
+use InvalidArgumentException;
+use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
@@ -125,7 +128,8 @@ class Controller extends Base
      *
      * @param string|null $filterQueryString The filter from the query string, if any.
      * @return SearchFilter\DataObject
-     * @throws MapperException if the user could not be found
+     * @throws Exception if the filter has invalid data
+     * @throws NotFound  if the creator is set, and cannot be found
      */
     private function buildSearchFilter(?string $filterQueryString): SearchFilter\DataObject
     {
@@ -135,23 +139,44 @@ class Controller extends Base
         $decodedFilter = json_decode($filterQueryString, true);
 
         $types = null;
-        if (is_array($decodedFilter['types'] ?? null)) {
-            $types = $decodedFilter['types'];
+        if (isset($decodedFilter['types'])) {
+            if (is_array($decodedFilter['types']) && array_is_list($decodedFilter['types'])) {
+                $types = $decodedFilter['types'];
+            } else {
+                throw new Exception('Invalid filter: types is not a list of valid types');
+            }
         }
 
         $fromDate = null;
         if (isset($decodedFilter['date']['from'])) {
-            $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], DateTimeInterface::RFC3339);
+            try {
+                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], DateTimeInterface::RFC3339);
+            } catch (InvalidArgumentException $e) {
+                throw new Exception('Invalid filter: date.from is not a RFC3339 date', 0, $e);
+            }
         }
 
         $toDate = null;
         if (isset($decodedFilter['date']['to'])) {
-            $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], DateTimeInterface::RFC3339);
+            try {
+                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], DateTimeInterface::RFC3339);
+            } catch (InvalidArgumentException $e) {
+                throw new Exception('Invalid filter: date.to is not a RFC3339 date', 0, $e);
+            }
         }
 
         $creator = null;
         if (isset($decodedFilter['creator']['id'])) {
-            $creator = $this->userMapper->findById($decodedFilter['creator']['id']);
+            if (!is_int($decodedFilter['creator']['id'])) {
+                throw new Exception('Invalid filter: creator.id is not an integer');
+            }
+            try {
+                $creator = $this->userMapper->findById($decodedFilter['creator']['id']);
+            } catch (MapperException $e) {
+                // Can't search for things created by an unknown user:
+                // raise an error?
+                throw new NotFound('Invalid filter: creator.id does not match known user', 0, $e);
+            }
         }
 
         return new SearchFilter\DataObject($types, $fromDate, $toDate, $creator);
