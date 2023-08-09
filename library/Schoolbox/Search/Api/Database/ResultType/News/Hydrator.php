@@ -72,7 +72,7 @@ class Hydrator implements IHydrator
 
         // And map them to an actual article
         $fullResults = array_map(
-            function (RawResult $match) use ($articles) {
+            function (RawResult $match) use ($articles, $keyword) {
                 $article = $articles->getBy('id', $match->id);
                 if ($article instanceof News\Model) {
                     return new FullResult(
@@ -92,7 +92,7 @@ class Hydrator implements IHydrator
                         $match->relevance,
                         $match->date,
                         // Meta looks like: x days ago in $category
-                        // TODO fill in metadata (or should this be a frontend responsibility?
+                        // Should probably be a frontend responsibility?
                         null,
                         $article->getFeatureImage()
                             ? (new Uri())
@@ -105,13 +105,10 @@ class Hydrator implements IHydrator
                                 )->__toString()
                             : null,
                         'news',
-                        // Description will be a truncated form of the article:
-                        // if there's a match in the content then somewhere
-                        // around that
-                        // TODO fill in description
-                        null,
+                        $this->generateDescriptionForArticle($keyword, $article),
                         $article->getAuthor(),
-                        // Context and links: leave blank for now
+                        // Links: leave blank for now
+                        // TODO fill in context
                     );
                 }
                 return null;
@@ -119,5 +116,67 @@ class Hydrator implements IHydrator
             $matches,
         );
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    private function generateDescriptionForArticle(string $keyword, News\Model $article): ?string
+    {
+        // Find keyword in blurb, then body
+        $truncateChars  = 300;
+        if ($article->getBlurb()) {
+            $truncatedBlurb = $this->truncateAroundKeyword(
+                $keyword,
+                strip_tags($article->getBlurb()),
+                $truncateChars,
+            );
+            if ($truncatedBlurb) {
+                return $truncatedBlurb;
+            }
+        }
+        if ($article->getBody()) {
+            return $this->truncateAroundKeyword(
+                $keyword,
+                strip_tags($article->getBody()),
+                $truncateChars,
+            );
+        }
+
+        return null;
+    }
+
+    private function truncateAroundKeyword(string $keyword, string $content, int $maxChars): ?string
+    {
+        // As always, encoding is UTF-8
+        $encoding = 'UTF-8';
+        $strpos   = mb_stripos($content, $keyword, 0, $encoding);
+        if ($strpos !== false) {
+            // How many chars before and after the keyword match?
+            $charsBefore = (int)($maxChars / 2);
+            $charsAfter  = $maxChars - $charsBefore;
+
+            $keywordStrlen = mb_strlen($keyword, $encoding);
+            $contentStrlen = mb_strlen($content, $encoding);
+
+            $cutStart       = $strpos - $charsAfter;
+            $startTruncated = true;
+            if ($cutStart < 0) {
+                $cutStart       = 0;
+                $startTruncated = false;
+            }
+
+            $finishTruncated = true;
+            $cutFinish       = $strpos + $keywordStrlen + $charsAfter;
+            if ($cutFinish > $contentStrlen) {
+                $finishTruncated = false;
+            }
+            $truncated = mb_strcut($content, $cutStart, $maxChars, $encoding);
+            if ($startTruncated) {
+                $truncated = '...' . $truncated;
+            }
+            if ($finishTruncated) {
+                $truncated = $truncated . '...';
+            }
+            return $truncated;
+        }
+        return null;
     }
 }
