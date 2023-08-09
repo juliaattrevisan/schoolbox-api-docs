@@ -51,9 +51,10 @@ class Hydrator implements IHydrator
     }
 
     /**
+     * @param string $keyword
      * @inheritdoc
      */
-    public function hydrate(array $matches, User $viewer): array
+    public function hydrate(string $keyword, array $matches, User $viewer): array
     {
         // Find all news articles which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
@@ -91,7 +92,7 @@ class Hydrator implements IHydrator
                         $match->relevance,
                         $match->date,
                         // Meta looks like: x days ago in $category
-                        // TODO fill in metadata
+                        // TODO fill in metadata (or should this be a frontend responsibility?
                         null,
                         $article->getFeatureImage()
                             ? (new Uri())

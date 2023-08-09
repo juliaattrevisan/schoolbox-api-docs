@@ -37,9 +37,13 @@ interface IHydrator
      * should be preserved so that the raw result may be associated with a full
      * result.
      *
+     * @param string                $keyword The original search keyword:
+     *                                       required so that descriptions may
+     *                                       be truncated to around where the
+     *                                       keyword is found.
      * @param array<int, RawResult> $matches A set of matches to hydrate.
      * @param User                  $viewer  The user viewing the search result.
      * @return array<int, FullResult|null>
      */
-    public function hydrate(array $matches, User $viewer): array;
+    public function hydrate(string $keyword, array $matches, User $viewer): array;
 }

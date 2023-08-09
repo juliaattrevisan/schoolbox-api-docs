@@ -49,11 +49,12 @@ class Aggregate implements IHydrator
      * Hydrate raw matches into a proper result, by attempting to hydrate the
      * list of matches with each hydrator in this aggregate.
      *
+     * @param string                $keyword
      * @param array<int, RawResult> $matches A set of matches to hydrate.
      * @param User                  $viewer
      * @return array<int, FullResult|null>
      */
-    public function hydrate(array $matches, User $viewer): array
+    public function hydrate(string $keyword, array $matches, User $viewer): array
     {
         // Group matches by the hydrator which accepts them
         $groupedRawResults = [];
@@ -73,7 +74,7 @@ class Aggregate implements IHydrator
         foreach ($this->hydrators as $hydrator) {
             $hydratorId = spl_object_id($hydrator);
             if (isset($groupedRawResults[$hydratorId])) {
-                $fullResults += $hydrator->hydrate($groupedRawResults[$hydratorId], $viewer);
+                $fullResults += $hydrator->hydrate($keyword, $groupedRawResults[$hydratorId], $viewer);
             }
         }
 
