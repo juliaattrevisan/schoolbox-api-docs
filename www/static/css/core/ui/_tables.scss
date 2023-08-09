@@ -452,7 +452,7 @@ $rotate-span-width: 11rem;
 table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     max-width: 200px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
 }
 
 // Prevent grades from wrapping over two lines
