@@ -2,17 +2,16 @@
 
 namespace Tests\Acceptance\LessonPlan;
 
-use Codeception\Util\Locator;
 use Tests\Support\AcceptanceTester;
 use Exception;
 use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\CreateLessonPlanTemplate;
 use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\LessonPlanTemplateList;
-use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\UpdateLessonPlanTemplate;
 use Tests\Support\Page\Common;
 use Tests\Support\Page\CourseModify;
 use Tests\Support\Page\Courses\CourseList;
 use Tests\Support\Page\Courses\ImportCourseIntoClass;
 use Tests\Support\Page\Folder\CreateFolder;
+use Tests\Support\Page\Group\ManageGroup;
 use Tests\Support\Page\LessonPlan\CreateLessonPlan;
 use Tests\Support\Page\LessonPlan\TemplateList;
 
@@ -46,15 +45,13 @@ class LessonPlanCest
     public function createLessonPlan(AcceptanceTester $i): void
     {
 
-        $courseList = new CourseList($i);
         $courseModify = new CourseModify($i);
-        $importCourseIntoClass = new ImportCourseIntoClass($i);
         $templateList = new TemplateList($i);
         $common = new Common($i);
         $createLessonPlan = new CreateLessonPlan($i);
         $templateName = "Automation Template to create a lesson plan";
         $lessonPlanName = 'Lesson Plan Automation Test 1';
-        $folderName = 'Test Class Homepage ' . $i->getUuid();
+        $folderName = 'Test Class Homepage Lesson Plan';
 
         $teacher = 'Jack Coles';
         $student = 'Eden Reed';
@@ -66,7 +63,7 @@ class LessonPlanCest
         $i->amOnPage($courseModify->getURL(6));
         $i->amGoingTo('click the arrow down for Romeo and Juliet unit');
         $courseModify->clickUnitArrow('15');
-        $i->amGoingTo('click New Lesson PLan button');
+        $i->amGoingTo('click New Lesson PLan button to create a lesson plan');
         $courseModify->clickNewLessonPlanButton();
         $i->waitForText("Create Lesson Plan", 5);
         $lessonPlanTemplateId = $i->grabFromDatabase('lesson_plan_template','id',['deleted_at' => null,'title like'=>$templateName]);
@@ -75,13 +72,33 @@ class LessonPlanCest
         $common->clickSubmitButton();
         $createLessonPlan->typeTitle($lessonPlanName);
         $createLessonPlan->clickCreateButton();
+        $i->amGoingTo('check if the lesson plan is presented');
         $i->canSee('Modify Course');
         $i->canSee($lessonPlanName);
 
+    }
 
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * importing the course with a lesson plan  into a homepage
+     * check if the teacher can view all the lesson plan fields
+     * check if the student is able to view the visible to student fields
+     * check if the students cannot see the not visible to student fields
+     */
+    public function lessonPlanFiledsVisibility(AcceptanceTester $i): void
+    {
 
-        
-        $i->amGoingTo('navigate to course list and click the 3-dot menu for Year 9 English course in the' .$folderName);
+        $courseList = new CourseList($i);
+        $importCourseIntoClass = new ImportCourseIntoClass($i);
+        $lessonPlanName = 'Lesson Plan Automation Test 1';
+        $folderName = 'Test Class Homepage Lesson Plan';
+
+        $teacher = 'Jack Coles';
+        $student = 'Eden Reed';
+
+        $i->amGoingTo('navigate to course list and click the 3-dot menu for Year 9 English course to import into a class page' .$folderName);
         $i->amOnPage($courseList::URL);
         $i->canSee('Course List');
         $courseList->clickCourseDotMenu('6');
@@ -104,36 +121,42 @@ class LessonPlanCest
         $importCourseIntoClass->tickAssessmentCheckbox('151');
         $i->amGoingTo('click button Import, navigate to the homepage and check that Romeo and Juliet unit is presented in the page');
         $importCourseIntoClass->clickSubmit('Import');
+        $i->amGoingTo('check if the lesson plan is presented in the homepage');
         $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => $folderName,'deleted_at' => null]);
         $i->amOnPage('/homepage/' . $folder_id);
         $i->canSee('Romeo and Juliet');
         $i->canSee($lessonPlanName);
 
+        $i->amGoingTo('as a student view the lesson plan');
+        $i->impersonateViaModifyUserPage($student);
+        $i->amOnPage('/homepage/' . $folder_id);
+        $i->click($lessonPlanName);
+        $i->amGoingTo('check if student can view the visible field and cannot view the not visible fields to students');
+        $i->canSee('Automation Field 1');
+        $i->cantSee('Automation Field 2 not visible to students');
+
+        $i->amGoingTo('as a teacher view the lesson plan');
+        $i->impersonateViaModifyUserPage($teacher);
+        $i->amOnPage('/homepage/' . $folder_id);
+        $i->click($lessonPlanName);
+        $i->amGoingTo('check if teacher can view all the lesson plan fields');
+        $i->canSee('Automation Field 1');
+        $i->canSee('Automation Field 2 not visible to students');
+
     }
 
     /**
-     * @param AcceptanceTester $i
+     *
+     * covenience function to create a homepage and a lesson plan template
      * @throws Exception
-     *
-     * check if the teacher can view all the lesson plan fields
-     * check if the student is able to view the visible to student fields
-     * check if the students cannot see the not visible to student fields
-     */
-//    public function lessonPlanFiledsVisibility(AcceptanceTester $i): void
-//    {
-//
-//    }
-
-    /**
-     *
-     * covenience function to creaate a homepage and a lesson plan template
      */
 
-    private function createLessonPlanTemplate (AcceptanceTester $i, string $templateName, string $folderName, string $student, string $teacher): void
+    private function createLessonPlanTemplate (AcceptanceTester $i, string $templateName, string $folderName, string $teacher, string $student): void
     {
         $templates = new CreateLessonPlanTemplate($i);
         $templateList = new LessonPlanTemplateList($i);
-
+        $createFolder = new createFolder($i);
+        $manageGroup = new ManageGroup($i);
 
         $i->amGoingTo('Click add a lesson plan template button in the lesson plan template lists page');
         $templateList->clickAddLessonPlanTemplateButton();
@@ -151,40 +174,44 @@ class LessonPlanCest
         $i->canSee($templateName);
 
         $i->amGoingTo('Create a homepage');
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/0/create");
-        $i->selectOption("template", "Blank");
-        $i->fillField(['name' => 'name'], $folderName);
-        $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupWrite2]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupRead3]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupRead4]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupRead5]']);
-        $i->click(['css' => 'input[type=submit]']);
+        $i->amOnPage($createFolder::URL);
+        $createFolder->waitCreateFolderTitleToBePresented();
+        $homepageTemplateOption = "Blank";
+        $i->amGoingTo("type a folder name, select a template option and set access permissions");
+        $createFolder->typeName($folderName);
+        $createFolder->setHomepageTemplate($homepageTemplateOption);
+        $createFolder->setAccessPermission('groupWrite1');
+        $createFolder->setAccessPermission('groupWrite2');
+        $createFolder->setAccessPermission('groupRead3');
+        $createFolder->setAccessPermission('groupRead4');
+        $createFolder->setAccessPermission('groupRead5');
+        $createFolder->setAccessPermission('groupRead6');
+        $createFolder->clickCreateFolderButton();
+        $i->amGoingTo("navigate to the resources page and check the new homepage folder is presented");
+        $i->amOnPage($createFolder::URL_RESOURCES);
+        $i->canSee($folderName);
 
-        $i->amGoingTo('Navigate to the new folder, store its location for later tests');
+        $i->amGoingTo('Navigate to the homepage');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee($folderName);
         $i->click($folderName);
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
-
-        $i->amGoingTo('Add few members into the homepage');
+        $i->amGoingTo('Add Jack Coles into the group via manage group page');
         $i->click('a#all-actions.icon-more');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
-        $i->waitForText("Manage Group", 5);
-        $i->clickWithLeftButton('#search-text');
-        $i->fillField('input#search-text', $student);
-        $i->checkOption('button.search-result input');
+        $manageGroup->search($teacher);
+        $manageGroup->selectUser(22);
+        $manageGroup->clickFromRadioButton('role');
         $i->click('Add Members');
-        sleep(1);
-        $i->clickWithLeftButton('#search-text');
-        $i->fillField('input#search-text', $teacher);
-        $i->checkOption('button.search-result input');
+        $i->amGoingTo('Making Jack Coles the group admin via database');
+        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null,'name like' => $folderName]);
+        $i->updateInDatabase('userAccess', ['type' => '3'], ['sid' => $folderId]);
+        $i->amGoingTo('Add Eden Reed into the group');
+        $manageGroup->search($student);
+        $manageGroup->selectUser(6);
+        $manageGroup->clickFromRadioButton('role');
         $i->click('Add Members');
-        sleep(1);
-        $i->selectOption('tr.VueTables__row:first-child select', 'admin');
-        sleep(5);
-
 
     }
 }
