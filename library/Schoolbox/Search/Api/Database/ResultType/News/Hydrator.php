@@ -124,8 +124,8 @@ class Hydrator implements IHydrator
                         'news',
                         $description,
                         $article->getAuthor(),
+                        [],
                         // Links: leave blank for now
-                        // TODO fill in context
                     );
                 }
                 return null;
