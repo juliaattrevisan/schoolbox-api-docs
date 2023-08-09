@@ -449,7 +449,7 @@ $rotate-span-width: 11rem;
 }
 
 // Prevent long names causing first column to be excessively wide.
-#marksheet-styles tbody tr th.profile-cell {
+table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
