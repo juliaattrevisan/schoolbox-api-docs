@@ -76,23 +76,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The news article's relevance:
      * * starts at its maximum value, and remains at that value for 7 days after
      *   publishing
-     * * linearly decays until reaching a minimum of 0.1 at 8 weeks after
+     * * linearly decays until reaching a minimum of 0 at 8 weeks after
      *   publishing
      */
     protected function buildRelevanceExpression(): string
     {
-        // TODO write into a generic function
-        // TODO add params, as this uses the newsNow param
-        return 'CAST(
-            LEAST(
-                1,
-                GREATEST(
-                    1 - ((DATEDIFF(:newsNow, n.publish_at) + 7) / 63),
-                    0.1
-                )
-            )
-            AS DECIMAL(2,2)
-        )';
+        return $this->buildLinearDecayExpression(
+            ':newsNow',
+            'n.publish_at',
+            7,
+            56,
+        );
     }
 
     /**

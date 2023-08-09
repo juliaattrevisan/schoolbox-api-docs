@@ -99,6 +99,55 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     }
 
     /**
+     * Build an expression whose result:
+     * * is between `$min` and `$max`
+     * * is `$max` if `$dateExpressionA` and `$dateExpressionB` are within
+     *   `$daysAtMax` of one another
+     * * is `$min` if `$dateExpressionA` and `$dateExpressionB` are more than
+     *   `$daysAtMin` apart
+     * * otherwise, if between `$daysLeeway` and `$daysAtMin` days apart:
+     *   decays linearly from `$max` to `$min` the further apart they are
+     *
+     * Used for building relevance expressions which depend on how far in the
+     * past or future a date is.
+     *
+     * @param string $dateExpressionA Expression for the first date to compare.
+     * @param string $dateExpressionB Expression for the second date to compare.
+     * @param int    $daysAtMax       The maximum number of days which the two
+     *                                date expressions may be apart, in order
+     *                                for `$max` to be the returned value.
+     * @param int    $daysAtMin       The minimum number of days which the two
+     *                                date expressions may be apart, in order
+     *                                for `$min` to be the returned value.
+     * @param float  $max             The max value of the expression: defaults
+     *                                to 1.
+     * @param float  $min             The min value of the expression: defaults
+     *                                to 0.
+     * @return string
+     */
+    protected function buildLinearDecayExpression(
+        string $dateExpressionA,
+        string $dateExpressionB,
+        int $daysAtMax,
+        int $daysAtMin,
+        float $max = 1,
+        float $min = 0,
+    ): string {
+        $dateDiff    = "ABS(DATEDIFF($dateExpressionA, $dateExpressionB))";
+        $numerator   = "($dateDiff + $daysAtMax)";
+        $denominator = ($daysAtMax + $daysAtMin) ?: 1;
+
+        return "CAST(
+            LEAST(
+                $max,
+                GREATEST($max - ($numerator / $denominator), $min)
+            )
+            AS DECIMAL(2,2)
+        )";
+    }
+
+
+    /**
      * Build the base set of WHERE parts and their params.
      *
      * @param string $keyword The search term from `buildMatchQueryParams`.
