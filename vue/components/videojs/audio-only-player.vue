@@ -203,7 +203,7 @@ export default {
 
 <template>
     <div ref="audioContainer">
-        <img v-if="isVideoEncoding" class="processing-img" :src="processingSrc" alt="audio is processing" />
+        <img v-if="isVideoEncoding" class="processing-img" :src="processingSrc" alt="Audio is processing" />
         <video v-else ref="audioPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
