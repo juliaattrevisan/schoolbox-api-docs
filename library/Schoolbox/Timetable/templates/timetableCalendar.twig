@@ -29,7 +29,8 @@
 
                     <dd{% if child.id == user.id %} class="active"{% endif %}>
                         <a title="Timetable for {{ childFormattedName }} in {{ campus.name }}"
-                           data-timetable-selector="{{ child.id }}-{{ campus.id }}"
+                           data-child-button
+                           data-userId="{{ child.id }}"
                            data-childFormattedName="{{ childFormattedName }}"
                            {# Format of data-childYearLevel must match format used below in <span data-heading-user-year>. #}
                            data-childYearLevel="{% if user.year and (user.year.longName(locale.year.proper)|length) %}, {{ user.year.longName(locale.year.proper) }}{% endif %}">

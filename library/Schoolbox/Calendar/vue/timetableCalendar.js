@@ -7,7 +7,7 @@ if (document.readyState !== "loading") {
 }
 
 function attachEventListeners() {
-    const anchors = document.querySelectorAll("[data-timetable-selector]");
+    const anchors = document.querySelectorAll("[data-child-button]");
 
     for (const anchor of anchors) {
         anchor.addEventListener("click", onClickTimetableSelector);
@@ -29,16 +29,13 @@ function onClickTimetableSelector(ev) {
         return;
     }
 
-    const key = anchor.getAttribute("data-timetable-selector");
-    const tokens = key.split("-");
-    const userId = tokens[0];
-    const campusId = tokens[1];
-
     // The ref is set as <timetable-calendar ref='timetable-calendar'></timetable-calendar> in timetableCalendar.twig.
-    window.fullCalendarVueAppRoot.$refs["timetable-calendar"].changeUserAndReloadEvents(userId);
+    window.fullCalendarVueAppRoot.$refs["timetable-calendar"].changeUserAndReloadEvents(
+        anchor.getAttribute("data-userId")
+    );
 
     // Update state of buttons.
-    for (const anchorInner of document.querySelectorAll("[data-timetable-selector]")) {
+    for (const anchorInner of document.querySelectorAll("[data-child-button]")) {
         anchorInner.parentElement.classList.remove("active");
     }
     anchor.parentElement.classList.add("active");
