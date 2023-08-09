@@ -1,8 +1,8 @@
 <tr class="sub-row" data-sub-table-row data-hidable-columns>
-    <td>{{ label }}</td>
-    <td>&nbsp;</td>
+    <th class="fixed-left">{{ label }}</th>
+    <th class="fixed-left">&nbsp;</th>
     {% if rankEnabled %}
-    <td>&nbsp;</td>
+    <td></td>
     {% endif %}
     {% for assessment in markbook.assessments  %}
     <td data-assessment="{{ assessment.id }}" class="student-grade-cell">

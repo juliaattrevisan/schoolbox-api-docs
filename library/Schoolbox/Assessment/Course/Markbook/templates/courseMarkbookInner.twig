@@ -172,11 +172,13 @@
                 {% for student in courseImportStudents[courseImpl.id] %}
                     <tr>
                         <th class="profile-cell fixed-left white">
-                            <div class="compact card no-pad small-12">
-                                <a href="/search/user/{{ student.id }}" title="View Profile">
-                                    {% include 'include/portrait.twig' with {user: student, render: 'tiny'} only %}
-                                    <p>{{ student.fullName }}</p>
-                                </a>
+                            <div class="sb-card">
+                                <div class="sb-card__main">
+                                    {% include "include/portrait.twig" with {user: student, render: "tiny", roundedCorners: true} only %}
+                                    <div class="sb-card__main-content">
+                                        <a href="/search/user/{{ student.id }}" title="View Profile">{{ student.fullName }}</a>
+                                    </div>
+                                </div>
                             </div>
                         </th>
 
