@@ -181,7 +181,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
                         $user->getRole()->isParent() ? null : $user,
-                        (false === $this->hasBeenFiltered) ? ['type' => $assessmentTypes] : []
+                        (false !== $this->hasBeenFiltered) ? ['type' => $assessmentTypes] : []
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
@@ -189,7 +189,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 // I'm an instructor - load all participants.
                 $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
                     $uiIds,
-                    options: (false === $this->hasBeenFiltered) ? ['type' => $assessmentTypes] : []
+                    options: (false !== $this->hasBeenFiltered) ? ['type' => $assessmentTypes] : []
                 );
             }
 
