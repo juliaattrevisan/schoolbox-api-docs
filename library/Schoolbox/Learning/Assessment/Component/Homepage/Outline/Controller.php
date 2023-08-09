@@ -151,11 +151,16 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->hasBeenFiltered = count($assessmentTypes) < count(AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)));
 
         /**
+         * if not empty array, contains an array of the assessment types to filter to
+         */
+        $assessmentFilter = ['type' => $assessmentTypes];
+        /**
          * if everything has been filtered out, we should ignore the filter (and show everything)
          */
         if (empty($assessmentTypes)) {
             $assessmentTypes = null;
             $this->hasBeenFiltered = false;
+            $assessmentFilter = [];
         }
 
         // Don't attempt to load course if not configured.
@@ -181,13 +186,13 @@ class Controller extends Component_Homepage_ControllerAbstract
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
                         $user->getRole()->isParent() ? null : $user,
-                        ['type' => $assessmentTypes]
+                        $assessmentFilter
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
             } else {
                 // I'm an instructor - load all participants.
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds, options: ['type' => $assessmentTypes]);
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds, options: $assessmentFilter);
             }
 
             // And then add them to the displayed course impl
