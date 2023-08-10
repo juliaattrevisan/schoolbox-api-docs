@@ -42,16 +42,31 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'userType'));
         }
         if ($filter->fromDate) {
-            $whereParts[]             = "$datePart >= :filterFromDate";
-            $params['filterFromDate'] = $filter->fromDate->getDatabase();
+            // No date part? Exclude this type of result entirely
+            if (isset($datePart)) {
+                $whereParts[]             = "$datePart >= :filterFromDate";
+                $params['filterFromDate'] = $filter->fromDate->getDatabase();
+            } else {
+                $whereParts[] = '1 = 0';
+            }
         }
         if ($filter->toDate) {
-            $whereParts[]           = "$datePart <= :filterToDate";
-            $params['filterToDate'] = $filter->toDate->getDatabase();
+            // No date part? Exclude this type of result entirely
+            if (isset($datePart)) {
+                $whereParts[]           = "$datePart <= :filterToDate";
+                $params['filterToDate'] = $filter->toDate->getDatabase();
+            } else {
+                $whereParts[] = '1 = 0';
+            }
         }
         if ($filter->creator) {
-            $whereParts[]            = "$creatorPart = :filterCreator";
-            $params['filterCreator'] = $filter->creator->getId();
+            // No creator part? Exclude this type of result entirely
+            if (isset($creatorPart)) {
+                $whereParts[]            = "$creatorPart = :filterCreator";
+                $params['filterCreator'] = $filter->creator->getId();
+            } else {
+                $whereParts[] = '1 = 0';
+            }
         }
 
         // Apply cursor
@@ -217,21 +232,26 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *
      * This should evaluate to a database datetime value.
      *
-     * @return string
+     * @return string|null The expression, or `null` if this item type does not
+     *                     have a date.
+     *                     (Items without dates will never match if there is a
+     *                     date filter on the search.)
      */
-    abstract protected function buildDateExpression(): string;
+    abstract protected function buildDateExpression(): ?string;
 
     /**
      * Build the expression for determining the creator for an item in this
      * search, as used in the `SELECT` and `WHERE` parts of the query.
      *
      * This should evaluate to an integer value, corresponding to the creator of
-     * this item: if it has no known creator, 0 (rather than NULL) should be
-     * returned (so that SQL comparisons work reliably).
+     * this item.
      *
-     * @return string
+     * @return string|null The expression, or `null` if this item type does not
+     *                     have a creator.
+     *                     (Items without creators will never match if there is
+     *                     a creator filter on the search.)
      */
-    abstract protected function buildCreatorExpression(): string;
+    abstract protected function buildCreatorExpression(): ?string;
 
     /**
      * Build the FROM part of the query, including any joins; e.g.:

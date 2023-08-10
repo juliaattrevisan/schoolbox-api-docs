@@ -128,7 +128,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The date of a news result is the article's publish date.
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(): ?string
     {
         return 'n.publish_at';
     }
@@ -136,7 +136,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The creator of a news result is the article's author.
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(): ?string
     {
         return 'n.author_id';
     }

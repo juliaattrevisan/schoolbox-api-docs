@@ -101,22 +101,18 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * Page results do not currently have dates: thus this will be null.
-     *
-     * TODO consider returning NULL if this source has no date?
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(): ?string
     {
-        return 'null';
+        return null;
     }
 
     /**
-     * Pages have no recorded creator: thus, this will always be 0.
-     *
-     * TODO consider returning NULL if this source has no creator?
+     * Pages have no recorded creator: thus, this will be null.
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(): ?string
     {
-        return '0';
+        return null;
     }
 
     /**
