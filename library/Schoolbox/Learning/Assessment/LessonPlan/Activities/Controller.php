@@ -111,9 +111,7 @@ class Controller extends Base
             function ($lessonPlan) {
                 return $lessonPlan->getContext()->getId();
             }
-        )
-        ;
-        // Schoolbox\Learning\Assessment\LessonPlan\Model
+        );
 
         $twigData = [
             'lessonPlans'       => $lessonPlans,

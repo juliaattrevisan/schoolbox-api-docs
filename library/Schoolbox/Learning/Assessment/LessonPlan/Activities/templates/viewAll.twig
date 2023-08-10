@@ -2,6 +2,7 @@
 {% import '@learningAssessment/fragments/macro/unit/completed.twig' as status %}
 
 <ul class="breadcrumb">
+    <li><a href="{{ routeLookup('learning.getClasses') }}">Learning</a></li>
     <li><a href="/homepage/{{ folder.id }}">{{ folder.getNameWithCodes() }}</a></li>
     <li class="active"><span>Lesson Plans</span></li>
 </ul>
@@ -19,6 +20,7 @@
             <ul class="action-list">
             {% for unit, plans in lessonPlans %}
             {% set unit = plans.first.baseContext %}
+            <li class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12">
                         <h3>
@@ -42,20 +44,12 @@
                     <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
 
                         {% if unit.isAfterDueDate == false %}
-                            <li class="separator">Create</li>
-                            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Lesson Plan</a></li>
+                            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
                         {% endif %}
-                        <li class="separator">Manage</li>
-                        {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
-                        {% if courseMarkbookRoute %}
-                            <li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>
-                        {% else %}
-                            <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folder: unit.course.folder, folderId: unit.course.folder.id}) }}" class="icon-curriculum">Class Markbook</a></li>
-                        {% endif %}
-                        <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}" data-action="delete-unit" class="icon-delete" title="Delete this {{ locale.unit }}">Delete</a></li>
+
                     </ul>
                 {% endif %}
-
+            </li>
                 {% for lesson in plans %}
                     {% set unit = lesson.baseContext %}
 
