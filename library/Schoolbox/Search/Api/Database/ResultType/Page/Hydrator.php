@@ -107,41 +107,4 @@ class Hydrator extends BaseHydrator
         );
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
     }
-
-    /**
-     * Build a predicate builder for the user search.
-     *
-     * @param array $userIds A list of user IDs to search for.
-     * @param User  $viewer  The user viewing the search results: this may
-     *                       filter out users from the result set.
-     * @return Builder
-     */
-    private function buildPredicateBuilder(array $userIds, User $viewer): Builder
-    {
-        $pb = $this->folderMapper->getPredicateBuilder()->in('id', $userIds);
-
-        // Exclude disabled users if that config isn't on
-        if (!$this->config->get('show_disabled_users')) {
-            $pb = $pb->isTrue('enabled');
-        }
-
-        // Exclude roles from search
-        $excludedRoles = [];
-        if ($viewer->getRole()->isGuest()) {
-            $excludedRoles[] = Role::PARENT;
-            $excludedRoles[] = Role::STUDENT;
-        } elseif (!$viewer->getRole()->isStaff()) {
-            if (!$this->config->get('parent_search_enable')) {
-                $excludedRoles[] = Role::PARENT;
-            }
-            if (!$this->config->get('student_search_enable')) {
-                $excludedRoles[] = Role::STUDENT;
-            }
-        }
-
-        if (!empty($excludedRoles)) {
-            $pb = $pb->notIn('g.group_type', $excludedRoles);
-        }
-        return $pb;
-    }
 }
