@@ -41,7 +41,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         $whereParts = [
             'f.deleted_at IS NULL',
-            'f.name LIKE :pageKeywordLike OR fc.code LIKE :pageKeywordLike',
+            '(f.name LIKE :pageKeywordLike OR fc.code LIKE :pageKeywordLike)',
         ];
         $params = ['pageKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%'];
 
