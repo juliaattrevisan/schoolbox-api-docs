@@ -24,7 +24,6 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 
 class Module extends BaseModule
 {
@@ -119,7 +118,6 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getErrorMapper(),
-            $this->getLinkedAssessmentsMapper(),
             $this->getCourseSpecificationMapper(),
             $this->getUnitSpecificationMapper(),
             $this->injector->get('assessmentDataSource'),
@@ -135,14 +133,6 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
-    /**
-     * @return Mapper|LinkedAssessmentsMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getLinkedAssessmentsMapper()
-    {
-        return $this->getMapperFactory()->get(LinkedAssessmentsMapper::class);
-    }
 
     /**
      * @return CourseSpecificationMapper

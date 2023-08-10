@@ -11,8 +11,6 @@ namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Model;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -35,7 +33,6 @@ class Controller extends Base
      */
     public function __construct(
         private ErrorMapper $errorMapper,
-        private Mapper $linkedAssessmentMappper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
         private AssessmentMapperProxy $assessmentMapperProxy
@@ -97,7 +94,7 @@ class Controller extends Base
     }
 
     /**
-     * 
+     *
      */
     public function getHomepage(Folder\Model $folder): void
     {
@@ -112,7 +109,7 @@ class Controller extends Base
         $lessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']])
         ->groupByCallback(
             function ($lessonPlan) {
-                return $lessonPlan->getContext()->getTitle();
+                return $lessonPlan->getContext()->getId();
             }
         )
         ;
