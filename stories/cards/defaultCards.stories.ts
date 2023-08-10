@@ -7,7 +7,7 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
-    title: "Cards",
+    title: "Cards/Default",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -99,6 +99,29 @@ export const MainSection: Story = {
                     <div class="sb-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                    </div>
+                </div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * To be used when the card data is loading
+ */
+export const MainSectionLoading: Story = {
+    render: () => ({
+        template: `
+            <div class="sb-card sb-card--loading">
+                <div class="sb-card__main">
+                    <div class="sb-card__primary-img img">
+                        <div class="img__wrapper">
+                            <div class="img-placeholder"></div>
+                        </div>
+                    </div>
+                    <div class="sb-card__main-content">
+                        <h3></h3>
+                        <span></span>
                     </div>
                 </div>
             </div>

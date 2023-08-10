@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import debounce from "lodash/debounce";
+import { vOnClickOutside } from "@vueuse/components";
 import SearchInput from "@schoolboxVue/components/search/search-input.vue";
-import HeaderSearchResultMeta from "./header-search-result-meta.vue";
 
 interface Result {
     id: string;
@@ -15,6 +15,7 @@ interface AllResults {
 }
 
 const isFocused = window.Vue.ref(false);
+const isActive = window.Vue.ref(false); // If the search input is active, to add the active styles
 const keyword = window.Vue.ref("");
 const results = window.Vue.ref<Result[]>([]);
 const isOpen = window.Vue.ref(false);
@@ -89,19 +90,11 @@ window.Vue.watch(keyword, () => {
 });
 
 /**
- * Go to a new browser page
- * @param {string} path - The path to go to
- */
-function goToPath(path: string) {
-    window.location.href = path;
-}
-
-/**
  * Navigate to the chosen result or submit the form to go to the search page
  */
 function onEnter() {
     if (arrowCounter.value > 0) {
-        goToPath(`${paths.userPage}${results.value[arrowCounter.value].id}`);
+        window.location.href = `${paths.userPage}${results.value[arrowCounter.value].id}`;
     } else {
         (formElement.value as HTMLFormElement).submit();
     }
@@ -115,17 +108,40 @@ function onClicked() {
 }
 
 /**
- * Focus the search input
- * @param { Event } event - The event object
+ * Only close the search results if the user clicks outside of the entire search component
  */
-function onFocusOver(event: Event) {
-    if (event.type === "focus") {
-        const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
-        // If left nav is unpinned and currently open, close it
-        if (offCanvasWrap.classList.contains("move-right")) {
-            offCanvasWrap.classList.remove("move-right");
-        }
-        isFocused.value = true;
+function onClickOutside() {
+    isFocused.value = false;
+    isActive.value = false;
+}
+
+/**
+ * The search input has gained focus
+ */
+function onFocusOver() {
+    isFocused.value = true;
+}
+
+/**
+ * The search input has lost focus, however in this scenario,
+ * we want to keep any search results open until the user clicks outside
+ * of the header search component
+ */
+function onFocusOut() {
+    if (keyword.value.length === 0) {
+        isFocused.value = false;
+    }
+}
+
+/**
+ * The user has hovered over the search bar
+ */
+function onMouseOver() {
+    isActive.value = true;
+    // If left nav is unpinned and currently open, close it
+    const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
+    if (offCanvasWrap.classList.contains("move-right")) {
+        offCanvasWrap.classList.remove("move-right");
     }
     /**
      * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
@@ -144,6 +160,16 @@ function onFocusOver(event: Event) {
 }
 
 /**
+ * The mouse has moved off the search bar, though we want to keep the search input 'active'
+ * if focus is still on the search input
+ */
+function onMouseOut() {
+    if (!isFocused.value) {
+        isActive.value = false;
+    }
+}
+
+/**
  * To display the users portrait image
  * @param {string} id - The user id
  * @returns {string} - The path to the image
@@ -154,60 +180,91 @@ function formatPortrait(id: string) {
 </script>
 
 <template>
-    <form id="search" ref="formElement" class="global-search" action="/search" :class="{ focus: isFocused }">
+    <form
+        id="search"
+        ref="formElement"
+        v-on-click-outside="onClickOutside"
+        class="global-search"
+        action="/search"
+        :class="{ focus: isFocused }"
+    >
         <search-input
+            :is-active="isActive"
             @input="onInput"
             @key-down="onArrowDown"
             @key-up="onArrowUp"
             @key-enter="onEnter"
             @focus-over="onFocusOver"
-            @focus-out="isFocused = false"
+            @focus-out="onFocusOut"
+            @mouse-over="onMouseOver"
+            @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <ul v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results information-list">
-            <li v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
-                <header-search-result-meta
-                    >Showing {{ results.length }} of {{ totalCount }} matching users</header-search-result-meta
-                >
-            </li>
-            <li v-for="(result, i) in results" :key="i" class="result">
-                <a
-                    class="link-row"
-                    :class="{ 'is-active': i === arrowCounter }"
-                    @click="goToPath(paths.userPage + result.id)"
-                    @mousedown.left="goToPath(paths.userPage + result.id)"
-                    @mouseover="arrowCounter = i"
-                    @mouseleave="arrowCounter = -1"
-                >
-                    <div class="card small-12">
-                        <img :src="formatPortrait(result.id)" alt="portrait photo" />
-                        <h3 class="name">{{ result.formattedName }}</h3>
-                        <p class="meta">{{ result.metadata }}</p>
+        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="sb-card-list results">
+            <div v-if="results.length && results.length !== totalCount" class="sb-card">
+                <div class="sb-card__content">
+                    <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
+                </div>
+            </div>
+            <a
+                v-for="(result, i) in results"
+                :key="i"
+                :class="`sb-card sb-card--link ${i === arrowCounter ? 'sb-card--active' : ''}`"
+                :href="paths.userPage + result.id"
+                @mouseover="arrowCounter = i"
+                @mouseleave="arrowCounter = -1"
+            >
+                <div class="sb-card__main">
+                    <div class="sb-card__primary-img img img--l img--round">
+                        <div class="img__wrapper">
+                            <img :src="formatPortrait(result.id)" alt="portrait photo" />
+                        </div>
+                    </div>
+                    <div class="sb-card__main-content">
+                        <a :href="paths.userPage + result.id"
+                            ><h3>{{ result.formattedName }}</h3></a
+                        >
+                        <span class="meta">{{ result.metadata }}</span>
+                    </div>
+                </div>
+            </a>
+            <a
+                v-if="results.length && totalCount > results.length"
+                class="sb-card sb-card--link sb-card--active"
+                :href="`${paths.searchPage}${keyword}#user`"
+            >
+                <div class="sb-card__content">
+                    <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
+                </div>
+            </a>
+            <template v-if="isLoading">
+                <div v-for="(row, index) in 3" :key="index" class="sb-card sb-card--loading">
+                    <div class="sb-card__main">
+                        <div class="sb-card__primary-img img img--round">
+                            <div class="img__wrapper">
+                                <div class="img-placeholder"></div>
+                            </div>
+                        </div>
+                        <div class="sb-card__main-content">
+                            <h3></h3>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template v-if="!isLoading && !results.length">
+                <div class="sb-card">
+                    <div class="sb-card__content">
+                        <span class="meta">No users were found matching "{{ keyword }}"</span>
+                    </div>
+                </div>
+                <a class="sb-card sb-card--link sb-card--active" :href="`${paths.searchPage}${keyword}#all`">
+                    <div class="sb-card__content">
+                        <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
                     </div>
                 </a>
-            </li>
-            <li v-if="isLoading" class="result-meta">
-                <header-search-result-meta><div class="loader"></div></header-search-result-meta>
-            </li>
-            <li
-                v-if="results.length && totalCount > results.length"
-                class="result-meta with-bg"
-                @mousedown.left="goToPath(paths.searchPage + keyword + '#user')"
-            >
-                <header-search-result-meta> View all {{ totalCount }} users </header-search-result-meta>
-            </li>
-            <li v-if="!isLoading && !results.length" class="result-meta">
-                <header-search-result-meta>No users were found matching "{{ keyword }}"</header-search-result-meta>
-            </li>
-            <li
-                v-if="!isLoading && !results.length"
-                class="result-meta with-bg"
-                @click="goToPath(paths.searchPage + keyword + '#all')"
-                @mousedown.left="goToPath(paths.searchPage + keyword + '#all')"
-            >
-                <header-search-result-meta> Search everything for "{{ keyword }}" </header-search-result-meta>
-            </li>
-        </ul>
+            </template>
+        </div>
     </form>
 </template>
 

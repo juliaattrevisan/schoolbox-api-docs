@@ -9,18 +9,6 @@
         color: transparent;
         font-weight: normal;
     }
-
-    input[type="text"] {
-        border: 0;
-        background-color: transparent;
-        color: $body-bg;
-        height: $tabbar-height;
-        width: $tabbar-height;
-        padding: $base-font-size;
-        margin: 0;
-        opacity: 0;
-        line-height: calc($tabbar-height / 2);
-    }
     &:hover,
     &.focus {
         width: 100%;
@@ -31,104 +19,24 @@
         }
     }
 
-    /* Search icon in its idle state
-     */
-    .icon-search {
-        align-items: center;
-        background: none;
-        display: flex;
-        justify-content: center;
-        line-height: inherit;
+    .search-input {
+        border: 0;
+        background-color: transparent;
+        color: $body-bg;
+        height: $tabbar-height;
+        width: $tabbar-height;
+        padding: $base-font-size;
         margin: 0;
-        padding: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-        transition: all 0.3s ease-in;
-        width: 5rem;
-        z-index: 1;
-        &:before {
-            color: $navigation-foreground;
-        }
-    }
-
-    /* Input field when Search feature is activated
-     */
-    [type="text"]:focus,
-    [type="text"]:active,
-    &:hover [type="text"],
-    &:hover [type="text"]:focus {
-        background-color: $white;
-        border: 2px solid $navigation-hover;
-        color: $black;
-        font-size: $base-font-size;
-        width: 100%;
-        opacity: 1;
-    }
-
-    [type="text"]:focus + .icon-search,
-    [type="text"]:active + .icon-search,
-    &:hover .icon-search {
-        width: 4rem;
-        /* Search icon when Search feature is activated
-        */
-        &:before {
-            color: $navigation-background;
-        }
-    }
-
-    .loader {
-        border-radius: 0.2rem;
-        height: 1rem;
-        margin: 1rem auto;
-        width: 1rem;
+        opacity: 0;
+        line-height: calc($tabbar-height / 2);
     }
 
     .results {
-        background-color: $white;
-        border: 2px solid $navigation-hover;
+        border: 2px solid var(--navigation-hover);
         border-top: 0;
-        margin: 0;
-        height: auto;
-        padding: 0;
-        z-index: 10000;
-    }
-    .result {
-        margin-left: 0;
-        margin-right: 0;
-        text-align: left;
-    }
-
-    .result-meta {
-        @extend .meta;
-        margin: 0;
-        padding: 0.5rem;
-        text-align: left;
-    }
-
-    .result-meta .list-item {
-        border-bottom: 0;
-    }
-
-    .result-meta.with-bg {
-        @include button-dimensions();
-        background-color: $content-ui-background;
-        color: $content-ui-foreground;
-        font-size: rem-calc(($base-font-size - 2));
-        font-style: normal;
-        line-height: inherit;
-        text-align: center;
-
-        &:hover {
-            background-color: $content-ui-hover;
-            color: $content-ui-foreground;
-            cursor: pointer;
-            text-decoration: none !important; // forgive me, for I have sinned.
+        h3 {
+            margin: 0; // clear .tab-bar h3 margins
         }
-    }
-
-    .is-active {
-        background-color: $content-ui-hover;
     }
 }
 

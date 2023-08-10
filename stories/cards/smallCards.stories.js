@@ -2,7 +2,7 @@ import SmallCard from "../../vue/components/card/small-card.vue";
 import UserPhoto from "../../vue/components/userPhoto/user-photo.vue";
 
 export default {
-    title: "Cards/SmallCard",
+    title: "Cards/Small",
     component: SmallCard,
 };
 
