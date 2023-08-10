@@ -237,10 +237,11 @@ function formatPortrait(id: string) {
                     </div>
                 </div>
             </a>
-            <!-- <div v-if="isLoading" class="result-meta">
-                <header-search-result-meta><div class="loader"></div></header-search-result-meta>
-            </div> -->
-            <!-- q -->
+            <div v-if="isLoading" class="sb-card">
+                <div class="sb-card__content">
+                    <div class="loader"></div>
+                </div>
+            </div>
             <div v-if="!isLoading && !results.length" class="sb-card">
                 <div class="sb-card__content">
                     <span class="meta">No users were found matching "{{ keyword }}"</span>
