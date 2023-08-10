@@ -46,7 +46,8 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         // Get collection of members
         $userMapper = UserMapper::getInstance();
 
-        if ($this->getContext()->getInherit()) {
+        $isInherited = $this->getContext()->getInherit();
+        if ($isInherited) {
             // Find nearest nian folder
             $folderMapper = FolderMapper::getInstance();
             $nianFolder   = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
@@ -101,17 +102,16 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             }
 
             $targetFolder = $this->getContext();
-            $useNianFolder = $this->getContext()->getInherit();
 
             // If this folder is being inherited, we want to use the nian folder to determine which block to show instead
-            if ($useNianFolder) {
+            if ($isInherited) {
                 $folderMapper = FolderMapper::getInstance();
                 $targetFolder = $folderMapper->findById($nianFolder->getId()); // nian only guarantees an ID, so we need the hydrated folder
             }
 
             if ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
-            } elseif ($useNianFolder && $targetFolder->getCodes()->count()) {
+            } elseif ($isInherited && $targetFolder->getCodes()->count()) {
                 $block = 'empty_class_inherited';
             } else {
                 $params = [
@@ -122,7 +122,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 if ($this->getAuthorizer()->isPathAuthorizedForUser('group.getModify', $params, $this->getUser())) {
                     $this->setVar('MANAGE_GROUP_LINK', $this->getRouteGenerator()->generate('group.getModify', $params));
 
-                    if (!$this->getSource()->getFolder()->isGroup() && !$useNianFolder) {
+                    if (!$this->getSource()->getFolder()->isGroup() && !$isInherited) {
                         $block = 'empty_not_group_members';
                     } else {
                         $block = 'empty_members';
