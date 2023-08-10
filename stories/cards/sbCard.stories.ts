@@ -106,6 +106,29 @@ export const MainSection: Story = {
     }),
 };
 
+/**
+ * To be used when the card data is loading
+ */
+export const MainSectionLoading: Story = {
+    render: () => ({
+        template: `
+            <div class="sb-card sb-card--loading">
+                <div class="sb-card__main">
+                    <div class="sb-card__primary-img img">
+                        <div class="img__wrapper">
+                            <div class="img-placeholder"></div>
+                        </div>
+                    </div>
+                    <div class="sb-card__main-content">
+                        <h3></h3>
+                        <span class="skeleton-box"></span>
+                    </div>
+                </div>
+            </div>
+        `,
+    }),
+};
+
 export const MainSectionTall: Story = {
     render: () => ({
         template: `

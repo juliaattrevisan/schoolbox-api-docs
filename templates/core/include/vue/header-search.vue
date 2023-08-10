@@ -231,10 +231,10 @@ function formatPortrait(id: string) {
             <div
                 v-if="results.length && totalCount > results.length"
                 class="sb-card sb-card--link sb-card--active"
-                :href="paths.searchPage + keyword + '#user'"
+                :href="`${paths.searchPage}${keyword}#user`"
             >
                 <div class="sb-card__content">
-                    <a :href="paths.searchPage + keyword + '#user'">View all {{ totalCount }} users</a>
+                    <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                 </div>
             </div>
             <div v-if="isLoading" class="sb-card">
@@ -250,10 +250,10 @@ function formatPortrait(id: string) {
             <a
                 v-if="!isLoading && !results.length"
                 class="sb-card sb-card--link sb-card--active"
-                :href="paths.searchPage + keyword + '#all'"
+                :href="`${paths.searchPage}${keyword}#all`"
             >
                 <div class="sb-card__content">
-                    <a :href="paths.searchPage + keyword + '#all'">Search everything for "{{ keyword }}"</a>
+                    <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
                 </div>
             </a>
         </div>

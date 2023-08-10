@@ -24,6 +24,7 @@
     // The main section of a card, generally with the most prominent information. Title, meta, actions, thumbnail.
     // In a lot of instances, this is all you need.
     &__main {
+        background-color: white;
         display: flex;
         flex-direction: row;
         gap: var(--whitespace-m);
@@ -101,7 +102,6 @@
         background-color: #f6f6f6;
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
         padding: var(--whitespace-xs);
-
         .sb-card__main-content {
             padding-block-start: 0;
             padding-block-end: 0;
@@ -123,6 +123,31 @@
     &--active {
         background-color: var(--content-ui-hover);
         filter: grayscale(20%);
+    }
+
+    // Used as a placeholder to show that the card data is currently being loaded
+    // Currently referencing the skeleton defined in www/static/css/core/ui/_skeleton.scss
+    &--loading {
+        @include skeleton-background-gradient;
+        animation: shine-lines 1.6s ease infinite !important;
+        background-size: 400% 100% !important;
+        .img-placeholder {
+            background: var(--loading-colour);
+            height: var(--image-size-l);
+            width: var(--image-size-l);
+        }
+        h3 {
+            background: var(--loading-colour);
+            height: 1rem;
+            margin-bottom: var(--whitespace-s);
+            width: 30%;
+        }
+        p,
+        span {
+            background: var(--loading-colour);
+            height: 0.8125rem;
+            width: 20%;
+        }
     }
 }
 
