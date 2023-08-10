@@ -200,7 +200,7 @@ function formatPortrait(id: string) {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results">
+        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="sb-card-list results">
             <div v-if="results.length && results.length !== totalCount" class="sb-card">
                 <div class="sb-card__content">
                     <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
@@ -214,7 +214,7 @@ function formatPortrait(id: string) {
                 @mouseover="arrowCounter = i"
                 @mouseleave="arrowCounter = -1"
             >
-                <div class="sb-card__main" s>
+                <div class="sb-card__main">
                     <div class="sb-card__primary-img img img--round">
                         <div class="img__wrapper">
                             <img :src="formatPortrait(result.id)" alt="portrait photo" />
@@ -228,7 +228,7 @@ function formatPortrait(id: string) {
                     </div>
                 </div>
             </a>
-            <div
+            <a
                 v-if="results.length && totalCount > results.length"
                 class="sb-card sb-card--link sb-card--active"
                 :href="`${paths.searchPage}${keyword}#user`"
@@ -236,12 +236,22 @@ function formatPortrait(id: string) {
                 <div class="sb-card__content">
                     <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                 </div>
-            </div>
-            <div v-if="isLoading" class="sb-card">
-                <div class="sb-card__content">
-                    <div class="loader"></div>
+            </a>
+            <template v-if="isLoading">
+                <div v-for="(row, index) in 3" :key="index" class="sb-card sb-card--loading">
+                    <div class="sb-card__main">
+                        <div class="sb-card__primary-img img img--round">
+                            <div class="img__wrapper">
+                                <div class="img-placeholder"></div>
+                            </div>
+                        </div>
+                        <div class="sb-card__main-content">
+                            <h3></h3>
+                            <span class="skeleton-box"></span>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </template>
             <div v-if="!isLoading && !results.length" class="sb-card">
                 <div class="sb-card__content">
                     <span class="meta">No users were found matching "{{ keyword }}"</span>

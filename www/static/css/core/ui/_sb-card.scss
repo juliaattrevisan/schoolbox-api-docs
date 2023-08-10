@@ -24,7 +24,6 @@
     // The main section of a card, generally with the most prominent information. Title, meta, actions, thumbnail.
     // In a lot of instances, this is all you need.
     &__main {
-        background-color: white;
         display: flex;
         flex-direction: row;
         gap: var(--whitespace-m);
@@ -131,20 +130,26 @@
         @include skeleton-background-gradient;
         animation: shine-lines 1.6s ease infinite !important;
         background-size: 400% 100% !important;
-        .img-placeholder {
+        .sb-card__main {
+            background-color: white;
+        }
+        .img-placeholder,
+        h3,
+        p,
+        span {
             background: var(--loading-colour);
+        }
+        .img-placeholder {
             height: var(--image-size-l);
             width: var(--image-size-l);
         }
         h3 {
-            background: var(--loading-colour);
             height: 1rem;
             margin-bottom: var(--whitespace-s);
             width: 30%;
         }
         p,
         span {
-            background: var(--loading-colour);
             height: 0.8125rem;
             width: 20%;
         }
