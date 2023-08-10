@@ -79,7 +79,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $idPart        AS id,
                 $titlePart     AS title,
                 $typePart      AS type,
-                $datePart      AS date,
                 $relevancePart AS relevance
             $from
             WHERE $where";

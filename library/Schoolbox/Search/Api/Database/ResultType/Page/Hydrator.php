@@ -74,7 +74,6 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($folders, $viewer) {
                 $folder = $folders->getBy('id', $match->id);
                 if ($folder instanceof Folder\Model) {
-
                     // Can the viewer even view this folder?
                     if ($this->access->getFolderAccess($viewer, $folder->getId()) < UserAccess::ACCESS_READ) {
                         return null;
@@ -87,7 +86,7 @@ class Hydrator extends BaseHydrator
                         '/homepage/' . $match->id,
                         $match->type,
                         $match->relevance,
-                        $match->date,
+                        null,
                         null,
                         // Image: folder's image if there is one
                         null,

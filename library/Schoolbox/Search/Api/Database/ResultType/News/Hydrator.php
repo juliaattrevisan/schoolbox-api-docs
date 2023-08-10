@@ -146,7 +146,7 @@ class Hydrator extends BaseHydrator
                             ->__toString(),
                         $match->type,
                         $match->relevance,
-                        $match->date,
+                        $article->getPublishAt(),
                         // Meta looks like: x days ago in $category
                         // Should probably be a frontend responsibility?
                         null,

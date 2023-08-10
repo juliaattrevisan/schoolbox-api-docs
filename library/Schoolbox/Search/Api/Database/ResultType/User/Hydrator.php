@@ -88,7 +88,7 @@ class Hydrator extends BaseHydrator
                         '/search/user/' . $match->id,
                         $match->type,
                         $match->relevance,
-                        $match->date,
+                        $user->getUpdatedAt(),
                         null,
                         (new Uri())
                             ->withPath('/portrait.php')
