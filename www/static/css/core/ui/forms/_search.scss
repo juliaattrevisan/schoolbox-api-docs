@@ -34,6 +34,9 @@
     .results {
         border: 2px solid var(--navigation-hover);
         border-top: 0;
+        h3 {
+            margin: 0;
+        }
     }
 }
 

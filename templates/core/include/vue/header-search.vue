@@ -222,7 +222,7 @@ function formatPortrait(id: string) {
                     </div>
                     <div class="sb-card__main-content">
                         <a :href="paths.userPage + result.id"
-                            ><h3 class="">{{ result.formattedName }}</h3></a
+                            ><h3>{{ result.formattedName }}</h3></a
                         >
                         <span class="meta">{{ result.metadata }}</span>
                     </div>
