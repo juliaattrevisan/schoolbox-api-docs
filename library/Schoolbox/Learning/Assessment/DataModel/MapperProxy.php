@@ -1744,7 +1744,11 @@ class MapperProxy
             if (!is_array($options['type'])) {
                 $options['type'] = [$options['type']];
             }
-            $filterBuilder = $this->baseMapper->getPredicateBuilder();
+            $filterBuilder = $builder;
+            // if only 1 assessment then dont use an any, but just pass the main PB along
+            if (1 < count($options['type'])) {
+                $filterBuilder = $this->baseMapper->getPredicateBuilder();
+            }
             foreach ($options['type'] as $type) {
                 switch ($type) {
                     case AssessmentType::TYPE_DUE_WORK:
@@ -1775,7 +1779,10 @@ class MapperProxy
                         break;
                 }
             }
-            $builder->any($filterBuilder);
+            // if only 1 assessment then dont use an any, but just pass the main PB along
+            if (1 < count($options['type'])) {
+                $builder->any($filterBuilder);
+            }
         }
 
         // Work type filter
