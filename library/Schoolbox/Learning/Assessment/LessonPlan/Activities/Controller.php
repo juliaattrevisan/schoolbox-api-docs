@@ -14,8 +14,11 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment;
@@ -35,8 +38,9 @@ class Controller extends Base
      */
     public function __construct(
         private ErrorMapper $errorMapper,
-        private CourseSpecificationMapper $courseSpecificationMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
+        private UnitImplementationMapper $unitImplementationMapper,
+        private LessonPlanMapper $lessonPlanMapper,
         private AssessmentMapperProxy $assessmentMapperProxy
     ) {
     }
@@ -47,22 +51,37 @@ class Controller extends Base
      *
      * @param CourseSpecification $course
      */
-    public function getCourse(CourseSpecification $courseSpec): void
+    public function getCourse(CourseSpecification $courseSpec, ?CourseImplementation $courseImpl): void
     {
-        $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
-
         /**
          * Assessments within the course grouped by units
          */
         $results = [];
 
-        foreach ($courseSpec->getUnits() as $unitSpec) {
-            $unitSpecId = $unitSpec->getId();
-            $folderId = $unitSpec->getFolder()->getId();
-            $options = ['order' => ['sequence' => 'ASC']];
-            $assessments = $this->assessmentMapperProxy->findAllByUnitSpecificationId($unitSpecId, $options);
-            $unitSpec->setAssessables($assessments);
-            $results[$unitSpecId] = $assessments;
+
+        // if we have specified a course implementation... then we should just return assessments within that
+        if ($courseImpl) {
+            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
+
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                $unitImplId = $unitImpl->getId();
+                $folderId = $unitImpl->getFolder()->getId();
+                $options = ['order' => ['sequence' => 'ASC']];
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImplId], $options);
+                $unitImpl->setAssessables($assessments);
+                $results[$unitImplId] = $assessments;
+            }
+        } else {
+            $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
+
+            foreach ($courseSpec->getUnits() as $unitSpec) {
+                $unitSpecId = $unitSpec->getId();
+                $folderId = $unitSpec->getFolder()->getId();
+                $options = ['order' => ['sequence' => 'ASC']];
+                $assessments = $this->assessmentMapperProxy->findAllByUnitSpecificationId($unitSpecId, $options);
+                $unitSpec->setAssessables($assessments);
+                $results[$unitSpecId] = $assessments;
+            }
         }
 
         $this->response = $this->responseAsJson($results);
@@ -73,9 +92,6 @@ class Controller extends Base
      */
     public function getHomepage(Folder\Model $folder): void
     {
-        $lessonPlanMapper = LessonPlanMapper::getInstance();
-        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
         /**
          * If user is a student, we have specific logic:
          * Students only see lesson plans that have been published
@@ -85,9 +101,9 @@ class Controller extends Base
         $publishDate = $isStudent ? \Alaress_Date_Format::now() : null;
 
         // grab the assessmentID for all lesson plans from the students subject list
-        $assessmentIds = $lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStudent);
+        $assessmentIds = $this->lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStudent);
         // hydrate those assessments
-        $lessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']])
+        $lessonPlans = $this->assessmentMapperProxy->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']])
         ->groupByCallback(
             function ($lessonPlan) {
                 return $lessonPlan->getContext()->getId();

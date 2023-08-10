@@ -16,9 +16,12 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -59,12 +62,27 @@ class Module extends BaseModule
 
         $preloadCourseSpec = function (array $params) {
             try {
-                return ['courseSpec' => $this->getCourseSpecificationMapper()->findById($params['id'])];
+                $courseSpec = $this->getCourseSpecificationMapper()->findById($params['specId']);
             } catch (MapperException\Deleted $e) {
-                return ['courseSpec' => $e->getDeletedObject()];
+                $courseSpec = $e->getDeletedObject();
             } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
+            // there may be no courses on class pages yet, so ignore these entries.
+            $courseImplementation = null;
+            if (null !== $params['implId']) {
+                try {
+                    $courseImplementation = $this->getCourseImplementationMapper()->findById($params['implId']);
+                } catch (MapperException\Deleted $e) {
+                    $courseImplementation = $e->getDeletedObject();
+                } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
+            }
+            return [
+                'courseSpec' => $courseSpec,
+                'courseImpl' => $courseImplementation,
+            ];
         };
 
         $preloadFolder = function (array $params) {
@@ -76,10 +94,10 @@ class Module extends BaseModule
         };
 
         // Get all activities contained within a course
-        $this->register('GET', '/course/{id}', 'getCourse', $perms, $preloadCourseSpec);
+        $this->register('GET', '/course/{specId:\d+}{/implId:\d+}', 'getCourse', $perms, $preloadCourseSpec);
 
         // get lessonplans for homepage
-        $this->register('GET', '/class/{folderId}', 'getHomepage', $permsAll, $preloadFolder);
+        $this->register('GET', '/class/{folderId:\d+}', 'getHomepage', $permsAll, $preloadFolder);
     }
 
     /**
@@ -97,8 +115,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getErrorMapper(),
-            $this->getCourseSpecificationMapper(),
             $this->getUnitSpecificationMapper(),
+            $this->getUnitImplementationMapper(),
+            $this->getLessonPlanMapper(),
             $this->injector->get('assessmentDataSource'),
         );
     }
@@ -110,6 +129,13 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
     }
+    /**
+     * @return CourseImplementationMapper
+     */
+    protected function getCourseImplementationMapper()
+    {
+        return $this->getMapperFactory()->get(CourseImplementationMapper::class);
+    }
 
     /**
      * @return UnitSpecificationMapper
@@ -117,6 +143,22 @@ class Module extends BaseModule
     protected function getUnitSpecificationMapper()
     {
         return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+    }
+
+    /**
+     * @return UnitImplementationMapper
+     */
+    protected function getUnitImplementationMapper()
+    {
+        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
+    }
+
+    /**
+     * @return LessonPlanMapper
+     */
+    protected function getLessonPlanMapper()
+    {
+        return $this->getMapperFactory()->get(LessonPlanMapper::class);
     }
 
     /**
