@@ -15,6 +15,8 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\User\Formatter\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
@@ -62,6 +64,7 @@ class Module extends BaseModule
                 $database,
                 new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
                 new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -73,6 +76,10 @@ class Module extends BaseModule
                     $mapperFactory->get(NewsMapper::class),
                     $routeGenerator,
                     $articleResolver,
+                ),
+                new Database\ResultType\Page\Hydrator(
+                    $mapperFactory->get(FolderMapper::class),
+                    Access::getInstance(),
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
