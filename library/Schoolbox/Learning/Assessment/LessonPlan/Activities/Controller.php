@@ -69,33 +69,6 @@ class Controller extends Base
     }
 
     /**
-     * @param Model $lessonPlan
-     * @return void
-     */
-    public function getLink(Model $lessonPlan): void
-    {
-        new \Alaress_Probe($lessonPlan);
-    }
-
-    /**
-     * @param Model $lessonPlan
-     * @return void
-     */
-    public function createLink(Model $lessonPlan): void
-    {
-        new \Alaress_Probe($lessonPlan);
-    }
-
-    /**
-     * @param Model $lessonPlan
-     * @return void
-     */
-    public function deleteLink(Model $lessonPlan): void
-    {
-        new \Alaress_Probe($lessonPlan);
-    }
-
-    /**
      *
      */
     public function getHomepage(Folder\Model $folder): void

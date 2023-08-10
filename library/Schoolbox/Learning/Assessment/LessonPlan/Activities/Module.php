@@ -75,16 +75,9 @@ class Module extends BaseModule
             }
         };
 
-        $preloadLessonPlan = function ($params) {
-            return $this->preloadLessonPlan($params);
-        };
-
         // Get all activities contained within a course
         $this->register('GET', '/course/{id}', 'getCourse', $perms, $preloadCourseSpec);
-        // routes for lesson plan specifically
-        $this->register('GET', '/{lessonPlanId}', 'getLink', $perms, $preloadLessonPlan);
-        $this->register('POST', '/{lessonPlanId}', 'createLink', $perms, $preloadLessonPlan);
-        $this->register('DELETE', '/{lessonPlanId}/{activity}', 'deleteLink', $perms, $preloadLessonPlan);
+
         // get lessonplans for homepage
         $this->register('GET', '/class/{folderId}', 'getHomepage', $permsAll, $preloadFolder);
     }
@@ -96,25 +89,6 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
-
-    /**
-     * @param array $params
-     * @return array
-     */
-    private function preloadLessonPlan(array $params): array
-    {
-        try {
-            $lessonPlan = $this->getLinkedAssessmentsMapper()->findById($params['lessonPlanId']);
-        } catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'lessonPlan' => $lessonPlan,
-        ];
-    }
-
 
     /**
      * @inheritdoc
@@ -128,16 +102,6 @@ class Module extends BaseModule
             $this->injector->get('assessmentDataSource'),
         );
     }
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
 
     /**
      * @return CourseSpecificationMapper
