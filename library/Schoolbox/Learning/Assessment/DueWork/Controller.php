@@ -685,7 +685,7 @@ class Controller extends Assessment\Controller
 
             if (count($marks)) {
                 foreach ($allIndicatorUsageIds as $indicatorUsageId) {
-                    if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                    if (array_key_exists('published', $marks[$indicatorUsageId]) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
                         $row[]      = $descriptor ? $descriptor->getDescription() : '';
                         $row[]      = $marks[$indicatorUsageId]['published']->getValue();
@@ -698,8 +698,12 @@ class Controller extends Assessment\Controller
             } else {
                 $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
             }
-            $row[]  = $sum;
-            $data[] = $row;
+
+            // If the sum is still NULL, the student has no marks, and should be hidden from the csv
+            if (null !== $sum) {
+                $row[]  = $sum;
+                $data[] = $row;
+            }
         }
         return $data;
     }
