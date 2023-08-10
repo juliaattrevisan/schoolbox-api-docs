@@ -87,8 +87,23 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(): string
     {
-        // Just "page" for now though
-        return "'page'";
+        // NVL2: if param 1 is not null returns param 2, otherwise param 3
+        return "CONCAT(
+            'page.',
+            NVL2(
+                cs.id,
+                'course',
+                NVL2(
+                    cus.id,
+                    'unit',
+                    NVL2(
+                        fc.code,
+                        'class',
+                        NVL2(hc.template, 'homepage', 'other')
+                    )
+                )
+            )
+        )";
     }
 
     /**
@@ -123,7 +138,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return "
             FROM folder f
-            LEFT JOIN folder_code fc ON f.id = fc.folder_id
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
+            LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+            LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+            LEFT JOIN homepage_config hc ON f.id = hc.cid
         ";
     }
 }
