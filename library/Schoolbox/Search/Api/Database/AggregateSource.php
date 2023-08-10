@@ -82,7 +82,9 @@ class AggregateSource implements ISource
                 (int)$row['id'],
                 $row['title'],
                 $row['type'],
-                Alaress_Date_Format::newDatabaseDate($row['date']),
+                $row['date']
+                    ? Alaress_Date_Format::newDatabaseDate($row['date'])
+                    : null,
                 (float)$row['relevance'],
             );
         }
