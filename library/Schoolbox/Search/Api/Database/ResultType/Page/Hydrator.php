@@ -89,7 +89,9 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         // Image: folder's image if there is one
-                        null,
+                        $folder->getCoverImage()
+                            ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
+                            : null,
                         // Icon: dependent on folder type
                         'folder',
                         null,

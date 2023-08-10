@@ -16,7 +16,6 @@ use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
-use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -90,7 +89,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $user->getUpdatedAt(),
                         null,
-                        (new Uri())
+                        $this->buildBaseUrl()
                             ->withPath('/portrait.php')
                             ->withQuery(
                                 http_build_query([

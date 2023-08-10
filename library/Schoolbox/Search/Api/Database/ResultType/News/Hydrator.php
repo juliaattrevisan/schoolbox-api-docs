@@ -10,14 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
 use Alaress\Html\ToText;
-use Alaress\Image\Transformation\Storage;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
-use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
 /**
@@ -135,7 +133,7 @@ class Hydrator extends BaseHydrator
                         $match,
                         $match->id,
                         $match->title,
-                        (new Uri())
+                        $this->buildBaseUrl()
                             ->withPath(
                                 $this->routeGenerator->generate(
                                     'commsNews.getDetail',
@@ -151,14 +149,7 @@ class Hydrator extends BaseHydrator
                         // Should probably be a frontend responsibility?
                         null,
                         $article->getFeatureImage()
-                            ? (new Uri())
-                                ->withPath('/storage/image.php')
-                                ->withQuery(
-                                    http_build_query([
-                                        'hash' => $article->getFeatureImage()->getHash(),
-                                        'size' => Storage::TRANSFORM_SQUARE64,
-                                    ])
-                                )->__toString()
+                            ? $this->buildStorageImageUrl($article->getFeatureImage())->__toString()
                             : null,
                         'news',
                         $description,
