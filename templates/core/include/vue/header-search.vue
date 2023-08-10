@@ -90,19 +90,11 @@ window.Vue.watch(keyword, () => {
 });
 
 /**
- * Go to a new browser page
- * @param {string} path - The path to go to
- */
-function goToPath(path: string) {
-    window.location.href = path;
-}
-
-/**
  * Navigate to the chosen result or submit the form to go to the search page
  */
 function onEnter() {
     if (arrowCounter.value > 0) {
-        goToPath(`${paths.userPage}${results.value[arrowCounter.value].id}`);
+        window.location.href = `${paths.userPage}${results.value[arrowCounter.value].id}`;
     } else {
         (formElement.value as HTMLFormElement).submit();
     }
@@ -236,6 +228,15 @@ function formatPortrait(id: string) {
                     </div>
                 </div>
             </a>
+            <div
+                v-if="results.length && totalCount > results.length"
+                class="sb-card sb-card--link sb-card--active"
+                :href="paths.searchPage + keyword + '#user'"
+            >
+                <div class="sb-card__content">
+                    <a :href="paths.searchPage + keyword + '#user'">View all {{ totalCount }} users</a>
+                </div>
+            </div>
             <div v-if="isLoading" class="sb-card">
                 <div class="sb-card__content">
                     <div class="loader"></div>
