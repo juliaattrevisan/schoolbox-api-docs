@@ -5,7 +5,9 @@
 </script>
 
 <template>
-    <div class="list-item-meta small-12">
-        <slot></slot>
+    <div class="sb-card">
+        <div class="sb-card__content">
+            <slot></slot>
+        </div>
     </div>
 </template>

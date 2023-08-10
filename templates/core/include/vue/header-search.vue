@@ -210,52 +210,51 @@ function formatPortrait(id: string) {
             @click="onClicked"
         />
         <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="">
-            <div v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
+            <!-- <div v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
                 <header-search-result-meta
                     >Showing {{ results.length }} of {{ totalCount }} matching users</header-search-result-meta
                 >
-            </div>
-            <div v-for="(result, i) in results" :key="i" class="sb-card">
-                <a
-                    :class="`sb-card__main sb-card__main--link ${i === arrowCounter ? 'sb-card__main--active' : ''}`"
-                    :href="paths.userPage + result.id"
-                    @mouseover="arrowCounter = i"
-                    @mouseleave="arrowCounter = -1"
-                >
+            </div> -->
+            <a
+                v-for="(result, i) in results"
+                :key="i"
+                :class="`sb-card sb-card--link ${i === arrowCounter ? 'sb-card--active' : ''}`"
+                :href="paths.userPage + result.id"
+                @mouseover="arrowCounter = i"
+                @mouseleave="arrowCounter = -1"
+            >
+                <div class="sb-card__main" s>
                     <div class="sb-card__primary-img img img--round">
                         <div class="img__wrapper">
                             <img :src="formatPortrait(result.id)" alt="portrait photo" />
                         </div>
                     </div>
                     <div class="sb-card__main-content">
-                        <a href="paths.userPage + result.id"
+                        <a :href="paths.userPage + result.id"
                             ><h3 class="">{{ result.formattedName }}</h3></a
                         >
                         <span class="meta">{{ result.metadata }}</span>
                     </div>
-                </a>
-            </div>
-            <div v-if="isLoading" class="result-meta">
+                </div>
+            </a>
+            <!-- <div v-if="isLoading" class="result-meta">
                 <header-search-result-meta><div class="loader"></div></header-search-result-meta>
+            </div> -->
+            <!-- q -->
+            <div v-if="!isLoading && !results.length" class="sb-card">
+                <div class="sb-card__content">
+                    <span class="meta">No users were found matching "{{ keyword }}"</span>
+                </div>
             </div>
-            <div
-                v-if="results.length && totalCount > results.length"
-                class="result-meta with-bg"
-                @mousedown.left="goToPath(paths.searchPage + keyword + '#user')"
-            >
-                <header-search-result-meta> View all {{ totalCount }} users </header-search-result-meta>
-            </div>
-            <div v-if="!isLoading && !results.length" class="result-meta">
-                <header-search-result-meta>No users were found matching "{{ keyword }}"</header-search-result-meta>
-            </div>
-            <div
+            <a
                 v-if="!isLoading && !results.length"
-                class="result-meta with-bg"
-                @click="goToPath(paths.searchPage + keyword + '#all')"
-                @mousedown.left="goToPath(paths.searchPage + keyword + '#all')"
+                class="sb-card sb-card--link sb-card--active"
+                :href="paths.searchPage + keyword + '#all'"
             >
-                <header-search-result-meta> Search everything for "{{ keyword }}" </header-search-result-meta>
-            </div>
+                <div class="sb-card__content">
+                    <a :href="paths.searchPage + keyword + '#all'">Search everything for "{{ keyword }}"</a>
+                </div>
+            </a>
         </div>
     </form>
 </template>
