@@ -17,7 +17,6 @@ use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
-use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
 /**
@@ -79,6 +78,7 @@ class Hydrator extends BaseHydrator
                         return null;
                     }
 
+                    // TODO consider how to load items within the folder
                     return new FullResult(
                         $match,
                         $match->id,
@@ -93,7 +93,8 @@ class Hydrator extends BaseHydrator
                         // Icon: dependent on folder type
                         'folder',
                         null,
-                        // Context: this folder's parentage
+                        null,
+                        $this->folderMapper->findParents($folder, null, true)->getAll(),
                     );
                 }
 
