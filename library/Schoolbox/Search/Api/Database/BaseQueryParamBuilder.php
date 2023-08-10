@@ -75,7 +75,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         // Build query and params
         $from = $this->buildFromStatement();
         $query = "
-            SELECT
+            SELECT DISTINCT
                 $idPart        AS id,
                 $titlePart     AS title,
                 $typePart      AS type,
