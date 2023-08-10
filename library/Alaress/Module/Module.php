@@ -672,7 +672,7 @@ class Module
         $requestQuery = new Values($request->getQueryParams());
         $requestPost  = new Values(
             strtoupper($request->getMethod()) === self::METHOD_POST
-                ? $request->getParsedBody()
+                ? ($request->getParsedBody() ?? [])
                 : []
         );
 
