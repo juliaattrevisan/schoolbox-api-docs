@@ -365,6 +365,25 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * @inheritdoc
+     */
+    public function getParticipantIfExtantIncludingExcluded(User $user): ?Participant
+    {
+        if (!$user || $user->isDeleted()) {
+            return null;
+        }
+        $userId = $user->getId();
+        foreach ($this->plans as $plan) {
+            if ($plan->getParticipants()->offsetExists($userId)) {
+                return $plan->getParticipants()[$userId];
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * @param User $user
      * @return bool
      */

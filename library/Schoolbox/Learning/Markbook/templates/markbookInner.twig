@@ -203,7 +203,7 @@
                 {% endif %}
 
                 {% for assessment in markbook.assessments %}
-                    {% set participant = assessment.getParticipantIfExtant(student) %}
+                    {% set participant = assessment.getParticipantIfExtantIncludingExcluded(student) %}
                     <td
                         class="column-{{ assessment.id }}
                             {% if not participant or participant.isExcluded %} excluded
@@ -270,6 +270,8 @@
                                 {% endif %}
                             {% endif %}
                         {% endif %}
+{% if participant %} participant {% else %} not-participant {% endif %}
+{% if participant and participant.isExcluded %} excluded {% else %} not-excluded {% endif %}
                     </td>
                 {% endfor %}
             </tr>
