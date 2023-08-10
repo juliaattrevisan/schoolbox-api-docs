@@ -347,7 +347,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getParticipantIfExtant(User $user): ?Participant
     {
-        if (!$user || $user->isDeleted()) {
+        if ($user->isDeleted()) {
             return null;
         }
         $userId = $user->getId();
@@ -369,7 +369,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getParticipantIfExtantIncludingExcluded(User $user): ?Participant
     {
-        if (!$user || $user->isDeleted()) {
+        if ($user->isDeleted()) {
             return null;
         }
         $userId = $user->getId();
