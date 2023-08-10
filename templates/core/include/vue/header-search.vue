@@ -2,7 +2,6 @@
 import debounce from "lodash/debounce";
 import { vOnClickOutside } from "@vueuse/components";
 import SearchInput from "@schoolboxVue/components/search/search-input.vue";
-import HeaderSearchResultMeta from "./header-search-result-meta.vue";
 
 interface Result {
     id: string;
