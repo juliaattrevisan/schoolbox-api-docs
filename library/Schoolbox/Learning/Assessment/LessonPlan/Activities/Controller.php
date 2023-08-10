@@ -19,6 +19,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
@@ -117,9 +119,8 @@ class Controller extends Base
             'lessonPlans'       => $lessonPlans,
             'folder'            => $folder,
             'returnUrlName'     => Assessment\Redirect::RETURN_URL,
-            'encodedReturnUrl'  => Assessment\Redirect::encode('/homepage/' . $folder->getId()),
-            // 'readOnly'          => $this->getContentPermission() < UserAccess::ACCESS_WRITE;,
-            'readOnly'          => false
+            'encodedReturnUrl'  => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
+            'readOnly'          => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE
         ];
 
         $this->response = $this->responseFromTemplate(

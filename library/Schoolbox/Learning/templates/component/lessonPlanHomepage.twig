@@ -50,7 +50,7 @@
                             <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
                         </h3>
                         <p class="meta">
-                            {{ unit.specification.course.folder.name }} | {{ unit.title }}
+                            {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% endif %} | {{ unit.title }}
                         </p>
                         <p class="meta">
                             {{ dueDate.forAssessment(lesson) }}
@@ -102,6 +102,6 @@
 {% endif %}
 <div class="component-action">
     <section>
-        <a href="#" class="button">View All</a> {# Link for this button will be added in SA-15993 #}
+        <a href="{{ routeLookup('lessonPlanActivities.getHomepage', {folderId: component.getContext.getFolder.getId}) }}" class="button">View All</a> {# Link for this button will be added in SA-15993 #}
     </section>
 </div>

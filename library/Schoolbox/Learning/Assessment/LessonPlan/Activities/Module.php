@@ -52,6 +52,11 @@ class Module extends BaseModule
             )
         );
 
+        /**
+         * All users should be able to view the classes lesson plans
+         */
+        $permsAll = new Rule\IsLoggedIn();
+
         $preloadCourseSpec = function (array $params) {
             try {
                 return ['courseSpec' => $this->getCourseSpecificationMapper()->findById($params['id'])];
@@ -81,7 +86,7 @@ class Module extends BaseModule
         $this->register('POST', '/{lessonPlanId}', 'createLink', $perms, $preloadLessonPlan);
         $this->register('DELETE', '/{lessonPlanId}/{activity}', 'deleteLink', $perms, $preloadLessonPlan);
         // get lessonplans for homepage
-        $this->register('GET', '/class/{folderId}', 'getHomepage', $perms, $preloadFolder);
+        $this->register('GET', '/class/{folderId}', 'getHomepage', $permsAll, $preloadFolder);
     }
 
     /**
