@@ -215,7 +215,7 @@ function formatPortrait(id: string) {
                 @mouseleave="arrowCounter = -1"
             >
                 <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img--round">
+                    <div class="sb-card__primary-img img img--l img--round">
                         <div class="img__wrapper">
                             <img :src="formatPortrait(result.id)" alt="portrait photo" />
                         </div>
@@ -252,20 +252,18 @@ function formatPortrait(id: string) {
                     </div>
                 </div>
             </template>
-            <div v-if="!isLoading && !results.length" class="sb-card">
-                <div class="sb-card__content">
-                    <span class="meta">No users were found matching "{{ keyword }}"</span>
+            <template v-if="!isLoading && !results.length">
+                <div class="sb-card">
+                    <div class="sb-card__content">
+                        <span class="meta">No users were found matching "{{ keyword }}"</span>
+                    </div>
                 </div>
-            </div>
-            <a
-                v-if="!isLoading && !results.length"
-                class="sb-card sb-card--link sb-card--active"
-                :href="`${paths.searchPage}${keyword}#all`"
-            >
-                <div class="sb-card__content">
-                    <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
-                </div>
-            </a>
+                <a class="sb-card sb-card--link sb-card--active" :href="`${paths.searchPage}${keyword}#all`">
+                    <div class="sb-card__content">
+                        <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
+                    </div>
+                </a>
+            </template>
         </div>
     </form>
 </template>
