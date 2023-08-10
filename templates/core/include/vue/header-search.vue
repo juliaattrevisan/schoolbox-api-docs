@@ -209,7 +209,7 @@ function formatPortrait(id: string) {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="">
+        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results">
             <!-- <div v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
                 <header-search-result-meta
                     >Showing {{ results.length }} of {{ totalCount }} matching users</header-search-result-meta

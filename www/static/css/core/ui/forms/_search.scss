@@ -39,47 +39,8 @@
     }
 
     .results {
-        background-color: $white;
-        border: 2px solid $navigation-hover;
+        border: 2px solid var(--navigation-hover);
         border-top: 0;
-        margin: 0;
-        height: auto;
-        padding: 0;
-        z-index: 10000;
-    }
-
-    .result {
-        margin-left: 0;
-        margin-right: 0;
-        text-align: left;
-    }
-
-    .result-meta {
-        @extend .meta;
-        margin: 0;
-        padding: 0.5rem;
-        text-align: left;
-    }
-
-    .result-meta .list-item {
-        border-bottom: 0;
-    }
-
-    .result-meta.with-bg {
-        @include button-dimensions();
-        background-color: $content-ui-background;
-        color: $content-ui-foreground;
-        font-size: rem-calc(($base-font-size - 2));
-        font-style: normal;
-        line-height: inherit;
-        text-align: center;
-
-        &:hover {
-            background-color: $content-ui-hover;
-            color: $content-ui-foreground;
-            cursor: pointer;
-            text-decoration: none !important; // forgive me, for I have sinned.
-        }
     }
 }
 
