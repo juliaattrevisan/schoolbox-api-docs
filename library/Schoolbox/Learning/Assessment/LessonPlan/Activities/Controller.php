@@ -103,10 +103,16 @@ class Controller extends Base
         $lessonPlanMapper = LessonPlanMapper::getInstance();
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
-        $publishDate = \Alaress_Date_Format::now();
+        /**
+         * If user is a student, we have specific logic:
+         * Students only see lesson plans that have been published
+         * Students should only see lesson plans that have the visibility set for students to view
+         */
+        $isStudent = $this->getUser()->getRole()->isStudent();
+        $publishDate = $isStudent ? \Alaress_Date_Format::now() : null;
 
         // grab the assessmentID for all lesson plans from the students subject list
-        $assessmentIds = $lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $this->getUser()->getRole()->isStudent());
+        $assessmentIds = $lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStudent);
         // hydrate those assessments
         $lessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']])
         ->groupByCallback(
