@@ -43,7 +43,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'f.deleted_at IS NULL',
             'f.name LIKE :pageKeywordLike OR fc.code LIKE :pageKeywordLike',
         ];
-        $params = ['pageKeywordLike' => $this->quoter->escapeForLike($keyword)];
+        $params = ['pageKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%'];
 
         return [
             'where'  => $whereParts,
@@ -101,6 +101,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * Page results do not currently have dates: thus this will be null.
+     *
+     * TODO consider returning NULL if this source has no date?
      */
     protected function buildDateExpression(): string
     {
@@ -109,6 +111,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * Pages have no recorded creator: thus, this will always be 0.
+     *
+     * TODO consider returning NULL if this source has no creator?
      */
     protected function buildCreatorExpression(): string
     {
