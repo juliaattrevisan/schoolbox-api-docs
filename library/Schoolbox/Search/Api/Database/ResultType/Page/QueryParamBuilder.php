@@ -127,7 +127,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return "
             FROM folder f
-            INNER JOIN folder_code fc ON f.id = fc.folder_id
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id
         ";
     }
 }
