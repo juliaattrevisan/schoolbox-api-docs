@@ -210,11 +210,11 @@ function formatPortrait(id: string) {
             @click="onClicked"
         />
         <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="results">
-            <!-- <div v-if="results.length && results.length !== totalCount" class="result-meta" @click.prevent>
-                <header-search-result-meta
-                    >Showing {{ results.length }} of {{ totalCount }} matching users</header-search-result-meta
-                >
-            </div> -->
+            <div v-if="results.length && results.length !== totalCount" class="sb-card">
+                <div class="sb-card__content">
+                    <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
+                </div>
+            </div>
             <a
                 v-for="(result, i) in results"
                 :key="i"
