@@ -247,7 +247,7 @@ function formatPortrait(id: string) {
                         </div>
                         <div class="sb-card__main-content">
                             <h3></h3>
-                            <span class="skeleton-box"></span>
+                            <span></span>
                         </div>
                     </div>
                 </div>
