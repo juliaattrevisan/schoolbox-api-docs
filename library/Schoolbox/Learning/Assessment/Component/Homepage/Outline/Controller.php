@@ -138,6 +138,13 @@ class Controller extends Component_Homepage_ControllerAbstract
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
 
         /**
+         * if filters fail, we should use the system default, of show everything
+         */
+        if (!is_array($filters)) {
+            $filters = AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE));
+        }
+
+        /**
          * Parse the filter to only the entries that are selected
          * then compare with the original list to see if we are actually filtering out anything
          */
@@ -181,7 +188,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
                         $user->getRole()->isParent() ? null : $user,
-                        (false !== $this->hasBeenFiltered) ? ['type' => $assessmentTypes] : []
+                        $this->hasBeenFiltered ? ['type' => $assessmentTypes] : []
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
@@ -189,7 +196,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 // I'm an instructor - load all participants.
                 $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
                     $uiIds,
-                    options: (false !== $this->hasBeenFiltered) ? ['type' => $assessmentTypes] : []
+                    options: $this->hasBeenFiltered ? ['type' => $assessmentTypes] : []
                 );
             }
 
