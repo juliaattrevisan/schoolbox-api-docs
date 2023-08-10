@@ -171,8 +171,9 @@ HELP;
         );
 
         /* A blind guess about the endpoint originally intended
+         * Cheat, because phpxmlrpc doesn't give me access to $methodname
          */
-        $method = str_replace(self::LISS_METHOD_PREFIX, '', $mockMessage->methodname);
+        $method = str_replace(self::LISS_METHOD_PREFIX, '', $mockMessage->method());
 
         if (!method_exists($liss, $method)) {
             $this->getLogger()->warning(sprintf(
