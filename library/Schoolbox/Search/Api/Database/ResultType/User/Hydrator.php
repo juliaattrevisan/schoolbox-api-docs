@@ -16,7 +16,6 @@ use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
-use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
