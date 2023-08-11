@@ -8,7 +8,7 @@
 @use "sass:list";
 
 // Generate utility classes for padding
-.u-padding {
+.l-pad {
     @each $size in $global-sizes {
         &-#{$size} {
             padding: var(--whitespace-#{$size});
