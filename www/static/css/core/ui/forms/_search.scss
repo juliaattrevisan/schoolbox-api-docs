@@ -20,15 +20,7 @@
     }
 
     .search-input {
-        border: 0;
-        background-color: transparent;
-        color: $body-bg;
-        height: $tabbar-height;
-        width: $tabbar-height;
-        padding: $base-font-size;
-        margin: 0;
-        opacity: 0;
-        line-height: calc($tabbar-height / 2);
+        opacity: 0; // is initially hidden in the global-search
     }
 
     .results {

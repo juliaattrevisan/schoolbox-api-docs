@@ -3,11 +3,20 @@
  * The search input to submit and start searching for results
  */
 
+import SearchInput from "@schoolboxVue/components/search/search-input.vue";
 import { useQueryStore } from "../store/spQueryStore";
 import { useSearchStore } from "../store/spSearchStore";
 
 const queryStore = useQueryStore();
 const searchStore = useSearchStore();
+
+/**
+ * Whenever the input is updated, update the query store
+ * @param {string} value - The input value
+ */
+function onInput(value: string) {
+    queryStore.query = value;
+}
 
 /**
  * Start a search
@@ -25,8 +34,9 @@ async function onSearch() {
 
 <template>
     <form @submit.prevent="onSearch">
-        <input v-model="queryStore.query" type="text" />
-        <button type="submit">Search</button>
+        <search-input :is-active="true" @input="onInput" @key-enter="onSearch" @click="onSearch" />
+        <!-- <input v-model="queryStore.query" type="text" /> -->
+        <!-- <button type="submit">Search</button> -->
     </form>
 </template>
 

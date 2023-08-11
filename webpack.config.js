@@ -409,7 +409,7 @@ module.exports = {
             files: {
                 "vendors.js": [
                     // Vue
-                    "./node_modules/vue/dist/vue.global.prod.js",
+                    "./node_modules/vue/dist/vue.global.js",
                     // jQuery
                     "./node_modules/jquery/dist/jquery.min.js",
                     "./node_modules/jquery-validation/dist/jquery.validate.min.js",
