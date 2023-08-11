@@ -756,8 +756,6 @@ class Controller extends Base
                 [
                     'id' => 'horizontal-marking',
                     'type' => 'response-analysis-by-item',
-                    // TODO Try "scorable"
-                    'question_source' => 'original',
                     'session_ids' => array_values($sessions),
                     'users' => array_values($users)
                 ]
