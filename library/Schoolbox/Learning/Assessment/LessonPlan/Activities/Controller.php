@@ -12,8 +12,10 @@ namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
@@ -127,20 +129,40 @@ class Controller extends Base
         $assessmentIds = $this->lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStudent);
         // hydrate those assessments
         $lessonPlans = $this->assessmentMapperProxy->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'ASC']])
-        // Group by Unit
-        ->groupByCallback(
-            function ($lessonPlan) {
-                return $lessonPlan->getContext()->getId();
+        ->groupByCallback(function ($assessment) {
+            return $assessment->getContext()->getId();
+        });
+        $courses = CourseImplementationMapper::getInstance()->findByFolderId($folder->getId());
+        $accessibleFolderIds = [];
+        foreach ($courses as $course) {
+            $course->setUnits(UnitImplementationMapper::getinstance()->findAllByCourseId($course->getId()));
+            foreach ($course->getUnits() as $unitImpl) {
+                if (isset($lessonPlans[$unitImpl->getId()])) {
+                    $unitImpl->setAssessables($lessonPlans[$unitImpl->getId()]);
+                }
             }
-        )
-        // Group now by Course
-        ->groupByCallback(
-            function ($unit) {
-                return $unit->first()->getContext()->getSpecification()->getCourse()->getId();
-            }
-        );
+            $accessibleFolderIds[$course->getId()] = $course->getUnits()
+            // this is to sort units and needs to be placed right after getUnits()
+            ->sortByCallback(
+                static function (Unit $a, Unit $b) {
+                    if ($a->getDueDate()->eq($b->getDueDate())) {
+                        return strnatcasecmp($a->getTitle(), $b->getTitle());
+                    }
+                    return $a->getDueDate()->compare($b->getDueDate());
+                }
+            )
+            ->filter(static function (\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unit) {
+                   return !$unit->getSpecification()->getFolder()->isDeleted();
+            })
+            ->map(static function (\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unit) {
+                   return $unit->getSpecification()->getFolder()->getId();
+            })->getAll();
+        }
+
 
         $twigData = [
+            'courses'           => $courses,
+            'courstThings'      => $accessibleFolderIds,
             'lessonPlans'       => $lessonPlans,
             'folder'            => $folder,
             'dateStart'         => $dateStart,

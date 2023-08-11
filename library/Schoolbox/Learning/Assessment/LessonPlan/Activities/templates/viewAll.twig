@@ -1,5 +1,11 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learningAssessment/fragments/macro/unit/completed.twig' as status %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/viewRoute.twig' as viewRoute %}
+
+{% set accessibleFolderIds = [] %}
+{% set componentInstance = {id: null} %}
 
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('learning.getClasses') }}">Learning</a></li>
@@ -14,162 +20,336 @@
 </div>
 
 <div class="small-12 island">
-{% set accessibleFolderIds = [] %}
-    {% if lessonPlans|length %}
-        <section>
-            <ul class="action-list">
-            {% for course, units in lessonPlans %}
-            {% set course = units.first.first.baseContext.specification.course.folder ?? '' %}
-            {% if course %}
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <h3 class="icon-course">
-                                {{ course.title }}
-                            </h3>
-                        </div>
-                    </div>
-                </li>
+    <ul class="information-list">
+    {% for course in courses %}
+        <li>
+            <p class="component-titlebar meta">
+            {% if course.folder.id in accessibleFolderIds %}
+                <a class="icon-course" href="{{ '/homepage/' ~ course.specification.folder.id }}" title="Visit course page">{{ course.specification.title }}</a>
+            {% else %}
+                <a class="icon-course">{{ course.specification.title }}</a>
             {% endif %}
-            {% for unit, plans in units %}
-            {% set unit = plans.first.baseContext %}
-            <li class="actions-small-1">
-                <div class="list-item">
-                    <div class="card small-12">
-                        <h3 class="icon-unit">
-                            {% if unit.isBeforeOpenDate==false or readOnly == false %}
-                                {% if unit.specification.folder.id in accessibleFolderIds %}
-                                    <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>
-                                {% else %}
-                                    {{ unit.title }}
-                                {% endif %}
-                            {% else %}
-                                {{ unit.title }}
-                            {% endif %}
-                        </h3>
-                        <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
-                    </div>
-                </div>
-                {% if readOnly == false %}
-                    <nav>
-                        <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
-                    </nav>
-                    <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
+            </p>
+            <ul class="information-list">
+                {% for unit in course.units %}
+                    {% set expanded = unit.isOpen == true %}
+                    {% set expanded_icon = expanded ? 'icon-up-arrow' :'icon-down-arrow'  %}
+                    {% set expanded_state = expanded ? 'expanded' :'collapsed' %}
 
-                        {% if unit.isAfterDueDate == false %}
-                            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
-                        {% endif %}
-
-                    </ul>
-                {% endif %}
-            </li>
-                {% for lesson in plans %}
-                    {% set unit = lesson.baseContext %}
-
-                    {# What action-tot routes are available to this user? #}
-                    {% if readOnly %}
-                        {# If readonly mode: show no tot #}
-                        {% set hasAssessmentRoutes = false %}
-                        {% set hasCourseRoutes = false %}
-                    {% else %}
-                        {# If write mode: show tot only if there's at least one action #}
-                        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: lesson.id, assessment: lesson}) %}
-                        {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: lesson.id, assessment: lesson}) %}
-                        {% set hasAssessmentRoutes = modifyRoute or deleteRoute or similarityReportRoute %}
-
-                        {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
-                        {% set specAssessment = lesson.specificationAssessment ?? null %}
-                        {% if specAssessment %}
-                            {% set saveToCourseRoute = routeLookupIfAuthorized(
-                                'courseExport.putAssessmentIntoUnit',
-                                {
-                                    assessmentId: lesson.id,
-                                    assessment: lesson,
-                                    unitSpecId: unit.specification.id,
-                                    unitSpec: unit.specification,
-                                }
-                            ) %}
-                            {% set saveToCourseMethod = 'PUT' %}
-                        {% else %}
-                            {% set saveToCourseRoute = routeLookupIfAuthorized(
-                                'courseExport.postAssessmentIntoUnit',
-                                {
-                                    assessmentId: lesson.id,
-                                    assessment: lesson,
-                                    unitSpecId: unit.specification.id,
-                                    unitSpec: unit.specification,
-                                }
-                            ) %}
-                            {% set saveToCourseMethod = 'POST' %}
-                        {% endif %}
-                        {% set hasCourseRoutes = saveToCourseRoute is not empty %}
-                    {% endif %}
-
-                    <li{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %}>
-                        <div class="card small-12">
-                            <h3>
-                                {# is the assessment active? #}
-                                <a class="title {% if (dateStart and dateEnd) and lesson.dueAt > dateStart and lesson.dueAt < dateEnd %}active-lesson-plan{% endif %}" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
-                            </h3>
-                            <p class="meta">
-                                {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% elseif course %}{{ course.name }}{% endif %} | {{ unit.title }}
-                            </p>
-                            <p class="meta">
-                                {{ dueDate.forAssessment(lesson) }}
-                            </p>
-                            {% if "staff" == lesson.visibility %}
-                            <p class="meta icon-eye-hollow">
-                                Not Visible to students
-                            </p>
+                    <li class="interact {{ expanded_state }}" data-unit="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
+                        <div class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <h3>
+                                        {% if unit.isBeforeOpenDate==false or readOnly == false %}
+                                            <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
+                                            {% if unit.specification.folder.id in accessibleFolderIds %}
+                                                <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>
+                                            {% else %}
+                                                {{ unit.title }}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ unit.title }}
+                                        {% endif %}
+                                    </h3>
+                                    <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
+                                </div>
+                            </div>
+                            {% if readOnly == false %}
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
+                                    {% if unit.isAfterDueDate == false %}
+                                        <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
+                                    {% endif %}
+                                </ul>
                             {% endif %}
                         </div>
-                        {% if hasAssessmentRoutes or hasCourseRoutes %}
-                            {% set dropdownId = "options-lessonplan" ~ lesson.id %}
-                            <nav>
-                                <a href="#" class="icon-more" data-dropdown="{{ dropdownId }}" aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul data-dropdown-content class="f-dropdown" id="{{ dropdownId }}">
-                                {% if hasAssessmentRoutes %}
-                                    <li class="separator">{{ locale.translate('assessment', false, true) }}</li>
-                                    {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
-                                    {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
-                                {% endif %}
-                                {% if hasCourseRoutes %}
-                                    <li class="separator">Course</li>
-                                    {% if saveToCourseRoute %}
-                                        <li>
-                                            <a href="{{ saveToCourseRoute }}"
-                                            class="icon-export"
-                                            data-reveal-id="save-to-course-modal-{{ lesson.id }}"
-                                            data-method="{{ saveToCourseMethod }}"
-                                            data-spec-assessment-id="{{ specAssessment.id ?? null }}"
-                                            data-spec-assessment-title="{{ specAssessment.title ?? null }}"
-                                            >Save to Course...</a>
-                                            {% include '@learningAssessment/outline/saveToCourseModal.twig' with {
-                                                assessment: lesson,
-                                                specAssessment: specAssessment ?? null,
-                                                saveToCourseRoute: saveToCourseRoute,
-                                                saveToCourseMethod: saveToCourseMethod,
-                                                componentInstance: {id: null},
-                                            } only %}
-                                        </li>
+
+                        <ul class="action-list task-list {% if expanded==false %}hide{% endif %}" data-task-list>
+                            {% for assessment in unit.assessables %}
+
+
+                                {% set specAssessment = assessment.specificationAssessment ?? null %}
+
+                                {# What action-tot routes are available to this user? #}
+                                {% if readOnly %}
+                                    {# If readonly mode: show no tot #}
+                                    {% set hasAssessmentRoutes = false %}
+                                    {% set hasCourseRoutes = false %}
+                                {% else %}
+                                    {# If write mode: show tot only if there's at least one action #}
+                                    {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+                                    {% if assessment is quiz %}
+                                        {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+                                    {% else %}
+                                        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
                                     {% endif %}
+                                    {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
+                                    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
+                                    {% set hasAssessmentRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
+
+                                    {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
+                                    {% if specAssessment %}
+                                        {% set saveToCourseRoute = routeLookupIfAuthorized(
+                                            'courseExport.putAssessmentIntoUnit',
+                                            {
+                                                assessmentId: assessment.id,
+                                                assessment: assessment,
+                                                unitSpecId: unit.specification.id,
+                                                unitSpec: unit.specification,
+                                            }
+                                        ) %}
+                                        {% set saveToCourseMethod = 'PUT' %}
+                                    {% else %}
+                                        {% set saveToCourseRoute = routeLookupIfAuthorized(
+                                            'courseExport.postAssessmentIntoUnit',
+                                            {
+                                                assessmentId: assessment.id,
+                                                assessment: assessment,
+                                                unitSpecId: unit.specification.id,
+                                                unitSpec: unit.specification,
+                                            }
+                                        ) %}
+                                        {% set saveToCourseMethod = 'POST' %}
+                                    {% endif %}
+                                    {% set hasCourseRoutes = saveToCourseRoute is not empty %}
                                 {% endif %}
-                            </ul>
-                        {% endif %}
+
+                                <li class="interact" data-unit-assessment="{{ assessment.id }}">
+                                    <div{% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %} class="actions-small-1"{% endif %}>
+                                        <div class="list-item">
+                                            <div class="small-12 compact card wrap-down">
+                                                {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
+
+                                                {# Don't render a link if you are unable to view the details #}
+                                                {% set route = viewRoute.viewRoute(assessment, USER) %}
+                                                {% if route %}
+                                                    <a title="{{ title }}" href="{{ route }}">
+                                                        <span class="{{ icon.renderClass(assessment) }}"></span>
+                                                        <p>{{ assessment.title }}</p>
+                                                    </a>
+                                                {% else %}
+                                                    <div title="{{ title }}">
+                                                        <span class="{{ icon.renderClass(assessment) }}"></span>
+                                                        <p>{{ assessment.title }}</p>
+                                                    </div>
+                                                {% endif %}
+
+                                                <p class="meta">
+                                                    <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {% if not readOnly %}
+                                            <nav>
+                                                <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
+                                            </nav>
+                                        {% endif %}
+
+                                        {% if hasAssessmentRoutes or hasCourseRoutes %}
+                                            <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
+                                                {% if hasAssessmentRoutes %}
+                                                    <li class="separator">{{ locale.translate('assessment', false, true) }}</li>
+                                                    {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
+                                                    {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
+                                                {% endif %}
+                                                {% if hasCourseRoutes %}
+                                                    <li class="separator">Course</li>
+                                                    {% if saveToCourseRoute %}
+                                                        <li>
+                                                            <a href="{{ saveToCourseRoute }}"
+                                                               class="icon-export"
+                                                               data-reveal-id="save-to-course-modal-{{ assessment.id }}"
+                                                               data-method="{{ saveToCourseMethod }}"
+                                                               data-spec-assessment-id="{{ specAssessment.id ?? null }}"
+                                                               data-spec-assessment-title="{{ specAssessment.title ?? null }}"
+                                                            >Save to Course...</a>
+                                                            {% include '@learningAssessment/outline/saveToCourseModal.twig' with {
+                                                                assessment: assessment,
+                                                                specAssessment: specAssessment ?? null,
+                                                                saveToCourseRoute: saveToCourseRoute,
+                                                                saveToCourseMethod: saveToCourseMethod,
+                                                                componentInstance: componentInstance,
+                                                            } only %}
+                                                        </li>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </ul>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
                     </li>
                 {% endfor %}
-                {% endfor %}
-                {% endfor %}
             </ul>
-        </section>
-    {% else %}
-        <div class="empty-state">
-            <i class="icon-lesson-plan"></i>
-            <p>You have no current lesson plans.</p>
-        </div>
-    {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
 </div>
+
+
+
+
+{#    {% if lessonPlans|length %}#}
+{#        <section>#}
+{#            <ul class="action-list">#}
+{#            {% for course, units in lessonPlans %}#}
+{#            {% set course = units.first.first.baseContext.specification.course.folder ?? '' %}#}
+{#            {% if course %}#}
+{#                <li class="actions-small-1">#}
+{#                    <div class="list-item">#}
+{#                        <div class="card small-12">#}
+{#                            <h3 class="icon-course">#}
+{#                                {{ course.title }}#}
+{#                            </h3>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </li>#}
+{#            {% endif %}#}
+{#            {% for unit, plans in units %}#}
+{#            {% set unit = plans.first.baseContext %}#}
+{#            <li class="actions-small-1">#}
+{#                <div class="list-item">#}
+{#                    <div class="card small-12">#}
+{#                        <h3 class="icon-unit">#}
+{#                            {% if unit.isBeforeOpenDate==false or readOnly == false %}#}
+{#                                {% if unit.specification.folder.id in accessibleFolderIds %}#}
+{#                                    <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>#}
+{#                                {% else %}#}
+{#                                    {{ unit.title }}#}
+{#                                {% endif %}#}
+{#                            {% else %}#}
+{#                                {{ unit.title }}#}
+{#                            {% endif %}#}
+{#                        </h3>#}
+{#                        <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>#}
+{#                    </div>#}
+{#                </div>#}
+{#                {% if readOnly == false %}#}
+{#                    <nav>#}
+{#                        <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>#}
+{#                    </nav>#}
+{#                    <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">#}
+
+{#                        {% if unit.isAfterDueDate == false %}#}
+{#                            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>#}
+{#                        {% endif %}#}
+
+{#                    </ul>#}
+{#                {% endif %}#}
+{#            </li>#}
+{#                {% for lesson in plans %}#}
+{#                    {% set unit = lesson.baseContext %}#}
+
+{#                    #}{# What action-tot routes are available to this user? #}
+{#                    {% if readOnly %}#}
+{#                        #}{# If readonly mode: show no tot #}
+{#                        {% set hasAssessmentRoutes = false %}#}
+{#                        {% set hasCourseRoutes = false %}#}
+{#                    {% else %}#}
+{#                        #}{# If write mode: show tot only if there's at least one action #}
+{#                        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: lesson.id, assessment: lesson}) %}#}
+{#                        {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: lesson.id, assessment: lesson}) %}#}
+{#                        {% set hasAssessmentRoutes = modifyRoute or deleteRoute or similarityReportRoute %}#}
+
+{#                        #}{# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
+{#                        {% set specAssessment = lesson.specificationAssessment ?? null %}#}
+{#                        {% if specAssessment %}#}
+{#                            {% set saveToCourseRoute = routeLookupIfAuthorized(#}
+{#                                'courseExport.putAssessmentIntoUnit',#}
+{#                                {#}
+{#                                    assessmentId: lesson.id,#}
+{#                                    assessment: lesson,#}
+{#                                    unitSpecId: unit.specification.id,#}
+{#                                    unitSpec: unit.specification,#}
+{#                                }#}
+{#                            ) %}#}
+{#                            {% set saveToCourseMethod = 'PUT' %}#}
+{#                        {% else %}#}
+{#                            {% set saveToCourseRoute = routeLookupIfAuthorized(#}
+{#                                'courseExport.postAssessmentIntoUnit',#}
+{#                                {#}
+{#                                    assessmentId: lesson.id,#}
+{#                                    assessment: lesson,#}
+{#                                    unitSpecId: unit.specification.id,#}
+{#                                    unitSpec: unit.specification,#}
+{#                                }#}
+{#                            ) %}#}
+{#                            {% set saveToCourseMethod = 'POST' %}#}
+{#                        {% endif %}#}
+{#                        {% set hasCourseRoutes = saveToCourseRoute is not empty %}#}
+{#                    {% endif %}#}
+
+{#                    <li{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %}>#}
+{#                        <div class="card small-12">#}
+{#                            <h3>#}
+{#                                #}{# is the assessment active? #}
+{#                                <a class="title {% if (dateStart and dateEnd) and lesson.dueAt > dateStart and lesson.dueAt < dateEnd %}active-lesson-plan{% endif %}" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>#}
+{#                            </h3>#}
+{#                            <p class="meta">#}
+{#                                {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% elseif course %}{{ course.name }}{% endif %} | {{ unit.title }}#}
+{#                            </p>#}
+{#                            <p class="meta">#}
+{#                                {{ dueDate.forAssessment(lesson) }}#}
+{#                            </p>#}
+{#                            {% if "staff" == lesson.visibility %}#}
+{#                            <p class="meta icon-eye-hollow">#}
+{#                                Not Visible to students#}
+{#                            </p>#}
+{#                            {% endif %}#}
+{#                        </div>#}
+{#                        {% if hasAssessmentRoutes or hasCourseRoutes %}#}
+{#                            {% set dropdownId = "options-lessonplan" ~ lesson.id %}#}
+{#                            <nav>#}
+{#                                <a href="#" class="icon-more" data-dropdown="{{ dropdownId }}" aria-expanded="false" title="Actions"></a>#}
+{#                            </nav>#}
+{#                            <ul data-dropdown-content class="f-dropdown" id="{{ dropdownId }}">#}
+{#                                {% if hasAssessmentRoutes %}#}
+{#                                    <li class="separator">{{ locale.translate('assessment', false, true) }}</li>#}
+{#                                    {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}#}
+{#                                    {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}#}
+{#                                {% endif %}#}
+{#                                {% if hasCourseRoutes %}#}
+{#                                    <li class="separator">Course</li>#}
+{#                                    {% if saveToCourseRoute %}#}
+{#                                        <li>#}
+{#                                            <a href="{{ saveToCourseRoute }}"#}
+{#                                            class="icon-export"#}
+{#                                            data-reveal-id="save-to-course-modal-{{ lesson.id }}"#}
+{#                                            data-method="{{ saveToCourseMethod }}"#}
+{#                                            data-spec-assessment-id="{{ specAssessment.id ?? null }}"#}
+{#                                            data-spec-assessment-title="{{ specAssessment.title ?? null }}"#}
+{#                                            >Save to Course...</a>#}
+{#                                            {% include '@learningAssessment/outline/saveToCourseModal.twig' with {#}
+{#                                                assessment: lesson,#}
+{#                                                specAssessment: specAssessment ?? null,#}
+{#                                                saveToCourseRoute: saveToCourseRoute,#}
+{#                                                saveToCourseMethod: saveToCourseMethod,#}
+{#                                                componentInstance: {id: null},#}
+{#                                            } only %}#}
+{#                                        </li>#}
+{#                                    {% endif %}#}
+{#                                {% endif %}#}
+{#                            </ul>#}
+{#                        {% endif %}#}
+{#                    </li>#}
+{#                {% endfor %}#}
+{#                {% endfor %}#}
+{#                {% endfor %}#}
+{#            </ul>#}
+{#        </section>#}
+{#    {% else %}#}
+{#        <div class="empty-state">#}
+{#            <i class="icon-lesson-plan"></i>#}
+{#            <p>You have no current lesson plans.</p>#}
+{#        </div>#}
+{#    {% endif %}#}
+{#</div>#}
 
 <style>
     .active-lesson-plan {
