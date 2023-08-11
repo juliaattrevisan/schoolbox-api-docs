@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -334,9 +333,20 @@ class AdditionalSubjects implements IStrategy
                  * e.g. search for -1011-A (unitised) in addition to 10-1011-A (non-unitised)
                  * since a teacher is apparently associated with both possible outcomes;
                  * one or the other might exist first
+                 *
+                 * If I have a class code like: 2-5555-C
+                 * It should not match with 12-5555-C
+                 *
+                 * If I have a class code like -1011-A
+                 * It should match with 10-1011-A
                  */
-                $pb = ($this->classEntryMapper->getPredicateBuilder())
-                    ->like('code', "%{$code}");
+                if (str_starts_with($code, '-')) {
+                    $pb = ($this->classEntryMapper->getPredicateBuilder())
+                        ->like('code', "%{$code}");
+                } else {
+                    $pb = ($this->classEntryMapper->getPredicateBuilder())
+                        ->equals('code', $code);
+                }
 
                 $classes = $this->classEntryMapper->findByPredicates($pb);
 
