@@ -11,8 +11,8 @@
             padding: var(--whitespace-#{$size});
 
             &--horiz {
-                padding-left: var(--whitespace-#{$size});
-                padding-right: var(--whitespace-#{$size});
+                padding-block-end: var(--whitespace-#{$size});
+                padding-block-start: var(--whitespace-#{$size});
             }
 
             &--vert {
@@ -28,12 +28,12 @@
                 padding-bottom: var(--whitespace-#{$size});
             }
 
-            &--left {
-                padding-left: var(--whitespace-#{$size});
+            &--start {
+                padding-block-start: var(--whitespace-#{$size});
             }
 
-            &--right {
-                padding-right: var(--whitespace-#{$size});
+            &--end {
+                padding-block-end: var(--whitespace-#{$size});
             }
         }
     }

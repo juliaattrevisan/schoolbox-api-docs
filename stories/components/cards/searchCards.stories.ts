@@ -7,6 +7,15 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
+    decorators: [
+        () => ({
+            template: `
+                <div class="l-pad-xl">
+                    <story />
+                </div>
+            `,
+        }),
+    ],
     title: "Components/Cards/Search",
 };
 export default meta;

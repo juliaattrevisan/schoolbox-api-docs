@@ -11,7 +11,7 @@ const resultsStore = useResultsStore();
 </script>
 
 <template>
-    <div class="l-flex-col l-gap--s" data-test-sp-results-list>
+    <div class="l-flex-col l-gap-s" data-test-sp-results-list>
         <sp-results-list-result v-for="result in resultsStore.results" :key="result.id" :result="result" />
         <sp-results-list-load-more />
     </div>

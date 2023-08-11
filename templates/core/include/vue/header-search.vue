@@ -208,7 +208,7 @@ function formatPortrait(id: string) {
         <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
             <div class="l-flex-col">
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
-                    <div class="c-card__content">
+                    <div class="l-pad-m">
                         <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                     </div>
                 </div>
@@ -239,7 +239,7 @@ function formatPortrait(id: string) {
                     class="c-card c-card--link c-card--active"
                     :href="`${paths.searchPage}${keyword}#user`"
                 >
-                    <div class="c-card__content">
+                    <div class="l-pad-m">
                         <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                     </div>
                 </a>
@@ -260,12 +260,12 @@ function formatPortrait(id: string) {
                 </template>
                 <template v-if="!isLoading && !results.length">
                     <div class="c-card">
-                        <div class="c-card__content">
+                        <div class="l-pad-m">
                             <span class="meta">No users were found matching "{{ keyword }}"</span>
                         </div>
                     </div>
                     <a class="c-card c-card--link c-card--active" :href="`${paths.searchPage}${keyword}#all`">
-                        <div class="c-card__content">
+                        <div class="l-pad-m">
                             <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
                         </div>
                     </a>

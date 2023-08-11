@@ -17,7 +17,7 @@ const resultsStore = useResultsStore();
 </script>
 
 <template>
-    <div class="l-flex__item--1 l-flex-col l-gap--m">
+    <div class="l-flex__item--1 l-flex-col l-gap-m">
         <sp-results-header />
         <sp-results-prompt v-if="searchStore.hasNotSearched" />
         <loading-table v-else-if="searchStore.isSearching" />

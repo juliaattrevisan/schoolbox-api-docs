@@ -18,7 +18,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-            <ul class="c-chips l-gap--xs l-pad-m">
+            <ul class="c-chips l-gap-xs l-pad-m">
                 <li><input type="checkbox" id="cb-1-1" /><label for="cb-1-1">Apple<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-1-2" /><label for="cb-1-2">Banana<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-1-3" /><label for="cb-1-3">Carrot<span class="c-chip__icon icon-tick"></span></label></li>
@@ -37,7 +37,7 @@ export const Default: Story = {
 export const Rounded: Story = {
     render: () => ({
         template: `
-            <ul class="c-chips c-chips--rounded l-gap--xs l-pad-m">
+            <ul class="c-chips c-chips--rounded l-gap-xs l-pad-m">
                 <li><input type="checkbox" id="cb-7-1" /><label for="cb-7-1">Apple<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-7-2" /><label for="cb-7-2">Banana<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-7-3" /><label for="cb-7-3">Carrot<span class="c-chip__icon icon-tick"></span></label></li>
@@ -56,7 +56,7 @@ export const Rounded: Story = {
 export const NoBackground: Story = {
     render: () => ({
         template: `
-            <ul class="c-chips c-chips--rounded c-chips--no-background l-gap--xs l-pad-m">
+            <ul class="c-chips c-chips--rounded c-chips--no-background l-gap-xs l-pad-m">
                 <li><input type="checkbox" id="cb-8-1" /><label for="cb-8-1">Apple<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-8-2" /><label for="cb-8-2">Banana<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-8-3" /><label for="cb-8-3">Carrot<span class="c-chip__icon icon-tick"></span></label></li>
@@ -75,7 +75,7 @@ export const NoBackground: Story = {
 export const NoBorder: Story = {
     render: () => ({
         template: `
-            <ul class="c-chips c-chips--rounded c-chips--no-border l-gap--xs l-pad-m">
+            <ul class="c-chips c-chips--rounded c-chips--no-border l-gap-xs l-pad-m">
                 <li><input type="checkbox" id="cb-9-1" /><label for="cb-9-1">Apple<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-9-2" /><label for="cb-9-2">Banana<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-9-3" /><label for="cb-9-3">Carrot<span class="c-chip__icon icon-tick"></span></label></li>
@@ -94,7 +94,7 @@ export const NoBorder: Story = {
 export const Icons: Story = {
     render: () => ({
         template: `
-            <ul class="c-chips c-chips--rounded l-gap--xs l-pad-m">
+            <ul class="c-chips c-chips--rounded l-gap-xs l-pad-m">
                 <li><input type="checkbox" id="cb-12-1" /><label for="cb-12-1">Sunny / Clear<span class="c-chip__icon icon-sunny"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-12-2" /><label for="cb-12-2">Mostly Cloudy<span class="c-chip__icon icon-mostly-cloudy"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-12-3" /><label for="cb-12-3">Cloudy<span class="c-chip__icon icon-cloudy"></span></label></li>
@@ -111,7 +111,7 @@ export const Icons: Story = {
 export const RTL: Story = {
     render: () => ({
         template: `
-            <ul class="c-chips l-gap--xs l-pad-m" dir="rtl">
+            <ul class="c-chips l-gap-xs l-pad-m" dir="rtl">
                 <li><input type="checkbox" id="cb-10-1" /><label for="cb-10-1">Apple<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-10-2" /><label for="cb-10-2">Banana<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-10-3" /><label for="cb-10-3">Carrot<span class="c-chip__icon icon-tick"></span></label></li>
@@ -130,7 +130,7 @@ export const RTL: Story = {
 export const Scrollable: Story = {
     render: () => ({
         template: `
-            <ul class="c-chips c-chips--scroll l-gap--xs l-pad-m">
+            <ul class="c-chips c-chips--scroll l-gap-xs l-pad-m">
                 <li><input type="checkbox" id="cb-11-1" /><label for="cb-11-1">Apple<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-11-2" /><label for="cb-11-2">Banana<span class="c-chip__icon icon-tick"></span></label></li>
                 <li><input type="checkbox" checked="checked" id="cb-11-3" /><label for="cb-11-3">Carrot<span class="c-chip__icon icon-tick"></span></label></li>
