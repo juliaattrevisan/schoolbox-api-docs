@@ -259,10 +259,6 @@ $rotate-span-width: 11rem;
     width: 100%;
 }
 
-.diagonal-headings-table-container table {
-    width: 98%; /* Not 100% so that the rightmost column sloped heading is not completely hidden. */
-}
-
 .diagonal-headings-table {
     thead {
         tr.rotate-headers {
