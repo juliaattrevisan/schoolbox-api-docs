@@ -126,7 +126,7 @@ function onMouseOut(event: MouseEvent) {
         />
         <button
             for="search-field"
-            class="icon-search no-text"
+            class="c-search-input__button icon-search no-text"
             title="Search"
             @mouseover="onMouseOver"
             @mouseout="onMouseOut"
@@ -169,18 +169,10 @@ function onMouseOut(event: MouseEvent) {
     font-size: var(--base-font-size);
     width: 100%;
     opacity: 1;
-    .icon-search {
-        width: 4rem;
-        /* Search icon when Search feature is activated
-        */
-        &:before {
-            color: var(--navigation-background);
-        }
-    }
 }
 
 // Search icon in its idle state, it sits on the right of the input field
-.icon-search {
+.c-search-input__button {
     align-items: center;
     background: none;
     display: flex;

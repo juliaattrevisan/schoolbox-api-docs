@@ -205,70 +205,72 @@ function formatPortrait(id: string) {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="sb-card-list results">
-            <div v-if="results.length && results.length !== totalCount" class="sb-card">
-                <div class="sb-card__content">
-                    <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
-                </div>
-            </div>
-            <a
-                v-for="(result, i) in results"
-                :key="i"
-                :class="`sb-card sb-card--link ${i === arrowCounter ? 'sb-card--active' : ''}`"
-                :href="paths.userPage + result.id"
-                @mouseover="arrowCounter = i"
-                @mouseleave="arrowCounter = -1"
-            >
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img--l img--round">
-                        <div class="img__wrapper">
-                            <img :src="formatPortrait(result.id)" alt="portrait photo" />
-                        </div>
-                    </div>
-                    <div class="sb-card__main-content">
-                        <a :href="paths.userPage + result.id"
-                            ><h3>{{ result.formattedName }}</h3></a
-                        >
-                        <span class="meta">{{ result.metadata }}</span>
+        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
+            <div class="sb-card-list">
+                <div v-if="results.length && results.length !== totalCount" class="sb-card">
+                    <div class="sb-card__content">
+                        <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                     </div>
                 </div>
-            </a>
-            <a
-                v-if="results.length && totalCount > results.length"
-                class="sb-card sb-card--link sb-card--active"
-                :href="`${paths.searchPage}${keyword}#user`"
-            >
-                <div class="sb-card__content">
-                    <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
-                </div>
-            </a>
-            <template v-if="isLoading">
-                <div v-for="(row, index) in 3" :key="index" class="sb-card sb-card--loading">
+                <a
+                    v-for="(result, i) in results"
+                    :key="i"
+                    :class="`sb-card sb-card--link ${i === arrowCounter ? 'sb-card--active' : ''}`"
+                    :href="paths.userPage + result.id"
+                    @mouseover="arrowCounter = i"
+                    @mouseleave="arrowCounter = -1"
+                >
                     <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img--round">
+                        <div class="sb-card__primary-img img img--l img--round">
                             <div class="img__wrapper">
-                                <div class="img-placeholder"></div>
+                                <img :src="formatPortrait(result.id)" alt="portrait photo" />
                             </div>
                         </div>
                         <div class="sb-card__main-content">
-                            <h3></h3>
-                            <span></span>
+                            <a :href="paths.userPage + result.id"
+                                ><h3>{{ result.formattedName }}</h3></a
+                            >
+                            <span class="meta">{{ result.metadata }}</span>
                         </div>
                     </div>
-                </div>
-            </template>
-            <template v-if="!isLoading && !results.length">
-                <div class="sb-card">
+                </a>
+                <a
+                    v-if="results.length && totalCount > results.length"
+                    class="sb-card sb-card--link sb-card--active"
+                    :href="`${paths.searchPage}${keyword}#user`"
+                >
                     <div class="sb-card__content">
-                        <span class="meta">No users were found matching "{{ keyword }}"</span>
-                    </div>
-                </div>
-                <a class="sb-card sb-card--link sb-card--active" :href="`${paths.searchPage}${keyword}#all`">
-                    <div class="sb-card__content">
-                        <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
+                        <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                     </div>
                 </a>
-            </template>
+                <template v-if="isLoading">
+                    <div v-for="(row, index) in 3" :key="index" class="sb-card sb-card--loading">
+                        <div class="sb-card__main">
+                            <div class="sb-card__primary-img img img--round">
+                                <div class="img__wrapper">
+                                    <div class="img-placeholder"></div>
+                                </div>
+                            </div>
+                            <div class="sb-card__main-content">
+                                <h3></h3>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <template v-if="!isLoading && !results.length">
+                    <div class="sb-card">
+                        <div class="sb-card__content">
+                            <span class="meta">No users were found matching "{{ keyword }}"</span>
+                        </div>
+                    </div>
+                    <a class="sb-card sb-card--link sb-card--active" :href="`${paths.searchPage}${keyword}#all`">
+                        <div class="sb-card__content">
+                            <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
+                        </div>
+                    </a>
+                </template>
+            </div>
         </div>
     </form>
 </template>

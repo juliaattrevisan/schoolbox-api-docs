@@ -19,16 +19,16 @@
         }
     }
 
-    .c-search-input__field {
-        opacity: 0; // is initially hidden until user interacts with
-    }
-
-    .results {
+    .c-header-search__results {
         border: 2px solid var(--navigation-hover);
         border-top: 0;
         h3 {
             margin: 0; // clear .tab-bar h3 margins
         }
+    }
+
+    .c-search-input__field {
+        opacity: 0; // is initially hidden until user interacts with
     }
 }
 
