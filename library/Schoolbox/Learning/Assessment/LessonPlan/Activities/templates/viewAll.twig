@@ -116,6 +116,11 @@
                             <p class="meta">
                                 {{ dueDate.forAssessment(lesson) }}
                             </p>
+                            {% if "staff" == lesson.visibility %}
+                            <p class="meta icon-eye-hollow">
+                                Not Visible to students
+                            </p>
+                            {% endif %}
                         </div>
                         {% if hasAssessmentRoutes or hasCourseRoutes %}
                             {% set dropdownId = "options-lessonplan" ~ lesson.id %}
