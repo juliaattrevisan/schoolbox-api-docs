@@ -150,7 +150,7 @@ table {
         }
     }
     .profile-cell {
-        min-width: 160px !important; /* 160px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
+        min-width: 180px !important; /* 180px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
         padding: 0;
 
         .card img {
@@ -328,7 +328,7 @@ $rotate-span-width: 11rem;
 
     th.fixed-left:nth-child(2) {
         @media #{$medium-up} {
-            left: 160px; /* 160px to match width of a .profile-cell table cell. */
+            left: 180px; /* 180px to match width of a .profile-cell table cell. */
         }
     }
 
@@ -452,6 +452,7 @@ $rotate-span-width: 11rem;
 table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     overflow: hidden;
     white-space: normal;
+    max-width: 200px;
 }
 
 // Prevent grades from wrapping over two lines
