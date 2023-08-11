@@ -57,19 +57,41 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
+/**
+ * We just add the `c-card--small` modifier class to the card
+ */
 export const Default: Story = {
     render: () => ({
         template: `
-            <div class="c-card">
+            <div class="c-card c-card--small">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img">
+                    <div class="c-card__primary-img c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
                     <div class="c-card__main-content">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
-                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        <span>Jane submitted on time</span>
+                        <span class="meta">3:47PM Tuesday 13th July 2022</span>
+                    </div>
+                </div>
+            </div>
+        `,
+    }),
+};
+
+export const WithLink: Story = {
+    render: () => ({
+        template: `
+            <div class="c-card c-card--small">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img__wrapper">
+                            <div class="icon icon-calendar"></div>
+                        </div>
+                    </div>
+                    <div class="c-card__main-content">
+                        <a href="">Compact icon - Shakespeare in Love</a>
                     </div>
                 </div>
             </div>

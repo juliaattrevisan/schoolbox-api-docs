@@ -115,6 +115,13 @@
         }
     }
 
+    // for smaller cards
+    &--small {
+        span {
+            font-size: 0.75rem;
+        }
+    }
+
     // To highlight that the card is active, could be used when the card is selected via arrow navigation for example
     &--active {
         background-color: var(--content-ui-hover);
