@@ -18,6 +18,7 @@ use Component_Instance;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -61,6 +62,8 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @var bool
      */
     private $canWrite;
+
+    private bool $hasBeenFiltered = false;
 
     /**
      * @var CourseImplementationMapper
@@ -132,6 +135,35 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $this->courseImplementation = null;
+        $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
+
+        /**
+         * if filters fail, we should use the system default, of show everything
+         */
+        if (!is_array($filters)) {
+            $filters = AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE));
+        }
+
+        /**
+         * Parse the filter to only the entries that are selected
+         * then compare with the original list to see if we are actually filtering out anything
+         */
+        $assessmentTypes = array_keys(array_filter(
+            $filters,
+            function ($v, $k) {
+                return $v === "1" && key_exists($k, AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)));
+            },
+            ARRAY_FILTER_USE_BOTH
+        ));
+        $this->hasBeenFiltered = count($assessmentTypes) < count(AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)));
+
+        /**
+         * if everything has been filtered out, we should ignore the filter (and show everything)
+         */
+        if (empty($assessmentTypes)) {
+            $assessmentTypes = null;
+            $this->hasBeenFiltered = false;
+        }
 
         // Don't attempt to load course if not configured.
         if ($courseImplId) {
@@ -156,12 +188,16 @@ class Controller extends Component_Homepage_ControllerAbstract
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
                         $user->getRole()->isParent() ? null : $user,
+                        $this->hasBeenFiltered ? ['type' => $assessmentTypes] : []
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
             } else {
                 // I'm an instructor - load all participants.
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds);
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
+                    $uiIds,
+                    options: $this->hasBeenFiltered ? ['type' => $assessmentTypes] : []
+                );
             }
 
             // And then add them to the displayed course impl
@@ -236,6 +272,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
+            'hasBeenFiltered'      => $this->hasBeenFiltered,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,
             'context'              => $this->getContext(),

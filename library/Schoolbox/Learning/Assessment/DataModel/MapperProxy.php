@@ -1666,6 +1666,7 @@ class MapperProxy
      * * converts "due_before" and "due_after" to due date filters
      * * converts "close_before" and "closed_after" to close date filters
      * * converts "type" to a filter which matches only that assessment type
+     *   Can be an array to filter to multiple assessment types
      *   (see AssessmentType::TYPE_* constants)
      * * converts "window_open" and "window_close" to a window inside which
      *   to find due assessments
@@ -1737,34 +1738,50 @@ class MapperProxy
             );
         }
 
-        // Assessment type filter
+        // Assessment type filter single or multiple if array
         if (isset($options['type'])) {
-            switch ($options['type']) {
-                case AssessmentType::TYPE_DUE_WORK:
-                    $builder->notNull('d.id');
-                    break;
+            // is this an array? then loop, else run once
+            if (!is_array($options['type'])) {
+                $options['type'] = [$options['type']];
+            }
+            $filterBuilder = $builder;
+            // if only 1 assessment then dont use an any, but just pass the main PB along
+            if (1 < count($options['type'])) {
+                $filterBuilder = $this->baseMapper->getPredicateBuilder();
+            }
+            foreach ($options['type'] as $type) {
+                switch ($type) {
+                    case AssessmentType::TYPE_DUE_WORK:
+                        $filterBuilder->notNull('d.id');
+                        break;
 
-                case AssessmentType::TYPE_TASK:
-                    $builder->notNull('t.id');
-                    break;
+                    case AssessmentType::TYPE_TASK:
+                        $filterBuilder->notNull('t.id');
+                        break;
 
-                case AssessmentType::TYPE_QUIZ:
-                    $builder->notNull('q.assess_id');
-                    break;
+                    case AssessmentType::TYPE_QUIZ:
+                        $filterBuilder->notNull('q.assess_id');
+                        break;
 
-                case AssessmentType::TYPE_LTI_ASSESSMENT:
-                    $builder->notNull('l.id');
-                    break;
+                    case AssessmentType::TYPE_LTI_ASSESSMENT:
+                        $filterBuilder->notNull('l.id');
+                        break;
 
-                case AssessmentType::TYPE_PROJECT:
-                    $builder->notNull('p.id');
-                    break;
+                    case AssessmentType::TYPE_PROJECT:
+                        $filterBuilder->notNull('p.id');
+                        break;
 
-                /* TODO Does Lesson Plans appear here?
-                 */
+                    case AssessmentType::TYPE_LESSON_PLAN:
+                        $filterBuilder->notNull('lessonPlan.id');
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+            }
+            // if only 1 assessment then dont use an any, but just pass the main PB along
+            if (1 < count($options['type'])) {
+                $builder->any($filterBuilder);
             }
         }
 

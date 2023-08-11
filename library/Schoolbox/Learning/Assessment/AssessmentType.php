@@ -116,4 +116,29 @@ class AssessmentType implements IType
             self::TYPE_LESSON_PLAN
         ];
     }
+
+    /**
+     * Returns the list of enabled assessment (activity) types
+     *
+     * @param bool $ltiEnabled      // Is LTI Enabled? check ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE
+     * @return array<string, string>
+     */
+    public static function getOptions(bool $ltiEnabled): array
+    {
+        $list = [
+            self::TYPE_DUE_WORK        => DueWork::getDefaultTypeName(),
+            self::TYPE_QUIZ            => Quiz::getDefaultTypeName(),
+            self::TYPE_TASK            => Task::getDefaultTypeName(),
+            self::TYPE_PROJECT         => Project::getDefaultTypeName(),
+            self::TYPE_LTI_ASSESSMENT  => LtiAssessment::getDefaultTypeName(),
+            self::TYPE_LESSON_PLAN     => LessonPlan::getDefaultTypeName(),
+        ];
+
+        // if LTI is not enabled then remove that entry
+        if (!$ltiEnabled) {
+            unset($list['lti']);
+        }
+
+        return $list;
+    }
 }
