@@ -1,13 +1,10 @@
-/*****************************
-    MARGIN
-*****************************/
-/* Utility classes to quickly apply standardised margin without having
- * to explicity define a class for it.
-*/
+/*
+    Layout classes to quickly apply standardised margin without having
+    to explicity define a class for it.
+ */
 
 @use "sass:list";
 
-// Generate utility classes for margin
 .l-mar {
     @each $size in $global-sizes {
         &-#{$size} {

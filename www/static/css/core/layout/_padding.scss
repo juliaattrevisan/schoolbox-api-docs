@@ -1,13 +1,10 @@
-/*****************************
-    PADDING
-*****************************/
-/* Utility classes to quickly apply standardised padding without having
- * to explicity define a class for it.
-*/
+/*
+    Layout classes to quickly apply standardised padding without having
+    to explicity define a class for it.
+ */
 
 @use "sass:list";
 
-// Generate utility classes for padding
 .l-pad {
     @each $size in $global-sizes {
         &-#{$size} {

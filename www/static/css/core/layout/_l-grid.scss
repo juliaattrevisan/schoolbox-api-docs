@@ -1,11 +1,9 @@
-/**
- *  l-grid.scss
- *
- *  Created to house the new css grid based implementation of grid. This file will
- *  hopefully replace the Foundation grid eventually once we land on the Normandy
- *  beaches of Operation Crumble. This class also houses the styles to support old
- *  Foundation twelve column styles (aka our legacy grid) inside a new grid container.
-**/
+/*
+    Created to house the new css grid based implementation of grid. This file will
+    hopefully replace the Foundation grid eventually once we land on the Normandy
+    beaches of Operation Crumble. This class also houses the styles to support old
+    Foundation twelve column styles (aka our legacy grid) inside a new grid container.
+*/
 @use "sass:list";
 @use "sass:map";
 
@@ -15,13 +13,13 @@ $minColWidth: 18rem;
 
 /* Variables for legacy sizing */
 
-/**
- *  Why are we decrementing in sizes? Because of the way CSS works. If we declare classes
- *  later into our style sheet their properties will overwrite any properties of classes
- *  declared earlier than them. Given we want our smaller rules to clobber larger rules
- *  in the event an element has multiple sizing classes, this is the best way to get CSS
- *  to apply that logic.
-**/
+/*
+    Why are we decrementing in sizes? Because of the way CSS works. If we declare classes
+    later into our style sheet their properties will overwrite any properties of classes
+    declared earlier than them. Given we want our smaller rules to clobber larger rules
+    in the event an element has multiple sizing classes, this is the best way to get CSS
+    to apply that logic.
+*/
 $foundation-breakpoint-map: (
     "small": (
         "breakpoint": $small-up,
