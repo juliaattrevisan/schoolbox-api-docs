@@ -809,8 +809,8 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
-            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
+            'scores' => $scores, // json_encode($scores, JSON_THROW_ON_ERROR),
+            'comments' => $comments // base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()

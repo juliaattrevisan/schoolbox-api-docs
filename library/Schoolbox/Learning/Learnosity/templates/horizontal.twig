@@ -14,13 +14,49 @@
         <section class="content">
             <div id="horizontal-marking"></div>
         </section>
+
+        <div class="row">
+            <div class="small-12 columns">
+                <h2 class="subheader">Scores</h2>
+                <section class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User Id</th>
+                                <th>Response Id</th>
+                                <th>Score</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for userId, userData in scores %}
+                            {% for responseId, scoreData in userData %}
+                                <tr>
+                                    <td>{{ userId }}</td>
+                                    <td><pre>{{ responseId }}</pre></td>
+                                    <td>{{ scoreData.score }} / {{ scoreData.max }}</td>
+                                    <td>{{ comments[responseId] ?? null }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 
 {% autoescape 'js' %}
     <script>
+        let reportCallback = {
+            dataListener: function (data) {
+                console.log(data);
+            }
+        };
+
         let reportsApp = LearnosityReports.init(
-            {{ initOptions | raw }}
+            {{ initOptions | raw }}, reportCallback
         );
     </script>
 {% endautoescape %}
