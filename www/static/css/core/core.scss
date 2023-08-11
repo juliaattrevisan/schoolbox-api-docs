@@ -27,9 +27,6 @@ $cdn-prefix: "../..";
 @import "utils/modifiers";
 @import "utils/visibility";
 @import "utils/u-typography";
-@import "utils/padding";
-@import "utils/margin";
-@import "utils/gap";
 
 // Layout
 @import "layout/footer";
@@ -43,6 +40,9 @@ $cdn-prefix: "../..";
 @import "layout/l-grid";
 @import "layout/l-flex";
 @import "layout/position";
+@import "layout/padding";
+@import "layout/margin";
+@import "layout/gap";
 
 // Shared user interface
 @import "ui/icons";
