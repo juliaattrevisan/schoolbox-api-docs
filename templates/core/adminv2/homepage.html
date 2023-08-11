@@ -14,6 +14,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
+        if (!document.getElementById("templateSelector")) {
+            return;
+        }
         // When the template selector changes, reload the page to get the new layout
         document.getElementById("templateSelector").addEventListener("change", () => {
             window.location.replace("#" + document.getElementById("templateSelector").value);
@@ -144,6 +147,7 @@
                 </nav>
             </div>
 
+            <!-- BEGIN content -->
             <section>
                 <div class="content">
                     <form id="template-action" class="no-margin" action="/adminv2/homepage/homepageForm.php" method="POST">
@@ -200,6 +204,12 @@
 
                 </div>
             </section>
+            <!-- END content -->
+            <!-- BEGIN empty -->
+            <div class="empty-state">
+                <p>No homepage templates have been created. Start by <a data-reveal-id="newDialog" title="Create">adding the first template</a>.
+            </div>
+            <!-- END empty -->
         </div>
         <div id="layoutContainer"></div>
     </div>

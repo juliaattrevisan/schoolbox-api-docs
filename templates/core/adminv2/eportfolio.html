@@ -16,6 +16,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
+        if (!document.getElementById("templateSelector")) {
+            return;
+        }
         // When the template selector changes, reload the page to get the new layout
         document.getElementById("templateSelector").addEventListener("change", () => {
             window.location.replace("#" + document.getElementById("templateSelector").value);
@@ -87,7 +90,7 @@
                     <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
                 </nav>
             </div>
-
+            <!-- BEGIN content -->
             <section>
                 <div class="content">
                     <form id="template-action" class="no-margin" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
@@ -129,6 +132,12 @@
                     </ul>
                 </div>
             </section>
+            <!-- END content -->
+            <!-- BEGIN empty -->
+            <div class="empty-state">
+                <p>No ePortfolio templates have been created. Start by <a data-reveal-id="newDialog" title="Create">adding the first template</a>.
+            </div>
+            <!-- END empty -->
         </div>
         <div id="layoutContainer"></div>
     </div>

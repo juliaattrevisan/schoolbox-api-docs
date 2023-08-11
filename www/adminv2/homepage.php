@@ -28,12 +28,15 @@ $this->setFile('layout', 'adminv2/component/layout.html');
 $this->setBlock('layout', 'position_top', 'position_top_block');
 $this->setBlock('layout', 'position_left', 'position_left_block');
 $this->setBlock('layout', 'position_right', 'position_right_block');
+
+$this->setBlock(TEMPLATE_content, 'content', 'content_block');
+$this->setBlock(TEMPLATE_content, 'empty', 'empty_block');
+
 /* Palette */
-$this->setBlock(TEMPLATE_content, 'component_tab', 'component_tab_block');
-$this->setBlock(TEMPLATE_content, 'component_page', 'component_page_block');
+$this->setBlock('content', 'component_tab', 'component_tab_block');
+$this->setBlock('content', 'component_page', 'component_page_block');
 $this->setBlock('component_page', 'component', 'component_block');
 
-// include the admin navigation
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
     ->generatePhplib($this, '/adminv2/homepage')
@@ -42,6 +45,16 @@ $this->setBlock('component_page', 'component', 'component_block');
 // Get list of templates
 $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
 $homepageTemplateList = $homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
+
+if ($homepageTemplateList->count() > 0) {
+    $this->parse('content_block', 'content', true);
+    $this->setVar('empty_block', '');
+} else {
+    $this->parse('empty_block', 'empty', true);
+    $this->setVar('content_block', '');
+    $this->setVar('layout_block', '');
+    return;
+}
 
 foreach ($homepageTemplateList as $currentTemplate) {
     $this->setVar(array(
