@@ -319,13 +319,17 @@ $rotate-span-width: 11rem;
     }
 
     th.fixed-left {
-        position: sticky;
-        left: 0;
+        @media #{$medium-up} {
+            position: sticky;
+            left: 0;
+        }
         z-index: 2; /* Z-index for left cells. */
     }
 
     th.fixed-left:nth-child(2) {
-        left: 160px; /* 160px to match width of a .profile-cell table cell. */
+        @media #{$medium-up} {
+            left: 160px; /* 160px to match width of a .profile-cell table cell. */
+        }
     }
 
     td,
