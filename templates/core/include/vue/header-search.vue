@@ -184,7 +184,7 @@ function formatPortrait(id: string) {
         id="search"
         ref="formElement"
         v-on-click-outside="onClickOutside"
-        class="global-search"
+        class="c-header-search"
         action="/search"
         :class="{ focus: isFocused }"
     >
@@ -268,9 +268,48 @@ function formatPortrait(id: string) {
     </form>
 </template>
 
-<style scoped>
-.inner-wrap:not(.left-open):not(.right-open) .global-search:hover,
-.inner-wrap:not(.left-open):not(.right-open) .global-search.focus {
+<style lang="scss" scoped>
+.c-header-search {
+    margin: 0;
+    position: absolute;
+    right: var(--tabbar-icon-width);
+    top: 0;
+    width: var(--tabbar-height);
+    z-index: 1000;
+    ::placeholder {
+        color: transparent;
+        font-weight: normal;
+    }
+    &:hover,
+    &.focus {
+        width: 100%;
+        padding-left: calc(var(--tabbar-icon-width) * 2);
+        ::placeholder {
+            color: black;
+            font-weight: normal;
+        }
+    }
+
+    .c-search-input__field {
+        opacity: 0; // is initially hidden until user interacts with
+    }
+
+    .results {
+        border: 2px solid var(--navigation-hover);
+        border-top: 0;
+        h3 {
+            margin: 0; // clear .tab-bar h3 margins
+        }
+    }
+}
+
+// When notifications are disabled
+.disableNotifications .c-header-search {
+    padding-left: var(--tabbar-icon-width);
+    right: 0;
+}
+.inner-wrap:not(.left-open):not(.right-open) .c-header-search:hover,
+.inner-wrap:not(.left-open):not(.right-open) .c-header-search.focus {
     padding-left: 9rem;
 }
 </style>

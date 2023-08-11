@@ -103,11 +103,11 @@ function onMouseOut(event: MouseEvent) {
 </script>
 
 <template>
-    <div class="search-input-container">
+    <div class="c-search-input l-rel">
         <input
             id="search-field"
             ref="inputElement"
-            :class="props.isActive ? 'search-input search-input-active' : 'search-input'"
+            :class="props.isActive ? 'c-search-input__field c-search-input__field--active' : 'c-search-input__field'"
             type="text"
             name="keyword"
             placeholder="Search"
@@ -136,26 +136,33 @@ function onMouseOut(event: MouseEvent) {
 </template>
 
 <style lang="scss" scoped>
-.search-input-container {
-    position: relative;
-}
-.search-input {
-    border: 0;
-    background-color: transparent;
-    color: var(--body-background);
-    height: var(--tabbar-height);
-    width: var(--tabbar-height);
-    padding: var(--base-font-size);
-    margin: 0;
-    line-height: calc(var(--tabbar-height) / 2);
+.c-search-input {
+    &__field {
+        border: 0;
+        background-color: transparent;
+        color: var(--body-background);
+        height: var(--tabbar-height);
+        width: var(--tabbar-height);
+        padding: var(--base-font-size);
+        margin: 0;
+        line-height: calc(var(--tabbar-height) / 2);
+    }
+    /*
+    * Styles to suggest the input is 'active'
+    * As the input can be part of a larger component (header-search.vue)
+    * we pass the isActive prop to the component to style it accordingly
+    */
+    &__field--active {
+        background-color: white;
+        border: 2px solid var(--navigation-hover);
+        color: black;
+        font-size: var(--base-font-size);
+        width: 100%;
+        opacity: 1;
+    }
 }
 
-/*
-* Styles to suggest the input is 'active'
-* As the input can be part of a larger component (header-search.vue)
-* we pass the isActive prop to the component to style it accordingly
-*/
-.search-input-active {
+.c-search-input--active {
     background-color: white;
     border: 2px solid var(--navigation-hover);
     color: black;

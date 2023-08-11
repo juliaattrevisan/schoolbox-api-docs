@@ -1,73 +1,33 @@
-.global-search {
-    margin: 0;
-    position: absolute;
-    right: $tabbar-icon-width;
-    top: 0;
-    width: $tabbar-height;
-    z-index: 1000;
-    ::placeholder {
-        color: transparent;
-        font-weight: normal;
-    }
-    &:hover,
-    &.focus {
-        width: 100%;
-        padding-left: $tabbar-icon-width * 2;
-        ::placeholder {
-            color: $black;
-            font-weight: normal;
-        }
-    }
-
-    .search-input {
-        opacity: 0; // is initially hidden in the global-search
-    }
-
-    .results {
-        border: 2px solid var(--navigation-hover);
-        border-top: 0;
-        h3 {
-            margin: 0; // clear .tab-bar h3 margins
-        }
-    }
-}
-
-// When notifications are disabled
-.disableNotifications .global-search {
-    right: 0;
-    padding-left: $tabbar-icon-width;
-}
-
 @media #{$allow-sidebar-stash} {
-    .inner-wrap:not(.left-open) .global-search {
+    .inner-wrap:not(.left-open) .c-header-search {
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
         }
     }
-    .inner-wrap.left-open .global-search {
+    .inner-wrap.left-open .c-header-search {
         right: $tabbar-icon-width * 2;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
         }
     }
-    .inner-wrap:not(.left-open):not(.right-open) .global-search,
-    .inner-wrap.right-open .global-search {
+    .inner-wrap:not(.left-open):not(.right-open) .c-header-search,
+    .inner-wrap.right-open .c-header-search {
         right: $tabbar-icon-width * 2;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 3;
         }
     }
-    .inner-wrap.left-open.right-open .global-search {
+    .inner-wrap.left-open.right-open .c-header-search {
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
         }
     }
     // When notifications are disabled
-    .disableNotifications .inner-wrap:not(.left-open) .global-search {
+    .disableNotifications .inner-wrap:not(.left-open) .c-header-search {
         right: $tabbar-icon-width;
 
         &:hover,
@@ -75,7 +35,7 @@
             padding-left: $tabbar-icon-width * 2;
         }
     }
-    .disableNotifications .inner-wrap.left-open .global-search {
+    .disableNotifications .inner-wrap.left-open .c-header-search {
         right: $tabbar-icon-width;
 
         &:hover,
@@ -86,31 +46,31 @@
 }
 
 @media #{$allow-notification-stash} {
-    .inner-wrap.left-open .global-search,
-    .inner-wrap.right-open .global-search {
+    .inner-wrap.left-open .c-header-search,
+    .inner-wrap.right-open .c-header-search {
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
         }
     }
-    .inner-wrap.left-open .global-search {
+    .inner-wrap.left-open .c-header-search {
         right: $tabbar-icon-width * 2;
     }
-    .inner-wrap.right-open .global-search {
+    .inner-wrap.right-open .c-header-search {
         right: $tabbar-icon-width;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
         }
     }
-    .inner-wrap.right-open.left-open .global-search {
+    .inner-wrap.right-open.left-open .c-header-search {
         right: $tabbar-icon-width;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width;
         }
     }
-    .right-off-canvas-menu.right-open + .global-search {
+    .right-off-canvas-menu.right-open + .c-header-search {
         right: 0;
         padding-left: 0;
     }
