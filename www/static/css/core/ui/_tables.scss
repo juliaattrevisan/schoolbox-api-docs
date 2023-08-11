@@ -456,6 +456,14 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     white-space: nowrap;
 }
 
+.marksheet [data-pop-out-menu] {
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--content-ui-hover);
+    }
+}
+
 // dataTables
 .island {
     table.dataTable.no-footer {
