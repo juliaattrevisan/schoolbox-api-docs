@@ -75,7 +75,8 @@ class Hydrator extends BaseHydrator
         }
 
         // Filter out articles which the user doesn't have permission to read
-        $permittedArticleIds = $this->articleResolver->findArticlesForUser($viewer, News\Model::STATE_PUBLIC, false);
+        $newsFeed            = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
+        $permittedArticleIds = $newsFeed->find($viewer, News\Model::STATE_PUBLIC, false);
         if (empty($permittedArticleIds)) {
             return [];
         }
