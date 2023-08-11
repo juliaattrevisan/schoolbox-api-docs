@@ -8,7 +8,7 @@
 @use "sass:list";
 
 // Generate utility classes for margin
-.u-margin {
+.l-mar {
     @each $size in $global-sizes {
         &-#{$size} {
             margin: var(--whitespace-#{$size});
