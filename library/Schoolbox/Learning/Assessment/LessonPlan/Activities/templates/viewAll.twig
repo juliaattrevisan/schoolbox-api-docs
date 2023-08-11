@@ -24,7 +24,7 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card small-12">
-                            <h3>
+                            <h3 class="icon-course">
                                 {{ course.title }}
                             </h3>
                         </div>
@@ -36,7 +36,7 @@
             <li class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12">
-                        <h3>
+                        <h3 class="icon-unit">
                             {% if unit.isBeforeOpenDate==false or readOnly == false %}
                                 {% if unit.specification.folder.id in accessibleFolderIds %}
                                     <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>
