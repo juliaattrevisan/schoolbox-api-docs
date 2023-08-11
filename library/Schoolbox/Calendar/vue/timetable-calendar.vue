@@ -1,4 +1,5 @@
 <script>
+import TimetableCalendarOptions from "@schoolboxLibrary/Calendar/vue/timetable-calendar-options.vue";
 import FullCalendar from "@fullcalendar/vue3";
 import interactionPlugin from "@fullcalendar/interaction";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -61,6 +62,7 @@ export default {
     name: "timetable-calendar",
 
     components: {
+        TimetableCalendarOptions,
         FilterModal,
         ExportModal,
         CreateEventModal,
@@ -91,12 +93,9 @@ export default {
         };
     },
 
-    /*
-    TODO: options passed from timetableCalendar.twig will end up here.
     props: {
-        options,
+        options: Object,
     },
-     */
 
     computed: {
         jQuery: () => window.jQuery,
@@ -820,7 +819,7 @@ export default {
 </script>
 
 <template>
-    <!--<timetable-calendar-options :options="children" @event-created="optionsChanged" />-->
+    <timetable-calendar-options :options="children" @event-created="optionsChanged" />
     <div>
         <create-event-modal
             ref="createEvent"

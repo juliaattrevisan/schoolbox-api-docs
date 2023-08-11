@@ -1,5 +1,11 @@
 import TimetableCalendar from "./timetable-calendar";
 
+window.Vue.createApp({
+    components: {
+        TimetableCalendar,
+    },
+}).mount("#timetable-calendar");
+/*
 if (document.readyState !== "loading") {
     onPageLoad();
 } else {
@@ -8,7 +14,7 @@ if (document.readyState !== "loading") {
 
 /**
  * Attach event listeners to buttons, and create the Vue app.
- */
+ *
 function onPageLoad() {
     const anchors = document.querySelectorAll("[data-child-student-button]");
 
@@ -29,7 +35,7 @@ function onPageLoad() {
  *  - Ignore the click if the button is already in the active state
  *  - Load calendar events for the newly selected child student
  *  - Update the state of the buttons and the page heading.
- */
+ *
 function onClickChildStudentButton(ev) {
     const anchor = ev.target;
 
@@ -55,3 +61,4 @@ function onClickChildStudentButton(ev) {
     document.querySelector("[data-heading-user-fullname]").innerHTML = childName;
     document.querySelector("[data-heading-user-year]").innerHTML = yearLevel == "" ? "" : yearLevel;
 }
+*/
