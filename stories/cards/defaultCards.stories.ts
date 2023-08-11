@@ -30,7 +30,7 @@ export const Default: Story = {
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
                     <div class="c-card__main-actions">
-                        <nav class="c-nav-actions">
+                        <nav class="c-nav-actions l-flex-row">
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-more no-text" href="" title="Actions"></a>
@@ -63,7 +63,7 @@ export const NavActions: Story = {
     render: () => ({
         template: `
             <div class="c-card">
-                <nav class="c-nav-actions">
+                <nav class="c-nav-actions l-flex-row">
                     <a class="icon-modify no-text" href="" title="Modify"></a>
                     <a class="icon-modify no-text" href="" title="Modify"></a>
                     <a class="icon-more no-text" href="" title="Actions"></a>
