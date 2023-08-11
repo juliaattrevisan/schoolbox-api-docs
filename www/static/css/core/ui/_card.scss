@@ -25,7 +25,6 @@
     // In a lot of instances, this is all you need.
     &__main {
         display: flex;
-        flex-direction: row;
         gap: var(--whitespace-m);
 
         &-content {
@@ -76,7 +75,6 @@
     // these actions are visually distinct if this card appears in a component and the component has actions.
     &__actions {
         display: flex;
-        flex-direction: row;
         justify-content: flex-start;
         min-inline-size: 100%;
 
