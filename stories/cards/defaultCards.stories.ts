@@ -20,8 +20,8 @@ export const Default: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img">
+                        <div class="c-img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
@@ -91,8 +91,8 @@ export const MainSection: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img">
+                        <div class="c-img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
@@ -114,8 +114,8 @@ export const MainSectionLoading: Story = {
         template: `
             <div class="c-card c-card--loading">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img">
+                        <div class="c-img__wrapper">
                             <div class="img-placeholder"></div>
                         </div>
                     </div>
@@ -134,8 +134,8 @@ export const MainSectionTall: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img">
+                        <div class="c-img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
@@ -158,8 +158,8 @@ export const MainSectionTallCentredImage: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img l-flex--center">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img l-flex--center">
+                        <div class="c-img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
@@ -182,8 +182,8 @@ export const MainSectionNavActionsVerticalAlign: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img">
+                        <div class="c-img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
@@ -207,8 +207,8 @@ export const MainSectionIcon: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img">
+                        <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
@@ -227,8 +227,8 @@ export const SubItem: Story = {
         template: `
             <div class="c-card c-card--subitem">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img img--s">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img__wrapper">
                             <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
@@ -247,8 +247,8 @@ export const SubItemIcon: Story = {
         template: `
             <div class="c-card c-card--subitem">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img img--s">
-                        <div class="img__wrapper">
+                    <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
@@ -268,8 +268,8 @@ export const CardList: Story = {
             <div class="c-card-list">
                 <div class="c-card">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img img">
-                            <div class="img__wrapper">
+                        <div class="c-card__primary-img c-img">
+                            <div class="c-img__wrapper">
                                 <div class="icon icon-house"></div>
                             </div>
                         </div>
@@ -281,8 +281,8 @@ export const CardList: Story = {
                 </div>
                 <div class="c-card c-card--subitem">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img img img--s">
-                            <div class="img__wrapper">
+                        <div class="c-card__primary-img c-img c-img--s">
+                            <div class="c-img__wrapper">
                                 <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
@@ -294,8 +294,8 @@ export const CardList: Story = {
                 </div>
                 <div class="c-card c-card--subitem">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img img img--s">
-                            <div class="img__wrapper">
+                        <div class="c-card__primary-img c-img c-img--s">
+                            <div class="c-img__wrapper">
                                 <img src="https://placedog.net/96/96" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
@@ -307,8 +307,8 @@ export const CardList: Story = {
                 </div>
                 <div class="c-card c-card--subitem">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img img img--s">
-                            <div class="img__wrapper">
+                        <div class="c-card__primary-img c-img c-img--s">
+                            <div class="c-img__wrapper">
                                 <img src="https://placedog.net/108/108" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>

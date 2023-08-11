@@ -44,8 +44,8 @@ const relativeTime = window.Vue.computed(() => {
 <template>
     <div class="c-card" data-test-sp-results-list-result>
         <div class="c-card__main">
-            <div :class="`c-card__primary-img img ${isImgRounded ? 'img--round' : ''}`">
-                <div class="img__wrapper">
+            <div :class="`c-card__primary-img c-img ${isImgRounded ? 'c-img--round' : ''}`">
+                <div class="c-img__wrapper">
                     <div v-if="props.result.type === ResultTypes.NEWS" class="icon icon-news"></div>
                     <img v-else :src="(props.result.image as string)" />
                 </div>
