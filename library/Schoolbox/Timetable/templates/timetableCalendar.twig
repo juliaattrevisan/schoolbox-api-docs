@@ -60,6 +60,11 @@
         <section>
             <div id="timetable-calendar">
                 <timetable-calendar ref="timetable-calendar"></timetable-calendar>
+<!--
+                # TODO: Move buttons above calendar into the timetable-calendar component.
+                #       Pass the children to the timetable-component like below:
+                <timetable-calendar :options="{{ children|json_encode }}"/>
+-->
             </div>
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
         </section>

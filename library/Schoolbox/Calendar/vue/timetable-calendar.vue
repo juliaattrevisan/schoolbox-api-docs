@@ -91,6 +91,13 @@ export default {
         };
     },
 
+    /*
+    TODO: options passed from timetableCalendar.twig will end up here.
+    props: {
+        options,
+    },
+     */
+
     computed: {
         jQuery: () => window.jQuery,
         config: () => window.fullCalendarConfig,
@@ -813,6 +820,7 @@ export default {
 </script>
 
 <template>
+    <!--<timetable-calendar-options :options="children" @event-created="optionsChanged" />-->
     <div>
         <create-event-modal
             ref="createEvent"
