@@ -265,8 +265,8 @@ export const SubItemIcon: Story = {
 export const CardList: Story = {
     render: () => ({
         template: `
-            <div class="c-card-list">
-                <div class="c-card">
+            <div class="l-flex-col">
+                <div class="c-card c-card--border-end">
                     <div class="c-card__main">
                         <div class="c-card__primary-img c-img">
                             <div class="c-img__wrapper">
@@ -279,7 +279,7 @@ export const CardList: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem">
+                <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
                         <div class="c-card__primary-img c-img c-img--s">
                             <div class="c-img__wrapper">
@@ -292,7 +292,7 @@ export const CardList: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem">
+                <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
                         <div class="c-card__primary-img c-img c-img--s">
                             <div class="c-img__wrapper">

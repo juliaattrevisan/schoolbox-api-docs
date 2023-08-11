@@ -158,15 +158,8 @@
             width: 20%;
         }
     }
-}
 
-/* A list to contain all these cards. It just adds a bottom border to everything except the last item. */
-.c-card-list {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-
-    .c-card:not(:last-child) {
+    &--border-end {
         border-block-end: 1px solid rgba(0, 0, 0, 0.2);
     }
 }

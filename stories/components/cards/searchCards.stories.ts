@@ -15,8 +15,8 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Assessments: Story = {
     render: () => ({
         template: `
-        <div class="c-card-list">
-            <div class="c-card c-card--subitem">
+        <div class="l-flex-col">
+            <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
                     <div class="c-card__primary-img c-img c-img--s">
                         <div class="c-img__wrapper">
@@ -28,7 +28,7 @@ export const Assessments: Story = {
                     </div>
                 </div>
             </div>
-            <div class="c-card c-card--subitem">
+            <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
                     <div class="c-card__primary-img c-img c-img--s">
                         <div class="c-img__wrapper">
@@ -40,7 +40,7 @@ export const Assessments: Story = {
                     </div>
                 </div>
             </div>
-            <div class="c-card c-card--subitem">
+            <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
                     <div class="c-card__primary-img c-img c-img--s">
                         <div class="c-img__wrapper">
@@ -52,7 +52,7 @@ export const Assessments: Story = {
                     </div>
                 </div>
             </div>
-            <div class="c-card c-card--subitem">
+            <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
                     <div class="c-card__primary-img c-img c-img--s">
                         <div class="c-img__wrapper">
@@ -144,8 +144,8 @@ export const Event: Story = {
 export const Files: Story = {
     render: () => ({
         template: `
-            <div class="c-card-list">
-                <div class="c-card c-card--subitem">
+            <div class="l-flex-col">
+                <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
                         <div class="c-card__primary-img c-img c-img--s">
                             <div class="c-img__wrapper">
@@ -158,7 +158,7 @@ export const Files: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem">
+                <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
                         <div class="c-card__primary-img c-img c-img--s">
                             <div class="c-img__wrapper">
@@ -171,7 +171,7 @@ export const Files: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem">
+                <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
                         <div class="c-card__primary-img c-img c-img--s">
                             <div class="c-img__wrapper">
@@ -184,7 +184,7 @@ export const Files: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem">
+                <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
                         <div class="c-card__primary-img c-img c-img--s">
                             <div class="c-img__wrapper">
