@@ -20,7 +20,7 @@ export const Default: Story = {
         template: `
             <div class="c-card c-card--small">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
@@ -40,7 +40,7 @@ export const WithLink: Story = {
         template: `
             <div class="c-card c-card--small">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>

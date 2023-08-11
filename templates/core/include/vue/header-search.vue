@@ -221,7 +221,7 @@ function formatPortrait(id: string) {
                     @mouseleave="arrowCounter = -1"
                 >
                     <div class="c-card__main">
-                        <div class="c-card__primary-img c-img c-img--l c-img--round">
+                        <div class="c-img c-img--l c-img--round">
                             <div class="c-img__wrapper">
                                 <img :src="formatPortrait(result.id)" alt="portrait photo" />
                             </div>
@@ -246,7 +246,7 @@ function formatPortrait(id: string) {
                 <template v-if="isLoading">
                     <div v-for="(row, index) in 3" :key="index" class="c-card c-card--loading">
                         <div class="c-card__main">
-                            <div class="c-card__primary-img c-img c-img--round">
+                            <div class="c-img c-img--round">
                                 <div class="c-img__wrapper">
                                     <div class="img-placeholder"></div>
                                 </div>

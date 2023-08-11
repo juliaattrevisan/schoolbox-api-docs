@@ -18,7 +18,7 @@ export const Assessments: Story = {
         <div class="l-flex-col">
             <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-due-work"></div>
                         </div>
@@ -30,7 +30,7 @@ export const Assessments: Story = {
             </div>
             <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-quiz"></div>
                         </div>
@@ -42,7 +42,7 @@ export const Assessments: Story = {
             </div>
             <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-project"></div>
                         </div>
@@ -54,7 +54,7 @@ export const Assessments: Story = {
             </div>
             <div class="c-card c-card--subitem c-card--border-end">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-task"></div>
                         </div>
@@ -66,7 +66,7 @@ export const Assessments: Story = {
             </div>
             <div class="c-card c-card--subitem">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-lesson-plan"></div>
                         </div>
@@ -86,7 +86,7 @@ export const Badge: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--badge">
+                    <div class="c-img c-img--badge">
                         <div class="c-img__wrapper">
                             <img src="https://schoolbox-static.cloud/23.0.5-1/images/badges/education/85.svg"/>
                         </div>
@@ -106,7 +106,7 @@ export const Course: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img">
+                    <div class="c-img">
                         <div class="c-img__wrapper">
                             <div class="icon icon-course"></div>
                         </div>
@@ -126,7 +126,7 @@ export const Event: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img">
+                    <div class="c-img">
                         <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
@@ -147,7 +147,7 @@ export const Files: Story = {
             <div class="l-flex-col">
                 <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                                 <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-audio.svg"/>
                             </div>
@@ -160,7 +160,7 @@ export const Files: Story = {
                 </div>
                 <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                             <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-video.svg"/>
                             </div>
@@ -173,7 +173,7 @@ export const Files: Story = {
                 </div>
                 <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                                 <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-blank.svg"/>
                             </div>
@@ -186,7 +186,7 @@ export const Files: Story = {
                 </div>
                 <div class="c-card c-card--subitem c-card--border-end">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                                 <img src="https://schoolbox-static.cloud/23.0.4-4/images/mime/application-pdf.svg"/>
                             </div>
@@ -199,7 +199,7 @@ export const Files: Story = {
                 </div>
                 <div class="c-card c-card--subitem">
                     <div class="c-card__main">
-                        <div class="c-card__primary-img c-img c-img--s">
+                        <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                                 <img src="https://placedog.net/120/120"/>
                             </div>
@@ -220,7 +220,7 @@ export const Forum: Story = {
         template: `
             <div class="c-card c-card--subitem">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-forum"></div>
                         </div>
@@ -239,7 +239,7 @@ export const Link: Story = {
         template: `
             <div class="c-card c-card--subitem">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-link"></div>
                         </div>
@@ -258,7 +258,7 @@ export const News: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img">
+                    <div class="c-img">
                         <div class="c-img__wrapper">
                             <div class="icon icon-news"></div>
                         </div>
@@ -278,7 +278,7 @@ export const Unit: Story = {
         template: `
             <div class="c-card c-card--subitem">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img c-img--s">
+                    <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-unit"></div>
                         </div>
@@ -297,7 +297,7 @@ export const User: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img c-img">
+                    <div class="c-img">
                         <div class="c-img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
