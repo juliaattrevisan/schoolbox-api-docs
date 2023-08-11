@@ -11,20 +11,15 @@ namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -33,11 +28,12 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param UnitSpecificationMapper  $unitSpecificationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
+     * @param LessonPlanMapper         $lessonPlanMapper
+     * @param AssessmentMapperProxy    $assessmentMapperProxy
      */
     public function __construct(
-        private ErrorMapper $errorMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
         private UnitImplementationMapper $unitImplementationMapper,
         private LessonPlanMapper $lessonPlanMapper,
@@ -49,7 +45,8 @@ class Controller extends Base
     /**
      * Provide form
      *
-     * @param CourseSpecification $course
+     * @param CourseSpecification       $courseSpec
+     * @param CourseImplementation|null $courseImpl
      */
     public function getCourse(CourseSpecification $courseSpec, ?CourseImplementation $courseImpl): void
     {

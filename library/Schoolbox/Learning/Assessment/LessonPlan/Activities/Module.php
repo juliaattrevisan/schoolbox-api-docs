@@ -114,7 +114,6 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getErrorMapper(),
             $this->getUnitSpecificationMapper(),
             $this->getUnitImplementationMapper(),
             $this->getLessonPlanMapper(),
@@ -159,14 +158,6 @@ class Module extends BaseModule
     protected function getLessonPlanMapper()
     {
         return $this->getMapperFactory()->get(LessonPlanMapper::class);
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 
     /**
