@@ -1,0 +1,42 @@
+{##
+ # Teacher gives feedback in Horizontal Marking context
+ #
+ # @param string|array $reportInitOptions  Learnosity API initialisation object
+ # @param IAssessable $assessment          Our schoolbgox quiz instance
+#}
+<script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+
+        <h2 class="subheader">Horizontal Marking</h2>
+        <section class="content">
+            <div id="horizontal-marking"></div>
+        </section>
+    </div>
+</div>
+
+{% autoescape 'js' %}
+    <script>
+        let reportsApp = LearnosityReports.init(
+            {{ initOptions | raw }}
+        );
+    </script>
+{% endautoescape %}
+
+{# Random repairs #}
+<style type="text/css">
+    /* For some reason the cloze exercise goes 100% of the available height
+     * so we need height: auto !important to override it for now
+     */
+    .lrn_widget.lrn_clozeassociation .lrn_response_input .lrn_response_container.lrn_dragdrop .lrn_btn_drag, .lrn_widget.lrn_imageclozeassociation .lrn_response_input .lrn_response_container.lrn_dragdrop .lrn_btn_drag, .lrn_widget.lrn_imageclozeassociationV2 .lrn_response_input .lrn_response_container.lrn_dragdrop .lrn_btn_drag {
+        margin: 0;
+        width: 100%;
+        max-width: none;
+        height: auto !important;
+        min-height: 2.3em;
+        float: left;
+        padding: .3em .6em;
+    }
+</style>

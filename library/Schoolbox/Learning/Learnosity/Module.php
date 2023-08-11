@@ -95,6 +95,10 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'postFeedback', $instructorPerms, $preloadAttempt);
 
+        /* Start horizontal marking using a Learnosity Report
+         */
+        $this->register('GET', '/{assessmentId}/horizontal', 'getHorizontalMarking', $instructorPerms, $preloadAssessment);
+
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);

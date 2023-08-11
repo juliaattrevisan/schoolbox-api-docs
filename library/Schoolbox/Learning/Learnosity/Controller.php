@@ -472,8 +472,6 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
         /* This is what the student did
          */
         $reportPayload = [
@@ -710,55 +708,122 @@ class Controller extends Base
 
 
     /**
-     * Live Progress monitor thing for a quiz
-     *
-     * Be sure to hit like and subscribe
-     * It really helps us out a lot
+     * Start horizontal marking for a given quiz
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
+     * @throws \RuntimeException
      */
-    public function getLiveProgress(IAssessable $assessment): void
+    public function getHorizontalMarking(IAssessable $assessment): void
     {
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        /* Get a list of attempts sorted by finish date
+         * This gives us the most recent attempt for a quiz, if a student did multiple attempts
+         *
+         * TODO What was supposed to happen for multiple attempts in a horizontal marking context?
+         */
+        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
+            'order' => [
+                'finish' => 'desc'
+            ]
+        ]);
+
+        /* Fetch all the assess_attempt.learnosity_references for $assessment
+         * for a student's most recent attempt and store then in a hashtable
+         */
+        $sessions = [];
         $users = [];
 
-        foreach ($assessment->getParticipantUsers() as $user) {
-            $users[] = [
-                'id' => $user->getId(),
-                'name' => $user->getFullName(),
-                'hash' => hash('sha256', $user->getId() . $this->learnosityConsumerSecret)
-            ];
+        foreach ($attempts as $attempt) {
+            if (!isset($stack[$attempt->getUser()->getId()])) {
+                $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
+
+                /* ...because Learnosity wants it in this format
+                 */
+                $users[$attempt->getUser()->getId()] = [
+                    'id' => $attempt->getUser()->getId(),
+                    'name' => $attempt->getUser()->getFullName()
+                ];
+            }
         }
 
         $payload = [
             'reports' => [
                 [
-                    'id' => 'live-progress',
-                    'type' => 'live-activitystatus-by-user',
-                    'activity' => [
-                        'id' => $assessment->getLearnosityReference(),
-                        'name' => $assessment->getTitle(),
-                    ],
-                    'show_user_selectors' => true,
-                    'show_action_controls' => true,
-                    'display_activity' => true,
-                    'users' => $users
+                    'id' => 'horizontal-marking',
+                    'type' => 'response-analysis-by-item',
+                    // TODO Try "scorable"
+                    'question_source' => 'original',
+                    'session_ids' => array_values($sessions),
+                    'users' => array_values($users)
                 ]
             ]
         ];
 
-        new \Alaress_Probe($payload);
-
-        $this->response = $this->responseFromTemplate('@learnosity/stream.twig', [
+        $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
         ], sprintf(
-            'Livestream for %s',
+            'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
     }
+
+
+//    /**
+//     * Live Progress monitor thing for a quiz
+//     *
+//     * Be sure to hit like and subscribe
+//     * It really helps us out a lot
+//     *
+//     * @param IAssessable $assessment
+//     * @return void
+//     * @throws ValidationException
+//     * @throws \JsonException
+//     */
+//    public function getLiveProgress(IAssessable $assessment): void
+//    {
+//        $users = [];
+//
+//        foreach ($assessment->getParticipantUsers() as $user) {
+//            $users[] = [
+//                'id' => $user->getId(),
+//                'name' => $user->getFullName(),
+//                'hash' => hash('sha256', $user->getId() . $this->learnosityConsumerSecret)
+//            ];
+//        }
+//
+//        $payload = [
+//            'reports' => [
+//                [
+//                    'id' => 'live-progress',
+//                    'type' => 'live-activitystatus-by-user',
+//                    'activity' => [
+//                        'id' => $assessment->getLearnosityReference(),
+//                        'name' => $assessment->getTitle(),
+//                    ],
+//                    'show_user_selectors' => true,
+//                    'show_action_controls' => true,
+//                    'display_activity' => true,
+//                    'users' => $users
+//                ]
+//            ]
+//        ];
+//
+//        new \Alaress_Probe($payload);
+//
+//        $this->response = $this->responseFromTemplate('@learnosity/stream.twig', [
+//            'initOptions' => $this->api->initOptions('reports', $payload),
+//            'assessment' => $assessment,
+//        ], sprintf(
+//            'Livestream for %s',
+//            $assessment->getTitle()
+//        ));
+//    }
 
 
     /**
