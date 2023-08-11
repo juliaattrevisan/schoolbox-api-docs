@@ -26,7 +26,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         int $limit,
-    ): QueryParams {
+    ): ?QueryParams {
         ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword);
 
         $relevancePart = $this->buildRelevanceExpression();
@@ -47,7 +47,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $whereParts[]             = "$datePart >= :filterFromDate";
                 $params['filterFromDate'] = $filter->fromDate->getDatabase();
             } else {
-                $whereParts[] = '1 = 0';
+                return null;
             }
         }
         if ($filter->toDate) {
@@ -56,7 +56,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $whereParts[]           = "$datePart <= :filterToDate";
                 $params['filterToDate'] = $filter->toDate->getDatabase();
             } else {
-                $whereParts[] = '1 = 0';
+                return null;
             }
         }
         if ($filter->creator) {
@@ -65,7 +65,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $whereParts[]            = "$creatorPart = :filterCreator";
                 $params['filterCreator'] = $filter->creator->getId();
             } else {
-                $whereParts[] = '1 = 0';
+                return null;
             }
         }
 
