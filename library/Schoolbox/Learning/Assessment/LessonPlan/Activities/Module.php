@@ -17,7 +17,6 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -26,7 +25,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -98,6 +96,7 @@ class Module extends BaseModule
 
         // get lessonplans for homepage
         $this->register('GET', '/class/{folderId:\d+}', 'getHomepage', $permsAll, $preloadFolder);
+        $this->register('GET', '/class/{folderId:\d+}/component/{componentId:\d+}', 'getHomepageComponent', $permsAll, $preloadFolder);
     }
 
     /**
@@ -118,6 +117,7 @@ class Module extends BaseModule
             $this->getUnitImplementationMapper(),
             $this->getLessonPlanMapper(),
             $this->injector->get('assessmentDataSource'),
+            $this->getComponentInstanceMapper(),
         );
     }
 
@@ -167,5 +167,22 @@ class Module extends BaseModule
     protected function getFolderMapper()
     {
         return $this->getMapperFactory()->get(Folder\Mapper::class);
+    }
+
+    /**
+     * @return Mapper|ErrorMapper
+     * @throws InvalidArgumentException If class not found
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+    /**
+     * @return Mapper|\Component_InstanceMapper
+     * @throws InvalidArgumentException If class not found
+     */
+    protected function getComponentInstanceMapper()
+    {
+        return $this->getMapperFactory()->get(\Component_InstanceMapper::class);
     }
 }

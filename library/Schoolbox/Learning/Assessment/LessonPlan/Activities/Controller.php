@@ -37,7 +37,8 @@ class Controller extends Base
         private UnitSpecificationMapper $unitSpecificationMapper,
         private UnitImplementationMapper $unitImplementationMapper,
         private LessonPlanMapper $lessonPlanMapper,
-        private AssessmentMapperProxy $assessmentMapperProxy
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private \Component_InstanceMapper $componentInstanceMapper
     ) {
     }
 
@@ -85,10 +86,35 @@ class Controller extends Base
     }
 
     /**
-     *
+     * Get the list of
+     * @param Folder\Model $folder
      */
     public function getHomepage(Folder\Model $folder): void
     {
+        $this->getHomepageComponent($folder);
+    }
+
+    /**
+     * @param Folder\Model $folder
+     * @param int|null     $componentId
+     * @return void
+     */
+    public function getHomepageComponent(Folder\Model $folder, ?int $componentId = null)
+    {
+        $dateStart = null;
+        $dateEnd = null;
+        // if there is a component specified grab the active date range
+        if ($componentId) {
+            $instanceConfig = $this->componentInstanceMapper->findByInstanceId($componentId)->getConfigArray();
+
+            //if there is no source, update to the current homepage
+            if ('' === trim($instanceConfig['componentname']['value'])) {
+                $instanceConfig['componentname']['value'] = $instanceConfig['componentname']['defaultValue'];
+            }
+            $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-(int)$instanceConfig['range']['value']);
+            $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays((int)$instanceConfig['range']['value']);
+        }
+
         /**
          * If user is a student, we have specific logic:
          * Students only see lesson plans that have been published
@@ -117,6 +143,8 @@ class Controller extends Base
         $twigData = [
             'lessonPlans'       => $lessonPlans,
             'folder'            => $folder,
+            'dateStart'         => $dateStart,
+            'dateEnd'           => $dateEnd,
             'returnUrlName'     => Assessment\Redirect::RETURN_URL,
             'encodedReturnUrl'  => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
             'readOnly'          => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE

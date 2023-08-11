@@ -108,7 +108,8 @@
                     <li{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %}>
                         <div class="card small-12">
                             <h3>
-                                <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
+                                {# is the assessment active? #}
+                                <a class="title {% if (dateStart and dateEnd) and lesson.dueAt > dateStart and lesson.dueAt < dateEnd %}active-lesson-plan{% endif %}" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
                             </h3>
                             <p class="meta">
                                 {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% elseif course %}{{ course.name }}{% endif %} | {{ unit.title }}
@@ -169,3 +170,9 @@
         </div>
     {% endif %}
 </div>
+
+<style>
+    .active-lesson-plan {
+        font-weight: bold;
+    }
+</style>

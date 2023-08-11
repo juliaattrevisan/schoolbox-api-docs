@@ -102,6 +102,6 @@
 {% endif %}
 <div class="component-action">
     <section>
-        <a href="{{ routeLookup('lessonPlanActivities.getHomepage', {folderId: component.getContext.getFolder.getId}) }}" class="button">View All</a> {# Link for this button will be added in SA-15993 #}
+        <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}" class="button">View All</a> {# Link for this button will be added in SA-15993 #}
     </section>
 </div>
