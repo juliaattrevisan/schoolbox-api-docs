@@ -104,9 +104,16 @@ class Controller extends Base
         $assessmentIds = $this->lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStudent);
         // hydrate those assessments
         $lessonPlans = $this->assessmentMapperProxy->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']])
+        // Group by Unit
         ->groupByCallback(
             function ($lessonPlan) {
                 return $lessonPlan->getContext()->getId();
+            }
+        )
+        // Group now by Course
+        ->groupByCallback(
+            function ($unit) {
+                return $unit->first()->getContext()->getSpecification()->getCourse()->getId();
             }
         );
 

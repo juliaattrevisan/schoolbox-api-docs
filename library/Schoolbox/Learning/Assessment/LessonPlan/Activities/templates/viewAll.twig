@@ -18,7 +18,20 @@
     {% if lessonPlans|length %}
         <section>
             <ul class="action-list">
-            {% for unit, plans in lessonPlans %}
+            {% for course, units in lessonPlans %}
+            {% set course = units.first.first.baseContext.specification.course.folder ?? '' %}
+            {% if course %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <h3>
+                                {{ course.title }}
+                            </h3>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+            {% for unit, plans in units %}
             {% set unit = plans.first.baseContext %}
             <li class="actions-small-1">
                 <div class="list-item">
@@ -139,6 +152,7 @@
                             </ul>
                         {% endif %}
                     </li>
+                {% endfor %}
                 {% endfor %}
                 {% endfor %}
             </ul>
