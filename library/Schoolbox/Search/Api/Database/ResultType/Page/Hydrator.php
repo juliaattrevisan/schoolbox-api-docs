@@ -92,8 +92,14 @@ class Hydrator extends BaseHydrator
                         $folder->getCoverImage()
                             ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
                             : null,
-                        // Icon: dependent on folder type
-                        'folder',
+                        // Icon: dependent on folder type?
+                        match ($match->type) {
+                            self::BASE_TYPE . '.course'    => 'course',
+                            self::BASE_TYPE . '.unit'      => 'unit',
+                            self::BASE_TYPE . '.class'     => 'teacher',
+                            self::BASE_TYPE . '.homepage'  => 'homepage',
+                            default                        => 'folder',
+                        },
                         null,
                         null,
                         $this->folderMapper->findParents($folder, null, true)->getAll(),
