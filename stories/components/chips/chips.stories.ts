@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import StorybookSlot from "../../vue/components/storybook-slot.vue";
+import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
  * Storybook meta data, any default properties that are passed into every story
@@ -7,7 +7,7 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
-    title: "Form/Chips",
+    title: "Components/Form/Chips",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

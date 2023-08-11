@@ -117,7 +117,7 @@ const meta: Meta<typeof DataTable> = {
             handlers: mswHandlers,
         },
     },
-    title: "Tables/DataTable",
+    title: "Components/Tables/DataTable",
 };
 export default meta;
 type Story = StoryObj<typeof DataTable>;
