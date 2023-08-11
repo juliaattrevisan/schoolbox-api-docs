@@ -1,5 +1,5 @@
 /**
- *  sb-grid.scss
+ *  l-grid.scss
  *
  *  Created to house the new css grid based implementation of grid. This file will
  *  hopefully replace the Foundation grid eventually once we land on the Normandy
@@ -53,7 +53,7 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
  *  aren't always easy to convert over to flexibile designs!
 **/
 //  Class used on our parent container to declare it as a grid layout.
-.sb-grid {
+.l-grid {
     /**
      *  If you can support smaller minimum sizes then overwrite grid-template-columns in
      *  another class with smaller minColWidth. For example...
@@ -103,7 +103,7 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 }
 
 //  Support legacy styles and 12 column layout.
-.sb-grid--12 {
+.l-grid--12 {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
 
@@ -162,6 +162,6 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 }
 
 // Override all the foundation set values back to default. Not necessary once Foundation is removed.
-.sb-grid--12 > * {
+.l-grid--12 > * {
     width: 100% !important;
 }
