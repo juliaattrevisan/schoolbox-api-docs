@@ -19,6 +19,7 @@
     </script>
 {% endautoescape %}
 
+{#
 {% if children|length > 0 %}
     <div class="row ">
         <div class="small-12 columns">
@@ -32,7 +33,7 @@
                            data-child-student-button
                            data-userId="{{ child.id }}"
                            data-childFormattedName="{{ childFormattedName }}"
-                           {# Format of data-childYearLevel must match format used below in <span data-heading-user-year>. #}
+                           {# Format of data-childYearLevel must match format used below in <span data-heading-user-year>. #
                            data-childYearLevel="{% if user.year and (user.year.longName(locale.year.proper)|length) %}, {{ user.year.longName(locale.year.proper) }}{% endif %}">
                             {{ childFormattedName }} ({{ campus.name }})
                         </a>
@@ -42,14 +43,15 @@
         </div>
     </div>
 {% endif %}
+#}
 
 <div class="row">
     <div class="small-12 columns">
         <h1>
             Timetable for
             {% apply spaceless %} {# Spaceless required because of comma inside data-heading-user-year span below. #}
-            <span data-heading-user-fullname>{{ user.fullname }}</span>
-            <span data-heading-user-year>{% if user.year and (user.year.longName(locale.year.proper)|length) %}, {{ user.year.longName(locale.year.proper) }}{% endif %}</span>
+                <span data-heading-user-fullname>{{ user.fullname }}</span>
+                <span data-heading-user-year>{% if user.year and (user.year.longName(locale.year.proper)|length) %}, {{ user.year.longName(locale.year.proper) }}{% endif %}</span>
             {% endapply %}
         </h1>
     </div>
@@ -59,9 +61,8 @@
     <div class="small-12 island">
         <section>
             <div id="timetable-calendar">
-                <timetable-calendar :options="{{ children|json_encode }}"/>
+                <timetable-calendar />
             </div>
-            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
-        </section>
-    </div>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
+    </section>
 </div>
