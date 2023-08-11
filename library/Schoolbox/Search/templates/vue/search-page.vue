@@ -20,11 +20,11 @@ useStore().init(props.endpoint, props.filterTypes);
 </script>
 
 <template>
-    <div class="sb-flex-col u-gap--xl">
+    <div class="l-flex-col u-gap--xl">
         <div>
             <sp-input />
         </div>
-        <div class="sb-flex-row u-gap--xl">
+        <div class="l-flex-row u-gap--xl">
             <sp-results />
             <sp-filters />
         </div>

@@ -1,5 +1,5 @@
 /**
- *  sb-flex.scss
+ *  l-flex.scss
  *
  *  This is basically a utility class for us to create flex containers without having to...
  *  a) explicitly create a class definition somewhere
@@ -14,7 +14,7 @@
  *  location. Could we do that if this was the same as "inline styles?"
 **/
 
-.sb-flex {
+.l-flex {
     display: flex;
 
     &-col,

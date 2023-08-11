@@ -7,12 +7,12 @@
     <div>
         <div class="small-12 columns">
             <h1>Rubric Report for {{ dueWork.title }}</h1>
-            <div class="sb-flex sb-flex--spacious">
+            <div class="l-flex l-flex--spacious">
                 <ul class="meta">
                     <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
                     <li class="icon-calendar">Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
                 </ul>
-                <div class="sb-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
+                <div class="l-flex u-gap--m u-padding-m--horiz" style="justify-content: flex-end; align-items: center;">
                     <div class="checklist">
                         <input type="checkbox" id="show-drafts">
                         <label for="show-drafts">
@@ -50,7 +50,7 @@
                     <tr>
                         <td>
                             <div class="wrap-down small-12 ">
-                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="sb-flex sb-flex-col sb-flex--center">
+                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="l-flex l-flex-col l-flex--center">
                                     <div class="img img--m img--round">
                                         <div class="img__wrapper">
                                             {% include 'include/portrait.twig' with {user: participant, description: participant.fullName, class: "rubric-profile"} only %}

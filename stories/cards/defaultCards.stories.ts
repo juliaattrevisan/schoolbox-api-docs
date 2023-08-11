@@ -158,7 +158,7 @@ export const MainSectionTallCentredImage: Story = {
         template: `
             <div class="c-card">
                 <div class="c-card__main">
-                    <div class="c-card__primary-img img sb-flex--center">
+                    <div class="c-card__primary-img img l-flex--center">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
@@ -191,7 +191,7 @@ export const MainSectionNavActionsVerticalAlign: Story = {
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
-                    <nav class="sb-nav-actions sb-flex--center">
+                    <nav class="sb-nav-actions l-flex--center">
                         <a class="icon-modify no-text" href="" title="Modify"></a>
                         <a class="icon-modify no-text" href="" title="Modify"></a>
                         <a class="icon-more no-text" href="" title="Actions"></a>
