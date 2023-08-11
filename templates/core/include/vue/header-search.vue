@@ -308,6 +308,89 @@ function formatPortrait(id: string) {
     padding-left: var(--tabbar-icon-width);
     right: 0;
 }
+
+/**
+ * To account for the side bar, tweaking the position of the
+ * search bar when the side bar is open/closed
+ */
+.inner-wrap:not(.left-open) .c-header-search {
+    &:hover,
+    &.focus {
+        padding-left: calc(var(--tabbar-icon-width) * 2);
+    }
+}
+.inner-wrap.left-open .c-header-search {
+    right: calc(var(--tabbar-icon-width) * 2);
+    &:hover,
+    &.focus {
+        padding-left: calc(var(--tabbar-icon-width) * 2);
+    }
+}
+.inner-wrap:not(.left-open):not(.right-open) .c-header-search,
+.inner-wrap.right-open .c-header-search {
+    right: calc(var(--tabbar-icon-width) * 2);
+    &:hover,
+    &.focus {
+        padding-left: calc(var(--tabbar-icon-width) * 3);
+    }
+}
+.inner-wrap.left-open.right-open .c-header-search {
+    &:hover,
+    &.focus {
+        padding-left: calc(var(--tabbar-icon-width) * 2);
+    }
+}
+// When notifications are disabled
+.disableNotifications .inner-wrap:not(.left-open) .c-header-search {
+    right: var(--tabbar-icon-width);
+
+    &:hover,
+    &.focus {
+        padding-left: calc(var(--tabbar-icon-width) * 2);
+    }
+}
+.disableNotifications .inner-wrap.left-open .c-header-search {
+    right: var(--tabbar-icon-width);
+
+    &:hover,
+    &.focus {
+        padding-left: var(--tabbar-icon-width);
+    }
+}
+
+/**
+ * To account for the notifications panel, tweaking the position of the
+ * search bar when the notifications panel is open/closed
+ */
+.inner-wrap.left-open .c-header-search,
+.inner-wrap.right-open .c-header-search {
+    &:hover,
+    &.focus {
+        padding-left: calc(var(--tabbar-icon-width) * 2);
+    }
+}
+.inner-wrap.left-open .c-header-search {
+    right: calc(var(--tabbar-icon-width) * 2);
+}
+.inner-wrap.right-open .c-header-search {
+    right: var(--tabbar-icon-width);
+    &:hover,
+    &.focus {
+        padding-left: calc(var(--tabbar-icon-width) * 2);
+    }
+}
+.inner-wrap.right-open.left-open .c-header-search {
+    right: var(--tabbar-icon-width);
+    &:hover,
+    &.focus {
+        padding-left: var(--tabbar-icon-width);
+    }
+}
+.right-off-canvas-menu.right-open + .c-header-search {
+    right: 0;
+    padding-left: 0;
+}
+
 .inner-wrap:not(.left-open):not(.right-open) .c-header-search:hover,
 .inner-wrap:not(.left-open):not(.right-open) .c-header-search.focus {
     padding-left: 9rem;

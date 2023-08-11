@@ -74,7 +74,6 @@ $cdn-prefix: "../..";
 @import "ui/button/tabs";
 @import "ui/navigation/navigation";
 @import "ui/navigation/notification"; // requires _button.scss
-@import "ui/forms/search"; // requires _navigation.scss
 @import "ui/navigation/breadcrumb";
 @import "ui/navigation/pagination";
 @import "ui/navigation/sub-nav";
