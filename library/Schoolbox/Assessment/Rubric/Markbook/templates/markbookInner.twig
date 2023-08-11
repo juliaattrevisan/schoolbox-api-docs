@@ -8,7 +8,106 @@
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-<div id="report_actions" class="l-flex u-gap--m l-pad-m--horiz" style="justify-content: flex-end; align-items: center;">
+<style>
+    .rubric-marksheet-container {
+        display: flex; /* ensure left and right tables are always side-by-side */
+    }
+
+    .capability-row,
+    .indicator-row {
+        height: 39px; /* Enforce a fixed height to ensure rows always match up */
+    }
+
+    /**** Styles to force the width of the 2 left columns ****/
+    .scrollable-table-wrap {
+        overflow-x: auto; /* Allow the user to scroll the mark table horizontally (has to be applied to container div, not table) */
+        padding-right: 10rem; /* Make room for diagonal student */
+    }
+
+    .left-columns {
+        margin-top: 10rem; /* This is the height of the student headings on the marksheet, plus a tweak to compensate for borders */
+        width: auto;
+    }
+
+    /**** Styles to force the width of the 2 left columns ****/
+    .left-columns-wrap.drop-shadow {
+        /* Drop shadow to make it easier to understand what's going on when scrolling the other table */
+        -webkit-box-shadow: 15px 0 32px -18px rgba(0, 0, 0, 0.1);
+        -moz-box-shadow: 15px 0 32px -18px rgba(0, 0, 0, 0.1);
+        box-shadow: 15px 0 32px -18px rgba(0, 0, 0, 0.1);
+
+        /* Ensure this element is positioned higher than the right column so the shadow is rendered above the right column */
+        z-index: 1;
+    }
+
+    .assessment {
+        max-width: 200px;
+    }
+
+    .capability,
+    .indicator {
+        max-width: 300px;
+    }
+
+    .assessment,
+    .capability,
+    .indicator {
+        white-space: nowrap; /* Ensures rows in each table stay in line with each other */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+    /**** Style the left columns' headings ****/
+    .assessment,
+    .capability,
+    .indicator,
+    .overall {
+        border: 1px solid #ededed;
+    }
+
+    .left-columns .capability,
+    .left-columns .indicator {
+        border-right-width: 2px;
+    }
+
+    .assessment {
+        font-weight: normal;
+    }
+
+    .indicator {
+        padding-left: 2rem;
+        font-weight: normal;
+    }
+
+    .mark {
+        white-space: nowrap;
+    }
+
+    .no-mark {
+        padding: 0.5rem 1.25rem 0.5rem 0; /* Makes it easier to click on the dashes */
+    }
+
+    .first-summated {
+        border-top: 2px solid #ededed; /* A gap between the body and overall sections */
+    }
+
+    .rubric-marksheet-container #rubric-marksheet.marksheet thead tr:first-child th:last-child {
+        /* The .marksheet class assumes DataTables is in use. This report also uses the .marksheet class to
+        leverage styling, but doesn not use DataTables, so need to undo DataTables specific rules */
+        padding-right: 0 !important;
+    }
+
+    .rubric-checklist > label {
+        margin-bottom: 0 !important;
+    }
+
+    [data-draft-mark] {
+        display: none;
+    }
+</style>
+
+<div id="report_actions" class="l-flex l-gap--m l-pad-m--horiz" style="justify-content: flex-end; align-items: center;">
     <div class="checklist rubric-checklist">
         <input type="checkbox" id="show-drafts">
         <label for="show-drafts">

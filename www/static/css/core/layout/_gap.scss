@@ -6,7 +6,7 @@
 @use "sass:list";
 
 @each $size in $global-sizes {
-    .u-gap--#{$size} {
+    .l-gap--#{$size} {
         gap: var(--whitespace-#{$size});
     }
 }
