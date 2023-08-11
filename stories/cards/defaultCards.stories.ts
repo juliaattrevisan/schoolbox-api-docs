@@ -18,18 +18,18 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img">
+            <div class="c-card">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
-                    <div class="sb-card__main-actions">
+                    <div class="c-card__main-actions">
                         <nav class="sb-nav-actions">
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
@@ -37,7 +37,7 @@ export const Default: Story = {
                         </nav>
                     </div>
                 </div>
-                <div class="sb-card__content">
+                <div class="c-card__content">
                     <article>
                         <p>Come and see why Schoolbox is more than a school.&nbsp;&nbsp;You can find out more about the broad range of learning experiences offered - from academia,
                             internationalism and earth studies, to sensational music, theatre and sport.&nbsp; Talk to students, staff&nbsp;and parents to learn more at Open Day.&nbsp;&nbsp;<br><br>Caulfield
@@ -50,7 +50,7 @@ export const Default: Story = {
                         <p>Of course tours are available at any time. Please&nbsp;<a href="http://www.schoolbox.com.au" target="_self">contact us</a>&nbsp;to arrange an appointment.</p>
                     </article>
                 </div>
-                <div class="sb-card__actions">
+                <div class="c-card__actions">
                     <a>READ MORE</a>
                     <a>ANOTHER ACTION</a>
                 </div>
@@ -62,7 +62,7 @@ export const Default: Story = {
 export const NavActions: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
+            <div class="c-card">
                 <nav class="sb-nav-actions">
                     <a class="icon-modify no-text" href="" title="Modify"></a>
                     <a class="icon-modify no-text" href="" title="Modify"></a>
@@ -76,8 +76,8 @@ export const NavActions: Story = {
 export const CardActions: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
-                <div class="sb-card__actions">
+            <div class="c-card">
+                <div class="c-card__actions">
                     <a>READ MORE</a>
                     <a>ANOTHER ACTION</a>
                 </div>
@@ -89,14 +89,14 @@ export const CardActions: Story = {
 export const MainSection: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img">
+            <div class="c-card">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
@@ -112,14 +112,14 @@ export const MainSection: Story = {
 export const MainSectionLoading: Story = {
     render: () => ({
         template: `
-            <div class="sb-card sb-card--loading">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img">
+            <div class="c-card c-card--loading">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img">
                         <div class="img__wrapper">
                             <div class="img-placeholder"></div>
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <h3></h3>
                         <span></span>
                     </div>
@@ -132,14 +132,14 @@ export const MainSectionLoading: Story = {
 export const MainSectionTall: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img">
+            <div class="c-card">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
@@ -156,14 +156,14 @@ export const MainSectionTall: Story = {
 export const MainSectionTallCentredImage: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img sb-flex--center">
+            <div class="c-card">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img sb-flex--center">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
@@ -180,14 +180,14 @@ export const MainSectionTallCentredImage: Story = {
 export const MainSectionNavActionsVerticalAlign: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img">
+            <div class="c-card">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
@@ -205,14 +205,14 @@ export const MainSectionNavActionsVerticalAlign: Story = {
 export const MainSectionIcon: Story = {
     render: () => ({
         template: `
-            <div class="sb-card">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img">
+            <div class="c-card">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img">
                         <div class="img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
@@ -225,14 +225,14 @@ export const MainSectionIcon: Story = {
 export const SubItem: Story = {
     render: () => ({
         template: `
-            <div class="sb-card sb-card--subitem">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img--s">
+            <div class="c-card c-card--subitem">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h6 class="">How cool is this dog?</h6></a>
                         <span class="meta">Last updated 3 weeks ago</span>
                     </div>
@@ -245,14 +245,14 @@ export const SubItem: Story = {
 export const SubItemIcon: Story = {
     render: () => ({
         template: `
-            <div class="sb-card sb-card--subitem">
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img--s">
+            <div class="c-card c-card--subitem">
+                <div class="c-card__main">
+                    <div class="c-card__primary-img img img--s">
                         <div class="img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
+                    <div class="c-card__main-content">
                         <a href=""><h6 class="">How cool is this dog?</h6></a>
                         <span class="meta">Last updated 3 weeks ago</span>
                     </div>
@@ -265,54 +265,54 @@ export const SubItemIcon: Story = {
 export const CardList: Story = {
     render: () => ({
         template: `
-            <div class="sb-card-list">
-                <div class="sb-card">
-                    <div class="sb-card__main">
-                        <div class="sb-card__primary-img img">
+            <div class="c-card-list">
+                <div class="c-card">
+                    <div class="c-card__main">
+                        <div class="c-card__primary-img img">
                             <div class="img__wrapper">
                                 <div class="icon icon-house"></div>
                             </div>
                         </div>
-                        <div class="sb-card__main-content">
+                        <div class="c-card__main-content">
                             <a href=""><h3 class="">Year 12 Biology (BIO12)</h3></a>
                             <span class="meta"><a href="">Courses</a> > <a href="">Senior Courses</a> > <a href="">English</a> > <a href="">Year 12 Biology</a></span>
                         </div>
                     </div>
                 </div>
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img--s">
+                <div class="c-card c-card--subitem">
+                    <div class="c-card__main">
+                        <div class="c-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
-                        <div class="sb-card__main-content">
+                        <div class="c-card__main-content">
                             <a href=""><h6 class="">How cool is this dog?</h6></a>
                             <span class="meta">Last updated 1 week ago</span>
                         </div>
                     </div>
                 </div>
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img--s">
+                <div class="c-card c-card--subitem">
+                    <div class="c-card__main">
+                        <div class="c-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/96/96" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
-                        <div class="sb-card__main-content">
+                        <div class="c-card__main-content">
                             <a href=""><h6 class="">What about this one?</h6></a>
                             <span class="meta">Last updated 2 weeks ago</span>
                         </div>
                     </div>
                 </div>
-                <div class="sb-card sb-card--subitem">
-                    <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img--s">
+                <div class="c-card c-card--subitem">
+                    <div class="c-card__main">
+                        <div class="c-card__primary-img img img--s">
                             <div class="img__wrapper">
                                 <img src="https://placedog.net/108/108" alt="Placedog 64 by 64 image" />
                             </div>
                         </div>
-                        <div class="sb-card__main-content">
+                        <div class="c-card__main-content">
                             <a href=""><h6 class="">Isn't this one cool too?</h6></a>
                             <span class="meta">Last updated 3 weeks ago</span>
                         </div>

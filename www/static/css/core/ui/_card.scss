@@ -1,5 +1,5 @@
 /**
- *  sb-card.scss
+ *  c-card.scss
  *
  *  Modern styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
  *
@@ -14,7 +14,7 @@
  *  tab in the pantry, for example) and some of the really unique cards we have across the platform
 */
 
-.sb-card {
+.c-card {
     // Should this be transparent?
     background-color: white;
     // Control radius from custom property
@@ -100,7 +100,7 @@
         background-color: #f6f6f6;
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
         padding: var(--whitespace-xs);
-        .sb-card__main-content {
+        .c-card__main-content {
             padding-block-start: 0;
             padding-block-end: 0;
         }
@@ -129,7 +129,7 @@
         @include skeleton-background-gradient;
         animation: shine-lines 1.6s ease infinite !important;
         background-size: 400% 100% !important;
-        .sb-card__main {
+        .c-card__main {
             background-color: white;
         }
         .img-placeholder,
@@ -156,12 +156,12 @@
 }
 
 /* A list to contain all these cards. It just adds a bottom border to everything except the last item. */
-.sb-card-list {
+.c-card-list {
     display: flex;
     flex-direction: column;
     margin: 0;
 
-    .sb-card:not(:last-child) {
+    .c-card:not(:last-child) {
         border-block-end: 1px solid rgba(0, 0, 0, 0.2);
     }
 }
