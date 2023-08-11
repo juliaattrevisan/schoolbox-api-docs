@@ -13,10 +13,10 @@ use Alaress\Html\ToText;
 use Alaress\Image\Transformation\Storage;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
-use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
@@ -74,15 +74,47 @@ class Hydrator extends BaseHydrator
             return [];
         }
 
-        // Filter out articles which the user doesn't have permission to read
-        $newsFeed            = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
-        $permittedArticleIds = $newsFeed->find($viewer, News\Model::STATE_PUBLIC, false);
-        if (empty($permittedArticleIds)) {
-            return [];
+        // Filter out articles depending on the viewer's attributes:
+        // * superusers view all articles
+        // * users with the news service permission view all articles
+        $filterArticleIds = true;
+        if ($viewer->isSuperuser()) {
+            $filterArticleIds = false;
+        } else {
+            $viewerServices = $viewer->getAccessList();
+            foreach ($viewerServices as $service) {
+                if ($service->getService() === UserAccess::SERVICE_NEWS) {
+                    $filterArticleIds = false;
+                    break;
+                }
+            }
+        }
+
+        if ($filterArticleIds) {
+            // Filter out articles which the user doesn't have permission to read
+            $newsFeed            = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
+            $permittedArticleIds = $newsFeed->find($viewer, News\Model::STATE_PUBLIC, false);
+
+            // In addition: find any articles which are in a folder the user has
+            // permission to read, via having read permissions via their role
+            $permittedArticleIds = array_values(
+                array_unique(
+                    array_merge(
+                        $permittedArticleIds,
+                        $this->newsMapper->findArticleIdsForRole($viewer->getRole(), $articleIds),
+                    )
+                )
+            );
+
+            if (empty($permittedArticleIds)) {
+                return [];
+            }
+
+            $articleIds = array_intersect($articleIds, $permittedArticleIds);
         }
 
         // Find the given articles
-        $articles = $this->newsMapper->findByColumn('id', array_intersect($articleIds, $permittedArticleIds));
+        $articles = $this->newsMapper->findByColumn('id', $articleIds);
 
         // And map them to a full result
         $fullResults = array_map(
