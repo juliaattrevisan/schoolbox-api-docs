@@ -207,7 +207,7 @@
                             {% endif %}
                         </th>
                         {% if rankEnabled %}
-                            <td>
+                            <td class='course-ranking'>
                                 {% if rank[student.id] is defined and publishedNormMark %}
                                     {# check if the rank object exits, and there is / was a mean score #}
                                     {{ rank[student.id] }}
