@@ -53,5 +53,5 @@ function onClickChildStudentButton(ev) {
     const childName = anchor.getAttribute("data-childFormattedName");
     const yearLevel = anchor.getAttribute("data-childYearLevel");
     document.querySelector("[data-heading-user-fullname]").innerHTML = childName;
-    document.querySelector("[data-heading-user-year]").innerHTML = yearLevel == "" ? "" : ", " + yearLevel;
+    document.querySelector("[data-heading-user-year]").innerHTML = yearLevel == "" ? "" : yearLevel;
 }
