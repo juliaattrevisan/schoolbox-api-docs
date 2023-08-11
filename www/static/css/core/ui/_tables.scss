@@ -446,9 +446,9 @@ $rotate-span-width: 11rem;
 
 // Prevent long names causing first column to be excessively wide.
 table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
+    max-width: 200px;
     overflow: hidden;
     white-space: normal;
-    max-width: 200px;
 }
 
 // Prevent grades from wrapping over two lines
