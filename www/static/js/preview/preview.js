@@ -147,6 +147,13 @@
                                                     gallery.$inner.selector
                                                         .querySelector(".lg-current")
                                                         .appendChild(fragmentDiv);
+
+                                                    // As we have manipulated the contents of the lightbox ourselves, LightGallery
+                                                    // will have no idea to change the download link to the correct URL, so we need
+                                                    // to do it ourselves. Uses optional chaining to ensure the download link exists.
+                                                    gallery.$toolbar.selector
+                                                        .querySelector("[download]")
+                                                        ?.setAttribute("href", href);
                                                 });
 
                                                 gallery.openGallery();
