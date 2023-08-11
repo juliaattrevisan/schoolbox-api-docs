@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * The search bar that currently appears within the top menu.
+ * It is currently used to search for users and prompt a full search,
+ * providing the option to be redirected to the search page.
+ */
 import debounce from "lodash/debounce";
 import { vOnClickOutside } from "@vueuse/components";
 import SearchInput from "@schoolboxVue/components/search/search-input.vue";
@@ -269,130 +274,5 @@ function formatPortrait(id: string) {
 </template>
 
 <style lang="scss" scoped>
-.c-header-search {
-    margin: 0;
-    position: absolute;
-    right: var(--tabbar-icon-width);
-    top: 0;
-    width: var(--tabbar-height);
-    z-index: 1000;
-    ::placeholder {
-        color: transparent;
-        font-weight: normal;
-    }
-    &:hover,
-    &.focus {
-        width: 100%;
-        padding-left: calc(var(--tabbar-icon-width) * 2);
-        ::placeholder {
-            color: black;
-            font-weight: normal;
-        }
-    }
-
-    .c-search-input__field {
-        opacity: 0; // is initially hidden until user interacts with
-    }
-
-    .results {
-        border: 2px solid var(--navigation-hover);
-        border-top: 0;
-        h3 {
-            margin: 0; // clear .tab-bar h3 margins
-        }
-    }
-}
-
-// When notifications are disabled
-.disableNotifications .c-header-search {
-    padding-left: var(--tabbar-icon-width);
-    right: 0;
-}
-
-/**
- * To account for the side bar, tweaking the position of the
- * search bar when the side bar is open/closed
- */
-.inner-wrap:not(.left-open) .c-header-search {
-    &:hover,
-    &.focus {
-        padding-left: calc(var(--tabbar-icon-width) * 2);
-    }
-}
-.inner-wrap.left-open .c-header-search {
-    right: calc(var(--tabbar-icon-width) * 2);
-    &:hover,
-    &.focus {
-        padding-left: calc(var(--tabbar-icon-width) * 2);
-    }
-}
-.inner-wrap:not(.left-open):not(.right-open) .c-header-search,
-.inner-wrap.right-open .c-header-search {
-    right: calc(var(--tabbar-icon-width) * 2);
-    &:hover,
-    &.focus {
-        padding-left: calc(var(--tabbar-icon-width) * 3);
-    }
-}
-.inner-wrap.left-open.right-open .c-header-search {
-    &:hover,
-    &.focus {
-        padding-left: calc(var(--tabbar-icon-width) * 2);
-    }
-}
-// When notifications are disabled
-.disableNotifications .inner-wrap:not(.left-open) .c-header-search {
-    right: var(--tabbar-icon-width);
-
-    &:hover,
-    &.focus {
-        padding-left: calc(var(--tabbar-icon-width) * 2);
-    }
-}
-.disableNotifications .inner-wrap.left-open .c-header-search {
-    right: var(--tabbar-icon-width);
-
-    &:hover,
-    &.focus {
-        padding-left: var(--tabbar-icon-width);
-    }
-}
-
-/**
- * To account for the notifications panel, tweaking the position of the
- * search bar when the notifications panel is open/closed
- */
-.inner-wrap.left-open .c-header-search,
-.inner-wrap.right-open .c-header-search {
-    &:hover,
-    &.focus {
-        padding-left: calc(var(--tabbar-icon-width) * 2);
-    }
-}
-.inner-wrap.left-open .c-header-search {
-    right: calc(var(--tabbar-icon-width) * 2);
-}
-.inner-wrap.right-open .c-header-search {
-    right: var(--tabbar-icon-width);
-    &:hover,
-    &.focus {
-        padding-left: calc(var(--tabbar-icon-width) * 2);
-    }
-}
-.inner-wrap.right-open.left-open .c-header-search {
-    right: var(--tabbar-icon-width);
-    &:hover,
-    &.focus {
-        padding-left: var(--tabbar-icon-width);
-    }
-}
-.right-off-canvas-menu.right-open + .c-header-search {
-    right: 0;
-    padding-left: 0;
-}
-
-.inner-wrap:not(.left-open):not(.right-open) .c-header-search:hover,
-.inner-wrap:not(.left-open):not(.right-open) .c-header-search.focus {
-    padding-left: 9rem;
-}
+@import "./header-search.scss";
 </style>
