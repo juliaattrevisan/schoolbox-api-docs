@@ -51,53 +51,6 @@ function removeValidation() {
 }
 
 /**
- * if the editor is inside a reveal modal, we need to make sure
- * the balloon is on top of the modal, otherwise it will be hidden underneath
- *
- * @param { Editor } editor - the CKEditor instance
- */
-function checkForModal(editor: Editor) {
-    // a modal is typically set to 1005, so we need to be higher than that
-    const zIndex = "1010";
-    if (editor.sourceElement.closest("[data-reveal]")) {
-        const contextualBalloon = editor.plugins.get("ContextualBalloon");
-        // fired when the balloon is shown or hidden by any UI
-        contextualBalloon.on("change:visibleView", (eventInfo, name, value) => {
-            const balloonElement = value?.element.parentElement.parentElement.parentElement;
-            if (balloonElement && balloonElement.style.zIndex !== zIndex) {
-                balloonElement.style.zIndex = zIndex;
-                // we also need to add the editor id to the balloon so we can potentially access it later
-                balloonElement.setAttribute("data-baloon-editor-id", editor.id);
-            }
-        });
-    }
-}
-
-/**
- * Some items in the toolbar are panels that display the items within horizontally.
- * These panels can be hidden underneath the notifications menu when its open.
- * So we should align them so the right edge of the panel is aligned with the right edge of the button.
- * Due to the current setup of the toolbar, we can keep this positioning regardless of whether the
- * notifications panel is pinned or not.
- * 		         [ Button ]
- *		+-----------------+
- *		|      Panel      |
- *		+-----------------+
- *
- * @param { Editor } editor - the CKEditor instance
- */
-function updatePanelPositions(editor: Editor) {
-    const buttonTitles = ["Insert media", "Emoji", "Insert table", "Other"];
-    const toolbarItems = editor.ui.view.toolbar.items._items;
-    toolbarItems.forEach((item) => {
-        if (buttonTitles.includes(item.buttonView?.label)) {
-            // refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#static-member-defaultPanelPositions
-            item.panelPosition = "sw";
-        }
-    });
-}
-
-/**
  * Once the iFramely script has loaded, we can add in the event listener
  *
  * @param { Editor } editor - the CKEditor instance
@@ -182,8 +135,6 @@ export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, c
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
-    checkForModal(editor);
-    updatePanelPositions(editor);
     await addIframelyEmbed(config, editor);
     await attachInspector(editor);
 }
