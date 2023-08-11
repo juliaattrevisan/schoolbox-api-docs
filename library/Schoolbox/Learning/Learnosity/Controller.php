@@ -751,20 +751,66 @@ class Controller extends Base
             }
         }
 
-        $payload = [
+        $reportPayload = [
             'reports' => [
                 [
                     'id' => 'horizontal-marking',
                     'type' => 'response-analysis-by-item',
                     'session_ids' => array_values($sessions),
-                    'users' => array_values($users)
-                ]
+                    'users' => array_values($users),
+                    'render' => true
+                ],
             ]
         ];
 
+        /* These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
+         */
+        $responseData = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => array_values($sessions)
+        ]);
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+        $learnosityReferences = [];
+
+        foreach ($responseData['data'] as $userData) {
+            $userId = $userData['user_id'];
+
+            /* Init their data struct if it didn't already exist
+             * We'll pile in (learnosity reference, scores) tuples here
+             */
+            if (!isset($scores[$userId])) {
+                $scores[$userId] = [];
+            }
+
+            /* Shank each score for each question for this user
+             */
+            foreach ($userData['responses'] as $response) {
+                $responseId = $response['response_id'];
+
+                /* We need to fetch our locally-stored comment for this reference
+                 */
+                $learnosityReferences[] = $responseId;
+
+                $scores[$userId][$responseId] = [
+                    'score' => $response['score'],
+                    'max' => $response['max_score']
+                ];
+            }
+        }
+
+        /* Find all the comments for this attempt
+         */
+        $comments = $this->feedbackMapper->findByLearnosityReferences($learnosityReferences);
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload),
+            'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
+            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
+            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
