@@ -12,7 +12,7 @@ INSERT INTO component_definition (
 ) VALUES (
              'Lesson Plans',
              'Schoolbox\\Learning\\Component\\Dashboard\\CurrentLessonPlanController',
-             'Shows the current Lesson Plans for the user',
+             'Shows the current lesson plans for the user',
              'dashboard',
              3, # Learning
              'true',
@@ -31,7 +31,7 @@ INSERT INTO component_config_definition (
              (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Dashboard\\CurrentLessonPlanController'),
              'range',
              0,
-             'Visibility Range',
+             'Display Range',
              null
 #          commented out as the AC does not require additional config options...
 #          ), (

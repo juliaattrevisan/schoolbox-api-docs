@@ -258,4 +258,42 @@ class Mapper extends \Schoolbox\Mapper
             $lessonPlan->setUpdatedBy($this->getSessionUser());
         }
     }
+
+    /**
+     * Get all lesson plans from a list of folders
+     * between specified dates
+     * and ensuring we are only returning lesson plans that are visible to the user
+     *
+     * @param array $folderIDs list of folders to gather all lesson plans from within
+     * @param \Alaress_Date_Format $startDate
+     * @param \Alaress_Date_Format $endDate
+     * @param \Alaress_Date_Format $publishDate
+     * @param bool $allowStudents should we return only student visible plans? or all plans?
+     * @return array<int> array of the assessment ID's for the lesson plans
+     */
+    public function findForFolder(array $folderIDs, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, \Alaress_Date_Format $publishDate, bool $allowStudents = false): array
+    {
+        $pb = $this->getDatabase()
+            ->buildPredicateBuilder('')
+            ->betweenDates('assessment.due_date', $startDate, $endDate)
+            ->lessThanOrEqualTo('assessment.publish_date', $publishDate->getDatabase())
+            ->in('mv_assessment_relation.folder_id', $folderIDs);
+
+        // Are we limiting to lesson plans visible to students? or staff only?
+        if ($allowStudents) {
+            $pb->equals('lesson_plan.visibility', 'student');
+        }
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+        $query       = "
+            SELECT * FROM assessment
+            JOIN lesson_plan ON (assessment.id = lesson_plan.assessment_id)
+            JOIN mv_assessment_relation on assessment.id = mv_assessment_relation.assessment_id
+            WHERE {$whereClause}
+            ";
+        $statement   = $this->getDatabase()->executeQuery($query, $pb->getParams());
+
+        // Return only the assessment ID's
+        return $statement->fetchColumnArray('assessment_id');
+    }
 }

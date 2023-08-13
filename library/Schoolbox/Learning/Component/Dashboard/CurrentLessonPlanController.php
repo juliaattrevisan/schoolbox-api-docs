@@ -2,15 +2,10 @@
 
 namespace Schoolbox\Learning\Component\Dashboard;
 
-use Alaress\Database\Connector\IConnector;
 use Component_Dashboard_ControllerAbstract;
-use Schoolbox\Collection;
-use Schoolbox\External\SubjectCollection;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
-use Schoolbox\Learning\Assessment\Visibility;
 
 class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 {
@@ -22,19 +17,14 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
      *
      * @var int
      */
-    private $range;
+    private int $range;
 
     /**
-     * The upcoming Quiz + DueWork that are visible to this Student
+     * The lesson plans visible to the user
      *
-     * @var array
+     * @var GenericCollection|IAssessable[]
      */
-    private array $visibleLessonPlans = [];
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentDataSource;
+    private GenericCollection|array $visibleLessonPlans;
 
     /**
      * Business logic to collate data ready for output
@@ -47,14 +37,6 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-
-        $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
-
-        $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
-        $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
-
-        $this->assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
-
         $student = $this->getUser();
 
         /**
@@ -65,76 +47,21 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
             return false;
         }
 
-        /** @var IConnector $database */
-        $database = $this->getSitePage()->getDi()->get('databaseInternal');
-        $pb          = $database
-            ->buildPredicateBuilder('')
-            ->betweenDates('assessment.due_date', $dateStart, $dateEnd)
-            ->in('mv_assessment_relation.folder_id', $student->getSubjectCollection()->getIds());
+        $lessonPlanMapper = LessonPlanMapper::getInstance();
+        $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
-        // set visibility check to be student for student...
-        if ($this->getUser()->getRole()->isStudent()) {
-            $pb->equals('lesson_plan.visibility', 'student');
-        }
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $query       = "
-            SELECT * FROM assessment
-            JOIN lesson_plan ON (assessment.id = lesson_plan.assessment_id)
-            JOIN mv_assessment_relation on assessment.id = mv_assessment_relation.assessment_id
-            WHERE {$whereClause}
-            ";
-        $statement   = $database->executeQuery($query, $pb->getParams());
+        $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
 
-        $assessmentIds = [];
-        while ($row = $statement->fetch()) {
-            $assessmentIds[] = $row['assessment_id'];
-        }
+        $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
+        $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
+        $publishDate = \Alaress_Date_Format::now();
 
-        $plans = $this->assessmentDataSource->findAllByIds($assessmentIds);
+        // grab the assessmentID for all lesson plans from the students subject list
+        $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
+        // hydrate those assessments
+        $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'ASC']]);
 
-        /** @var LessonPlanModel $lessonPlan **/
-        foreach ($plans as $lessonPlan) {
-            $params =  [
-                'assessmentId' => $lessonPlan->getId(),
-                'assessment'   => $lessonPlan,
-                'studentId'    => $student->getId(),
-                'student'      => $student,
-            ];
-
-            //build array
-            $this->visibleLessonPlans[] = [
-                'title' => $lessonPlan->getTitle(),
-                'dueDate' => $lessonPlan->getDueAt(),
-                'className' => $lessonPlan->getContext()->getFolder()->getTitle(),
-                'classColour' => $lessonPlan->getContext()->getFolder()->getColour(),
-                '_links' => [
-                    'assessment' => $this->getRouteGenerator()->generate('learningAssessment.getSummary', $params),
-                    'folder' => sprintf("/homepage/%s", $lessonPlan->getContext()->getFolder()->getId()),
-                ]
-            ];
-        }
-
-        // sort by dueDate
-        usort($this->visibleLessonPlans, function ($a, $b) {
-            return $a['dueDate'] <=> $b['dueDate'];
-        });
-
-        //        return true;
         return \count($this->visibleLessonPlans) > 0;
-        /**
-         * return array should be similar to:
-         * ```
-         * [{
-         * 'title': 'Lesson Plan Title',
-         * 'dueDate': '2023-07-21 11:13:56Z',
-         * 'class': 'class Name',
-         * 'classColour': '#FFFFFF',
-         * 'url': 'https://vagrant.dev.schoolbox.cloud/learning/assessments/434/1'
-         * },
-         * ]
-         * ```
-         *
-         */
     }
 
     /**

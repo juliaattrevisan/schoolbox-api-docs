@@ -10,7 +10,7 @@ class Component_Config_Range extends Component_Config_Abstract
     protected function getOptions(): array
     {
         return [
-            0 => 'Today',
+            0 => 'Today Only',
             1 => '1 Day',
             2 => '2 Days',
             3 => '3 Days'
