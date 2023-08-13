@@ -150,7 +150,7 @@ table {
         }
     }
     .profile-cell {
-        min-width: 160px !important; /* 160px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
+        min-width: 180px !important; /* 180px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
         padding: 0;
 
         .card img {
@@ -259,10 +259,6 @@ $rotate-span-width: 11rem;
     width: 100%;
 }
 
-.diagonal-headings-table-container table {
-    width: 98%; /* Not 100% so that the rightmost column sloped heading is not completely hidden. */
-}
-
 .diagonal-headings-table {
     thead {
         tr.rotate-headers {
@@ -290,10 +286,6 @@ $rotate-span-width: 11rem;
         tr.average-headers {
             th.average-expander {
                padding: 0.5rem !important;
-            }
-
-            th {
-                background-color: $white !important;
             }
         }
 
@@ -323,13 +315,17 @@ $rotate-span-width: 11rem;
     }
 
     th.fixed-left {
-        position: sticky;
-        left: 0;
+        @media #{$medium-up} {
+            position: sticky;
+            left: 0;
+        }
         z-index: 2; /* Z-index for left cells. */
     }
 
     th.fixed-left:nth-child(2) {
-        left: 160px; /* 160px to match width of a .profile-cell table cell. */
+        @media #{$medium-up} {
+            left: 180px; /* 180px to match width of a .profile-cell table cell. */
+        }
     }
 
     td,
@@ -458,6 +454,14 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 // Prevent grades from wrapping over two lines
 .marksheet .student-grade-cell {
     white-space: nowrap;
+}
+
+.marksheet [data-pop-out-menu] {
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--content-ui-hover);
+    }
 }
 
 // dataTables

@@ -15,6 +15,10 @@
    padding-right: 1rem;
 }
 
+#courseMarkbookContent td.course-ranking {
+    text-align: right;
+}
+
 #courseMarkbookContent,
 #report_content,
 .marksheet {
@@ -123,7 +127,6 @@
             text-align: center;
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
-            border-right: 1px solid #eee;
         }
         .course-headers th.transparent {
             background: $body-bg;

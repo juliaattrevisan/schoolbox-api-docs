@@ -18,7 +18,6 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learning/macro/markDecorator.twig' as decorator %}
 
-
     <div class="actions-small-1 small-12 columns">
         {% if not courseSpec.courseImplementations|length %}
         {% set importUrl = routeLookup('courseImport.getImport', {courseSpecId: courseSpec.id, folderId: 0, componentId: 0}) %}
@@ -123,7 +122,11 @@
             </thead>
             <tbody>
             <tr>
-                <th colspan="{% if rankEnabled %}3{% else %}2{% endif %}" class="course-row class-row-heading fixed-left">Course Average <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span></th>
+                <th class="course-row class-row-heading fixed-left">Course Average <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span></th>
+                <th class="course-row fixed-left"></th>
+                {% if rankEnabled %}
+                    <th></th>
+                {% endif %}
                 {% for assessment in collapsedAssessments %}
                     {% if assessment.isSpecification %}
                         <td class="course-row">
@@ -146,7 +149,11 @@
             </tr>
             {% for courseImpl in courseImpls %}
                 <tr>
-                    <th colspan="{% if rankEnabled %}3{% else %}2{% endif %}" class="class-row class-row-heading fixed-left"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></th>
+                    <th class="class-row class-row-heading fixed-left"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></th>
+                    <th class="class-row fixed-left"></th>
+                    {% if rankEnabled %}
+                        <th></th>
+                    {% endif %}
                     {% for assessment in collapsedAssessments %}
                         {% if courseImportAssessments[courseImpl.id][assessment.id] is defined %}
                             {% set assessmentImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
@@ -200,7 +207,7 @@
                             {% endif %}
                         </th>
                         {% if rankEnabled %}
-                            <td>
+                            <td class='course-ranking'>
                                 {% if rank[student.id] is defined and publishedNormMark %}
                                     {# check if the rank object exits, and there is / was a mean score #}
                                     {{ rank[student.id] }}
