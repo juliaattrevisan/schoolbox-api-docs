@@ -81,7 +81,7 @@ class UserGroupMembershipCest
             $i->sendPostAsJson("/api/user/{$newMember->getId()}/group/{$newGroup->getId()}", $data);
 
             if ($user->isSuperuser()) {
-                $i->seeResponseCodeIs(200);
+                $i->seeResponseCodeIs(201);
 
                 $i->sendGet("/api/user/{$newMember->getId()}/group/{$newGroup->getId()}", []);
                 $i->seeResponseContainsJson(['membership' => 'read']);

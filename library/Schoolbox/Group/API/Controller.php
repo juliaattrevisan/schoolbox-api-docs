@@ -60,7 +60,7 @@ class Controller extends Base
      * Returns group memberships for a user
      *
      * @param User $user
-     * @api  /user/{userId}/group
+     * @api  GET /user/{userId}/group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipSearch
      */
     public function apiMembership(User $user)
@@ -115,7 +115,7 @@ class Controller extends Base
                        ->setFolder($group->getFolder())
                        ->setService(UserAccess::SERVICE_HOMEPAGE);
         }
-        $this->processGroupPostData($userAccess, $user, $group, false);
+        $this->processGroupPostData($userAccess, $user, $group, false, 201);
     }
 
     /**
@@ -133,7 +133,7 @@ class Controller extends Base
             $this->sendJsonError('User does not exist in the group', 409);
             return;
         }
-        $this->processGroupPostData($userAccess, $user, $group, false);
+        $this->processGroupPostData($userAccess, $user, $group, false, 200);
     }
 
     /**
@@ -151,7 +151,7 @@ class Controller extends Base
             $this->sendJsonError('User does not exist in the group', 409);
             return;
         }
-        $this->processGroupPostData($userAccess, $user, $group, true);
+        $this->processGroupPostData($userAccess, $user, $group, true, 200);
     }
 
     /**
@@ -160,9 +160,10 @@ class Controller extends Base
      * @param User            $user
      * @param Group           $group
      * @param bool            $isPatch set false to check full parameters
+     * @param int             $responseCode
      * @return void
      */
-    private function processGroupPostData(UserGroupAccess $userAccess, User $user, Group $group, bool $isPatch)
+    private function processGroupPostData(UserGroupAccess $userAccess, User $user, Group $group, bool $isPatch, int $responseCode)
     {
         $post = $this->request->getParsedBody();
 
@@ -199,7 +200,7 @@ class Controller extends Base
             }
         }
         $output         = (new ModelToArray())($newAccess);
-        $this->response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson($output)->withStatus($responseCode);
     }
 
     /**
