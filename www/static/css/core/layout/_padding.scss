@@ -11,33 +11,33 @@
             padding: var(--whitespace-#{$size});
 
             &--horiz {
-                padding-block-end: var(--whitespace-#{$size});
-                padding-block-start: var(--whitespace-#{$size});
+                padding-inline-end: var(--whitespace-#{$size});
+                padding-inline-start: var(--whitespace-#{$size});
             }
 
             &--vert {
-                padding-top: var(--whitespace-#{$size});
-                padding-bottom: var(--whitespace-#{$size});
-            }
-
-            &--top {
-                padding-top: var(--whitespace-#{$size});
-            }
-
-            &--bottom {
-                padding-bottom: var(--whitespace-#{$size});
-            }
-
-            &--start {
+                padding-block-end: var(--whitespace-#{$size});
                 padding-block-start: var(--whitespace-#{$size});
             }
 
-            &--end {
+            &--top {
+                padding-block-start: var(--whitespace-#{$size});
+            }
+
+            &--bottom {
                 padding-block-end: var(--whitespace-#{$size});
+            }
+
+            &--left {
+                padding-inline-start: var(--whitespace-#{$size});
+            }
+
+            &--right {
+                padding-inline-end: var(--whitespace-#{$size});
             }
         }
     }
-    &--none {
+    &--0 {
         padding: 0;
     }
 }

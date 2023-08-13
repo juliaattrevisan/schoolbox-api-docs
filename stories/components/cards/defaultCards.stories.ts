@@ -22,29 +22,27 @@ export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
 /**
- * Standard card implementation
+ * Standard card implementation with all features displayed.
  */
-export const Default: Story = {
+export const Standard: Story = {
     render: () => ({
         template: `
             <div class="c-card">
                 <div class="l-flex-row l-gap-m">
-                    <div class="c-img">
+                    <div class="c-img c-img--l">
                         <div class="c-img__wrapper">
-                            <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                            <img src="/news.jpg" alt="Band playing music" />
                         </div>
                     </div>
-                    <div class="l-flex-col l-flex--center-justify l-flex__item--1 f-no-margins">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
-                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                    <div class="l-flex-col l-flex--center-justify l-flex__item--1 l-pad-s--vert f-no-margins">
+                        <h3 class=""><a href="">School Musical Auditions & Rehearsals</a></h3>
+                        <p class="meta"><span>By  <a href="/search/user/6">Willow Tenorio</a></span> <span>—<time title="Monday August 7th 2023 5:00am">1 week ago</time></span> <span>in <a>Extra-Curricular</a></p>
                     </div>
-                    <div class="c-card__main-actions">
-                        <nav class="c-nav-actions l-flex-row">
-                            <a class="icon-view no-text" href="" title="Hide"></a>
-                            <a class="icon-modify no-text" href="" title="Modify"></a>
-                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
-                        </nav>
-                    </div>
+                    <nav class="c-nav-actions l-flex-row">
+                        <a class="icon-view no-text" href="" title="Hide"></a>
+                        <a class="icon-modify no-text" href="" title="Modify"></a>
+                        <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                    </nav>
                 </div>
                 <div class="l-pad-m">
                     <article>
@@ -59,7 +57,7 @@ export const Default: Story = {
                         <p>Of course tours are available at any time. Please&nbsp;<a href="http://www.schoolbox.com.au" target="_self">contact us</a>&nbsp;to arrange an appointment.</p>
                     </article>
                 </div>
-                <div class="c-card__actions">
+                <div class="c-card__actions l-flex-row">
                     <a>READ MORE</a>
                     <a>ANOTHER ACTION</a>
                 </div>
@@ -68,38 +66,23 @@ export const Default: Story = {
     }),
 };
 
-export const ImageAndText: Story = {
+/**
+ * Features can be removed for a more slimline card.
+ *
+ * Icons can also be used by replacing the `<img>` tag with a `<div class="icon icon-calendar"></div>`.
+ */
+export const Slimline: Story = {
     render: () => ({
         template: `
-            <div class="c-card">
+            <div class="c-card l-pad-xs">
                 <div class="l-flex-row l-gap-m">
                     <div class="c-img">
-                        <div class="c-img__wrapper">
-                            <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
-                        </div>
-                    </div>
-                    <div class="l-flex-col l-flex--center-justify f-no-margins">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
-                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const IconAndText: Story = {
-    render: () => ({
-        template: `
-            <div class="c-card">
-                <div class="l-flex-row l-gap-m">
-                    <div class="c-img l-pad-s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
                     <div class="l-flex-col l-flex--center-justify f-no-margins">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                        <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
                 </div>
@@ -108,129 +91,56 @@ export const IconAndText: Story = {
     }),
 };
 
-export const ImageAndTallText: Story = {
+/**
+ * The `l-flex--center` flex utlity class can be used to center the content of the card.
+ */
+export const SlimlineCentered: Story = {
     render: () => ({
         template: `
-            <div class="c-card">
-                <div class="l-flex-row l-gap-m">
-                    <div class="c-img">
+            <div class="c-card l-pad-xs--vert">
+                <div class="l-flex-row l-gap-m l-flex--center-align">
+                    <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
-                            <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                            <img src="/user.jpg" alt="Jana Reed profile photo" />
                         </div>
                     </div>
-                    <div class="l-flex-col l-flex--center-justify f-no-margins">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
+                    <div class="l-flex-col l-flex--center-justify l-flex__item--1 f-no-margins">
+                        <h3 class=""><a href="">Jana Reed</a></h3>
                         <span class="meta">Friday April 12th 2015 11:11am</span>
                         <span class="meta">Edited five days ago</span>
                         <span class="meta">Some more meta</span>
                         <span class="meta">And even more meta</span>
                     </div>
+                    <nav class="c-nav-actions l-flex-row">
+                        <a class="icon-view no-text" href="" title="Hide"></a>
+                        <a class="icon-modify no-text" href="" title="Modify"></a>
+                        <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                    </nav>
                 </div>
             </div>
         `,
     }),
 };
 
-export const CenteredImageAndTallText: Story = {
+/**
+ * The `c-card__link` modifier class can be used when the card is a link.
+ */
+export const Link: Story = {
     render: () => ({
         template: `
-            <div class="c-card">
+            <a class="c-card c-card--link l-pad-xs--vert" href="">
                 <div class="l-flex-row l-gap-m">
-                    <div class="c-img l-flex--center">
+                    <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
-                            <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                            <img src="https://schoolbox-static.cloud/23.0.5-1/images/badges/education/85.svg"/>
                         </div>
                     </div>
                     <div class="l-flex-col l-flex--center-justify f-no-margins">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
-                        <span class="meta">Friday April 12th 2015 11:11am</span>
-                        <span class="meta">Edited five days ago</span>
-                        <span class="meta">Some more meta</span>
-                        <span class="meta">And even more meta</span>
+                        <h3 class=""><a href="">Critical and Creative Thinking - Level 1</a></h3>
+                        <span class="meta">Learning</span>
                     </div>
                 </div>
-            </div>
-        `,
-    }),
-};
-
-export const ImageAndTextAndActions: Story = {
-    render: () => ({
-        template: `
-            <div class="c-card">
-                <div class="l-flex-row l-gap-m">
-                    <div class="c-img">
-                        <div class="c-img__wrapper">
-                            <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
-                        </div>
-                    </div>
-                    <div class="l-flex-col l-flex--center-justify l-flex__item--1 f-no-margins">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
-                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
-                    </div>
-                    <div class="c-card__main-actions">
-                        <nav class="c-nav-actions l-flex-row">
-                            <a class="icon-view no-text" href="" title="Hide"></a>
-                            <a class="icon-modify no-text" href="" title="Modify"></a>
-                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const CenteredImageAndTextAndActions: Story = {
-    render: () => ({
-        template: `
-            <div class="c-card">
-                <div class="l-flex-row l-gap-m">
-                    <div class="c-img">
-                        <div class="c-img__wrapper">
-                            <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
-                        </div>
-                    </div>
-                    <div class="l-flex-col l-flex--center-justify l-flex__item--1 f-no-margins">
-                        <a href=""><h3 class="">Class Cancelled - 21st June</h3></a>
-                        <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
-                    </div>
-                    <div class="c-card__main-actions l-flex--center">
-                        <nav class="c-nav-actions l-flex-row">
-                            <a class="icon-view no-text" href="" title="Hide"></a>
-                            <a class="icon-modify no-text" href="" title="Modify"></a>
-                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const NavActions: Story = {
-    render: () => ({
-        template: `
-            <div class="c-card">
-                <nav class="c-nav-actions l-flex-row">
-                    <a class="icon-modify no-text" href="" title="Modify"></a>
-                    <a class="icon-modify no-text" href="" title="Modify"></a>
-                    <a class="icon-more no-text" href="" title="Actions"></a>
-                </nav>
-            </div>
-        `,
-    }),
-};
-
-export const CardActions: Story = {
-    render: () => ({
-        template: `
-            <div class="c-card">
-                <div class="c-card__actions">
-                    <a>READ MORE</a>
-                    <a>ANOTHER ACTION</a>
-                </div>
-            </div>
+            </a>
         `,
     }),
 };
@@ -248,7 +158,7 @@ export const Loading: Story = {
                             <div class="img-placeholder"></div>
                         </div>
                     </div>
-                    <div class="l-flex-col l-flex--center-justify">
+                    <div class="l-flex-col l-flex--center-justify l-flex__item--1 l-gap-s">
                         <h3></h3>
                         <span></span>
                     </div>
@@ -258,19 +168,21 @@ export const Loading: Story = {
     }),
 };
 
-export const SubItem: Story = {
+/**
+ * The `c-card--child` modifier class is used to create a _child_ of a _parent_ card.
+ */
+export const Child: Story = {
     render: () => ({
         template: `
-            <div class="c-card c-card--subitem">
+            <div class="c-card c-card--child">
                 <div class="l-flex-row l-gap-m">
                     <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
-                            <img src="https://placedog.net/40/40" alt="Placedog 64 by 64 image" />
+                            <div class="icon icon-unit"></div>
                         </div>
                     </div>
                     <div class="l-flex-col l-flex--center-justify f-no-margins">
-                        <a href=""><h6 class="">How cool is this dog?</h6></a>
-                        <span class="meta">Last updated 3 weeks ago</span>
+                        <h6 class=""><a href="">Romeo and Juliet</a></h6>
                     </div>
                 </div>
             </div>
@@ -278,27 +190,10 @@ export const SubItem: Story = {
     }),
 };
 
-export const SubItemWithIcon: Story = {
-    render: () => ({
-        template: `
-            <div class="c-card c-card--subitem">
-                <div class="l-flex-row l-gap-m">
-                    <div class="c-img c-img--s">
-                        <div class="c-img__wrapper">
-                            <div class="icon icon-calendar"></div>
-                        </div>
-                    </div>
-                    <div class="l-flex-col l-flex--center-justify f-no-margins">
-                        <a href=""><h6 class="">How cool is this dog?</h6></a>
-                        <span class="meta">Last updated 3 weeks ago</span>
-                    </div>
-                </div>
-            </div>
-        `,
-    }),
-};
-
-export const CardList: Story = {
+/**
+ * The `c-card--border-end` modifier class is used on each card except the last to create a border between cards.
+ */
+export const ParentWithChildren: Story = {
     render: () => ({
         template: `
             <div class="l-flex-col">
@@ -310,47 +205,44 @@ export const CardList: Story = {
                             </div>
                         </div>
                         <div class="l-flex-col l-flex--center-justify f-no-margins">
-                            <a href=""><h3 class="">Year 12 Biology (BIO12)</h3></a>
-                            <span class="meta"><a href="">Courses</a> > <a href="">Senior Courses</a> > <a href="">English</a> > <a href="">Year 12 Biology</a></span>
+                            <h3 class=""><a href="">Year 9 English</a></h3>
+                            <span class="meta"><a href="">Courses</a> > <a href="">Senior Courses</a> > <a href="">English</a></span>
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem c-card--border-end">
+                <div class="c-card c-card--child c-card--border-end">
                     <div class="l-flex-row l-gap-m">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
-                                <img src="https://placedog.net/64/64" alt="Placedog 64 by 64 image" />
+                                <div class="icon icon-unit"></div>
                             </div>
                         </div>
                         <div class="l-flex-col l-flex--center-justify f-no-margins">
-                            <a href=""><h6 class="">How cool is this dog?</h6></a>
-                            <span class="meta">Last updated 1 week ago</span>
+                            <h6 class=""><a href="">Romeo and Juliet</a></h6>
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem c-card--border-end">
+                <div class="c-card c-card--child c-card--border-end">
                     <div class="l-flex-row l-gap-m">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
-                                <img src="https://placedog.net/96/96" alt="Placedog 64 by 64 image" />
+                                <div class="icon icon-unit"></div>
                             </div>
                         </div>
                         <div class="l-flex-col l-flex--center-justify f-no-margins">
-                            <a href=""><h6 class="">What about this one?</h6></a>
-                            <span class="meta">Last updated 2 weeks ago</span>
+                            <h6 class=""><a href="">Persuasion and the Media</a></h6>
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--subitem">
+                <div class="c-card c-card--child">
                     <div class="l-flex-row l-gap-m">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
-                                <img src="https://placedog.net/108/108" alt="Placedog 64 by 64 image" />
+                                <div class="icon icon-unit"></div>
                             </div>
                         </div>
                         <div class="l-flex-col l-flex--center-justify f-no-margins">
-                            <a href=""><h6 class="">Isn't this one cool too?</h6></a>
-                            <span class="meta">Last updated 3 weeks ago</span>
+                            <h6 class=""><a href="">To Kill a Mockingbird</a></h6>
                         </div>
                     </div>
                 </div>

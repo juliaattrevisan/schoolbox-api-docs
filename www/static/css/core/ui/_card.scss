@@ -26,8 +26,7 @@
 }
 
 .c-card {
-    // Should this be transparent?
-    background-color: white;
+    background-color: var(--foreground-colour);
     // Control radius from custom property
     border-radius: var(--roundness-cards);
     line-height: var(--base-line-height);
@@ -45,22 +44,16 @@
         white-space: nowrap;
     }
 
-    &__main-actions {
-        display: flex;
-        flex: 0;
-    }
-
     // A bar that sits (generally) at the bottom of the card with actions that a user can take. Left aligned so that
     // these actions are visually distinct if this card appears in a component and the component has actions.
     &__actions {
-        display: flex;
-        justify-content: flex-start;
-        min-inline-size: 100%;
+        // display: flex;
+        // justify-content: flex-start;
+        min-inline-size: 40px;
 
         a {
             font-size: 13px;
             font-weight: 600;
-            margin-bottom: 0;
             padding: var(--whitespace-s) var(--whitespace-m);
             text-align: center;
             text-transform: uppercase;
@@ -73,14 +66,10 @@
 
     /* MODIFIERS / VARIANTS */
     // Add inline (default left) border and grey background to card.
-    &--subitem {
+    &--child {
         background-color: #f6f6f6;
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
         padding: var(--whitespace-xs);
-        .c-card__main-content {
-            padding-block-start: 0;
-            padding-block-end: 0;
-        }
     }
 
     // Cards can be an <a> tag, so we add a hover state
@@ -91,13 +80,6 @@
         :focus {
             background-color: var(--content-ui-hover);
             filter: grayscale(0%);
-        }
-    }
-
-    // for smaller cards
-    &--small {
-        span {
-            font-size: 0.75rem;
         }
     }
 
@@ -113,14 +95,15 @@
         @include skeleton-background-gradient;
         animation: shine-lines 1.6s ease infinite !important;
         background-size: 400% 100% !important;
-        .c-card__main {
-            background-color: white;
+        .l-flex-row {
+            background-color: var(--foreground-colour);
         }
         .img-placeholder,
         h3,
         p,
         span {
             background: var(--loading-colour);
+            margin: 0;
         }
         .img-placeholder {
             height: var(--image-size-l);
@@ -128,7 +111,6 @@
         }
         h3 {
             height: 1rem;
-            margin-bottom: var(--whitespace-s);
             width: 30%;
         }
         p,
