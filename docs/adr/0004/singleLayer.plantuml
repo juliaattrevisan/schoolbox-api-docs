@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface SearchInterface {
+search(keyword) : Result[]
+}
+
+class SearchAggregate implements SearchInterface {
+SearchInterface[] subSearches
+search(keyword) : Result[]
+}
+
+note bottom of SearchAggregate
+ Each search in subSearches must perform the search,
+ hydration and filtering steps.
+end note
+
+@enduml

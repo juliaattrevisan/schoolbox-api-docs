@@ -1,0 +1,244 @@
+<?php
+
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Search\Api\Database;
+
+use Alaress\Database\Predicate\Builder;
+use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
+use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
+
+/**
+ * Abstract base class for query param builders.
+ */
+abstract class BaseQueryParamBuilder implements IQueryParamBuilder
+{
+    /**
+     * @inheritdoc
+     */
+    public function buildMatchQueryParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        int $limit,
+    ): QueryParams {
+        ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword);
+
+        $relevancePart = $this->buildRelevanceExpression();
+        $titlePart     = $this->buildTitleExpression();
+        $typePart      = $this->buildTypeExpression();
+        $idPart        = $this->buildIdExpression();
+        $datePart      = $this->buildDateExpression();
+        $creatorPart   = $this->buildCreatorExpression();
+
+        // Apply filter
+        if ($filter->types) {
+            $whereParts[] = "$typePart IN " . Builder::getArrayPlaceholders($filter->types, 'userType');
+            $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'userType'));
+        }
+        if ($filter->fromDate) {
+            $whereParts[]             = "$datePart >= :filterFromDate";
+            $params['filterFromDate'] = $filter->fromDate->getDatabase();
+        }
+        if ($filter->toDate) {
+            $whereParts[]           = "$datePart <= :filterToDate";
+            $params['filterToDate'] = $filter->toDate->getDatabase();
+        }
+        if ($filter->creator) {
+            $whereParts[]            = "$creatorPart = :filterCreator";
+            $params['filterCreator'] = $filter->creator->getId();
+        }
+
+        // Apply cursor
+        if ($cursor) {
+            $cursorSearchParts = [
+                "($relevancePart < :cursorRelevance)",
+                "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)",
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)",
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND $idPart > :cursorId)",
+            ];
+
+            $whereParts[]              = '(' . implode(' OR ', $cursorSearchParts) . ')';
+            $params['cursorRelevance'] = $cursor->relevance;
+            $params['cursorType']      = $cursor->type;
+            $params['cursorTitle']     = $cursor->title;
+            $params['cursorId']        = $cursor->id;
+        }
+
+        $where = implode(' AND ', $whereParts);
+
+        // Build query and params
+        $from = $this->buildFromStatement();
+        $query = "
+            SELECT
+                $idPart        AS id,
+                $titlePart     AS title,
+                $typePart      AS type,
+                $datePart      AS date,
+                $relevancePart AS relevance
+            $from
+            WHERE $where";
+
+        // Build order parts
+        $orderParts = [];
+        if ($this->isOrderedByRelevance()) {
+            $orderParts[] = "$relevancePart DESC";
+        }
+        $orderParts[] = "$titlePart ASC";
+        $orderParts[] = "$typePart ASC";
+        $orderParts[] = "$idPart ASC";
+        $query .= ' ORDER BY ' . implode(', ', $orderParts);
+        $query .= ' LIMIT :limit';
+
+        $params['limit'] = $limit;
+        return new QueryParams($query, $params);
+    }
+
+    /**
+     * Build an expression whose result:
+     * * is between `$min` and `$max`
+     * * is `$max` if `$dateExpressionA` and `$dateExpressionB` are within
+     *   `$daysAtMax` of one another
+     * * is `$min` if `$dateExpressionA` and `$dateExpressionB` are more than
+     *   `$daysAtMin` apart
+     * * otherwise, if between `$daysLeeway` and `$daysAtMin` days apart:
+     *   decays linearly from `$max` to `$min` the further apart they are
+     *
+     * Used for building relevance expressions which depend on how far in the
+     * past or future a date is.
+     *
+     * @param string $dateExpressionA Expression for the first date to compare.
+     * @param string $dateExpressionB Expression for the second date to compare.
+     * @param int    $daysAtMax       The maximum number of days which the two
+     *                                date expressions may be apart, in order
+     *                                for `$max` to be the returned value.
+     * @param int    $daysAtMin       The minimum number of days which the two
+     *                                date expressions may be apart, in order
+     *                                for `$min` to be the returned value.
+     * @param float  $max             The max value of the expression: defaults
+     *                                to 1.
+     * @param float  $min             The min value of the expression: defaults
+     *                                to 0.
+     * @return string
+     */
+    protected function buildLinearDecayExpression(
+        string $dateExpressionA,
+        string $dateExpressionB,
+        int $daysAtMax,
+        int $daysAtMin,
+        float $max = 1,
+        float $min = 0,
+    ): string {
+        $dateDiff    = "ABS(DATEDIFF($dateExpressionA, $dateExpressionB))";
+        $numerator   = "($dateDiff + $daysAtMax)";
+        $denominator = ($daysAtMax + $daysAtMin) ?: 1;
+
+        return "CAST(
+            LEAST(
+                $max,
+                GREATEST($max - ($numerator / $denominator), $min)
+            )
+            AS DECIMAL(2,2)
+        )";
+    }
+
+
+    /**
+     * Build the base set of WHERE parts and their params.
+     *
+     * @param string $keyword The search term from `buildMatchQueryParams`.
+     * @return array{where: array<string>, params: array}
+     */
+    abstract protected function buildBaseWhereParams(string $keyword): array;
+
+    /**
+     * Build the expression for determining the relevance for an item in this
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to a decimal number between 0 and 1: the greater the
+     * number, the more relevant the result.
+     *
+     * Currently, the relevance of a result is not dependent on how closely it
+     * matches the search term: thus, this doesn't take the `$keyword` from
+     * `buildMatchQueryParams`.
+     *
+     * @return string An SQL expression for determining
+     */
+    abstract protected function buildRelevanceExpression(): string;
+
+    /**
+     * Does the relevance of an item depend on the evaluation of an expression?
+     *
+     * Required because `ORDER BY` on a static expression causes later
+     * conditions in the `ORDER BY` to be ignored.
+     *
+     * @return bool true if `buildRelevanceExpression` is a non-static value:
+     *              false if static.
+     */
+    abstract protected function isOrderedByRelevance(): bool;
+
+    /**
+     * Build the expression for determining the title for an item in this
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to a string value.
+     *
+     * @return string
+     */
+    abstract protected function buildTitleExpression(): string;
+
+    /**
+     * Build the expression for determining the type for an item in this
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to a string value.
+     *
+     * @return string
+     */
+    abstract protected function buildTypeExpression(): string;
+
+    /**
+     * Build the expression for determining the ID for an item in this
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to an integer value.
+     *
+     * @return string
+     */
+    abstract protected function buildIdExpression(): string;
+
+    /**
+     * Build the expression for determining the date for an item in this
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to a database datetime value.
+     *
+     * @return string
+     */
+    abstract protected function buildDateExpression(): string;
+
+    /**
+     * Build the expression for determining the creator for an item in this
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to an integer value, corresponding to the creator of
+     * this item: if it has no known creator, 0 (rather than NULL) should be
+     * returned (so that SQL comparisons work reliably).
+     *
+     * @return string
+     */
+    abstract protected function buildCreatorExpression(): string;
+
+    /**
+     * Build the FROM part of the query, including any joins; e.g.:
+     * "FROM table t JOIN other_table ot ON ..."
+     *
+     * @return string
+     */
+    abstract protected function buildFromStatement(): string;
+}

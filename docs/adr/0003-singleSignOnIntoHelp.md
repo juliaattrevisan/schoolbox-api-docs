@@ -1,6 +1,6 @@
 # Single Sign-On into Help
 
-* Status: Proposed
+* Status: Accepted
 * Deciders: James Leckie, Andy Ryan, Amri Sannang
 * Date: 2021-04-27
 

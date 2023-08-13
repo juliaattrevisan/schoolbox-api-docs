@@ -8,6 +8,7 @@
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
+use Schoolbox\Search\Api;
 use Schoolbox\Search\Mock;
 use Schoolbox\Search\User;
 
@@ -23,6 +24,9 @@ class Search implements ModuleConfigInterface
     {
         $module = new Mock\Module($di);
         $module->registerModule('/searchv2');
+
+        $module = new Api\Module($di);
+        $module->registerModule('/api/search');
 
         $module = new User\Module($di);
         $module->registerModule('/search/user');

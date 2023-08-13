@@ -1,0 +1,49 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface SearchResultInterface {
+search(keyword) : RawResult[]
+}
+
+class SearchResultAggregate implements SearchResultInterface {
+SearchInterface[] subSearches
+search(keyword) : RawResult[]
+}
+
+note bottom of SearchResultAggregate
+ Each search in subSearches is responsible
+ only for finding matches: these matches
+ are passed to the hydrator.
+end note
+
+interface SearchHydratorInterface {
+hydrate(RawResult[]) : Result[]
+}
+
+class SearchHydratorAggregate implements SearchHydratorInterface {
+SearchHydratorInterface[] subHydrators
+hydrate(RawResult[]) : Result[]
+}
+
+note bottom of SearchHydratorAggregate
+ Each hydrator in subHydrators is responsible
+ only for hydrating a match into a full result:
+ these results are passed to the filter.
+end note
+
+interface SearchFilterInterface {
+filter(Result[], User) : Result[]
+}
+
+class SearchFilterAggregate implements SearchFilterInterface {
+SearchFilterInterface[] subFilters
+filter(Result[], User) : Result[]
+}
+
+note bottom of SearchFilterAggregate
+ Each filter in subFilters is responsible
+ only for filtering results of the types it
+ knows about.
+end note
+
+@enduml
