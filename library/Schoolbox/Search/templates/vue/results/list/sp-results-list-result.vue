@@ -34,7 +34,7 @@ const isImgRounded = window.Vue.computed(() => {
 });
 
 /**
- *
+ * To display the relative time of the result
  */
 const relativeTime = window.Vue.computed(() => {
     return window.dayjs.duration(window.dayjs(props.result.date).diff()).humanize(true);
