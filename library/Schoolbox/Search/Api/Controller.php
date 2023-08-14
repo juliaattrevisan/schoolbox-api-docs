@@ -61,60 +61,19 @@ class Controller extends Base
         $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         if (mb_strlen($keyword) >= 2) {
-            $cursor = new Cursor\Cursor(
-                $this->source,
-                $keyword,
-                $filter,
-                $limit,
-            );
-
-            // Fetch results from cursor and hydrate, until either:
-            // - limit is reached
-            // - the end of cursor is reached
-            // This ensures there is a consistent number of results returned,
-            // even if the hydrator filters out results.
-            $i             = 0;
-            $fullResults   = [];
-            $requestCursor = $this->requestQuery['cursor'] ?? null;
-            while (count($fullResults) < $limit && $i++ < 100) {
-                // Get next set of raw results, and the cursor for the next
-                // iteration.
-                $nextRawResults = $cursor->retrieveResults($requestCursor);
-                $requestCursor  = $cursor->next($nextRawResults);
-
-                // No raw results retrieved and no cursor?
-                // We're at the end of the result set, so break.
-                if (!isset($requestCursor) && count($nextRawResults) === 0) {
-                    break;
-                }
-
-                // Otherwise: hydrate raw results into full results,
-                // then add them to the full result set.
-                $fullResults = array_merge(
-                    $fullResults,
-                    $this->hydrator->hydrate($keyword, $nextRawResults->getAll(), $this->user)
-                );
-
-                // Too many full results now?
-                // Slice off excess results, get a cursor to the last remaining
-                // full result, then break.
-                if (count($fullResults) > $limit) {
-                    $fullResults    = array_slice($fullResults, 0, $limit);
-                    $lastFullResult = $fullResults[array_key_last($fullResults)];
-                    $requestCursor  = $cursor->next(new Collection([$lastFullResult->rawResult]));
-                    break;
-                }
-            }
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
             // Finally output the response
+            // Non-folder requests: find items in folders, and create responses
+            // for their folders
             $this->response = $this->responseAsJson(
                 [
-                    'data'     => array_map($this->fullResultTranslator, $fullResults),
+                    'data'     => array_map($this->fullResultTranslator, $results),
                     'metadata' => [
                         'count'  => null,
                         'cursor' => [
                             'current' => null,
-                            'next'    => $requestCursor,
+                            'next'    => $nextCursor,
                         ],
                     ],
                 ]
@@ -134,7 +93,28 @@ class Controller extends Base
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
-        $filter = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $folder);
+        $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $folder);
+        $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
+        if (mb_strlen($keyword) >= 2) {
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
+
+            // Finally output the response
+            $this->response = $this->responseAsJson(
+                [
+                    'data'     => array_map($this->fullResultTranslator, $results),
+                    'metadata' => [
+                        'count'  => null,
+                        'cursor' => [
+                            'current' => null,
+                            'next'    => $nextCursor,
+                        ],
+                    ],
+                ]
+            );
+        } else {
+            $this->sendJsonError('Search keyword must be at least 2 characters', 400);
+        }
     }
 
     /**
@@ -196,5 +176,62 @@ class Controller extends Base
         }
 
         return new SearchFilter\DataObject($types, $fromDate, $toDate, $creator, $folder);
+    }
+
+    /**
+     * Build a result set from the keyword, filter and limit.
+     *
+     * @param string                  $keyword
+     * @param SearchFilter\DataObject $filter
+     * @param int                     $limit
+     * @return array{results: array, nextCursor: string}
+     */
+    private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit): array
+    {
+        $cursor = new Cursor\Cursor(
+            $this->source,
+            $keyword,
+            $filter,
+            $limit,
+        );
+
+        // Fetch results from cursor and hydrate, until either:
+        // - limit is reached
+        // - the end of cursor is reached
+        // This ensures there is a consistent number of results returned,
+        // even if the hydrator filters out results.
+        $i             = 0;
+        $fullResults   = [];
+        $nextCursor    = $this->requestQuery['cursor'] ?? null;
+        while (count($fullResults) < $limit && $i++ < 100) {
+            // Get next set of raw results, and the cursor for the next
+            // iteration.
+            $nextRawResults = $cursor->retrieveResults($nextCursor);
+            $nextCursor  = $cursor->next($nextRawResults);
+
+            // No raw results retrieved and no cursor?
+            // We're at the end of the result set, so break.
+            if (!isset($nextCursor) && count($nextRawResults) === 0) {
+                break;
+            }
+
+            // Otherwise: hydrate raw results into full results,
+            // then add them to the full result set.
+            $fullResults = array_merge(
+                $fullResults,
+                $this->hydrator->hydrate($keyword, $nextRawResults->getAll(), $this->user)
+            );
+
+            // Too many full results now?
+            // Slice off excess results, get a cursor to the last remaining
+            // full result, then break.
+            if (count($fullResults) > $limit) {
+                $fullResults    = array_slice($fullResults, 0, $limit);
+                $lastFullResult = $fullResults[array_key_last($fullResults)];
+                $nextCursor     = $cursor->next(new Collection([$lastFullResult->rawResult]));
+                break;
+            }
+        }
+        return ['results' => $fullResults, 'nextCursor' => $nextCursor];
     }
 }
