@@ -221,7 +221,8 @@ class Controller extends Base
             'dateEnd'               => $dateEnd,
             'returnUrlName'         => Assessment\Redirect::RETURN_URL,
             'encodedReturnUrl'      => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
-            'readOnly'              => $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE
+            'readOnly'              => $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE,
+            'componentInstance'     => $componentInstance ?? ['id' => null],
         ];
 
         $this->response = $this->responseFromTemplate(
