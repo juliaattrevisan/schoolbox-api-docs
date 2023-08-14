@@ -11,8 +11,6 @@ namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Course\Markbook\CourseMarkbook;
-use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -51,7 +49,6 @@ class Controller extends Base
     ) {
     }
 
-
     /**
      * Provide form
      *
@@ -64,7 +61,6 @@ class Controller extends Base
          * Assessments within the course grouped by units
          */
         $results = [];
-
 
         // if we have specified a course implementation... then we should just return assessments within that
         if ($courseImpl) {
@@ -191,6 +187,12 @@ class Controller extends Base
         $courses = $courses->filter(function ($course) {
             return $course->getUnits()->count();
         })
+        /**
+         * Sort courses' based on the:
+         * Course name
+         * First Unit open date
+         * Course import ID
+         */
         ->sortByCallback(function (CourseImplementation $left, CourseImplementation $right) {
             // Course Import's folder name
             $folderNameCompare = strnatcasecmp($left->getFolder()->getTitle(), $right->getFolder()->getTitle());
@@ -211,15 +213,15 @@ class Controller extends Base
         }, true);
 
         $twigData = [
-            'courses'           => $courses,
-            'accessibleFolderIds'      => $accessibleFolderIds,
-            'lessonPlans'       => $lessonPlans,
-            'folder'            => $folder,
-            'dateStart'         => $dateStart,
-            'dateEnd'           => $dateEnd,
-            'returnUrlName'     => Assessment\Redirect::RETURN_URL,
-            'encodedReturnUrl'  => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
-            'readOnly'          => $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE
+            'courses'               => $courses,
+            'accessibleFolderIds'   => $accessibleFolderIds,
+            'lessonPlans'           => $lessonPlans,
+            'folder'                => $folder,
+            'dateStart'             => $dateStart,
+            'dateEnd'               => $dateEnd,
+            'returnUrlName'         => Assessment\Redirect::RETURN_URL,
+            'encodedReturnUrl'      => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
+            'readOnly'              => $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE
         ];
 
         $this->response = $this->responseFromTemplate(
