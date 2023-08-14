@@ -24,6 +24,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access as AccessMapper;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -118,6 +119,7 @@ class Module extends BaseModule
             $this->getLessonPlanMapper(),
             $this->injector->get('assessmentDataSource'),
             $this->getComponentInstanceMapper(),
+            $this->getAccessMapper(),
         );
     }
 
@@ -177,6 +179,7 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
+
     /**
      * @return Mapper|\Component_InstanceMapper
      * @throws InvalidArgumentException If class not found
@@ -184,5 +187,14 @@ class Module extends BaseModule
     protected function getComponentInstanceMapper()
     {
         return $this->getMapperFactory()->get(\Component_InstanceMapper::class);
+    }
+
+    /**
+     * @return Mapper|AccessMapper
+     * @throws InvalidArgumentException If class not found
+     */
+    protected function getAccessMapper()
+    {
+        return $this->getMapperFactory()->get(AccessMapper::class);
     }
 }

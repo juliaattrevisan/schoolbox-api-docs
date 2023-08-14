@@ -21,27 +21,30 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Permission\Access\Access;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access as AccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
      *
-     * @param UnitSpecificationMapper  $unitSpecificationMapper
-     * @param UnitImplementationMapper $unitImplementationMapper
-     * @param LessonPlanMapper         $lessonPlanMapper
-     * @param AssessmentMapperProxy    $assessmentMapperProxy
+     * @param UnitSpecificationMapper   $unitSpecificationMapper
+     * @param UnitImplementationMapper  $unitImplementationMapper
+     * @param LessonPlanMapper          $lessonPlanMapper
+     * @param AssessmentMapperProxy     $assessmentMapperProxy
+     * @param \Component_InstanceMapper $componentInstanceMapper
+     * @param AccessMapper              $accessMapper
      */
     public function __construct(
         private UnitSpecificationMapper $unitSpecificationMapper,
         private UnitImplementationMapper $unitImplementationMapper,
         private LessonPlanMapper $lessonPlanMapper,
         private AssessmentMapperProxy $assessmentMapperProxy,
-        private \Component_InstanceMapper $componentInstanceMapper
+        private \Component_InstanceMapper $componentInstanceMapper,
+        private AccessMapper $accessMapper,
     ) {
     }
 
@@ -104,6 +107,8 @@ class Controller extends Base
      */
     public function getHomepageComponent(Folder\Model $folder, ?int $componentId = null)
     {
+        /** @var AccessMapper $accessMapper */
+        $accessMapper = AccessMapper::getInstance();
         $dateStart = null;
         $dateEnd = null;
         // if there is a component specified grab the active date range
@@ -137,6 +142,7 @@ class Controller extends Base
         $filledCourses = new Collection();
         $accessibleFolderIds = [];
         foreach ($courses as $course) {
+            $specFolderIds = [];
             $course->setUnits(UnitImplementationMapper::getinstance()->findAllByCourseId($course->getId()));
             foreach ($course->getUnits() as $unitImpl) {
                 if (isset($lessonPlans[$unitImpl->getId()])) {
@@ -147,7 +153,7 @@ class Controller extends Base
             $course->setUnits($course->getUnits()->filter(function ($unit) {
                 return $unit->getAssessables()->count();
             }));
-            $accessibleFolderIds[$course->getId()] = $course->getUnits()
+            $specFolderIds = $course->getUnits()
             // this is to sort units and needs to be placed right after getUnits()
             ->sortByCallback(
                 static function (Unit $a, Unit $b) {
@@ -163,6 +169,21 @@ class Controller extends Base
             ->map(static function (\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unit) {
                    return $unit->getSpecification()->getFolder()->getId();
             })->getAll();
+            // course spec folder id, if not deleted
+            if (!$course->getSpecification()->getFolder()->isDeleted()) {
+                $specFolderIds[] = $course->getSpecification()->getFolder()->getId();
+            }
+            // gather folder ids the current user can access
+            $accessibleFolderIds = array_merge($accessibleFolderIds, array_filter(
+                $specFolderIds,
+                function (int $folderId) {
+                    try {
+                        return $this->accessMapper->getFolderAccess($this->getUser(), $folderId) >= UserAccess::ACCESS_READ;
+                    } catch (MapperException $e) {
+                    }
+                    return false;
+                }
+            ));
         }
 
         // filter out courses that contain no assessments
@@ -172,14 +193,14 @@ class Controller extends Base
 
         $twigData = [
             'courses'           => $courses,
-            'courstThings'      => $accessibleFolderIds,
+            'accessibleFolderIds'      => $accessibleFolderIds,
             'lessonPlans'       => $lessonPlans,
             'folder'            => $folder,
             'dateStart'         => $dateStart,
             'dateEnd'           => $dateEnd,
             'returnUrlName'     => Assessment\Redirect::RETURN_URL,
             'encodedReturnUrl'  => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
-            'readOnly'          => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE
+            'readOnly'          => $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE
         ];
 
         $this->response = $this->responseFromTemplate(

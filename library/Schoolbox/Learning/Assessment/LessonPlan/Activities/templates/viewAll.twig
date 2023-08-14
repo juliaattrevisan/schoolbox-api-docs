@@ -4,7 +4,7 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learning/macro/viewRoute.twig' as viewRoute %}
 
-{% set accessibleFolderIds = [] %}
+
 {% set componentInstance = {id: null} %}
 
 <ul class="breadcrumb">
@@ -24,7 +24,7 @@
     {% for course in courses %}
         <li>
             <p class="component-titlebar meta">
-            {% if course.folder.id in accessibleFolderIds %}
+            {% if course.specification.folder.id in accessibleFolderIds %}
                 <a class="icon-course" href="{{ '/homepage/' ~ course.specification.folder.id }}" title="Visit course page">{{ course.specification.title }}</a>
             {% else %}
                 <a class="icon-course">{{ course.specification.title }}</a>
