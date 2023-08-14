@@ -67,12 +67,14 @@ class Controller extends Base
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
         $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
+        $cursor  = null;
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
             $translatedResults = [];
             foreach ($results as $result) {
-                $resultKey = $result->type . '.' . $result->id;
+                $resultKey        = $result->type . '.' . $result->id;
+                $translatedResult = call_user_func($this->fullResultTranslator, $result);
                 if ($result->folder) {
                     // Is this a result with a folder? If so: translate this
                     // into a folder result, and inject a page of results within
@@ -102,27 +104,29 @@ class Controller extends Base
 
                         // Translate the folder result
                         $translatedResults[$resultKey] = call_user_func($this->fullResultTranslator, $folderResult);
-
-                        // Add search results for this folder to the
-                        // `_subResults` key of the translated result
-                        ['results' => $folderResults, 'nextCursor' => $folderNextCursor] = $this->populateResultSet(
-                            $keyword,
-                            $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $result->folder),
-                            self::RESULT_LIMIT_WITHIN_FOLDER,
-                        );
-                        $translatedResults[$resultKey]['_subResults'] = [
-                            'data'     => array_map($this->fullResultTranslator, $folderResults),
-                            'metadata' => [
-                                'count'  => null,
-                                'cursor' => [
-                                    'current' => null,
-                                    'next'    => $folderNextCursor,
-                                ],
-                            ]
-                        ];
                     }
+
+                    // Add this result into the sub-results
+                    $translatedResults[$resultKey]['_subResults'] ??= [
+                        'data'     => [],
+                        'metadata' => [
+                            'count'  => null,
+                            'cursor' => [
+                                'current' => null,
+                                'next'    => null,
+                            ],
+                        ]
+                    ];
+                    $translatedResults[$resultKey]['_subResults']['data'][] = $translatedResult;
+
+                    // Use the cursor object to build a pointer to the next
+                    // result within this page
+                    $cursor ??= new Cursor\Cursor($this->source, $keyword, $filter, $limit);
+                    $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
+                        new Collection([$result])
+                    );
                 } else {
-                    $translatedResults[$resultKey] = call_user_func($this->fullResultTranslator, $result);
+                    $translatedResults[$resultKey] = $translatedResult;
                 }
             }
             $translatedResults = array_values($translatedResults);
