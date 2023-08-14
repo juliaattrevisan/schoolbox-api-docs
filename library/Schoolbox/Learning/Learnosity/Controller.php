@@ -97,7 +97,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'mode'      => 'activity_edit',
+            'mode'  => 'activity_edit',
             /* A Learnosity uuid that we arbitrarily prescribed
              */
             'reference' => $assessment->getLearnosityReference(),
@@ -107,8 +107,8 @@ class Controller extends Base
              *
              * TODO Waiting for learnosity to clarify
              */
-            'user'      => [
-                'id'        => (string)$this->getConfigLoader()->get('learnosity_author_id'),
+            'user' => [
+                'id' => (string)$this->getUser()->getId(),
                 /* These fields are superfluous and are presumably
                  * used for auditing; we attribute an individual user's
                  * name to a collectively-utilised author account
