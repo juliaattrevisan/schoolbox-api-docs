@@ -55,7 +55,7 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
      * Whether role / group access is limited to users in student campus only
      * @var bool
      */
-    private bool $studentCampusOnly = false;
+    private bool $matchCampus = false;
 
     /**
      * Whether the user/role is allowed to comment
@@ -308,18 +308,18 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
     /**
      * @return bool
      */
-    public function getStudentCampusOnly(): bool
+    public function getMatchCampus(): bool
     {
-        return $this->studentCampusOnly;
+        return $this->matchCampus;
     }
 
     /**
-     * @param bool $studentCampusOnly
+     * @param bool $matchCampus
      * @return static
      */
-    public function setStudentCampusOnly(bool $studentCampusOnly): self
+    public function setMatchCampus(bool $matchCampus): self
     {
-        $this->studentCampusOnly = $studentCampusOnly;
+        $this->matchCampus = $matchCampus;
         return $this;
     }
 

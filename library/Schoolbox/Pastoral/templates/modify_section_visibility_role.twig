@@ -22,7 +22,7 @@
                     {% set roleName = userAccess.role.name %}
                     {% set readonly = userAccess.role.type == 'staff' ? 'readonly' : '' %}
                     {% set campusHidden = 0 %}
-                    {% set campusChecked = userAccess.studentCampusOnly ? 'checked="checked"' : '' %}
+                    {% set campusChecked = userAccess.matchCampus ? 'checked="checked"' : '' %}
                     {% set alwaysReadOnly = userAccess.role.type == 'staff' ? 1 : 0 %}
                     {% set checkedComment = userAccess.role.type == 'staff' ? 'checked="checked"' : '' %}
                 {% endif %}
@@ -212,7 +212,7 @@
 
             {# Add role to table #}
 
-            window.addRole = function(roleId, roleName, permission, commentsAllowed, studentCampusOnly, locked) {
+            window.addRole = function(roleId, roleName, permission, commentsAllowed, matchCampus, locked) {
 
                 // this line will check if the argument is undefined
                 // if so set it to 1, otherwise set it to its original value
@@ -241,7 +241,7 @@
                             permission
                     );
 
-                    initCheckbox($('#roleCampus' + roleId), false, studentCampusOnly, isStaff ? permission : '0');
+                    initCheckbox($('#roleCampus' + roleId), false, matchCampus, isStaff ? permission : '0');
 
                     //Check the correct box
                     let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';

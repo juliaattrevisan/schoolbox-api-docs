@@ -118,7 +118,7 @@ class NotifierHelper
                         $student,
                         $parentAccessEnabled && $nonStaffCommentAllowed,
                         $studentAccessEnabled && $nonStaffCommentAllowed,
-                        $pastoralAccess->getStudentCampusOnly()
+                        $pastoralAccess->getMatchCampus()
                     );
                 } elseif ($pastoralAccess->getRoleType()) {
                     $targetUsers += $this->buildTargetUsersForRoleType(
@@ -126,7 +126,7 @@ class NotifierHelper
                         $student,
                         $parentAccessEnabled && $nonStaffCommentAllowed,
                         $studentAccessEnabled && $nonStaffCommentAllowed,
-                        $pastoralAccess->getStudentCampusOnly()
+                        $pastoralAccess->getMatchCampus()
                     );
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     $targetUsers += $this->buildTargetUsersForGroup(
@@ -134,7 +134,7 @@ class NotifierHelper
                         $student,
                         $parentAccessEnabled && $nonStaffCommentAllowed,
                         $studentAccessEnabled && $nonStaffCommentAllowed,
-                        $pastoralAccess->getStudentCampusOnly()
+                        $pastoralAccess->getMatchCampus()
                     );
                 } elseif ($pastoralAccess->getUser() instanceof User) {
                     $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
@@ -161,7 +161,7 @@ class NotifierHelper
      *                                   will be notified.
      * @param bool $parentAccessEnabled
      * @param bool $studentAccessEnabled
-     * @param bool $studentCampusOnly
+     * @param bool $matchCampus
      * @return array
      */
     private function buildTargetUsersForRole(
@@ -169,7 +169,7 @@ class NotifierHelper
         User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
-        bool $studentCampusOnly
+        bool $matchCampus
     ): array {
         $targetUsers = [];
         if ($role->isStaff() && $role->getAccessPastoral()) {
@@ -177,7 +177,7 @@ class NotifierHelper
             foreach ($student->getTeacherCollection() as $teacher) {
                 if (
                     $teacher->getRole()->getId() === $role->getId()
-                    && (!$studentCampusOnly || AccessLevelCensor::inSameCampus($student, $teacher))
+                    && (!$matchCampus || AccessLevelCensor::inSameCampus($student, $teacher))
                 ) {
                     $targetUsers[$teacher->getId()] = $teacher;
                 }
@@ -210,7 +210,7 @@ class NotifierHelper
      *                                     parents will be notified.
      * @param bool   $parentAccessEnabled
      * @param bool   $studentAccessEnabled
-     * @param bool   $studentCampusOnly
+     * @param bool   $matchCampus
      * @return array
      */
     private function buildTargetUsersForRoleType(
@@ -218,7 +218,7 @@ class NotifierHelper
         User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
-        bool $studentCampusOnly
+        bool $matchCampus
     ): array {
         // The system should only notify staff if they are a teacher of the student
         $targetUsers = [];
@@ -229,7 +229,7 @@ class NotifierHelper
                 foreach ($student->getTeacherCollection() as $teacher) {
                     if (
                         $teacher->getRole()->getAccessPastoral()
-                        && (!$studentCampusOnly || AccessLevelCensor::inSameCampus($student, $teacher))
+                        && (!$matchCampus || AccessLevelCensor::inSameCampus($student, $teacher))
                     ) {
                         $targetUsers[$teacher->getId()] = $teacher;
                     }
@@ -265,7 +265,7 @@ class NotifierHelper
      * @param User $student
      * @param bool $parentAccessEnabled
      * @param bool $studentAccessEnabled
-     * @param bool $studentCampusOnly
+     * @param bool $matchCampus
      * @return array
      * @throws MapperException if the pastoral group doesn't exist
      * @throws Deleted
@@ -275,7 +275,7 @@ class NotifierHelper
         User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
-        bool $studentCampusOnly
+        bool $matchCampus
     ): array {
         // Sending to a pastoral group, make sure its hydrated
         $pastoralGroup = $this->pastoralGroupMapper->findById($groupId);
@@ -284,7 +284,7 @@ class NotifierHelper
         /** @var PastoralGroupMember $member */
         foreach ($pastoralGroup->getMembersWithPermission() as $member) {
             $memberUser = $this->userMapper->findById($member->getUser()->getId());
-            if ($studentCampusOnly && !AccessLevelCensor::inSameCampus($student, $memberUser)) {
+            if ($matchCampus && !AccessLevelCensor::inSameCampus($student, $memberUser)) {
                 $this->log->debug("Group Member {$member->getUser()->getId()} is not in campus");
                 continue;
             }

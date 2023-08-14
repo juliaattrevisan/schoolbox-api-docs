@@ -392,7 +392,7 @@ class Controller extends Base
                     $members = $this->pastoralGroupMemberMapper->createCollection();
                     foreach ($access->getGroup()->getMembersWithPermission() as $member) {
                         $memberUser = $this->userMapper->findById($member->getUser()->getId());
-                        if (!$access->getStudentCampusOnly() || AccessLevelCensor::inSameCampus($student, $memberUser)) {
+                        if (!$access->getMatchCampus() || AccessLevelCensor::inSameCampus($student, $memberUser)) {
                             $members->add($member);
                         }
                     }

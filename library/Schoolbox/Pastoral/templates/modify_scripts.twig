@@ -295,13 +295,13 @@
             if ('{{ typeAudiences.typeId }}' === typeId && '{{ typeAudiences.subtypeId }}' === subtypeId) {
                 {% for audience in typeAudiences.audiences %}
                 {% if audience.group %}
-                window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}", "{{ audience.studentCampusOnly }}", visibilityLocked);
+                window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}", "{{ audience.matchCampus }}", visibilityLocked);
                 {% endif %}
                 {% if audience.role %}
-                window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access }}", "{{ audience.commentsAllowed }}", "{{ audience.studentCampusOnly }}", visibilityLocked);
+                window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access }}", "{{ audience.commentsAllowed }}", "{{ audience.matchCampus }}", visibilityLocked);
                 {% endif %}
                 {% if audience.roleType %}
-                window.addRole("role-type-{{ audience.roleType }}", "{{ audience.roleType | capitalize }}", "{{ audience.access }}", "{{ audience.commentsAllowed }}", "{{ audience.studentCampusOnly }}", visibilityLocked);
+                window.addRole("role-type-{{ audience.roleType }}", "{{ audience.roleType | capitalize }}", "{{ audience.access }}", "{{ audience.commentsAllowed }}", "{{ audience.matchCampus }}", visibilityLocked);
                 {% endif %}
                 {% if audience.user %}
                 window.modalUserAdded({

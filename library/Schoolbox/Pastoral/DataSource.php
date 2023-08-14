@@ -588,7 +588,7 @@ class DataSource
                 ->greaterThan('access', 0);
             if (!$inSameCampus) {
                 // Returns only permissions not limiting campus
-                $hasAccessPb->isFalse('student_campus_only');
+                $hasAccessPb->isFalse('match_campus');
             }
             $whereHasAccess = implode(' AND ', $hasAccessPb->getWhere());
 

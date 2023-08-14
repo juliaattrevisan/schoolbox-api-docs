@@ -19,7 +19,7 @@ interface IPastoralAccess
 
     public function setAccess(int $access): self;
 
-    public function setStudentCampusOnly(bool $studentCampusOnly): self;
+    public function setMatchCampus(bool $matchCampus): self;
 
     public function setCommentsAllowed(bool $commentsAllowed): self;
 

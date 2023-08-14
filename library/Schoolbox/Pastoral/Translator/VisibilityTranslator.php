@@ -70,18 +70,18 @@ class VisibilityTranslator
                         throw new SchoolboxException("Invalid role type: {$roleType}");
                     }
                     $access->setRoleType($roleType);
-                    // student campus only is relevant to staff only
+                    // match campus check is relevant to staff only
                     if ($roleType !== Role::STAFF) {
-                        $access->setStudentCampusOnly(false);
+                        $access->setMatchCampus(false);
                     }
                 } else {
                     /** @var Role|null $role */
                     $role = $allowedRoles[$roleId] ?? null;
                     if ($role) {
                         $access->setRole($role);
-                        // student campus only is relevant to staff only
+                        // match campus check is relevant to staff only
                         if (!$role->isStaff()) {
-                            $access->setStudentCampusOnly(false);
+                            $access->setMatchCampus(false);
                         }
                     } else {
                         throw new SchoolboxException("Invalid role id: $roleId");
@@ -136,18 +136,18 @@ class VisibilityTranslator
      * @param IPastoralAccess $emptyAccess
      * @param int|null        $id
      * @param int             $accessLevel
-     * @param bool            $studentCampusOnly
+     * @param bool            $matchCampus
      * @param bool            $commentAllowed
      * @return IPastoralAccess
      */
-    private static function getBaseAccess(IPastoralAccess $emptyAccess, ?int $id, int $accessLevel, bool $studentCampusOnly, bool $commentAllowed): IPastoralAccess
+    private static function getBaseAccess(IPastoralAccess $emptyAccess, ?int $id, int $accessLevel, bool $matchCampus, bool $commentAllowed): IPastoralAccess
     {
         if (!in_array($accessLevel, Mapper::ACCESSES)) {
             throw new SchoolboxException(sprintf("Invalid access %s provided", $accessLevel));
         }
         $access = clone $emptyAccess;
         $access->setAccess($accessLevel)
-            ->setStudentCampusOnly($studentCampusOnly)
+            ->setMatchCampus($matchCampus)
             ->setCommentsAllowed($accessLevel === Mapper::ACCESS_DENY ? false : $commentAllowed);
         if ($id) {
             $access->setId($id);

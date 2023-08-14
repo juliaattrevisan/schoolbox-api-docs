@@ -66,7 +66,7 @@ class Mapper extends BaseMapper
             [Role::GUEST, Role::STUDENT, Role::PARENT, Role::STAFF, null],
         );
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
-        $this->uses('student_campus_only', self::TYPE_BOOLEAN);
+        $this->uses('match_campus', self::TYPE_BOOLEAN);
         $this->uses('comments_allowed', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

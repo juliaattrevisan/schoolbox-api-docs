@@ -50,7 +50,7 @@
                     {% if not reportPage %}
                     <td class="small-1 checklist">
                         <input type="checkbox" name="groupCampus{{ userAccess.group.id }}" id="groupCampus{{ userAccess.group.id }}"
-                               value="1" {{ userAccess.studentCampusOnly ? 'checked="checked"' : '' }}>
+                               value="1" {{ userAccess.matchCampus ? 'checked="checked"' : '' }}>
                         <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="groupCampus{{ userAccess.group.id }}"></label>
                     </td>
                     <td class="small-1 checklist">
@@ -154,7 +154,7 @@
 
 
 
-            window.addGroup = function(groupId, groupName, permission, studentCampusOnly, locked) {
+            window.addGroup = function(groupId, groupName, permission, matchCampus, locked) {
                 if (window.groupsAdded[groupId] !== true) {
                     $('#empty-groups').remove();
 
@@ -169,7 +169,7 @@
                     permissionListGroups.append(html);
 
                     initCheckbox($('#groupComment' + groupId), true, true, permission);
-                    initCheckbox($('#groupCampus' + groupId), false, studentCampusOnly, permission);
+                    initCheckbox($('#groupCampus' + groupId), false, matchCampus, permission);
 
                     setRadioButtonListener('[data-group-id="' + groupId + '"]');
                     applyLock(['groups'], locked);

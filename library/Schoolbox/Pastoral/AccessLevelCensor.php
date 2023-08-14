@@ -253,7 +253,7 @@ class AccessLevelCensor
             if ($accessLevelCurrent === PastoralAccessMapper::ACCESS_DENY) {
                 return PastoralAccessMapper::ACCESS_DENY;
             }
-            if ($access->getStudentCampusOnly()) {
+            if ($access->getMatchCampus()) {
                 if (!self::inSameCampus($record->getStudent(), $user)) {
                     return PastoralAccessMapper::ACCESS_DENY;
                 }
@@ -278,14 +278,14 @@ class AccessLevelCensor
     }
 
     /**
-     * @param User $student
+     * @param User $viewee
      * @param User $viewer
      * @return bool
      */
-    public static function inSameCampus(User $student, User $viewer): bool
+    public static function inSameCampus(User $viewee, User $viewer): bool
     {
         return !empty(array_intersect(
-            $student->getCampusCollection()->getPropertyValues('id'),
+            $viewee->getCampusCollection()->getPropertyValues('id'),
             $viewer->getCampusCollection()->getPropertyValues('id')
         ));
     }
