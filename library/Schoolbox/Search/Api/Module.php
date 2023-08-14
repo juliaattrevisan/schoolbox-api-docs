@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api;
 
-use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\User\Formatter\Factory;
@@ -34,8 +35,22 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
-        $permission = new IsLoggedIn();
-        $this->register(self::METHOD_GET, '', 'getSearch', $permission);
+        $this->register(
+            self::METHOD_GET,
+            '',
+            'getSearch',
+            new Rule\IsLoggedIn(),
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/folder/{folderId}',
+            'getSearchWithinFolder',
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                fn (array $params = []) => $params['folderId'] ?? null,
+                Access::getInstance(),
+            ),
+        );
     }
 
     /**

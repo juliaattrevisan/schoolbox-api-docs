@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
 use Schoolbox\Search\Api\Source\ISource;
@@ -121,6 +122,18 @@ class Controller extends Base
         } else {
             $this->sendJsonError('Search keyword must be at least 2 characters', 400);
         }
+    }
+
+    /**
+     * Search for all results which match a keyword within a folder.
+     *
+     * @api GET /api/search/folder/{folderId}
+     * @since 23.1
+     *
+     * @return void
+     */
+    public function getSearchWithinFolder(Folder\Model $folder): void
+    {
     }
 
     /**
