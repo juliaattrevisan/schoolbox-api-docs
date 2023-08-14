@@ -181,29 +181,29 @@
         }
 
         /**
-         * @param commentCheckbox element - Checkbox element
+         * @param targetCheckbox element - Checkbox element
          * @param alwaysReadOnly bool - Whether always read only - true for staff
-         * @param commentsAllowed bool - Whether comments allowed
+         * @param isChecked bool - Whether it's checked
          * @param permission int - Deny, General, General + Confidential
          */
-        function initCheckbox(commentCheckbox, alwaysReadOnly, commentsAllowed, permission)
+        function initCheckbox(targetCheckbox, alwaysReadOnly, isChecked, permission)
         {
-            let commentCheckboxLabel = $("label[for='" + commentCheckbox.attr('id') +"']");
+            let targetCheckboxLabel = $("label[for='" + targetCheckbox.attr('id') +"']");
             if (alwaysReadOnly) {
-                commentCheckbox.attr('checked', 'checked');
-                commentCheckbox.attr('readonly', 'readonly');
-                commentCheckbox.attr('data-always-read-only', 1);
+                targetCheckbox.attr('checked', 'checked');
+                targetCheckbox.attr('readonly', 'readonly');
+                targetCheckbox.attr('data-always-read-only', 1);
                 if (permission === '0') {
-                    commentCheckboxLabel.hide();
+                    targetCheckboxLabel.hide();
                 }
             } else {
-                if (commentsAllowed) {
-                    commentCheckbox.attr('checked', 'checked');
+                if (isChecked) {
+                    targetCheckbox.attr('checked', 'checked');
                 }
-                commentCheckbox.attr('data-always-read-only', 0);
+                targetCheckbox.attr('data-always-read-only', 0);
                 if (permission === '0') {
-                    commentCheckbox.prop('checked', false);
-                    commentCheckboxLabel.hide();
+                    targetCheckbox.prop('checked', false);
+                    targetCheckboxLabel.hide();
                 }
             }
         }
