@@ -70,39 +70,48 @@ class Controller extends Base
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
-            $translatedResults       = [];
-            $translatedFolderResults = [];
+            $translatedResults = [];
             foreach ($results as $result) {
                 $resultKey = $result->type . '.' . $result->id;
                 if ($result->folder) {
-                    // Translate this into a folder result?
-                    // Inject $translatedResult into the results?
-                    // Load three folder results, then the next cursor?
-                    if (!isset($translatedFolderResults[$result->folder->getId()])) {
+                    // Is this a result with a folder? If so: translate this
+                    // into a folder result, and inject a page of results within
+                    // that folder into the result.
+                    // Do not add the folder result more than once, if there is
+                    // more than one result for the same folder: the search
+                    // results within the folder will contain a reasonable
+                    // subset of results.
+                    if (!isset($translatedResults[$resultKey])) {
+                        // Finagle a raw result for the folder, and hydrate that
+                        // into a full result.
+                        // TODO need to populate page subtype
                         $rawFolderResult = new RawResult(
                             $result->folder->getId(),
                             $result->folder->getTitle(),
-                            // Which kind of page?
-                            // TODO need to populate subtype
                             'page',
                             $result->relevance,
                         );
-                        [$translatedFolderResult] = $this->hydrator->hydrate(
+                        [$folderResult] = $this->hydrator->hydrate(
                             $keyword,
                             [$rawFolderResult],
                             $this->getUser(),
                         );
-                        $translatedFolderResults[$result->folder->getId()] = $translatedFolderResult;
-                        $translatedResults[$resultKey] ??= call_user_func($this->fullResultTranslator, $translatedFolderResult);
+                        if (!$folderResult) {
+                            continue;
+                        }
 
-                        // Add search results for this folder
+                        // Translate the folder result
+                        $translatedResults[$resultKey] = call_user_func($this->fullResultTranslator, $folderResult);
+
+                        // Add search results for this folder to the
+                        // `_subResults` key of the translated result
                         ['results' => $folderResults, 'nextCursor' => $folderNextCursor] = $this->populateResultSet(
                             $keyword,
                             $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $result->folder),
                             self::RESULT_LIMIT_WITHIN_FOLDER,
                         );
                         $translatedResults[$resultKey]['_subResults'] = [
-                            'data' => array_map($this->fullResultTranslator, $folderResults),
+                            'data'     => array_map($this->fullResultTranslator, $folderResults),
                             'metadata' => [
                                 'count'  => null,
                                 'cursor' => [
@@ -113,14 +122,12 @@ class Controller extends Base
                         ];
                     }
                 } else {
-                    $translatedResults[$resultKey] ??= call_user_func($this->fullResultTranslator, $result);
+                    $translatedResults[$resultKey] = call_user_func($this->fullResultTranslator, $result);
                 }
             }
             $translatedResults = array_values($translatedResults);
 
             // Finally output the response
-            // Non-folder requests: find items in folders, and create responses
-            // for their folders
             $this->response = $this->responseAsJson(
                 [
                     'data'     => $translatedResults,
