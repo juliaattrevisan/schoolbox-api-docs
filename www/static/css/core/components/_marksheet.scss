@@ -29,7 +29,7 @@
             justify-content: flex-end;
             flex-wrap: wrap;
         }
-        .indicator {
+        .legend-indicator {
             position: relative;
             top: 0.75rem;
             margin-right: 0.5rem;
@@ -65,27 +65,28 @@
         }
     }
 
-    // Indicators: used in legend, so don't put in .marksheet
-    .indicator {
+    // Indicators.
+    //  * Class 'indicator' is used for a different purpose in the Rubric Markbook, so 'legend-indicator' is used here to avoid confusion.
+    .legend-indicator {
         position: absolute;
         top: 0;
         right: 0;
         width: 0;
         height: 0;
     }
-    .indicator.indicator-none {
+    .legend-indicator.indicator-none {
         border-top: 0.75rem solid $base;
         border-left: 0.75rem solid transparent;
     }
-    .indicator.indicator-pending {
+    .legend-indicator.indicator-pending {
         border-top: 0.75rem solid $warning-color;
         border-left: 0.75rem solid transparent;
     }
-    .indicator.indicator-published {
+    .legend-indicator.indicator-published {
         border-top: 0.75rem solid $success-color;
         border-left: 0.75rem solid transparent;
     }
-    .indicator.indicator-resubmit {
+    .legend-indicator.indicator-resubmit {
         border-top: 0.75rem solid $alert-color;
         border-left: 0.75rem solid transparent;
     }

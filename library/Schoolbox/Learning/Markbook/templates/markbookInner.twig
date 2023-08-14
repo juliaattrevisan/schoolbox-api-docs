@@ -19,10 +19,10 @@
 <div class="actions-small-1 small-12 columns">
     <div class="legend">
         <div class="indicators">
-            <p class="meta"><span class="indicator indicator-none"></span>Unmarked</p>
-            <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
-            <p class="meta"><span class="indicator indicator-resubmit"></span>Resubmit</p>
-            <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
+            <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
+            <p class="meta"><span class="legend-indicator indicator-pending"></span>Unpublished draft</p>
+            <p class="meta"><span class="legend-indicator indicator-resubmit"></span>Resubmit</p>
+            <p class="meta"><span class="legend-indicator indicator-published"></span>Mark Published</p>
         </div>
     </div>
     <div class="checklist">
@@ -262,7 +262,7 @@
                                        title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment : '' }}">{{ decorator.label(participant, false) }}</span>
                                 {% endif %}
                                 {% if participant.hasSubmittedResponse or participant.resubmissionRequired or participant.hasPublishedFeedback or draftMark %}
-                                    <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
+                                    <span class="legend-indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                 {% endif %}
                                 {% if not participant.plan.isDynamic %}
                                     <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
