@@ -29,8 +29,6 @@
     // A bar that sits (generally) at the bottom of the card with actions that a user can take. Left aligned so that
     // these actions are visually distinct if this card appears in a component and the component has actions.
     &__actions {
-        // display: flex;
-        // justify-content: flex-start;
         min-inline-size: 40px;
 
         a {
@@ -62,7 +60,11 @@
             background-color: var(--content-ui-hover);
             filter: grayscale(0%);
         }
-        a::before {
+        // To make the entire card clickable, we make the anchor fill the card
+        // this aids accessibility, providing better screen reader context than
+        // wrapping the entire card in an anchor while also allowing a wider click target
+        // https://inclusive-components.design/cards/
+        a:first-child::before {
             bottom: 0;
             content: " ";
             left: 0;

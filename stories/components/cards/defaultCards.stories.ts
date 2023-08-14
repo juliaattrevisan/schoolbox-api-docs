@@ -136,7 +136,7 @@ export const Link: Story = {
                         </div>
                     </div>
                     <div class="l-flex-col l-flex--justify-center f-no-margins">
-                        <h3 class=""><a href="">Critical and Creative Thinking - Level 1</a></h3>
+                        <h3 class=""><a href="#first-link">Critical and Creative Thinking - Level 1</a></h3>
                         <span class="meta">Learning</span>
                     </div>
                 </div>
