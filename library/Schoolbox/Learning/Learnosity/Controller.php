@@ -767,7 +767,9 @@ class Controller extends Base
         ]);
 
         /* Fetch all the assess_attempt.learnosity_references for $assessment
-         * for a student's most recent attempt and store then in a hashtable
+         * for a student's most recent completed attempt and store then in a hashtable
+         *
+         * Remove this deduping if you wanted to show all attempts regardless of completion status.
          */
         $sessions = [];
         $users = [];
