@@ -208,14 +208,16 @@ function formatPortrait(id: string) {
         <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
             <div class="l-flex-col">
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
-                    <div class="l-pad-m">
+                    <div class="l-pad-s">
                         <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                     </div>
                 </div>
                 <div
                     v-for="(result, i) in results"
                     :key="i"
-                    :class="`c-card c-card--link ${i === arrowCounter ? 'c-card--active' : ''}`"
+                    :class="`c-card c-card--link c-card--border-end ${i === arrowCounter ? 'c-card--active' : ''}`"
+                    @mouseover="arrowCounter = i"
+                    @mouseleave="arrowCounter = -1"
                 >
                     <div class="l-flex-row l-flex--center-align l-gap-m l-pad-xs--vert">
                         <div class="c-img c-img--l c-img--round">
@@ -243,29 +245,27 @@ function formatPortrait(id: string) {
                         <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                     </div>
                 </a>
-                <template v-if="isLoading">
-                    <div v-for="(row, index) in 3" :key="index" class="c-card c-card--loading">
-                        <div class="l-flex-row l-gap-m">
-                            <div class="c-img c-img--round">
-                                <div class="c-img__wrapper">
-                                    <div class="img-placeholder"></div>
-                                </div>
-                            </div>
-                            <div class="l-flex-col l-flex--center-justify l-flex__item--1 l-gap-s">
-                                <h3></h3>
-                                <span></span>
+                <div v-if="isLoading" class="c-card c-card--loading">
+                    <div class="l-flex-row l-gap-m">
+                        <div class="c-img c-img--round">
+                            <div class="c-img__wrapper">
+                                <div class="img-placeholder"></div>
                             </div>
                         </div>
+                        <div class="l-flex-col l-flex--center-justify l-flex__item--1 l-gap-s">
+                            <h3></h3>
+                            <span></span>
+                        </div>
                     </div>
-                </template>
+                </div>
                 <template v-if="!isLoading && !results.length">
                     <div class="c-card">
-                        <div class="l-pad-m">
+                        <div class="l-pad-s">
                             <span class="meta">No users were found matching "{{ keyword }}"</span>
                         </div>
                     </div>
                     <a class="c-card c-card--link c-card--active" :href="`${paths.searchPage}${keyword}#all`">
-                        <div class="l-pad-m">
+                        <div class="l-pad-s">
                             <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
                         </div>
                     </a>

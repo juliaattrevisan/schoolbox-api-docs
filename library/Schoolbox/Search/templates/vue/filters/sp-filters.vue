@@ -43,8 +43,9 @@ async function onApplySelected() {
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .filters {
+    display: none; // hidden until filters are implemented
     max-width: 400px;
 }
 </style>
