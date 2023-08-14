@@ -34,36 +34,38 @@
                 <ul class="information-list">
                     {% for unit in course.units %}
                         <li class="interact" data-unit="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
-                            <div class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <h3 class="icon-unit">
-                                            {% if unit.isBeforeOpenDate==false or readOnly == false %}
-                                                {% if unit.specification.folder.id in accessibleFolderIds %}
-                                                    <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>
-                                                {% else %}
-                                                    {{ unit.title }}
-                                                {% endif %}
-                                            {% else %}
-                                                {{ unit.title }}
-                                            {% endif %}
-                                        </h3>
-                                        <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
-                                    </div>
-                                </div>
-                                {% if readOnly == false %}
-                                    <nav>
-                                        <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
-                                    </nav>
-                                    <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
-                                        {% if unit.isAfterDueDate == false %}
-                                            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
-                                        {% endif %}
-                                    </ul>
-                                {% endif %}
-                            </div>
-
                             <ul class="action-list">
+                                <li>
+                                    <div class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="card small-12">
+                                                <h3 class="icon-unit">
+                                                    {% if unit.isBeforeOpenDate==false or readOnly == false %}
+                                                        {% if unit.specification.folder.id in accessibleFolderIds %}
+                                                            <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>
+                                                        {% else %}
+                                                            {{ unit.title }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {{ unit.title }}
+                                                    {% endif %}
+                                                </h3>
+                                                <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
+                                            </div>
+                                        </div>
+                                        {% if readOnly == false %}
+                                            <nav>
+                                                <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
+                                            </nav>
+                                            <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
+                                                {% if unit.isAfterDueDate == false %}
+                                                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
+                                                {% endif %}
+                                            </ul>
+                                        {% endif %}
+                                    </div>
+                                </li>
+
                                 {% for assessment in unit.assessables %}
 
 
