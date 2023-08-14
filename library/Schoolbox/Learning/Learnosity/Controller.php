@@ -240,7 +240,36 @@ class Controller extends Base
                 ],
                 /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
                  */
-                'regions'       => 'main',
+                'regions'       => [
+                    'top-left' => [
+                        ['type' => 'title_element'],
+                    ],
+                    'top-right' => [
+                        ['type' => 'itemcount_element'],
+                        ['type' => 'timer_element'],
+                        ['type' => 'reading_timer_element'],
+                        ['type' => 'pause_button'],
+                    ],
+                    'items' => [
+                        ['type' => 'progress_element'],
+                        ['type' => 'slider_element']
+                    ],
+                    'right' => [
+                        ['type' => 'save_button'],
+                        ['type' => 'reviewscreen_button'],
+                        ['type' => 'resource_button'],
+                        ['type' => 'accessibility_button'],
+                        ['type' => 'flagitem_button'],
+                        ['type' => 'masking_button'],
+                        ['type' => 'verticaltoc_element'],
+                    ],
+                    'bottom-left' => [
+                        ['type' => 'previous_button'],
+                    ],
+                    'bottom-right' => [
+                        ['type' => 'next_button'],
+                    ]
+                ],
                 /* This is our Quiz title, I guess
                  */
                 "title"         => $assessment->getTitle(),
@@ -248,7 +277,7 @@ class Controller extends Base
             ],
             /* Enable livestreaming lol
              */
-            'events' => true,
+            'events' => false,
             /* This is our Quiz title, I guess
              */
             'name'                 => $assessment->getTitle(),
