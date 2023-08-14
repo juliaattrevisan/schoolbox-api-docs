@@ -88,6 +88,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         null,
                         null,
+                        null,
                         // Image: folder's image if there is one
                         $folder->getCoverImage()
                             ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()

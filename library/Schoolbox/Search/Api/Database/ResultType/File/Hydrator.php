@@ -90,6 +90,7 @@ class Hydrator extends BaseHydrator
                         $match->type,
                         $match->relevance,
                         $file->getModifiedAt(),
+                        $file->getFolder(),
                         null,
                         // Image? show thumbnail, otherwise show mimetype thumb
                         null,
