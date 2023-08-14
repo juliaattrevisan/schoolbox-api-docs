@@ -773,7 +773,7 @@ class Controller extends Base
         $users = [];
 
         foreach ($attempts as $attempt) {
-            if (!isset($stack[$attempt->getUser()->getId()])) {
+            if ($attempt->isFinished() && !isset($stack[$attempt->getUser()->getId()])) {
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
 
                 /* ...because Learnosity wants it in this format
