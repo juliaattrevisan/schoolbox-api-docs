@@ -136,10 +136,17 @@
                                                         <p>{{ assessment.title }}</p>
                                                     </div>
                                                 {% endif %}
-
+                                                <p class="meta">
+                                                    {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% elseif course %}{{ course.name }}{% endif %} | {{ unit.title }}
+                                                </p>
                                                 <p class="meta">
                                                     <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
                                                 </p>
+                                                {% if "staff" == assessment.visibility %}
+                                                <p class="meta">
+                                                    <span class="icon-eye-hollow"></span>Not Visible to students
+                                                </p>
+                                                {% endif %}
                                             </div>
                                         </div>
 
