@@ -530,12 +530,6 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         border: 1px solid $body-bg;
     }
 
-    th .text-container,
-    td .text-container {
-        background-color: $white !important;
-        max-width: 180px;
-    }
-
     /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
     th:nth-child(2) > div {
         background-color: $body-bg;
@@ -548,8 +542,8 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 
     th.second-child,
     td.second-child {
-        max-width: 180px;
-        min-width: 180px;
+        max-width: 350px;
+        min-width: 250px;
     }
 
     .assessment {
