@@ -118,7 +118,7 @@
                                 {% endif %}
 
                                 <li class="interact" data-unit-assessment="{{ assessment.id }}">
-                                    <div{% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %} class="actions-small-1"{% endif %}>
+                                    <div{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %}>
                                         <div class="list-item">
                                             <div class="small-12 compact card wrap-down">
                                                 {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
