@@ -43,14 +43,14 @@ const relativeTime = window.Vue.computed(() => {
 
 <template>
     <div class="c-card" data-test-sp-results-list-result>
-        <div class="l-flex-row l-flex--center-align l-gap-m l-pad-xs--vert">
+        <div class="l-flex-row l-flex--align-center l-gap-m l-pad-xs--vert">
             <div :class="`c-img c-img--s ${isImgRounded ? 'c-img--round' : ''}`">
                 <div class="c-img__wrapper">
                     <div v-if="props.result.type === ResultTypes.NEWS" class="icon icon-news"></div>
                     <img v-else :src="(props.result.image as string)" :alt="`Photo of ${props.result.title}`" />
                 </div>
             </div>
-            <div class="l-flex-col l-flex--center-justify f-no-margins">
+            <div class="l-flex-col l-flex--justify-center f-no-margins">
                 <h3>
                     <!-- eslint-disable-next-line vue/no-v-html -->
                     <a :href="props.result.url" v-html="addMarks(props.result.title, queryStore.queryWordList)"></a>

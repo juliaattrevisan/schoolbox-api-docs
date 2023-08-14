@@ -40,21 +40,26 @@
         justify-content: center;
     }
 
-    &--center-align {
+    &--align-center {
         align-items: center;
     }
 
-    &--center-justify {
+    &--justify-center {
         justify-content: center;
+    }
+
+    &--justify-end {
+        justify-content: flex-end;
+    }
+
+    &--justify-space {
+        justify-content: space-between;
     }
 
     &__item {
         &--1 {
             flex: 1;
         }
-    }
-    &--spacious {
-        justify-content: space-between;
     }
 
     @each $size in $global-sizes {

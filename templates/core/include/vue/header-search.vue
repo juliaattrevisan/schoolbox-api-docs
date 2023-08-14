@@ -219,7 +219,7 @@ function formatPortrait(id: string) {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex-row l-flex--center-align l-gap-m l-pad-xs--vert">
+                    <div class="l-flex-row l-flex--align-center l-gap-m l-pad-xs--vert">
                         <div class="c-img c-img--l c-img--round">
                             <div class="c-img__wrapper">
                                 <img
@@ -228,7 +228,7 @@ function formatPortrait(id: string) {
                                 />
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--center-justify f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h3>
                                 <a :href="paths.userPage + result.id">{{ result.formattedName }}</a>
                             </h3>
@@ -252,7 +252,7 @@ function formatPortrait(id: string) {
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--center-justify l-flex__item--1 l-gap-s">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-s">
                             <h3></h3>
                             <span></span>
                         </div>
