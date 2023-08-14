@@ -78,7 +78,6 @@ class Hydrator extends BaseHydrator
                         return null;
                     }
 
-                    // TODO consider how to load items within the folder
                     return new FullResult(
                         $match,
                         $match->id,

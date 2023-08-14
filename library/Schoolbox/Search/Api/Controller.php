@@ -73,7 +73,6 @@ class Controller extends Base
             $translatedResults       = [];
             $translatedFolderResults = [];
             foreach ($results as $result) {
-                $translatedResult = call_user_func($this->fullResultTranslator, $result);
                 $resultKey = $result->type . '.' . $result->id;
                 if ($result->folder) {
                     // Translate this into a folder result?
@@ -103,7 +102,7 @@ class Controller extends Base
                             self::RESULT_LIMIT_WITHIN_FOLDER,
                         );
                         $translatedResults[$resultKey]['_subResults'] = [
-                            'data' => $folderResults,
+                            'data' => array_map($this->fullResultTranslator, $folderResults),
                             'metadata' => [
                                 'count'  => null,
                                 'cursor' => [
@@ -114,7 +113,7 @@ class Controller extends Base
                         ];
                     }
                 } else {
-                    $translatedResults[$resultKey] ??= $translatedResult;
+                    $translatedResults[$resultKey] ??= call_user_func($this->fullResultTranslator, $result);
                 }
             }
             $translatedResults = array_values($translatedResults);
