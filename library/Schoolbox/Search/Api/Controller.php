@@ -18,6 +18,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Search\Api\Cursor\RawResult;
+use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
 use Schoolbox\Search\Api\Source\ISource;
@@ -32,6 +34,11 @@ class Controller extends Base
      * Maximum number of search results to return per call.
      */
     private const MAX_RESULT_LIMIT = 10;
+
+    /**
+     * Number of search results to return within a folder.
+     */
+    private const RESULT_LIMIT_WITHIN_FOLDER = 3;
 
     /**
      * Constructor
@@ -63,12 +70,61 @@ class Controller extends Base
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
+            $translatedResults       = [];
+            $translatedFolderResults = [];
+            foreach ($results as $result) {
+                $translatedResult = call_user_func($this->fullResultTranslator, $result);
+                $resultKey = $result->type . '.' . $result->id;
+                if ($result->folder) {
+                    // Translate this into a folder result?
+                    // Inject $translatedResult into the results?
+                    // Load three folder results, then the next cursor?
+                    if (!isset($translatedFolderResults[$result->folder->getId()])) {
+                        $rawFolderResult = new RawResult(
+                            $result->folder->getId(),
+                            $result->folder->getTitle(),
+                            // Which kind of page?
+                            // TODO need to populate subtype
+                            'page',
+                            $result->relevance,
+                        );
+                        [$translatedFolderResult] = $this->hydrator->hydrate(
+                            $keyword,
+                            [$rawFolderResult],
+                            $this->getUser(),
+                        );
+                        $translatedFolderResults[$result->folder->getId()] = $translatedFolderResult;
+                        $translatedResults[$resultKey] ??= call_user_func($this->fullResultTranslator, $translatedFolderResult);
+
+                        // Add search results for this folder
+                        ['results' => $folderResults, 'nextCursor' => $folderNextCursor] = $this->populateResultSet(
+                            $keyword,
+                            $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $result->folder),
+                            self::RESULT_LIMIT_WITHIN_FOLDER,
+                        );
+                        $translatedResults[$resultKey]['_subResults'] = [
+                            'data' => $folderResults,
+                            'metadata' => [
+                                'count'  => null,
+                                'cursor' => [
+                                    'current' => null,
+                                    'next'    => $folderNextCursor,
+                                ],
+                            ]
+                        ];
+                    }
+                } else {
+                    $translatedResults[$resultKey] ??= $translatedResult;
+                }
+            }
+            $translatedResults = array_values($translatedResults);
+
             // Finally output the response
             // Non-folder requests: find items in folders, and create responses
             // for their folders
             $this->response = $this->responseAsJson(
                 [
-                    'data'     => array_map($this->fullResultTranslator, $results),
+                    'data'     => $translatedResults,
                     'metadata' => [
                         'count'  => null,
                         'cursor' => [
@@ -184,7 +240,7 @@ class Controller extends Base
      * @param string                  $keyword
      * @param SearchFilter\DataObject $filter
      * @param int                     $limit
-     * @return array{results: array, nextCursor: string}
+     * @return array{results: array<FullResult>, nextCursor: string}
      */
     private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit): array
     {
