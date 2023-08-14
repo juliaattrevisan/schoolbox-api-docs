@@ -102,6 +102,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * document
      * * other
      *
+     * (For now it's just "file" though)
+     *
      * @return string
      */
     protected function buildTypeExpression(): string
