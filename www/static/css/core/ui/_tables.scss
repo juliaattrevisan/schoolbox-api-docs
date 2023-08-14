@@ -550,9 +550,12 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         font-weight: normal;
     }
 
+    /* To override '.indicator' styles in _marksheet.css. */
     .indicator {
         font-weight: normal;
         padding-left: 2rem;
+        position: static;
+        top: 0;
         width: auto;
     }
 
