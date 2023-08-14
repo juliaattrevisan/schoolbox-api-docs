@@ -142,6 +142,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * The file's folder is its `category` column.
+     *
+     * @return string|null
+     */
+    public function buildFolderExpression(): ?string
+    {
+        return 'f.category';
+    }
+
+    /**
      * Files are fetched from the `file` table: mimetypes will be derived from
      * `allowedFileTypes`.
      *

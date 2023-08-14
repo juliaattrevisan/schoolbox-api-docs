@@ -35,6 +35,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $idPart        = $this->buildIdExpression();
         $datePart      = $this->buildDateExpression();
         $creatorPart   = $this->buildCreatorExpression();
+        $folderPart    = $this->buildFolderExpression();
 
         // Apply filter
         if ($filter->types) {
@@ -64,6 +65,15 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             if (isset($creatorPart)) {
                 $whereParts[]            = "$creatorPart = :filterCreator";
                 $params['filterCreator'] = $filter->creator->getId();
+            } else {
+                return null;
+            }
+        }
+        if ($filter->folder) {
+            // No folder part? Exclude this type of result entirely
+            if (isset($folderPart)) {
+                $whereParts[]           = "$folderPart = :filterFolder";
+                $params['filterFolder'] = $filter->folder->getId();
             } else {
                 return null;
             }
@@ -252,6 +262,20 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *                     a creator filter on the search.)
      */
     abstract protected function buildCreatorExpression(): ?string;
+
+    /**
+     * Build the expression for determining the folder for an item in this
+     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     *
+     * This should evaluate to an integer value, corresponding to the folder the
+     * item belongs in.
+     *
+     * @return string|null The expression, or `null` if this item type does not
+     *                     have a folder.
+     *                     (Items without folder will never match if there is a
+     *                     folder filter on the search.)
+     */
+    abstract protected function buildFolderExpression(): ?string;
 
     /**
      * Build the FROM part of the query, including any joins; e.g.:

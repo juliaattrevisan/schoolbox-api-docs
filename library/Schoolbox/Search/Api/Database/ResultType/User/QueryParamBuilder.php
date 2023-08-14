@@ -136,6 +136,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * Users do not have folders, thus this returns `null`.
+     *
+     * @return string|null
+     */
+    public function buildFolderExpression(): ?string
+    {
+        return null;
+    }
+
+    /**
      * User results need to be fetched from the user and groups (a.k.a. roles)
      * tables.
      */
