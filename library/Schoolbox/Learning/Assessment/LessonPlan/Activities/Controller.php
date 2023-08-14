@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Course\Markbook\CourseMarkbook;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -107,8 +108,6 @@ class Controller extends Base
      */
     public function getHomepageComponent(Folder\Model $folder, ?int $componentId = null)
     {
-        /** @var AccessMapper $accessMapper */
-        $accessMapper = AccessMapper::getInstance();
         $dateStart = null;
         $dateEnd = null;
         // if there is a component specified grab the active date range
@@ -140,7 +139,6 @@ class Controller extends Base
             return $assessment->getContext()->getId();
         });
         $courses = CourseImplementationMapper::getInstance()->findByFolderId($folder->getId());
-        $filledCourses = new Collection();
         $accessibleFolderIds = [];
         foreach ($courses as $course) {
             $specFolderIds = [];
@@ -161,7 +159,7 @@ class Controller extends Base
                     if ($a->getDueDate()->eq($b->getDueDate())) {
                         return strnatcasecmp($a->getTitle(), $b->getTitle());
                     }
-                    return $a->getDueDate()->compare($b->getDueDate());
+                    return $b->getDueDate()->compare($a->getDueDate());
                 }
             )
             ->filter(static function (\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unit) {
@@ -190,7 +188,25 @@ class Controller extends Base
         // filter out courses that contain no assessments
         $courses = $courses->filter(function ($course) {
             return $course->getUnits()->count();
-        });
+        })
+        ->sortByCallback(function (CourseImplementation $left, CourseImplementation $right) {
+            // Course Import's folder name
+            $folderNameCompare = strnatcasecmp($left->getFolder()->getTitle(), $right->getFolder()->getTitle());
+            if (0 !== $folderNameCompare) {
+                return $folderNameCompare;
+            }
+
+            // Course-imports first unit open date
+            $firstLeftUnitImpl   = CourseMarkbook::getFirstUnitImpl($left);
+            $firstRightUnitImpl  = CourseMarkbook::getFirstUnitImpl($right);
+            $unitOpenDateCompare = $firstLeftUnitImpl->getOpenDate()->compare($firstRightUnitImpl->getOpenDate());
+            if (0 !== $unitOpenDateCompare) {
+                return $unitOpenDateCompare;
+            }
+
+            // Course import id
+            return $left->getId() <=> $right->getId();
+        }, true);
 
         $twigData = [
             'courses'           => $courses,
