@@ -6,12 +6,16 @@
 // Margins usually should no longer be applied directly on an element and should instead be added to the parent
 // via the l-gap utility classes
 .f-no-margins {
+    h1,
+    h2,
     h3,
     h4,
     h5,
     h6,
     a,
-    span {
-        margin: 0;
+    span,
+    input,
+    button {
+        margin: 0 !important;
     }
 }

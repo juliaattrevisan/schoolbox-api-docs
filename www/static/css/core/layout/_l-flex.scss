@@ -60,6 +60,9 @@
         &--1 {
             flex: 1;
         }
+        &--0-shrink {
+            flex-shrink: 0;
+        }
     }
 
     @each $size in $global-sizes {
