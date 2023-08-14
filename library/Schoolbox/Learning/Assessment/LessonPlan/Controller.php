@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
 class Controller extends Assessment\Controller
@@ -135,5 +136,26 @@ class Controller extends Assessment\Controller
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // noop
+    }
+
+    /**
+     * APIs
+     */
+    public function getActivities(Model $assessment): void
+    {
+        $this->response = $this->responseAsJson($assessment->getLinkedAssessments());
+    }
+
+    public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
+    {
+        $newLink = $assessment->setLinkedAssessments($assessment->getLinkedAssessments()->add($linkedAssessment));
+        $this->getAssessmentMapper()->save($newLink, $this->getUser());
+
+        $this->response = $this->responseAsJson($newLink->getLinkedAssessments());
+    }
+
+    public function deleteActivity(Model $assessment, IAssessable $linkedAssessment): void
+    {
+        return;
     }
 }

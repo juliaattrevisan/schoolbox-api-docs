@@ -76,17 +76,26 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Linked Assessments
        */
-        $this->joinsVia(
-            'lesson_plan_assessment',
-            AssessmentMapper::class,
-            'id',
-            'lesson_plan_id',
-            'assessment_id',
-            null,
-            null,
-            null,
-            'linkedAssessments'
+        $this->hasJoin(
+            'linkedAssessments',
+            [
+                'multiple'  => true,
+                'mapper'    => LinkedAssessments\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'lesson_plan_id',
+            ]
         );
+//        $this->joinsVia(
+//            'lesson_plan_assessment',
+//            AssessmentMapper::class,
+//            'id',
+//            'lesson_plan_id',
+//            'assessment_id',
+//            null,
+//            null,
+//            null,
+//            'linkedAssessments'
+//        );
 
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
@@ -110,12 +119,14 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('updatedBy', 'updatedBy')},
                 {$this->getJoinColumnString('deletedBy', 'deletedBy')},
                 {$this->getJoinColumnString('lessonPlanField', 'lessonPlanField')},
+                {$this->getJoinColumnString('assessmentModel', 'assessmentModel')},
                 {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
             LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy', true)}
+            LEFT JOIN {$this->getJoinSql('lessonPlanField', '', 'lessonPlanField')}
             LEFT JOIN {$this->getJoinSql('lessonPlanField', '', 'lessonPlanField')}
         ";
 
@@ -223,6 +234,15 @@ class Mapper extends \Schoolbox\Mapper
         $this->cascadeJoin('lessonPlanField', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getFields());
     }
 
+    /**
+     * Persist Lesson Plan attachments
+     *
+     * @param Model $lessonPlan
+     */
+    public function saveLinkedAssessments(Model $lessonPlan): void
+    {
+        $this->cascadeJoin('lesson_plan_assessment', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getLinkedAssessments());
+    }
 
     /**
      * Delete the fields that were associated with $lessonPlanTemplate

@@ -115,6 +115,9 @@ class Module extends BaseModule
         $preloadParticipant            = function ($params) {
             return $this->preloadAssessmentAndStudent($params);
         };
+        $preloadLessonPlanAPI           = function ($params) {
+            return $this->preloadLessonPlanAPI($params);
+        };
 
         // rules in use
         $isSuper                  = $this->getAuthRule('isSuperuser');
@@ -197,6 +200,14 @@ class Module extends BaseModule
          */
         $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewSimilarityReport, $preloadAssessment);
         $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewSimilarityReport, $preloadAssessment);
+
+        /*
+         * Lesson Plan APIs
+         */
+        $this->register('GET', "{$assRoute}/activities", 'getActivities', $loggedIn, $preloadAssessment);
+        //POST/DELETE /learning/assessments/<lesson plan assessment id>/activities/<link id>
+        $this->register('POST', "{$assRoute}/activities/{linkId:\d+}", 'postActivity', $canModify, $preloadLessonPlanAPI);
+        $this->register('DELETE', "{$assRoute}/activities/{linkId:\d+}", 'deleteActivity', $canModify, $preloadLessonPlanAPI);
 
 
         // LTI assessment related routes
@@ -420,6 +431,47 @@ class Module extends BaseModule
 
         return [
             'assessment' => $assessment
+        ];
+    }
+
+
+    /**
+     * Convert route params into an assessment object for lesson plan hydration
+     *
+     * @param array     $params
+     * @return array
+     * @throws ApplicationException\Exception If assessment is not found
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     */
+    protected function preloadLessonPlanAPI(array $params): array
+    {
+        try {
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+        } catch (MapperException\Deleted $e) {
+            $assessment = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+        try {
+            $linkedAssessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['linkId']);
+        } catch (MapperException\Deleted $e) {
+            $linkedAssessment = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // set the controller
+        $this->setControllerFromAssessment($assessment);
+
+        return [
+            'assessment' => $assessment,
+            'linkedAssessment' => $linkedAssessment
         ];
     }
 

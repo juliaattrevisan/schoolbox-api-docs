@@ -21,7 +21,7 @@ class Model
     /**
      * Lesson Plan
      */
-    private LessonPlanModel $lessonPlan;
+    private  $lessonPlan;
 
     /**
      * Linked Assessment ID
@@ -59,9 +59,9 @@ class Model
     }
 
     /**
-     * @param LessonPlanModel $lessonPlan
+     * @param $lessonPlan
      */
-    public function setLessonPlan(LessonPlanModel $lessonPlan): self
+    public function setLessonPlan( $lessonPlan): self
     {
         $this->lessonPlanId = $lessonPlan->getId();
         $this->lessonPlan = $lessonPlan;
@@ -88,7 +88,7 @@ class Model
     /**
      * @return IAssessable
      */
-    public function getAssessment(): IAssessable
+    public function getAssessmentModel(): IAssessable
     {
         return $this->assessment;
     }
@@ -96,7 +96,7 @@ class Model
     /**
      * @param IAssessable $assessment
      */
-    public function setAssessment(IAssessable $assessment): self
+    public function setAssessmentModel(IAssessable $assessment): self
     {
         $this->assessmentId = $assessment->getId();
         $this->assessment = $assessment;
