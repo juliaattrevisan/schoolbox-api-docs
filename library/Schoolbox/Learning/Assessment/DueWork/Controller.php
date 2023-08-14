@@ -685,7 +685,7 @@ class Controller extends Assessment\Controller
 
             if (count($marks)) {
                 foreach ($allIndicatorUsageIds as $indicatorUsageId) {
-                    if (array_key_exists('published', $marks[$indicatorUsageId]) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                    if (array_key_exists('published', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
                         $row[]      = $descriptor ? $descriptor->getDescription() : '';
                         $row[]      = $marks[$indicatorUsageId]['published']->getValue();
