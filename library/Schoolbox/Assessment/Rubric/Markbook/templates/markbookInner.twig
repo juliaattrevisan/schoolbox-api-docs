@@ -244,7 +244,7 @@
                                     <th class="fixed-left overall" rowspan="{{ rowSpan }}">Overall</th>
                                 {% endif %}
                                 {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                <th class="fixed-left second-child capability">{{ capabilityData.name }}</th>
+                                <th class="fixed-left white second-child capability">{{ capabilityData.name }}</th>
 
                                 {% for studentId, studentData in students %}
                                     {% if capabilityData.show %}
@@ -264,7 +264,7 @@
                             {% for indicatorId, indicatorData in capabilityData.indicators %}
                                 <tr class="indicator-row summated">
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left second-child indicator">{{ indicatorData.name }}</th>
+                                    <th class="fixed-left white second-child indicator">{{ indicatorData.name }}</th>
                                     {% for studentId, studentData in students %}
                                         <td class="mark">
                                             {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
