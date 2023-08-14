@@ -32,16 +32,18 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param UnitSpecificationMapper   $unitSpecificationMapper
-     * @param UnitImplementationMapper  $unitImplementationMapper
-     * @param LessonPlanMapper          $lessonPlanMapper
-     * @param AssessmentMapperProxy     $assessmentMapperProxy
-     * @param \Component_InstanceMapper $componentInstanceMapper
-     * @param AccessMapper              $accessMapper
+     * @param UnitSpecificationMapper    $unitSpecificationMapper
+     * @param UnitImplementationMapper   $unitImplementationMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param LessonPlanMapper           $lessonPlanMapper
+     * @param AssessmentMapperProxy      $assessmentMapperProxy
+     * @param \Component_InstanceMapper  $componentInstanceMapper
+     * @param AccessMapper               $accessMapper
      */
     public function __construct(
         private UnitSpecificationMapper $unitSpecificationMapper,
         private UnitImplementationMapper $unitImplementationMapper,
+        private CourseImplementationMapper $courseImplementationMapper,
         private LessonPlanMapper $lessonPlanMapper,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private \Component_InstanceMapper $componentInstanceMapper,
@@ -138,11 +140,11 @@ class Controller extends Base
         ->groupByCallback(function ($assessment) {
             return $assessment->getContext()->getId();
         });
-        $courses = CourseImplementationMapper::getInstance()->findByFolderId($folder->getId());
+        $courses = $this->courseImplementationMapper->findByFolderId($folder->getId());
         $accessibleFolderIds = [];
         foreach ($courses as $course) {
             $specFolderIds = [];
-            $course->setUnits(UnitImplementationMapper::getinstance()->findAllByCourseId($course->getId()));
+            $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
             foreach ($course->getUnits() as $unitImpl) {
                 if (isset($lessonPlans[$unitImpl->getId()])) {
                     $unitImpl->setAssessables($lessonPlans[$unitImpl->getId()]);

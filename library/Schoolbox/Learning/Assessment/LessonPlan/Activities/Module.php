@@ -117,6 +117,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getUnitSpecificationMapper(),
             $this->getUnitImplementationMapper(),
+            $this->getCourseImplementationMapper(),
             $this->getLessonPlanMapper(),
             $this->injector->get('assessmentDataSource'),
             $this->getComponentInstanceMapper(),
