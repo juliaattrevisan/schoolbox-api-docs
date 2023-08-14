@@ -112,8 +112,9 @@ class Controller extends Base
         $dateStart = null;
         $dateEnd = null;
         // if there is a component specified grab the active date range
-        if ($componentId) {
-            $instanceConfig = $this->componentInstanceMapper->findByInstanceId($componentId)->getConfigArray();
+        $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId);
+        if ($componentInstance) {
+            $instanceConfig = $componentInstance->getConfigArray();
 
             //if there is no source, update to the current homepage
             if ('' === trim($instanceConfig['componentname']['value'])) {
