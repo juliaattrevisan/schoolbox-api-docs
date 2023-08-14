@@ -113,10 +113,25 @@ class Mapper extends BaseMapper
      */
     public function findInvolvedTeamIds(\Schoolbox\User $user): array
     {
+        /* $user might be involved with teams either:
+         *     - as a player currently
+         *     - as a coach of a team currently
+         *     - as someone who was previously a coach of a team
+         *
+         * For now we'll just do it the same way as players
+         */
+
         $query = "
-            SELECT DISTINCT team_id
-            FROM {$this->getTable()}
-            WHERE user_id = :userId
+            (SELECT DISTINCT team_id
+            FROM sportsfixtures_team_user
+            WHERE user_id = :userId)
+
+            UNION
+
+            (SELECT DISTINCT team_id
+            FROM sportsfixtures_team_coach stc
+            INNER JOIN sportsfixtures_coach sc ON stc.coach_id = sc.user_id
+            WHERE sc.user_id = :userId)
         ";
 
         $statement = $this->getDatabase()->prepare($query);
