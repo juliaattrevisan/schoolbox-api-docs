@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Component_InstanceMapper;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -126,14 +127,14 @@ class Module extends BaseModule
     /**
      * @return CourseSpecificationMapper
      */
-    protected function getCourseSpecificationMapper()
+    protected function getCourseSpecificationMapper(): CourseSpecificationMapper
     {
         return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
     }
     /**
      * @return CourseImplementationMapper
      */
-    protected function getCourseImplementationMapper()
+    protected function getCourseImplementationMapper(): CourseImplementationMapper
     {
         return $this->getMapperFactory()->get(CourseImplementationMapper::class);
     }
@@ -141,7 +142,7 @@ class Module extends BaseModule
     /**
      * @return UnitSpecificationMapper
      */
-    protected function getUnitSpecificationMapper()
+    protected function getUnitSpecificationMapper(): UnitSpecificationMapper
     {
         return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
     }
@@ -149,7 +150,7 @@ class Module extends BaseModule
     /**
      * @return UnitImplementationMapper
      */
-    protected function getUnitImplementationMapper()
+    protected function getUnitImplementationMapper(): UnitImplementationMapper
     {
         return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
@@ -157,43 +158,43 @@ class Module extends BaseModule
     /**
      * @return LessonPlanMapper
      */
-    protected function getLessonPlanMapper()
+    protected function getLessonPlanMapper(): LessonPlanMapper
     {
         return $this->getMapperFactory()->get(LessonPlanMapper::class);
     }
 
     /**
-     * @return Mapper|Folder\Mapper
+     * @return Folder\Mapper
      * @throws InvalidArgumentException If class not found
      */
-    protected function getFolderMapper()
+    protected function getFolderMapper(): Folder\Mapper
     {
         return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 
     /**
-     * @return Mapper|ErrorMapper
+     * @return ErrorMapper
      * @throws InvalidArgumentException If class not found
      */
-    protected function getErrorMapper()
+    protected function getErrorMapper(): ErrorMapper
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 
     /**
-     * @return Mapper|\Component_InstanceMapper
+     * @return Component_InstanceMapper
      * @throws InvalidArgumentException If class not found
      */
-    protected function getComponentInstanceMapper()
+    protected function getComponentInstanceMapper(): Component_InstanceMapper
     {
-        return $this->getMapperFactory()->get(\Component_InstanceMapper::class);
+        return $this->getMapperFactory()->get(Component_InstanceMapper::class);
     }
 
     /**
-     * @return Mapper|AccessMapper
+     * @return AccessMapper
      * @throws InvalidArgumentException If class not found
      */
-    protected function getAccessMapper()
+    protected function getAccessMapper(): AccessMapper
     {
         return $this->getMapperFactory()->get(AccessMapper::class);
     }
