@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
@@ -133,6 +134,7 @@ class Controller extends Base
             return $assessment->getContext()->getId();
         });
         $courses = CourseImplementationMapper::getInstance()->findByFolderId($folder->getId());
+        $filledCourses = new Collection();
         $accessibleFolderIds = [];
         foreach ($courses as $course) {
             $course->setUnits(UnitImplementationMapper::getinstance()->findAllByCourseId($course->getId()));
@@ -141,6 +143,10 @@ class Controller extends Base
                     $unitImpl->setAssessables($lessonPlans[$unitImpl->getId()]);
                 }
             }
+            // filter out units that contain no assessments
+            $course->setUnits($course->getUnits()->filter(function ($unit) {
+                return $unit->getAssessables()->count();
+            }));
             $accessibleFolderIds[$course->getId()] = $course->getUnits()
             // this is to sort units and needs to be placed right after getUnits()
             ->sortByCallback(
@@ -159,6 +165,10 @@ class Controller extends Base
             })->getAll();
         }
 
+        // filter out courses that contain no assessments
+        $courses = $courses->filter(function ($course) {
+            return $course->getUnits()->count();
+        });
 
         $twigData = [
             'courses'           => $courses,
