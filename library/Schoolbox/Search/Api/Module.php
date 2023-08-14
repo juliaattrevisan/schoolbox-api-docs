@@ -17,6 +17,7 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\User\Formatter\Factory;
@@ -80,6 +81,7 @@ class Module extends BaseModule
                 new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
                 new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -94,6 +96,10 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Page\Hydrator(
                     $mapperFactory->get(FolderMapper::class),
+                    Access::getInstance(),
+                ),
+                new Database\ResultType\File\Hydrator(
+                    $mapperFactory->get(FileMapper::class),
                     Access::getInstance(),
                 ),
             ),

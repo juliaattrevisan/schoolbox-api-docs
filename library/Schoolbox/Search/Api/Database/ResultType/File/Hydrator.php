@@ -85,7 +85,8 @@ class Hydrator extends BaseHydrator
                         $file->getTitle(),
                         $this->buildBaseUrl()
                              ->withPath('send.php')
-                             ->withQuery(http_build_query(['id' => $file->getId()])),
+                             ->withQuery(http_build_query(['id' => $file->getId()]))
+                             ->__toString(),
                         $match->type,
                         $match->relevance,
                         $file->getModifiedAt(),
