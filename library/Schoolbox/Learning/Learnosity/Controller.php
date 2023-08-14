@@ -745,7 +745,7 @@ class Controller extends Base
                 /* ...because Learnosity wants it in this format
                  */
                 $users[$attempt->getUser()->getId()] = [
-                    'id' => $attempt->getUser()->getId(),
+                    'id' => (string)$attempt->getUser()->getId(),
                     'name' => $attempt->getUser()->getFullName()
                 ];
             }
