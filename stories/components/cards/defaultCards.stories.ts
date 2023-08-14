@@ -36,7 +36,7 @@ export const Standard: Story = {
                     </div>
                     <div class="l-flex-col l-flex--center-justify l-flex__item--1 l-pad-s--vert f-no-margins">
                         <h3 class=""><a href="">School Musical Auditions & Rehearsals</a></h3>
-                        <p class="meta"><span>By  <a href="/search/user/6">Willow Tenorio</a></span> <span>—<time title="Monday August 7th 2023 5:00am">1 week ago</time></span> <span>in <a>Extra-Curricular</a></p>
+                        <span class="meta">By <a href="/search/user/6">Willow Tenorio</a> —<time title="Monday August 7th 2023 5:00am">1 week ago</time> in <a>Extra-Curricular</a></span>
                     </div>
                     <nav class="c-nav-actions l-flex-row">
                         <a class="icon-view no-text" href="" title="Hide"></a>
@@ -74,8 +74,8 @@ export const Standard: Story = {
 export const Slimline: Story = {
     render: () => ({
         template: `
-            <div class="c-card l-pad-xs">
-                <div class="l-flex-row l-gap-m">
+            <div class="c-card">
+                <div class="l-flex-row l-gap-m l-pad-xs">
                     <div class="c-img">
                         <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
@@ -97,8 +97,8 @@ export const Slimline: Story = {
 export const SlimlineCentered: Story = {
     render: () => ({
         template: `
-            <div class="c-card l-pad-xs--vert">
-                <div class="l-flex-row l-gap-m l-flex--center-align">
+            <div class="c-card">
+                <div class="l-flex-row l-flex--center-align l-gap-m l-pad-xs--vert">
                     <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
                             <img src="/user.jpg" alt="Jana Reed profile photo" />
@@ -128,8 +128,8 @@ export const SlimlineCentered: Story = {
 export const Link: Story = {
     render: () => ({
         template: `
-            <a class="c-card c-card--link l-pad-xs--vert" href="">
-                <div class="l-flex-row l-gap-m">
+            <a class="c-card c-card--link" href="">
+                <div class="l-flex-row l-gap-m l-pad-xs--vert">
                     <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
                             <img src="https://schoolbox-static.cloud/23.0.5-1/images/badges/education/85.svg"/>

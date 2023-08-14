@@ -114,11 +114,9 @@
 
     /*
         Some additional rules for rounded images - they need whitespace around them as they generally look bad
-        stretching from edge to edge of their parent. Badges also get this treatment as all badges in our platform
-        are round.
+        stretching from edge to edge of their parent.
     */
-    &--round,
-    &--badge {
+    &--round {
         .c-img__wrapper {
             margin: var(--whitespace-xs);
         }

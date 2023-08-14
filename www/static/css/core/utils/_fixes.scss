@@ -1,0 +1,17 @@
+/*
+    The following is a list of fixes that are typically used to overrule deprecated featured added by Foundation.
+    As we move away from Foundation, these fixes should no longer be necessary and should be removed.
+*/
+
+// Margins usually should no longer be applied directly on an element and should instead be added to the parent
+// via the l-gap utility classes
+.f-no-margins {
+    h3,
+    h4,
+    h5,
+    h6,
+    a,
+    span {
+        margin: 0;
+    }
+}
