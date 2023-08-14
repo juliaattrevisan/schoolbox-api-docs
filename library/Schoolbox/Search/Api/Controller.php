@@ -58,7 +58,7 @@ class Controller extends Base
     public function getSearch(): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
-        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null);
+        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         if (mb_strlen($keyword) >= 2) {
             $cursor = new Cursor\Cursor(
@@ -134,20 +134,23 @@ class Controller extends Base
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
+        $filter = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $folder);
     }
 
     /**
      * Build a search filter data object, for passing into the cursor.
      *
-     * @param string|null $filterQueryString The filter from the query string, if any.
+     * @param string|null       $filterQueryString The filter from the query string, if any.
+     * @param Folder\Model|null $folder            If provided, the folder to filter search results to.
+     *                                             (This is never provided via the query string.)
      * @return SearchFilter\DataObject
      * @throws Exception if the filter has invalid data
      * @throws NotFound  if the creator is set, and cannot be found
      */
-    private function buildSearchFilter(?string $filterQueryString): SearchFilter\DataObject
+    private function buildSearchFilter(?string $filterQueryString, ?Folder\Model $folder): SearchFilter\DataObject
     {
         if (!isset($filterQueryString)) {
-            return new SearchFilter\DataObject(null, null, null, null);
+            return new SearchFilter\DataObject(null, null, null, null, $folder);
         }
         $decodedFilter = json_decode($filterQueryString, true);
 
@@ -192,6 +195,6 @@ class Controller extends Base
             }
         }
 
-        return new SearchFilter\DataObject($types, $fromDate, $toDate, $creator);
+        return new SearchFilter\DataObject($types, $fromDate, $toDate, $creator, $folder);
     }
 }
