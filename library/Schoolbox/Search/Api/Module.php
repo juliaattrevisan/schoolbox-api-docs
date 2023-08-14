@@ -51,6 +51,11 @@ class Module extends BaseModule
                 fn (array $params = []) => $params['folderId'] ?? null,
                 Access::getInstance(),
             ),
+            function (array $params) {
+                return [
+                    'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
+                ];
+            }
         );
     }
 

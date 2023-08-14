@@ -97,7 +97,8 @@ class Hydrator extends BaseHydrator
                         $file->getDescription(),
                         // Should this be modified by instead?
                         $file->getOwner(),
-                        [],
+                        // Context: file's folder
+                        [$file->getFolder(),],
                         [],
                     );
                 }
