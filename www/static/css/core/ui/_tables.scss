@@ -362,7 +362,7 @@ $rotate-span-width: 11rem;
 
     th.fixed-left:nth-child(2) {
         @media #{$medium-up} {
-            left: 180px !important; /* 180px to match width of a .profile-cell table cell. */
+            left: 180px; /* 180px to match width of a .profile-cell table cell. */
         }
     }
 
