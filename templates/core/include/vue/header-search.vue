@@ -212,28 +212,28 @@ function formatPortrait(id: string) {
                         <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                     </div>
                 </div>
-                <a
+                <div
                     v-for="(result, i) in results"
                     :key="i"
                     :class="`c-card c-card--link ${i === arrowCounter ? 'c-card--active' : ''}`"
-                    :href="paths.userPage + result.id"
-                    @mouseover="arrowCounter = i"
-                    @mouseleave="arrowCounter = -1"
                 >
-                    <div class="c-card__main">
+                    <div class="l-flex-row l-flex--center-align l-gap-m l-pad-xs--vert">
                         <div class="c-img c-img--l c-img--round">
                             <div class="c-img__wrapper">
-                                <img :src="formatPortrait(result.id)" alt="portrait photo" />
+                                <img
+                                    :src="formatPortrait(result.id)"
+                                    :alt="`Portrait photo of ${result.formattedName}`"
+                                />
                             </div>
                         </div>
-                        <div class="c-card__main-content">
-                            <a :href="paths.userPage + result.id"
-                                ><h3>{{ result.formattedName }}</h3></a
-                            >
+                        <div class="l-flex-col l-flex--center-justify f-no-margins">
+                            <h3>
+                                <a :href="paths.userPage + result.id">{{ result.formattedName }}</a>
+                            </h3>
                             <span class="meta">{{ result.metadata }}</span>
                         </div>
                     </div>
-                </a>
+                </div>
                 <a
                     v-if="results.length && totalCount > results.length"
                     class="c-card c-card--link c-card--active"
@@ -245,13 +245,13 @@ function formatPortrait(id: string) {
                 </a>
                 <template v-if="isLoading">
                     <div v-for="(row, index) in 3" :key="index" class="c-card c-card--loading">
-                        <div class="c-card__main">
+                        <div class="l-flex-row l-gap-m">
                             <div class="c-img c-img--round">
                                 <div class="c-img__wrapper">
                                     <div class="img-placeholder"></div>
                                 </div>
                             </div>
-                            <div class="c-card__main-content">
+                            <div class="l-flex-col l-flex--center-justify l-flex__item--1 l-gap-s">
                                 <h3></h3>
                                 <span></span>
                             </div>

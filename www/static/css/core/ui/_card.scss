@@ -7,6 +7,7 @@
     // Control radius from custom property
     border-radius: var(--roundness-cards);
     line-height: var(--base-line-height);
+    position: relative;
     text-align: start;
 
     // prevent overflow on all titles within
@@ -53,14 +54,21 @@
         padding: var(--whitespace-xs);
     }
 
-    // Cards can be an <a> tag, so we add a hover state
+    // When we want the whole card to be selectable
     &--link {
-        display: block;
         transition: background-color 0.2s ease-in-out;
         &:hover,
         :focus {
             background-color: var(--content-ui-hover);
             filter: grayscale(0%);
+        }
+        a::before {
+            position: absolute;
+            content: " ";
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
         }
     }
 

@@ -141,6 +141,7 @@ function onMouseOut(event: MouseEvent) {
         border: 0;
         background-color: transparent;
         color: var(--body-background);
+        font-size: 0; // is properly with --active
         height: var(--tabbar-height);
         width: var(--tabbar-height);
         padding: var(--base-font-size);

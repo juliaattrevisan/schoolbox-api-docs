@@ -128,7 +128,7 @@ export const SlimlineCentered: Story = {
 export const Link: Story = {
     render: () => ({
         template: `
-            <a class="c-card c-card--link" href="">
+            <div class="c-card c-card--link">
                 <div class="l-flex-row l-gap-m l-pad-xs--vert">
                     <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
@@ -140,7 +140,7 @@ export const Link: Story = {
                         <span class="meta">Learning</span>
                     </div>
                 </div>
-            </a>
+            </div>
         `,
     }),
 };
