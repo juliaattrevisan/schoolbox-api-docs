@@ -248,9 +248,9 @@ class Controller extends Base
                     ],
                     'top-right' => [
                         ['type' => 'itemcount_element'],
-                        ['type' => 'timer_element'],
-                        ['type' => 'reading_timer_element'],
                         ['type' => 'pause_button'],
+                        ['type' => 'reading_timer_element'],
+                        ['type' => 'timer_element'],
                     ],
                     'items' => [
                         ['type' => 'progress_element'],
