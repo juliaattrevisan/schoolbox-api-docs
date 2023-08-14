@@ -57,10 +57,36 @@ class Controller extends Base
         $externalUser->loadChildren([$user]); // Loads children into $user.
         $children = $user->getChildren();
 
+        // Create data structure needed by the Vue template (timetable-calendar.vue).
+        $userOptions = [];
+        foreach ($children as $child) {
+            $campuses = $child->getCampusCollection();
+            $userOptions[] = [
+                'userId' => $child->getId(),
+                'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
+                'formattedName' => $child->formatName(),
+                'yearLevel' => $child->getYear()?->getLongName('Year ')
+            ];
+        }
+
+        if (count($userOptions) > 0) {
+            // The selected user is the first of the $userOptions.
+            $selectedUser = $userOptions[0];
+        } else {
+            // The selected user is the logged in user.
+            $campuses = $user->getCampusCollection();
+            $selectedUser = [
+                'userId' => $user->getUserId(),
+                'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
+                'formattedName' => $user->formatName(),
+                'yearLevel' => $user->getYear()?->getLongName('Year ')
+            ];
+        }
+
         $this->response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
-            'children' => $children,
-            'user' => ((count($children) > 0) ? $children[0] : $user), // If the user is a parent, we are interested in the timetable of the first child.
             'selectedDate' => $selectedDate,
+            'selectedUser' => $selectedUser,
+            'userOptions' => $userOptions,
             'weekends' => $weekends
         ], sprintf(
             'Timetable Calendar for %s',

@@ -1,7 +1,7 @@
 {#
     Expected variables:
-    'children'     - Collection of Users (children of 'user' who is a parent).
-    'user'         - Logged in User.
+    'userOptions'  - Collection of Users that will appear as buttons at the top of the timetable.  Click the button to show that user's timetable.
+    'selectedUser' - The currently selected user.
     'selectedDate' - Date in format 'Y-m-d'.
     'weekends'     - String 'true' or 'false'. ('true' not supported yet).
 #}
@@ -14,7 +14,7 @@
 
         window.fullCalendarConfig = {
             schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
-            userId:             Number('{{ user.id }}'),
+            userId:             Number('{{ selectedUser.userId }}'),
             dateDisplayFormats: dateDisplayFormats,
             /* Decide which display format to use, based on viewport dimensions'
              * so phone users can view this data meaningfully
@@ -26,23 +26,19 @@
     </script>
 {% endautoescape %}
 
-{#
-{% if children|length > 0 %}
+{% if userOptions|length > 0 %}
     <div class="row ">
         <div class="small-12 columns">
             <dl class="sub-nav">
-                {% for child in children %}
-                    {% set childFormattedName = child.formatName %}
-                    {% set campus = child.campusCollection.first %}
-
-                    <dd{% if child.id == user.id %} class="active"{% endif %}>
-                        <a title="Timetable for {{ childFormattedName }} in {{ campus.name }}"
-                           data-child-student-button
-                           data-userId="{{ child.id }}"
-                           data-childFormattedName="{{ childFormattedName }}"
-                           {# Format of data-childYearLevel must match format used below in <span data-heading-user-year>. #
-                           data-childYearLevel="{% if user.year and (user.year.longName(locale.year.proper)|length) %}, {{ user.year.longName(locale.year.proper) }}{% endif %}">
-                            {{ childFormattedName }} ({{ campus.name }})
+                {% for userOption in userOptions %}
+                    <dd{% if userOption.userId == selectedUser.userId %} class="active"{% endif %}>
+                        <a title="Timetable for {{ userOption.formattedName }} in {{ userOption.firstCampusName }}"
+                           data-userOption-student-button
+                           data-userId="{{ userOption.userId }}"
+                           data-userOptionFormattedName="{{ userOption.formattedName }}"
+                           {# Format of data-userOptionYearLevel must match format used below in <span data-heading-user-year>. #}
+                           data-userOptionYearLevel="{{ userOption.yearLevel }}">
+                            {{ userOption.formattedName }} ({{ userOption.firstCampusName }})
                         </a>
                     </dd>
                 {% endfor %}
@@ -50,15 +46,14 @@
         </div>
     </div>
 {% endif %}
-#}
 
 <div class="row">
     <div class="small-12 columns">
         <h1>
             Timetable for
             {% apply spaceless %} {# Spaceless required because of comma inside data-heading-user-year span below. #}
-                <span data-heading-user-fullname>{{ user.fullname }}</span>
-                <span data-heading-user-year>{% if user.year and (user.year.longName(locale.year.proper)|length) %}, {{ user.year.longName(locale.year.proper) }}{% endif %}</span>
+                <span data-heading-user-fullname>{{ selectedUser.formattedName }}</span>
+                <span data-heading-user-year>{{ selectedUser.yearLevel }}</span>
             {% endapply %}
         </h1>
     </div>
@@ -68,7 +63,7 @@
     <div class="small-12 island">
         <section>
             <div id="timetable-calendar">
-                <timetable-calendar />
+                <timetable-calendar :options="{{ userOptions|json_encode }}" :selectedOption="{{ selectedUser|json_encode }}"/>
             </div>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
     </section>

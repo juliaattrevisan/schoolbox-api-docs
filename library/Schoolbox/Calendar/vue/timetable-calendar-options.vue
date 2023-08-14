@@ -13,7 +13,10 @@ export default {
         return {};
     },
 
-    props: {},
+    props: {
+        options: Array,
+        selectedOption: Object,
+    },
 
     computed: {},
 
@@ -69,6 +72,24 @@ export default {
 
 <template>
     <div>Hello! I'm a Vue component.</div>
+    <div class="row">
+        <div class="small-12 columns">
+            <dl class="sub-nav">
+                <dd v-for="userOption in options" :class="`((userOption.userId === selectedUser.id) ? 'active': '')`">
+                    <!-- Format of data-childYearLevel must match format used below in <span data-heading-user-year>. -->
+                    <a
+                        title="Timetable for {{ userOption.formattedName }} in {{ userOption.firstCampusName }}"
+                        data-child-student-button
+                        data-userId="{{ userOption.userId }}"
+                        data-childFormattedName="{{ userOption.formattedName }}"
+                        data-childYearLevel="{{ userOption.yearLevel }}"
+                    >
+                        {{ userOption.formattedName }} ({{ userOption.firstCampusName }})
+                    </a>
+                </dd>
+            </dl>
+        </div>
+    </div>
 </template>
 
 <style lang="scss"></style>

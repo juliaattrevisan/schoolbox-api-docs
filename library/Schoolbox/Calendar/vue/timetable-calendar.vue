@@ -94,7 +94,8 @@ export default {
     },
 
     props: {
-        options: Object,
+        options: Array,
+        selectedOption: Object,
     },
 
     computed: {
@@ -819,7 +820,7 @@ export default {
 </script>
 
 <template>
-    <timetable-calendar-options :options="children" @event-created="optionsChanged" />
+    <timetable-calendar-options :options="options" :selectedUser="selectedUser" @event-created="optionsChanged" />
     <div>
         <create-event-modal
             ref="createEvent"
