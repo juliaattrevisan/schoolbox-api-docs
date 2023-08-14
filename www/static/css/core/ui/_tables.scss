@@ -270,10 +270,31 @@ $rotate-span-width: 11rem;
     border: 1px solid $body-bg;
 }
 
+#rubric-marksheet.diagonal-headings-table thead th:nth-child(1) div,
+#rubric-marksheet.diagonal-headings-table thead th:nth-child(2) div, {
+    border-right-width: 0 !important;
+}
+
+#rubric-marksheet.diagonal-headings-table tbody th {
+    white-space: normal !important;
+}
+
 /* To prevent vertical border lines from showing over the diagonal table headings. */
 #rubric-marksheet.diagonal-headings-table thead th {
     border-left: 0;
     border-right: 0;
+}
+
+#rubric-marksheet.diagonal-headings-table th:nth-child(1),
+#rubric-marksheet.diagonal-headings-table td:nth-child(1) {
+    min-width: 180px !important; /* 180px to match width of a .profile-cell table cell. */
+}
+
+/* This class needed because first child is a cell spanning mulitple rows. */
+#rubric-marksheet.diagonal-headings-table tbody th.fixed-left.second-child {
+    @media #{$medium-up} {
+        left: 180px; /* 180px to match width of a .profile-cell table cell. */
+    }
 }
 
 .diagonal-headings-table {
@@ -339,10 +360,9 @@ $rotate-span-width: 11rem;
         z-index: 2; /* Z-index for left cells. */
     }
 
-    th.fixed-left.second-child, /* This class needed because first child is a cell spanning mulitple rows. */
     th.fixed-left:nth-child(2) {
         @media #{$medium-up} {
-            left: 180px; /* 180px to match width of a .profile-cell table cell. */
+            left: 180px !important; /* 180px to match width of a .profile-cell table cell. */
         }
     }
 
@@ -357,15 +377,6 @@ $rotate-span-width: 11rem;
     background-color: $body-bg;
 
     th {
-        &:empty {
-            &:first-child {
-                width: 50%;
-            }
-            &:last-child {
-                width: 100%;
-            }
-        }
-
         font-size: $paragraph-font-size;
         border-color: $vapor;
         height: $rotate-width * 2 + 1;
