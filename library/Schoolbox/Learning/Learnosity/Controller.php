@@ -239,6 +239,8 @@ class Controller extends Base
                     "show_outro" => false
                 ],
                 /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
+                 *
+                 * Perhaps more useful: https://reference.learnosity.com/items-api/initialization/config.regions
                  */
                 'regions'       => [
                     'top-left' => [
@@ -264,7 +266,10 @@ class Controller extends Base
                         ['type' => 'verticaltoc_element'],
                     ],
                     'bottom-left' => [
-                        ['type' => 'previous_button'],
+                        [
+                            'type' => 'previous_button',
+                            'show_label_option' => true
+                        ],
                     ],
                     'bottom-right' => [
                         ['type' => 'next_button'],
