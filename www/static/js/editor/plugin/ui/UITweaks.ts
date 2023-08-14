@@ -28,25 +28,40 @@ export default class PanelTweaks extends Plugin {
         const toolbarItems = this.editor.ui.view.toolbar.items;
         const dropDownItems = toolbarItems.filter((item) => item.panelPosition); // get only those toolbar items that are dropdowns
         dropDownItems.forEach((item) => {
+            this.updateDropdownPosition(item);
+        });
+    }
+
+    /**
+     * When the dropdown is opened, we need to update the position of the dropdown.
+     * As these listeners are assigned after the toolbar has been created, they will be executed
+     * after the listener assigned within the toolbar item.
+     * We just replicate the logic used in https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#function-render
+     * but add .limiter to the getOptimalPosition util method.
+     * @param {DropdownButtonView} item - the dropdown item
+     */
+    updateDropdownPosition(item) {
+        item.on("change:isOpen", (eventInfo, name, isOpen) => {
+            if (!isOpen) {
+                return;
+            }
             /**
-             * When the dropdown is opened, we need to update the position of the dropdown.
-             * As these listeners are assigned after the toolbar has been created, they will be executed
-             * after the listener assigned within the toolbar item.
-             * We just replicate the logic used in https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#function-render
-             * but add .limiter to the getOptimalPosition util method.
+             * We also need to account for dropdowns within dropdowns.
              */
-            item.on("change:isOpen", (eventInfo, name, isOpen) => {
-                if (!isOpen) {
-                    return;
-                }
-                item.panelView.position = getOptimalPosition({
-                    element: item.panelView.element,
-                    target: item.buttonView.element,
-                    fitInViewport: true,
-                    limiter: document.getElementById("content"),
-                    positions: item._panelPositions,
-                }).name;
-            });
+            if (item.toolbarView) {
+                const innerItems = item.toolbarView.itemsView.children;
+                const innerDropDownItems = innerItems.filter((item) => item.panelPosition); // get only those toolbar items that are dropdowns
+                innerDropDownItems.forEach((item) => {
+                    this.updateDropdownPosition(item);
+                });
+            }
+            item.panelView.position = getOptimalPosition({
+                element: item.panelView.element,
+                target: item.buttonView.element,
+                fitInViewport: true,
+                limiter: document.getElementById("content"),
+                positions: item._panelPositions,
+            }).name;
         });
     }
 
