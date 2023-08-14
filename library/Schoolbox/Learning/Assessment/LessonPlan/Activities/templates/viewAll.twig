@@ -123,12 +123,12 @@
                                                 {% if route %}
                                                     <a title="{{ title }}" href="{{ route }}">
                                                         <span class="{{ icon.renderClass(assessment) }}"></span>
-                                                        <p>{{ assessment.title }}</p>
+                                                        <p class="{% if (dateStart and dateEnd) and assessment.dueAt > dateStart and assessment.dueAt < dateEnd %}active-lesson-plan{% endif %}">{{ assessment.title }}</p>
                                                     </a>
                                                 {% else %}
                                                     <div title="{{ title }}">
                                                         <span class="{{ icon.renderClass(assessment) }}"></span>
-                                                        <p>{{ assessment.title }}</p>
+                                                        <p class="{% if (dateStart and dateEnd) and assessment.dueAt > dateStart and assessment.dueAt < dateEnd %}active-lesson-plan{% endif %}">{{ assessment.title }}</p>
                                                     </div>
                                                 {% endif %}
                                                 <p class="meta">
