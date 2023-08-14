@@ -503,15 +503,20 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 }
 
 #rubric-marksheet.diagonal-headings-table {
+    /* To prevent vertical border lines from showing over the diagonal table headings. */
+    thead th {
+        border-left: 0;
+        border-right: 0;
+    }
+
     thead th:nth-child(1) div,
     thead th:nth-child(2) div, {
         border-right-width: 0 !important;
     }
 
-    /* To prevent vertical border lines from showing over the diagonal table headings. */
-    thead th {
-        border-left: 0;
-        border-right: 0;
+    /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
+    thead th:nth-child(2) > div {
+        background-color: $body-bg;
     }
 
     tbody th {
@@ -528,11 +533,6 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     th,
     td {
         border: 1px solid $body-bg;
-    }
-
-    /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
-    th:nth-child(2) > div {
-        background-color: $body-bg;
     }
 
     th:nth-child(1),
