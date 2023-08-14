@@ -518,7 +518,7 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         white-space: normal !important;
     }
 
-    /* This class needed because first child is a cell spanning mulitple rows. */
+    /* This class needed because first child is a cell spanning multiple rows. */
     tbody th.fixed-left.second-child {
         @media #{$medium-up} {
             left: 180px; /* 180px to match width of a .profile-cell table cell. */
@@ -530,6 +530,12 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         border: 1px solid $body-bg;
     }
 
+    th .text-container,
+    td .text-container {
+        background-color: $white !important;
+        max-width: 180px;
+    }
+
     /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
     th:nth-child(2) > div {
         background-color: $body-bg;
@@ -537,8 +543,13 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 
     th:nth-child(1),
     td:nth-child(1) {
-        min-width: 180px !important; /* 180px to match width of a .profile-cell table cell. */
-        max-width: none !important;
+        min-width: 180px; /* 180px to match width of a .profile-cell table cell. */
+    }
+
+    th.second-child,
+    td.second-child {
+        max-width: 180px;
+        min-width: 180px;
     }
 
     .assessment {
@@ -548,6 +559,7 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     .indicator {
         font-weight: normal;
         padding-left: 2rem;
+        width: auto;
     }
 
     .mark {

@@ -60,11 +60,13 @@
                                 <tr class="capability-row">
                                     {% if loop.index0 == 0 %}
                                         <th class="fixed-left white assessment" title="{{ assessment.name }}" rowspan="{{ rowSpan }}">
-                                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
+                                            <div class="text-container">{{ assessment.name }}</div>
                                         </th>
                                     {% endif %}
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left second-child white capability" title="{{ capability.name }}">{{ capability.name }}</th>
+                                    <th class="fixed-left second-child white capability" title="{{ capability.name }}">
+                                        <div class="text-container">{{ capability.name }}</div>
+                                    </th>
 
                                     {% for studentId, student in students %}
                                         {% if not capability.show or not assessment.isMarkPerCapability %}
@@ -99,7 +101,9 @@
                                 {% for indicatorId, indicator in capability.indicators %}
                                     <tr class="indicator-row">
                                         {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                        <th class="fixed-left second-child white indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
+                                        <th class="fixed-left second-child white indicator" title="{{ indicator.name }}">
+                                            <div class="text-container">{{ indicator.name }}</div>
+                                        </th>
 
                                         {% for studentId, student in students %}
 
@@ -148,10 +152,14 @@
                         {% for capabilityId, capabilityData in overall %}
                             <tr class="capability-row summated{% if loop.index0 == 0 %} first-summated{% endif %}">
                                 {% if loop.index0 == 0 %}
-                                    <th class="fixed-left overall" rowspan="{{ rowSpan }}">Overall</th>
+                                    <th class="fixed-left overall" rowspan="{{ rowSpan }}">
+                                        <div class="text-container">Overall</th>
+                                    </th>
                                 {% endif %}
                                 {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                <th class="fixed-left white second-child capability">{{ capabilityData.name }}</th>
+                                <th class="fixed-left white second-child capability">
+                                    <div class='text-container'>{{ capabilityData.name }}</div>
+                                </th>
 
                                 {% for studentId, studentData in students %}
                                     {% if capabilityData.show %}
@@ -168,10 +176,13 @@
                                     {% endif %}
                                 {% endfor %}
                             </tr>
+
                             {% for indicatorId, indicatorData in capabilityData.indicators %}
                                 <tr class="indicator-row summated">
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left white second-child indicator">{{ indicatorData.name }}</th>
+                                    <th class="fixed-left second-child white indicator">
+                                        <div class="text-container">{{ indicatorData.name }}</div>
+                                    </th>
                                     {% for studentId, studentData in students %}
                                         <td class="mark">
                                             {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
