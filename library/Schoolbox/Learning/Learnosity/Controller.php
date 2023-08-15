@@ -747,27 +747,83 @@ class Controller extends Base
      * This is grossly inefficient but there aren't many options available to us
      *
      * @param IAssessable $assessment
-     * @param string|null $learnosityReference
+     * @param string|null $learnosityReference  An item reference identifier in learnosity land
      * @return void
      */
-    public function getHorizontal(IAssessable $assessment, ?string $learnosityReference): void
+    public function getHorizontalMarking(IAssessable $assessment, ?string $learnosityReference): void
     {
         /* Get the quiz identifier
          */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
-        /* Find the most recent attempt made by each person
-         * who attempted this quiz
+        /* Get a list of attempts sorted by finish date
+         * This gives us the most recent attempt for a quiz, if a student did multiple attempts
+         *
+         * TODO What was supposed to happen for multiple attempts in a horizontal marking context?
          */
+        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
+            'order' => [
+                'finish' => 'desc'
+            ]
+        ]);
+
+        /* Fetch all the assess_attempt.learnosity_references for $assessment
+         * for a student's most recent completed attempt and store then in a hashtable
+         *
+         * Remove this deduping if you wanted to show all attempts regardless of completion status.
+         */
+        $sessions = [];
+        $users = [];
+
+        foreach ($attempts as $attempt) {
+            if ($attempt->isFinished() && !isset($stack[$attempt->getUser()->getId()])) {
+                $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
+
+                /* ...because Learnosity wants it in this format
+                 */
+                $users[$attempt->getUser()->getId()] = [
+                    'id' => (string)$attempt->getUser()->getId(),
+                    'name' => $attempt->getUser()->getFullName()
+                ];
+            }
+        }
 
         /* Obtain their scores from Learnosity
          */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => array_values($sessions)
+        ]);
 
         /* Find a list of Learnosity Items (questions) available in this quiz
          */
+        $itemReferences = $this->api->dataGetRequest('itembank/activities', [
+            'references' => [
+                $quiz->getLearnosityReference()
+            ]
+        ])['data'][0]['data']['items'];
 
         /* If $learnosityReference was specified, load everyone's responses
          * for that particular item; otherwise just load the first one
          */
+        $currentItemReference = $learnosityReference;
+
+        /* The responses that we want to show at the moment
+         */
+        $currentResponses = [];
+
+        if (null === $learnosityReference) {
+            $currentItemReference = $itemReferences[0]['reference'];
+        }
+
+        foreach ($responses['data'] as $responseData) {
+            foreach ($responseData['responses'] as $response) {
+                if ($response['item_reference'] === $currentItemReference) {
+                    $currentResponses[] = $response;
+                }
+            }
+        }
+
+        new \Alaress_Probe($sessions, $users, $responses, $itemReferences, $currentResponses);
 
         /* Provide "Previous Question" and "Next Question" urls
          */
