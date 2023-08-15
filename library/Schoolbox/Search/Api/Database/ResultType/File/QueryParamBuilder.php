@@ -41,6 +41,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         $whereParts         = [
             'f.deleted_at IS NULL',
+            'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
             'f.realname LIKE :fileKeywordLike',
@@ -189,6 +190,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return '
             FROM file f
+            INNER JOIN folder               fo  ON f.category = fo.id
             INNER JOIN storage              s   ON f.hash = s.hash
             INNER JOIN allowedFileExtension afe ON s.ext = afe.extension
             INNER JOIN allowedFileTypes     aft ON afe.fileTypeID = aft.fileTypeID

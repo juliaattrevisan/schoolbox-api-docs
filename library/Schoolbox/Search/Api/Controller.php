@@ -38,14 +38,19 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param ISource   $source   Source for raw search results.
-     * @param IHydrator $hydrator Hydrates raw search results to full results.
+     * @param ISource           $source               Source for raw search results.
+     * @param IHydrator         $hydrator             Hydrates raw search results to full results.
+     * @param FullResultToArray $fullResultTranslator Translates full results to their JSON representation.
+     * @param UserMapper        $userMapper           Finds the user model corresponding to the creator in the filter.
+     * @param Folder\Mapper     $folderMapper         Fully hydrates the folder in a raw result, so that its type may be
+     *                                                determined.
      */
     public function __construct(
         private ISource $source,
         private IHydrator $hydrator,
         private FullResultToArray $fullResultTranslator,
         private UserMapper $userMapper,
+        private Folder\Mapper $folderMapper,
     ) {
     }
 
@@ -78,9 +83,29 @@ class Controller extends Base
                     // more than one result for the same folder: the search
                     // results within the folder will contain a reasonable
                     // subset of results.
-                    // TODO need to populate page subtype
-                    $folderResultType = 'page';
-                    $folderResultId   = $result->folder->getId();
+                    $folderResultId = $result->folder->getId();
+
+                    // Determine the folder's result type
+                    // TODO single point of control: this is in the query param
+                    //      builder for pages as well
+                    try {
+                        $folder = $this->folderMapper->findById($folderResultId);
+                    } catch (MapperException) {
+                        // Somehow this was deleted? It shouldn't be, so ignore.
+                        continue;
+                    }
+                    $folderResultType = 'page.';
+                    if ($folder->hasCourseSpecification()) {
+                        $folderResultType .= 'course';
+                    } elseif ($folder->hasUnitSpecification()) {
+                        $folderResultType .= 'unit';
+                    } elseif (count($folder->getCodes())) {
+                        $folderResultType .= 'class';
+                    } elseif ($folder->hasHomepage()) {
+                        $folderResultType .= 'homepage';
+                    } else {
+                        $folderResultType .= 'other';
+                    }
                     $folderResultKey  = $folderResultType . '.' . $folderResultId;
                     if (!isset($translatedResults[$folderResultKey])) {
                         // Finagle a raw result for the folder, and hydrate that

@@ -114,6 +114,7 @@ class Module extends BaseModule
                 new FolderTranslator(0),
             ),
             $mapperFactory->get(UserMapper::class),
+            $mapperFactory->get(FolderMapper::class),
         );
     }
 }
