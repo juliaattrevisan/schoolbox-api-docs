@@ -140,7 +140,8 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
 -------------------------------------------------------------------------------------*/
 
 table {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     width: 100%;
     line-height: 1.4;
     .card {
@@ -339,15 +340,6 @@ $rotate-span-width: 11rem;
     background-color: $body-bg;
 
     th {
-        &:empty {
-            &:first-child {
-                width: 50%;
-            }
-            &:last-child {
-                width: 100%;
-            }
-        }
-
         font-size: $paragraph-font-size;
         border-color: $vapor;
         height: $rotate-width * 2 + 1;
@@ -496,6 +488,7 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
                 margin-left: 2rem;
             }
         }
+
         // Remove scrollbar from fixed column, is a bug that needs a workaround
         // https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap
         .DTFC_LeftBodyLiner {
@@ -507,4 +500,79 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 // Tables in homepage components
 .component-container table {
     background: transparent;
+}
+
+#rubric-marksheet.diagonal-headings-table {
+    /* To prevent vertical border lines from showing over the diagonal table headings. */
+    thead th {
+        border-left: 0;
+        border-right: 0;
+    }
+
+    thead th:nth-child(1) div,
+    thead th:nth-child(2) div, {
+        border-right-width: 0 !important;
+    }
+
+    /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
+    thead th:nth-child(2) > div {
+        background-color: $body-bg;
+    }
+
+    tbody th {
+        white-space: normal !important;
+    }
+
+    /* This class needed because first child is a cell spanning multiple rows. */
+    tbody th.fixed-left.second-child {
+        @media #{$medium-up} {
+            left: 180px; /* 180px to match width of a .profile-cell table cell. */
+        }
+    }
+
+    th,
+    td {
+        border: 1px solid $body-bg;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+        min-width: 180px; /* 180px to match width of a .profile-cell table cell. */
+    }
+
+    th.second-child,
+    td.second-child {
+        max-width: 350px;
+        min-width: 250px;
+    }
+
+    .assessment {
+        font-weight: normal;
+    }
+
+    /* To override '.indicator' styles in _marksheet.css. */
+    .indicator {
+        font-weight: normal;
+        padding-left: 2rem;
+    }
+
+    .mark {
+        white-space: nowrap;
+    }
+
+    .no-mark {
+        padding: 0.5rem 1.25rem 0.5rem 0; /* Makes it easier to click on the dashes */
+    }
+
+    .first-summated {
+        border-top: 2px solid #ededed; /* A gap between the body and overall sections */
+    }
+
+    .rubric-checklist > label {
+        margin-bottom: 0 !important;
+    }
+
+    [data-draft-mark] {
+        display: none;
+    }
 }

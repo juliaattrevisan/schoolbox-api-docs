@@ -29,7 +29,7 @@
             justify-content: flex-end;
             flex-wrap: wrap;
         }
-        .indicator {
+        .legend-indicator {
             position: relative;
             top: 0.75rem;
             margin-right: 0.5rem;
@@ -65,27 +65,28 @@
         }
     }
 
-    // Indicators: used in legend, so don't put in .marksheet
-    .indicator {
+    // Indicators.
+    //  * Class 'indicator' is used for a different purpose in the Rubric Markbook, so 'legend-indicator' is used here to avoid confusion.
+    .legend-indicator {
         position: absolute;
         top: 0;
         right: 0;
         width: 0;
         height: 0;
     }
-    .indicator.indicator-none {
+    .legend-indicator.indicator-none {
         border-top: 0.75rem solid $base;
         border-left: 0.75rem solid transparent;
     }
-    .indicator.indicator-pending {
+    .legend-indicator.indicator-pending {
         border-top: 0.75rem solid $warning-color;
         border-left: 0.75rem solid transparent;
     }
-    .indicator.indicator-published {
+    .legend-indicator.indicator-published {
         border-top: 0.75rem solid $success-color;
         border-left: 0.75rem solid transparent;
     }
-    .indicator.indicator-resubmit {
+    .legend-indicator.indicator-resubmit {
         border-top: 0.75rem solid $alert-color;
         border-left: 0.75rem solid transparent;
     }
@@ -134,8 +135,7 @@
         .course-headers th.white {
             background: $white;
         }
-        .row-header,
-        .island table.dataTable thead th {
+        .row-header {
             border-bottom: none;
         }
 
@@ -150,19 +150,3 @@
         }
     }
 }
-
-
-/* Markbook has a special slanty header th that needs to resize
- * according to its corresponding data td's width
- */
-table.dataTable.marksheet {
-    /* Styles to ensure the markbook remains full-width, even when there are not enough columns to fill the screen.
-     * DataTables sets the width of these elements as an inline style attribute, so we need to use !important to override them.
-     *
-     * This means when the markbook is filtered, it will remain full-width.
-     *
-     * TODO: Remove this rule once DataTables has been removed from the Class Markbook and Rubric Markbook pages.
-     */
-    width: 100% !important;
-}
-
