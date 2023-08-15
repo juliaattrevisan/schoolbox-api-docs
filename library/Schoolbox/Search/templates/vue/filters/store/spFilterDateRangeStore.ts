@@ -10,6 +10,10 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     const activeStartDate = window.Vue.ref(""); // the start date currently applied to the active search
     const activeEndDate = window.Vue.ref(""); // the end date currently applied to the active search
 
+    const startDateFormatted = window.Vue.computed(() => {
+        return window.dayjs(startDate.value).format("DD/MM/YYYY");
+    });
+
     /**
      * Is the start date filter set
      * @returns {boolean}
@@ -56,10 +60,11 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     function getFormData() {
         const from = activeStartDate.value;
         const to = activeEndDate.value;
+        // only add from and to if they are set
         return {
             date: {
-                from,
-                to,
+                ...(from !== "" && { from }),
+                ...(to !== "" && { to }),
             },
         };
     }
