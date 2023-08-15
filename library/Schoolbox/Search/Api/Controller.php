@@ -36,11 +36,6 @@ class Controller extends Base
     private const MAX_RESULT_LIMIT = 10;
 
     /**
-     * Number of search results to return within a folder.
-     */
-    private const RESULT_LIMIT_WITHIN_FOLDER = 3;
-
-    /**
      * Constructor
      *
      * @param ISource   $source   Source for raw search results.

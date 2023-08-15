@@ -102,13 +102,41 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * document
      * * other
      *
-     * (For now it's just "file" though)
-     *
      * @return string
      */
     protected function buildTypeExpression(): string
     {
-        return "'file'";
+        // Depends on the mime's file type:
+        // derived from a similar list in
+        // `\Schoolbox\Resource\File\Mapper::findForFolders`
+        return "CONCAT(
+            'file.',
+            IF(
+                LOCATE('pdf', aft.mime)
+                OR LOCATE('msword', aft.mime)
+                OR LOCATE('vnd.ms', aft.mime)
+                OR LOCATE('rtf', aft.mime)
+                OR LOCATE('text', aft.mime)
+                OR LOCATE('document', aft.mime)
+                OR LOCATE('powerpoint', aft.mime),
+                'document',
+                IF(
+                    LOCATE('image', aft.mime),
+                    'image',
+                    IF(
+                        LOCATE('audio', aft.mime),
+                        'audio',
+                        IF(
+                            LOCATE('video', aft.mime)
+                            OR LOCATE('flash', aft.mime)
+                            OR LOCATE('realmedia', aft.mime),
+                            'video',
+                            'other'
+                        )
+                    )
+                )
+            )
+        )";
     }
 
     /**
