@@ -8,6 +8,7 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMappe
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
@@ -67,6 +68,8 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
+        // hack to warm the db cache for courses, so when hydrating the assessments we actually get the course folder details (name)
+        $courses = CourseImplementationMapper::GetInstance()->findByFolderId($this->getContext()->getFolder()->getId());
         // hydrate those assessments
         $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]);
 
