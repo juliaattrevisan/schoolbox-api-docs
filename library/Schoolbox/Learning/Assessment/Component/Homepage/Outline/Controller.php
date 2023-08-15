@@ -63,7 +63,11 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     private $canWrite;
 
-    private bool $hasBeenFiltered = false;
+    /**
+     * if filtering, the list of assessment types to show, else not filtering, so show everything
+     * @var array<string>|false
+     */
+    private false|array $filterList = false;
 
     /**
      * @var CourseImplementationMapper
@@ -155,14 +159,18 @@ class Controller extends Component_Homepage_ControllerAbstract
             },
             ARRAY_FILTER_USE_BOTH
         ));
-        $this->hasBeenFiltered = count($assessmentTypes) < count(AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)));
+        /**
+         * If we are filtering, set the filterList to the visible assessment types.
+         * if we are not filtering, then set filterList to false
+         */
+        $this->filterList = (count($assessmentTypes) < count(AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)))) ? $assessmentTypes : false;
 
         /**
          * if everything has been filtered out, we should ignore the filter (and show everything)
          */
         if (empty($assessmentTypes)) {
             $assessmentTypes = null;
-            $this->hasBeenFiltered = false;
+            $this->filterList = false;
         }
 
         // Don't attempt to load course if not configured.
@@ -188,15 +196,14 @@ class Controller extends Component_Homepage_ControllerAbstract
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
                         $user->getRole()->isParent() ? null : $user,
-                        $this->hasBeenFiltered ? ['type' => $assessmentTypes] : []
+                        $this->filterList ? ['type' => $assessmentTypes] : []
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
             } else {
                 // I'm an instructor - load all participants.
                 $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
-                    $uiIds,
-                    options: $this->hasBeenFiltered ? ['type' => $assessmentTypes] : []
+                    $uiIds
                 );
             }
 
@@ -272,7 +279,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
-            'hasBeenFiltered'      => $this->hasBeenFiltered,
+            'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,
             'context'              => $this->getContext(),

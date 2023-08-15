@@ -74,7 +74,7 @@
             {% set hasCourseRoutes = saveToCourseRoute is not empty %}
         {% endif %}
 
-        <li class="interact" data-unit-assessment="{{ assessment.id }}">
+        <li class="interact" {% if filterList and assessment.getFamilyName not in filterList %}data-sortable-hidden="true"{% endif %} data-unit-assessment="{{ assessment.id }}">
             <div{% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %} class="actions-small-1"{% endif %}>
                 {% if canWrite %}
                     <div class="grip compact"></div>
