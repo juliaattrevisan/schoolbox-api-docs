@@ -1,9 +1,11 @@
 {#
     Expected variables:
-    'userOptions'  - Collection of Users that will appear as buttons at the top of the timetable.  Click the button to show that user's timetable.
-    'selectedUser' - The currently selected user.
-    'selectedDate' - Date in format 'Y-m-d'.
-    'weekends'     - String 'true' or 'false'. ('true' not supported yet).
+    'options' - [
+        'userOptions'  - Collection of Users that will appear as buttons at the top of the timetable.  Click the button to show that user's timetable.
+        'selectedUser' - The currently selected user.
+        'selectedDate' - Date in format 'Y-m-d'.
+        'weekends'     - String 'true' or 'false'. ('true' not supported yet).
+    ]
 #}
 {% autoescape 'js' %}
     <script type="text/javascript">
@@ -14,24 +16,24 @@
 
         window.fullCalendarConfig = {
             schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
-            userId:             Number('{{ selectedUser.userId }}'),
+            userId:             Number('{{ options['selectedUserOption'].userId }}'),
             dateDisplayFormats: dateDisplayFormats,
             /* Decide which display format to use, based on viewport dimensions'
              * so phone users can view this data meaningfully
              */
             defaultView:        window.innerWidth < SMALL_VIEWPORT_THRESHOLD ? 'timeGridDay' : 'timeGridWeek',
-            defaultDate:        '{{ selectedDate|date('Y-m-d') }}',
-            weekends:           {{ weekends }}
+            defaultDate:        '{{ options['selectedDate']|date('Y-m-d') }}',
+            weekends:           {{ options['weekends'] }}
         };
     </script>
 {% endautoescape %}
 
-{% if userOptions|length > 0 %}
+{% if options['userOptions']|length > 0 %}
     <div class="row ">
         <div class="small-12 columns">
             <dl class="sub-nav">
-                {% for userOption in userOptions %}
-                    <dd{% if userOption.userId == selectedUser.userId %} class="active"{% endif %}>
+                {% for userOption in options['userOptions'] %}
+                    <dd{% if userOption.userId == options['selectedUserOption'].userId %} class="active"{% endif %}>
                         <a title="Timetable for {{ userOption.formattedName }} in {{ userOption.firstCampusName }}"
                            data-userOption-student-button
                            data-userId="{{ userOption.userId }}"
@@ -51,10 +53,8 @@
     <div class="small-12 columns">
         <h1>
             Timetable for
-            {% apply spaceless %} {# Spaceless required because of comma inside data-heading-user-year span below. #}
-                <span data-heading-user-fullname>{{ selectedUser.formattedName }}</span>
-                <span data-heading-user-year>{{ selectedUser.yearLevel }}</span>
-            {% endapply %}
+            <span data-heading-user-fullname>{{ options['selectedUserOption'].formattedName }}</span>,
+            <span data-heading-user-year>{{ options['selectedUserOption'].yearLevel }}</span>
         </h1>
     </div>
 </div>
@@ -63,7 +63,7 @@
     <div class="small-12 island">
         <section>
             <div id="timetable-calendar">
-                <timetable-calendar :options="{{ userOptions|json_encode }}" :selectedOption="{{ selectedUser|json_encode }}"/>
+                <timetable-calendar :options="{{ options|json_encode }}"/>
             </div>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
     </section>

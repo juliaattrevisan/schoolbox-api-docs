@@ -14,8 +14,7 @@ export default {
     },
 
     props: {
-        options: Array,
-        selectedOption: Object,
+        options: Object,
     },
 
     computed: {},
@@ -72,10 +71,14 @@ export default {
 
 <template>
     <div>Hello! I'm a Vue component.</div>
+    <div>The selected user's ID is {{ options["selectedUserOption"].userId }}</div>
     <div class="row">
         <div class="small-12 columns">
             <dl class="sub-nav">
-                <dd v-for="userOption in options" :class="`((userOption.userId === selectedUser.id) ? 'active': '')`">
+                <dd
+                    v-for="userOption in options['userOptions']"
+                    :class="`((userOption.userId === options['selectedUserOption'].userId) ? 'active': '')`"
+                >
                     <!-- Format of data-childYearLevel must match format used below in <span data-heading-user-year>. -->
                     <a
                         title="Timetable for {{ userOption.formattedName }} in {{ userOption.firstCampusName }}"

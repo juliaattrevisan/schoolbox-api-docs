@@ -71,11 +71,11 @@ class Controller extends Base
 
         if (count($userOptions) > 0) {
             // The selected user is the first of the $userOptions.
-            $selectedUser = $userOptions[0];
+            $selectedUserOption = $userOptions[0];
         } else {
             // The selected user is the logged in user.
             $campuses = $user->getCampusCollection();
-            $selectedUser = [
+            $selectedUserOption = [
                 'userId' => $user->getUserId(),
                 'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
                 'formattedName' => $user->formatName(),
@@ -84,10 +84,12 @@ class Controller extends Base
         }
 
         $this->response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
-            'selectedDate' => $selectedDate,
-            'selectedUser' => $selectedUser,
-            'userOptions' => $userOptions,
-            'weekends' => $weekends
+            'options' => [
+                'selectedDate' => $selectedDate,
+                'selectedUserOption' => $selectedUserOption,
+                'userOptions' => $userOptions,
+                'weekends' => $weekends
+            ]
         ], sprintf(
             'Timetable Calendar for %s',
             $user->getFullName()
