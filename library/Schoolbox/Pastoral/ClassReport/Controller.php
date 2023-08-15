@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\CampusMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -41,6 +42,7 @@ class Controller extends Base
         private UserTranslator $userTranslator,
         private Translator\ModelToArray $pastoralTranslator,
         private FilterHelper $filterHelper,
+        private CampusMapper $campusMapper,
     ) {
     }
 
@@ -88,9 +90,12 @@ class Controller extends Base
         );
 
         // Find all students in class
-        $students = $this->userAccessMapper
-            ->findUsersInCategory($folder, Role::STUDENT)
-            ->sortByCallback((new SortUsersByName())->getCallable(), true);
+        $students = $this->userAccessMapper->findUsersInCategory($folder, Role::STUDENT);
+
+        // Hydrate campus for permission check
+        $this->campusMapper->populateUserCampus($students);
+        $students->sortByCallback((new SortUsersByName())->getCallable(), true);
+
 
         // Find all pastoral IDs for records matching those students
         $pastoralIds = $this->filterHelper->findPastoralRecordIds(

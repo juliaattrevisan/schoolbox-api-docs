@@ -2,7 +2,7 @@
 
 <li>
     <div class="small-12 card wrap-down">
-        <div class="icon-teacher size-48" title="Pastoral Group"></div>
+        <div class="icon-teacher size-48" title="{{ locale.pastoral.proper }} Group"></div>
         {{ accessLevelLabel | raw }}
         {# Display link to group if the user is a pastoral moderator #}
 
@@ -15,7 +15,7 @@
             <p>{{ access.group.name }}</p>
         {% endif %}
 
-        <p class="meta">Pastoral Group</p>
+        <p class="meta">{{ locale.pastoral.proper }} Group{{ access.matchCampus ? ' and matching campus' : '' }}</p>
 
     </div>
 </li>

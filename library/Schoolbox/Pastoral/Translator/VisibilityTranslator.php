@@ -16,6 +16,7 @@ use Schoolbox\Pastoral\Access\Mapper;
 use Schoolbox\Pastoral\Audience\Model as PastoralAudience;
 use Schoolbox\Pastoral\IPastoralAccess;
 use Schoolbox\Pastoral\Type\TypeAbstract;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class VisibilityTranslator
@@ -58,19 +59,30 @@ class VisibilityTranslator
                     $emptyAccess,
                     $post->getInt("roleAccessId{$roleId}"),
                     (int)$accessLevel,
+                    $post->getBool("roleCampus{$roleId}", false),
                     $post->getBool("roleComment{$roleId}", false)
                 );
 
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
-                    if (!in_array($matches['roleType'], $allowedRoleTypes)) {
-                        throw new SchoolboxException("Invalid role type: {$matches['roleType']}");
+                    $roleType = $matches['roleType'];
+                    if (!in_array($roleType, $allowedRoleTypes)) {
+                        throw new SchoolboxException("Invalid role type: {$roleType}");
                     }
-                    $access->setRoleType($matches['roleType']);
+                    $access->setRoleType($roleType);
+                    // match campus check is relevant to staff only
+                    if ($roleType !== Role::STAFF) {
+                        $access->setMatchCampus(false);
+                    }
                 } else {
+                    /** @var Role|null $role */
                     $role = $allowedRoles[$roleId] ?? null;
                     if ($role) {
                         $access->setRole($role);
+                        // match campus check is relevant to staff only
+                        if (!$role->isStaff()) {
+                            $access->setMatchCampus(false);
+                        }
                     } else {
                         throw new SchoolboxException("Invalid role id: $roleId");
                     }
@@ -90,6 +102,7 @@ class VisibilityTranslator
                     $emptyAccess,
                     $post->getInt("groupAccessId{$groupId}"),
                     (int)$accessLevel,
+                    $post->getBool("groupCampus{$groupId}", false),
                     $post->getBool("groupComment{$groupId}", false)
                 );
                 $access->setGroup($groups[$groupId]);
@@ -108,6 +121,7 @@ class VisibilityTranslator
                     $emptyAccess,
                     $post->getInt("userAccessId{$userId}"),
                     (int)$accessLevel,
+                    false,
                     $post->getBool("userComment{$userId}", false)
                 );
                 $access->setUser($users[$userId]);
@@ -122,17 +136,19 @@ class VisibilityTranslator
      * @param IPastoralAccess $emptyAccess
      * @param int|null        $id
      * @param int             $accessLevel
+     * @param bool            $matchCampus
      * @param bool            $commentAllowed
      * @return IPastoralAccess
      */
-    private static function getBaseAccess(IPastoralAccess $emptyAccess, ?int $id, int $accessLevel, bool $commentAllowed): IPastoralAccess
+    private static function getBaseAccess(IPastoralAccess $emptyAccess, ?int $id, int $accessLevel, bool $matchCampus, bool $commentAllowed): IPastoralAccess
     {
         if (!in_array($accessLevel, Mapper::ACCESSES)) {
             throw new SchoolboxException(sprintf("Invalid access %s provided", $accessLevel));
         }
         $access = clone $emptyAccess;
-        $access->setAccess($accessLevel);
-        $access->setCommentsAllowed($accessLevel === Mapper::ACCESS_DENY ? false : $commentAllowed);
+        $access->setAccess($accessLevel)
+            ->setMatchCampus($matchCampus)
+            ->setCommentsAllowed($accessLevel === Mapper::ACCESS_DENY ? false : $commentAllowed);
         if ($id) {
             $access->setId($id);
         }

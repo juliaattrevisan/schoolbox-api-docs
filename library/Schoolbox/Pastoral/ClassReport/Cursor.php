@@ -110,9 +110,9 @@ class Cursor implements ICursor
         }
         return $this->dataSource->countByColumnList(
             $this->currentUser,
+            $this->student,
             [
-                'id'         => $this->pastoralIds,
-                'student_id' => $this->student->getId(),
+                'id' => $this->pastoralIds,
             ],
         );
     }
@@ -128,6 +128,7 @@ class Cursor implements ICursor
         return $this->dataSource
             ->findRecordsByPredicates(
                 $this->currentUser,
+                $this->student,
                 $this->buildPredicateBuilder($encodedCursor),
                 [
                     'order' => $this->buildOrderPart(),

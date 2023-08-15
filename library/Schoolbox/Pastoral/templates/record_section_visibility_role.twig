@@ -8,7 +8,7 @@
             <span class="neutral label right">Comments</span>
         {% endif %}
         <p>{{ access.role.name }}</p>
-        <p class="meta">User Role</p>
+        <p class="meta">User Role{{ access.matchCampus ? ' and matching campus' : '' }}</p>
     </div>
 </li>
 

@@ -180,7 +180,7 @@ class Helper
         $studentCounts = new Collection(
             $this->pastoralDataSource->countRecordsByType(
                 $viewer,
-                $student->getId(),
+                $student,
                 $pastoralTypes->getPropertyValues('id'),
                 $pastoralSubtypes->getPropertyValues('id'),
                 $startDate
@@ -213,7 +213,7 @@ class Helper
         $studentCounts = new Collection(
             $this->pastoralDataSource->countRecordsByTypeGroupByMonth(
                 $viewer,
-                $student->getId(),
+                $student,
                 $startDate
             )
         );

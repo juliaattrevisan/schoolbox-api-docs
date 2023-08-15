@@ -51,6 +51,16 @@ class Model implements ISoftDeletable, IPastoralAccess
     /** @var integer */
     private int $access;
 
+    /**
+     * Whether role / group access is limited to users in student campus only
+     * @var bool
+     */
+    private bool $matchCampus = false;
+
+    /**
+     * Whether the user/role is allowed to comment
+     * Staff with access can always comment regardless of this flag
+     */
     private bool $commentsAllowed = false;
 
 
@@ -183,6 +193,24 @@ class Model implements ISoftDeletable, IPastoralAccess
     public function setAccess(int $access): self
     {
         $this->access = $access;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getMatchCampus(): bool
+    {
+        return $this->matchCampus;
+    }
+
+    /**
+     * @param bool $matchCampus
+     * @return static
+     */
+    public function setMatchCampus(bool $matchCampus): self
+    {
+        $this->matchCampus = $matchCampus;
         return $this;
     }
 

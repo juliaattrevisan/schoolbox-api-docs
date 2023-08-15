@@ -48,7 +48,9 @@
                         <label class="radio-label" for="userPrivate{{ userAccess.user.id }}"></label>
                     </td>
                     {% if not reportPage %}
-                    <td class="small-2 checklist">
+                    <td class="small-1">
+                    </td>
+                    <td class="small-1 checklist">
                         <input type="checkbox" name="userComment{{ userAccess.user.id }}" id="userComment{{ userAccess.user.id }}"
                                value="1" {{ userAccess.commentsAllowed ? 'checked' : '' }} {{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? '' : 'readonly' }}
                                data-always-read-only="{{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? 0 : 1 }}" >
@@ -110,7 +112,7 @@
                     permissionListUsers.append(html);
 
                     let commentCheckbox = $('#userComment' + user.id);
-                    initCommentCheckbox(
+                    initCheckbox(
                             commentCheckbox,
                             user.roleType === 'staff',
                             commentsAllowed,

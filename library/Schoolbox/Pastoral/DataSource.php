@@ -135,13 +135,14 @@ class DataSource
     /**
      * User-sensitive wrapper for `Mapper::countByColumnList`.
      *
-     * @param User  $viewer
+     * @param User $viewer
+     * @param User $student
      * @param array $columnList
      * @return int
      */
-    public function countByColumnList(User $viewer, array $columnList): int
+    public function countByColumnList(User $viewer, User $student, array $columnList): int
     {
-        $where = $this->getPermissionClause($viewer, null, null);
+        $where = $this->getPermissionClause($viewer, $student, null, null);
         $pb    = $this->mapper->getPredicateBuilder();
         foreach ($columnList as $column => $value) {
             $pb = is_iterable($value)
@@ -160,15 +161,15 @@ class DataSource
 
     /**
      * Finds a count of records for a particular student visible to the given viewer
-     * @param User     $viewer    Who is viewing this student's records
-     * @param int      $studentId Id of a student being viewed
-     * @param int|null $typeId    Filter the records with a pastoral type, if provided
+     * @param User $viewer Who is viewing this student's records
+     * @param User $student Student being viewed
+     * @param int|null $typeId Filter the records with a pastoral type, if provided
      * @param int|null $subtypeId Filter the records with a pastoral subtype, if provided
      * @return int
      */
-    public function countRecords(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId): int
+    public function countRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId): int
     {
-        $where = $this->getPermissionClause($viewer, $studentId, $typeId, $subtypeId);
+        $where = $this->getPermissionClause($viewer, $student, $typeId, $subtypeId);
         return $this->countRecordsFromWhere($where['where'], $where['params']);
     }
 
@@ -189,14 +190,14 @@ class DataSource
     /**
      * count and details of pastoral events of a single student that a specified `viewer` is allowed to see
      *
-     * @param User                     $viewer
-     * @param int                      $studentId
-     * @param array                    $typeIds
-     * @param array                    $subtypeIds
+     * @param User $viewer
+     * @param User $student
+     * @param array $typeIds
+     * @param array $subtypeIds
      * @param Alaress_Date_Format|null $startDate
      * @return array
      */
-    public function countRecordsByType(User $viewer, int $studentId, array $typeIds, array $subtypeIds, ?Alaress_Date_Format $startDate): array
+    public function countRecordsByType(User $viewer, User $student, array $typeIds, array $subtypeIds, ?Alaress_Date_Format $startDate): array
     {
         if (empty($typeIds) && empty($subtypeIds)) {
             return [];
@@ -218,7 +219,7 @@ class DataSource
         }
 
 
-        $where     = $this->getPermissionClause($viewer, $studentId, null);
+        $where     = $this->getPermissionClause($viewer, $student, null, null);
         $typeWhere = implode(' OR ', $typeWheres);
 
         $sql    = "
@@ -245,14 +246,14 @@ class DataSource
     /**
      * count pastoral records and group the results by month
      *
-     * @param User                     $viewer
-     * @param int                      $studentId
+     * @param User $viewer
+     * @param User $student
      * @param Alaress_Date_Format|null $startDate
      * @return array
      */
-    public function countRecordsByTypeGroupByMonth(User $viewer, int $studentId, ?Alaress_Date_Format $startDate): array
+    public function countRecordsByTypeGroupByMonth(User $viewer, User $student, ?Alaress_Date_Format $startDate): array
     {
-        $where          = $this->getPermissionClause($viewer, $studentId, null);
+        $where          = $this->getPermissionClause($viewer, $student, null, null);
         $startDateWhere = $startDate ? ' AND created_at >= :startDate ' : '';
 
         $sql = "
@@ -273,19 +274,19 @@ class DataSource
 
     /**
      * Gets records for a particular student visible to the given viewer
-     * @param User     $viewer          Who is viewing this student's records
-     * @param int      $studentId       Id of a student being viewed
-     * @param int|null $typeId          Filter the records with a pastoral type, if not null
+     * @param User $viewer Who is viewing this student's records
+     * @param User $student Student being viewed
+     * @param int|null $typeId Filter the records with a pastoral type, if not null
      * @param int|null $subtypeId
-     * @param int      $offset
-     * @param int      $limit
-     * @param int|null $linkedStudentId Returns the records linked to this student only, if provided
-     * @return GenericCollection|Model[]
+     * @param int $offset
+     * @param int $limit
+     * @param User|null $linkedStudent Returns the records linked to this student only, if provided
+     * @return GenericCollection
      */
-    public function findRecords(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?int $linkedStudentId): GenericCollection
+    public function findRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?User $linkedStudent): GenericCollection
     {
         // get records for the student
-        $studentRecords = $this->findRawRecords($viewer, $studentId, $typeId, $subtypeId, $offset, $limit, $linkedStudentId, null);
+        $studentRecords = $this->findRawRecords($viewer, $student, $typeId, $subtypeId, $offset, $limit, $linkedStudent, null);
 
         if (!$studentRecords->count()) {
             return $studentRecords;
@@ -315,10 +316,11 @@ class DataSource
      */
     public function findRecordsByPredicates(
         User $viewer,
+        User $student,
         Builder $pb,
         array $options = [],
     ): GenericCollection {
-        $permissionClause = $this->getPermissionClause($viewer, null, null);
+        $permissionClause = $this->getPermissionClause($viewer, $student, null, null);
         return $this->findRawRecordsByPredicates(
             $pb->rawWhere($permissionClause['where'], $permissionClause['params']),
             $options['order'] ?? [],
@@ -330,22 +332,22 @@ class DataSource
 
     /**
      * Gets records with least hydration. This will not populate any linked records to the returning records.
-     * @param User       $viewer          Who is viewing this student's records
-     * @param int|null   $studentId       Id of a student being viewed
-     * @param int|null   $typeId          Filter the records with a pastoral type, if not null
-     * @param int|null   $subtypeId
-     * @param int|null   $offset
-     * @param int|null   $limit
-     * @param int|null   $linkedStudentId Find records linked to this student only, if provided
+     * @param User $viewer Who is viewing this student's records
+     * @param User|null $student
+     * @param int|null $typeId Filter the records with a pastoral type, if not null
+     * @param int|null $subtypeId
+     * @param int|null $offset
+     * @param int|null $limit
+     * @param User|null $linkedStudent Find records linked to this student only, if provided
      * @param array|null $linkedRecordIds Find records linked to these records only, if provided
      * @return GenericCollection<Model>
      */
-    private function findRawRecords(User $viewer, ?int $studentId, ?int $typeId, ?int $subtypeId, ?int $offset, ?int $limit, ?int $linkedStudentId, ?array $linkedRecordIds): GenericCollection
+    private function findRawRecords(User $viewer, ?User $student, ?int $typeId, ?int $subtypeId, ?int $offset, ?int $limit, ?User $linkedStudent, ?array $linkedRecordIds): GenericCollection
     {
-        $permissionClause = $this->getPermissionClause($viewer, $studentId, $typeId, $subtypeId);
+        $permissionClause = $this->getPermissionClause($viewer, $student, $typeId, $subtypeId);
         $pb = $this->getPredicateBuilder()->rawWhere($permissionClause['where'], $permissionClause['params']);
-        if (null !== $linkedRecordIds || null != $linkedStudentId) {
-            $linkedClause = $this->getLinkedClause($viewer, $linkedStudentId, $linkedRecordIds);
+        if (null !== $linkedRecordIds || null !== $linkedStudent) {
+            $linkedClause = $this->getLinkedClause($viewer, $linkedStudent, $linkedRecordIds);
             $pb = $pb->rawWhere($linkedClause['where'], $linkedClause['params']);
         }
         return $this->findRawRecordsByPredicates($pb, [], $offset, $limit);
@@ -470,16 +472,16 @@ class DataSource
     /**
      * Gets "where" string to find linked records
      * @param User       $viewer
-     * @param int|null   $linkedStudentId Find records linked to this student only, if provided
+     * @param User|null   $linkedStudent Find records linked to this student only, if provided
      * @param array|null $recordIds       Find records linked to these records only, if provided
      * @return array
      */
-    private function getLinkedClause(User $viewer, ?int $linkedStudentId, ?array $recordIds): array
+    private function getLinkedClause(User $viewer, ?User $linkedStudent, ?array $recordIds): array
     {
         $whereClauses = [];
         $params       = [];
         for ($i = 0; $i < 3; $i++) {
-            $permissionClause = $this->getPermissionClause($viewer, $linkedStudentId, null, null, "pl{$i}");
+            $permissionClause = $this->getPermissionClause($viewer, $linkedStudent, null, null, "pl{$i}");
             $whereClauses[$i] = $permissionClause['where'];
             $params[$i]       = $permissionClause['params'];
             if (is_array($recordIds)) {
@@ -526,14 +528,14 @@ class DataSource
 
     /**
      * Generates where clause with parameters to find visible pastoral records
-     * @param User     $viewer
-     * @param int|null $studentId
+     * @param User $viewer
+     * @param User|null $student
      * @param int|null $typeId
      * @param int|null $subtypeId
-     * @param string   $alias
+     * @param string $alias
      * @return array
      */
-    private function getPermissionClause(User $viewer, ?int $studentId, ?int $typeId, ?int $subtypeId = null, string $alias = 'p'): array
+    private function getPermissionClause(User $viewer, ?User $student, ?int $typeId, ?int $subtypeId, string $alias = 'p'): array
     {
         // Hydrate pastoral group membership, if not yet set
         if ($viewer->getPastoralGroupIds() === null) {
@@ -545,8 +547,10 @@ class DataSource
         /**
          * Pastoral records that we are interested in */
         $validPb = (new Builder($this->mapper->getDatabase()->getQuoter(), $alias))->setParamPrefix("{$alias}v");
-        if (null !== $studentId) {
-            $validPb->equals("{$alias}.student_id", $studentId);
+        $inSameCampus = true;
+        if (null !== $student) {
+            $validPb->equals("{$alias}.student_id", $student->getId());
+            $inSameCampus = $viewer->getRole()->isStudent() || $viewer->getRole()->isParent() || AccessLevelCensor::inSameCampus($student, $viewer);
         }
         $validPb->isNull("{$alias}.deleted_at");
         if (null !== $typeId) {
@@ -582,6 +586,10 @@ class DataSource
                 ->any($paInnerPb1)
                 ->isNull('deleted_at')
                 ->greaterThan('access', 0);
+            if (!$inSameCampus) {
+                // Returns only permissions not limiting campus
+                $hasAccessPb->isFalse('match_campus');
+            }
             $whereHasAccess = implode(' AND ', $hasAccessPb->getWhere());
 
             /**
@@ -726,15 +734,15 @@ class DataSource
     /**
      * Finds a count of linked records grouped by linked student names for a particular student visible to the given viewer
      * @param User     $viewer    Who is viewing this student's records
-     * @param int      $studentId Id of a student being viewed
+     * @param User     $student   Student being viewed
      * @param int|null $typeId
      * @param int|null $subtypeId
      * @return array
      */
-    public function getLinkedStudentRecordCount(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId): array
+    public function getLinkedStudentRecordCount(User $viewer, User $student, ?int $typeId, ?int $subtypeId): array
     {
         $permissionClause = $this->getPermissionClause($viewer, null, $typeId, $subtypeId, 'p');
-        $linkedClause     = $this->getLinkedClause($viewer, $studentId, null);
+        $linkedClause     = $this->getLinkedClause($viewer, $student, null);
 
         $sql = "
                 SELECT  p.student_id,
