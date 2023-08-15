@@ -56,8 +56,13 @@ class AggregateSource implements ISource
         $params  = [];
         foreach ($this->queryParamBuilders as $queryParamBuilder) {
             $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
-            $queries[]   = $queryParams->query;
-            $params      = array_merge($params, $queryParams->params);
+            if ($queryParams) {
+                $queries[] = $queryParams->query;
+                $params    = array_merge($params, $queryParams->params);
+            }
+        }
+        if (empty($queries)) {
+            return [];
         }
 
         // UNION all queries together
@@ -82,7 +87,6 @@ class AggregateSource implements ISource
                 (int)$row['id'],
                 $row['title'],
                 $row['type'],
-                Alaress_Date_Format::newDatabaseDate($row['date']),
                 (float)$row['relevance'],
             );
         }

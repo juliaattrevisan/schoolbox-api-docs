@@ -24,12 +24,15 @@ interface IQueryParamBuilder
      * @param FilterDataObject      $filter  A set of filters to apply at the query building level.
      * @param CursorDataObject|null $cursor  A cursor to apply when building the query.
      * @param int                   $limit   The maximum number of results to retrieve.
-     * @return QueryParams
+     * @return QueryParams|null The query and parameters to use to find matches,
+     *                          or null if this builder is not to be used at
+     *                          all (e.g. if `$filter` excludes all possible
+     *                          matches).
      */
     public function buildMatchQueryParams(
         string $keyword,
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         int $limit,
-    ): QueryParams;
+    ): ?QueryParams;
 }

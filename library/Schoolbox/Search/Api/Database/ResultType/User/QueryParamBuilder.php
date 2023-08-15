@@ -122,17 +122,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The date of a user result will be their last updated date.
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(): ?string
     {
         return 'u.updated_at';
     }
 
     /**
-     * Users have no recorded creator: thus, this will always be 0.
+     * Users have no recorded creator: thus, this will always be null.
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(): ?string
     {
-        return '0';
+        return null;
     }
 
     /**
