@@ -62,6 +62,10 @@ class Module extends BaseModule
             return $this->preloadAttempt($params);
         };
 
+        $preloadAttemptForReview = function ($params) {
+            return $this->preloadAttemptForReview($params);
+        };
+
         /* Modify Learnosity contents for a given schoolbox quiz id
          */
         $this->register('GET', '/{assessmentId}/content', 'getContent', $instructorPerms, $preloadAssessment);
@@ -89,11 +93,11 @@ class Module extends BaseModule
 
         /* Provide feedback to a student's attempt
          */
-        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'getFeedback', $instructorPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'getFeedback', $instructorPerms, $preloadAttemptForReview);
 
         /* Persist feedback to a student's attempt
          */
-        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'postFeedback', $instructorPerms, $preloadAttempt);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
 
         /* Start horizontal marking using a Learnosity Report
          */
@@ -244,6 +248,9 @@ class Module extends BaseModule
          */
         $student = $participantPreload['student'];
 
+        /* Students can see if if they own it
+         * Otherwise get out
+         */
         if ((int)$student->getId() !== (int)$attempt->getUser()->getId()) {
             throw new NotFound();
         }
@@ -252,6 +259,37 @@ class Module extends BaseModule
             'attempt' => $attempt
         ]);
     }
+
+
+    /**
+     * Preloads an attempt via its learnosity reference identifier
+     *
+     * @param array $params
+     * @return array
+     * @throws Exception
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws NotFound
+     */
+    protected function preloadAttemptForReview(array $params): array
+    {
+        $participantPreload = $this->preloadAssessmentAndStudent($params);
+
+        try {
+            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnosityReference']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new NotFound();
+        }
+
+        /* Staff can always see it
+         */
+        return array_merge($participantPreload, [
+            'attempt' => $attempt
+        ]);
+    }
+
 
     /**
      * @inheritdoc
