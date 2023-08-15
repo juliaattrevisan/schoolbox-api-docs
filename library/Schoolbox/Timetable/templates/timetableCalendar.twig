@@ -28,6 +28,7 @@
     </script>
 {% endautoescape %}
 
+{#
 {% if options['userOptions']|length > 0 %}
     <div class="row ">
         <div class="small-12 columns">
@@ -38,7 +39,7 @@
                            data-userOption-student-button
                            data-userId="{{ userOption.userId }}"
                            data-userOptionFormattedName="{{ userOption.formattedName }}"
-                           {# Format of data-userOptionYearLevel must match format used below in <span data-heading-user-year>. #}
+                           {# Format of data-userOptionYearLevel must match format used below in <span data-heading-user-year>. #
                            data-userOptionYearLevel="{{ userOption.yearLevel }}">
                             {{ userOption.formattedName }} ({{ userOption.firstCampusName }})
                         </a>
@@ -58,13 +59,13 @@
         </h1>
     </div>
 </div>
+#}
 
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <div id="timetable-calendar">
-                <timetable-calendar :options="{{ options|json_encode }}"/>
-            </div>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
-    </section>
+{#
+    TODO: Remove this wrapper div.  A div with id="timetable-calendar" already exists in timetable-calendar.vue.
+          Why does everything break (page goes blank) when I remove this wrapper div?
+#}
+<div id="timetable-calendar">
+    <timetable-calendar :options="{{ options|json_encode }}"/>
 </div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
