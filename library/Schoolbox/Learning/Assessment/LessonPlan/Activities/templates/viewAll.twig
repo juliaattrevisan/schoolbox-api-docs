@@ -119,22 +119,23 @@
                                     <li class="interact" data-unit-assessment="{{ assessment.id }}">
                                         <div{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %}>
                                             <div class="list-item">
-                                                <div class="small-12 card wrap-down">
+                                                <div class="small-12 compact card wrap-down">
                                                     {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
 
                                                     {# Don't render a link if you are unable to view the details #}
                                                     {% set route = viewRoute.viewRoute(assessment, USER) %}
-                                                    <h3 class="icon-lesson-plan">
                                                     {% if route %}
                                                         <a title="{{ title }}" href="{{ route }}" class="title {% if (dateStart and dateEnd) and assessment.dueAt > dateStart and assessment.dueAt < dateEnd %}active-lesson-plan{% endif %}">
-                                                            {{ assessment.title }}
+                                                            <span class="icon-lesson-plan"></span>
+                                                            <p>{{ assessment.title }}</p>
                                                         </a>
                                                     {% else %}
                                                         <div title="{{ title }}" class="title {% if (dateStart and dateEnd) and assessment.dueAt > dateStart and assessment.dueAt < dateEnd %}active-lesson-plan{% endif %}">
-                                                            {{ assessment.title }}
+                                                            <span class="icon-lesson-plan"></span>
+                                                            <p>{{ assessment.title }}</p>
                                                         </div>
                                                     {% endif %}
-                                                    </h3>
+
                                                     <p class="meta">
                                                         {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% elseif course %}{{ course.name }}{% endif %} | {{ unit.title }}
                                                     </p>
