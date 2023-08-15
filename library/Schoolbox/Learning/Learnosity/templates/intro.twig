@@ -38,6 +38,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>User</th>
                     <th>Start</th>
                     <th>Finish</th>
                     <th>Time Taken</th>
@@ -51,6 +52,7 @@
             {% for attempt in attempts %}
                 {% set finished = attempt.finish %}
                 <tr>
+                    <td>{{ attempt.user.fullname }}</td>
                     <td>{{ attempt.start.short }}</td>
                     <td>
                         {% if finished %}
