@@ -35,7 +35,7 @@
 </script>
 {% set urlSuffix = (encodedReturnUrl | length) ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl) : '' %}
 <section>
-{% if hasBeenFiltered and not readOnly%}
+{% if filterList and not readOnly%}
     <p class="component-titlebar meta">
         <a class="icon-filter" href="#" title="View / Edit filter">This is being filtered</a>
     </p>
