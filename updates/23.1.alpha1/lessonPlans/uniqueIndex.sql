@@ -4,7 +4,7 @@ alter table lesson_plan
 
 drop index assessment_id on lesson_plan;
 
-create unique index assessment_id
+create unique index fk_lesson_plan_assessment
     on lesson_plan (assessment_id);
 
 alter table lesson_plan
@@ -15,9 +15,9 @@ alter table lesson_plan
 alter table lti_assessment
     drop foreign key lti_assessment_assessment_id_fk;
 
-drop index assessment_id on lti_assessment;
+drop index lti_assessment_assessment_id_fk on lti_assessment;
 
-create unique index assessment_id
+create unique index lti_assessment_assessment_id_fk
     on lti_assessment (assessment_id);
 
 alter table lti_assessment
