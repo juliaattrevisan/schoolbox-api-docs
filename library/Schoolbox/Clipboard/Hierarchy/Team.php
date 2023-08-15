@@ -485,7 +485,7 @@ class Team implements IStrategy
      */
     private function findCoach(array $userLookup, array $coach): \Schoolbox\Fixtures\Coach\Model
     {
-        $externalId = trim((string)($coach['id'] ?? null));
+        $externalId = trim((string)($coach['sisId'] ?? null));
         $coachName = "{$coach['firstName']} {$coach['lastName']}";
 
         /* No external id? Spawn a whole new guy from out of the blue
@@ -529,15 +529,15 @@ class Team implements IStrategy
              * if one doesn't already exist that we can reuse
              */
             try {
+                $coach = $this->coachMapper->findOneByColumnList([
+                    'name' => $coachName
+                ]);
+
                 $this->log->debug(sprintf(
                     'Reusing existing coach %s (%s) by using their name',
                     $coachName,
                     $externalId
                 ));
-
-                $coach = $this->coachMapper->findOneByColumnList([
-                    'name' => $coachName
-                ]);
 
                 if ($this->perform) {
                     $this->coachMapper->save($coach);
