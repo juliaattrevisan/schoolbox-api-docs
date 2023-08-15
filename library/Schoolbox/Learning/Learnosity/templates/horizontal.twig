@@ -19,6 +19,10 @@
 {% endfor %}
 </div>
 
+<div id="loading">
+    <div class="loader"></div>
+</div>
+
 <script>
     let reportPayloads = {{ reportPayloads|raw }};
 
@@ -59,11 +63,15 @@
                 attemptReport.on('ready:itemsApi', function(itemsApp) {
                     window.itemsApp = itemsApp;
 
-                    reportsLoaded[i] = true;
+                    /* Loosely presume how many have loaded successfully
+                     * by maintaining a counter; could use reportId as a
+                     * lookup index if you wanted to double-down on this
+                     */
+                    reportsLoaded++;
 
                     /* Start hiding things
                      */
-                    console.log('start hiding things for report ' + reportId);
+                    hideAllResponses(reportId);
                 });
             }
         };
@@ -76,18 +84,20 @@
     /* Poll to see when reportsLoaded == reportsExpected
      * If true, we're ready to go, and can clear the timeout
      */
-    // let reportsReady = setInterval(function() {
-    //     if (reportsLoaded === reportsExpected) {
-    //         clearInterval(reportsReady);
-    //
-    //         /* Show list of questions to choose from
-    //          */
-    //         document.getElementById('item-list').style = 'display: block';
-    //         document.getElementById('reports').style = 'display: block';
-    //
-    //         hideAllResponses(reportIds);
-    //     }
-    // }, 100);
+    let reportsReady = setInterval(function() {
+        if (reportsLoaded === reportsExpected) {
+            clearInterval(reportsReady);
+
+            /* Show list of questions to choose from
+             */
+            document.getElementById('item-list').style = 'display: block';
+            document.getElementById('reports').style = 'display: block';
+
+            /* Hide the spinny
+             */
+            document.getElementById('loading').style = 'display: none';
+        }
+    }, 100);
 
     //
     // /**
@@ -131,26 +141,24 @@
      * There are no wrapper containers so you have to hide all of them
      * somewhat arbitrarily/naively
      */
-    function hideAllResponses(reportIds) {
-        for (let i = 0; i < reportIds.length; i++) {
-            let report = document.getElementById(reportIds[i]);
+    function hideAllResponses(reportId) {
+        let report = document.getElementById(reportId);
 
-            let titles = report.getElementsByClassName('lrn-report-item-title');
-            let clearfixes = report.getElementsByClassName('clearfix');
-            let items = report.getElementsByClassName('learnosity-item');
+        let titles = report.getElementsByClassName('lrn-report-item-title');
+        let clearfixes = report.getElementsByClassName('clearfix');
+        let items = report.getElementsByClassName('learnosity-item');
 
-            $.each(titles, function(index, element) {
-                element.style = 'display:none';
-            });
+        $.each(titles, function(index, element) {
+            element.style = 'display:none';
+        });
 
-            $.each(clearfixes, function(index, element) {
-                element.style = 'display:none';
-            });
+        $.each(clearfixes, function(index, element) {
+            element.style = 'display:none';
+        });
 
-            $.each(items, function (index, element) {
-                element.style = 'display:none';
-            });
-        }
+        $.each(items, function (index, element) {
+            element.style = 'display:none';
+        });
     }
 
 
