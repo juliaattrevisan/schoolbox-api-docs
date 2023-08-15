@@ -83,14 +83,17 @@ class Controller extends Base
                     // more than one result for the same folder: the search
                     // results within the folder will contain a reasonable
                     // subset of results.
-                    if (!isset($translatedResults[$resultKey])) {
+                    // TODO need to populate page subtype
+                    $folderResultType = 'page';
+                    $folderResultId   = $result->folder->getId();
+                    $folderResultKey  = $folderResultType . '.' . $folderResultId;
+                    if (!isset($translatedResults[$folderResultKey])) {
                         // Finagle a raw result for the folder, and hydrate that
                         // into a full result.
-                        // TODO need to populate page subtype
                         $rawFolderResult = new RawResult(
-                            $result->folder->getId(),
+                            $folderResultId,
                             $result->folder->getTitle(),
-                            'page',
+                            $folderResultType,
                             $result->relevance,
                         );
                         [$folderResult] = $this->hydrator->hydrate(
@@ -103,11 +106,11 @@ class Controller extends Base
                         }
 
                         // Translate the folder result
-                        $translatedResults[$resultKey] = call_user_func($this->fullResultTranslator, $folderResult);
+                        $translatedResults[$folderResultKey] = call_user_func($this->fullResultTranslator, $folderResult);
                     }
 
                     // Add this result into the sub-results
-                    $translatedResults[$resultKey]['_subResults'] ??= [
+                    $translatedResults[$folderResultKey]['_subResults'] ??= [
                         'data'     => [],
                         'metadata' => [
                             'count'  => null,
@@ -117,12 +120,12 @@ class Controller extends Base
                             ],
                         ]
                     ];
-                    $translatedResults[$resultKey]['_subResults']['data'][] = $translatedResult;
+                    $translatedResults[$folderResultKey]['_subResults']['data'][] = $translatedResult;
 
                     // Use the cursor object to build a pointer to the next
                     // result within this page
                     $cursor ??= new Cursor\Cursor($this->source, $keyword, $filter, $limit);
-                    $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
+                    $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
                         new Collection([$result])
                     );
                 } else {
