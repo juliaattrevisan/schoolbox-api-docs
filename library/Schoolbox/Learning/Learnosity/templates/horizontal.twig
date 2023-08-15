@@ -1,10 +1,5 @@
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 
-<style>
-    .lrn {
-        display: none;
-    }
-</style>
 {# A list of contents for this quiz
  # Used to help people change questions
  #}
@@ -37,6 +32,7 @@
      */
     let reportsLoaded = 0;
     let reportsExpected = reportPayloads.length;
+    let reportIds = [];
 
     let reportCallback = {
         readyListener: function() {
@@ -48,7 +44,15 @@
      * Selectively showing only one item's responses at a time
      */
     for (let i = 0; i < reportPayloads.length; i++) {
-        let reportsApp = LearnosityReports.init(JSON.parse(reportPayloads[i]), reportCallback);
+        let initOptions = JSON.parse(reportPayloads[i]);
+
+        /* Remember all the report ids that we'll need to traverse
+         */
+        reportIds.push(initOptions.request.reports[0].id);
+
+        /* Initialise reports for each attempt
+         */
+        let reportsApp = LearnosityReports.init(initOptions, reportCallback);
     }
 
     /* Poll to see when reportsLoaded == reportsExpected
@@ -56,12 +60,31 @@
      */
     let reportsReady = setInterval(function() {
         if (reportsLoaded === reportsExpected) {
-            console.log('Loaded ' + reportsLoaded + ' of ' + reportsExpected);
             clearInterval(reportsReady);
 
             /* Show list of questions to choose from
              */
             document.getElementById('item-list').style = 'display: block';
+            document.getElementById('reports').style = 'display: block';
         }
     }, 100);
+
+
+    /**
+     *
+     */
+    function hideAllResponses() {
+
+    }
+
+
+    /**
+     * When a user clicks an item from the list,
+     * show everyone's responses for that item
+     *
+     * @param learnosityReference
+     */
+    function showResponse(learnosityReference) {
+
+    }
 </script>
