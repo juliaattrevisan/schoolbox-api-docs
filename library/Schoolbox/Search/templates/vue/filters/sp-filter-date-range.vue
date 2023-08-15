@@ -3,20 +3,36 @@
  * To filter the search results to a date range
  */
 
-import $ from "jquery";
 import { useFilterDateRangeStore } from "./store/spFilterDateRangeStore";
 
 const filterDateRangeStore = useFilterDateRangeStore();
 
 /**
- * initialise the date pickers
+ * Formats the date picker date to ISO8601 format
+ * @param {string} date - The date to format
+ * @returns {string} - The formatted date
+ */
+function getDateFormatted(date: string) {
+    return window.dayjs(date, "DD-MM-YYYY").format();
+}
+
+/**
+ * [data-datepicker-vue] is used to avoid using the attach within
+ * www/static/js/alaress-datetime-picker/attacher.datepicker.js as it may be
+ * called when the component is not mounted yet.
  */
 function initDatePickers() {
-    $("[data-datepicker]").each(function attachAlaressDatePicker() {
+    $("[data-datepicker-vue]").each(function attachAlaressDatePicker() {
         const $dateinput = $(this);
         if ($dateinput.attr("data-datepicker-id") === undefined) {
             $dateinput.alaressDateTimePicker();
         }
+    });
+    $("#sp-start-date-input").on("change", (event) => {
+        filterDateRangeStore.startDate = getDateFormatted((event.currentTarget as HTMLInputElement).value);
+    });
+    $("#sp-end-date-input").on("change", (event) => {
+        filterDateRangeStore.endDate = getDateFormatted((event.currentTarget as HTMLInputElement).value);
     });
 }
 
@@ -33,7 +49,7 @@ window.Vue.onMounted(() => {
                 <input
                     id="sp-start-date-input"
                     type="text"
-                    data-datepicker
+                    data-datepicker-vue
                     data-datepicker-buttontext
                     data-datesync-enddate="#sp-end-date-input"
                 />
@@ -42,7 +58,7 @@ window.Vue.onMounted(() => {
                 <input
                     id="sp-end-date-input"
                     type="text"
-                    data-datepicker
+                    data-datepicker-vue
                     data-datepicker-buttontext
                     data-datesync-startdate="#sp-start-date-input"
                 />
