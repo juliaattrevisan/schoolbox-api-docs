@@ -3696,11 +3696,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/AssessmentContextType.php

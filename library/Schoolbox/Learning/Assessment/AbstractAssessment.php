@@ -344,19 +344,22 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @inheritdoc
+     * @param $removeExcluded - If this is true, participants with isExcluded() true will be treated as non-extant.
      */
-    public function getParticipantIfExtant(User $user): ?Participant
+    public function getParticipantIfExtant(User $user, $removeExcluded = true): ?Participant
     {
-        if (!$user || $user->isDeleted()) {
+        if ($user->isDeleted()) {
             return null;
         }
         $userId = $user->getId();
         foreach ($this->plans as $plan) {
             if ($plan->getParticipants()->offsetExists($userId)) {
                 $participant = $plan->getParticipants()[$userId];
-                if (!$participant->isExcluded()) {
-                    return $participant;
+                if ($removeExcluded && $participant->isExcluded()) {
+                    continue;
                 }
+
+                return $participant;
             }
         }
 

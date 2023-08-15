@@ -128,7 +128,8 @@
                         includeRoute: target.dataset.includeRoute,
                         historyRoute: target.dataset.historyRoute,
                     },
-                    isExcluded: target.dataset.isExcluded,
+                    isExcluded: (target.dataset.isExcluded === 'true'),
+                    isParticipant: (target.dataset.isParticipant === 'true'),
                     assessmentType: target.dataset.assessmentType,
                 }
             }))
