@@ -102,6 +102,7 @@ class Module extends BaseModule
                 new Database\ResultType\Page\Hydrator(
                     $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
+                    $routeGenerator,
                 ),
                 new Database\ResultType\File\Hydrator(
                     $mapperFactory->get(FileMapper::class),

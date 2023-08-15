@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
 use Alaress\Database\Predicate\Builder;
+use Aura\Router\Generator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -35,12 +36,14 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param Folder\Mapper $folderMapper Used to fetch folders for hydration.
-     * @param Access        $access       Used to determine if the current user may view this page.
+     * @param Folder\Mapper $folderMapper   Used to fetch folders for hydration.
+     * @param Access        $access         Used to determine if the current user may view this page.
+     * @param Generator     $routeGenerator Used to build a route to the result search for pages.
      */
     public function __construct(
         private Folder\Mapper $folderMapper,
         private Access $access,
+        private Generator $routeGenerator,
     ) {
     }
 
@@ -70,7 +73,7 @@ class Hydrator extends BaseHydrator
 
         // Map those folders to full results
         $fullResults = array_map(
-            function (RawResult $match) use ($folders, $viewer) {
+            function (RawResult $match) use ($folders, $viewer, $keyword) {
                 $folder = $folders->getBy('id', $match->id);
                 if ($folder instanceof Folder\Model) {
                     // Can the viewer even view this folder?
@@ -103,6 +106,20 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         $this->folderMapper->findParents($folder, null, true)->getAll(),
+                        [
+                            'subResults' => $this->buildBaseUrl()
+                                ->withPath(
+                                    $this->routeGenerator->generate(
+                                        'searchApi.getSearchWithinFolder',
+                                        [
+                                            'folder'   => $folder,
+                                            'folderId' => $folder->getId(),
+                                        ]
+                                    )
+                                )
+                                ->withQuery(http_build_query(['keyword' => $keyword]))
+                                ->__toString(),
+                        ],
                     );
                 }
 
