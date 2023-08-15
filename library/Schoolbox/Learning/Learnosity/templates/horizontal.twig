@@ -48,6 +48,7 @@
         /* Remember all the report ids that we'll need to traverse
          */
         let reportId = initOptions.request.reports[0].id;
+        reportIds[i] = reportId;
 
         /* Every report gets its own callback; this is because the readyListeners()
          * don't have any idea which report they are in, which means we can't tell
@@ -98,6 +99,35 @@
             document.getElementById('loading').style = 'display: none';
         }
     }, 100);
+
+    $(function() {
+        /* Presume it'll take longer to load all the learnosity reports
+         * than it does for jquery to init
+         *
+         * Spondonicles God of War might have a smarter, less-flavourful
+         * way of doing this in vanilla js (I leave this conversion to him)
+         */
+        $('[data-item-reference]').on('click', function (event) {
+            event.preventDefault();
+
+            /* Hide everything first lol
+             * Then show certain parts lol
+             */
+            for (let i = 0; i < reportIds.length; i++) {
+                hideAllResponses(reportIds[i]);
+
+                let itemReference = $(this).attr('data-item-reference');
+
+                let response = $('#' + reportIds[i]).find('[data-reference="' + itemReference + '"]');
+                let clearfix = response.prev();
+                let title = clearfix.prev();
+
+                response.attr('style', '');
+                clearfix.attr('style', '');
+                title.attr('style', '');
+            }
+        });
+    });
 
     //
     // /**
