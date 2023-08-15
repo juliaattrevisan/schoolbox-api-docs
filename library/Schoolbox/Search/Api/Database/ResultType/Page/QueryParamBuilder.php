@@ -131,6 +131,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * Pages do not have folders, thus this returns `null`.
+     *
+     * (Whilst a page/folder is stored within another folder, pages are not
+     * displayed underneath a folder.)
+     *
+     * @return string|null
+     */
+    public function buildFolderExpression(): ?string
+    {
+        return null;
+    }
+
+    /**
      * Page results need to be fetched from the folder table: possibly joining
      * onto other tables to populate the result type and folder codes.
      */

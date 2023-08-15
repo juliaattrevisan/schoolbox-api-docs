@@ -145,6 +145,7 @@ class Hydrator extends BaseHydrator
                         $match->type,
                         $match->relevance,
                         $article->getPublishAt(),
+                        null,
                         // Meta looks like: x days ago in $category
                         // Should probably be a frontend responsibility?
                         null,

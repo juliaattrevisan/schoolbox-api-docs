@@ -142,6 +142,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * News results do not have folders, thus this returns `null`.
+     *
+     * (Whilst a news article may be audienced to a folder, news articles are
+     * not displayed underneath a folder.)
+     *
+     * @return string|null
+     */
+    public function buildFolderExpression(): ?string
+    {
+        return null;
+    }
+
+    /**
      * News results are simply fetched from the `comms_news_article` table:
      * currently, no joins are required.
      */

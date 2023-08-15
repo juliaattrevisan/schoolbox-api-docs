@@ -9,13 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api;
 
-use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\User\Formatter\Factory;
@@ -34,8 +36,27 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
-        $permission = new IsLoggedIn();
-        $this->register(self::METHOD_GET, '', 'getSearch', $permission);
+        $this->register(
+            self::METHOD_GET,
+            '',
+            'getSearch',
+            new Rule\IsLoggedIn(),
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/folder/{folderId}',
+            'getSearchWithinFolder',
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                fn (array $params = []) => $params['folderId'] ?? null,
+                Access::getInstance(),
+            ),
+            function (array $params) {
+                return [
+                    'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
+                ];
+            }
+        );
     }
 
     /**
@@ -65,6 +86,7 @@ class Module extends BaseModule
                 new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
                 new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -80,6 +102,11 @@ class Module extends BaseModule
                 new Database\ResultType\Page\Hydrator(
                     $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
+                    $routeGenerator,
+                ),
+                new Database\ResultType\File\Hydrator(
+                    $mapperFactory->get(FileMapper::class),
+                    Access::getInstance(),
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
@@ -87,6 +114,7 @@ class Module extends BaseModule
                 new FolderTranslator(0),
             ),
             $mapperFactory->get(UserMapper::class),
+            $mapperFactory->get(FolderMapper::class),
         );
     }
 }

@@ -33,6 +33,7 @@ class FullResult
      * @param string                   $type        The type of search result.
      * @param float                    $relevance   The relevance score of the search result.
      * @param Alaress_Date_Format|null $date        The date (if any) of the search result.
+     * @param FolderModel|null         $folder      The folder (if any) the search result belongs in.
      * @param string|null              $meta        An optional brief context line for the search result.
      * @param string|null              $image       A link to an image to display next to this search result.
      * @param string|null              $icon        The name of an icon to display next to this search result
@@ -52,6 +53,7 @@ class FullResult
         public string $type,
         public float $relevance,
         public ?Alaress_Date_Format $date = null,
+        public ?FolderModel $folder = null,
         public ?string $meta = null,
         public ?string $image = null,
         public ?string $icon = null,

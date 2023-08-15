@@ -89,6 +89,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $user->getUpdatedAt(),
                         null,
+                        null,
                         $this->buildBaseUrl()
                             ->withPath('/portrait.php')
                             ->withQuery(
