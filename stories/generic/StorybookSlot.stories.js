@@ -8,7 +8,7 @@ export default {
 const DefaultTemplate = (args, { argTypes }) => ({
     components: { StorybookSlot },
     template: `
-        <div class="u-padding-m">
+        <div class="l-pad-m">
             <h3>Storybook Slot</h3>
             <p>
                 Hi. This is a generic container class for use with non-Vue components inside Storybook.

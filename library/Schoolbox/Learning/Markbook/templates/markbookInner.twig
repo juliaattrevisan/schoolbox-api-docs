@@ -154,12 +154,12 @@
             {% for student in markbook.students %}
             <tr data-student="{{ student.id }}">
                 <th class="fixed-left white profile-cell">
-                    <div class="sb-card">
-                        <div class="sb-card__main">
+                    <div class="c-card">
+                        <div class="l-flex-row l-gap-m l-pad-xs">
                             {% if studentCount < functionDegradeLimit %}
                                 {% include "include/portrait.twig" with {user: student, render: "tiny", roundedCorners: true} only %}
                             {% endif %}
-                            <div class="sb-card__main-content">
+                            <div class="l-flex-col l-flex--justify-center f-no-margins">
                                 <a href="/search/user/{{ student.id }}" title="View Profile">{{ student.lastname }}, {{ student.firstname }}</a>
                             </div>
                         </div>

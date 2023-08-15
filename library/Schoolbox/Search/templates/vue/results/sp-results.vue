@@ -17,12 +17,14 @@ const resultsStore = useResultsStore();
 </script>
 
 <template>
-    <sp-results-header />
-    <sp-results-prompt v-if="searchStore.hasNotSearched" />
-    <loading-table v-else-if="searchStore.isSearching" />
-    <sp-results-error v-else-if="searchStore.hasLoadError" />
-    <sp-results-none v-else-if="resultsStore.hasNoResults" />
-    <sp-results-list v-else-if="resultsStore.hasResults" />
+    <div class="l-flex__item--1 l-flex-col l-gap-m">
+        <sp-results-header />
+        <sp-results-prompt v-if="searchStore.hasNotSearched" />
+        <loading-table v-else-if="searchStore.isSearching" />
+        <sp-results-error v-else-if="searchStore.hasLoadError" />
+        <sp-results-none v-else-if="resultsStore.hasNoResults" />
+        <sp-results-list v-else-if="resultsStore.hasResults" />
+    </div>
 </template>
 
 <style scoped></style>

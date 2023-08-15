@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * The search bar that currently appears within the top menu.
+ * It is currently used to search for users and prompt a full search,
+ * providing the option to be redirected to the search page.
+ */
 import debounce from "lodash/debounce";
 import { vOnClickOutside } from "@vueuse/components";
 import SearchInput from "@schoolboxVue/components/search/search-input.vue";
@@ -184,7 +189,7 @@ function formatPortrait(id: string) {
         id="search"
         ref="formElement"
         v-on-click-outside="onClickOutside"
-        class="global-search"
+        class="c-header-search"
         action="/search"
         :class="{ focus: isFocused }"
     >
@@ -200,77 +205,76 @@ function formatPortrait(id: string) {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="sb-card-list results">
-            <div v-if="results.length && results.length !== totalCount" class="sb-card">
-                <div class="sb-card__content">
-                    <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
+        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
+            <div class="l-flex-col">
+                <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
+                    <div class="l-pad-s">
+                        <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
+                    </div>
                 </div>
-            </div>
-            <a
-                v-for="(result, i) in results"
-                :key="i"
-                :class="`sb-card sb-card--link ${i === arrowCounter ? 'sb-card--active' : ''}`"
-                :href="paths.userPage + result.id"
-                @mouseover="arrowCounter = i"
-                @mouseleave="arrowCounter = -1"
-            >
-                <div class="sb-card__main">
-                    <div class="sb-card__primary-img img img--l img--round">
-                        <div class="img__wrapper">
-                            <img :src="formatPortrait(result.id)" alt="portrait photo" />
+                <div
+                    v-for="(result, i) in results"
+                    :key="i"
+                    :class="`c-card c-card--link c-card--border-end ${i === arrowCounter ? 'c-card--active' : ''}`"
+                    @mouseover="arrowCounter = i"
+                    @mouseleave="arrowCounter = -1"
+                >
+                    <div class="l-flex-row l-flex--align-center l-gap-m l-pad-xs--vert">
+                        <div class="c-img c-img--l c-img--round">
+                            <div class="c-img__wrapper">
+                                <img
+                                    :src="formatPortrait(result.id)"
+                                    :alt="`Portrait photo of ${result.formattedName}`"
+                                />
+                            </div>
+                        </div>
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
+                            <h3>
+                                <a :href="paths.userPage + result.id">{{ result.formattedName }}</a>
+                            </h3>
+                            <span class="meta">{{ result.metadata }}</span>
                         </div>
                     </div>
-                    <div class="sb-card__main-content">
-                        <a :href="paths.userPage + result.id"
-                            ><h3>{{ result.formattedName }}</h3></a
-                        >
-                        <span class="meta">{{ result.metadata }}</span>
+                </div>
+                <a
+                    v-if="results.length && totalCount > results.length"
+                    class="c-card c-card--link c-card--active"
+                    :href="`${paths.searchPage}${keyword}#user`"
+                >
+                    <div class="l-pad-m">
+                        <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                     </div>
-                </div>
-            </a>
-            <a
-                v-if="results.length && totalCount > results.length"
-                class="sb-card sb-card--link sb-card--active"
-                :href="`${paths.searchPage}${keyword}#user`"
-            >
-                <div class="sb-card__content">
-                    <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
-                </div>
-            </a>
-            <template v-if="isLoading">
-                <div v-for="(row, index) in 3" :key="index" class="sb-card sb-card--loading">
-                    <div class="sb-card__main">
-                        <div class="sb-card__primary-img img img--round">
-                            <div class="img__wrapper">
+                </a>
+                <div v-if="isLoading" class="c-card c-card--loading">
+                    <div class="l-flex-row l-gap-m">
+                        <div class="c-img c-img--round">
+                            <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="sb-card__main-content">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-s">
                             <h3></h3>
                             <span></span>
                         </div>
                     </div>
                 </div>
-            </template>
-            <template v-if="!isLoading && !results.length">
-                <div class="sb-card">
-                    <div class="sb-card__content">
-                        <span class="meta">No users were found matching "{{ keyword }}"</span>
+                <template v-if="!isLoading && !results.length">
+                    <div class="c-card">
+                        <div class="l-pad-s">
+                            <span class="meta">No users were found matching "{{ keyword }}"</span>
+                        </div>
                     </div>
-                </div>
-                <a class="sb-card sb-card--link sb-card--active" :href="`${paths.searchPage}${keyword}#all`">
-                    <div class="sb-card__content">
-                        <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
-                    </div>
-                </a>
-            </template>
+                    <a class="c-card c-card--link c-card--active" :href="`${paths.searchPage}${keyword}#all`">
+                        <div class="l-pad-s">
+                            <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
+                        </div>
+                    </a>
+                </template>
+            </div>
         </div>
     </form>
 </template>
 
-<style scoped>
-.inner-wrap:not(.left-open):not(.right-open) .global-search:hover,
-.inner-wrap:not(.left-open):not(.right-open) .global-search.focus {
-    padding-left: 9rem;
-}
+<style lang="scss" scoped>
+@import "./header-search.scss";
 </style>

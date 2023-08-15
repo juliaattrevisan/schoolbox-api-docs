@@ -1,0 +1,43 @@
+/*
+    Layout classes to quickly apply standardised padding without having
+    to explicity define a class for it.
+ */
+
+@use "sass:list";
+
+.l-pad {
+    @each $size in $global-sizes {
+        &-#{$size} {
+            padding: var(--whitespace-#{$size});
+
+            &--horiz {
+                padding-inline-end: var(--whitespace-#{$size});
+                padding-inline-start: var(--whitespace-#{$size});
+            }
+
+            &--vert {
+                padding-block-end: var(--whitespace-#{$size});
+                padding-block-start: var(--whitespace-#{$size});
+            }
+
+            &--top {
+                padding-block-start: var(--whitespace-#{$size});
+            }
+
+            &--bottom {
+                padding-block-end: var(--whitespace-#{$size});
+            }
+
+            &--left {
+                padding-inline-start: var(--whitespace-#{$size});
+            }
+
+            &--right {
+                padding-inline-end: var(--whitespace-#{$size});
+            }
+        }
+    }
+    &--0 {
+        padding: 0;
+    }
+}

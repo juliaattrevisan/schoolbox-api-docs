@@ -1,0 +1,248 @@
+/*
+ * Basic DOM manipulation utilities
+ */
+
+import { escapeRegExp } from "@js/util/jsUtils";
+
+/**
+ * returns an integer indicating the position of the
+ * passed element relative to the original collection
+ * replacement for $(el).index
+ * @param {HTMLElement} element - the DOM element to find the index of
+ * @returns {number} - position of the DOM element
+ */
+export function getIndex(element: HTMLElement) {
+    if (!element || !element.parentNode) {
+        return -1;
+    }
+    return [...element.parentElement.children].indexOf(element);
+}
+
+/**
+ * empty the element of children
+ * replacement for $(el).empty
+ * @param {HTMLElement} element - the DOM element to empty
+ */
+export function empty(element: HTMLElement) {
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}
+
+/**
+ * switch elements, changing stacking order
+ * @param {HTMLElement} firstElement - the first DOM element
+ * @param {HTMLElement} secondElement - the second DOM element
+ */
+export function swapElements(firstElement: HTMLElement, secondElement: HTMLElement) {
+    firstElement.parentNode?.insertBefore(firstElement, secondElement);
+}
+
+/**
+ * Insert the target node before the reference
+ * @param {HTMLElement} referenceElement - element to use as basis
+ * @param {HTMLElement} targetElement - element that will be added
+ */
+export function insertElementBefore(referenceElement: HTMLElement, targetElement: HTMLElement) {
+    referenceElement.parentNode?.insertBefore(targetElement, referenceElement);
+}
+
+/**
+ * Insert the target node after the reference
+ * @param {HTMLElement} referenceElement - element to use as basis
+ * @param {HTMLElement} targetElement - element that will be added
+ */
+export function insertElementAfter(referenceElement: HTMLElement, targetElement: HTMLElement) {
+    referenceElement.parentNode?.insertBefore(targetElement, referenceElement.nextSibling);
+}
+
+/**
+ * put at the very top of the stack
+ * @param {HTMLElement} element - the DOM element
+ */
+export function insertBeforeFirstChild(element: HTMLElement) {
+    const theFirstChild = element.parentNode?.firstChild as ChildNode;
+    element.parentNode?.insertBefore(element, theFirstChild);
+}
+
+/**
+ * To get an elements left and mid height point relative to the document
+ * @param {HTMLElement} element - the element to get the left and mid height point of
+ * @returns {object} - the left and mid height point of the element
+ */
+export function getElementsLeftAndMidHeightPoint(element: HTMLElement) {
+    return {
+        left: element.getBoundingClientRect().left,
+        top: element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2,
+    };
+}
+
+/**
+ * Find the closest element (relative to its mid point) in a NodeList, based on a x,y of a targetPoint
+ * @param {HTMLElement} targetElement - the element to find the closest element to
+ * @param {HTMLElement[]} elements - the elements to search through
+ * @returns {HTMLElement} - the closest element
+ */
+export function getClosestElement(targetElement: HTMLElement, elements: HTMLElement[]) {
+    const targetPoint = getElementsLeftAndMidHeightPoint(targetElement);
+    let closestElement = elements[0];
+    let minDistance = 99999; // if this doesn't get overwritten we got issues...
+    elements.forEach((element) => {
+        // loop through each element and find the closest element using pythagoras theorem
+        const elementsTargetPoint = getElementsLeftAndMidHeightPoint(element);
+        // ** is: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Exponentiation
+        const distance = Math.sqrt(
+            (elementsTargetPoint.left - targetPoint.left) ** 2 + (elementsTargetPoint.top - targetPoint.top) ** 2
+        );
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestElement = element;
+        }
+    });
+    return closestElement;
+}
+
+/**
+ * To get an elements mid point relative to the document
+ * @param {HTMLElement} element - the element to get the mid point of
+ * @returns {object} - the mid point of the element
+ */
+export function getElementsMidPoint(element: HTMLElement) {
+    return {
+        left: element.getBoundingClientRect().left + element.offsetWidth / 2,
+        top: element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2,
+    };
+}
+
+/**
+ * Is the midpoint of an element above the midpoint of another element
+ * @param {HTMLElement} firstElement - the element to check
+ * @param {HTMLElement} secondElement - the element to check against
+ * @returns {boolean} - true if the first element is above the second element
+ */
+export function isElementAboveOtherElement(firstElement: HTMLElement, secondElement: HTMLElement) {
+    return getElementsMidPoint(firstElement).top > getElementsMidPoint(secondElement).top;
+}
+
+/**
+ * Is the midpoint of an element below the midpoint of another element
+ * @param {HTMLElement} firstElement - the element to check
+ * @param {HTMLElement} secondElement - the element to check against
+ * @returns {boolean} - true if the first element is below the second element
+ */
+export function isElementBelowOtherElement(firstElement: HTMLElement, secondElement: HTMLElement) {
+    return getElementsMidPoint(firstElement).top < getElementsMidPoint(secondElement).top;
+}
+
+/**
+ * Add styles to an element
+ * @param {HTMLElement} element - the element to add styles to
+ * @param {object} styles - for example { position: 'absolute', top: '20px' }
+ */
+export function setStylesOnElement(element: HTMLElement, styles: object) {
+    Object.assign(element.style, styles);
+}
+
+/**
+ * Async inject a <script> tag into the DOM
+ * https://stackoverflow.com/a/39008859
+ * @param {string} src - the src of the script to inject
+ */
+export function injectScript(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.setAttribute("data-is-loaded", "false");
+        script.addEventListener("load", () => {
+            script.setAttribute("data-is-loaded", "true");
+            resolve();
+        });
+        script.addEventListener("error", (e) => reject(e.error));
+        script.src = src;
+        document.head.appendChild(script);
+    });
+}
+
+/**
+ * Set and get an attribute on an element
+ * @param {HTMLElement} element - the element to set the attribute on
+ * @param {string} attribute - the attribute to set
+ * @param {string} value - the value to set the attribute to
+ * @returns {string} - the value of the attribute
+ */
+export function setAndGetAttribute(element: HTMLElement, attribute: string, value: string) {
+    element.setAttribute(attribute, value);
+    return element.getAttribute(attribute);
+}
+
+/**
+ * Returns true if the script exists on the page
+ * @param {string} src - the src of the script
+ * @returns {boolean} - true if the script exists on the page
+ */
+export function isScriptAdded(src: string) {
+    return Boolean(document.querySelector(`script[src="${src}"]`));
+}
+
+/**
+ * When new HTML is added dynamically to page, we need to ensure any <script> tags
+ * have been loaded prior to adding the new HTML to the page
+ * @param {string} htmlString - note: the HTML shouldn't exist in the DOM yet, so we can load properly
+ * @returns { Element } - the HTML as a DOM element
+ */
+export async function getLoadedHTML(htmlString: string) {
+    const documentFragment = document.createRange().createContextualFragment(htmlString); // createContextualFragment ensures any </script> tags within the element are run
+    const scriptTags = documentFragment.querySelectorAll("script[src]:not([data-is-vue])"); // get each <script src></script> that isn't a vue component (which don't require preloading)
+    const newScriptTags = Array.from(scriptTags).filter(
+        (scriptTag) => !isScriptAdded(scriptTag.getAttribute("src") as string)
+    ); // only add those <scripts> that aren't already on the page
+    const injections: Promise<void>[] = [];
+    newScriptTags.forEach((scriptTag) => {
+        injections.push(injectScript(scriptTag.getAttribute("src") as string));
+    });
+    // add each into the document head
+    await Promise.all(injections);
+    if (documentFragment.childElementCount === 1) {
+        // should be returning a single div
+        return documentFragment.firstElementChild;
+    }
+    // and if there's not, wrap everything around one
+    const wrappedElement = document.createElement("div");
+    wrappedElement.append(documentFragment);
+    return wrappedElement;
+}
+
+/**
+ * Returns the script element
+ * @param {string} src - the src of the script
+ * @returns { HTMLScriptElement } - the script element
+ */
+export function getScriptElement(src: string) {
+    return document.querySelector(`script[src="${src}"]`);
+}
+
+/**
+ * Returns true if the script has been loaded
+ * @param {string} src - the src of the script
+ * @returns {boolean} - true if the script has been loaded
+ */
+export function isScriptLoaded(src: string) {
+    const scriptElement = document.querySelector(`script[src="${src}"]`);
+    return scriptElement && scriptElement.getAttribute("data-is-loaded") === "true";
+}
+
+/**
+ * To add <mark> elements around the input on any of the matches
+ * (?![^>]*>) is used to check we are not inside an element node
+ * @param {string} toMark - the string to find all instanced of the current search string in
+ * @param {string[]} wordList - the list of words to search for
+ * @returns {string} string for v-html with <mark></mark> wrapped around each found result
+ */
+export function addMarks(toMark: string, wordList: string[]) {
+    let marked = toMark;
+    wordList.forEach((wordInSearch) => {
+        marked = marked.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
+            return `<mark>${match}</mark>`;
+        });
+    });
+    return marked;
+}

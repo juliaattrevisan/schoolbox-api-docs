@@ -31,14 +31,21 @@ async function onApplySelected() {
 </script>
 
 <template>
-    <h2 class="subheader">Filters</h2>
-    <section class="content">
-        <sp-filter-date-range />
-        <sp-filter-creator />
-        <sp-filter-types />
-        <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
-        <button class="full-width" @click.prevent="onApplySelected">Apply filters</button>
-    </section>
+    <div class="filters">
+        <h2 class="subheader">Filters</h2>
+        <section>
+            <sp-filter-date-range />
+            <sp-filter-creator />
+            <sp-filter-types />
+            <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
+            <button class="full-width" @click.prevent="onApplySelected">Apply filters</button>
+        </section>
+    </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.filters {
+    display: none; // hidden until filters are implemented
+    max-width: 400px;
+}
+</style>

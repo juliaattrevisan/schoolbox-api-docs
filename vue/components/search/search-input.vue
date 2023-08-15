@@ -14,7 +14,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    input: [event: string];
+    input: [value: string];
     keyDown: [];
     keyUp: [];
     keyEnter: [];
@@ -103,66 +103,82 @@ function onMouseOut(event: MouseEvent) {
 </script>
 
 <template>
-    <input
-        id="search-field"
-        ref="inputElement"
-        :class="props.isActive ? 'search-input search-input-active' : 'search-input'"
-        type="text"
-        name="keyword"
-        placeholder="Search"
-        maxlength="2048"
-        autocomplete="off"
-        :value="currentInput"
-        @input="onInput"
-        @keydown.down="onKeyDown"
-        @keydown.up="onKeyUp"
-        @keydown.enter.prevent="onKeyEnter"
-        @focus="onFocusOver"
-        @mouseover="onMouseOver"
-        @mouseout="onMouseOut"
-        @blur="onFocusOut"
-        @focusout="onFocusOut"
-    />
-    <button
-        for="search-field"
-        class="icon-search no-text"
-        title="Search"
-        @mouseover="onMouseOver"
-        @mouseout="onMouseOut"
-        @click.prevent="onClicked"
-    ></button>
+    <div class="c-search-input l-rel">
+        <input
+            id="search-field"
+            ref="inputElement"
+            :class="props.isActive ? 'c-search-input__field c-search-input__field--active' : 'c-search-input__field'"
+            type="text"
+            name="keyword"
+            placeholder="Search"
+            maxlength="2048"
+            autocomplete="off"
+            :value="currentInput"
+            @input="onInput"
+            @keydown.down="onKeyDown"
+            @keydown.up="onKeyUp"
+            @keydown.enter.prevent="onKeyEnter"
+            @focus="onFocusOver"
+            @mouseover="onMouseOver"
+            @mouseout="onMouseOut"
+            @blur="onFocusOut"
+            @focusout="onFocusOut"
+        />
+        <button
+            for="search-field"
+            class="c-search-input__button icon-search no-text"
+            title="Search"
+            @mouseover="onMouseOver"
+            @mouseout="onMouseOut"
+            @click.prevent="onClicked"
+        ></button>
+    </div>
 </template>
 
 <style lang="scss" scoped>
-/*
-* Styles to suggest the input is 'active'
-* As the input can be part of a larger component (header-search.vue)
-* we pass the isActive prop to the component to style it accordingly
-*/
-.search-input-active {
+.c-search-input {
+    &__field {
+        border: 0;
+        background-color: transparent;
+        color: var(--body-background);
+        font-size: 0; // is properly with --active
+        height: var(--tabbar-height);
+        width: var(--tabbar-height);
+        padding: var(--base-font-size);
+        margin: 0;
+        line-height: calc(var(--tabbar-height) / 2);
+    }
+    /*
+    * Styles to suggest the input is 'active'
+    * As the input can be part of a larger component (header-search.vue)
+    * we pass the isActive prop to the component to style it accordingly
+    */
+    &__field--active {
+        background-color: white;
+        border: 2px solid var(--navigation-hover);
+        color: black;
+        font-size: var(--base-font-size);
+        width: 100%;
+        opacity: 1;
+    }
+}
+
+.c-search-input--active {
     background-color: white;
     border: 2px solid var(--navigation-hover);
     color: black;
     font-size: var(--base-font-size);
     width: 100%;
     opacity: 1;
-    .icon-search {
-        width: 4rem;
-        /* Search icon when Search feature is activated
-        */
-        &:before {
-            color: var(--navigation-background);
-        }
-    }
 }
 
 // Search icon in its idle state, it sits on the right of the input field
-.icon-search {
+.c-search-input__button {
     align-items: center;
     background: none;
     display: flex;
+    height: var(--tabbar-height);
     justify-content: center;
-    line-height: inherit;
     margin: 0;
     padding: 0;
     position: absolute;

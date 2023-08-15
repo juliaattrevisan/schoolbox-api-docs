@@ -20,6 +20,10 @@ export type Result = {
         firstName?: string;
         lastName?: string;
         fullName?: string;
+        _links?: {
+            profile?: string;
+            avatar?: string;
+        };
     };
     context: ResultContext[];
     icon?: string;

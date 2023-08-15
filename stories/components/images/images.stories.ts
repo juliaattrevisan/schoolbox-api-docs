@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import StorybookSlot from "../../vue/components/storybook-slot.vue";
+import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
  * Storybook meta data, any default properties that are passed into every story
@@ -7,7 +7,7 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
-    title: "Images/Images",
+    title: "Components/Images/Images",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -15,8 +15,8 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-            <div class="img">
-                <div class="img__wrapper">
+            <div class="c-img">
+                <div class="c-img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
             </div>
@@ -25,15 +25,15 @@ export const Default: Story = {
 };
 
 /**
- * Image size can be modified with `img--xxs`, `img--xs`, `img--s`, `img--m`, `img--l`, `img--xl`, `img--xxl`
+ * Image size can be modified with `c-img--xxs`, `c-img--xs`, `c-img--s`, `c-img--m`, `c-img--l`, `c-img--xl`, `c-img--xxl`
  *
- * The default size is `img--m`
+ * The default size is `c-img--m`
  */
 export const Sizes: Story = {
     render: () => ({
         template: `
-            <div class="img img--xl">
-                <div class="img__wrapper">
+            <div class="c-img c-img--xl">
+                <div class="c-img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
             </div>
@@ -42,13 +42,13 @@ export const Sizes: Story = {
 };
 
 /**
- *  Rounded borders are added with `img--round`
+ *  Rounded borders are added with `c-img--round`
  */
 export const RoundedImage: Story = {
     render: () => ({
         template: `
-            <div class="img img--round">
-                <div class="img__wrapper">
+            <div class="c-img c-img--round">
+                <div class="c-img__wrapper">
                     <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
                 </div>
             </div>
@@ -62,8 +62,8 @@ export const RoundedImage: Story = {
 export const Icon: Story = {
     render: () => ({
         template: `
-            <div class="img img--l">
-                <div class="img__wrapper">
+            <div class="c-img c-img--l">
+                <div class="c-img__wrapper">
                     <div class="icon icon-calendar"></div>
                 </div>
             </div>
@@ -77,8 +77,8 @@ export const Icon: Story = {
 export const Initials: Story = {
     render: () => ({
         template: `
-            <div class="img">
-                <div class="img__wrapper" style="background-color: #0066B0;">
+            <div class="c-img">
+                <div class="c-img__wrapper" style="background-color: #0066B0;">
                     <div class="img__initials">JL</div>
                 </div>
             </div>

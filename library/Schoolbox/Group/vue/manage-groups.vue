@@ -161,7 +161,7 @@ export default {
             :selected-groups="selectedGroups"
             :is-search-active="isSearchActive"
         />
-        <div v-else class="sb-grid sb-grid--12">
+        <div v-else class="l-grid l-grid--12">
             <manage-groups-item
                 v-for="group in filteredGroups"
                 :key="group.id"

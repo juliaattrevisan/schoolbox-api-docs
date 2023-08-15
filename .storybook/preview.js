@@ -35,8 +35,24 @@ setup((app) => {
 });
 
 export const parameters = {
+    backgrounds: {
+        default: "demo",
+        values: [
+            {
+                name: "demo",
+                value: "rgb(229, 239, 247)",
+            },
+        ],
+    },
     chromatic: {
         pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
     },
     layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
+    options: {
+        storySort: {
+            // Sort stories alphabetically, but with Introduction and CSS Principles first
+            method: "alphabetical",
+            order: ["Introduction", "CSS Principles", "*"],
+        },
+    },
 };

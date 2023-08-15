@@ -5,7 +5,7 @@
  *  Basically, an alternative and more visual way to do checkbox selections. Read the pantry for example use cases.
 **/
 
-.sb-chips {
+.c-chips {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -29,7 +29,7 @@
             color: var(--content-ui-foreground-contrast);
             font-weight: 400;
 
-            .sb-chip__icon {
+            .c-chip__icon {
                 &::before {
                     display: inline-block;
                     margin-inline-end: 0.25rem;
@@ -64,7 +64,7 @@
             padding-inline: var(--whitespace-m);
             user-select: none;
 
-            .sb-chip__icon {
+            .c-chip__icon {
                 color: var(--content-ui-foreground-contrast);
                 line-height: normal;
                 margin-inline-end: var(--whitespace-s);

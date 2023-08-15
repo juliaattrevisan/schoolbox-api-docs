@@ -114,8 +114,9 @@ module.exports = {
         highcharts: "./www/static/js/vendors/highcharts/highcharts.js",
         highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
 
-        // Header Search Bar
+        // Search
         headerSearch: "./templates/core/include/vue/headerSearch.js",
+        searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
 
         // Calendars
         sbFullCalendar: "./library/Schoolbox/Calendar/vue/sbFullCalendar.js",
@@ -408,7 +409,7 @@ module.exports = {
             files: {
                 "vendors.js": [
                     // Vue
-                    "./node_modules/vue/dist/vue.global.prod.js",
+                    "./node_modules/vue/dist/vue.global.js",
                     // jQuery
                     "./node_modules/jquery/dist/jquery.min.js",
                     "./node_modules/jquery-validation/dist/jquery.validate.min.js",
