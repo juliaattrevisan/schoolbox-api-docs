@@ -33,12 +33,7 @@
     let reportsLoaded = 0;
     let reportsExpected = reportPayloads.length;
     let reportIds = [];
-
-    let reportCallback = {
-        readyListener: function() {
-            reportsLoaded++;
-        }
-    };
+    let reportCallbacks = [];
 
     /* Initialise a report for everyone's attempt
      * Selectively showing only one item's responses at a time
@@ -48,28 +43,51 @@
 
         /* Remember all the report ids that we'll need to traverse
          */
-        reportIds.push(initOptions.request.reports[0].id);
+        let reportId = initOptions.request.reports[0].id;
+
+        /* Every report gets its own callback; this is because the readyListeners()
+         * don't have any idea which report they are in, which means we can't tell
+         * when a report has been fully loaded to the point where we can hide all
+         * their divs, because we only want to show one div at a time per report.
+         */
+        reportCallbacks[i] = {
+            readyListener: function() {
+                let attemptReport = reportsApp.getReport(reportId);
+
+                /* itemsApi only spawns if you used session-detail-by-item
+                 */
+                attemptReport.on('ready:itemsApi', function(itemsApp) {
+                    window.itemsApp = itemsApp;
+
+                    reportsLoaded[i] = true;
+
+                    /* Start hiding things
+                     */
+                    console.log('start hiding things for report ' + reportId);
+                });
+            }
+        };
 
         /* Initialise reports for each attempt
          */
-        let reportsApp = LearnosityReports.init(initOptions, reportCallback);
+        let reportsApp = LearnosityReports.init(initOptions, reportCallbacks[i]);
     }
 
     /* Poll to see when reportsLoaded == reportsExpected
      * If true, we're ready to go, and can clear the timeout
      */
-    let reportsReady = setInterval(function() {
-        if (reportsLoaded === reportsExpected) {
-            clearInterval(reportsReady);
-
-            /* Show list of questions to choose from
-             */
-            document.getElementById('item-list').style = 'display: block';
-            document.getElementById('reports').style = 'display: block';
-
-            hideAllResponses(reportIds);
-        }
-    }, 100);
+    // let reportsReady = setInterval(function() {
+    //     if (reportsLoaded === reportsExpected) {
+    //         clearInterval(reportsReady);
+    //
+    //         /* Show list of questions to choose from
+    //          */
+    //         document.getElementById('item-list').style = 'display: block';
+    //         document.getElementById('reports').style = 'display: block';
+    //
+    //         hideAllResponses(reportIds);
+    //     }
+    // }, 100);
 
     //
     // /**
