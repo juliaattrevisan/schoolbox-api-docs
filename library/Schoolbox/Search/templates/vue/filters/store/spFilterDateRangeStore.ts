@@ -7,20 +7,20 @@ import { defineStore } from "pinia";
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     const startDate = window.Vue.ref(window.dayjs().subtract(1, "year").format());
     const endDate = window.Vue.ref(window.dayjs().format());
-    const activeStartDate = window.Vue.ref(null); // the start date currently applied to the active search
-    const activeEndDate = window.Vue.ref(null); // the end date currently applied to the active search
+    const activeStartDate = window.Vue.ref(""); // the start date currently applied to the active search
+    const activeEndDate = window.Vue.ref(""); // the end date currently applied to the active search
 
     /**
      * Is the start date filter set
      * @returns {boolean}
      */
-    const hasStartDate = window.Vue.computed(() => startDate.value !== null);
+    const hasStartDate = window.Vue.computed(() => startDate.value !== "");
 
     /**
      * Is the end date filter set
      * @returns {boolean}
      */
-    const hasEndDate = window.Vue.computed(() => endDate.value !== null);
+    const hasEndDate = window.Vue.computed(() => endDate.value !== "");
 
     /**
      * Are both the start and end date filters set
@@ -54,8 +54,8 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
      * @returns {string} - the date range filter data
      */
     function getFormData() {
-        const from = activeStartDate.value !== null ? activeStartDate.value : "";
-        const to = activeEndDate.value !== null ? activeEndDate.value : "";
+        const from = activeStartDate.value;
+        const to = activeEndDate.value;
         return {
             date: {
                 from,
@@ -68,10 +68,10 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
      * clear the date filter
      */
     function clear() {
-        startDate.value = null;
-        endDate.value = null;
-        activeStartDate.value = null;
-        activeEndDate.value = null;
+        startDate.value = "";
+        endDate.value = "";
+        activeStartDate.value = "";
+        activeEndDate.value = "";
     }
 
     return {

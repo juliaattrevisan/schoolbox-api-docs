@@ -9,6 +9,7 @@ import { ActiveDropdown } from "@js/dropdown/dropdownTypes";
 
 declare global {
     interface Window {
+        $: JQuery;
         cdnPrefix: string;
         CKEDITOR: any;
         dayjs: typeof dayjs;
@@ -24,5 +25,9 @@ declare global {
         siteVersion: string;
         STORYBOOK_ENV: string;
         Vue: typeof Vue;
+    }
+    interface JQuery {
+        // we can add any extra methods we have extended onto the JQuery object here
+        alaressDateTimePicker(): JQuery;
     }
 }
