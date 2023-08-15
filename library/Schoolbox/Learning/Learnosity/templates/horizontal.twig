@@ -73,6 +73,46 @@
                     /* Start hiding things
                      */
                     hideAllResponses(reportId);
+
+                    /* Slap on some our feedback stuff
+                     */
+                    itemsApp.getQuestions(function(questions) {
+                        $.each(questions, function(index, element) {
+                            /* Access different parts of the dom directly, to place
+                             * our input fields etc.
+                             */
+                            let learnosityReference = element.metadata.sheet_reference;
+                            let learnosityReferenceTuple = element.response_id;
+
+                            /* Student scoring and metadata
+                             */
+                            // let score = attemptScores[learnosityReferenceTuple].score;
+                            // let maxScore = attemptScores[learnosityReferenceTuple].max;
+
+                            /* TODO remove by replace with actual values
+                             */
+                            let score = Math.random();
+                            let maxScore = Math.random();
+                            let attemptComments = [];
+
+                            /* Containers into which we inject things
+                             */
+                            let container = $('[data-reference="' + learnosityReference + '"]');
+
+                            container.append('' +
+                                '<div class="sb-custom-score">' +
+                                '<label>Customise score</label>' +
+                                '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
+                                '<label>Comment</label>' +
+                                '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + (attemptComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
+                                '</div>' +
+                            '');
+
+                            /* We need this for cke replacements
+                             */
+                            // attemptEditorFields.push('#comments-' + learnosityReferenceTuple);
+                        });
+                    });
                 });
             }
         };
