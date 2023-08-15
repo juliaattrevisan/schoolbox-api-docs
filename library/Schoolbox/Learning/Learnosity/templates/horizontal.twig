@@ -66,15 +66,73 @@
              */
             document.getElementById('item-list').style = 'display: block';
             document.getElementById('reports').style = 'display: block';
+
+            hideAllResponses(reportIds);
         }
     }, 100);
 
+    //
+    // /**
+    //  * Reconfigure learnosity's dom
+    //  *
+    //
+    //  *
+    //  * This function wraps every three elements into a div with an item
+    //  * identifier so we can toggle things easier
+    //  *
+    //  * @param reportIds
+    //  */
+    // function rearrangeGuts(reportIds) {
+    //     for (let i = 0; i < reportIds.length; i++) {
+    //         let report = document.getElementById(reportIds[i]);
+    //         let divs = report.children;
+    //
+    //         let subcontainer = document.createElement('div');
+    //         let j = 0;
+    //
+    //         /* Group up every three elements
+    //          */
+    //         // for (let j = 0; j < divs.length; j++) {
+    //         //     if (j % 3 < 2) {
+    //         //         subcontainer.appendChild(divs[j]);
+    //         //     }
+    //         // }
+    //
+    //         console.log(divs, subcontainer);
+    //
+    //     }
+    // }
+
 
     /**
+     * Every report comes with an ungrouped sequence of these elements:
+     *      .lrn-report-item-title
+     *      .clearfix
+     *      .learnosity-item lrn lrn-item-processed
      *
+     * There are no wrapper containers so you have to hide all of them
+     * somewhat arbitrarily/naively
      */
-    function hideAllResponses() {
+    function hideAllResponses(reportIds) {
+        for (let i = 0; i < reportIds.length; i++) {
+            let report = document.getElementById(reportIds[i]);
 
+            let titles = report.getElementsByClassName('lrn-report-item-title');
+            let clearfixes = report.getElementsByClassName('clearfix');
+            let items = report.getElementsByClassName('learnosity-item');
+
+            $.each(titles, function(index, element) {
+                element.style = 'display:none';
+            });
+
+            $.each(clearfixes, function(index, element) {
+                element.style = 'display:none';
+            });
+
+            $.each(items, function (index, element) {
+                element.style = 'display:none';
+            });
+        }
     }
 
 
