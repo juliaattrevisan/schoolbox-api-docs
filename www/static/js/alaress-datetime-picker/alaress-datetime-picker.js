@@ -264,6 +264,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             }
         });
 
+    // Set the initial date value if there is one
+    if (adtp.getValue(element, "data-datepicker-initial-value")) {
+        const initialDate = adtp.getValue(element, "data-datepicker-initial-value");
+        setValue(element, options, false, false, initialDate);
+    }
+
     // Create click event to open the modal for the element
     $datepickerButton.click(function () {
         var originalValue;
@@ -499,7 +505,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
      * @param trigger
      * @param date
      */
-    function setValue(element, options, state, trigger, date) {
+    function setValue(element, options, state, trigger, date, dateFormat = "") {
         // Get their pickerIds
         var pId = element.attr("data-datepicker-id");
 

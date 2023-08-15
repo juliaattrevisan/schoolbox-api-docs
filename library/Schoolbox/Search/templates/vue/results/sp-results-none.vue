@@ -23,7 +23,7 @@ async function onNoFiltersSelected() {
         <p>
             Sorry, but your search did not return any results.
             <template v-if="fitersStore.isActive">
-                >You can try again with
+                You can try again with
                 <button title="Search with no filters active" @click="onNoFiltersSelected">no filters</button> otherwise
                 modify your search term.</template
             >

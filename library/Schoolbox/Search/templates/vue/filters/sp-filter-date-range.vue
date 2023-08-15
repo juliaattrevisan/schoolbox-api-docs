@@ -13,7 +13,7 @@ const filterDateRangeStore = useFilterDateRangeStore();
  * @returns {string} - The formatted date
  */
 function getDateFormatted(date: string) {
-    return window.dayjs(date, "DD-MM-YYYY").format();
+    return window.dayjs(date, "DD/MM/YYYY").format();
 }
 
 /**
@@ -52,6 +52,7 @@ window.Vue.onMounted(() => {
                     data-datepicker-vue
                     data-datepicker-buttontext
                     data-datesync-enddate="#sp-end-date-input"
+                    :data-datepicker-initial-value="filterDateRangeStore.startDate"
                 />
             </div>
             <div class="input-group">
@@ -61,6 +62,7 @@ window.Vue.onMounted(() => {
                     data-datepicker-vue
                     data-datepicker-buttontext
                     data-datesync-startdate="#sp-start-date-input"
+                    :data-datepicker-initial-value="filterDateRangeStore.endDate"
                 />
             </div>
         </div>
