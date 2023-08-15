@@ -1,0 +1,22 @@
+<script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
+
+{# Render an html element into which each student's attempt will reside
+ # This is needed for each Learnosity report which we initially hide in
+ # a display:none container
+ #}
+<div id="reports" style="display:none">
+{% for user in users %}
+    <div id="schoolbox-student-{{ user.id }}"></div>
+{% endfor %}
+</div>
+
+<script>
+    let reportPayloads = {{ reportPayloads|raw }};
+
+    /* Initialise a report for everyone's attempt
+     * Selectively showing only one item's responses at a time
+     */
+    for (let i = 0; i < reportPayloads.length; i++) {
+        let reportsApp = LearnosityReports.init(JSON.parse(reportPayloads[i]));
+    }
+</script>

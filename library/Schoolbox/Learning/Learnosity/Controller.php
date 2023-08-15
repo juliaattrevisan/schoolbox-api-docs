@@ -774,9 +774,10 @@ class Controller extends Base
          */
         $sessions = [];
         $users = [];
+        $reportPayloads = [];
 
         foreach ($attempts as $attempt) {
-            if ($attempt->isFinished() && !isset($stack[$attempt->getUser()->getId()])) {
+            if ($attempt->isFinished() && !isset($users[$attempt->getUser()->getId()])) {
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
 
                 /* ...because Learnosity wants it in this format
@@ -785,45 +786,70 @@ class Controller extends Base
                     'id' => (string)$attempt->getUser()->getId(),
                     'name' => $attempt->getUser()->getFullName()
                 ];
+
+                /* Collate a report payload for this attempt
+                 * We're going to get them all and display them all at the same time
+                 * using css to hide all the questions except for the item_id
+                 * ($learnosityReference) currently determined.
+                 */
+                $reportPayloads[] = $this->api->initOptions('reports', [
+                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'reports' => [
+                        [
+                            /* DOM element id, where this goes in
+                             *
+                             * It's configurable by us, unlike the other anchors for
+                             * Author and Items api
+                             */
+                            'id' => 'schoolbox-student-' . $attempt->getUser()->getId(),
+                            'type' => 'session-detail-by-item',
+                            'session_id' => $attempt->getLearnosityReference(),
+                            'questions_api_init_options' => [
+                                'showCorrectAnswers' => true
+                            ]
+                        ]
+                    ],
+                ]);
             }
         }
 
-        /* Obtain their scores from Learnosity
-         */
-        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => array_values($sessions)
-        ]);
+        $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
+            'reportPayloads' => json_encode($reportPayloads),
+            'users' => $users,
+            'assessment' => $assessment,
+        ], sprintf(
+            'Horizontal Marking for %s',
+            $assessment->getTitle()
+        ));
 
-        /* Find a list of Learnosity Items (questions) available in this quiz
-         */
-        $itemReferences = $this->api->dataGetRequest('itembank/activities', [
-            'references' => [
-                $quiz->getLearnosityReference()
-            ]
-        ])['data'][0]['data']['items'];
-
-        /* If $learnosityReference was specified, load everyone's responses
-         * for that particular item; otherwise just load the first one
-         */
-        $currentItemReference = $learnosityReference;
-
-        /* The responses that we want to show at the moment
-         */
-        $currentResponses = [];
-
-        if (null === $learnosityReference) {
-            $currentItemReference = $itemReferences[0]['reference'];
-        }
-
-        foreach ($responses['data'] as $responseData) {
-            foreach ($responseData['responses'] as $response) {
-                if ($response['item_reference'] === $currentItemReference) {
-                    $currentResponses[] = $response;
-                }
-            }
-        }
-
-        new \Alaress_Probe($sessions, $users, $responses, $itemReferences, $currentResponses);
+//        /* Obtain their scores from Learnosity
+//         */
+//        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+//            'session_id' => array_values($sessions)
+//        ]);
+//
+//        /* Find a list of Learnosity Items (questions) available in this quiz
+//         */
+//        $itemReferences = $this->api->dataGetRequest('itembank/activities', [
+//            'references' => [
+//                $quiz->getLearnosityReference()
+//            ]
+//        ])['data'][0]['data']['items'];
+//
+//        /* If $learnosityReference was specified, load everyone's responses
+//         * for that particular item; otherwise just load the first one
+//         */
+//        $currentItemReference = $learnosityReference;
+//
+//        /* The responses that we want to show at the moment
+//         */
+//        $currentResponses = [];
+//
+//        if (null === $learnosityReference) {
+//            $currentItemReference = $itemReferences[0]['reference'];
+//        }
+//
+//        new \Alaress_Probe($sessions, $users, $responses, $itemReferences);
 
         /* Provide "Previous Question" and "Next Question" urls
          */
