@@ -26,9 +26,3 @@ declare global {
         Vue: typeof Vue;
     }
 }
-
-declare module "jquery" {
-    export = $;
-}
-
-export {};

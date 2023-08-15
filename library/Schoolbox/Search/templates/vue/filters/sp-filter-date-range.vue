@@ -3,6 +3,7 @@
  * To filter the search results to a date range
  */
 
+import $ from "jquery";
 import { useFilterDateRangeStore } from "./store/spFilterDateRangeStore";
 
 const filterDateRangeStore = useFilterDateRangeStore();
