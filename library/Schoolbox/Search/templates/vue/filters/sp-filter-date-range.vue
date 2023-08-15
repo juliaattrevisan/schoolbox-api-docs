@@ -3,9 +3,33 @@
  * To filter the search results to a date range
  */
 
-import { useFilterDateRangeStore } from "./store/spFilterDateRangeStore";
+import { useFilterDateRangeStore, EMPTY_DATE } from "./store/spFilterDateRangeStore";
 
 const filterDateRangeStore = useFilterDateRangeStore();
+
+/**
+ * Clear the stard date if the filters have been reset
+ */
+window.Vue.watch(
+    () => filterDateRangeStore.startDate,
+    (newValue) => {
+        if (newValue === EMPTY_DATE) {
+            $("#sp-start-date-input").val(EMPTY_DATE);
+        }
+    }
+);
+
+/**
+ * Clear the end date if the filters have been reset
+ */
+window.Vue.watch(
+    () => filterDateRangeStore.endDate,
+    (newValue) => {
+        if (newValue === EMPTY_DATE) {
+            $("#sp-end-date-input").val(EMPTY_DATE);
+        }
+    }
+);
 
 /**
  * Formats the date picker date to ISO8601 format
