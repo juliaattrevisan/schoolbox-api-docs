@@ -265,7 +265,7 @@
                                     <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                 {% endif %}
                                 {% if not participant.plan.isDynamic %}
-                                    <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
+                                    <span class="individualisation has-tip tip-left" data-width="200" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
                                 {% endif %}
                             {% endif %}
                         {% endif %}
