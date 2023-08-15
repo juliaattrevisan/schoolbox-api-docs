@@ -485,12 +485,22 @@ class Receiver
             $startTime = trim((string)($struct['StartTime']->me['string'] ?? null));
             $finishTime = trim((string)($struct['EndTime']->me['string'] ?? null));
 
-            $timetablePeriod = $timetablePeriodMapper->createModel()
-                ->setCycle($cycle)
-                ->setTitle($periodName)
-                ->setDay($dayNumber)
-                ->setStart(new \Alaress_Date_Format($startTime, 'H:i'))
-                ->setFinish(new \Alaress_Date_Format($finishTime, 'H:i'));
+            try {
+                $timetablePeriod = $timetablePeriodMapper->findOneByColumnList([
+                    'cycle_id' => $cycle->getId(),
+                    'title' => $periodName,
+                    'day' => $dayNumber,
+                    'start' => $startTime,
+                    'finish' => $finishTime,
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $timetablePeriod = $timetablePeriodMapper->createModel()
+                    ->setCycle($cycle)
+                    ->setTitle($periodName)
+                    ->setDay($dayNumber)
+                    ->setStart(new \Alaress_Date_Format($startTime, 'H:i'))
+                    ->setFinish(new \Alaress_Date_Format($finishTime, 'H:i'));
+            }
 
             /* TODO: Undo these hardcoded values at some point
               */
@@ -722,13 +732,22 @@ class Receiver
              * Save it!
              */
             if ($allPeriods->count() && $allClasses->count()) {
-                $classPeriod = $classPeriodMapper->createModel()
-                    ->setClass($allClasses->first()->getId())
-                    ->setPeriod($allPeriods->first()->getId())
-                    ->setTeacher($externalId)
-                    ->setRoom($room);
+                try {
+                    $classPeriod = $classPeriodMapper->findOneByColumnList([
+                        'class_id' => $allClasses->first()->getId(),
+                        'period_id' => $allPeriods->first()->getId(),
+                        'teacher_external_id' => $externalId,
+                        'room' => $room
+                    ]);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $classPeriod = $classPeriodMapper->createModel()
+                        ->setClass($allClasses->first()->getId())
+                        ->setPeriod($allPeriods->first()->getId())
+                        ->setTeacher($externalId)
+                        ->setRoom($room);
 
-                $classPeriodMapper->save($classPeriod);
+                    $classPeriodMapper->save($classPeriod);
+                }
             } else {
                 /* These ones are broken */
                 if ($allPeriods->count() === 0) {
