@@ -8,7 +8,7 @@
 {# A list of contents for this quiz
  # Used to help people change questions
  #}
-<ul>
+<ul id="item-list" style="display:none">
 {% for itemReference in itemReferences %}
     <li><a data-item-reference="{{ itemReference.id }}">{{ itemReference.id }}</a></li>
 {% endfor %}
@@ -58,6 +58,10 @@
         if (reportsLoaded === reportsExpected) {
             console.log('Loaded ' + reportsLoaded + ' of ' + reportsExpected);
             clearInterval(reportsReady);
+
+            /* Show list of questions to choose from
+             */
+            document.getElementById('item-list').style = 'display: block';
         }
     }, 100);
 </script>
