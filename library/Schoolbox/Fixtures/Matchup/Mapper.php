@@ -187,6 +187,8 @@ class Mapper extends BaseMapper
             AND sm.deleted_at IS NULL
             AND st1.deleted_at IS NULL
             AND st2.deleted_at IS NULL
+            AND sc1.deleted_at IS NULL
+            AND sc2.deleted_at IS NULL
             ORDER BY sm.start_at
         ";
 
