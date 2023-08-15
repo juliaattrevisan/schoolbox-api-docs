@@ -741,6 +741,41 @@ class Controller extends Base
     }
 
 
+    /**
+     * Start horizontal marking for a given quiz
+     *
+     * This is grossly inefficient but there aren't many options available to us
+     *
+     * @param IAssessable $assessment
+     * @param string|null $learnosityReference
+     * @return void
+     */
+    public function getHorizontal(IAssessable $assessment, ?string $learnosityReference): void
+    {
+        /* Get the quiz identifier
+         */
+
+        /* Find the most recent attempt made by each person
+         * who attempted this quiz
+         */
+
+        /* Obtain their scores from Learnosity
+         */
+
+        /* Find a list of Learnosity Items (questions) available in this quiz
+         */
+
+        /* If $learnosityReference was specified, load everyone's responses
+         * for that particular item; otherwise just load the first one
+         */
+
+        /* Provide "Previous Question" and "Next Question" urls
+         */
+
+        return;
+    }
+
+
 
 //
 //    /**
