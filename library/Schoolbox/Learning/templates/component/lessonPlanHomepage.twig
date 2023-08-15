@@ -94,14 +94,15 @@
             {% endfor %}
         </ul>
     </section>
+    <div class="component-action">
+        <section>
+            <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}" class="button">View All</a>
+        </section>
+    </div>
 {% else %}
     <div class="empty-state">
         <i class="icon-lesson-plan"></i>
-        <p>You have no current lesson plans.</p>
+        <p>You currently have no scheduled lesson plans available. You may wish to <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}">view all</a> lesson plans</p>
     </div>
 {% endif %}
-<div class="component-action">
-    <section>
-        <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}" class="button">View All</a> {# Link for this button will be added in SA-15993 #}
-    </section>
-</div>
+
