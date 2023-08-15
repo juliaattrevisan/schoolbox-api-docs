@@ -70,22 +70,20 @@ export default {
 </script>
 
 <template>
-    <div>Hello! I'm a Vue component.</div>
-    <div>The selected user's ID is {{ options["selectedUserOption"].userId }}</div>
     <div class="row">
         <div class="small-12 columns">
             <dl class="sub-nav">
                 <dd
                     v-for="userOption in options['userOptions']"
-                    :class="`((userOption.userId === options['selectedUserOption'].userId) ? 'active': '')`"
+                    :class="userOption.userId === options['selectedUserOption'].userId ? 'active' : ''"
                 >
                     <!-- Format of data-childYearLevel must match format used below in <span data-heading-user-year>. -->
                     <a
-                        title="Timetable for {{ userOption.formattedName }} in {{ userOption.firstCampusName }}"
                         data-child-student-button
-                        data-userId="{{ userOption.userId }}"
-                        data-childFormattedName="{{ userOption.formattedName }}"
-                        data-childYearLevel="{{ userOption.yearLevel }}"
+                        :data-userId="userOption.userId"
+                        :data-childFormattedName="userOption.formattedName"
+                        :data-childYearLevel="userOption.yearLevel"
+                        :title="`'Timetable for ${userOption.formattedName} in ${userOption.firstCampusName}`"
                     >
                         {{ userOption.formattedName }} ({{ userOption.firstCampusName }})
                     </a>
