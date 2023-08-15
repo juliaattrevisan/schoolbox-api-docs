@@ -813,10 +813,19 @@ class Controller extends Base
             }
         }
 
+        /* Find a list of Learnosity Items (questions) available in this quiz
+         */
+        $itemReferences = $this->api->dataGetRequest('itembank/activities', [
+            'references' => [
+                $quiz->getLearnosityReference()
+            ]
+        ])['data'][0]['data']['items'];
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'reportPayloads' => json_encode($reportPayloads),
             'users' => $users,
             'assessment' => $assessment,
+            'itemReferences' => $itemReferences
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
@@ -828,13 +837,7 @@ class Controller extends Base
 //            'session_id' => array_values($sessions)
 //        ]);
 //
-//        /* Find a list of Learnosity Items (questions) available in this quiz
-//         */
-//        $itemReferences = $this->api->dataGetRequest('itembank/activities', [
-//            'references' => [
-//                $quiz->getLearnosityReference()
-//            ]
-//        ])['data'][0]['data']['items'];
+
 //
 //        /* If $learnosityReference was specified, load everyone's responses
 //         * for that particular item; otherwise just load the first one

@@ -1,5 +1,19 @@
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 
+<style>
+    .lrn {
+        display: none;
+    }
+</style>
+{# A list of contents for this quiz
+ # Used to help people change questions
+ #}
+<ul>
+{% for itemReference in itemReferences %}
+    <li><a data-item-reference="{{ itemReference.id }}">{{ itemReference.id }}</a></li>
+{% endfor %}
+</ul>
+
 {# Render an html element into which each student's attempt will reside
  # This is needed for each Learnosity report which we initially hide in
  # a display:none container
@@ -13,10 +27,37 @@
 <script>
     let reportPayloads = {{ reportPayloads|raw }};
 
+    /* Remember how many reports were loaded
+     *
+     * We can only really interact with the ui once everyone's
+     * full attempt has been loaded...but we don't know any identifiers
+     * from within this callback. What we *do* know is how many reports
+     * have loaded, which we can compare with how many we expect to load
+     * via reportPayloads|length.
+     */
+    let reportsLoaded = 0;
+    let reportsExpected = reportPayloads.length;
+
+    let reportCallback = {
+        readyListener: function() {
+            reportsLoaded++;
+        }
+    };
+
     /* Initialise a report for everyone's attempt
      * Selectively showing only one item's responses at a time
      */
     for (let i = 0; i < reportPayloads.length; i++) {
-        let reportsApp = LearnosityReports.init(JSON.parse(reportPayloads[i]));
+        let reportsApp = LearnosityReports.init(JSON.parse(reportPayloads[i]), reportCallback);
     }
+
+    /* Poll to see when reportsLoaded == reportsExpected
+     * If true, we're ready to go, and can clear the timeout
+     */
+    let reportsReady = setInterval(function() {
+        if (reportsLoaded === reportsExpected) {
+            console.log('Loaded ' + reportsLoaded + ' of ' + reportsExpected);
+            clearInterval(reportsReady);
+        }
+    }, 100);
 </script>
