@@ -7,15 +7,20 @@ import { useFilterDateRangeStore } from "./store/spFilterDateRangeStore";
 
 const filterDateRangeStore = useFilterDateRangeStore();
 
-window.Vue.onMounted(() => {
-    let attachAlaressDatePicker = function () {
-        var $dateinput = $(this);
+/**
+ * initialise the date pickers
+ */
+function initDatePickers() {
+    $("[data-datepicker]").each(function attachAlaressDatePicker() {
+        const $dateinput = $(this);
         if ($dateinput.attr("data-datepicker-id") === undefined) {
             $dateinput.alaressDateTimePicker();
         }
-    };
+    });
+}
 
-    $("[data-datepicker]").each(attachAlaressDatePicker);
+window.Vue.onMounted(() => {
+    initDatePickers();
 });
 </script>
 
