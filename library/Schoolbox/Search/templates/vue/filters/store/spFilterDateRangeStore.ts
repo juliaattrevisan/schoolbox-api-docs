@@ -5,8 +5,8 @@
 import { defineStore } from "pinia";
 
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
-    const startDate = window.Vue.ref(null);
-    const endDate = window.Vue.ref(null);
+    const startDate = window.Vue.ref(window.dayjs().subtract(1, "year").format());
+    const endDate = window.Vue.ref(window.dayjs().format());
     const activeStartDate = window.Vue.ref(null); // the start date currently applied to the active search
     const activeEndDate = window.Vue.ref(null); // the end date currently applied to the active search
 

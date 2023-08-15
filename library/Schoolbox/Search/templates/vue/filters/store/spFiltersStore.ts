@@ -56,8 +56,8 @@ export const useFiltersStore = defineStore("spFilters", () => {
     function getFormData() {
         const filterData = {
             ...useFilterDateRangeStore().getFormData(),
-            ...useFilterCreatorStore().getFormData(),
-            ...useFilterTypesStore().getFormData(),
+            // ...useFilterCreatorStore().getFormData(),
+            // ...useFilterTypesStore().getFormData(),
         };
         return JSON.stringify(filterData);
     }
