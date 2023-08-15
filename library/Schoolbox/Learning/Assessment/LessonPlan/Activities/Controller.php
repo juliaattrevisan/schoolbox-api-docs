@@ -108,6 +108,7 @@ class Controller extends Base
     {
         $dateStart = null;
         $dateEnd = null;
+        $readOnly = $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE;
         // if there is a component specified grab the active date range
         $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId);
         if ($componentInstance) {
@@ -140,16 +141,21 @@ class Controller extends Base
         $accessibleFolderIds = [];
         foreach ($courses as $course) {
             $specFolderIds = [];
-            $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
+            $newUnits = $this->unitImplementationMapper->findAllByCourseId($course->getId());
+            $course->setUnits($newUnits);
             foreach ($course->getUnits() as $unitImpl) {
                 if (isset($lessonPlans[$unitImpl->getId()])) {
                     $unitImpl->setAssessables($lessonPlans[$unitImpl->getId()]);
                 }
             }
-            // filter out units that contain no assessments
-            $course->setUnits($course->getUnits()->filter(function ($unit) {
-                return $unit->getAssessables()->count();
-            }));
+            // if read only filter out units that contain no assessments
+            if ($readOnly) {
+                $course->setUnits(
+                    $course->getUnits()->filter(function ($unit) {
+                        return $unit->getAssessables()->count();
+                    })
+                );
+            }
             $specFolderIds = $course->getUnits()
             // this is to sort units and needs to be placed right after getUnits()
             ->sortByCallback(
@@ -221,7 +227,7 @@ class Controller extends Base
             'dateEnd'               => $dateEnd,
             'returnUrlName'         => Assessment\Redirect::RETURN_URL,
             'encodedReturnUrl'      => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
-            'readOnly'              => $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE,
+            'readOnly'              => $readOnly,
             'componentInstance'     => $componentInstance ?? ['id' => null],
         ];
 

@@ -57,7 +57,7 @@
                                         </div>
                                         {% if readOnly == false %}
                                             <nav>
-                                                <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
+                                                <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="{% if unit.isAfterDueDate == false %}Actions{% else %}Unable to add to closed Units{% endif %}"></a>
                                             </nav>
                                             <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
                                                 {% if unit.isAfterDueDate == false %}
