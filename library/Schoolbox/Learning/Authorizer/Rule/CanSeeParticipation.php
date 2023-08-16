@@ -13,6 +13,7 @@ use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -79,6 +80,11 @@ class CanSeeParticipation extends AbstractParticipationRule
 
         // Instructors or staffs can always see participants' summary pages
         if ($accessLevel >= UserAccess::ACCESS_WRITE || ($user->getRole()->isStaff() && $user->getRole()->getViewStudentGrades())) {
+            return true;
+        }
+
+        // All uses should be able to view lesson plans (there is no participation on these)
+        if ($assessable instanceof LessonPlan\Model) {
             return true;
         }
 
