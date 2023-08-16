@@ -28,39 +28,6 @@
     </script>
 {% endautoescape %}
 
-{#
-{% if options['userOptions']|length > 0 %}
-    <div class="row ">
-        <div class="small-12 columns">
-            <dl class="sub-nav">
-                {% for userOption in options['userOptions'] %}
-                    <dd{% if userOption.userId == options['selectedUserOption'].userId %} class="active"{% endif %}>
-                        <a title="Timetable for {{ userOption.formattedName }} in {{ userOption.firstCampusName }}"
-                           data-userOption-student-button
-                           data-userId="{{ userOption.userId }}"
-                           data-userOptionFormattedName="{{ userOption.formattedName }}"
-                           {# Format of data-userOptionYearLevel must match format used below in <span data-heading-user-year>. #
-                           data-userOptionYearLevel="{{ userOption.yearLevel }}">
-                            {{ userOption.formattedName }} ({{ userOption.firstCampusName }})
-                        </a>
-                    </dd>
-                {% endfor %}
-            </dl>
-        </div>
-    </div>
-{% endif %}
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>
-            Timetable for
-            <span data-heading-user-fullname>{{ options['selectedUserOption'].formattedName }}</span>,
-            <span data-heading-user-year>{{ options['selectedUserOption'].yearLevel }}</span>
-        </h1>
-    </div>
-</div>
-#}
-
 <div id="timetable-calendar">
     <timetable-calendar :options="{{ options|json_encode }}"/>
 </div>
