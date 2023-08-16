@@ -90,6 +90,8 @@ export default {
             /* For deciding which display format to use
              */
             windowWidth: window.innerWidth,
+
+            selectedUserOption: null,
         };
     },
 
@@ -249,6 +251,8 @@ export default {
         let quickSwitchIcon = document.createElement("a");
         quickSwitchIcon.setAttribute("class", "adtp-btn icon-calendar no-text");
         document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
+
+        this.selectedUserOption = this.options["selectedUserOption"];
     },
 
     beforeDestroy() {
@@ -256,13 +260,9 @@ export default {
     },
 
     methods: {
-        changeUserAndReloadEvents(details) {
-            this.config.userId = details.selectedUserId;
-
-            // TODO: Update page heading somehow using details.selectedUserName and details.selectedUser
-            //document.querySelector("[data-heading-user-fullname]").innerHTML = childName;
-            //document.querySelector("[data-heading-user-year]").innerHTML = yearLevel == "" ? "" : yearLevel;
-
+        changeUserAndReloadEvents(selectedUserOption) {
+            this.selectedUserOption = selectedUserOption;
+            this.config.userId = this.selectedUserOption.userId;
             this.reloadEvents();
         },
 
@@ -829,9 +829,13 @@ export default {
         <div class="small-12 columns">
             <h1>
                 Timetable for
-                <span data-heading-user-fullname>{{ options["selectedUserOption"].formattedName }}</span
+                <span data-heading-user-fullname>{{
+                    selectedUserOption === null ? "" : selectedUserOption.formattedName
+                }}</span
                 >,
-                <span data-heading-user-year>{{ options["selectedUserOption"].yearLevel }}</span>
+                <span data-heading-user-year>{{
+                    selectedUserOption === null ? "" : selectedUserOption.yearLevel
+                }}</span>
             </h1>
         </div>
     </div>
