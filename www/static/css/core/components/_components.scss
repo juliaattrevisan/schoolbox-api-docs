@@ -97,6 +97,20 @@
     cursor: move;
 }
 
+.ui-sortable li {
+    &[data-sortable-hidden] {
+        display: none;
+    }
+
+    &[data-sortable-hidden="false"] {
+        opacity: 0.5;
+    }
+
+    &[data-sortable-active] {
+        background: #dddddd;
+    }
+}
+
 .component-action {
     @extend .hide-for-print;
 
