@@ -15,7 +15,6 @@
         var $dateinput = $(this);
         if ($dateinput.attr("data-datepicker-id") === undefined) {
             $dateinput.alaressDateTimePicker();
-            console.warn("alaressDateTimePicker");
         }
     };
 
