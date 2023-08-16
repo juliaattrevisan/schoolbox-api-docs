@@ -79,7 +79,7 @@
             </tr>
 
             <tr class="average-headers" data-hidable-columns>
-                <th class="fixed-left white profile-cell average-expander">
+                <th class="fixed-left profile-cell average-expander">
                     <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                     Class Average
                 </th>
@@ -92,7 +92,7 @@
                 {% endif %}
                 {% for assessment in markbook.assessments %}
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
-                    <th data-assessment="{{ assessment.id }}" class="student-grade-cell white">
+                    <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
                         <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                             {{ stats.mean | default('-') }}
                         </span>
@@ -153,7 +153,7 @@
             {% apply spaceless %}
             {% for student in markbook.students %}
             <tr data-student="{{ student.id }}">
-                <th class="fixed-left white profile-cell">
+                <th class="fixed-left profile-cell">
                     <div class="c-card">
                         <div class="l-flex-row l-gap-m l-pad-xs">
                             {% if studentCount < functionDegradeLimit %}
@@ -175,7 +175,7 @@
                 {% set draftsOffClass      = studentMean is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
                 {% set draftsOnClass       = draftWeightedMean is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
 
-                <th class="fixed-left white {{ draftsOffClass }} student-grade-cell"
+                <th class="fixed-left {{ draftsOffClass }} student-grade-cell"
                     {% if draftWeightedMean %}data-student-average{% endif %}
                     data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                     {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}

@@ -89,9 +89,9 @@
             </tr>
             <tr class="course-headers">
                 <th class="fixed-left"></th>
-                <th class="fixed-left white"></th>
+                <th class="fixed-left"></th>
                 {% if rankEnabled %}
-                <th class="white"></th>
+                <th></th>
                 {% endif %}
                 {# Ensure single-source-of-truth regarding column ordering #}
                 {% set currentUnitSpec = null %}
@@ -178,7 +178,7 @@
                 </tr>
                 {% for student in courseImportStudents[courseImpl.id] %}
                     <tr>
-                        <th class="profile-cell fixed-left white">
+                        <th class="profile-cell fixed-left">
                             <div class="c-card">
                                 <div class="l-flex-row l-gap-m l-pad-xs">
                                     {% include "include/portrait.twig" with {user: student, render: "tiny", roundedCorners: true} only %}
@@ -199,7 +199,7 @@
                         {% set draftsOffClass = marks.published is defined and marks.published.hr ? urgency.marks(publishedNormMark) ~ '-bg' : 'gradient-off-bg' %}
                         {% set draftsOnClass = marks.any is defined and marks.any.hr ? urgency.marks(draftNormMark) ~ '-bg' : 'gradient-off-bg' %}
 
-                        <th class="white fixed-left student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
+                        <th class="fixed-left student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                             {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
                             <a class="{{ draftsOffClass }}" href="{{ gradesRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
                             {% if marks.any is defined %}
