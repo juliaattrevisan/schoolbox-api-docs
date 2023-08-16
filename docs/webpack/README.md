@@ -4,7 +4,7 @@
 
 ## Add new entry point
 
-A new entry point needs to be added whenever you add a new Vue setup or create a new JS bundle. Within `webpack.config.js` (found in the root directory), in `entry` add your new bundle:
+A new entry point needs to be added whenever you add a new Vue setup or create a new JS bundle. Within `webpack.common.js` (found in the root directory), in `entry` add your new bundle:
 
 ```js
 assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',

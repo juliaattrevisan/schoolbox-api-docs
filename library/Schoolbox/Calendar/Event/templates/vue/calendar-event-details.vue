@@ -2,7 +2,7 @@
 import AudiencesModal from "./audiences-modal";
 import debounce from "lodash/debounce";
 
-/* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+/* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
  */
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
