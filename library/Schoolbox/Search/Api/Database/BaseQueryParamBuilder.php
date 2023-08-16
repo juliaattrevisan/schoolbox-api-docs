@@ -39,8 +39,20 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 
         // Apply filter
         if ($filter->types) {
-            $whereParts[] = "$typePart IN " . Builder::getArrayPlaceholders($filter->types, 'userType');
-            $params       = array_merge($params, Builder::getArrayParameters($filter->types, 'userType'));
+            $subTypes = array_filter(
+                $filter->types,
+                function (string $type) {
+                    return str_starts_with($type, $this->getType() . '.');
+                }
+            );
+            if (!empty($subTypes)) {
+                $bindings     = Builder::getBindings($subTypes, $this->getType());
+                $whereParts[] = "$typePart IN ({$bindings->getPlaceholder()})";
+                $params       = array_merge($params, $bindings->getParams());
+            } elseif (!in_array($this->getType(), $filter->types)) {
+                // there are no relevant types in this filter
+                return null;
+            }
         }
         if ($filter->fromDate) {
             // No date part? Exclude this type of result entirely
@@ -215,6 +227,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * @return string
      */
     abstract protected function buildTitleExpression(): string;
+
+    abstract protected function getType(): string;
 
     /**
      * Build the expression for determining the type for an item in this

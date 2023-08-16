@@ -110,6 +110,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * @return string
+     */
+    protected function getType(): string
+    {
+        return Hydrator::BASE_TYPE;
+    }
+
+    /**
      * The type of a news result is simply "news".
      */
     protected function buildTypeExpression(): string

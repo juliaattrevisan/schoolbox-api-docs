@@ -18,6 +18,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -45,6 +46,7 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
@@ -91,6 +93,8 @@ class Api extends \Codeception\Module
 
     private EventTypeMapper $eventTypeMapper;
 
+    private NewsMapper $newsMapper;
+
     /**
      * HOOK: executed after configuration is loaded
      *
@@ -132,6 +136,7 @@ class Api extends \Codeception\Module
         $this->unitImplMapper       = UnitImplMapper::getInstance();
         $this->eventMapper          = EventMapper::getInstance();
         $this->eventTypeMapper      = EventTypeMapper::getInstance();
+        $this->newsMapper = NewsMapper::getInstance();
     }
 
     private array $users = [];
@@ -237,6 +242,7 @@ class Api extends \Codeception\Module
         $user = $this->userMapper->createModel()
                                  ->setUsername($username)
                                  ->setFirstname($username)
+                                 ->setLastname($this->generateText(8))
                                  ->setRole($this->getRole($roleType))
                                  ->setCampusCollection($this->getCampuses())
                                  ->setLocalEmail(false)
@@ -618,6 +624,7 @@ class Api extends \Codeception\Module
     {
         $event = $this->eventMapper->createModel();
         $event->setTitle($this->generateText(50))
+              ->setDetail($this->generateText(50))
               ->setAuthor($owner)
               ->setOwner($owner)
               ->setAccess($accessLevel)
@@ -697,5 +704,32 @@ class Api extends \Codeception\Module
             }
         }
         return null;
+    }
+
+    /**
+     * @param int|null $articleId
+     * @return \Schoolbox\Comms\News\Model
+     * @throws MapperException
+     * @throws ModuleException
+     */
+    public function getExistingNewsArticle(?int $articleId): \Schoolbox\Comms\News\Model
+    {
+        $db = $this->getDbModule();
+        if ($articleId) {
+            $articleIds = [$articleId];
+        } else {
+            $articleIds = $db->grabColumnFromDatabase('comms_news_article', 'id', ['deleted_at' => null]);
+        }
+        return $this->newsMapper->findById($articleIds[0]);
+    }
+
+    /**
+     * @return \Schoolbox\Resource\File\Model
+     */
+    public function getExistingFile(): \Schoolbox\Resource\File\Model
+    {
+        $db = $this->getDbModule();
+        $fileIds = $db->grabColumnFromDatabase('file', 'id', ['deleted_at' => null]);
+        return FileMapper::getInstance()->findById($fileIds[0]);
     }
 }

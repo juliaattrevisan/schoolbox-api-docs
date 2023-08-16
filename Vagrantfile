@@ -36,6 +36,7 @@ primary_php_majver = default["primary_php_majver"]
 taskd_dir = default["taskd_dir"]
 taskd_sync_type = default["taskd_sync_type"]
 taskd_build_from_local = default["taskd_build_from_local"]
+api_dir = default["api_dir"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -128,6 +129,9 @@ if File.file?('vagrant.yaml')
   if !conf["taskd_build_from_local"].nil?
     taskd_build_from_local = conf["taskd_build_from_local"]
   end
+  if !conf["api_dir"].nil?
+    api_dir = conf["api_dir"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -206,6 +210,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
+  if api_dir
+    config.vm.synced_folder api_dir, "/tmp/schoolbox-api-docs"
+  end
 
   # Puppet Apply Provisioner (without a puppet master)
   # See https://www.vagrantup.com/docs/provisioning/puppet_apply.html

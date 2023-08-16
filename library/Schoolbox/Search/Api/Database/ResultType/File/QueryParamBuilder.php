@@ -96,6 +96,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * @return string
+     */
+    protected function getType(): string
+    {
+        return Hydrator::BASE_TYPE;
+    }
+
+    /**
      * A file's type depends on its mimetype:
      * * audio
      * * video

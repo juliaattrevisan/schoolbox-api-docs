@@ -76,6 +76,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         return "f.name";
     }
 
+
+    /**
+     * @return string
+     */
+    protected function getType(): string
+    {
+        return Hydrator::BASE_TYPE;
+    }
+
     /**
      * The type of a page result depends on what sort of page it is, in the
      * following order of preference:

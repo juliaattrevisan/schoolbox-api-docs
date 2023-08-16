@@ -100,7 +100,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleExpression(): string
     {
-        return "CONCAT(u.chosen_name, ' ', u.lastname)";
+        return "CONCAT_WS(' ', u.chosen_name, u.lastname)";
+    }
+
+    /**
+     * @return string
+     */
+    protected function getType(): string
+    {
+        return Hydrator::BASE_TYPE;
     }
 
     /**

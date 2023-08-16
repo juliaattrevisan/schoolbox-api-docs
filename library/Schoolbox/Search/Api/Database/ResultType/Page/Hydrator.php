@@ -31,7 +31,7 @@ class Hydrator extends BaseHydrator
     /**
      * This hydrator's base type.
      */
-    private const BASE_TYPE = 'page';
+    public const BASE_TYPE = 'page';
 
     /**
      * Constructor
