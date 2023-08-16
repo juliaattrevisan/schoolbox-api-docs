@@ -253,10 +253,9 @@ class AccessLevelCensor
             if ($accessLevelCurrent === PastoralAccessMapper::ACCESS_DENY) {
                 return PastoralAccessMapper::ACCESS_DENY;
             }
-            if ($access->getMatchCampus()) {
-                if (!self::inSameCampus($record->getStudent(), $user)) {
-                    return PastoralAccessMapper::ACCESS_DENY;
-                }
+            if ($access->getMatchCampus() && !self::inSameCampus($record->getStudent(), $user)) {
+                // The access rule didn't apply to this user, continue to the next one
+                continue;
             }
 
             // We want the highest access level
