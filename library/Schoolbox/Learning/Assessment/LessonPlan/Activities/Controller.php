@@ -223,6 +223,7 @@ class Controller extends Base
             return $left->getId() <=> $right->getId();
         }, true);
 
+        $returnUrl = $componentId ? $this->routeGenerator->generate('lessonPlanActivities.getHomepageComponent', ['folderId' => $folder->getId(), 'componentId' => $componentId]) : $this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()]);
         $twigData = [
             'courses'               => $courses,
             'accessibleFolderIds'   => $accessibleFolderIds,
@@ -231,7 +232,7 @@ class Controller extends Base
             'dateStart'             => $dateStart,
             'dateEnd'               => $dateEnd,
             'returnUrlName'         => Assessment\Redirect::RETURN_URL,
-            'encodedReturnUrl'      => Assessment\Redirect::encode($this->routeGenerator->generate('lessonPlanActivities.getHomepage', ['folderId' => $folder->getId()])),
+            'encodedReturnUrl'      => Assessment\Redirect::encode($returnUrl),
             'readOnly'              => $readOnly,
             'componentInstance'     => $componentInstance ?? ['id' => null],
         ];
