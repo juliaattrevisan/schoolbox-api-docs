@@ -20,7 +20,7 @@ export default {
 
     methods: {
         /**
-         * When a child student button is clicked:
+         * When a button is clicked:
          *  - Ignore the click if the button is already in the active state
          *  - Update this.selectedUserOption and let Vue update the button states
          *  - Emit an event to inform timetable-calendar of the new selected option.
@@ -59,7 +59,6 @@ export default {
                     "
                 >
                     <a
-                        data-child-student-button
                         :data-userId="userOption.userId"
                         :title="`'Timetable for ${userOption.formattedName} in ${userOption.firstCampusName}`"
                         @click="selectOption"

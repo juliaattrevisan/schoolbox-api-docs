@@ -16,14 +16,14 @@
 
         window.fullCalendarConfig = {
             schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
-            userId:             Number('{{ options['selectedUserOption'].userId }}'),
+            userId: Number('{{ options['selectedUserOption'].userId }}'),
             dateDisplayFormats: dateDisplayFormats,
             /* Decide which display format to use, based on viewport dimensions'
              * so phone users can view this data meaningfully
              */
-            defaultView:        window.innerWidth < SMALL_VIEWPORT_THRESHOLD ? 'timeGridDay' : 'timeGridWeek',
-            defaultDate:        '{{ options['selectedDate']|date('Y-m-d') }}',
-            weekends:           {{ options['weekends'] }}
+            defaultView: window.innerWidth < SMALL_VIEWPORT_THRESHOLD ? 'timeGridDay' : 'timeGridWeek',
+            defaultDate: '{{ options['selectedDate']|date('Y-m-d') }}',
+            weekends: {{ options['weekends'] }}
         };
     </script>
 {% endautoescape %}
