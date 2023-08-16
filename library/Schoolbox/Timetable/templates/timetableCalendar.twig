@@ -61,10 +61,6 @@
 </div>
 #}
 
-{#
-    TODO: Remove this wrapper div.  A div with id="timetable-calendar" already exists in timetable-calendar.vue.
-          Why does everything break (page goes blank) when I remove this wrapper div?
-#}
 <div id="timetable-calendar">
     <timetable-calendar :options="{{ options|json_encode }}"/>
 </div>

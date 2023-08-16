@@ -833,55 +833,53 @@ export default {
     <div class="row">
         <div class="small-12 island">
             <section>
-                <div id="timetable-calendar">
-                    <div>
-                        <create-event-modal
-                            ref="createEvent"
-                            :user-id="config.userId"
-                            :can-invite="config.canInvite"
-                            :event-types="config.eventTypes"
-                            :event-create-url="urls.create"
-                            :event-create-form-url="urls.createForm"
-                            :event-modify-form-url="urls.modifyForm"
-                            :format-form-date="formats.formDate"
-                            :format-form-datetime="formats.formDatetime"
-                            :format-display-date="formats.displayDate"
-                            :format-display-datetime="formats.displayDatetime"
-                            @eventCreated="addEvent"
-                        />
+                <div>
+                    <create-event-modal
+                        ref="createEvent"
+                        :user-id="config.userId"
+                        :can-invite="config.canInvite"
+                        :event-types="config.eventTypes"
+                        :event-create-url="urls.create"
+                        :event-create-form-url="urls.createForm"
+                        :event-modify-form-url="urls.modifyForm"
+                        :format-form-date="formats.formDate"
+                        :format-form-datetime="formats.formDatetime"
+                        :format-display-date="formats.displayDate"
+                        :format-display-datetime="formats.displayDatetime"
+                        @eventCreated="addEvent"
+                    />
 
-                        <view-event-modal
-                            ref="event"
-                            :event-modify-form-url="urls.modifyForm"
-                            :event-modify-form-action-url="urls.modifyFormAction"
-                            :event-delete-url="urls.delete"
-                            :event-update-url="urls.update"
-                            :attendance-list-url="urls.attendanceList"
-                            :attendance-toggle-url="urls.attendanceToggle"
-                            :format-display-date="formats.displayDate"
-                            :format-display-time="formats.displayTime"
-                            :format-display-datetime="formats.displayDatetime"
-                            :return-url="returnUrl()"
-                            @eventModified="reloadEvents"
-                            @eventDeleted="reloadEvents"
-                        />
+                    <view-event-modal
+                        ref="event"
+                        :event-modify-form-url="urls.modifyForm"
+                        :event-modify-form-action-url="urls.modifyFormAction"
+                        :event-delete-url="urls.delete"
+                        :event-update-url="urls.update"
+                        :attendance-list-url="urls.attendanceList"
+                        :attendance-toggle-url="urls.attendanceToggle"
+                        :format-display-date="formats.displayDate"
+                        :format-display-time="formats.displayTime"
+                        :format-display-datetime="formats.displayDatetime"
+                        :return-url="returnUrl()"
+                        @eventModified="reloadEvents"
+                        @eventDeleted="reloadEvents"
+                    />
 
-                        <full-calendar ref="fullCalendar" :options="calendarOptions">
-                            <template #eventContent="arg">
-                                <customised-calendar-event :content="arg" />
-                            </template>
-                        </full-calendar>
+                    <full-calendar ref="fullCalendar" :options="calendarOptions">
+                        <template #eventContent="arg">
+                            <customised-calendar-event :content="arg" />
+                        </template>
+                    </full-calendar>
 
-                        <flat-pickr
-                            ref="flatPickr"
-                            :config="{
-                                defaultDate: config.defaultDate,
-                                selector: '.fc-quickSwitchButton-button',
-                                disableMobile: true,
-                            }"
-                            @dateSelected="onQuickSwitch"
-                        />
-                    </div>
+                    <flat-pickr
+                        ref="flatPickr"
+                        :config="{
+                            defaultDate: config.defaultDate,
+                            selector: '.fc-quickSwitchButton-button',
+                            disableMobile: true,
+                        }"
+                        @dateSelected="onQuickSwitch"
+                    />
                 </div>
             </section>
         </div>
