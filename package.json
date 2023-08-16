@@ -151,9 +151,9 @@
         "url": "git://github.com/alaress/schoolbox.git"
     },
     "scripts": {
-        "build": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development",
-        "watch": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch",
-        "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch --watch-poll=1000",
+        "build": "./node_modules/.bin/webpack-cli --config webpack.dev.js",
+        "watch": "./node_modules/.bin/webpack-cli --config webpack.dev.js --watch",
+        "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.dev.js --watch --watch-poll=1000",
         "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
