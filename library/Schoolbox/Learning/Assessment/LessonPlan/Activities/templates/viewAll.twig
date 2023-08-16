@@ -48,14 +48,12 @@
                                                 <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
                                             </div>
                                         </div>
-                                        {% if readOnly == false %}
+                                        {% if readOnly == false and unit.isAfterDueDate == false %}
                                             <nav>
-                                                <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="{% if unit.isAfterDueDate == false %}Actions{% else %}Unable to add to closed Units{% endif %}"></a>
+                                                <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
                                             </nav>
                                             <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
-                                                {% if unit.isAfterDueDate == false %}
                                                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
-                                                {% endif %}
                                             </ul>
                                         {% endif %}
                                     </div>
