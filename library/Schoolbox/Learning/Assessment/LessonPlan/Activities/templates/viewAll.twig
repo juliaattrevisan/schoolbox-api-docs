@@ -17,22 +17,15 @@
 </div>
 
 <div class="small-12 island">
+{% for course in courses %}
+{% if course.specification.folder.id in accessibleFolderIds %}
+    <h2 class="icon-course subheader"><a href="{{ '/homepage/' ~ course.specification.folder.id }}" title="Visit course page">{{ course.specification.title }}</a></h2>
+{% else %}
+    <h2 class="icon-course subheader"><span></span>{{ course.specification.title }}</h2>
+{% endif %}
     <section>
         <ul class="action-list">
-        {% for course in courses %}
             <li>
-                <div class="component-titlebar">
-                    <div class="actions-small-3">
-                        <div class="list-item">
-                            {% if course.specification.folder.id in accessibleFolderIds %}
-                                <h2 class="icon-course subheader"><a href="{{ '/homepage/' ~ course.specification.folder.id }}" title="Visit course page">{{ course.specification.title }}</a></h2>
-                            {% else %}
-                                <h2 class="icon-course subheader"><span></span>{{ course.specification.title }}</h2>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
                 <ul class="information-list">
                     {% for unit in course.units %}
                         <li class="interact" data-unit="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
@@ -135,10 +128,6 @@
                                                             <p>{{ assessment.title }}</p>
                                                         </div>
                                                     {% endif %}
-
-                                                    <p class="meta">
-                                                        {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% elseif course %}{{ course.name }}{% endif %} | {{ unit.title }}
-                                                    </p>
                                                     <p class="meta">
                                                         <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
                                                     </p>
