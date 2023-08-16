@@ -1,3 +1,7 @@
+/**
+ * All webpack configuration thats shared between dev and prod
+ */
+
 const path = require("path");
 const { styles } = require("@ckeditor/ckeditor5-dev-utils"); // https://www.npmjs.com/package/@ckeditor/ckeditor5-dev-utils
 

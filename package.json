@@ -154,7 +154,7 @@
         "build": "./node_modules/.bin/webpack-cli --config webpack.dev.js",
         "watch": "./node_modules/.bin/webpack-cli --config webpack.dev.js --watch",
         "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.dev.js --watch --watch-poll=1000",
-        "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production",
+        "publish": "./node_modules/.bin/webpack-cli --config webpack.prod.js",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "chromatic": "chromatic --exit-zero-on-changes",
