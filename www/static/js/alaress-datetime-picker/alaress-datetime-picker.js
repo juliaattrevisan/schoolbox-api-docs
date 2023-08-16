@@ -505,7 +505,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
      * @param trigger
      * @param date
      */
-    function setValue(element, options, state, trigger, date, dateFormat = "") {
+    function setValue(element, options, state, trigger, date) {
         // Get their pickerIds
         var pId = element.attr("data-datepicker-id");
 
