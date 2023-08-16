@@ -65,7 +65,7 @@ class Controller extends Base
                 'userId' => $child->getId(),
                 'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
                 'formattedName' => $child->formatName(),
-                'yearLevel' => $child->getYear()?->getLongName('Year ')
+                'yearLevel' => $child->getYear()?->getLongName('Year')
             ];
         }
 
@@ -79,7 +79,7 @@ class Controller extends Base
                 'userId' => $user->getUserId(),
                 'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
                 'formattedName' => $user->formatName(),
-                'yearLevel' => $user->getYear()?->getLongName('Year ')
+                'yearLevel' => $user->getYear()?->getLongName('Year')
             ];
         }
 
