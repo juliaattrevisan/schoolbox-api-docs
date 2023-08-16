@@ -76,7 +76,7 @@ class Controller extends Base
             // The selected user is the logged in user.
             $campuses = $user->getCampusCollection();
             $selectedUserOption = [
-                'userId' => $user->getUserId(),
+                'userId' => $user->getId(),
                 'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
                 'formattedName' => $user->formatName(),
                 'yearLevel' => $user->getYear()?->getLongName('Year')
