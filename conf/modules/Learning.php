@@ -36,6 +36,7 @@ use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
 use Schoolbox\Learning\Student\Module as StudentCourseModule;
 use Schoolbox\Learning\Upcoming;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Module as LessonPlanActivitiesModule;
 
 class Learning extends ModuleLoader
 {
@@ -65,6 +66,7 @@ class Learning extends ModuleLoader
             $this->loadModule($di, Upcoming\Module::class, "/{$namespace}/due");
             $this->loadModule($di, AssessmentExporterModule::class, "/{$namespace}/export");
             $this->loadModule($di, MarkScheme\Module::class, "/{$namespace}/markscheme");
+            $this->loadModule($di, LessonPlanActivitiesModule::class, "/{$namespace}/lessonplan");
         }
 
         // Student toolkit component: not feature flagged

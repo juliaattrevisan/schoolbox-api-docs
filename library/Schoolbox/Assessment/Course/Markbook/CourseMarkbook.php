@@ -425,7 +425,7 @@ class CourseMarkbook
      * @param CourseImplementation\Model $courseImpl
      * @return UnitImplementation\Model
      */
-    private function getFirstUnitImpl(CourseImplementation\Model $courseImpl): UnitImplementation\Model
+    public static function getFirstUnitImpl(CourseImplementation\Model $courseImpl): UnitImplementation\Model
     {
         /** @var UnitImplementation\Model $firstUnitImpl */
         $firstUnitImpl = null;
