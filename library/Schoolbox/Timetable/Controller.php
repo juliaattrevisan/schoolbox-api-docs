@@ -14,7 +14,6 @@ namespace Schoolbox\Timetable;
 use Alaress\Web\Controller\Base;
 use DateTime;
 use External_Timetable;
-use Schoolbox\External\User as ExternalUser;
 
 class Controller extends Base
 {
@@ -38,7 +37,7 @@ class Controller extends Base
      * This screen is a FullCalendar view of all timetable-related subscriptions
      * for a specific user, $user
      *
-     * @param \Schoolbox\User $user
+     * @param \Schoolbox\User $user - The user whose timetable is to be retrieved.
      * @param string          $date
      * @return void
      * @throws \InvalidArgumentException
@@ -53,13 +52,10 @@ class Controller extends Base
          */
         $weekends = 'false';
 
-        $externalUser = new ExternalUser();
-        $externalUser->loadChildren([$user]); // Loads children into $user.
-        $children = $user->getChildren();
-
         // Create data structure needed by the Vue template (timetable-calendar.vue).
+        // The children of the logged-in user will be passed to the Twig template as $userOptions.
         $userOptions = [];
-        foreach ($children as $child) {
+        foreach ($_SESSION['user']->getChildren() as $child) {
             $campuses = $child->getCampusCollection();
             $userOptions[] = [
                 'userId' => $child->getId(),
