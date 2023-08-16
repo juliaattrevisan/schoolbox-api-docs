@@ -31,13 +31,18 @@
                 }
             });
 
+            // Open component settings on click of filtered info
+            $component.find('[data-action="filtered"]').on('click', function(event){
+                event.preventDefault();
+                document.querySelector('#component{{ componentInstance.id }} [data-target="settings"]').click();
+            });
         });
 </script>
 {% set urlSuffix = (encodedReturnUrl | length) ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl) : '' %}
 <section>
 {% if filterList and not readOnly%}
     <p class="component-titlebar meta">
-        <a class="icon-filter" href="#" title="View / Edit filter">This is being filtered</a>
+        <a class="icon-filter" title="View / Edit filter" data-action="filtered">This is being filtered</a>
     </p>
 {% endif %}
     {% if (courseImplementation.units ?? [])|length %}
