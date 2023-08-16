@@ -256,8 +256,13 @@ export default {
     },
 
     methods: {
-        changeUserAndReloadEvents(userId) {
-            this.config.userId = userId;
+        changeUserAndReloadEvents(details) {
+            this.config.userId = details.selectedUserId;
+
+            // TODO: Update page heading somehow using details.selectedUserName and details.selectedUser
+            //document.querySelector("[data-heading-user-fullname]").innerHTML = childName;
+            //document.querySelector("[data-heading-user-year]").innerHTML = yearLevel == "" ? "" : yearLevel;
+
             this.reloadEvents();
         },
 
@@ -819,7 +824,7 @@ export default {
 </script>
 
 <template>
-    <timetable-calendar-options :options="options" @event-created="optionsChanged" />
+    <timetable-calendar-options :options="options" @option-selected="changeUserAndReloadEvents" />
     <div class="row">
         <div class="small-12 columns">
             <h1>

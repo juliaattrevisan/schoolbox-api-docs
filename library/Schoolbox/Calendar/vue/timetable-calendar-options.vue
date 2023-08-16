@@ -7,6 +7,8 @@ export default {
 
     components: {},
 
+    emits: ["optionSelected"],
+
     mixins: [],
 
     data() {
@@ -32,30 +34,25 @@ export default {
          * @param ev - The click event.
          */
         onClickChildStudentButton(ev) {
-            console.info("Click!");
-            //const anchor = ev.target;
-            //
-            //if (anchor.parentElement.classList.contains("active")) {
-            //    // This child is already selected, so do nothing.
-            //    return;
-            //}
-            //
-            //// The ref is set as <timetable-calendar ref='timetable-calendar'></timetable-calendar> in timetableCalendar.twig.
-            //window.fullCalendarVueAppRoot.$refs["timetable-calendar"].changeUserAndReloadEvents(
-            //    anchor.getAttribute("data-userId")
-            //);
-            //
-            //// Update state of buttons.
+            const anchor = ev.target;
+
+            if (anchor.parentElement.classList.contains("active")) {
+                // This child is already selected, so do nothing.
+                console.info("Already selected so nothing to do.");
+                return;
+            }
+
+            this.$emit("optionSelected", {
+                selectedUserId: anchor.getAttribute("data-userId"),
+                selectedUserName: anchor.getAttribute("data-childFormattedName"),
+                selectedYearLevel: anchor.getAttribute("data-childYearLevel"),
+            });
+
+            // TODO: Update state of buttons the Vue way somehow.
             //for (const anchorInner of document.querySelectorAll("[data-child-student-button]")) {
             //    anchorInner.parentElement.classList.remove("active");
             //}
             //anchor.parentElement.classList.add("active");
-            //
-            //// Update page heading.
-            //const childName = anchor.getAttribute("data-childFormattedName");
-            //const yearLevel = anchor.getAttribute("data-childYearLevel");
-            //document.querySelector("[data-heading-user-fullname]").innerHTML = childName;
-            //document.querySelector("[data-heading-user-year]").innerHTML = yearLevel == "" ? "" : yearLevel;
         },
     },
 };
