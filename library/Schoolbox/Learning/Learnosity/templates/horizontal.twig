@@ -162,61 +162,9 @@
         $('[data-item-reference]').on('click', function (event) {
             event.preventDefault();
 
-            /* Hide everything first lol
-             * Then show certain parts lol
-             */
-            for (let i = 0; i < reportIds.length; i++) {
-                hideAllResponses(reportIds[i]);
-
-                let itemReference = $(this).attr('data-item-reference');
-
-                let response = $('#' + reportIds[i]).find('[data-reference="' + itemReference + '"]');
-                let clearfix = response.prev();
-                let title = clearfix.prev();
-                let score = $('.sb-custom-score').find('[data-reference="'+ itemReference +'"]');
-
-                response.attr('style', '');
-                clearfix.attr('style', '');
-                title.attr('style', '');
-
-                /* Show our custom scoring fields
-                 */
-                score.attr('style', '');
-            }
+            showResponse($(this).attr('data-item-reference'));
         });
     });
-
-    //
-    // /**
-    //  * Reconfigure learnosity's dom
-    //  *
-    //
-    //  *
-    //  * This function wraps every three elements into a div with an item
-    //  * identifier so we can toggle things easier
-    //  *
-    //  * @param reportIds
-    //  */
-    // function rearrangeGuts(reportIds) {
-    //     for (let i = 0; i < reportIds.length; i++) {
-    //         let report = document.getElementById(reportIds[i]);
-    //         let divs = report.children;
-    //
-    //         let subcontainer = document.createElement('div');
-    //         let j = 0;
-    //
-    //         /* Group up every three elements
-    //          */
-    //         // for (let j = 0; j < divs.length; j++) {
-    //         //     if (j % 3 < 2) {
-    //         //         subcontainer.appendChild(divs[j]);
-    //         //     }
-    //         // }
-    //
-    //         console.log(divs, subcontainer);
-    //
-    //     }
-    // }
 
 
     /**
@@ -258,9 +206,27 @@
      * When a user clicks an item from the list,
      * show everyone's responses for that item
      *
-     * @param learnosityReference
+     * @param itemReference
      */
-    function showResponse(learnosityReference) {
+    function showResponse(itemReference) {
+        /* Hide everything first lol
+         * Then show certain parts lol
+         */
+        for (let i = 0; i < reportIds.length; i++) {
+            hideAllResponses(reportIds[i]);
 
+            let response = $('#' + reportIds[i]).find('[data-reference="' + itemReference + '"]');
+            let clearfix = response.prev();
+            let title = clearfix.prev();
+            let score = $('.sb-custom-score').find('[data-reference="'+ itemReference +'"]');
+
+            response.attr('style', '');
+            clearfix.attr('style', '');
+            title.attr('style', '');
+
+            /* Show our custom scoring fields
+             */
+            score.attr('style', '');
+        }
     }
 </script>
