@@ -98,6 +98,8 @@
                     /* Slap on some our feedback stuff
                      */
                     itemsApp.getQuestions(function(questions) {
+                        let report = document.querySelector(`#${reportId}`);
+
                         $.each(questions, function(index, element) {
                             /* Access different parts of the dom directly, to place
                              * our input fields etc.
@@ -118,7 +120,7 @@
 
                             /* Containers into which we inject things
                              */
-                            let container = document.querySelector(`#${reportId}`).querySelector(`[data-reference="${learnosityReference}"]`);
+                            let container = report.querySelector(`[data-reference="${learnosityReference}"]`);
                             let guts = document.createElement('div');
 
                             guts.innerHTML = '' +
@@ -138,7 +140,6 @@
 
                         /* Rewrite the item title to be the guy's name
                          */
-                        let report = document.querySelector('#' + reportId);
                         let titles = report.getElementsByClassName('lrn-report-item-title');
 
                         $.each(titles, function(index, element) {
@@ -242,18 +243,56 @@
         for (let i = 0; i < reportIds.length; i++) {
             hideAllResponses(reportIds[i]);
 
-            let response = $('#' + reportIds[i]).find('[data-reference="' + itemReference + '"]');
-            let clearfix = response.prev();
-            let title = clearfix.prev();
-            let score = $('.sb-custom-score').find('[data-reference="'+ itemReference +'"]');
+            let report = document.querySelector(`#${reportIds[i]}`);
+            let response = report.querySelector(`.learnosity-item[data-reference="${itemReference}"]`);
+            let clearfix = prev(response);
+            let title = prev(clearfix);
+            let score = report.querySelector(`.sb-custom-score[data-reference="${itemReference}"]`);
 
-            response.attr('style', '');
-            clearfix.attr('style', '');
-            title.attr('style', '');
-
-            /* Show our custom scoring fields
+            /* If elements existed, show them
+             * Learnosity Elements need to be shown as a group (response, clearfix, title)
+             * and we show our custom scoring interface separately (score)
              */
-            score.attr('style', '');
+            if (response) {
+                response.style = '';
+            }
+
+            if (clearfix) {
+                clearfix.style = ''
+            }
+
+            if (title) {
+                title.style = '';
+            }
+
+            if (score) {
+                score.style = '';
+            }
         }
+    }
+
+
+    /**
+     * jquery replacement
+     * https://youmightnotneedjquery.com/#prev
+     *
+     * @param el
+     * @param selector
+     * @returns {Element|null}
+     */
+    function prev(el, selector) {
+        /* Scenario where el didn't exist
+         */
+        if (null === el) {
+            return null;
+        }
+
+        const prevEl = el.previousElementSibling;
+
+        if (!selector || (prevEl && prevEl.matches(selector))) {
+            return prevEl;
+        }
+
+        return null;
     }
 </script>
