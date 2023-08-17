@@ -76,7 +76,7 @@ export default {
     },
     async mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
-        window.onpopstate = async function (event) {
+        window.onpopstate = async (event) => {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
             this.setSelectedTagAndFiltersToMatchState(event.state);
 
