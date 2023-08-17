@@ -1,4 +1,5 @@
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
 {# A list of contents for this quiz
  # Used to help people change questions
@@ -38,6 +39,10 @@
     let reportsExpected = reportPayloads.length;
     let reportIds = [];
     let reportCallbacks = [];
+
+    /* Remember all the textareas we built
+     */
+    let attemptEditorFields = [];
 
     /* Initialise a report for everyone's attempt
      * Selectively showing only one item's responses at a time
@@ -110,7 +115,7 @@
 
                             /* We need this for cke replacements
                              */
-                            // attemptEditorFields.push('#comments-' + learnosityReferenceTuple);
+                            attemptEditorFields.push('#comments-' + learnosityReferenceTuple);
                         });
                     });
                 });
@@ -128,6 +133,13 @@
     let reportsReady = setInterval(function() {
         if (reportsLoaded === reportsExpected) {
             clearInterval(reportsReady);
+            /* cke all the commentary fields
+             */
+            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                detail: {
+                    targetElements: attemptEditorFields
+                }
+            }));
 
             /* Show list of questions to choose from
              */
