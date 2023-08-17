@@ -752,6 +752,8 @@ class Controller extends Base
      */
     public function getHorizontalMarking(IAssessable $assessment, ?string $learnosityReference): void
     {
+        $reportIdentifierPrefix = 'schoolbox-student-';
+
         /* Get the quiz identifier
          */
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
@@ -777,12 +779,14 @@ class Controller extends Base
         $reportPayloads = [];
 
         foreach ($attempts as $attempt) {
-            if ($attempt->isFinished() && !isset($users[$attempt->getUser()->getId()])) {
+            $key = $reportIdentifierPrefix . $attempt->getUser()->getId();
+
+            if (!isset($users[$key]) && $attempt->isFinished()) {
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
 
                 /* ...because Learnosity wants it in this format
                  */
-                $users[$attempt->getUser()->getId()] = [
+                $users[$key] = [
                     'id' => (string)$attempt->getUser()->getId(),
                     'name' => $attempt->getUser()->getFullName()
                 ];
@@ -832,8 +836,6 @@ class Controller extends Base
         /* Consolidate reference and titles into an in-order lookup
          * (because $items is in some non-sequenced order)
          */
-        $itemTuples = [];
-
         foreach ($itemReferences as &$itemReference) {
             $reference = $itemReference['reference'];
 
@@ -850,8 +852,9 @@ class Controller extends Base
         unset($itemReference);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
-            'reportPayloads' => json_encode($reportPayloads),
+            'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
             'users' => $users,
+            'usersEncoded' => json_encode($users, JSON_THROW_ON_ERROR),
             'assessment' => $assessment,
             'itemReferences' => $itemReferences
         ], sprintf(

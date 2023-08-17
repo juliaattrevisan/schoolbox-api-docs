@@ -27,7 +27,7 @@
     <div class="small-12 island">
         <section id="reports" class="content" style="display:none">
             {% for user in users %}
-                <div id="schoolbox-student-{{ user.id }}"></div>
+                <div id="schoolbox-student-{{ user.id }}" data-name="{{ user.name }}"></div>
             {% endfor %}
         </section>
     </div>
@@ -52,6 +52,11 @@
     /* Remember all the textareas we built
      */
     let attemptEditorFields = [];
+
+    /* A list of (user_id, name) tuples that we use to replace Item titles
+     * with the student's name, e.g. replace "Item 2" with "Michael White"
+     */
+    let users = JSON.parse('{{ usersEncoded|raw }}');
 
     /* Initialise a report for everyone's attempt
      * Selectively showing only one item's responses at a time
@@ -125,6 +130,15 @@
                             /* We need this for cke replacements
                              */
                             attemptEditorFields.push('#comments-' + learnosityReferenceTuple);
+                        });
+
+                        /* Rewrite the item title to be the guy's name
+                         */
+                        let report = document.querySelector('#' + reportId);
+                        let titles = report.getElementsByClassName('lrn-report-item-title');
+
+                        $.each(titles, function(index, element) {
+                            element.firstChild.textContent = users[reportId].name;
                         });
                     });
                 });
