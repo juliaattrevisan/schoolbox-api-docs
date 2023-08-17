@@ -253,6 +253,16 @@ export default {
         document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
 
         this.selectedUserOption = this.options["selectedUserOption"];
+
+        window.onpopstate = (event) => {
+            // NOTE: event.state will be null unless the state has been saved using window.history.pushState().
+            if (event.state !== null) {
+                this.changeUserAndReloadEvents(event.state, false);
+            }
+        };
+
+        console.info("Pushing ", this.selectedUserOption.formattedName, " to history.");
+        window.history.pushState(this.getCopyOfSelectedUserOption(), "", window.location.href);
     },
 
     beforeDestroy() {
@@ -260,10 +270,44 @@ export default {
     },
 
     methods: {
-        changeUserAndReloadEvents(selectedUserOption) {
+        /**
+         * Return a copy of a userOption object.
+         * This is to avoid getting '' errors when trying to window.pushState with this.selectedUserOption.
+         * @param {object} userOption - The object to copy.
+         */
+        getCopyOfSelectedUserOption(userOption) {
+            return {
+                userId: this.selectedUserOption.userId,
+                firstCampusName: this.selectedUserOption.firstCampusName,
+                formattedName: this.selectedUserOption.formattedName,
+                yearLevel: this.selectedUserOption.yearLevel,
+            };
+        },
+
+        /**
+         * @param {object} selectedUserOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
+         */
+        changeUserAndReloadEvents(selectedUserOption, pushState) {
+            if (pushState === undefined) {
+                pushState = true;
+            }
+
+            if (pushState) {
+                // Push current state to history.
+                console.info("Pushing ", this.selectedUserOption.formattedName, " to history.");
+                window.history.pushState(this.getCopyOfSelectedUserOption(), "", window.location.href);
+            }
+
+            // Update state.
             this.selectedUserOption = selectedUserOption;
             this.config.userId = this.selectedUserOption.userId;
             this.reloadEvents();
+
+            // Replace current state in history object with the new state.
+            const oldUrl = window.location.href;
+            const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedUserOption.userId;
+            console.info("Replacing current state with ", this.selectedUserOption.formattedName, ".");
+            window.history.replaceState(this.getCopyOfSelectedUserOption(), "", newUrl);
         },
 
         /**

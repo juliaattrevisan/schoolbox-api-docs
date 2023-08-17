@@ -46,7 +46,6 @@ class Controller extends Base
     {
         $loggedInUser = $_SESSION['user'];
 
-        // Create data structure needed by the Vue template (timetable-calendar.vue).
         // The children of $loggedInUser will be passed to the Twig template as $userOptions.
         $userOptions = [];
         foreach ($loggedInUser->getChildren() as $child) {
@@ -82,7 +81,9 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseFromTemplate(
-            '@timetable/timetableCalendar.twig', [
+            '@timetable/timetableCalendar.twig',
+            // This data structure will be passed through the twig template to the Vue template (timetable-calendar.vue).
+            [
                 'options' => [
                     'selectedDate' => (new \Alaress_Date_Format($date, 'd-m-Y'))->getDatabaseDate(),
                     'selectedUserOption' => $selectedUserOption,
