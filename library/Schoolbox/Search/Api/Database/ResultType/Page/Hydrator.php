@@ -9,12 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
-use Alaress\Database\Predicate\Builder;
 use Aura\Router\Generator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;

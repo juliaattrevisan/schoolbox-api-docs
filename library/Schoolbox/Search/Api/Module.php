@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Permission\Access\Access;
@@ -87,6 +88,7 @@ class Module extends BaseModule
                 new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -107,6 +109,10 @@ class Module extends BaseModule
                 new Database\ResultType\File\Hydrator(
                     $mapperFactory->get(FileMapper::class),
                     Access::getInstance(),
+                ),
+                new Database\ResultType\Event\Hydrator(
+                    $mapperFactory->get(UserMapper::class),
+                    $mapperFactory->get(FolderMapper::class),
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(

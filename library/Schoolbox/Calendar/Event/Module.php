@@ -60,7 +60,7 @@ class Module extends BaseModule
                     new IsSuperuser(),
                     new Event\Authorizer\CanViewEvent($this->getConfig())
                 )
-            );
+        );
         });
 
         /* Permissions for creating an event
