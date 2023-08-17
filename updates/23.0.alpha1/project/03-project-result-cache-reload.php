@@ -33,7 +33,7 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
-        $this->getLogger()->alert("Once upgraded, please run the project script manually: `tools/assessment/projectResultCacheReload.php`");
+        $this->getLogger()->warning("Once upgraded, please run the project script manually: `tools/assessment/projectResultCacheReload.php`");
     }
 };
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
