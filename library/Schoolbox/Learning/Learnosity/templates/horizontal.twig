@@ -24,12 +24,14 @@
     </div>
 
     {# Everyone's attempt loads here #}
-    <div class="small-12 island">
-        <section id="reports" class="content" style="display:none">
+    <div id="reports" style="display:none">
+        <div class="small-12 island">
             {% for user in users %}
-                <div id="schoolbox-student-{{ user.id }}" data-name="{{ user.name }}"></div>
+                <section class="content">
+                    <div id="schoolbox-student-{{ user.id }}" data-name="{{ user.name }}"></div>
+                </section>
             {% endfor %}
-        </section>
+        </div>
     </div>
 </div>
 
