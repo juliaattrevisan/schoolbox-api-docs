@@ -39,7 +39,7 @@ async function onApplySelected() {
                 <!-- <sp-filter-creator /> -->
                 <!-- <sp-filter-types /> -->
                 <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
-                <button class="full-width" @click.prevent="onApplySelected">Apply filters</button>
+                <button class="full-width submit" @click.prevent="onApplySelected">Apply filters and search</button>
             </div>
         </div>
     </div>
