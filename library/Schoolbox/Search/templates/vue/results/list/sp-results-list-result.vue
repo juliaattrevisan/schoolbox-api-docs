@@ -34,10 +34,11 @@ const isImgRounded = window.Vue.computed(() => {
 });
 
 /**
- * To display the relative time of the result
+ * To display the date in format
+ * @returns {string} the formatted date
  */
-const relativeTime = window.Vue.computed(() => {
-    return window.dayjs.duration(window.dayjs(props.result.date).diff()).humanize(true);
+const dateFormatted = window.Vue.computed(() => {
+    return window.dayjs(props.result.date).format("DD/MM/YYYY");
 });
 </script>
 
@@ -62,8 +63,8 @@ const relativeTime = window.Vue.computed(() => {
                     </h3>
                     <span v-if="props.result.type === ResultTypes.NEWS" class="meta"
                         >Posted by
-                        <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a>
-                        {{ relativeTime }}</span
+                        <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
+                        {{ dateFormatted }}</span
                     >
                     <span v-else-if="props.result.meta" class="meta">{{ props.result.meta }}</span>
                     <span v-else-if="props.result.context" class="meta"

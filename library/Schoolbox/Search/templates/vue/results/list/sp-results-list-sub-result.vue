@@ -5,6 +5,7 @@
 
 import { addMarks } from "@js/util/domUtils";
 import { Result } from "../../../js/types/Result";
+import { ResultTypes } from "../../../js/types/ResultTypes";
 import { useQueryStore } from "../../store/spQueryStore";
 
 interface Props {
@@ -14,6 +15,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const queryStore = useQueryStore();
+
+/**
+ * To display the date in format
+ * @returns {string} the formatted date
+ */
+const dateFormatted = window.Vue.computed(() => {
+    return window.dayjs(props.subResult.date).format("DD/MM/YYYY");
+});
 </script>
 
 <template>
@@ -32,6 +41,11 @@ const queryStore = useQueryStore();
                         v-html="addMarks(props.subResult.title, queryStore.queryWordList)"
                     ></a>
                 </h6>
+                <span v-if="props.subResult.type.includes(ResultTypes.FILE)" class="meta"
+                    >Created by
+                    <a :href="props.subResult.creator?._links?.profile">{{ props.subResult.creator?.fullName }}</a> on
+                    {{ dateFormatted }}</span
+                >
             </div>
         </div>
     </div>
