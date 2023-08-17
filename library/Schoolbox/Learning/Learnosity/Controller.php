@@ -814,7 +814,7 @@ class Controller extends Base
                              * It's configurable by us, unlike the other anchors for
                              * Author and Items api
                              */
-                            'id' => 'schoolbox-student-' . $attempt->getUser()->getId(),
+                            'id' => $key,
                             'type' => 'session-detail-by-item',
                             'session_id' => $attempt->getLearnosityReference(),
                             'questions_api_init_options' => [
