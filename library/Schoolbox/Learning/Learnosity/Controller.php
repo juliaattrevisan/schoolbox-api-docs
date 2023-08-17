@@ -747,8 +747,13 @@ class Controller extends Base
      * This is grossly inefficient but there aren't many options available to us
      *
      * @param IAssessable $assessment
-     * @param string|null $learnosityReference  An item reference identifier in learnosity land
+     * @param string|null $learnosityReference An item reference identifier in learnosity land
      * @return void
+     * @throws Error
+     * @throws Exception
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function getHorizontalMarking(IAssessable $assessment, ?string $learnosityReference): void
     {
