@@ -97,8 +97,8 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('awardedBy.role', 'a', 'ar')}
             LEFT JOIN {$this->getJoinSql('awardedBy.pronoun', 'a', 'ap')}
             LEFT  JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
-            LEFT  JOIN {$this->getJoinSql('reasonedBy.role', 'a', 'rbr')}
-            LEFT  JOIN {$this->getJoinSql('reasonedBy.pronoun', 'a', 'rbp')}
+            LEFT  JOIN {$this->getJoinSql('reasonedBy.role', 'rb', 'rbr')}
+            LEFT  JOIN {$this->getJoinSql('reasonedBy.pronoun', 'rb', 'rbp')}
             LEFT  JOIN {$this->getJoinSql('award', '', 'aw')}
             LEFT  JOIN {$this->getJoinSql('award.badge', 'aw', 'awb')}
             LEFT  JOIN {$this->getJoinSql('award.recipient', 'aw', 'awr', true)}
