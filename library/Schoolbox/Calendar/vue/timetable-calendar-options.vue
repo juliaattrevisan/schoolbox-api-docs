@@ -19,6 +19,10 @@ export default {
     },
 
     methods: {
+        setSelectedUserOption(userOption) {
+            this.selectedUserOption = userOption;
+        },
+
         /**
          * When a button is clicked:
          *  - Ignore the click if the button is already in the active state

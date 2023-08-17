@@ -309,6 +309,7 @@ export default {
             this.selectedUserOption = selectedUserOption;
             this.config.userId = this.selectedUserOption.userId;
             this.reloadEvents();
+            this.$refs.tco.setSelectedUserOption(this.selectedUserOption); // TODO: Not sure if it is necessary to use $refs here.
 
             // Replace current state in history object with the new state.
             const oldUrl = window.location.href;
@@ -880,7 +881,7 @@ export default {
 </script>
 
 <template>
-    <timetable-calendar-options :options="options" @option-selected="changeUserAndReloadEvents" />
+    <timetable-calendar-options :options="options" @option-selected="changeUserAndReloadEvents" ref="tco" />
     <div class="row">
         <div class="small-12 columns">
             <h1>
