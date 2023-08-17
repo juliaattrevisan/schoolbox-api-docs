@@ -215,25 +215,33 @@
         function setRadioButtonListener (row) {
             $(row).find('.radio-label').click(function () {
                 let clickedElement = $("#" + $(this).attr('for'));
-                let radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
+                let elementName = clickedElement.attr('name');
+                let radioGroupSelector = 'input[name*="' + elementName + '"]';
                 {# Uncheck all radio buttons in the group #}
                 $(radioGroupSelector).removeAttr('checked');
                 {# Check the one that was clicked #}
                 clickedElement.attr('checked', 'true');
-                // hide comment box for denied permission
-                let commentCheckboxLabel = clickedElement.closest('tr').find('.checkbox-label');
-                let commentCheckbox = $('#' + commentCheckboxLabel.attr('for'));
-                if (clickedElement.val() === '0') {
-                    commentCheckboxLabel.hide();
-                    if (commentCheckbox.attr('data-always-read-only') === '0') {
-                        commentCheckbox.prop('checked', false);
-                    }
-                } else {
-                    commentCheckboxLabel.show();
-                    if (commentCheckboxLabel.hasClass('hide')) {
-                        commentCheckboxLabel.removeClass('hide');
-                    }
-                }
+                // hide checkboxes for denied permission
+                clickedElement.closest('tr').find('.checkbox-label').each(
+                        function () {
+                            if ($(this).attr('for') === 'roleCampusrole-type-student'
+                                    || $(this).attr('for') === 'roleCampusrole-type-parent') {
+                                return;
+                            }
+                            let checkbox = $('#' + $(this).attr('for'));
+                            if (clickedElement.val() === '0') {
+                                $(this).hide();
+                                if (checkbox.attr('data-always-read-only') === '0') {
+                                    checkbox.prop('checked', false);
+                                }
+                            } else {
+                                $(this).show();
+                                if ($(this).hasClass('hide')) {
+                                    $(this).removeClass('hide');
+                                }
+                            }
+                        }
+                )
             });
         }
 
