@@ -117,6 +117,8 @@ cd tools || exit 1
 echo "enabling summative report exporter"
 mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name = 'summative_report_enabled';"
 ./module/refresh-cache.php
+echo "re building project result Cache" # When we upgrade sales to after 23.0.alpha1 we can remove this
+php assessment/projectResultCacheReload.php --perform
 
 # Force the persistent instance again
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"
