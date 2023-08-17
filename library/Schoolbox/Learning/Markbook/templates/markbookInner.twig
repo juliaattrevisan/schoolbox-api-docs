@@ -92,7 +92,7 @@
                 {% endif %}
                 {% for assessment in markbook.assessments %}
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
-                    <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
+                    <th data-assessment="{{ assessment.id }}" class="student-grade-cell white">
                         <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                             {{ stats.mean | default('-') }}
                         </span>
