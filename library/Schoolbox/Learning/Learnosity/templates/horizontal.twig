@@ -1,27 +1,36 @@
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
-{# A list of contents for this quiz
- # Used to help people change questions
- #}
-<ul id="item-list" style="display:none">
-{% for itemReference in itemReferences %}
-    <li><a data-item-reference="{{ itemReference.id }}">{{ itemReference.id }}</a></li>
-{% endfor %}
-</ul>
-
 {# Render an html element into which each student's attempt will reside
  # This is needed for each Learnosity report which we initially hide in
  # a display:none container
  #}
-<div id="reports" style="display:none">
-{% for user in users %}
-    <div id="schoolbox-student-{{ user.id }}"></div>
-{% endfor %}
-</div>
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div id="loading">
+                <div class="loader"></div>
+            </div>
 
-<div id="loading">
-    <div class="loader"></div>
+            {# A list of contents for this quiz
+             # Used to help people change questions
+             #}
+            <ul id="item-list" style="display:none">
+                {% for itemReference in itemReferences %}
+                    <li><a data-item-reference="{{ itemReference.id }}">{{ itemReference.id }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+
+    {# Everyone's attempt loads here #}
+    <div class="small-12 island">
+        <section id="reports" class="content" style="display:none">
+            {% for user in users %}
+                <div id="schoolbox-student-{{ user.id }}"></div>
+            {% endfor %}
+        </section>
+    </div>
 </div>
 
 <script>
