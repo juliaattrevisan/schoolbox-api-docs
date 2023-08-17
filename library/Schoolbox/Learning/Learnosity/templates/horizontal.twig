@@ -118,16 +118,18 @@
 
                             /* Containers into which we inject things
                              */
-                            let container = $('#' + reportId).find('[data-reference="' + learnosityReference + '"]');
+                            let container = document.querySelector(`#${reportId}`).querySelector(`[data-reference="${learnosityReference}"]`);
+                            let guts = document.createElement('div');
 
-                            container.append('' +
+                            guts.innerHTML = '' +
                                 '<div class="sb-custom-score" style="display:none" data-reference="' + learnosityReference + '">' +
                                 '<label>Customise score</label>' +
                                 '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
                                 '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + (attemptComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
-                                '</div>' +
-                            '');
+                                '</div>';
+
+                            container.append(guts);
 
                             /* We need this for cke replacements
                              */
