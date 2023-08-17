@@ -36,11 +36,7 @@ async function onLoadMoreSelected() {
     <button v-else-if="showLoadMore" data-sp-results-list-load-more-button @click.prevent="onLoadMoreSelected">
         Load more results
     </button>
-    <div
-        v-else-if="resultsStore.hasLoadedAllResults"
-        class="alert-box success"
-        data-sp-results-list-load-more-all-loaded
-    >
+    <div v-else-if="resultsStore.hasLoadedAllResults" class="alert-box" data-sp-results-list-load-more-all-loaded>
         All results have been loaded
     </div>
 </template>

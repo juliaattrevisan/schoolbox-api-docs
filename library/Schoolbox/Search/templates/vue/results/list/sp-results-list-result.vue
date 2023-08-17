@@ -44,11 +44,15 @@ const relativeTime = window.Vue.computed(() => {
 <template>
     <div>
         <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`" data-test-sp-results-list-result>
-            <div class="l-flex-row l-flex--align-center l-gap-m l-pad-xs--vert">
-                <div :class="`c-img c-img--s ${isImgRounded ? 'c-img--round' : ''}`">
+            <div class="l-flex-row l-flex--align-center l-gap-m">
+                <div :class="`c-img c-img--s ${isImgRounded ? 'c-img--round' : ''} l-pad-s`">
                     <div class="c-img__wrapper">
-                        <div v-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
-                        <img v-else :src="(props.result.image as string)" :alt="`Photo of ${props.result.title}`" />
+                        <img
+                            v-if="props.result.image"
+                            :src="(props.result.image as string)"
+                            :alt="`Photo of ${props.result.title}`"
+                        />
+                        <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
                     </div>
                 </div>
                 <div class="l-flex-col l-flex--justify-center f-no-margins">
