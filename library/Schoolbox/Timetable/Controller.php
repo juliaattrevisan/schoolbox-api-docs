@@ -37,25 +37,19 @@ class Controller extends Base
      * This screen is a FullCalendar view of all timetable-related subscriptions
      * for a specific user, $user
      *
-     * @param \Schoolbox\User $user - The user whose timetable is to be retrieved.
+     * @param \Schoolbox\User $requestedUser - The user whose timetable is to be retrieved.
      * @param string          $date
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function getTimetableCalendar(\Schoolbox\User $user, string $date): void
+    public function getTimetableCalendar(\Schoolbox\User $requestedUser, string $date): void
     {
-        /* Selected date
-         */
-        $selectedDate = (new \Alaress_Date_Format($date, 'd-m-Y'))->getDatabaseDate();
-
-        /* TODO: Figure out what happens when school weeks start on a weekend
-         */
-        $weekends = 'false';
+        $loggedInUser = $_SESSION['user'];
 
         // Create data structure needed by the Vue template (timetable-calendar.vue).
-        // The children of the logged-in user will be passed to the Twig template as $userOptions.
+        // The children of $loggedInUser will be passed to the Twig template as $userOptions.
         $userOptions = [];
-        foreach ($_SESSION['user']->getChildren() as $child) {
+        foreach ($loggedInUser->getChildren() as $child) {
             $campuses = $child->getCampusCollection();
             $userOptions[] = [
                 'userId' => $child->getId(),
@@ -65,31 +59,39 @@ class Controller extends Base
             ];
         }
 
-        if (count($userOptions) > 0) {
-            // The selected user is the first of the $userOptions.
-            $selectedUserOption = $userOptions[0];
-        } else {
-            // The selected user is the logged in user.
-            $campuses = $user->getCampusCollection();
-            $selectedUserOption = [
-                'userId' => $user->getId(),
-                'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
-                'formattedName' => $user->formatName(),
-                'yearLevel' => $user->getYear()?->getLongName('Year')
-            ];
+        if (
+            // If the logged-in user is a parent, and not a superuser, and has requested their own timetable...
+            count($userOptions) > 0 &&
+            !$loggedInUser->isSuperuser() &&
+            $loggedInUser->getId() === $requestedUser->getId()
+        ) {
+            // Redirect to the timetable of the logged-in user's first child.
+            // (Parents do not need to see their own timetable - clarified in Jira comments for SA-16065).
+            // TODO: Find the preferred way to redirect.
+            echo "Must redirect here to timetable for {$userOptions[0]['userId']}\n";
+            die;
         }
 
-        $this->response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
-            'options' => [
-                'selectedDate' => $selectedDate,
-                'selectedUserOption' => $selectedUserOption,
-                'userOptions' => $userOptions,
-                'weekends' => $weekends
-            ]
-        ], sprintf(
-            'Timetable Calendar for %s',
-            $user->getFullName()
-        ));
+        // The selected user is the $requestedUser.
+        $campuses = $requestedUser->getCampusCollection();
+        $selectedUserOption = [
+            'userId' => $requestedUser->getId(),
+            'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
+            'formattedName' => $requestedUser->formatName(),
+            'yearLevel' => $requestedUser->getYear()?->getLongName('Year')
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@timetable/timetableCalendar.twig', [
+                'options' => [
+                    'selectedDate' => (new \Alaress_Date_Format($date, 'd-m-Y'))->getDatabaseDate(),
+                    'selectedUserOption' => $selectedUserOption,
+                    'userOptions' => $userOptions,
+                    'weekends' => 'false' // TODO: Figure out what happens when school weeks start on a weekend.
+                ]
+            ],
+            'Timetable Calendar for ' . $requestedUser->getFullName()
+        );
     }
 
 
