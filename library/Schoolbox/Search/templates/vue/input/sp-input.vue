@@ -22,9 +22,6 @@ function onInput(value: string) {
  * Start a search
  */
 async function onSearch() {
-    if (!queryStore.isActive) {
-        return;
-    }
     if (searchStore.isSearching) {
         return;
     }
@@ -34,7 +31,13 @@ async function onSearch() {
 
 <template>
     <form @submit.prevent="onSearch">
-        <search-input :is-active="true" @input="onInput" @key-enter="onSearch" @click="onSearch" />
+        <search-input
+            :is-active="true"
+            :is-active-when-empty="true"
+            @input="onInput"
+            @key-enter="onSearch"
+            @click="onSearch"
+        />
         <!-- <input v-model="queryStore.query" type="text" /> -->
         <!-- <button type="submit">Search</button> -->
     </form>

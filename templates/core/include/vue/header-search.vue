@@ -195,6 +195,7 @@ function formatPortrait(id: string) {
     >
         <search-input
             :is-active="isActive"
+            :is-active-when-empty="false"
             @input="onInput"
             @key-down="onArrowDown"
             @key-up="onArrowUp"

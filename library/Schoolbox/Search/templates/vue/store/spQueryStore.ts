@@ -4,18 +4,9 @@
 
 import { defineStore } from "pinia";
 
-const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
-
 export const useQueryStore = defineStore("spQuery", () => {
     const query = window.Vue.ref(""); // current search input
     const activeQuery = window.Vue.ref(""); // the latest query that was searched
-
-    /**
-     * To only start showing search results once enough characters
-     * have been added
-     * @returns {boolean}
-     */
-    const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH);
 
     /**
      * the search string broken into words, to search for each word
@@ -46,7 +37,6 @@ export const useQueryStore = defineStore("spQuery", () => {
     return {
         query,
         activeQuery,
-        isActive,
         queryWordList,
         setActive,
         clear,

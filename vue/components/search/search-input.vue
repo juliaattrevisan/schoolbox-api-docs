@@ -10,6 +10,7 @@
 interface Props {
     isActive: boolean; // to add the active styles
     initialInput?: string; // to prefill the input
+    isActiveWhenEmpty?: boolean; // can be selected while the input is empty
 }
 const props = defineProps<Props>();
 
@@ -62,6 +63,9 @@ function onKeyEnter() {
  * If the input is empty, focus over input, otherwise emit click
  */
 function onClicked() {
+    if (props.isActiveWhenEmpty) {
+        emit("click");
+    }
     if (currentInput.value.length > 0) {
         emit("click");
     } else {
