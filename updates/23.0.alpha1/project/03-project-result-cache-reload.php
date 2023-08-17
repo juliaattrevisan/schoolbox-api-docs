@@ -24,8 +24,18 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  *
  *     Example: php example.php 2> log.txt
  */
-$app = new ResultCache\Cli\Reloader();
+$app = new class extends CliTool\App {
+    public function runAsRoot(): ?bool
+    {
+        // doesn't matter
+        return null;
+    }
 
+    public function run(): void
+    {
+        $this->getLogger()->alert("Once upgraded, please run the project script manually: `tools/assessment/projectResultCacheReload.php`");
+    }
+};
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
  *
  * You should generally try to fix those, even though in some special cases php will throw notices
@@ -34,4 +44,4 @@ $app = new ResultCache\Cli\Reloader();
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp(true);
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
