@@ -12,7 +12,12 @@ const resultsStore = useResultsStore();
 
 <template>
     <div class="l-flex-col l-gap-s" data-test-sp-results-list>
-        <sp-results-list-result v-for="result in resultsStore.results" :key="result.id" :result="result" />
+        <sp-results-list-result
+            v-for="(result, index) in resultsStore.results"
+            :key="result.id"
+            :result="result"
+            :index="index"
+        />
         <sp-results-list-load-more />
     </div>
 </template>
