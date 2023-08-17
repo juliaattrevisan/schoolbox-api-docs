@@ -97,10 +97,10 @@
 
                             /* Containers into which we inject things
                              */
-                            let container = $('[data-reference="' + learnosityReference + '"]');
+                            let container = $('#' + reportId).find('[data-reference="' + learnosityReference + '"]');
 
                             container.append('' +
-                                '<div class="sb-custom-score">' +
+                                '<div class="sb-custom-score" style="display:none" data-reference="' + learnosityReference + '">' +
                                 '<label>Customise score</label>' +
                                 '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
@@ -161,10 +161,15 @@
                 let response = $('#' + reportIds[i]).find('[data-reference="' + itemReference + '"]');
                 let clearfix = response.prev();
                 let title = clearfix.prev();
+                let score = $('.sb-custom-score').find('[data-reference="'+ itemReference +'"]');
 
                 response.attr('style', '');
                 clearfix.attr('style', '');
                 title.attr('style', '');
+
+                /* Show our custom scoring fields
+                 */
+                score.attr('style', '');
             }
         });
     });
@@ -217,6 +222,7 @@
         let titles = report.getElementsByClassName('lrn-report-item-title');
         let clearfixes = report.getElementsByClassName('clearfix');
         let items = report.getElementsByClassName('learnosity-item');
+        let scores = report.getElementsByClassName('sb-custom-score');
 
         $.each(titles, function(index, element) {
             element.style = 'display:none';
@@ -227,6 +233,10 @@
         });
 
         $.each(items, function (index, element) {
+            element.style = 'display:none';
+        });
+
+        $.each(scores, function(element) {
             element.style = 'display:none';
         });
     }
