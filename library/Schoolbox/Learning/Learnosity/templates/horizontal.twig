@@ -1,6 +1,12 @@
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Horizontal Marking for {{ assessment.title }}</h1>
+    </div>
+</div>
+
 {# Render an html element into which each student's attempt will reside
  # This is needed for each Learnosity report which we initially hide in
  # a display:none container
