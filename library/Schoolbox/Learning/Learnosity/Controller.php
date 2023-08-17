@@ -814,12 +814,40 @@ class Controller extends Base
         }
 
         /* Find a list of Learnosity Items (questions) available in this quiz
+         * These are their references only
          */
         $itemReferences = $this->api->dataGetRequest('itembank/activities', [
             'references' => [
                 $quiz->getLearnosityReference()
             ]
         ])['data'][0]['data']['items'];
+
+        /* Find a list of Learnosity Items (questions) available in this quiz
+         * This includes more info about each item
+         */
+        $items = $this->api->dataGetRequest('itembank/items', [
+            'references' => array_column($itemReferences, 'id')
+        ])['data'];
+
+        /* Consolidate reference and titles into an in-order lookup
+         * (because $items is in some non-sequenced order)
+         */
+        $itemTuples = [];
+
+        foreach ($itemReferences as &$itemReference) {
+            $reference = $itemReference['reference'];
+
+            /* Find it in the set of $items
+             */
+            foreach ($items as $item) {
+                if ($reference === $item['reference']) {
+                    $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
+                    $itemReference['title'] = $title;
+                }
+            }
+        }
+
+        unset($itemReference);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'reportPayloads' => json_encode($reportPayloads),
