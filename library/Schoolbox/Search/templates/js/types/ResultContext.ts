@@ -4,5 +4,12 @@
 export type ResultContext = {
     id: number;
     name: string;
-    url: string;
+    title: string;
+    codes: number[];
+    parent: {
+        id: number;
+    };
+    _links: {
+        view: string;
+    };
 };

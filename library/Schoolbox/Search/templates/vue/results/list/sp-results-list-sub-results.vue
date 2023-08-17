@@ -89,13 +89,26 @@ async function onLoadMoreSelected() {
     }
     await loadMore();
 }
+
+/**
+ * To determine whether the sub result is the last one
+ * @param {number} index - the index of the sub result
+ * @returns {boolean} - whether the sub result is the last one
+ */
+function isLast(index: number) {
+    if (!props.result._subResults) {
+        return false;
+    }
+    return index === props.result._subResults.data.length - 1;
+}
 </script>
 
 <template>
     <sp-results-list-sub-result
-        v-for="subResult in props.result._subResults?.data"
+        v-for="(subResult, index) in props.result._subResults?.data"
         :key="subResult.id"
         :sub-result="subResult"
+        :is-last="isLast(index)"
     />
     <div class="load-more-container">
         <loading-table v-if="isLoading" :rows="2" />
@@ -104,8 +117,4 @@ async function onLoadMoreSelected() {
     </div>
 </template>
 
-<style scoped>
-.load-more-container {
-    margin-left: 1rem;
-}
-</style>
+<style scoped></style>
