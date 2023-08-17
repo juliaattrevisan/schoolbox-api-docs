@@ -21,7 +21,7 @@
                     {% set roleId = userAccess.role.id %}
                     {% set roleName = userAccess.role.name %}
                     {% set readonly = userAccess.role.type == 'staff' ? 'readonly' : '' %}
-                    {% set campusHidden = 0 %}
+                    {% set campusHidden = userAccess.access == 0 %}
                     {% set campusChecked = userAccess.matchCampus ? 'checked="checked"' : '' %}
                     {% set alwaysReadOnly = userAccess.role.type == 'staff' ? 1 : 0 %}
                     {% set checkedComment = userAccess.role.type == 'staff' ? 'checked="checked"' : '' %}
