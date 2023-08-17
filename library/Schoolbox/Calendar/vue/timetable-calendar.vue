@@ -263,8 +263,12 @@ export default {
             console.info("onPopState x");
         };
 
-        console.info("Pushing ", this.selectedUserOption.formattedName, this.selectedUserOption.userId, " to history.");
-        window.history.pushState(this.getCopyOfSelectedUserOption(), "", window.location.href);
+        console.info(
+            "Initialise history by setting the current state to ",
+            this.selectedUserOption.formattedName,
+            this.selectedUserOption.userId
+        );
+        window.history.replaceState(this.getCopyOfSelectedUserOption(), "", window.location.href);
     },
 
     beforeDestroy() {
