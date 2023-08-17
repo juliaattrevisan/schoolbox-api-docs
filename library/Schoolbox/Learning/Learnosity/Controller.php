@@ -30,6 +30,12 @@ use Twig\Error\Error;
 class Controller extends Base
 {
     /**
+     * A prefix for each report id attr in the front end
+     */
+    private const REPORT_HORIZONTAL_MARKING_PREFIX = 'schoolbox-student-';
+
+
+    /**
      * Learnosity API instance is the same for everything afaict
      *
      * @var Api
@@ -757,7 +763,7 @@ class Controller extends Base
      */
     public function getHorizontalMarking(IAssessable $assessment, ?string $learnosityReference): void
     {
-        $reportIdentifierPrefix = 'schoolbox-student-';
+
 
         /* Get the quiz identifier
          */
@@ -784,7 +790,7 @@ class Controller extends Base
         $reportPayloads = [];
 
         foreach ($attempts as $attempt) {
-            $key = $reportIdentifierPrefix . $attempt->getUser()->getId();
+            $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
 
             if (!isset($users[$key]) && $attempt->isFinished()) {
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
