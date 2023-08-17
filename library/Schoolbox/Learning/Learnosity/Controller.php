@@ -763,8 +763,6 @@ class Controller extends Base
      */
     public function getHorizontalMarking(IAssessable $assessment, ?string $learnosityReference): void
     {
-
-
         /* Get the quiz identifier
          */
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
@@ -895,8 +893,6 @@ class Controller extends Base
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
-
-
 
 //
 //        /* If $learnosityReference was specified, load everyone's responses
