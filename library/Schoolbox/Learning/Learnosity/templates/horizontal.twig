@@ -36,7 +36,9 @@
 </div>
 
 <script>
-    let reportPayloads = {{ reportPayloads|raw }};
+    /* All the scores and comments that people got
+     */
+    let attemptScores = JSON.parse('{{ scores|raw }}');
 
     /* Remember how many reports were loaded
      *
@@ -46,8 +48,12 @@
      * have loaded, which we can compare with how many we expect to load
      * via reportPayloads|length.
      */
+    let reportPayloads = {{ reportPayloads|raw }};
     let reportsLoaded = 0;
     let reportsExpected = reportPayloads.length;
+
+    /* Lookups/indexes - a list of ids, and individualised report callbacks
+     */
     let reportIds = [];
     let reportCallbacks = [];
 
@@ -109,13 +115,11 @@
 
                             /* Student scoring and metadata
                              */
-                            // let score = attemptScores[learnosityReferenceTuple].score;
-                            // let maxScore = attemptScores[learnosityReferenceTuple].max;
+                            let score = attemptScores[learnosityReferenceTuple].score;
+                            let maxScore = attemptScores[learnosityReferenceTuple].max;
 
                             /* TODO remove by replace with actual values
                              */
-                            let score = Math.random();
-                            let maxScore = Math.random();
                             let attemptComments = [];
 
                             /* Containers into which we inject things

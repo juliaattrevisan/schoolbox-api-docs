@@ -851,23 +851,41 @@ class Controller extends Base
 
         unset($itemReference);
 
+        /* Obtain their scores from Learnosity
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => array_values($sessions)
+        ])['data'];
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+
+        foreach ($responses as $session) {
+            foreach ($session['responses'] as $response) {
+                $learnosityReference = $response['response_id'];
+
+                $scores[$learnosityReference] = [
+                    'score' => $response['score'],
+                    'max' => $response['max_score']
+                ];
+            }
+        }
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
             'users' => $users,
             'usersEncoded' => json_encode($users, JSON_THROW_ON_ERROR),
             'assessment' => $assessment,
-            'itemReferences' => $itemReferences
+            'itemReferences' => $itemReferences,
+            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
 
-//        /* Obtain their scores from Learnosity
-//         */
-//        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-//            'session_id' => array_values($sessions)
-//        ]);
-//
+
 
 //
 //        /* If $learnosityReference was specified, load everyone's responses
