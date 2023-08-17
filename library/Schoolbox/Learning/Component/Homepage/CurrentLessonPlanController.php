@@ -9,6 +9,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
@@ -60,6 +61,14 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         $lessonPlanMapper = LessonPlanMapper::getInstance();
         $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
+        /**
+         * Get all Courses for the homepage, so we can use these to hydrate the assessment specification later
+         */
+        $courses = CourseImplementationMapper::GetInstance()->findByFolderId($this->getContext()->getFolder()->getId())
+        ->indexByCallback(function (CourseImplementationModel $course) {
+            return $course->getSpecification()->getId();
+        });
+
         $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
 
         $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
@@ -68,10 +77,15 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
-        // hack to warm the db cache for courses, so when hydrating the assessments we actually get the course folder details (name)
-        $courses = CourseImplementationMapper::GetInstance()->findByFolderId($this->getContext()->getFolder()->getId());
         // hydrate those assessments
         $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]);
+        /** @var Assessment\LessonPlan\Model $lessonPlan **/
+        foreach ($this->visibleLessonPlans as $lessonPlan) {
+            /**
+             * Use the courses that exist in this homepage, and overwrite the incomplete course specification from the lesson plan
+             */
+            $lessonPlan->getContext()->getSpecification()->setCourse($courses->offsetGet($lessonPlan->getContext()->getSpecification()->getCourse()->getId())->getSpecification());
+        }
 
         return true;
     }
