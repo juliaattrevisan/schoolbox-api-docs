@@ -9,7 +9,7 @@ export default {
                 return {};
             },
         },
-        selectedUserOption: {
+        selectedOption: {
             type: Object,
             default() {
                 return {};
@@ -59,9 +59,7 @@ export default {
             <dl class="sub-nav">
                 <dd
                     v-for="userOption in options['userOptions']"
-                    :class="
-                        selectedUserOption !== null && userOption.userId === selectedUserOption.userId ? 'active' : ''
-                    "
+                    :class="selectedOption !== null && userOption.userId === selectedOption.userId ? 'active' : ''"
                 >
                     <a
                         :data-userId="userOption.userId"

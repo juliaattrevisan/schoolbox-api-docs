@@ -91,7 +91,7 @@ export default {
              */
             windowWidth: window.innerWidth,
 
-            selectedUserOption: null,
+            selectedOption: null,
         };
     },
 
@@ -252,7 +252,7 @@ export default {
         quickSwitchIcon.setAttribute("class", "adtp-btn icon-calendar no-text");
         document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
 
-        this.selectedUserOption = this.options["selectedUserOption"];
+        this.selectedOption = this.options["selectedUserOption"];
 
         window.onpopstate = (event) => {
             // NOTE: event.state will be null unless the state has been saved using window.history.pushState().
@@ -272,22 +272,22 @@ export default {
     methods: {
         /**
          * Return a copy of a userOption object.
-         * This is to avoid getting '' errors when trying to window.pushState with this.selectedUserOption.
+         * This is to avoid getting '' errors when trying to window.pushState with this.selectedOption.
          * @param {object} userOption - The object to copy.
          */
         getCopyOfSelectedUserOption(userOption) {
             return {
-                userId: this.selectedUserOption.userId,
-                firstCampusName: this.selectedUserOption.firstCampusName,
-                formattedName: this.selectedUserOption.formattedName,
-                yearLevel: this.selectedUserOption.yearLevel,
+                userId: this.selectedOption.userId,
+                firstCampusName: this.selectedOption.firstCampusName,
+                formattedName: this.selectedOption.formattedName,
+                yearLevel: this.selectedOption.yearLevel,
             };
         },
 
         /**
-         * @param {object} selectedUserOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
+         * @param {object} selectedOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
          */
-        changeUserAndReloadEvents(selectedUserOption, pushState) {
+        changeUserAndReloadEvents(selectedOption, pushState) {
             if (pushState === undefined) {
                 pushState = true;
             }
@@ -298,13 +298,13 @@ export default {
             }
 
             // Update state.
-            this.selectedUserOption = selectedUserOption;
-            this.config.userId = this.selectedUserOption.userId;
+            this.selectedOption = selectedOption;
+            this.config.userId = this.selectedOption.userId;
             this.reloadEvents();
 
             // Replace current state in history object with the new state.
             const oldUrl = window.location.href;
-            const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedUserOption.userId;
+            const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedOption.userId;
             window.history.replaceState(this.getCopyOfSelectedUserOption(), "", newUrl);
         },
 
@@ -868,20 +868,16 @@ export default {
 <template>
     <timetable-calendar-options
         :options="options"
-        :selected-user-option="selectedUserOption"
+        :selected-option="selectedOption"
         @option-selected="changeUserAndReloadEvents"
     />
     <div class="row">
         <div class="small-12 columns">
             <h1>
                 Timetable for
-                <span data-heading-user-fullname>{{
-                    selectedUserOption === null ? "" : selectedUserOption.formattedName
-                }}</span
+                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span
                 >,
-                <span data-heading-user-year>{{
-                    selectedUserOption === null ? "" : selectedUserOption.yearLevel
-                }}</span>
+                <span data-heading-user-year>{{ selectedOption === null ? "" : selectedOption.yearLevel }}</span>
             </h1>
         </div>
     </div>
