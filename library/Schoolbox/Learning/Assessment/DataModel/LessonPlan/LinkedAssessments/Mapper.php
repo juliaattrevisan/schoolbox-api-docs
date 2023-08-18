@@ -11,10 +11,15 @@ namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Model;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan as LessonPlanData;
 use Schoolbox\Learning\Assessment\DataModel\Model as DataModelModel;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 
 /**
@@ -96,10 +101,11 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param LessonPlanData\Model  $lessonPlan
-     * @param DataModelModel        $assessment
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @param LessonPlanModel $lessonPlan
+     * @param DataModelModel $assessment
+     * @return bool|int[]
+     * @throws Exception
+     * @throws Deleted
      */
     public function saveLink(LessonPlanData\Model $lessonPlan, DataModelModel $assessment)
     {
@@ -119,5 +125,25 @@ class Mapper extends \Schoolbox\Mapper
             // save if not already exists in the mapper
             return $this->save($planLink);
         }
+    }
+
+    /**
+     * @param Model          $lessonPlan
+     * @param DataModelModel $assessment
+     * @return int
+     * @throws Exception
+     * @throws Deleted
+     */
+    public function deleteLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment)
+    {
+        // find the ID of the lesson plan
+        $query = $this->getDatabase()->executeQuery("SELECT id FROM lesson_plan where assessment_id = :id", ['id' => $lessonPlan->getId()]);
+        $lessonPlanId = $query->fetchColumn();
+        return $this->deleteByColumnList(
+            [
+                'lesson_plan_id' => $lessonPlanId,
+                'assessment_id' => $assessment->getId()
+            ]
+        );
     }
 }

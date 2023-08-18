@@ -156,6 +156,11 @@ class Controller extends Assessment\Controller
 
     public function deleteActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
-        return;
+        $linkedAssessmentsMapper = Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::getInstance();
+        $return = $linkedAssessmentsMapper->deleteLink($assessment, $linkedAssessment);
+        if (0 === $return) {
+            throw new NotFound();
+        }
+        $this->response = $this->responseEmpty();
     }
 }
