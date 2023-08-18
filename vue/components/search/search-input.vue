@@ -138,17 +138,16 @@ function onMouseOut(event: MouseEvent) {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .c-search-input {
     display: flex;
 
-    &__field {
+    input[type="text"].c-search-input__field {
         border: 2px solid var(--form-border-color);
         background-color: var(--foreground-colour);
         color: var(--primary-text-colour);
         font-size: var(--base-font-size);
         height: var(--tabbar-height);
-        width: var(--tabbar-height);
         padding: var(--base-font-size);
         margin: 0;
         line-height: calc(var(--tabbar-height) / 2);

@@ -194,7 +194,6 @@ function formatPortrait(id: string) {
         :class="{ focus: isFocused }"
     >
         <search-input
-            :is-active="isActive"
             :is-active-when-empty="false"
             @input="onInput"
             @key-down="onArrowDown"
@@ -276,6 +275,6 @@ function formatPortrait(id: string) {
     </form>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "./header-search.scss";
 </style>
