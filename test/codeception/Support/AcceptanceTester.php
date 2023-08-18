@@ -139,7 +139,7 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Impersonate a user via modify screen
+     * Impersonate a user via modify screen by passing their title and fullname
      * @param $userId
      * @throws Exception
      */

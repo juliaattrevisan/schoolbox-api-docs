@@ -175,8 +175,7 @@ class HomepageInitialCest
         sleep(1);
         $i->click("a.icon-home");
         $home_page_url = $i->getCurrentUrl();
-        $i->impersonateViaModifyUserPage('Jana Reed');
-//        $i->impersonate("Ms Jana Reed");
+        $i->impersonateViaModifyUserPage('Ms Jana Reed');
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
         sleep(2);

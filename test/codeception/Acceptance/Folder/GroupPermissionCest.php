@@ -48,10 +48,10 @@ class GroupPermissionCest
         $folderName = "Group Free";
         $homepageTemplateOption = "Course";
 
-        $studentJunior = 'Eden Reed';
+        $studentJunior = 'Ms Eden Reed';
         $studentMiddle = 'Louisa Smith';
-        $studentSenior = 'Tim Reed';
-        $groupMember = 'Eloise White';
+        $studentSenior = 'Mr Tim Reed';
+        $groupMember = 'Ms Eloise White';
 
         $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
@@ -125,10 +125,10 @@ class GroupPermissionCest
         $folderName = "Group Moderated";
         $homepageTemplateOption = "Course";
 
-        $studentJunior = 'Eden Reed';
+        $studentJunior = 'Ms Eden Reed';
         $studentMiddle = 'Louisa Smith';
-        $studentSenior = 'Tim Reed';
-        $groupMember = 'Eloise White';
+        $studentSenior = 'Mr Tim Reed';
+        $groupMember = 'Ms Eloise White';
 
         $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
@@ -204,10 +204,10 @@ class GroupPermissionCest
         $folderName = "Group Restricted";
         $homepageTemplateOption = "Course";
 
-        $studentJunior = 'Eden Reed';
+        $studentJunior = 'Ms Eden Reed';
         $studentMiddle = 'Louisa Smith';
-        $studentSenior = 'Tim Reed';
-        $groupMember = 'Jana Reed';
+        $studentSenior = 'Mr Tim Reed';
+        $groupMember = 'Ms Jana Reed';
 
         $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
