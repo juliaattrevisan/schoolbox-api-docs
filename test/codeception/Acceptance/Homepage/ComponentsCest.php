@@ -40,7 +40,7 @@ class ComponentsCest
         $i->amGoingTo('Check the tabs present the proper numbers of components');
         $i->canSee('Information (7)');
         $i->canSee('Collaboration (10)');
-        $i->canSee('Learning (11)');
+        $i->canSee('Learning (12)');
         $i->canSee('Multimedia (9)');
         $i->canSee('Resources (4)');
         $i->canSee('Feeds (6)');
@@ -110,6 +110,8 @@ class ComponentsCest
         $i->canSee('Rubric Capabilities and Indicators');
         $homepage->checkComponentIcon('Schoolbox_Learning_Assessment_Task_Component_Homepage_Controller');
         $i->canSee('Tasks');
+        $homepage->checkComponentIcon('Schoolbox_Learning_Component_Homepage_CurrentLessonPlanController');
+        $i->canSee('Lesson Plan');
 
         $i->amGoingTo('Check the tab Multimedia presents the proper components');
         $homepage->clickComponentsTab($homepage::ELEMENT_COMPONENT_SECTION_MULTIMEDIA);
