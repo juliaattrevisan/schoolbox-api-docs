@@ -40,7 +40,7 @@ class Create extends Request
         $this->contextType = $contextType;
         $this->contextId   = $contextId;
 
-        $this->setReferer("/learning/{$contextType}s/{$contextId}/assessments/new?type==$assessableType");
+        $this->setReferer("/learning/{$contextType}s/{$contextId}/assessments/new?type=$assessableType");
 
         $this->initiateForm($assessableType);
 
@@ -70,6 +70,10 @@ class Create extends Request
         $this->setFormParam('markType', 1);
         $this->setFormParam('gradingScheme', 1);
         $this->setFormParam('resultset', 1);
+        $this->setFormParam('useRubric', 0);
+        // 6 - none
+        $this->setFormParam('capability-markType', 6);
+        $this->setFormParam('capability-gradingScheme', 1);
     }
 
 
