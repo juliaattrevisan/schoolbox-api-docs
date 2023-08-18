@@ -2,13 +2,16 @@
 <script type="text/javascript">
         $(function() {
             var $component = $('#component{{ component.instance.id }}');
-            $component.setupAssessmentComponentTot();
+            $component.setupAssessmentComponentTot({
+                emptySelector: '.empty-state',
+                contentSelector: '[data-component-content]',
+            });
         });
 </script>
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% if lessonPlans|length %}
-    <section>
-        <ul class="action-list">
+    <section data-component-content>
+        <ul class="action-list" data-task-list>
             {% for lesson in lessonPlans %}
                 {% set unit = lesson.baseContext %}
 
@@ -100,16 +103,15 @@
                 </li>
             {% endfor %}
         </ul>
+        <div class="component-action">
+            <section>
+                <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}" class="button">View All</a>
+            </section>
+        </div>
     </section>
-    <div class="component-action">
-        <section>
-            <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}" class="button">View All</a>
-        </section>
-    </div>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-lesson-plan"></i>
-        <p>You currently have no scheduled lesson plans available. You may wish to <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}">view all</a> lesson plans</p>
-    </div>
 {% endif %}
+<div class="empty-state" {% if lessonPlans|length %}hidden{% endif %}>
+    <i class="icon-lesson-plan"></i>
+    <p>You currently have no scheduled lesson plans available. You may wish to <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}">view all</a> lesson plans</p>
+</div>
 <div class="toast" data-alert></div>

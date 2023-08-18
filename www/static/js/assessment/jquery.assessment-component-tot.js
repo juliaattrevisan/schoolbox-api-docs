@@ -2,7 +2,12 @@
  * Event listeners for dropdowns used on some assessment-related components
  */
 (function ($) {
-    $.fn.setupAssessmentComponentTot = function () {
+    $.fn.setupAssessmentComponentTot = function (options) {
+        var defaults = {
+            emptySelector: false, // When all tasks are deleted, show this element - false to ignore
+            contentSelector: "[data-component-content]", // Content to hide when showing the empty selector
+        };
+        var settings = $.extend({}, defaults, options);
         var component = $(this);
 
         // Browser options: now based on component
@@ -78,7 +83,18 @@
                             });
 
                             $assessmentRow.fadeOut({
-                                done: $assessmentRow.remove,
+                                done: function () {
+                                    $assessmentRow.remove();
+
+                                    // When all activities are deleted, show the empty selector
+                                    if (settings.emptySelector) {
+                                        var $taskList = $assessmentRow.closest("[data-task-list]");
+                                        if ($taskList.find("[data-unit-assessment]").length === 0) {
+                                            component.find(settings.emptySelector).removeAttr("hidden");
+                                            component.find(settings.contentSelector).attr("hidden", true);
+                                        }
+                                    }
+                                },
                             });
                         })
                         .fail(function () {
