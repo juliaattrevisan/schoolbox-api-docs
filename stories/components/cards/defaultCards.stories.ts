@@ -250,3 +250,105 @@ export const ParentWithChildren: Story = {
         `,
     }),
 };
+
+/**
+ * To help distinguish groups of cards `c-card--alt-bkg` can be used to add alternating backgrounds.
+ */
+export const Grouped: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex-col">
+                <div class="c-card c-card--border-end">
+                    <div class="l-flex-row l-gap-s">
+                        <div class="c-img">
+                            <div class="c-img__wrapper">
+                                <div class="icon icon-calendar"></div>
+                            </div>
+                        </div>
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                            <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
+                            <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        </div>
+                        <nav class="c-nav-actions l-flex-row">
+                            <a class="icon-view no-text" href="" title="Hide"></a>
+                            <a class="icon-modify no-text" href="" title="Modify"></a>
+                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                        </nav>
+                    </div>
+                </div>
+                <div class="c-card c-card--alt-bkg c-card--border-end">
+                    <div class="l-flex-row l-gap-s">
+                        <div class="c-img">
+                            <div class="c-img__wrapper">
+                                <div class="icon icon-calendar"></div>
+                            </div>
+                        </div>
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                            <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
+                            <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        </div>
+                        <nav class="c-nav-actions l-flex-row">
+                            <a class="icon-view no-text" href="" title="Hide"></a>
+                            <a class="icon-modify no-text" href="" title="Modify"></a>
+                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                        </nav>
+                    </div>
+                </div>
+                <div class="c-card c-card--border-end">
+                    <div class="l-flex-row l-gap-s">
+                        <div class="c-img">
+                            <div class="c-img__wrapper">
+                                <div class="icon icon-calendar"></div>
+                            </div>
+                        </div>
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                            <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
+                            <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        </div>
+                        <nav class="c-nav-actions l-flex-row">
+                            <a class="icon-view no-text" href="" title="Hide"></a>
+                            <a class="icon-modify no-text" href="" title="Modify"></a>
+                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                        </nav>
+                    </div>
+                </div>
+                <div class="c-card c-card--alt-bkg c-card--border-end">
+                    <div class="l-flex-row l-gap-s">
+                        <div class="c-img">
+                            <div class="c-img__wrapper">
+                                <div class="icon icon-calendar"></div>
+                            </div>
+                        </div>
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                            <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
+                            <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        </div>
+                        <nav class="c-nav-actions l-flex-row">
+                            <a class="icon-view no-text" href="" title="Hide"></a>
+                            <a class="icon-modify no-text" href="" title="Modify"></a>
+                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                        </nav>
+                    </div>
+                </div>
+                <div class="c-card">
+                    <div class="l-flex-row l-gap-s">
+                        <div class="c-img">
+                            <div class="c-img__wrapper">
+                                <div class="icon icon-calendar"></div>
+                            </div>
+                        </div>
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                            <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
+                            <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
+                        </div>
+                        <nav class="c-nav-actions l-flex-row">
+                            <a class="icon-view no-text" href="" title="Hide"></a>
+                            <a class="icon-modify no-text" href="" title="Modify"></a>
+                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        `,
+    }),
+};
