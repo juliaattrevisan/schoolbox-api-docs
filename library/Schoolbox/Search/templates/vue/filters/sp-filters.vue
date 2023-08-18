@@ -34,7 +34,7 @@ async function onApplySelected() {
     <div class="filters l-flex-col l-gap-s l-flex__item--0-shrink f-no-margins">
         <h2 class="subheader">Filters</h2>
         <div class="c-card">
-            <div class="l-flex-col l-gap-s l-pad-m">
+            <div class="l-flex-col l-gap-s">
                 <sp-filter-date-range />
                 <!-- <sp-filter-creator /> -->
                 <!-- <sp-filter-types /> -->

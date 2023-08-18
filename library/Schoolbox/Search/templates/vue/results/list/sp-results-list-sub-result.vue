@@ -27,7 +27,7 @@ const dateFormatted = window.Vue.computed(() => {
 
 <template>
     <div :class="`c-card c-card--child ${!props.isLast ? `c-card--border-end` : ''}`">
-        <div class="l-flex-row l-gap-m">
+        <div class="l-flex-row l-gap-s">
             <div class="c-img c-img--xs">
                 <div class="c-img__wrapper">
                     <div :class="`icon icon-document`"></div>
