@@ -146,12 +146,12 @@ function onMouseOut(event: MouseEvent) {
         border: 2px solid var(--form-border-color);
         background-color: var(--foreground-colour);
         color: var(--primary-text-colour);
+        flex: 1;
         font-size: var(--base-font-size);
         height: var(--tabbar-height);
         padding: var(--base-font-size);
         margin: 0;
         line-height: calc(var(--tabbar-height) / 2);
-        width: 100%;
     }
 
     &__button {
