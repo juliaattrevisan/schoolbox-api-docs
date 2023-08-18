@@ -190,13 +190,12 @@ class Fixture
         $i->wait(2);
         $i->dontSee($notif);
         $i->amGoingTo('As Jana Reed, check notification is presented');
-        $i->impersonateViaModifyUserPage('Jana Reed');
+        $i->impersonateViaModifyUserPage('Ms Jana Reed');
         $i->amOnPage('/messages');
         $i->wait(2);
         $i->see($notif);
         $i->logout();
         $i->loginAsAdmin();
-//        $i->impersonateAnyUser('Schoolbox Admin');
     }
 
     /**
@@ -212,7 +211,7 @@ class Fixture
         $i->wait(2);
         $i->dontSee($notif);
         $i->amGoingTo('As Jana Reed, check notification is not presented');
-        $i->impersonateViaModifyUserPage('Jana Reed');
+        $i->impersonateViaModifyUserPage('Ms Jana Reed');
         $i->amOnPage('/messages');
         $i->wait(2);
         $i->dontSee($notif);

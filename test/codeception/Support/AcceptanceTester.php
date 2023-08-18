@@ -139,7 +139,7 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Impersonate a user via modify screen
+     * Impersonate a user via modify screen by passing their title and fullname
      * @param $userId
      * @throws Exception
      */
@@ -168,7 +168,7 @@ class AcceptanceTester extends Actor
         $i = $this;
         $i->click('button.icon-search.no-text');
         $i->fillField('input#search-field', $fullname);
-        $i->click('a.sb-card.sb-card--link');
+        $i->click($fullname);
         $i->waitForText($fullname, 5);
     }
 
