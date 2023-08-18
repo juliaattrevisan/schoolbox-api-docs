@@ -13,6 +13,9 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan as LessonPlanData;
+use Schoolbox\Learning\Assessment\DataModel\Model as DataModelModel;
+use Schoolbox\Mapper\Exception\NotFound;
 
 /**
  * Class Mapper
@@ -79,10 +82,9 @@ class Mapper extends \Schoolbox\Mapper
 
         foreach ($statement as $row) {
             if (!isset($lessonPlans[$row['lesson_plan_id']])) {
-
                 $lessonPlan = $this->hydrate($row);
                 $lessonPlan->setLessonPlan($this->hydrateJoin($row, 'lessonPlan', 'lessonPlan'));
-                $lessonPlan->setAssessment($this->hydrateJoin($row, 'assessmentModel', 'assessmentModel'));
+                $lessonPlan->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'assessmentModel'));
 
                 /* Stack it up
                  */
@@ -91,5 +93,31 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $this->createCollection(array_values($lessonPlans));
+    }
+
+    /**
+     * @param LessonPlanData\Model  $lessonPlan
+     * @param DataModelModel        $assessment
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function saveLink(LessonPlanData\Model $lessonPlan, DataModelModel $assessment)
+    {
+        // find the ID of the lesson plan
+        try {
+            $planLink = $this->findOneByColumnList(
+                [
+                    'lesson_plan_id' => $lessonPlan->getId(),
+                    'assessment_id' => $assessment->getId()
+                ]
+            );
+            return false;
+        } catch (NotFound $e) {
+            $planLink = $this->createModel()
+                ->setLessonPlanId($lessonPlan->getId())
+                ->setAssessmentId($assessment->getId());
+            // save if not already exists in the mapper
+            return $this->save($planLink);
+        }
     }
 }

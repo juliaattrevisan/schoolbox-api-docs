@@ -11,6 +11,8 @@ namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanData;
+use Schoolbox\Learning\Assessment\DataModel\Model as DataModel;
 
 class Model
 {
@@ -21,7 +23,7 @@ class Model
     /**
      * Lesson Plan
      */
-    private  $lessonPlan;
+    private LessonPlanData|LessonPlanModel $lessonPlan;
 
     /**
      * Linked Assessment ID
@@ -31,10 +33,11 @@ class Model
     /**
      * Linked Assessment
      */
-    private IAssessable $assessment;
+    private DataModel|IAssessable $assessment;
 
     /**
      * @param int $lessonPlanId
+     * @return Model
      */
     public function setLessonPlanId(int $lessonPlanId): self
     {
@@ -51,17 +54,18 @@ class Model
     }
 
     /**
-     * @return LessonPlanModel
+     * @return LessonPlanData|LessonPlanModel
      */
-    public function getLessonPlan(): LessonPlanModel
+    public function getLessonPlan(): LessonPlanData|LessonPlanModel
     {
         return $this->lessonPlan;
     }
 
     /**
-     * @param $lessonPlan
+     * @param LessonPlanData|LessonPlanModel $lessonPlan
+     * @return Model
      */
-    public function setLessonPlan( $lessonPlan): self
+    public function setLessonPlan(LessonPlanData|LessonPlanModel $lessonPlan): self
     {
         $this->lessonPlanId = $lessonPlan->getId();
         $this->lessonPlan = $lessonPlan;
@@ -70,6 +74,7 @@ class Model
 
     /**
      * @param int $assessmentId
+     * @return Model
      */
     public function setAssessmentId(int $assessmentId): self
     {
@@ -86,17 +91,18 @@ class Model
     }
 
     /**
-     * @return IAssessable
+     * @return DataModel|IAssessable
      */
-    public function getAssessmentModel(): IAssessable
+    public function getAssessmentModel(): DataModel|IAssessable
     {
         return $this->assessment;
     }
 
     /**
-     * @param IAssessable $assessment
+     * @param DataModel|IAssessable $assessment
+     * @return Model
      */
-    public function setAssessmentModel(IAssessable $assessment): self
+    public function setAssessmentModel(DataModel|IAssessable $assessment): self
     {
         $this->assessmentId = $assessment->getId();
         $this->assessment = $assessment;

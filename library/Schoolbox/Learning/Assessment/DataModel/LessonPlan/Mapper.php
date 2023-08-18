@@ -119,14 +119,12 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('updatedBy', 'updatedBy')},
                 {$this->getJoinColumnString('deletedBy', 'deletedBy')},
                 {$this->getJoinColumnString('lessonPlanField', 'lessonPlanField')},
-                {$this->getJoinColumnString('assessmentModel', 'assessmentModel')},
                 {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
             LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy', true)}
-            LEFT JOIN {$this->getJoinSql('lessonPlanField', '', 'lessonPlanField')}
             LEFT JOIN {$this->getJoinSql('lessonPlanField', '', 'lessonPlanField')}
         ";
 
@@ -232,16 +230,6 @@ class Mapper extends \Schoolbox\Mapper
         /* TODO This might not work once we delink joins
          */
         $this->cascadeJoin('lessonPlanField', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getFields());
-    }
-
-    /**
-     * Persist Lesson Plan attachments
-     *
-     * @param Model $lessonPlan
-     */
-    public function saveLinkedAssessments(Model $lessonPlan): void
-    {
-        $this->cascadeJoin('lesson_plan_assessment', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getLinkedAssessments());
     }
 
     /**
