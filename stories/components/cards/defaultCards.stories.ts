@@ -28,7 +28,7 @@ export const Standard: Story = {
     render: () => ({
         template: `
             <div class="c-card">
-                <div class="l-flex-row l-gap-s">
+                <div class="l-flex-row l-flex--wrap l-gap-s">
                     <div class="c-img c-img--l">
                         <div class="c-img__wrapper">
                             <img src="/news.jpg" alt="Band playing music" />

@@ -15,6 +15,11 @@
 .l-flex {
     display: flex;
 
+    // prevent flex items from overflowing the container
+    > * {
+        max-width: 100%;
+    }
+
     &-col,
     &-row {
         display: flex;
