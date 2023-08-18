@@ -12,11 +12,14 @@
     &.focus {
         width: 100%;
         padding-left: calc(var(--tabbar-icon-width) * 2);
+        .c-search-input {
+            grid-template-columns: 1fr 5rem;
+        }
         .c-search-input__field {
-            display: block;
+            opacity: 1;
         }
         .c-search-input__button {
-            background-color: (--navigation-background);
+            background-color: var(--navigation-hover);
         }
         ::placeholder {
             color: black;
@@ -25,11 +28,13 @@
     }
 
     .c-search-input {
+        grid-template-columns: 0 5rem;
         &__field {
-            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-out;
         }
         &__button {
-            background: none;
+            background-color: var(--navigation-background);
         }
     }
 

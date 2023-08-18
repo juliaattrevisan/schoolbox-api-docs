@@ -140,13 +140,13 @@ function onMouseOut(event: MouseEvent) {
 
 <style lang="scss">
 .c-search-input {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 5rem;
 
     input[type="text"].c-search-input__field {
         border: 2px solid var(--form-border-color);
         background-color: var(--foreground-colour);
         color: var(--primary-text-colour);
-        flex: 1;
         font-size: var(--base-font-size);
         height: var(--tabbar-height);
         padding: var(--base-font-size);
@@ -162,7 +162,6 @@ function onMouseOut(event: MouseEvent) {
         justify-content: center;
         margin: 0;
         padding: 0;
-        width: 5rem;
         &:before {
             transition: all 0.2s ease-in;
             color: var(--content-ui-submit-foreground);
