@@ -1,32 +1,35 @@
 <script>
 export default {
-    name: "timetable-calendar-options",
+    name: "TimetableCalendarOptions",
+
+    props: {
+        options: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
+        selectedUserOption: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
+    },
 
     emits: ["optionSelected"],
 
     data() {
-        return {
-            selectedUserOption: null,
-        };
+        return {};
     },
 
-    props: {
-        options: Object,
-    },
-
-    mounted() {
-        this.selectedUserOption = this.options["selectedUserOption"];
-    },
+    mounted() {},
 
     methods: {
-        setSelectedUserOption(userOption) {
-            this.selectedUserOption = userOption;
-        },
-
         /**
          * When a button is clicked:
          *  - Ignore the click if the button is already in the active state
-         *  - Update this.selectedUserOption and let Vue update the button states
+         *  - Find the userOption that matches the newly selected userId.
          *  - Emit an event to inform timetable-calendar of the new selected option.
          * @param {object} ev - The click event.
          */
@@ -42,11 +45,9 @@ export default {
 
             for (const userOption of this.options["userOptions"]) {
                 if (userOption.userId === selectedUserId) {
-                    this.selectedUserOption = userOption;
+                    this.$emit("optionSelected", userOption);
                 }
             }
-
-            this.$emit("optionSelected", this.selectedUserOption);
         },
     },
 };
