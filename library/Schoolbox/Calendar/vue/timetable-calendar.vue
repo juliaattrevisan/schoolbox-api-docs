@@ -255,19 +255,13 @@ export default {
         this.selectedUserOption = this.options["selectedUserOption"];
 
         window.onpopstate = (event) => {
-            console.info("onPopState e");
             // NOTE: event.state will be null unless the state has been saved using window.history.pushState().
             if (event.state !== null) {
                 this.changeUserAndReloadEvents(event.state, false);
             }
-            console.info("onPopState x");
         };
 
-        console.info(
-            "Initialise history by setting the current state to ",
-            this.selectedUserOption.formattedName,
-            this.selectedUserOption.userId
-        );
+        // Initialise history by setting the current state.
         window.history.replaceState(this.getCopyOfSelectedUserOption(), "", window.location.href);
     },
 
@@ -300,12 +294,6 @@ export default {
 
             if (pushState) {
                 // Push current state to history.
-                console.info(
-                    "Pushing ",
-                    this.selectedUserOption.formattedName,
-                    this.selectedUserOption.userId,
-                    " to history."
-                );
                 window.history.pushState(this.getCopyOfSelectedUserOption(), "", window.location.href);
             }
 
@@ -317,12 +305,6 @@ export default {
             // Replace current state in history object with the new state.
             const oldUrl = window.location.href;
             const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedUserOption.userId;
-            console.info(
-                "Replacing current state with ",
-                this.selectedUserOption.formattedName,
-                this.selectedUserOption.userId,
-                "."
-            );
             window.history.replaceState(this.getCopyOfSelectedUserOption(), "", newUrl);
         },
 
