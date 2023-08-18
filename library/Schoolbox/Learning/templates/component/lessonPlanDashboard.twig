@@ -1,3 +1,4 @@
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="action-list">
     {% for lesson in lessonPlans %}
         <li>
@@ -5,13 +6,24 @@
                 <h3>
                     <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
                 </h3>
-                <p>
-                    <a href="/homepage/{{ lesson.context.folder.id }}">{{ lesson.context.folder.title }}</a>
+                <p class="meta">
+                    {# Same as upcomingAssessments.twig but without assessment type name #}
+                    {% if lesson.context is project %}
+                        <a href="/homepage/{{ lesson.context.context.folder.id }}">{{ lesson.context.context.folder.title }}</a> >
+                        <a href="/homepage/{{ lesson.context.context.folder.id }}">{{ lesson.context.context.title }}</a> >
+                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.context.id, studentId: USER.id}) }}">
+                        {{ lesson.context.title }}</a>
+                    {% elseif lesson.context is unitImplementation %}
+                        <a href="/homepage/{{ lesson.context.folder.id }}">{{ lesson.context.folder.title }}</a> >
+                        <a href="/homepage/{{ lesson.context.folder.id }}">{{ lesson.context.title }}</a>
+                    {% else %}
+                        <a href="/homepage/{{ lesson.context.id }}">{{ lesson.context.title }}</a>
+                    {% endif %}
                 </p>
                 <p class="meta">
-                    <span title="{{ lesson.dueAt.local }}">
-                        Scheduled <time datetime="{{ lesson.dueAt.json }}">{{ lesson.dueAt.getRelativeDay }} </time>
-                    </span>
+                    <p class="meta">
+                        {{ dueDate.forAssessment(lesson) }}
+                    </p>
                 </p>
             </div>
         </li>
