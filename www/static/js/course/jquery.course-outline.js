@@ -4,17 +4,11 @@
 (function ($) {
     $.fn.setupCourseOutline = function (options) {
         var defaults = {
-            course_homepage: "",
             readonly: false,
             previewSelector: "[data-plugin=preview]",
         };
         var settings = $.extend({}, defaults, options);
         var component = $(this);
-        var browser = $("#resource-browser");
-
-        // Browser options: now based on component
-        var component_id = component.attr("id");
-        var destination = "#" + component_id + ' input[name="homepage"]';
 
         // Expand/collapse of units
         component.on("click.courseInstance", 'a[data-interaction="toggle-expanded"]', function (event) {
@@ -42,85 +36,6 @@
                 .find(":submit")
                 .prop("disabled", title.length === 0);
         });
-
-        // Student updating progress or clicking task name
-        component.on("click.courseInstance", 'a[data-interaction="update_progress"]', function (event) {
-            event.preventDefault();
-
-            var taskRow = $(this).closest("[data-unit-assessment]");
-            var taskId = taskRow.data("unit_task_id");
-
-            $.ajax({ type: "post", url: this.href, dataType: "json" }).done(function (data) {
-                switch (data.type) {
-                    case "redirect":
-                        window.location.href = data.fragment;
-                        break;
-                    case "none":
-                    default:
-                        // Maybe just reload the component?
-                        var component = $(data.fragment);
-                        taskRow.empty().append(component.find('[data-unit-assessment="' + taskId + '"]').children());
-                        // Reapply preview
-                        taskRow.find(settings.previewSelector).preview();
-                        break;
-                }
-            });
-        });
-
-        // Create/edit task form submission
-        // Bind to the document and filter on component ID manually,
-        // because the form is no longer a child of the component
-        $(document).on(
-            "submit.courseInstance",
-            'form[data-form_type="task"][data-component="' + component_id + '"]',
-            function (event) {
-                var form = $(this);
-                event.preventDefault();
-
-                var label = form.find("[data-create-task-indicator]");
-
-                label.toastActivate();
-
-                // Is this a new form?
-                var is_new = !form.find('input[name="id"]').val();
-
-                $(this).find("input[type=submit]").attr("disabled", true);
-
-                $.post(
-                    form.attr("action"),
-                    form.serialize(),
-                    function (data) {
-                        label.toastTimeout({
-                            text: "Saved",
-                            css: "success",
-                        });
-
-                        // Do validation stuff here eventually.
-                        if (is_new) {
-                            form.get(0).reset();
-                        }
-
-                        $(document).foundation("reveal", "close");
-                        postCallback(form, data);
-                    },
-                    "json"
-                );
-            }
-        );
-
-        /**
-         * Callback that gets called when the list of tasks changes - it reloads
-         * the contents of the component.
-         *
-         * @param form The form that was submitted
-         * @param data Object returned by JSON call. The "html" key contains
-         *             the contents of this component.
-         */
-        var postCallback = function (form, data) {
-            //var container = form.closest('[data-form-container]');
-            //container.addClass('hide');
-            reloadTaskList(data);
-        };
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function (data) {

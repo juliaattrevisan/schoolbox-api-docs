@@ -7,7 +7,6 @@
                 socialstreamSession = { categoryId: '{{ courseSpecification.folder.id ?? '' }}' };
 
             $component.setupCourseOutline({
-                course_homepage: '{{ course.folder.id ?? '' }}',
                 readonly:        {{ readOnly ? 'true' : 'false' }},
                 previewSelector: '[data-plugin=preview]'
             });
