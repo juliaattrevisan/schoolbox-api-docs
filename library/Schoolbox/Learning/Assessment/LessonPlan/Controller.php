@@ -148,10 +148,12 @@ class Controller extends Assessment\Controller
 
     public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
-        $newLink = $assessment->setLinkedAssessments($assessment->getLinkedAssessments()->add($linkedAssessment));
-        $this->getAssessmentMapper()->save($newLink, $this->getUser());
-
-        $this->response = $this->responseAsJson($newLink->getLinkedAssessments());
+        $linkedAssessmentsMapper = Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::getInstance();
+        if ($linkedAssessmentsMapper->saveLink($assessment, $linkedAssessment)) {
+            $this->response = $this->responseAsJson($assessment->getLinkedAssessments());
+        } else {
+            $this->response = $this->responseAsJson("Link already Exists");
+        }
     }
 
     public function deleteActivity(Model $assessment, IAssessable $linkedAssessment): void

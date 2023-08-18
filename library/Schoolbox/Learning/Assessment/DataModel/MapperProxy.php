@@ -1335,7 +1335,7 @@ class MapperProxy
             $lessonPlanMapper->saveFiles($subObject);
             $linkedAssessmentMapper = LessonPlan\LinkedAssessments\Mapper::getInstance();
             foreach ($subObject->getLinkedAssessments() as $linkedAssessment) {
-                $linkedAssessmentMapper->saveLink($subObject, $linkedAssessment);
+                $linkedAssessmentMapper->persistLink($subObject, $linkedAssessment);
             }
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);

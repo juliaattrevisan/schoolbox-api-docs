@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments;
 
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanData;
 use Schoolbox\Learning\Assessment\DataModel\Model as DataModel;
 
@@ -23,7 +22,7 @@ class Model
     /**
      * Lesson Plan
      */
-    private LessonPlanData|LessonPlanModel $lessonPlan;
+    private LessonPlanData $lessonPlan;
 
     /**
      * Linked Assessment ID
@@ -54,18 +53,18 @@ class Model
     }
 
     /**
-     * @return LessonPlanData|LessonPlanModel
+     * @return LessonPlanData
      */
-    public function getLessonPlan(): LessonPlanData|LessonPlanModel
+    public function getLessonPlan(): LessonPlanData
     {
         return $this->lessonPlan;
     }
 
     /**
-     * @param LessonPlanData|LessonPlanModel $lessonPlan
+     * @param LessonPlanData $lessonPlan
      * @return Model
      */
-    public function setLessonPlan(LessonPlanData|LessonPlanModel $lessonPlan): self
+    public function setLessonPlan(LessonPlanData $lessonPlan): self
     {
         $this->lessonPlanId = $lessonPlan->getId();
         $this->lessonPlan = $lessonPlan;

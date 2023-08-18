@@ -107,7 +107,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws Exception
      * @throws Deleted
      */
-    public function saveLink(LessonPlanData\Model $lessonPlan, DataModelModel $assessment)
+    public function persistLink(LessonPlanData\Model $lessonPlan, DataModelModel $assessment)
     {
         // find the ID of the lesson plan
         try {
@@ -128,13 +128,46 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
+     * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
+     * @param IAssessable $assessment
+     * @return bool|int[]
+     * @throws Exception
+     * @throws Deleted
+     */
+    public function saveLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment)
+    {
+        // find the ID of the lesson plan
+        $query = $this->getDatabase()->executeQuery("SELECT id FROM lesson_plan where assessment_id = :id", ['id' => $lessonPlan->getId()]);
+        $lessonPlanId = $query->fetchColumn();
+        try {
+            $planLink = $this->findOneByColumnList(
+                [
+                    'lesson_plan_id' => $lessonPlanId,
+                    'assessment_id' => $assessment->getId()
+                ]
+            );
+            return false;
+        } catch (NotFound $e) {
+            // save if not already exists in the mapper
+            $this->getDatabase()->executeQuery(
+                "INSERT INTO lesson_plan_assessment (lesson_plan_id, assessment_id) VALUES (:lessonPlanId, :assessmentId)",
+                [
+                    'lessonPlanId' => $lessonPlanId,
+                    'assessmentId' => $assessment->getId()
+                ]
+            );
+            return true;
+        }
+    }
+
+    /**
      * @param Model          $lessonPlan
      * @param DataModelModel $assessment
      * @return int
      * @throws Exception
      * @throws Deleted
      */
-    public function deleteLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment)
+    public function deleteLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment): int
     {
         // find the ID of the lesson plan
         $query = $this->getDatabase()->executeQuery("SELECT id FROM lesson_plan where assessment_id = :id", ['id' => $lessonPlan->getId()]);
