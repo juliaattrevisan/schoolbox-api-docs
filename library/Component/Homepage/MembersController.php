@@ -49,7 +49,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         // Get collection of members
         $userMapper = UserMapper::getInstance();
-        if ($this->getContext()->getInherit()) {
+
+        $isInherited = $this->getContext()->getInherit();
+        if ($isInherited) {
             // Find nearest nian folder
             $folderMapper = FolderMapper::getInstance();
             $nianFolder   = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
@@ -73,6 +75,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         if (count($userList) === 0) {
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
+            $this->setBlock('empty_state', 'empty_class_inherited', 'empty_class_inherited_block');
             $this->setBlock('empty_state', 'empty_not_group_members', 'empty_not_group_members_block');
             $this->setBlock('empty_state', 'empty_not_group_managers', 'empty_not_group_managers_block');
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
@@ -83,6 +86,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 [
                     'has_members_block'              => '',
                     'empty_class_block'              => '',
+                    'empty_class_inherited_block'    => '',
                     'empty_not_group_members_block'  => '',
                     'empty_not_group_managers_block' => '',
                     'empty_members_block'            => '',
@@ -92,23 +96,37 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     'COMPONENT_ICON'                 => 'group',
                     'ALT_COMPONENT'                  => 'class list',
                     'FOLDER_ID'                      => $this->getSource()
-                                                             ->getFolder()
-                                                             ->getId(),
+                        ->getFolder()
+                        ->getId(),
                 ]
             );
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getInherit()) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 return false;
-            } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
+            }
+
+            $targetFolder = $this->getContext();
+
+            // If this folder is being inherited, we want to use the nian folder to determine which block to show instead
+            if ($isInherited) {
+                $folderMapper = FolderMapper::getInstance();
+                $targetFolder = $folderMapper->findById($nianFolder->getId()); // nian only guarantees an ID, so we need the hydrated folder
+            }
+
+            if ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
+            } elseif ($isInherited && $targetFolder->getCodes()->count()) {
+                $block = 'empty_class_inherited';
             } else {
                 $params = [
-                    'folderId' => $this->getContext()->getId(),
-                    'folder'   => $this->getContext(),
+                    'folderId' => $targetFolder->getId(),
+                    'folder'   => $targetFolder,
                 ];
+
                 if ($this->getAuthorizer()->isPathAuthorizedForUser('group.getModify', $params, $this->getUser())) {
                     $this->setVar('MANAGE_GROUP_LINK', $this->getRouteGenerator()->generate('group.getModify', $params));
-                    if (!$this->getSource()->getFolder()->isGroup()) {
+
+                    if (!$this->getSource()->getFolder()->isGroup() && !$isInherited) {
                         $block = 'empty_not_group_members';
                     } else {
                         $block = 'empty_members';
