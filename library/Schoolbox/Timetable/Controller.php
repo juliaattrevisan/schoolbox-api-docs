@@ -66,9 +66,18 @@ class Controller extends Base
         ) {
             // Redirect to the timetable of the logged-in user's first child.
             // (Parents do not need to see their own timetable - clarified in Jira comments for SA-16065).
-            // TODO: Find the preferred way to redirect.
             echo "Must redirect here to timetable for {$userOptions[0]['userId']}\n";
             die;
+            // TODO: Use method similar to below.
+//            $this->response = $this->redirectFound(
+//                $this->routeGenerator->generate(
+//                    'customMeridenPastoral.index',
+//                    [
+//                        'id'   => $student->getId(),
+//                        'year' => min($lastReportYear, $currentYear)
+//                    ]
+//                )
+//            );
         }
 
         // The selected user is the $requestedUser.

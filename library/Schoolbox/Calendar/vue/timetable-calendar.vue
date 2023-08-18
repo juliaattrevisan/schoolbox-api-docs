@@ -313,7 +313,7 @@ export default {
             this.selectedUserOption = selectedUserOption;
             this.config.userId = this.selectedUserOption.userId;
             this.reloadEvents();
-            this.$refs.tco.setSelectedUserOption(this.selectedUserOption); // TODO: Not sure if it is necessary to use $refs here.
+            this.$refs.tco.setSelectedUserOption(this.selectedUserOption); // TODO: Use prop instead of data in child component to avoid having to use $refs.
 
             // Replace current state in history object with the new state.
             const oldUrl = window.location.href;
