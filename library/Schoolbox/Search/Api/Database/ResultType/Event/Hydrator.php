@@ -93,7 +93,7 @@ class Hydrator extends BaseHydrator
                     $match->relevance,
                     $event->getStartTime(),
                     // TODO: is this correct?
-                    $event->getCategoryCollection()?->first() ? $folders->offsetGet($event->getCategoryCollection()?->first()->getCategoryId()) : null,
+                    $event->getCategoryCollection()?->first() ? $folders->offsetGet($event->getCategoryCollection()->first()->getCategoryId()) : null,
                     null,
                     null,
                     self::BASE_TYPE,
