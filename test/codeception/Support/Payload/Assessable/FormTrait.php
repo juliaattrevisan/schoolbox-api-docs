@@ -58,11 +58,15 @@ trait FormTrait
             $this->setFormParam('self_reviewable', '');
         }
         $this->setFormParam('visibility', '');
-        $this->setFormParam('markType', '');
+        $this->setFormParam('markType', 1);
         $this->setFormParam('maxMark', '');
-        $this->setFormParam('gradingScheme', '');
+        $this->setFormParam('gradingScheme', 1);
         $this->setFormParam('resultset', '');
         $this->setFormParam('formField', 'rb');
+        $this->setFormParam('useRubric', 0);
+        // 6 - none
+        $this->setFormParam('capability-markType', 6);
+        $this->setFormParam('capability-gradingScheme', 1);
 
         foreach ([0, 1] as $index) {
             $this->setRubricLevel($index, null, '');
