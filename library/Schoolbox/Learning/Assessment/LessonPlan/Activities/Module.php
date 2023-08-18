@@ -115,10 +115,6 @@ class Module extends BaseModule
 
         // Get all activities contained within a course
         $this->register('GET', '/course/{id}', 'getCourse', $perms, $preloadCourseSpec);
-        // routes for lesson plan specifically
-        $this->register('GET', '/{lessonPlanId}', 'getLink', $perms, $preloadLessonPlan);
-        $this->register('POST', '/{lessonPlanId}', 'createLink', $perms, $preloadLessonPlan);
-        $this->register('DELETE', '/{lessonPlanId}/{activity}', 'deleteLink', $perms, $preloadLessonPlan);
         // get lessonplans for homepage
         $this->register('GET', '/class/{folderId:\d+}', 'getHomepage', $permsAll, $preloadFolder);
         $this->register('GET', '/class/{folderId:\d+}/component/{componentId:\d+}', 'getHomepageComponent', $permsAll, $preloadFolder);
