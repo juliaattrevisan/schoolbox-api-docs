@@ -107,7 +107,7 @@ class SearchNewsCest
             'keyword' => $title,
             'filter'  => [
                 'types' => ['news'],
-                'date' => [
+                'date'  => [
                     'from' => '2010-01-30T21:00:00Z',
                 ],
             ],
@@ -117,8 +117,8 @@ class SearchNewsCest
             'keyword' => $title,
             'filter'  => [
                 'types' => ['news'],
-                'date' => [
-                    'to' => '2023-01-30T21:00:00Z',
+                'date'  => [
+                    'to' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
                 ],
             ],
             'valid'   => true,
@@ -126,7 +126,7 @@ class SearchNewsCest
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types' => ['news'],
+                'types'   => ['news'],
                 'creator' => [
                     'id' => $this->article->getAuthor()->getId(),
                 ],

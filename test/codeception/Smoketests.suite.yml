@@ -4,7 +4,7 @@ modules:
     - Tests\Support\Helper\Integration:
         depends: PhpBrowser
         url: 'https://vagrant.dev.schoolbox.cloud'
-        xdebug: false
+        xdebug: true
         curl:
           CURLOPT_SSL_VERIFYPEER: false
     - Db:

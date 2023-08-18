@@ -620,7 +620,7 @@ class Api extends \Codeception\Module
      * @return Event
      * @throws MapperException
      */
-    public function createEvent(\Schoolbox\User $owner, int $accessLevel, int $attendance, bool $showAttendance): Event
+    public function createEvent(\Schoolbox\User $owner, int $accessLevel, int $attendance, bool $showAttendance, ?Folder $folder): Event
     {
         $event = $this->eventMapper->createModel();
         $event->setTitle($this->generateText(50))
@@ -634,6 +634,9 @@ class Api extends \Codeception\Module
               ->setType($this->eventTypeMapper->findAll()->first())
               ->setStartDateTime(\Alaress_Date_Format::now()->addDays(1))
               ->setEndDateTime(\Alaress_Date_Format::now()->addDays(1)->addHours(1));
+        if ($folder) {
+            $event->setFolderCollection($this->folderMapper->createCollection([$folder]));
+        }
         $this->eventMapper->save($event);
         return $event;
     }

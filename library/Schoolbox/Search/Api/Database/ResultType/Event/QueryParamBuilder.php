@@ -8,7 +8,9 @@
 declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Event;
+
 use Alaress\Database\Quoter\IQuoter;
+use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
 class QueryParamBuilder extends BaseQueryParamBuilder
@@ -33,17 +35,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'e.deleted_at IS NULL',
             'f.deleted_at IS NULL',
         ];
-        $params = [
-            'eventNow' => \Alaress_Date_Format::now()->getDatabase(),
+        $params     = [
+            'eventNow' => Alaress_Date_Format::now()->getDatabase(),
         ];
 
-        $keywordSearchParts = [
+        $keywordSearchParts         = [
             'e.title LIKE :eventKeywordLike',
             'e.detail LIKE :eventKeywordLike',
             'e.location LIKE :eventKeywordLike',
         ];
         $params['eventKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
-        $whereParts[]              = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $whereParts[]               = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
             'where'  => $whereParts,
             'params' => $params,
