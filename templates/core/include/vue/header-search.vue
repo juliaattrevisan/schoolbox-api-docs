@@ -208,7 +208,7 @@ function formatPortrait(id: string) {
         <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
             <div class="l-flex-col">
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
-                    <div class="l-pad-s">
+                    <div class="l-pad-m">
                         <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                     </div>
                 </div>

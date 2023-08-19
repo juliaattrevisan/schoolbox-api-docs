@@ -59,8 +59,8 @@ const dateFormatted = window.Vue.computed(() => {
 <template>
     <div ref="resultEl" class="l-flex-col">
         <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`" data-test-sp-results-list-result>
-            <div class="l-flex-row l-flex--align-center l-gap-s">
-                <div :class="`c-img c-img--s ${isImgRounded ? 'c-img--round' : ''} l-pad-s`">
+            <div class="l-flex-row l-flex--align-center l-gap-m">
+                <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''}`">
                     <div class="c-img__wrapper">
                         <img
                             v-if="props.result.image"

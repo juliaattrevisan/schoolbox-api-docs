@@ -31,10 +31,10 @@ async function onApplySelected() {
 </script>
 
 <template>
-    <div class="filters l-flex-col l-gap-s l-flex__item--0-shrink f-no-margins">
+    <div class="c-filters l-flex-col l-gap-s l-flex__item--0-shrink f-no-margins">
         <h2 class="subheader">Filters</h2>
-        <div class="c-card">
-            <div class="l-flex-col l-gap-s">
+        <div class="c-filters__container">
+            <div class="l-flex-col l-gap-m">
                 <sp-filter-date-range />
                 <!-- <sp-filter-creator /> -->
                 <!-- <sp-filter-types /> -->
@@ -46,7 +46,10 @@ async function onApplySelected() {
 </template>
 
 <style lang="scss" scoped>
-.filters {
+c-filters {
     width: 500px;
+    &__container {
+        background-color: var(--foreground-colour);
+    }
 }
 </style>

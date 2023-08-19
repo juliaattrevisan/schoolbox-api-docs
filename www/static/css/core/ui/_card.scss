@@ -7,7 +7,7 @@
     // Control radius from custom property
     border-radius: var(--roundness-cards);
     line-height: var(--base-line-height);
-    padding: var(--whitespace-s);
+    padding: var(--whitespace-m);
     position: relative;
     text-align: start;
 
@@ -38,7 +38,7 @@
     &--child {
         background-color: #f6f6f6;
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
-        padding: var(--whitespace-xs);
+        padding: var(--whitespace-s);
     }
 
     // When we want the whole card to be selectable
