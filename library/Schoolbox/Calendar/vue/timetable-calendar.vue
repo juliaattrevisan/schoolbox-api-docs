@@ -255,7 +255,7 @@ export default {
         this.selectedOption = this.options["selectedUserOption"];
 
         window.onpopstate = (event) => {
-            // NOTE: event.state will be null unless the state has been saved using window.history.pushState().
+            // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
             if (event.state !== null) {
                 this.changeUserAndReloadEvents(event.state, false);
             }
@@ -272,7 +272,7 @@ export default {
     methods: {
         /**
          * Return a copy of a userOption object.
-         * This is to avoid getting '' errors when trying to window.pushState with this.selectedOption.
+         * This is to avoid getting 'Proxy object could not be cloned' errors when trying to window.pushState(this.selectedOption).
          * @param {object} userOption - The object to copy.
          */
         getCopyOfSelectedUserOption(userOption) {
