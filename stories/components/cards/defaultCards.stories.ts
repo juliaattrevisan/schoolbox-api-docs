@@ -47,7 +47,7 @@ export const Standard: Story = {
                     </div>
                     <article>
                         <p>Come and see why Schoolbox is more than a school.&nbsp;&nbsp;You can find out more about the broad range of learning experiences offered - from academia,
-                            internationalism and earth studies, to sensational music, theatre and sport.&nbsp; Talk to students, staff&nbsp;and parents to learn more at Open Day.&nbsp;&nbsp;<br><br>Caulfield
+                            internationalism and earth studies, to sensational music, theatre and sport.&nbsp; Talk to students, staff&nbsp;and parents to learn more at Open Day.&nbsp;&nbsp;</p><p>Caulfield
                             Grammar's three metropolitan campuses -&nbsp;Schoolbox&nbsp;Campus, Mars Campus and Venus Campus will conduct Open Days on:</p>
                         <blockquote>
                             <ul>
@@ -158,7 +158,7 @@ export const Loading: Story = {
                             <div class="img-placeholder"></div>
                         </div>
                     </div>
-                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-m>
+                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-m">
                         <h3></h3>
                         <span></span>
                     </div>
@@ -199,7 +199,7 @@ export const ParentWithChildren: Story = {
             <div class="l-flex-col">
                 <div class="c-card c-card--border-end">
                     <div class="l-flex-row l-gap-m">
-                        <div class="c-img l-pad-s">
+                        <div class="c-img">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-house"></div>
                             </div>

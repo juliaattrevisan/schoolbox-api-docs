@@ -208,9 +208,7 @@ function formatPortrait(id: string) {
         <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
             <div class="l-flex-col">
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
-                    <div class="l-pad-m">
-                        <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
-                    </div>
+                    <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                 </div>
                 <div
                     v-for="(result, i) in results"
@@ -219,8 +217,8 @@ function formatPortrait(id: string) {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex-row l-flex--align-center l-gap-m l-pad-xs--vert">
-                        <div class="c-img c-img--l c-img--round">
+                    <div class="l-flex-row l-flex--align-center l-gap-m">
+                        <div class="c-img c-img--round">
                             <div class="c-img__wrapper">
                                 <img
                                     :src="formatPortrait(result.id)"
@@ -241,9 +239,7 @@ function formatPortrait(id: string) {
                     class="c-card c-card--link c-card--active"
                     :href="`${paths.searchPage}${keyword}#user`"
                 >
-                    <div class="l-pad-m">
-                        <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
-                    </div>
+                    <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
                     <div class="l-flex-row l-gap-m">
@@ -252,7 +248,7 @@ function formatPortrait(id: string) {
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-s">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1">
                             <h3></h3>
                             <span></span>
                         </div>
@@ -260,14 +256,10 @@ function formatPortrait(id: string) {
                 </div>
                 <template v-if="!isLoading && !results.length">
                     <div class="c-card">
-                        <div class="l-pad-s">
-                            <span class="meta">No users were found matching "{{ keyword }}"</span>
-                        </div>
+                        <span class="meta">No users were found matching "{{ keyword }}"</span>
                     </div>
                     <a class="c-card c-card--link c-card--active" :href="`${paths.searchPage}${keyword}#all`">
-                        <div class="l-pad-s">
-                            <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
-                        </div>
+                        <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
                     </a>
                 </template>
             </div>

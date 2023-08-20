@@ -20,15 +20,30 @@ useStore().init(props.endpoint, props.filterTypes);
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-xl">
-        <div>
-            <sp-input />
-        </div>
-        <div class="l-flex-row l-gap-xl">
-            <sp-results />
-            <sp-filters />
-        </div>
+    <div class="c-search-page">
+        <sp-input class="c-search-page__input" />
+        <sp-results class="c-search-page__results" />
+        <sp-filters class="c-search-page__filters" />
     </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.c-search-page {
+    display: grid;
+    gap: var(--whitespace-xl);
+    grid-template-areas:
+        "input input"
+        "results filters";
+    grid-template-columns: 1fr 500px;
+    grid-template-rows: auto 1fr;
+    &__input {
+        grid-area: input;
+    }
+    &__results {
+        grid-area: results;
+    }
+    &__filters {
+        grid-area: filters;
+    }
+}
+</style>

@@ -31,25 +31,23 @@ async function onApplySelected() {
 </script>
 
 <template>
-    <div class="c-filters l-flex-col l-gap-s l-flex__item--0-shrink f-no-margins">
+    <div class="l-flex-col l-gap-s l-flex__item--0-shrink f-no-margins">
         <h2 class="subheader">Filters</h2>
-        <div class="c-filters__container">
-            <div class="l-flex-col l-gap-m">
+        <div class="c-filters">
+            <form class="l-flex-col l-gap-m" role="search" aria-label="Apply filters" @submit.prevent="onApplySelected">
                 <sp-filter-date-range />
                 <!-- <sp-filter-creator /> -->
                 <!-- <sp-filter-types /> -->
                 <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
                 <button class="full-width submit" @click.prevent="onApplySelected">Apply filters and search</button>
-            </div>
+            </form>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-c-filters {
-    width: 500px;
-    &__container {
-        background-color: var(--foreground-colour);
-    }
+.c-filters {
+    background-color: var(--foreground-colour);
+    padding: var(--whitespace-m);
 }
 </style>

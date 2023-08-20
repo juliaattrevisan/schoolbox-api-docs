@@ -30,7 +30,7 @@ async function onSearch() {
 </script>
 
 <template>
-    <form @submit.prevent="onSearch">
+    <form role="search" aria-label="Sitewide" @submit.prevent="onSearch">
         <search-input
             :is-active="true"
             :is-active-when-empty="true"
