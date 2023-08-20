@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Textbox\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
+use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
@@ -108,6 +109,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'textbox'   => $this->textbox,
                 'context'   => $this->getContext(),
                 'writable'  => $this->getContentPermission() >= UserAccess::ACCESS_WRITE,
+                'returnUrl' => Querystring::encode("/homepage/{$this->getContext()->getId()}")
             ],
             !$this->getConfig('compactMode')
         );
