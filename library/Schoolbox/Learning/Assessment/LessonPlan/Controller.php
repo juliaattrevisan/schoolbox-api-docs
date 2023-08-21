@@ -104,6 +104,7 @@ class Controller extends Assessment\Controller
         $unitSpecificationMapper = UnitSpecificationMapper::getInstance();
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments();
 
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
@@ -119,8 +120,8 @@ class Controller extends Assessment\Controller
                     $courseAssessments['units'][] = [
                         'id' => $unitImplId,
                         'title' => $unitImpl->getTitle(),
-                        'closeDate' => $unitImpl->getDueDate(),
-                        'assessments' => $assessments
+                        'closeDate' => $unitImpl->getDueDate()?->getUsingFormat(DATE_ATOM),
+                        'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
             } else {
@@ -136,7 +137,7 @@ class Controller extends Assessment\Controller
                         'id' => $unitSpecId,
                         'title' => $unitSpec->getTitle(),
                         'closeDate' => null, // No Close Date for specifications
-                        'assessments' => $assessments
+                        'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
             }
