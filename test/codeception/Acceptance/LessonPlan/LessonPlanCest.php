@@ -94,8 +94,8 @@ class LessonPlanCest
         $lessonPlanName = 'Lesson Plan Automation Test 1';
         $folderName = 'Test Class Homepage Lesson Plan';
 
-        $teacher = 'Jack Coles';
-        $student = 'Eden Reed';
+        $teacher = 'Mr Jack Coles';
+        $student = 'Ms Eden Reed';
 
         $i->amGoingTo('navigate to course list and click the 3-dot menu for Year 9 English course to import into a class page' . $folderName);
         $i->amOnPage($courseList::URL);
