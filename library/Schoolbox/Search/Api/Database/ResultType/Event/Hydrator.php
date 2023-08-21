@@ -96,7 +96,7 @@ class Hydrator extends BaseHydrator
                     $event->getCategoryCollection()?->first() ? $folders->offsetGet($event->getCategoryCollection()->first()->getCategoryId()) : null,
                     null,
                     null,
-                    self::BASE_TYPE,
+                    'calendar',
                     $event->getDetail(),
                     $authors->offsetGet($event->getAuthorId()),
                     [],
