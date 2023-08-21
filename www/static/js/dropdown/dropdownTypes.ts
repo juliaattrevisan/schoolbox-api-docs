@@ -1,6 +1,6 @@
 export interface ActiveDropdown {
     id: string;
-    content: HTMLElement;
     trigger: HTMLElement;
+    content: HTMLElement;
     close: (e?: MouseEvent) => void;
 }

@@ -9,22 +9,20 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const dropdownButton = window.Vue.ref<HTMLButtonElement | null>(null);
+const dropdownTrigger = window.Vue.ref<HTMLButtonElement | null>(null);
 const dropdownContent = window.Vue.ref<HTMLElement | null>(null);
+const isOpen = window.Vue.ref(false);
 
 /**
  * Initialise the dropdown
  */
 window.Vue.onMounted(() => {
-    addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("DOMContentLoaded", () => {
         dropdownContent.value = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
         if (!dropdownContent.value) {
             return;
         }
-
-        dropdownButton.value.setAttribute("aria-haspopup", "true");
-        dropdownButton.value.setAttribute("aria-expanded", "false");
-        dropdownButton.value.setAttribute("aria-hidden", "true");
+        dropdownContent.value.setAttribute("aria-hidden", "true");
     });
 });
 
@@ -48,15 +46,15 @@ function onButtonSelected() {
 
     dropdownContent.value.style.display = "block"; // The element must be visible to correctly compute its position
 
-    computePosition(dropdownButton.value, dropdownContent.value, {
+    computePosition(dropdownTrigger.value, dropdownContent.value, {
         placement: "bottom-end",
         middleware: [flip(), shift()],
     })
         .then(({ x, y }) => {
             window.sbProps.activeDropdown = {
                 id: props.dataDropdown,
+                trigger: dropdownTrigger.value,
                 content: dropdownContent.value,
-                trigger: dropdownButton.value,
                 close: (event?: MouseEvent) => {
                     // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
                     if (
@@ -69,7 +67,7 @@ function onButtonSelected() {
 
                     dropdownContent.value.style.display = "none";
                     dropdownContent.value.setAttribute("aria-hidden", "true");
-                    dropdownButton.value.setAttribute("aria-expanded", "false");
+                    isOpen.value = false;
 
                     if (window.sbProps.activeDropdown) {
                         document.removeEventListener("click", window.sbProps.activeDropdown.close);
@@ -81,7 +79,7 @@ function onButtonSelected() {
             dropdownContent.value.style.top = `${y}px`;
 
             dropdownContent.value.setAttribute("aria-hidden", "false");
-            dropdownButton.value.setAttribute("aria-expanded", "true");
+            isOpen.value = true;
 
             // Add an event listener to close the dropdown when the user clicks anywhere outside the content
             document.addEventListener("click", window.sbProps.activeDropdown.close);
@@ -94,10 +92,12 @@ function onButtonSelected() {
 
 <template>
     <button
-        ref="dropdownButton"
+        ref="dropdownTrigger"
         type="button"
         class="c-button c-button--icon-only c-button--no-bkg"
         aria-label="Open drop down"
+        aria-haspopup="menu"
+        :aria-expanded="isOpen"
         @click.stop.prevent="onButtonSelected"
     >
         <svg
