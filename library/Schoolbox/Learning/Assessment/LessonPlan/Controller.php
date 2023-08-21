@@ -196,7 +196,7 @@ class Controller extends Assessment\Controller
      */
     public function getActivities(Model $assessment): void
     {
-        $this->response = $this->responseAsJson($assessment->getLinkedAssessments());
+        $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->map(new Assessment\Translator\UnitAssessments()));
     }
 
     public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
