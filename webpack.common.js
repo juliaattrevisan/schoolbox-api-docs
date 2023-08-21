@@ -279,6 +279,7 @@ module.exports = {
                 options: {
                     appendTsSuffixTo: [/\.vue$/],
                     compilerOptions: {
+                        isCustomElement: (tag) => tag.startsWith("wc-"), // allow wc- tags in vue templates, which is our custom element prefix
                         whitespace: "preserve",
                     },
                 },
