@@ -77,16 +77,15 @@ export default {
     async mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
         window.onpopstate = async (event) => {
-            // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
+            // NOTE: event.state should never be null because of the history.replaceState() call in this.loadFilteredContent().
             this.setSelectedTagAndFiltersToMatchState(event.state);
-
             await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
-            this.onChangeFilters(this.selectedTag, false);
+            this.loadFilteredContent(this.selectedTag, false);
         };
 
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
         await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
-        this.onChangeFilters(this.selectedTag, false);
+        this.loadFilteredContent(this.selectedTag, false);
 
         // Ensure dropdowns are initialised
         this.$nextTick(() => {
@@ -296,15 +295,15 @@ export default {
         },
 
         /**
-         * Save the state of the filters to the browser history.  The purpose of doing this is to enable use of the
-         * back button to visit previous filter states, and to enable sharing of the URL for the page in a particular
-         * filter state.
-         * @param selectedTag { String } Blank string means no selected tag.
-         * @param saveFiltersState { Boolean }
+         * Load new content based on the changed state of the filters, and optionally simulate a redirect.
+         * The point of simulating a redirect is to enable use of the back button to visit previous filter states, and
+         * enable sharing of the URL of the page in a particular filter state.
+         *
+         * @param { string } selectedTag -
+         * @param { boolean } simulateRedirect
+         *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
          */
-        onChangeFilters(selectedTag, saveFiltersState) {
-            this.selectedTag = selectedTag;
-
+        loadFilteredContent(selectedTag, simulateRedirect) {
             // Note Regarding behaviour when all-checked/none-checked
             // ------------------------------------------------------
             // If all checkboxes are checked, we leave them that way.
@@ -312,22 +311,23 @@ export default {
             // which behaves the same as if all were checked.  However, we decided it would be less confusing to the
             // user if checking the last checkbox resulted in all being checked rather than none being checked.
 
-            if (saveFiltersState) {
+            this.selectedTag = selectedTag;
+
+            if (simulateRedirect) {
                 // Push the old filters state to the history object.
                 history.pushState(this.getFiltersStateFromUrl(), "", window.location.href);
             }
 
-            // Get the new filters state and URL.
+            // Get the new filters state from the DOM, and create a new URL to match that state.
             let filtersState = this.getFiltersStateFromDom();
             let newUrl = new URL(window.location.href);
             newUrl.searchParams.delete("tag");
-            if (filtersState !== null && filtersState.tag !== "") {
-                newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
-            }
             newUrl.searchParams.delete("filterNames[]");
-            // Only save filter state to URL if not all filters are selected.
-            //            if (filtersState !== null && filtersState.filterNames.length !== Object.keys(this.selectedFilters).length) {
             if (filtersState !== null) {
+                if (filtersState.tag !== "") {
+                    newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
+                }
+
                 for (let filterName of filtersState.filterNames) {
                     newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
                 }
@@ -519,7 +519,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-learningMoments"
                                         name="includeLearningMoments"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.learningMoments"
                                     />
                                     <label for="filter-learningMoments">Learning Moments</label>
@@ -530,7 +530,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-goals"
                                         name="includeGoals"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.goals"
                                         :true-value="true"
                                         :false-value="false"
@@ -543,7 +543,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-achievements"
                                         name="includeAchievements"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.achievements"
                                     />
                                     <label for="filter-achievements">Achievements</label>
@@ -554,7 +554,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-feedback"
                                         name="includeDueWork"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.feedback"
                                     />
                                     <label for="filter-feedback">Feedback</label>
@@ -565,7 +565,7 @@ export default {
                             <template v-if="selectedTag !== ''">
                                 <p>
                                     Showing tag "{{ selectedTag }}"
-                                    <span class="anchor-style" id="removeFilters" @click="onChangeFilters('', true)"
+                                    <span class="anchor-style" id="removeFilters" @click="loadFilteredContent('', true)"
                                         >(remove)</span
                                     >
                                 </p>
@@ -700,7 +700,7 @@ export default {
                                                     <template v-if="index !== 0">, </template>
                                                     <span
                                                         class="anchor-style"
-                                                        @click="onChangeFilters(tag.name, true)"
+                                                        @click="loadFilteredContent(tag.name, true)"
                                                         title="Click to only show items with this tag."
                                                         >{{ tag.name }}</span
                                                     >
