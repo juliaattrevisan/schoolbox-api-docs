@@ -156,8 +156,15 @@ class Controller extends Assessment\Controller
         $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments();
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
+            // if we are inside a project get the projects context
+            $course = null;
             if ($assessment->getContext()->isImplementationContext()) {
-                $course = $this->courseImplementationMapper->findById($assessment->getContext()->getId());
+                if ($assessment->getContext() instanceof Project) {
+                    $course = $assessment->getContext()->getBaseContext();
+                } else {
+                    $course = $assessment->getContext();
+                }
+                $course = $this->courseImplementationMapper->findById($course->getId());
                 $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitImpl) {
                     /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitSpec */
@@ -173,7 +180,11 @@ class Controller extends Assessment\Controller
                     ];
                 }
             } else {
-                $course = $assessment->getContext()->getCourse();
+                if ($assessment->getContext() instanceof Project) {
+                    $course = $assessment->getContext()->getBaseContext()->getCourse();
+                } else {
+                    $course = $assessment->getContext()->getCourse();
+                }
                 $course->setUnits($this->unitSpecificationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitSpec) {
                     /** @var \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unitSpec */
