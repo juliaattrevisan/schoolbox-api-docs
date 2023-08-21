@@ -5,7 +5,7 @@
 {% set routeDownload  = folder.id != 0 and access >= 2 ? '/cms/fetchFolder.php?folder=' ~ folder.id : false %}
 {% set routeUploadZip = folder.id != 0 and (user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload)) ? '/cms/zipFile/' ~ folder.id : false %}
 {% set routeDelete    = routeLookupIfAuthorized('folder.deleteFolder', {id: folder.id, folder: folder}) %}
-{% set routeViewFiles = folder.id == 0 ? false : routeLookupIfAuthorized('resourceBrowser.showFolderFiles', {sourceFolderID: folder.id, sourceFolder: folder}) %}
+{% set routeViewFiles = folder.id == 0 ? false : routeLookupIfAuthorized('resourceBrowser.showFolderFiles', {folderId: folder.id, folder: folder}) %}
 {% set viewFilesName  = (folder.id != 0 and (user.isSuperuser or access >= 2)) ? 'Manage Files' : 'View Files' %}
 {% set routeManageGroup = routeLookupIfAuthorized('group.getModify', {folderId: folder.id, folder: folder}) %}
 

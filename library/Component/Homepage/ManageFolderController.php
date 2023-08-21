@@ -99,7 +99,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             ]);
             $this->setVar('VIEW_FILES_LINK_NAME', 'View Files');
         }
-        $this->setVar('VIEW_FILES_LINK', $this->getRouteGenerator()->generate('resourceBrowser.showFolderFiles', ['sourceFolderID' => $this->getContext()->getId()]));
+        $this->setVar('VIEW_FILES_LINK', $this->getRouteGenerator()->generate('resourceBrowser.showFolderFiles', ['folderId' => $this->getContext()->getId(), 'folder' => $this->getContext()]));
 
         // User subscription to groups.
         $this->setBlock($templateHandle, 'subscribed', 'subscribed_block');

@@ -84,7 +84,7 @@ class FilesBuilder
                 'componentID'    => $componentId,
                 'sourceFolderID' => $folderId,
             ])
-            : $this->routeGenerator->generate('resourceBrowser.showFolderFiles', ['sourceFolderID' => $folderId]);
+            : $this->routeGenerator->generate('resourceBrowser.showFolderFiles', ['folderId' => $folderId]);
 
         $encodedReturnUrl = Redirect::encode($returnUrl);
 
