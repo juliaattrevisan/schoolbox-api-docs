@@ -262,7 +262,7 @@ export default {
         };
 
         // Initialise history by setting the current state.
-        window.history.replaceState(this.getCopyOfSelectedUserOption(), "", window.location.href);
+        window.history.replaceState(this.getCopyOfSelectedOption(), "", window.location.href);
     },
 
     beforeDestroy() {
@@ -275,7 +275,7 @@ export default {
          * This is to avoid getting 'Proxy object could not be cloned' errors when trying to window.pushState(this.selectedOption).
          * @param {object} userOption - The object to copy.
          */
-        getCopyOfSelectedUserOption(userOption) {
+        getCopyOfSelectedOption(userOption) {
             return {
                 userId: this.selectedOption.userId,
                 firstCampusName: this.selectedOption.firstCampusName,
@@ -296,7 +296,7 @@ export default {
 
             if (simulateRedirect) {
                 // Push current state to history.
-                window.history.pushState(this.getCopyOfSelectedUserOption(), "", window.location.href);
+                window.history.pushState(this.getCopyOfSelectedOption(), "", window.location.href);
             }
 
             // Update state.
@@ -307,7 +307,7 @@ export default {
             // Replace current state in history object with the new state (and set the current URL to match that state).
             const oldUrl = window.location.href;
             const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedOption.userId;
-            window.history.replaceState(this.getCopyOfSelectedUserOption(), "", newUrl);
+            window.history.replaceState(this.getCopyOfSelectedOption(), "", newUrl);
         },
 
         /**
@@ -797,7 +797,7 @@ export default {
              * It needs to go to the new /timetable/calendar/... route
              */
             window.history.pushState(
-                "",
+                null,
                 "",
                 "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
             );
