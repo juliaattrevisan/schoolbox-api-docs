@@ -24,3 +24,9 @@ window.Vue.onMounted(() => {
         <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions" id="all-actions" data-dropdown-initialized="true" aria-haspopup="true" aria-expanded="true"></a>
     -->
 </template>
+
+<style lang="scss" scoped>
+button {
+    background-color: var(--foreground-colour);
+}
+</style>
