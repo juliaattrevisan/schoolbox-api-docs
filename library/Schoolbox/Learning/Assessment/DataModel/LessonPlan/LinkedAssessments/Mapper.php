@@ -161,11 +161,9 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param Model          $lessonPlan
-     * @param DataModelModel $assessment
+     * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
+     * @param IAssessable                                     $assessment
      * @return int
-     * @throws Exception
-     * @throws Deleted
      */
     public function deleteLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment): int
     {
