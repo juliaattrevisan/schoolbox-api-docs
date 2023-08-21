@@ -3,15 +3,6 @@
     as well as some custom tweaks
 */
 
-// * {
-//     box-sizing: border-box;
-// }
-
-// a,
-// button {
-//     font-size: 1.5rem;
-// }
-
 // Inherits colour from the parent element
 .c-icon {
     fill: currentcolor;
@@ -105,6 +96,15 @@ button.c-button {
             width: 100%;
             height: 100%;
             fill: currentColor;
+        }
+    }
+
+    // rely on the background it sits on
+    &--no-bkg {
+        background: none;
+        &:hover,
+        &:active {
+            background-color: rgba(0, 0, 0, 0.1);
         }
     }
 }
