@@ -268,7 +268,8 @@ class Controller extends Assessment\Controller
     {
         $linkedAssessmentsMapper = Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::getInstance();
         if ($linkedAssessmentsMapper->saveLink($assessment, $linkedAssessment)) {
-            $this->response = $this->responseAsJson($assessment->getLinkedAssessments());
+            $assessment->getLinkedAssessments()->add($linkedAssessment);
+            $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->map(new Assessment\Translator\UnitAssessments()));
         } else {
             $this->response = $this->responseAsJson("Link already Exists");
         }
