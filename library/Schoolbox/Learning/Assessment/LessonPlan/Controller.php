@@ -167,7 +167,7 @@ class Controller extends Assessment\Controller
                 $course = $this->courseImplementationMapper->findById($course->getId());
                 $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitImpl) {
-                    /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitSpec */
+                    /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitImpl */
                     $unitImplId = $unitImpl->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
                     $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options);
