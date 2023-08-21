@@ -792,10 +792,10 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|ErrorMapper
+     * @return ErrorMapper
      * @throws InvalidArgumentException
      */
-    protected function getErrorMapper()
+    protected function getErrorMapper(): ErrorMapper
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
