@@ -898,27 +898,6 @@ class Controller extends Base
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
-
-//
-//        /* If $learnosityReference was specified, load everyone's responses
-//         * for that particular item; otherwise just load the first one
-//         */
-//        $currentItemReference = $learnosityReference;
-//
-//        /* The responses that we want to show at the moment
-//         */
-//        $currentResponses = [];
-//
-//        if (null === $learnosityReference) {
-//            $currentItemReference = $itemReferences[0]['reference'];
-//        }
-//
-//        new \Alaress_Probe($sessions, $users, $responses, $itemReferences);
-
-        /* Provide "Previous Question" and "Next Question" urls
-         */
-
-        return;
     }
 
 
