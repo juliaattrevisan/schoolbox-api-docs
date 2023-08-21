@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -268,6 +269,14 @@ class Controller extends Assessment\Controller
 
     public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
+        // don't link to my self...
+        if ($assessment === $linkedAssessment) {
+            $problem = (new ApiProblem('Unable to link lesson plan to itself.'))
+                ->setStatus(409)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(409);
+            return; //exit early
+        }
         if ($this->linkedAssessmentsMapper->saveLink($assessment, $linkedAssessment)) {
             $assessment->getLinkedAssessments()->add($linkedAssessment);
             $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->map(new Assessment\Translator\UnitAssessments()));
