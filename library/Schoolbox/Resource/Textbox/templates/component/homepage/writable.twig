@@ -11,7 +11,7 @@
 {% if textboxExists %}
     <script type="text/javascript">
         $(function () {
-            $('#component{{ component.instance.id }} .component-titlebar').attr('id', 'textbox{{ textbox.id }}');
+            $('#component{{ component.instance.id }} .component-titlebar').attr('id', 'textbox-{{ component.instance.id}}-{{ textbox.id }}');
         });
     </script>
     {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
@@ -26,7 +26,7 @@
     <div class="content" data-textbox-exists>
         <article data-content
                  data-textbox-heading="{{ textbox.heading }}"
-                 id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
+                 id="textBoxBody-{{ component.instance.id}}-{{ textbox.id }}" data-textbox-id="{{textbox.id}}">{{ textbox.body | purify }}</article>
     </div>
 
     <div class="component-action">

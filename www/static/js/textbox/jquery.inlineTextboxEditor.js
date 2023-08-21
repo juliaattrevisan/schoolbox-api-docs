@@ -246,7 +246,7 @@
                 self.editorInstance.removeAttr("contentEditable");
                 self.editorInstance.html(`<div class="loader"></div>`);
 
-                const textboxId = self.editorInstance.attr("id").replace("textBoxBody", "");
+                const textboxId = self.editorInstance.attr("data-textbox-id");
 
                 // Pull new content from /textbox/id
                 // We grab the new content from the server, as the server may have modified the content in some way.
