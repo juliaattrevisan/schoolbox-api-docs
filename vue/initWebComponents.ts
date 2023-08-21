@@ -1,6 +1,7 @@
 /**
  * Instantiate all custom web components that leverage Vue as their rendering engine
- * More info on Vue and web components here: https://vuejs.org/guide/extras/web-components.html
+ * More info on web components here: https://developer.mozilla.org/en-US/docs/Web/API/Web_components
+ * And using Vue with web components here: https://vuejs.org/guide/extras/web-components.html
  */
 
 import WcDropDown from "./components/dropDown/wc-drop-down.ce.vue";
