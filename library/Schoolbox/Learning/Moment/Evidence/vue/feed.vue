@@ -77,7 +77,7 @@ export default {
     async mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
         window.onpopstate = async (event) => {
-            // NOTE: event.state will be null unless the state has been saved using history.pushState().
+            // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
             this.setSelectedTagAndFiltersToMatchState(event.state);
 
             await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
@@ -296,6 +296,9 @@ export default {
         },
 
         /**
+         * Save the state of the filters to the browser history.  The purpose of doing this is to enable use of the
+         * back button to visit previous filter states, and to enable sharing of the URL for the page in a particular
+         * filter state.
          * @param selectedTag { String } Blank string means no selected tag.
          * @param saveFiltersState { Boolean }
          */
@@ -307,52 +310,47 @@ export default {
             // If all checkboxes are checked, we leave them that way.
             // We could have decided to uncheck all in this situation, to match the default state of all unchecked,
             // which behaves the same as if all were checked.  However, we decided it would be less confusing to the
-            // user if checking the last checkbox resulted in all being checked rather than none being checkked.
+            // user if checking the last checkbox resulted in all being checked rather than none being checked.
 
             if (saveFiltersState) {
-                this.saveFiltersStateToBrowserHistory();
+                // Push the old filters state to the history object.
+                history.pushState(this.getFiltersStateFromUrl(), "", window.location.href);
             }
 
-            this.load();
-        },
-
-        /**
-         * Save the state of the filters to the browser history.  The purpose of doing this is to enable use of the
-         * back button to visit previous filter states, and to enable sharing of the URL for the page in a particular
-         * filter state.
-         */
-        saveFiltersStateToBrowserHistory() {
+            // Get the new filters state and URL.
             let filtersState = this.getFiltersStateFromDom();
             let newUrl = new URL(window.location.href);
-
             newUrl.searchParams.delete("tag");
-            if (filtersState.tag !== "") {
+            if (filtersState !== null && filtersState.tag !== "") {
                 newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
             }
-
-            // Only save filter state to URL if not all filters are selected.
             newUrl.searchParams.delete("filterNames[]");
-            if (filtersState.filterNames.length !== Object.keys(this.selectedFilters).length) {
+            // Only save filter state to URL if not all filters are selected.
+            //            if (filtersState !== null && filtersState.filterNames.length !== Object.keys(this.selectedFilters).length) {
+            if (filtersState !== null) {
                 for (let filterName of filtersState.filterNames) {
                     newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
                 }
             }
 
-            history.pushState(filtersState, "", newUrl.toString());
+            // Get new content based on changed filters state.
+            this.load();
+
+            // Replace the current state in the history object with the new state.
+            history.replaceState(filtersState, "", newUrl.toString());
         },
 
         /**
          * Generate a filterState object from the URL parameters (if there are any).
-         * If there are no recognised URL parameters, the return value will be null.
          *
          * The URL is expected to have parameters like this:
          *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
          *    * Both parameters ('tag' and 'filterNames') are optional
          *    * filterNames are expected to match the keys from this.selectedFilters.
          *
-         * Example of non-null return value:
+         * Example of return value:
          *    {
-         *       filterNames: ['feedback', 'learningMoments'],
+         *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
          *       tag: '' { String }
          *    }
          *
@@ -362,10 +360,6 @@ export default {
          */
         getFiltersStateFromUrl() {
             let url = new URL(window.location.href);
-
-            if (Array.from(url.searchParams).length === 0) {
-                return null;
-            }
 
             let filtersState = { tag: "", filterNames: [] };
 
@@ -438,12 +432,8 @@ export default {
                 this.selectedTag = filtersState.tag;
 
                 // Restore state of filter checkboxes.
-                const allFiltersAreSelected =
-                    Array.from(this.selectedFilters).length === filtersState.filterNames.length;
                 for (const filterName of Object.keys(this.selectedFilters)) {
-                    this.selectedFilters[filterName] = allFiltersAreSelected
-                        ? true
-                        : filtersState.filterNames.includes(filterName);
+                    this.selectedFilters[filterName] = filtersState.filterNames.includes(filterName);
                 }
             }
         },
