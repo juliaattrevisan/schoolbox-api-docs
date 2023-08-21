@@ -53,6 +53,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsSimilarityCheckEnabled;
 use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -695,7 +696,9 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
+                    $this->getCourseImplementationMapper(),
+                    $this->getUnitImplementationMapper(),
                 );
 
             default:
@@ -873,6 +876,14 @@ class Module extends BaseModule
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Access::class);
+    }
+
+    /**
+     * @return CourseImplementationMapper
+     */
+    protected function getCourseImplementationMapper(): CourseImplementationMapper
+    {
+        return $this->getMapperFactory()->get(CourseImplementationMapper::class);
     }
 
 

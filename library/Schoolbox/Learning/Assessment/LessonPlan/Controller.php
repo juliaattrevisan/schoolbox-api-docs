@@ -10,18 +10,72 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
+use Schoolbox\Assessment\Term;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Controller extends Assessment\Controller
 {
+    public function __construct(
+        UserMapper $userMapper,
+        ErrorMapper $errorMapper,
+        AssessmentMapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
+        Access $access,
+        Transactor $transactor,
+        BreadcrumbFactory $bakery,
+        Term\Mapper $termMapper,
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator,
+        LatestViewMapper $latestViewMapper,
+        Project\ResultCache\Mapper $projectResultCacheMapper,
+        LessonPlanTemplateMapper $lessonPlanTemplateMapper,
+        LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        private CourseImplementationMapper $courseImplementationMapper,
+        private UnitImplementationMapper $unitImplementationMapper
+    ) {
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $workTypeMapper,
+            $access,
+            $transactor,
+            $bakery,
+            $termMapper,
+            $participantDataSource,
+            $courseSpecificationMapper,
+            $unitSpecificationMapper,
+            $replicator,
+            $latestViewMapper,
+            $projectResultCacheMapper,
+            $lessonPlanTemplateMapper,
+            $lessonPlanDataModelMapper
+        );
+    }
+
     /**
      * Construct an arbitrary array of data for twig rendering
      *
@@ -99,23 +153,17 @@ class Controller extends Assessment\Controller
          * get list of all activities within this course
          * only for staff
          */
-        $courseImplementationMapper = CourseImplementationMapper::getInstance();
-        $unitImplementationMapper = UnitImplementationMapper::getInstance();
-        $unitSpecificationMapper = UnitSpecificationMapper::getInstance();
-        /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
         $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments();
-
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
             if ($assessment->getContext()->isImplementationContext()) {
-                $course = $courseImplementationMapper->findById($assessment->getContext()->getId());
-                $course->setUnits($unitImplementationMapper->findAllByCourseId($course->getId()));
+                $course = $this->courseImplementationMapper->findById($assessment->getContext()->getId());
+                $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitImpl) {
                     /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitSpec */
                     $unitImplId = $unitImpl->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
-                    $assessments = $assessmentMapperProxy->findAllByUnitImplementationIds([$unitImplId], $options);
+                    $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options);
                     $unitImpl->setAssessables($assessments);
                     $courseAssessments['units'][] = [
                         'id' => $unitImplId,
@@ -126,12 +174,12 @@ class Controller extends Assessment\Controller
                 }
             } else {
                 $course = $assessment->getContext()->getCourse();
-                $course->setUnits($unitSpecificationMapper->findAllByCourseId($course->getId()));
+                $course->setUnits($this->unitSpecificationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitSpec) {
                     /** @var \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unitSpec */
                     $unitSpecId = $unitSpec->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
-                    $assessments = $assessmentMapperProxy->findAllByUnitSpecificationId($unitSpecId, $options);
+                    $assessments = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpecId, $options);
                     $unitSpec->setAssessables($assessments);
                     $courseAssessments['units'][] = [
                         'id' => $unitSpecId,
