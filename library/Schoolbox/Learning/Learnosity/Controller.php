@@ -1017,46 +1017,6 @@ class Controller extends Base
 
 
     /**
-     * Get an overview for all the sessions conducted
-     *
-     * This gives teachers a strategic idea of how many questions were
-     * attempted correctly
-     *
-     * @return void
-     * @throws \JsonException
-     * @throws ValidationException
-     */
-    public function getSessionListReport(): void
-    {
-        $payload = [
-            'user_id' => (string)$this->getUser()->getId(),
-            'reports' => [
-                [
-                    /* DOM element id, where this goes in
-                     *
-                     * It's configurable by us, unlike the other anchors for
-                     * Author and Items api
-                     */
-                    'id' => 'schoolbox-result',
-                    'type' => 'sessions-list',
-                    'limit' => 100,
-                    'ui' => 'table',
-                    'activities' => [
-                        [
-                            'id' => '733',
-                            'name' => 'the thing'
-                        ]
-                    ]
-                ]
-            ],
-        ];
-
-        $this->response = $this->responseFromTemplate('@learnosity/sessionList.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload)
-        ], 'Example Session List');
-    }
-
-    /**
      * TODO Literally copypasta'd
      *
      * Converts an assessment_id to a Quiz
