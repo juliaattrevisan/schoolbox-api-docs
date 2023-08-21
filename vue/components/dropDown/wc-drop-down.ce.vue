@@ -29,7 +29,7 @@ window.Vue.onMounted(() => {
 /**
  * When the dropdown button is clicked
  */
-function onButtonSelected() {
+async function onButtonSelected() {
     // If there's an active dropdown, close it
     //  This check applies when the user clicks on any dropdown trigger
     //  As we have stopped the propagation of the click event, the event listener on the document won't be triggered
@@ -46,47 +46,43 @@ function onButtonSelected() {
 
     dropdownContent.style.display = "block"; // The element must be visible to correctly compute its position
 
-    computePosition(dropdownTrigger.value as ReferenceElement, dropdownContent, {
+    const position = await computePosition(dropdownTrigger.value as ReferenceElement, dropdownContent, {
         placement: "bottom-end",
         middleware: [flip(), shift()],
-    })
-        .then(({ x, y }) => {
-            window.sbProps.activeDropdown = {
-                id: props.dataDropdown,
-                trigger: dropdownTrigger.value as HTMLButtonElement,
-                content: dropdownContent,
-                close: (event?: MouseEvent) => {
-                    // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
-                    if (
-                        event &&
-                        dropdownContent.contains(event.target as Node) &&
-                        dropdownContent.getAttribute("aria-autoclose") === "false"
-                    ) {
-                        return;
-                    }
+    });
 
-                    dropdownContent.style.display = "none";
-                    dropdownContent.setAttribute("aria-hidden", "true");
-                    isOpen.value = false;
+    window.sbProps.activeDropdown = {
+        id: props.dataDropdown,
+        trigger: dropdownTrigger.value as HTMLButtonElement,
+        content: dropdownContent,
+        close: (event?: MouseEvent) => {
+            // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
+            if (
+                event &&
+                dropdownContent.contains(event.target as Node) &&
+                dropdownContent.getAttribute("aria-autoclose") === "false"
+            ) {
+                return;
+            }
 
-                    if (window.sbProps.activeDropdown) {
-                        document.removeEventListener("click", window.sbProps.activeDropdown.close);
-                        window.sbProps.activeDropdown = false;
-                    }
-                },
-            };
-            dropdownContent.style.left = `${x}px`;
-            dropdownContent.style.top = `${y}px`;
+            dropdownContent.style.display = "none";
+            dropdownContent.setAttribute("aria-hidden", "true");
+            isOpen.value = false;
 
-            dropdownContent.setAttribute("aria-hidden", "false");
-            isOpen.value = true;
+            if (window.sbProps.activeDropdown) {
+                document.removeEventListener("click", window.sbProps.activeDropdown.close);
+                window.sbProps.activeDropdown = false;
+            }
+        },
+    };
+    dropdownContent.style.left = `${position.x}px`;
+    dropdownContent.style.top = `${position.y}px`;
 
-            // Add an event listener to close the dropdown when the user clicks anywhere outside the content
-            document.addEventListener("click", window.sbProps.activeDropdown.close);
-        })
-        .catch(() => {
-            // noop
-        });
+    dropdownContent.setAttribute("aria-hidden", "false");
+    isOpen.value = true;
+
+    // Add an event listener to close the dropdown when the user clicks anywhere outside the content
+    document.addEventListener("click", window.sbProps.activeDropdown.close);
 }
 </script>
 
