@@ -7,20 +7,9 @@
     // Control radius from custom property
     border-radius: var(--roundness-cards);
     line-height: var(--base-line-height);
+    padding: var(--whitespace-m);
     position: relative;
     text-align: start;
-
-    // prevent overflow on all titles within
-    span,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        overflow-x: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
 
     p:last-child {
         margin-bottom: 0;
@@ -29,8 +18,6 @@
     // A bar that sits (generally) at the bottom of the card with actions that a user can take. Left aligned so that
     // these actions are visually distinct if this card appears in a component and the component has actions.
     &__actions {
-        // display: flex;
-        // justify-content: flex-start;
         min-inline-size: 40px;
 
         a {
@@ -51,7 +38,7 @@
     &--child {
         background-color: #f6f6f6;
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
-        padding: var(--whitespace-xs);
+        padding: var(--whitespace-s);
     }
 
     // When we want the whole card to be selectable
@@ -62,7 +49,11 @@
             background-color: var(--content-ui-hover);
             filter: grayscale(0%);
         }
-        a::before {
+        // To make the entire card clickable, we make the anchor fill the card
+        // this aids accessibility, providing better screen reader context than
+        // wrapping the entire card in an anchor while also allowing a wider click target
+        // https://inclusive-components.design/cards/
+        a:first-child::before {
             bottom: 0;
             content: " ";
             left: 0;
@@ -111,5 +102,9 @@
 
     &--border-end {
         border-block-end: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    &--alt-bkg {
+        background-color: #f6f6f6;
     }
 }

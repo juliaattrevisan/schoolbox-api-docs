@@ -6,6 +6,13 @@
  * Prettier is added to the end so eslint doesnt report on formatting issues that prettier will automatically fix.
  */
 module.exports = {
+    // specifies the allowed environments: https://eslint.org/docs/latest/use/configure/language-options#specifying-environments
+    env: {
+        browser: true,
+        commonjs: true,
+        es6: true,
+        jquery: true,
+    },
     extends: [
         "airbnb-base",
         "airbnb-typescript/base",

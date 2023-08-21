@@ -10,15 +10,36 @@ import { useResultsStore } from "../results/store/spResultsStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
 import type { Results } from "../../js/types/Results";
 
+/**
+ * What is returned when there is a search error
+ */
+export type SearchError = {
+    title: string;
+    type: string;
+    status: number;
+};
+
 export const useSearchStore = defineStore("spSearch", () => {
     const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
     const url = window.Vue.ref("");
+    const searchError = window.Vue.ref<SearchError | null>(null);
     const {
         execute,
         data,
         isFetching: isSearching, // to notify of searching
         error: hasLoadError, // to notify of a search error
-    } = useFetch(url, { immediate: false }).get().json();
+    } = useFetch(url, {
+        immediate: false,
+        onFetchError(ctx) {
+            // we catch the Search error to display the error message
+            if ((ctx.data as SearchError).status) {
+                searchError.value = ctx.data as SearchError;
+            }
+            return ctx;
+        },
+    })
+        .get()
+        .json();
 
     /**
      * To record the active query and filters at the time of the search
@@ -36,7 +57,11 @@ export const useSearchStore = defineStore("spSearch", () => {
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
         await execute();
-        useResultsStore().setFirstResults((data.value as Results).data);
+        try {
+            useResultsStore().setFirstResults((data.value as Results).data);
+        } catch (e) {
+            hasLoadError.value = true;
+        }
     }
 
     /**
@@ -63,5 +88,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         search,
         clear,
         clearFiltersAndSearch,
+        searchError,
     };
 });

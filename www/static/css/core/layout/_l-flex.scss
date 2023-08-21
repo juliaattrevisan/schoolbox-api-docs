@@ -15,6 +15,11 @@
 .l-flex {
     display: flex;
 
+    > * {
+        flex-wrap: wrap; // always allow flex items to wrap
+        max-width: 100%; // prevent flex items from overflowing the container
+    }
+
     &-col,
     &-row {
         display: flex;
@@ -25,10 +30,6 @@
     }
     &-row {
         flex-direction: row;
-    }
-
-    &--wrap {
-        flex-wrap: wrap;
     }
 
     &--wrap-reverse {
@@ -59,6 +60,9 @@
     &__item {
         &--1 {
             flex: 1;
+        }
+        &--0-shrink {
+            flex-shrink: 0;
         }
     }
 

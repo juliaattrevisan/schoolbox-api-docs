@@ -4,7 +4,7 @@ import MetaList from "@schoolboxVue/components/meta/list";
 import MetaItem from "@schoolboxVue/components/meta/item";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 
-/* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+/* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
  */
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
@@ -414,9 +414,7 @@ export default {
                         detail: {
                             targetElements: ["#view-detail"],
                             toolbar: EditorToolbar.SIMPLE,
-                            removeFromToolbar: [
-                                'link',
-                            ]
+                            removeFromToolbar: ["link"],
                         },
                     })
                 );

@@ -8,8 +8,8 @@
  */
 
 interface Props {
-    isActive: boolean; // to add the active styles
     initialInput?: string; // to prefill the input
+    isActiveWhenEmpty?: boolean; // can be selected while the input is empty
 }
 const props = defineProps<Props>();
 
@@ -62,6 +62,9 @@ function onKeyEnter() {
  * If the input is empty, focus over input, otherwise emit click
  */
 function onClicked() {
+    if (props.isActiveWhenEmpty) {
+        emit("click");
+    }
     if (currentInput.value.length > 0) {
         emit("click");
     } else {
@@ -103,11 +106,11 @@ function onMouseOut(event: MouseEvent) {
 </script>
 
 <template>
-    <div class="c-search-input l-rel">
+    <div class="c-search-input">
         <input
             id="search-field"
             ref="inputElement"
-            :class="props.isActive ? 'c-search-input__field c-search-input__field--active' : 'c-search-input__field'"
+            class="c-search-input__field"
             type="text"
             name="keyword"
             placeholder="Search"
@@ -135,64 +138,41 @@ function onMouseOut(event: MouseEvent) {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .c-search-input {
-    &__field {
-        border: 0;
-        background-color: transparent;
-        color: var(--body-background);
-        font-size: 0; // is properly with --active
+    display: grid;
+    grid-template-columns: 1fr 5rem;
+
+    input[type="text"].c-search-input__field {
+        border: 2px solid var(--form-border-color);
+        background-color: var(--foreground-colour);
+        color: var(--primary-text-colour);
+        font-size: var(--base-font-size);
         height: var(--tabbar-height);
-        width: var(--tabbar-height);
         padding: var(--base-font-size);
         margin: 0;
         line-height: calc(var(--tabbar-height) / 2);
     }
-    /*
-    * Styles to suggest the input is 'active'
-    * As the input can be part of a larger component (header-search.vue)
-    * we pass the isActive prop to the component to style it accordingly
-    */
-    &__field--active {
-        background-color: white;
-        border: 2px solid var(--navigation-hover);
-        color: black;
-        font-size: var(--base-font-size);
-        width: 100%;
-        opacity: 1;
-    }
-}
 
-.c-search-input--active {
-    background-color: white;
-    border: 2px solid var(--navigation-hover);
-    color: black;
-    font-size: var(--base-font-size);
-    width: 100%;
-    opacity: 1;
-}
-
-// Search icon in its idle state, it sits on the right of the input field
-.c-search-input__button {
-    align-items: center;
-    background: none;
-    display: flex;
-    height: var(--tabbar-height);
-    justify-content: center;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 5rem;
-    z-index: 1;
-    &:before {
-        transition: color 0.2s ease-in;
-        color: var(--navigation-foreground);
-    }
-    &:hover {
+    &__button {
+        align-items: center;
+        background-color: var(--content-ui-submit-background);
+        display: flex;
+        height: var(--tabbar-height);
+        justify-content: center;
+        margin: 0;
+        padding: 0;
         &:before {
-            color: black;
+            transition: all 0.2s ease-in;
+            color: var(--content-ui-submit-foreground);
+        }
+        &:hover {
+            background-color: rgba(
+                calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+                calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+                calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+                var(--content-ui-submit-background-a)
+            );
         }
     }
 }

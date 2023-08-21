@@ -25,10 +25,12 @@ declare global {
         STORYBOOK_ENV: string;
         Vue: typeof Vue;
     }
+    interface JQuery {
+        // we can add any extra methods we have extended onto the JQuery object here
+        /**
+         * Our custom datepicker component
+         * www/static/js/alaress-datetime-picker/alaress-datetime-picker.js
+         */
+        alaressDateTimePicker(): JQuery;
+    }
 }
-
-declare module "jquery" {
-    export = $;
-}
-
-export {};

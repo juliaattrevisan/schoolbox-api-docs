@@ -4,23 +4,26 @@
 
 import { defineStore } from "pinia";
 
+export const EMPTY_DATE = ""; // the value to use when the date is not set
+export const INVALID_DATE = "Invalid Date"; // the string dayjs returns when a date is not valid
+
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
-    const startDate = window.Vue.ref(null);
-    const endDate = window.Vue.ref(null);
-    const activeStartDate = window.Vue.ref(null); // the start date currently applied to the active search
-    const activeEndDate = window.Vue.ref(null); // the end date currently applied to the active search
+    const startDate = window.Vue.ref(window.dayjs().subtract(1, "year").format());
+    const endDate = window.Vue.ref(window.dayjs().format());
+    const activeStartDate = window.Vue.ref(EMPTY_DATE); // the start date currently applied to the active search
+    const activeEndDate = window.Vue.ref(EMPTY_DATE); // the end date currently applied to the active search
 
     /**
      * Is the start date filter set
      * @returns {boolean}
      */
-    const hasStartDate = window.Vue.computed(() => startDate.value !== null);
+    const hasStartDate = window.Vue.computed(() => startDate.value !== EMPTY_DATE && startDate.value !== INVALID_DATE);
 
     /**
      * Is the end date filter set
      * @returns {boolean}
      */
-    const hasEndDate = window.Vue.computed(() => endDate.value !== null);
+    const hasEndDate = window.Vue.computed(() => endDate.value !== EMPTY_DATE && endDate.value !== INVALID_DATE);
 
     /**
      * Are both the start and end date filters set
@@ -51,15 +54,14 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
 
     /**
      * Get the date range filter data
-     * @returns {string} - the date range filter data
+     * @returns {object} - the date range filter data
      */
     function getFormData() {
-        const from = activeStartDate.value !== null ? activeStartDate.value : "";
-        const to = activeEndDate.value !== null ? activeEndDate.value : "";
+        // only add from and to if they are set
         return {
             date: {
-                from,
-                to,
+                ...(hasStartDate.value && { from: activeStartDate.value }),
+                ...(hasEndDate.value && { to: activeEndDate.value }),
             },
         };
     }
@@ -68,10 +70,10 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
      * clear the date filter
      */
     function clear() {
-        startDate.value = null;
-        endDate.value = null;
-        activeStartDate.value = null;
-        activeEndDate.value = null;
+        startDate.value = EMPTY_DATE;
+        endDate.value = EMPTY_DATE;
+        activeStartDate.value = EMPTY_DATE;
+        activeEndDate.value = EMPTY_DATE;
     }
 
     return {

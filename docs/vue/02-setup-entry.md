@@ -42,9 +42,9 @@ createApp({
 -   The `el` arg is the container element's id which we previously named `#user-list-container`.
 -   And the `components` is used to list the Vue components that are being referenced within `#user-list-container`
 
-### 2.1.3 Update webpack.config.js
+### 2.1.3 Update webpack.common.js
 
-Next, we need to add a path to this javascript file in `webpack.config.js` so the compiler knows where to look for it.
+Next, we need to add a path to this javascript file in `webpack.common.js` so the compiler knows where to look for it.
 
 At the top, there's a `module.exports` object literal definition. You'll find other schoobox vue components there. Simply add the path to the `userList.js` file to the `entry` node, which is an index of all the JS entry points that currently exist.
 
@@ -64,7 +64,7 @@ Add `library/Schoolbox/Greenhouse/templates/user-list.vue` and paste this massiv
 <script>
 
 /**
- * To display a list of users 
+ * To display a list of users
  */
 
 import Toast from '@schoolboxVue/components/toast';
@@ -194,7 +194,7 @@ export default {
 
 ### 2.1.4 npm run build
 
-Now you can compile and keep it compliing every file save. 
+Now you can compile and keep it compliing every file save.
 
 ```
 npm run watch
