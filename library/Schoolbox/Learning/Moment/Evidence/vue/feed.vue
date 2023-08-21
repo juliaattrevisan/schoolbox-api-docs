@@ -338,7 +338,7 @@ export default {
             // Get new content based on changed filters state.
             this.load();
 
-            // Replace the current state in the history object with the new state.
+            // Replace the current state in the history object with the new state (and set the current URL to match that state).
             history.replaceState(filtersState, "", newUrl.toString());
         },
 
