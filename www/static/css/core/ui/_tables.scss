@@ -322,6 +322,10 @@ $rotate-span-width: 11rem;
     tbody {
         th.profile-cell {
             font-weight: normal;
+
+            > div {
+                padding: 0;
+            }
         }
     }
 
