@@ -29,6 +29,9 @@ module.exports = {
             "./www/static/js/foundation/jquery.tab-activator.js",
             "./www/static/js/foundation/jquery.collapsable.js",
 
+            // Custom Web Components
+            "./vue/initWebComponents.ts",
+
             // Side Navigation
             // This includes the Flyout menu, on user profile drop down
             // Also fixes touch on side navigation and adds scroll to top
