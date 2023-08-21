@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -99,6 +100,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateContext']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAttachments']);
     }
@@ -281,6 +283,22 @@ class Mapper extends \Schoolbox\Mapper
             $lessonPlan->setUpdatedBy($this->getSessionUser());
         }
     }
+    /**
+     * Validates context is a valid option (Unit / Project)
+     *
+     * @param Model $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateContext(Model $model): bool
+    {
+        if ($model->getAssessmentModel()->getAssessmentContext() instanceof \Schoolbox\Resource\Folder\Model) {
+            throw new CallbackException("Lesson Plans are unable to created inside a folder");
+        }
+
+        return true;
+    }
+
 
     /**
      * Get all lesson plans from a list of folders
