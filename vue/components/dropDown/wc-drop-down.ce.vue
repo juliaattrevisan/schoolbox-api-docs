@@ -2,7 +2,7 @@
 /**
  * When selected displays a linked dropdown
  */
-import { computePosition, flip, shift } from "@floating-ui/dom";
+import { ReferenceElement, computePosition, flip, shift } from "@floating-ui/dom";
 
 interface Props {
     dataDropdown: string; // the id of the linked dropdown to display
@@ -10,7 +10,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dropdownTrigger = window.Vue.ref<HTMLButtonElement | null>(null);
-const dropdownContent = window.Vue.ref<HTMLElement | null>(null);
+let dropdownContent: HTMLElement;
 const isOpen = window.Vue.ref(false);
 
 /**
@@ -18,11 +18,11 @@ const isOpen = window.Vue.ref(false);
  */
 window.Vue.onMounted(() => {
     window.addEventListener("DOMContentLoaded", () => {
-        dropdownContent.value = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
-        if (!dropdownContent.value) {
+        dropdownContent = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
+        if (!dropdownContent) {
             return;
         }
-        dropdownContent.value.setAttribute("aria-hidden", "true");
+        dropdownContent.setAttribute("aria-hidden", "true");
     });
 });
 
@@ -44,29 +44,29 @@ function onButtonSelected() {
         }
     }
 
-    dropdownContent.value.style.display = "block"; // The element must be visible to correctly compute its position
+    dropdownContent.style.display = "block"; // The element must be visible to correctly compute its position
 
-    computePosition(dropdownTrigger.value, dropdownContent.value, {
+    computePosition(dropdownTrigger.value as ReferenceElement, dropdownContent, {
         placement: "bottom-end",
         middleware: [flip(), shift()],
     })
         .then(({ x, y }) => {
             window.sbProps.activeDropdown = {
                 id: props.dataDropdown,
-                trigger: dropdownTrigger.value,
-                content: dropdownContent.value,
+                trigger: dropdownTrigger.value as HTMLButtonElement,
+                content: dropdownContent,
                 close: (event?: MouseEvent) => {
                     // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
                     if (
                         event &&
-                        dropdownContent.value.contains(event.target as Node) &&
-                        dropdownContent.value.getAttribute("aria-autoclose") === "false"
+                        dropdownContent.contains(event.target as Node) &&
+                        dropdownContent.getAttribute("aria-autoclose") === "false"
                     ) {
                         return;
                     }
 
-                    dropdownContent.value.style.display = "none";
-                    dropdownContent.value.setAttribute("aria-hidden", "true");
+                    dropdownContent.style.display = "none";
+                    dropdownContent.setAttribute("aria-hidden", "true");
                     isOpen.value = false;
 
                     if (window.sbProps.activeDropdown) {
@@ -75,10 +75,10 @@ function onButtonSelected() {
                     }
                 },
             };
-            dropdownContent.value.style.left = `${x}px`;
-            dropdownContent.value.style.top = `${y}px`;
+            dropdownContent.style.left = `${x}px`;
+            dropdownContent.style.top = `${y}px`;
 
-            dropdownContent.value.setAttribute("aria-hidden", "false");
+            dropdownContent.setAttribute("aria-hidden", "false");
             isOpen.value = true;
 
             // Add an event listener to close the dropdown when the user clicks anywhere outside the content
