@@ -9,6 +9,7 @@
  # @param array $scores             A list of score tuples obtained per question in this attempt
  # @param array $responseComments   A list of comment tuples that contain per-question comments
  # @param array $attemptComments    A list of comment tuples that contain per-attempt comments
+ # @param array $attemptReferences  A list of attempt Learnosity references used in Attempt Comment textarea ids
  #}
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
@@ -68,7 +69,7 @@
         <section class="content">
             {% for user in users %}
                 <h3>{{ user.name }}</h3>
-                <textarea>{{ attemptComments[user.id].comment ?? '' }}</textarea>
+                <textarea id="attempt-comment-{{ attemptComments[user.id].reference }}" name="attemptComment[{{ attemptComments[user.id].reference }}]">{{ attemptComments[user.id].comment ?? '' }}</textarea>
             {% endfor %}
         </section>
     </div>
@@ -108,7 +109,15 @@
 
     /* Remember all the textareas we built
      */
-    let responseEditorFields = [];
+    let ckeditorFields = [];
+
+    /* These are the Attempt Comment identifiers that we spawned with twig
+     */
+    let attemptComments = JSON.parse('{{ attemptReferences|raw }}');
+
+    attemptComments.forEach(function(element, index) {
+        ckeditorFields.push('#attempt-comment-' + element);
+    });
 
     /* A list of (user_id, name) tuples that we use to replace Item titles
      * with the student's name, e.g. replace "Item 2" with "Michael White"
@@ -186,7 +195,7 @@
 
                             /* We need this for cke replacements
                              */
-                            responseEditorFields.push('#responseComments-' + learnosityReferenceTuple);
+                            ckeditorFields.push('#responseComments-' + learnosityReferenceTuple);
 
                             /* Assign async blur listener to each Score and Comment field
                              * so it sends back to Learnosity upon blur
@@ -231,14 +240,14 @@
              */
             document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
                 detail: {
-                    targetElements: responseEditorFields
+                    targetElements: ckeditorFields
                 }
             }));
 
             /* Assign event listeners for changes in ckeditors after waiting
              * for them all to spawn
              */
-            responseEditorFields.forEach(function (element, index) {
+            ckeditorFields.forEach(function (element, index) {
                 document.querySelector(element).addEventListener('EDITOR__CREATED', function() {
                     /* Remove that hash
                      */

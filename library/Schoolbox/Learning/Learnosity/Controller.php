@@ -903,6 +903,7 @@ class Controller extends Base
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
             'responseComments' => base64_encode(json_encode($responseComments, JSON_THROW_ON_ERROR)),
             'attemptComments' => $attemptComments,
+            'attemptReferences' => json_encode(array_values($sessions), JSON_THROW_ON_ERROR)
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
