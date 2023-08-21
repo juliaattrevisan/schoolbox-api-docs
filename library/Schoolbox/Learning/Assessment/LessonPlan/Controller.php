@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -54,7 +55,8 @@ class Controller extends Assessment\Controller
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         private CourseImplementationMapper $courseImplementationMapper,
-        private UnitImplementationMapper $unitImplementationMapper
+        private UnitImplementationMapper $unitImplementationMapper,
+        private LinkedAssessmentsMapper $linkedAssessmentsMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -266,8 +268,7 @@ class Controller extends Assessment\Controller
 
     public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
-        $linkedAssessmentsMapper = Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::getInstance();
-        if ($linkedAssessmentsMapper->saveLink($assessment, $linkedAssessment)) {
+        if ($this->linkedAssessmentsMapper->saveLink($assessment, $linkedAssessment)) {
             $assessment->getLinkedAssessments()->add($linkedAssessment);
             $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->map(new Assessment\Translator\UnitAssessments()));
         } else {
@@ -277,8 +278,7 @@ class Controller extends Assessment\Controller
 
     public function deleteActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
-        $linkedAssessmentsMapper = Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::getInstance();
-        $return = $linkedAssessmentsMapper->deleteLink($assessment, $linkedAssessment);
+        $return = $this->linkedAssessmentsMapper->deleteLink($assessment, $linkedAssessment);
         if (0 === $return) {
             throw new NotFound();
         }

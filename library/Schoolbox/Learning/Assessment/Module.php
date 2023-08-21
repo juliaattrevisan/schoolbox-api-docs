@@ -509,6 +509,9 @@ class Module extends BaseModule
         $projectResultCacheMapper  = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
         $lessonPlanTemplateMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class);
         $lessonPlanDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class);
+        $linkedAssessmentsMapper   = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
+        $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
+        $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
 
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->injector->get('assessmentDataSource');
@@ -697,8 +700,9 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
-                    $this->getCourseImplementationMapper(),
-                    $this->getUnitImplementationMapper(),
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    $linkedAssessmentsMapper
                 );
 
             default:
@@ -877,15 +881,6 @@ class Module extends BaseModule
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Access::class);
     }
-
-    /**
-     * @return CourseImplementationMapper
-     */
-    protected function getCourseImplementationMapper(): CourseImplementationMapper
-    {
-        return $this->getMapperFactory()->get(CourseImplementationMapper::class);
-    }
-
 
     /**
      * Rules in order of preference:
