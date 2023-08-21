@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
@@ -112,21 +111,33 @@ class Controller extends Assessment\Controller
                 $course = $courseImplementationMapper->findById($assessment->getContext()->getId());
                 $course->setUnits($unitImplementationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitImpl) {
+                    /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitSpec */
                     $unitImplId = $unitImpl->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
                     $assessments = $assessmentMapperProxy->findAllByUnitImplementationIds([$unitImplId], $options);
                     $unitImpl->setAssessables($assessments);
-                    $courseAssessments[$unitImplId] = $assessments;
+                    $courseAssessments['units'][] = [
+                        'id' => $unitImplId,
+                        'title' => $unitImpl->getTitle(),
+                        'closeDate' => $unitImpl->getDueDate(),
+                        'assessments' => $assessments
+                    ];
                 }
             } else {
                 $course = $assessment->getContext()->getCourse();
                 $course->setUnits($unitSpecificationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitSpec) {
+                    /** @var \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unitSpec */
                     $unitSpecId = $unitSpec->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
                     $assessments = $assessmentMapperProxy->findAllByUnitSpecificationId($unitSpecId, $options);
                     $unitSpec->setAssessables($assessments);
-                    $courseAssessments[$unitSpecId] = $assessments;
+                    $courseAssessments['units'][] = [
+                        'id' => $unitSpecId,
+                        'title' => $unitSpec->getTitle(),
+                        'closeDate' => null,
+                        'assessments' => $assessments
+                    ];
                 }
             }
         }
