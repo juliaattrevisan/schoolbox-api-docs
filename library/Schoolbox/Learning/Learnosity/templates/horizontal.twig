@@ -209,6 +209,11 @@
          *
          * Spondonicles God of War might have a smarter, less-flavourful
          * way of doing this in vanilla js (I leave this conversion to him)
+         *
+         * Tried the replacement specified in
+         * https://youmightnotneedjquery.com/#on
+         * but kept getting
+         * Uncaught TypeError: el.addEventListener is not a function
          */
         $('[data-item-reference]').on('click', function (event) {
             event.preventDefault();
