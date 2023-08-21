@@ -127,7 +127,7 @@
                                                         </div>
                                                     {% endif %}
                                                     <p class="meta">
-                                                        <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
+                                                        <span class="unit-task-due-date">{{ dueDate.forAssessment(assessment) }}</span>
                                                     </p>
                                                     {% if "staff" == assessment.visibility %}
                                                     <p class="meta">
