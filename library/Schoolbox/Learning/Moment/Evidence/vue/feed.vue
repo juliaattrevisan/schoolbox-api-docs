@@ -114,6 +114,8 @@ export default {
 
         /**
          * Appends learning evidence to the data list.
+         *
+         * @param {string} cursor -
          */
         async append(cursor) {
             const params = {};
@@ -141,8 +143,8 @@ export default {
         /**
          * Groups learning evidence / badges by the date which it was posted.
          *
-         * @param {Array} feedResults
-         * @return Array
+         * @param { Array } feedResults -
+         * @returns { Array } -
          */
         groupFeedResults(feedResults) {
             let groupedEvidenceByDate = {};
@@ -175,7 +177,8 @@ export default {
         /**
          * Renders the created-at time as a string.
          *
-         * @param {Moment} createdAt
+         * @param {object} createdAt -
+         * @returns {string} - Created at date in human-readable format.
          */
         renderCreatedAt(createdAt) {
             let now = dayjs().startOf("d"),
@@ -203,17 +206,17 @@ export default {
         /**
          * Does this evidence have a menu?
          *
-         * @param evidence
-         * @returns {Boolean}
+         * @param { object } evidence -
+         * @returns { boolean } -
          */
         hasMenu(evidence) {
-            return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm);
+            return Boolean(evidence?.links?.modifyForm || evidence?._links?.deleteForm);
         },
 
         /**
          * Display the delete modal for a piece of evidence.
          *
-         * @param {Object} evidence
+         * @param { object } evidence -
          */
         showDeleteModal(evidence) {
             this.currentlyDeletingEvidence = evidence;
@@ -223,7 +226,7 @@ export default {
         /**
          * Actually delete this evidence.
          *
-         * @param {Object} evidence
+         * @param { object } evidence -
          */
         async deleteEvidence(evidence) {
             this.$refs.toast.activate("Deleting...");
@@ -261,7 +264,7 @@ export default {
         /**
          * Open the view badge award modal.
          *
-         * @param {Object} badgeAward The badge award object to display
+         * @param {object} badgeAward - The badge award object to display
          */
         openViewBadgeAwardModal(badgeAward) {
             this.$refs.awardDetailModal.open(badgeAward);
@@ -270,10 +273,9 @@ export default {
         /**
          * Format the date as specified
          *
-         * @param { Date }
-         * @param { String }
-         *
-         * @returns { String }
+         * @param {Date} date -
+         * @param {string} format -
+         * @returns {string} -
          */
         formatDate(date, format) {
             return dayjs(date).format(format);
@@ -287,7 +289,7 @@ export default {
         /**
          * to open up the node details modal
          *
-         * @param { Object }
+         * @param {object} node -
          */
         onCodeSelected(node) {
             this.selectedNode = node;
@@ -345,8 +347,8 @@ export default {
          *
          * The URL is expected to have parameters like this:
          *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
-         *    * Both parameters ('tag' and 'filterNames') are optional
-         *    * filterNames are expected to match the keys from this.selectedFilters.
+         *    - Both parameters ('tag' and 'filterNames') are optional
+         *    - filterNames are expected to match the keys from this.selectedFilters.
          *
          * Example of return value:
          *    {
@@ -354,8 +356,7 @@ export default {
          *       tag: '' { String }
          *    }
          *
-         * @return { ?Object }
-         *
+         * @returns {?object} -
          * @see this.getFiltersStateFromDom()
          */
         getFiltersStateFromUrl() {
@@ -394,8 +395,7 @@ export default {
          *       tag: '' { String }
          *    }
          *
-         * @return { Object }
-         *
+         * @returns {object} -
          * @see this.getFiltersStateFromUrl()
          */
         getFiltersStateFromDom() {
@@ -411,7 +411,7 @@ export default {
         },
 
         /**
-         * @param filtersState { ?Object }
+         * @param  {?object} filtersState -
          *
          * Example of non-null filtersState object:
          *    {
