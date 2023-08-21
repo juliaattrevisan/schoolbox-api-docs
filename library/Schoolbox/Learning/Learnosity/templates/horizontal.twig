@@ -219,11 +219,11 @@
                 }
             }));
 
-            /* FIXME Assign event listeners for changes in ckeditors after waiting
-             * for them all to spawn (arbitrary 1000ms)
+            /* Assign event listeners for changes in ckeditors after waiting
+             * for them all to spawn
              */
-            setTimeout(function() {
-                responseEditorFields.forEach(function (element, index) {
+            responseEditorFields.forEach(function (element, index) {
+                document.querySelector(element).addEventListener('EDITOR__CREATED', function() {
                     /* Remove that hash
                      */
                     let key = element.substr(1);
@@ -239,8 +239,8 @@
                             console.log('Send ' + key + ' comment to our db');
                         }
                     });
-                })
-            }, 1000);
+                });
+            });
 
             /* Show list of questions to choose from
              */
