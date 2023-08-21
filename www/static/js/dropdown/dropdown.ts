@@ -51,7 +51,16 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
                     id: dropdownId,
                     content: dropdownContent,
                     trigger: dropdownTrigger,
-                    close: () => {
+                    close: (event?: MouseEvent) => {
+                        // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
+                        if (
+                            event &&
+                            dropdownContent.contains(event.target as Node) &&
+                            dropdownContent.getAttribute("aria-autoclose") === "false"
+                        ) {
+                            return;
+                        }
+
                         dropdownContent.style.display = "none";
                         dropdownContent.setAttribute("aria-hidden", "true");
                         dropdownTrigger.setAttribute("aria-expanded", "false");
