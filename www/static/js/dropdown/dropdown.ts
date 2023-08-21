@@ -89,22 +89,22 @@ function initializeDropdown(dropdownTrigger: HTMLElement) {
 /*
  * Initialize dropdowns on DOMContentLoaded
  */
-document.addEventListener("DOMContentLoaded", () => {
-    // Initialize the activeDropdown property if it doesn't exist
-    window.sbProps.activeDropdown = window.sbProps.activeDropdown ?? false;
+// document.addEventListener("DOMContentLoaded", () => {
+//     // Initialize the activeDropdown property if it doesn't exist
+//     window.sbProps.activeDropdown = window.sbProps.activeDropdown ?? false;
 
-    const dropdowns = document.querySelectorAll("[data-dropdown]");
-    dropdowns.forEach((dropdownTrigger) => {
-        initializeDropdown(dropdownTrigger as HTMLElement);
-    });
-});
+//     const dropdowns = document.querySelectorAll("[data-dropdown]");
+//     dropdowns.forEach((dropdownTrigger) => {
+//         initializeDropdown(dropdownTrigger as HTMLElement);
+//     });
+// });
 
 /*
  * Initialize dropdowns on DROPDOWN__INIT event (In case the dropdown is added to the DOM after DOMContentLoaded)
  */
-document.addEventListener("DROPDOWN__INIT", () => {
-    const dropdowns = document.querySelectorAll("[data-dropdown]");
-    dropdowns.forEach((dropdownTrigger) => {
-        initializeDropdown(dropdownTrigger as HTMLElement);
-    });
-});
+// document.addEventListener("DROPDOWN__INIT", () => {
+//     const dropdowns = document.querySelectorAll("[data-dropdown]");
+//     dropdowns.forEach((dropdownTrigger) => {
+//         initializeDropdown(dropdownTrigger as HTMLElement);
+//     });
+// });
