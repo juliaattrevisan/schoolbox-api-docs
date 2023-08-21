@@ -438,8 +438,8 @@
 
             let report = document.querySelector(`#${reportIds[i]}`);
             let response = report.querySelector(`.learnosity-item[data-reference="${itemReference}"]`);
-            let clearfix = prev(response);
-            let title = prev(clearfix);
+            let clearfix = prev(response, null);
+            let title = prev(clearfix, null);
             let score = report.querySelector(`.sb-custom-score[data-reference="${itemReference}"]`);
 
             /* If elements existed, show them
