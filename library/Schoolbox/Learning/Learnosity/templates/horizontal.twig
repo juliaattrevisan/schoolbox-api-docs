@@ -51,7 +51,7 @@
     <div id="reports" style="display:none">
         <div class="small-12 island">
             {% for user in users %}
-                <section class="content">
+                <section class="content" data-learnosity-report-container>
                     <div id="schoolbox-student-{{ user.id }}" data-name="{{ user.name }}"></div>
                 </section>
             {% endfor %}
@@ -444,11 +444,21 @@
         }
 
         /* Special case: Attempt Comments
+         * When the Attempt Comments pseudoreport shows, hide the other ones
+         * and vice versa
          */
         if (itemReference === 'sb-attempt-comments') {
             document.querySelector('#sb-attempt-comments').style = '';
+
+            document.querySelectorAll('[data-learnosity-report-container]').forEach(function (element, index) {
+                element.style = 'display:none;'
+            });
         } else {
             document.querySelector('#sb-attempt-comments').style = 'display:none';
+
+            document.querySelectorAll('[data-learnosity-report-container]').forEach(function (element, index) {
+                element.style = ''
+            });
         }
     }
 
