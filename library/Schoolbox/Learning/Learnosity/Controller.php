@@ -179,13 +179,14 @@ class Controller extends Base
      * Let a student do an attempt in a Learnosity quiz
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
      * @throws Deleted
+     * @throws Error
      * @throws Exception
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \Alaress\Database\Exception
-     * @throws RouteNotFound
      * @throws \JsonException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
@@ -500,9 +501,9 @@ class Controller extends Base
      * Provide feedback for an attempt
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
-     * @throws Exception
+     * @param User $student
+     * @param Model $attempt
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      * @throws \RuntimeException
