@@ -395,6 +395,7 @@ class Calendar extends DeprecatedModel
         // Filters - some of these are covered by main query anyway, so no need
         // for extra filters.
         $filter_query = [];
+        $filterParams = [];
 
         if (isset($filter['campus'])) {
             $filter_query[] = 'access = ' . EventModel::ACCESS_CAMPUS;
@@ -423,7 +424,13 @@ class Calendar extends DeprecatedModel
         }
 
         if (isset($filter['id'])) {
-            $filter_query[] = 'event.id = ' . intval($filter['id']);
+            if (is_array($filter['id']) && !empty($filter['id'])) {
+                $idBinds = \Alaress\Database\Predicate\Builder::getBindings($filter['id'], 'id');
+                $filter_query[] = "event.id IN ({$idBinds->getPlaceholder()})";
+                $filterParams = array_merge($filterParams, $idBinds->getParams());
+            } else {
+                $filter_query[] = 'event.id = ' . intval($filter['id']);
+            }
         }
 
         $filter_query = implode(' AND ', $filter_query);
@@ -532,7 +539,7 @@ class Calendar extends DeprecatedModel
             EventModel::ACCESS_CAMPUS
         );
 
-        $allEvents = $this->db->query($query)->fetchAll();
+        $allEvents = $this->db->query($query, $filterParams)->fetchAll();
 
         /* Standardised output
          */

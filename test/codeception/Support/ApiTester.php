@@ -52,4 +52,51 @@ class ApiTester extends \Codeception\Actor
         $this->haveHttpHeader('Accept', 'application/json');
         $this->haveHttpHeader('X-Requested-With', 'xmlhttprequest');
     }
+
+
+    /**
+     * @param array $response
+     * @param array $schema
+     * @return void
+     */
+    public function checkSchema(array $response, array $schema): void
+    {
+        $notDocumentedProperties = array_diff(array_keys($response), array_keys($schema['properties']));
+        $this->assertEmpty($notDocumentedProperties, 'Checked properties missing in document.');
+
+        // iterate through documented properties
+        foreach ($schema['properties'] as $key => $value) {
+            if (!isset($value['type'])) {
+                $this->comment("$key doesn't have type : " . json_encode($value));
+                continue;
+            }
+            if ($value['type'] === 'object') {
+                if (!isset($value['properties'])) {
+                    $this->comment("Object $key doesn't have properties");
+                    continue;
+                }
+                foreach ($value['properties'] as $subKey => $subValue) {
+                    if (!isset($subValue['type'])) {
+                        $this->comment("$key doesn't have type : " . json_encode($value));
+                        continue;
+                    }
+                    $responseVal = $this->grabDataFromResponseByJsonPath("$.data[0].$key.$subKey");
+                    if ($responseVal[0] === null) {
+                        $this->assertTrue(array_key_exists('nullable', $subValue));
+                    } else {
+                        $this->seeResponseMatchesJsonType([$subKey => $subValue['type']], "$.data[0].$key");
+                    }
+                }
+            } else {
+                $responseVal = $this->grabDataFromResponseByJsonPath("$.data[0].$key");
+                if ($responseVal[0] === null) {
+                    $this->assertTrue(array_key_exists('nullable', $value));
+                } else {
+                    $this->seeResponseMatchesJsonType([$key => $value['type']], "$.data[0]");
+                }
+            }
+
+            $this->assertArrayHasKey($key, $response, "Checked whether property $key in document exists in response.");
+        }
+    }
 }

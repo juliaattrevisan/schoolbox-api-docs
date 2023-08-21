@@ -81,7 +81,7 @@ class CalendarEventAttendanceCest
     }
 
     /**
-     * @param ApiTester      $i
+     * @param ApiTester       $i
      * @param \Schoolbox\User $user
      * @param bool            $canInvite
      * @return void
@@ -110,7 +110,8 @@ class CalendarEventAttendanceCest
             $user,
             Event::ACCESS_PERSONAL,
             Event\Attendance\Model::LEVEL_NO_ATTENDANCE,
-            true
+            true,
+            null
         );
 
         if ($canInvite) {
@@ -118,13 +119,15 @@ class CalendarEventAttendanceCest
                 $user,
                 Event::ACCESS_PERSONAL,
                 Event\Attendance\Model::LEVEL_INVITE_ONLY,
-                false
+                false,
+                null
             );
             $inviteShowGuestListEvent = $i->createEvent(
                 $user,
                 Event::ACCESS_PERSONAL,
                 Event\Attendance\Model::LEVEL_INVITE_ONLY,
-                true
+                true,
+                null
             );
         }
 

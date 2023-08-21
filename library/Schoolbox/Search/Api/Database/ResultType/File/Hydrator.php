@@ -25,7 +25,7 @@ class Hydrator extends BaseHydrator
     /**
      * Base type for this type of result.
      */
-    private const BASE_TYPE = 'file';
+    public const BASE_TYPE = 'file';
 
     /**
      * Constructor

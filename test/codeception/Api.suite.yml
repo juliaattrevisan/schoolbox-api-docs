@@ -6,7 +6,7 @@ modules:
     - REST:
         depends: PhpBrowser
         url: 'https://vagrant.dev.schoolbox.cloud'
-        xdebug: false
+        xdebug: true
         part: Json
     - Db:
         dsn: "mysql:host=localhost;dbname=schoolbox"
@@ -14,3 +14,9 @@ modules:
         password: "tnp879"
     - Tests\Support\Helper\Api:
     - Asserts:
+    - Tests\Support\Helper\Integration:
+        depends: PhpBrowser
+        url: 'https://vagrant.dev.schoolbox.cloud'
+        xdebug: true
+        curl:
+          CURLOPT_SSL_VERIFYPEER: false

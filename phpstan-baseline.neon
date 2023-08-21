@@ -586,11 +586,6 @@ parameters:
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
 
 		-
-			message: "#^Argument of an invalid type null supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
 			message: "#^Method Calendar\\\\Event\\\\Type\\\\EventBase\\:\\:getAuthorName\\(\\) should return null but returns string\\.$#"
 			count: 1
 			path: library/Calendar/Event/Type/EventBase.php

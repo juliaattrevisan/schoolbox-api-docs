@@ -15,6 +15,7 @@ namespace Calendar\Event\Type\Day;
 
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
+use Schoolbox\GenericCollection;
 
 class Event extends EventBase
 {
@@ -64,7 +65,7 @@ class Event extends EventBase
     /**
      * Associated Groups (Type 2)
      *
-     * @var null
+     * @var null|GenericCollection
      */
     protected $categoryCollection = null;
 
@@ -338,7 +339,7 @@ class Event extends EventBase
     /**
      * Set category collection
      *
-     * @param null $categoryCollection
+     * @param null|GenericCollection $categoryCollection
      */
     public function setCategoryCollection($categoryCollection)
     {
@@ -348,7 +349,7 @@ class Event extends EventBase
     /**
      * Get category collection
      *
-     * @return null
+     * @return null|GenericCollection
      */
     public function getCategoryCollection()
     {
