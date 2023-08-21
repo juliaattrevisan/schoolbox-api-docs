@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\UserMapper;
 
 /**
@@ -43,6 +44,7 @@ class Mapper extends BaseMapper
         $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateContext']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAssessables']);
     }
 
@@ -89,6 +91,22 @@ class Mapper extends BaseMapper
         // TODO remove superfluous soft-delete field from other assessment types
         $assessmentMapper->delete($otherAssessmentTypeModels);
         $submissionBoxMapper->delete($submissionBoxes);
+
+        return true;
+    }
+
+    /**
+     * Validates context is a valid option (Unit)
+     *
+     * @param Model $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateContext(Model $model): bool
+    {
+        if ($model->getAssessmentModel()->getAssessmentContext() instanceof \Schoolbox\Resource\Folder\Model) {
+            throw new CallbackException("Projects are unable to created inside a folder");
+        }
 
         return true;
     }

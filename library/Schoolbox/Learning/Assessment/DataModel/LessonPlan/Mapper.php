@@ -283,6 +283,7 @@ class Mapper extends \Schoolbox\Mapper
             $lessonPlan->setUpdatedBy($this->getSessionUser());
         }
     }
+
     /**
      * Validates context is a valid option (Unit / Project)
      *
