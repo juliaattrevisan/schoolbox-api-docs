@@ -23,6 +23,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as AccessMapper;
@@ -56,9 +57,14 @@ class Module extends BaseModule
         );
 
         /**
-         * All users should be able to view the classes lesson plans
+         * All users should be able to view the classes lesson plans if they can see the class page
          */
-        $permsAll = new Rule\IsLoggedIn();
+        $permsAll = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function ($params) {
+                return $params['folderId'];
+            }, $this->getAccessMapper())
+        );
 
         $preloadCourseSpec = function (array $params) {
             try {
