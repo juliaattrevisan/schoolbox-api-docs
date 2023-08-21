@@ -70,6 +70,10 @@
             {# Attached files #}
             {% include '@learningAssessment/fragments/attachments.twig' with { attachments: assessment.attachments } %}
             {# Linked Assessments #}
+            {# all assessments that I could link to... #}
+            <pre>
+                {{ courseAssessments |json_encode }}
+            </pre>
             {% if assessment.linkedAssessments is not empty %}
                 Linked Assessments:
                 <ul>

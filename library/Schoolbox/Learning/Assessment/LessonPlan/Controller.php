@@ -11,8 +11,13 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
@@ -91,12 +96,48 @@ class Controller extends Assessment\Controller
 
         $lastView->addNewView($assessment, $student, $this->getUser());
 
+        /**
+         * get list of all activities within this course
+         * only for staff
+         */
+        $courseImplementationMapper = CourseImplementationMapper::getInstance();
+        $unitImplementationMapper = UnitImplementationMapper::getInstance();
+        $unitSpecificationMapper = UnitSpecificationMapper::getInstance();
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        $courseAssessments = [];
+        if ($this->getUser()->getRole()->isStaff()) {
+            if ($assessment->getContext()->isImplementationContext()) {
+                $course = $courseImplementationMapper->findById($assessment->getContext()->getId());
+                $course->setUnits($unitImplementationMapper->findAllByCourseId($course->getId()));
+                foreach ($course->getUnits() as $unitImpl) {
+                    $unitImplId = $unitImpl->getId();
+                    $options = ['order' => ['sequence' => 'ASC']];
+                    $assessments = $assessmentMapperProxy->findAllByUnitImplementationIds([$unitImplId], $options);
+                    $unitImpl->setAssessables($assessments);
+                    $courseAssessments[$unitImplId] = $assessments;
+                }
+            } else {
+                $course = $assessment->getContext()->getCourse();
+                $course->setUnits($unitSpecificationMapper->findAllByCourseId($course->getId()));
+                foreach ($course->getUnits() as $unitSpec) {
+                    $unitSpecId = $unitSpec->getId();
+                    $options = ['order' => ['sequence' => 'ASC']];
+                    $assessments = $assessmentMapperProxy->findAllByUnitSpecificationId($unitSpecId, $options);
+                    $unitSpec->setAssessables($assessments);
+                    $courseAssessments[$unitSpecId] = $assessments;
+                }
+            }
+        }
+
         $twigData = [
             'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,
             'student'      => $student,
             'returnUrl'    => $returnUrl,
+            'courseAssessments' => $courseAssessments,
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
