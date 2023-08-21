@@ -375,6 +375,10 @@
             newElement.addEventListener('click',  function() {
                 showResponse(document.querySelector(`#item-list [data-item-reference="${itemReference}"]`).getAttribute('data-item-reference'));
                 updateNavigator(itemIndex, itemReference);
+
+                /* Scroll to the top of the responses, I guess
+                 */
+                document.getElementById('reports').scrollIntoView();
             }, null);
         } else {
             /* Disable the button
