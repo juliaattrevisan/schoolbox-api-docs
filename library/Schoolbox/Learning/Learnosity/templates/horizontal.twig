@@ -36,6 +36,12 @@
                 {% for itemReference in itemReferences %}
                     <li><a data-item-reference="{{ itemReference.reference }}">{{ itemReference.title }}</a></li>
                 {% endfor %}
+                {# You could craft an intentionally-unusual data-item-reference,
+                 # hardcoded to never collide with Learnosity's; this would allow
+                 # people to visit the Attempt Comments as part of the navigation
+                 # scheme, but that might be a bit disruptive
+                 #}
+                <li><a href="#">Attempt Comments</a></li>
             </ul>
         </section>
     </div>
@@ -49,6 +55,13 @@
                 </section>
             {% endfor %}
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <a id="previous-item">Previous Question</a>
+        <a id="next-item">Next Question</a>
     </div>
 </div>
 
@@ -200,6 +213,10 @@
         }
     }, 100);
 
+    /* Table of contents :p
+     */
+    let itemIndex = buildItemIndex();
+
     $(function() {
         /* Presume it'll take longer to load all the learnosity reports
          * than it does for jquery to init
@@ -215,9 +232,84 @@
         $('[data-item-reference]').on('click', function (event) {
             event.preventDefault();
 
-            showResponse($(this).attr('data-item-reference'));
+            let currentItemReference = $(this).attr('data-item-reference');
+
+            showResponse(currentItemReference);
+            updateNavigator(itemIndex, currentItemReference);
         });
     });
+
+
+    /**
+     * Build a sequenced list of item references used in the table of contents
+     * that users can click to navigate around horizontal marking. SURELY there
+     * was an easier way with vanilla next() and prev() but kept running into
+     * random syntax problems, and you can do this in one line in jquery.
+     */
+    function buildItemIndex() {
+        let itemList = document.querySelectorAll('#item-list [data-item-reference]');
+
+        let itemReferences = [];
+
+        itemList.forEach(function (element, index) {
+            itemReferences.push(element.getAttribute('data-item-reference'));
+        });
+
+        return itemReferences;
+    }
+
+
+    /**
+     * Update previous/next buttons
+     *
+     * @param itemIndex A list of item references
+     * @param current The item reference of the current question that we clicked
+     */
+    function updateNavigator(itemIndex, current) {
+        let previous = null;
+        let next = null;
+
+        itemIndex.forEach(function (element, index) {
+            if (current === element) {
+                previous = itemIndex[index-1];
+                next = itemIndex[index+1];
+            }
+        });
+
+        /* Redefine what Previous button does
+         */
+        if (previous) {
+            /* Clear all event listeners by replacing the whole thing
+             */
+            let oldElement = document.querySelector('#previous-item');
+            let newElement = oldElement.cloneNode(true);
+            oldElement.parentNode.replaceChild(newElement, oldElement);
+
+            /* Reassign new behaviour
+             */
+            document.querySelector('#previous-item').addEventListener('click',  function() {
+                showResponse(document.querySelector(`#item-list [data-item-reference="${previous}"]`).getAttribute('data-item-reference'));
+                updateNavigator(itemIndex, previous);
+            }, null);
+        }
+
+        /* Redefine what Next button does
+         */
+        if (next) {
+            /* Clear all event listeners by replacing the whole thing
+             */
+            let oldElement = document.querySelector('#next-item');
+            let newElement = oldElement.cloneNode(true);
+            oldElement.parentNode.replaceChild(newElement, oldElement);
+
+            /* Reassign new behaviour
+             */
+            document.querySelector('#next-item').addEventListener('click', function() {
+                showResponse(document.querySelector(`#item-list [data-item-reference="${next}"]`).getAttribute('data-item-reference'));
+                updateNavigator(itemIndex, next);
+            }, null);
+        }
+    }
 
 
     /**
@@ -316,6 +408,25 @@
 
         if (!selector || (prevEl && prevEl.matches(selector))) {
             return prevEl;
+        }
+
+        return null;
+    }
+
+
+    /**
+     * jquery replacement
+     * https://youmightnotneedjquery.com/#next
+     *
+     * @param el
+     * @param selector
+     * @returns {Element|null}
+     */
+    function next(el, selector) {
+        const nextEl = el.nextElementSibling;
+
+        if (!selector || (nextEl && nextEl.matches(selector))) {
+            return nextEl;
         }
 
         return null;
