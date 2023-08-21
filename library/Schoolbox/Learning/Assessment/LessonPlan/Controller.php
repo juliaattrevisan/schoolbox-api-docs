@@ -135,7 +135,7 @@ class Controller extends Assessment\Controller
                     $courseAssessments['units'][] = [
                         'id' => $unitSpecId,
                         'title' => $unitSpec->getTitle(),
-                        'closeDate' => null,
+                        'closeDate' => null, // No Close Date for specifications
                         'assessments' => $assessments
                     ];
                 }
