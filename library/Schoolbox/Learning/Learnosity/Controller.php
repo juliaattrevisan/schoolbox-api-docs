@@ -786,12 +786,20 @@ class Controller extends Base
         $sessions = [];
         $users = [];
         $reportPayloads = [];
+        $attemptComments = [];
 
         foreach ($attempts as $attempt) {
             $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
 
             if (!isset($users[$key]) && $attempt->isFinished()) {
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
+
+                /* Find all the comments for this attempt (need it later)
+                 */
+                $attemptComments[$attempt->getUser()->getId()] = [
+                    'reference' => $attempt->getLearnosityReference(),
+                    'comment' => $attempt->getComment()
+                ];
 
                 /* ...because Learnosity wants it in this format
                  */
@@ -884,7 +892,7 @@ class Controller extends Base
 
         /* Find all the comments for these responses
          */
-        $comments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
@@ -893,7 +901,8 @@ class Controller extends Base
             'assessment' => $assessment,
             'itemReferences' => $itemReferences,
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
+            'responseComments' => base64_encode(json_encode($responseComments, JSON_THROW_ON_ERROR)),
+            'attemptComments' => $attemptComments,
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()

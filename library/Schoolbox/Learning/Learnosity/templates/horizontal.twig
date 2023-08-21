@@ -7,8 +7,9 @@
  # @param IAssessable $assessment   Our schoolbgox quiz instance
  # @param array $itemReferences     A set of (item reference, item title) tuples for rendering the table of contents
  # @param array $scores             A list of score tuples obtained per question in this attempt
- # @param array $comments           A list of comment tuples that contain per-question comments
-#}
+ # @param array $responseComments   A list of comment tuples that contain per-question comments
+ # @param array $attemptComments    A list of comment tuples that contain per-attempt comments
+ #}
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
@@ -41,7 +42,7 @@
                  # people to visit the Attempt Comments as part of the navigation
                  # scheme, but that might be a bit disruptive
                  #}
-                <li><a href="#">Attempt Comments</a></li>
+                <li><a data-item-reference="sb-attempt-comments">Attempt Comments</a></li>
             </ul>
         </section>
     </div>
@@ -58,6 +59,21 @@
     </div>
 </div>
 
+{# Attempt Comments
+ # These are always on the last page of a quiz according to the table of contents
+ # and are part of the Previous Question/Next Question cycler
+ #}
+<div id='sb-attempt-comments' class="row" style="display:none">
+    <div class="small-12 island">
+        <section class="content">
+            {% for user in users %}
+                <h3>{{ user.name }}</h3>
+                <textarea>{{ attemptComments[user.id].comment ?? '' }}</textarea>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+
 <div class="row">
     <div class="small-12 columns">
         <div class="sb-grid u-gap--l sb-grid--2-col dummy-content highlighter u-margin-m--bottom">
@@ -71,7 +87,7 @@
     /* All the scores and comments that people got
      */
     let responseScores = JSON.parse('{{ scores|raw }}');
-    let responseComments = JSON.parse(atob('{{ comments|raw }}'));
+    let responseComments = JSON.parse(atob('{{ responseComments|raw }}'));
 
     /* Remember how many reports were loaded
      *
@@ -163,14 +179,14 @@
                                 '<label>Customise score</label>' +
                                 '<input id="scores-' + learnosityReferenceTuple + '" name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
-                                '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + (responseComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
+                                '<textarea id="responseComments-' + learnosityReferenceTuple + '" name="responseComments[' + learnosityReferenceTuple + ']">' + (responseComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
                                 '</div>';
 
                             container.append(guts);
 
                             /* We need this for cke replacements
                              */
-                            responseEditorFields.push('#comments-' + learnosityReferenceTuple);
+                            responseEditorFields.push('#responseComments-' + learnosityReferenceTuple);
 
                             /* Assign async blur listener to each Score and Comment field
                              * so it sends back to Learnosity upon blur
@@ -182,7 +198,7 @@
                                 /* TODO Add toaster
                                  */
 
-                                /* Send it
+                                /* TODO Send it
                                  */
                                 console.log('Send ' + learnosityReferenceTuple + ' score back to guys');
                             });
@@ -425,6 +441,14 @@
             if (score) {
                 score.style = '';
             }
+        }
+
+        /* Special case: Attempt Comments
+         */
+        if (itemReference === 'sb-attempt-comments') {
+            document.querySelector('#sb-attempt-comments').style = '';
+        } else {
+            document.querySelector('#sb-attempt-comments').style = 'display:none';
         }
     }
 
