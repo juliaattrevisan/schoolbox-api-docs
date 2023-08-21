@@ -805,7 +805,9 @@ class Controller extends Base
                  */
                 $users[$key] = [
                     'id' => (string)$attempt->getUser()->getId(),
-                    'name' => $attempt->getUser()->getFullName()
+                    'name' => $attempt->getUser()->getFullName(),
+                    'firstname' => $attempt->getUser()->getFirstname(),
+                    'lastname' => $attempt->getUser()->getLastname()
                 ];
 
                 /* Collate a report payload for this attempt
@@ -833,6 +835,18 @@ class Controller extends Base
                 ]);
             }
         }
+
+        /* Sort alphabetically.
+         * Apparently this has been copypasted a bunch of times all over
+         * the place so I might as well add my two rupees to the pile
+         */
+        uasort($users, static function(array $a, array $b) {
+            $last = strnatcasecmp($a['lastname'], $b['lastname']);
+            if ($last === 0) {
+                return strnatcasecmp($a['firstname'], $b['firstname']);
+            }
+            return $last;
+        });
 
         /* Find a list of Learnosity Items (questions) available in this quiz
          * These are their references only
