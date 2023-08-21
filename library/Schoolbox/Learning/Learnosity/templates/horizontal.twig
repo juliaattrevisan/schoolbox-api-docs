@@ -123,7 +123,9 @@
                     itemsApp.getQuestions(function(questions) {
                         let report = document.querySelector(`#${reportId}`);
 
-                        $.each(questions, function(index, element) {
+                        for (let key in questions) {
+                            let element = questions[key];
+
                             /* Access different parts of the dom directly, to place
                              * our input fields etc.
                              */
@@ -157,15 +159,15 @@
                             /* We need this for cke replacements
                              */
                             attemptEditorFields.push('#comments-' + learnosityReferenceTuple);
-                        });
+                        }
 
                         /* Rewrite the item title to be the guy's name
                          */
                         let titles = report.getElementsByClassName('lrn-report-item-title');
 
-                        $.each(titles, function(index, element) {
+                        for (let element of titles) {
                             element.firstChild.textContent = users[reportId].name;
-                        });
+                        }
                     });
                 });
             }
@@ -233,21 +235,21 @@
         let items = report.getElementsByClassName('learnosity-item');
         let scores = report.getElementsByClassName('sb-custom-score');
 
-        $.each(titles, function(index, element) {
+        for (let element of titles) {
             element.style = 'display:none';
-        });
+        }
 
-        $.each(clearfixes, function(index, element) {
+        for (let element of clearfixes) {
             element.style = 'display:none';
-        });
+        }
 
-        $.each(items, function (index, element) {
+        for (let element of items) {
             element.style = 'display:none';
-        });
+        }
 
-        $.each(scores, function(element) {
+        for (let element of scores) {
             element.style = 'display:none';
-        });
+        }
     }
 
 
