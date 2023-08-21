@@ -180,9 +180,15 @@ class Controller extends Assessment\Controller
                     ];
                 }
             } else {
+                /**
+                 * Stan complains due to the possibility of the project or assessment will only exist within a project, or unit.
+                 * It will never exist on a folder.
+                 */
                 if ($assessment->getContext() instanceof Project) {
+                    /** @phpstan-ignore-next-line */
                     $course = $assessment->getContext()->getBaseContext()->getCourse();
                 } else {
+                    /** @phpstan-ignore-next-line */
                     $course = $assessment->getContext()->getCourse();
                 }
                 $course->setUnits($this->unitSpecificationMapper->findAllByCourseId($course->getId()));
