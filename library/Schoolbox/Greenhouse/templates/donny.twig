@@ -1,12 +1,101 @@
 
 <div class="l-flex-col l-gap-m">
     <div>
-        <h2>Web Component</h2>
-        <wc-drop-down data-dropdown="my-drop-down"></wc-drop-down>
+        <wc-drop-down data-dropdown="tab-control"></wc-drop-down>
+        <div id="tab-control" class="f-dropdown" data-dropdown-content="">
+            <div class="row collapse">
+                <div class="small-12 columns">
+                    <ul class="role-view">
+                        <li class="separator">You are in Teacher View</li>
+                        <li><a href="?readonly=1" class="icon-staff-students">Switch to Student View</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container">
+                <div class="category">
+                    <ul>
+                        <li class="separator">Class Actions</li>
+                        <li>
+                            <a href="/learning/class/80" class="icon-class-list">Class List</a>
+                        </li>
+
+                        <li>
+                            <a href="/learning/markbook/class/80" class="icon-curriculum">Class Markbook</a>
+                        </li>
+
+                        <li>
+                            <a href="/rubricMarkbook/80" class="icon-curriculum">Rubric Markbook</a>
+                        </li>
+
+
+                        <li>
+                            <a href="/learning/assessment/calendar?folder=80" class="icon-calendar">Assessment Calendar</a>
+                        </li>
+
+
+                        <li>
+                            <a href="/rubric/manager/80" class="icon-criteria">Manage Rubric Capabilities</a>
+                        </li>
+
+                        <li>
+                            <a href="/learning/badge/award/list/80" class="icon-achievement">Badge Report</a>
+                        </li>
+
+                        <li>
+                            <a href="/qrcode/80" class="icon-tiles">Generate Login Codes</a>
+                        </li>
+
+                        <li>
+                            <a href="/pastoral/class/80" class="icon-pastoral">Pastoral Care Report</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category">
+                    <ul>
+                        <li class="separator">Folder Actions</li>
+                        <li>
+                            <a href="/resource/folder/80/create" class="icon-add">Add Sub Folder</a>
+                        </li>
+                        <li>
+                            <a href="/resource/folder/80/modify" class="icon-modify">Modify Folder</a>
+                        </li>
+                        <li>
+                            <a href="/group/modify/80" class="icon-group">Manage Group</a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-favourite" id="postToMyLinks">Add to My Links</a>
+                        </li>
+                        <li>
+                            <a href="/statistics/homepage/80" class="icon-progress">View Statistics</a>
+                        </li>
+
+                        <li>
+                            <a href="/resources/80" class="icon-folder">Browse Resources</a>
+                        </li>
+                        <li>
+                            <a href="/resources/folder/files/80" class="icon-files">Manage Files</a>
+                        </li>
+                        <li>
+                            <a href="/textbox/folder/80?returnUrl=L2hvbWVwYWdlLzgw" class="icon-textbox">Manage Text Boxes</a>
+                        </li>
+
+                        <li>
+                            <a href="/news/feed/c0a7aa93276dd881581f696db/80" class="icon-homepagefeed">RSS</a>
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="category">
+                    <ul>
+                        <li class="separator">Course Actions</li>
+                        <li><a href="/course/import/80" class="icon-course" data-course-selector="">Import Course</a></li>
+                        <li><a href="/course/import/management/80" class="icon-course">Manage Courses</a></li>
+
+                        <li class="separator">Analytics</li>
+                        <li><a href="/learning/analytics/course/5/class/80/term/2023-1" class="icon-poll">Year 9 English</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-        <h2>Not Web Component</h2>
-        <button>
-            <span>Just a button</span>
-        </button>
-    </div>
+</div>
