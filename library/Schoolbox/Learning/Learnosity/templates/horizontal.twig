@@ -119,6 +119,10 @@
         ckeditorFields.push('#attempt-comment-' + element);
     });
 
+    /* Table of contents :p
+     */
+    let itemIndex = buildItemIndex();
+
     /* A list of (user_id, name) tuples that we use to replace Item titles
      * with the student's name, e.g. replace "Item 2" with "Michael White"
      */
@@ -275,12 +279,15 @@
             /* Hide the spinny
              */
             document.getElementById('loading').style = 'display: none';
+
+            /* Show the first question upon loading, I guess
+             */
+            let firstReference = document.querySelector('#item-list [data-item-reference]').getAttribute('data-item-reference');
+
+            showResponse(firstReference);
+            updateNavigator(itemIndex, firstReference);
         }
     }, 100);
-
-    /* Table of contents :p
-     */
-    let itemIndex = buildItemIndex();
 
     $(function() {
         /* Presume it'll take longer to load all the learnosity reports
