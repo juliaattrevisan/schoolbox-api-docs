@@ -161,7 +161,7 @@
                             guts.innerHTML = '' +
                                 '<div class="sb-custom-score" style="display:none" data-reference="' + learnosityReference + '">' +
                                 '<label>Customise score</label>' +
-                                '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
+                                '<input id="scores-' + learnosityReferenceTuple + '" name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
                                 '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + (responseComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
                                 '</div>';
@@ -171,6 +171,21 @@
                             /* We need this for cke replacements
                              */
                             responseEditorFields.push('#comments-' + learnosityReferenceTuple);
+
+                            /* Assign async blur listener to each Score and Comment field
+                             * so it sends back to Learnosity upon blur
+                             *
+                             * TODO make more sophisticated by checking dirtyness first
+                             *   just like textboxes I guess
+                             */
+                            document.querySelector('#scores-' + learnosityReferenceTuple).addEventListener('blur', function() {
+                                /* TODO Add toaster
+                                 */
+
+                                /* Send it
+                                 */
+                                console.log('Send ' + learnosityReferenceTuple + ' score back to guys');
+                            });
                         }
 
                         /* Rewrite the item title to be the guy's name
@@ -203,6 +218,29 @@
                     targetElements: responseEditorFields
                 }
             }));
+
+            /* FIXME Assign event listeners for changes in ckeditors after waiting
+             * for them all to spawn (arbitrary 1000ms)
+             */
+            setTimeout(function() {
+                responseEditorFields.forEach(function (element, index) {
+                    /* Remove that hash
+                     */
+                    let key = element.substr(1);
+
+                    /* Detect a change
+                     * https://stackoverflow.com/questions/63601901/ckeditor5-how-do-i-write-a-blur-event-handler-in-my-javascript-function
+                     */
+                    window.sbProps.editors[key].ui.focusTracker.on("change:isFocused", (event, name, isFocused) => {
+                        if (!isFocused) {
+                            /* TODO Add toaster
+                             */
+
+                            console.log('Send ' + key + ' comment to our db');
+                        }
+                    });
+                })
+            }, 1000);
 
             /* Show list of questions to choose from
              */
