@@ -29,16 +29,16 @@ export const Standard: Story = {
                 <button class="c-button" type="button">Real Button</button>
                 <button class="c-button c-button--submit" type="button">Real Button</button>
                 <button type="button" class="c-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false" class="c-button__icon">
-                        <path d="M32 12.408l-11.056-1.607-4.944-10.018-4.944 10.018-11.056 1.607 8 7.798-1.889 11.011 9.889-5.199 9.889 5.199-1.889-11.011 8-7.798z"></path>
-                    </svg>
+                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
                     <span>Real Button</span>
                 </button>
-                <a href="javascript:;" class="c-button c-icon-button" aria-label="Icon-only Button">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false" class="c-icon-button__icon">
-                        <path d="M32 12.408l-11.056-1.607-4.944-10.018-4.944 10.018-11.056 1.607 8 7.798-1.889 11.011 9.889-5.199 9.889 5.199-1.889-11.011 8-7.798z"></path>
-                    </svg>
-                </a>
+                <button type="button" class="c-button c-button--icon-only" aria-label="Icon-only Button">
+                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+                </button>
+                <button type="button" class="c-button c-button--submit">
+                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+                    <span>Real Button</span>
+                </button>
             </div>
         `,
     }),
