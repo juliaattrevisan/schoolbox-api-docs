@@ -269,6 +269,16 @@ $rotate-span-width: 11rem;
                 top: 0;
             }
 
+            th:nth-child(n+3) {
+                /* This is done so that the ths (which are not rotated) are invisible. */
+                visibility: hidden;
+
+                > div {
+                    /* This is done so that the divs inside the ths (which are rotated) are visible despite the parent being hidden. */
+                    visibility: visible;
+                }
+            }
+
             th:nth-child(1),
             th:nth-child(2),
             th:nth-child(1) > div {
