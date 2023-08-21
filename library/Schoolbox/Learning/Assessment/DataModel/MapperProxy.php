@@ -1519,6 +1519,9 @@ class MapperProxy
             if ($subModel instanceof Project) {
                 ProjectMapper::getInstance()->restoreSoftDeleted($subModel);
             }
+            if ($subModel instanceof LessonPlan\Model) {
+                LessonPlan\Mapper::getInstance()->restoreSoftDeleted($subModel);
+            }
             $this->baseMapper->restoreSoftDeleted($dataModel);
         }
         $assessable->setDeletedAt(null);
