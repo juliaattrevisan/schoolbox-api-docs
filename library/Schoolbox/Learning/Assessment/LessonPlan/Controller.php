@@ -281,7 +281,11 @@ class Controller extends Assessment\Controller
             $assessment->getLinkedAssessments()->add($linkedAssessment);
             $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->map(new Assessment\Translator\UnitAssessments()));
         } else {
-            $this->response = $this->responseAsJson("Link already Exists");
+            $problem = (new ApiProblem('Link already Exists'))
+                ->setStatus(409)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(409);
+            return; //exit early
         }
     }
 
