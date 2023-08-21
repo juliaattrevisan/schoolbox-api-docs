@@ -286,13 +286,15 @@ export default {
 
         /**
          * @param {object} selectedOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
+         * @param {boolean} simulateRedirect
+         *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
          */
-        changeUserAndReloadEvents(selectedOption, pushState) {
-            if (pushState === undefined) {
-                pushState = true;
+        changeUserAndReloadEvents(selectedOption, simulateRedirect) {
+            if (simulateRedirect === undefined) {
+                simulateRedirect = true;
             }
 
-            if (pushState) {
+            if (simulateRedirect) {
                 // Push current state to history.
                 window.history.pushState(this.getCopyOfSelectedUserOption(), "", window.location.href);
             }
@@ -302,7 +304,7 @@ export default {
             this.config.userId = this.selectedOption.userId;
             this.reloadEvents();
 
-            // Replace current state in history object with the new state.
+            // Replace current state in history object with the new state (and set the current URL to match that state).
             const oldUrl = window.location.href;
             const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedOption.userId;
             window.history.replaceState(this.getCopyOfSelectedUserOption(), "", newUrl);
