@@ -255,6 +255,7 @@ export default {
         this.selectedOption = this.options["selectedUserOption"];
 
         window.onpopstate = (event) => {
+            console.info("onPopState() event.state: ", event.state);
             // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
             if (event.state !== null) {
                 this.changeUserAndReloadEvents(event.state, false);
@@ -263,6 +264,7 @@ export default {
 
         // Initialise history by setting the current state.
         window.history.replaceState(this.getCopyOfSelectedOption(), "", window.location.href);
+        console.info("mounted() replaced state ", this.getCopyOfSelectedOption(), window.location.href);
     },
 
     beforeDestroy() {
@@ -297,6 +299,11 @@ export default {
             if (simulateRedirect) {
                 // Push current state to history.
                 window.history.pushState(this.getCopyOfSelectedOption(), "", window.location.href);
+                console.info(
+                    "changeUserAndReloadEvents() pushed state ",
+                    this.getCopyOfSelectedOption(),
+                    window.location.href
+                );
             }
 
             // Update state.
@@ -308,6 +315,7 @@ export default {
             const oldUrl = window.location.href;
             const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedOption.userId;
             window.history.replaceState(this.getCopyOfSelectedOption(), "", newUrl);
+            console.info("changeUserAndReloadEvents() replaced state ", this.getCopyOfSelectedOption(), newUrl);
         },
 
         /**
@@ -798,6 +806,11 @@ export default {
              */
             window.history.pushState(
                 null,
+                "",
+                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+            );
+            console.info(
+                "updateListViewDateRangeField() pushed state ",
                 "",
                 "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
             );
