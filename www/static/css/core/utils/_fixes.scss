@@ -1,6 +1,8 @@
 /*
     The following is a list of fixes that are typically used to overrule deprecated featured added by Foundation.
     As we move away from Foundation, these fixes should no longer be necessary and should be removed.
+
+    In addition to these, fixes linked to specific components are to be identified with the ^foundation-fixes^ comment
 */
 
 // Margins usually should no longer be applied directly on an element and should instead be added to the parent

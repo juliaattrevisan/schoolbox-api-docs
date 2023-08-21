@@ -27,6 +27,7 @@ export const Standard: Story = {
             <div class="l-flex-row l-gap-m">
                 <a href="javascript:;" class="c-button">Button Link</a>
                 <button class="c-button" type="button">Real Button</button>
+                <button class="c-button c-button--submit" type="button">Real Button</button>
             </div>
         `,
     }),
