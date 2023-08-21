@@ -308,6 +308,8 @@
     function updateNavigator(itemIndex, current) {
         let previous = null;
         let next = null;
+        let oldElement;
+        let newElement;
 
         itemIndex.forEach(function (element, index) {
             if (current === element) {
@@ -317,37 +319,45 @@
         });
 
         /* Redefine what Previous button does
+         *  First, clear all event listeners by replacing the whole thing
          */
-        if (previous) {
-            /* Clear all event listeners by replacing the whole thing
-             */
-            let oldElement = document.querySelector('#previous-item');
-            let newElement = oldElement.cloneNode(true);
-            oldElement.parentNode.replaceChild(newElement, oldElement);
+        oldElement = document.querySelector('#previous-item');
+        newElement = oldElement.cloneNode(true);
+        oldElement.parentNode.replaceChild(newElement, oldElement);
 
-            /* Reassign new behaviour
-             */
-            document.querySelector('#previous-item').addEventListener('click',  function() {
-                showResponse(document.querySelector(`#item-list [data-item-reference="${previous}"]`).getAttribute('data-item-reference'));
-                updateNavigator(itemIndex, previous);
-            }, null);
-        }
+        refreshNavigatorState(document.querySelector('#previous-item'), previous);
 
         /* Redefine what Next button does
+         * First, clear all event listeners by replacing the whole thing
          */
-        if (next) {
-            /* Clear all event listeners by replacing the whole thing
-             */
-            let oldElement = document.querySelector('#next-item');
-            let newElement = oldElement.cloneNode(true);
-            oldElement.parentNode.replaceChild(newElement, oldElement);
+        oldElement = document.querySelector('#next-item');
+        newElement = oldElement.cloneNode(true);
+        oldElement.parentNode.replaceChild(newElement, oldElement);
+
+        refreshNavigatorState(document.querySelector('#next-item'), next);
+    }
+
+
+    /**
+     * Micromanage the state of each navigator button
+     *
+     * @param button
+     * @param itemReference
+     */
+    function refreshNavigatorState(button, itemReference) {
+        if (itemReference) {
+            button.classList.remove('disabled');
 
             /* Reassign new behaviour
              */
-            document.querySelector('#next-item').addEventListener('click', function() {
-                showResponse(document.querySelector(`#item-list [data-item-reference="${next}"]`).getAttribute('data-item-reference'));
-                updateNavigator(itemIndex, next);
+            button.addEventListener('click',  function() {
+                showResponse(document.querySelector(`#item-list [data-item-reference="${itemReference}"]`).getAttribute('data-item-reference'));
+                updateNavigator(itemIndex, itemReference);
             }, null);
+        } else {
+            /* Disable the button
+             */
+            button.classList.add('disabled');
         }
     }
 
