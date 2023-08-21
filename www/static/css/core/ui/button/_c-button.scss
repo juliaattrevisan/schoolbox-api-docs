@@ -1,0 +1,62 @@
+// * {
+//     box-sizing: border-box;
+// }
+
+// a,
+// button {
+//     font-size: 1.5rem;
+// }
+
+// Reset default link styles
+a.c-button {
+    text-decoration: none;
+}
+
+// Reset default button styles
+button.c-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    @media screen and (-ms-high-contrast: active) {
+        border: 2px solid currentcolor;
+    }
+}
+
+a.c-button,
+button.c-button {
+    align-items: center;
+    align-self: start; // Optional - see "Gotchas"
+    background-color: var(--content-ui-background);
+    border-radius: var(--roundness-interactibles);
+    color: var(--content-ui-foreground);
+    display: inline-flex;
+    justify-content: center;
+    line-height: 1.1;
+    min-height: 44px;
+    min-width: 10ch;
+    padding: 0.25em 0.75em;
+    text-align: center;
+    transition: 220ms all ease-in-out;
+
+    // ^foundation-overides^
+    overflow: auto;
+    position: static;
+    vertical-align: baseline;
+
+    &:hover,
+    &:active {
+        background-color: var(--content-ui-hover);
+    }
+
+    &:focus {
+        outline-style: solid;
+        outline-color: transparent;
+        box-shadow: 0 0 0 3px var(--content-ui-foreground);
+    }
+
+    &--block {
+        width: 100%;
+    }
+}
