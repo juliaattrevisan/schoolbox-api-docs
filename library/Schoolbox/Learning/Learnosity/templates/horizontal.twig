@@ -308,8 +308,6 @@
     function updateNavigator(itemIndex, current) {
         let previous = null;
         let next = null;
-        let oldElement;
-        let newElement;
 
         itemIndex.forEach(function (element, index) {
             if (current === element) {
@@ -319,45 +317,37 @@
         });
 
         /* Redefine what Previous button does
-         *  First, clear all event listeners by replacing the whole thing
-         */
-        oldElement = document.querySelector('#previous-item');
-        newElement = oldElement.cloneNode(true);
-        oldElement.parentNode.replaceChild(newElement, oldElement);
-
-        refreshNavigatorState(document.querySelector('#previous-item'), previous);
-
-        /* Redefine what Next button does
          * First, clear all event listeners by replacing the whole thing
          */
-        oldElement = document.querySelector('#next-item');
-        newElement = oldElement.cloneNode(true);
-        oldElement.parentNode.replaceChild(newElement, oldElement);
-
-        refreshNavigatorState(document.querySelector('#next-item'), next);
+        refreshNavigatorState('#previous-item', previous);
+        refreshNavigatorState('#next-item', next);
     }
 
 
     /**
      * Micromanage the state of each navigator button
      *
-     * @param button
+     * @param buttonId
      * @param itemReference
      */
-    function refreshNavigatorState(button, itemReference) {
+    function refreshNavigatorState(buttonId, itemReference) {
+        let oldElement = document.querySelector(buttonId);
+        let newElement = oldElement.cloneNode(true);
+        oldElement.parentNode.replaceChild(newElement, oldElement);
+
         if (itemReference) {
-            button.classList.remove('disabled');
+            newElement.classList.remove('disabled');
 
             /* Reassign new behaviour
              */
-            button.addEventListener('click',  function() {
+            newElement.addEventListener('click',  function() {
                 showResponse(document.querySelector(`#item-list [data-item-reference="${itemReference}"]`).getAttribute('data-item-reference'));
                 updateNavigator(itemIndex, itemReference);
             }, null);
         } else {
             /* Disable the button
              */
-            button.classList.add('disabled');
+            newElement.classList.add('disabled');
         }
     }
 
