@@ -882,6 +882,10 @@ class Controller extends Base
             }
         }
 
+        /* Find all the comments for these responses
+         */
+        $comments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
             'users' => $users,
@@ -889,6 +893,7 @@ class Controller extends Base
             'assessment' => $assessment,
             'itemReferences' => $itemReferences,
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
+            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()

@@ -55,7 +55,8 @@
 <script>
     /* All the scores and comments that people got
      */
-    let attemptScores = JSON.parse('{{ scores|raw }}');
+    let responseScores = JSON.parse('{{ scores|raw }}');
+    let responseComments = JSON.parse(atob('{{ comments|raw }}'));
 
     /* Remember how many reports were loaded
      *
@@ -76,7 +77,7 @@
 
     /* Remember all the textareas we built
      */
-    let attemptEditorFields = [];
+    let responseEditorFields = [];
 
     /* A list of (user_id, name) tuples that we use to replace Item titles
      * with the student's name, e.g. replace "Item 2" with "Michael White"
@@ -134,12 +135,8 @@
 
                             /* Student scoring and metadata
                              */
-                            let score = attemptScores[learnosityReferenceTuple].score;
-                            let maxScore = attemptScores[learnosityReferenceTuple].max;
-
-                            /* TODO remove by replace with actual values
-                             */
-                            let attemptComments = [];
+                            let score = responseScores[learnosityReferenceTuple].score;
+                            let maxScore = responseScores[learnosityReferenceTuple].max;
 
                             /* Containers into which we inject things
                              */
@@ -151,14 +148,14 @@
                                 '<label>Customise score</label>' +
                                 '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
-                                '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + (attemptComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
+                                '<textarea id="comments-' + learnosityReferenceTuple + '" name="comments[' + learnosityReferenceTuple + ']">' + (responseComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
                                 '</div>';
 
                             container.append(guts);
 
                             /* We need this for cke replacements
                              */
-                            attemptEditorFields.push('#comments-' + learnosityReferenceTuple);
+                            responseEditorFields.push('#comments-' + learnosityReferenceTuple);
                         }
 
                         /* Rewrite the item title to be the guy's name
@@ -188,7 +185,7 @@
              */
             document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
                 detail: {
-                    targetElements: attemptEditorFields
+                    targetElements: responseEditorFields
                 }
             }));
 

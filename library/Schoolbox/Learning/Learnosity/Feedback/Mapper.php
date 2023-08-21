@@ -64,8 +64,9 @@ class Mapper extends \Schoolbox\Mapper
         return $comments;
     }
 
+
     /**
-     * Find all the comments for this set of learnosity references
+     * Find all the comments for this set of learnosity references (response ids)
      */
     public function findByLearnosityReferences(array $learnosityReferences): array
     {
