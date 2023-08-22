@@ -947,36 +947,6 @@ export default {
         },
 
         /**
-         * @param {string} dateStr - In FORMAT_FORM_DATE format (DD-MM-YYYY).
-         * @returns {string} - in FORMAT_FLATPICKR_DATE format ("DD/MM/YYYY").
-         */
-        convertDateStrFromFormToFlatpickrFormat(dateStr) {
-            if (dateStr[2] !== "-" || dateStr[5] !== "-") {
-                console.error(
-                    "Date string is in unexpected format.  Expected FORMAT_FORM_DATE (DD-MM-YYYY), found '" +
-                        dateStr +
-                        "'."
-                );
-            }
-            return dateStr.replace(/-/g, "/");
-        },
-
-        /**
-         * @param {string} dateStr - In FORMAT_FLATPICKR_DATE format (DD/MM/YYYY).
-         * @returns {string} - in FORMAT_FORM_DATE format ("DD-MM-YYYY").
-         */
-        convertDateStrFromFlatpickrToFormFormat(dateStr) {
-            if (dateStr[2] !== "/" || dateStr[5] !== "/") {
-                console.error(
-                    "Date string is in unexpected format.  Expected FORMAT_FLATPICKR_DATE (DD/MM/YYYY), found '" +
-                        dateStr +
-                        "'."
-                );
-            }
-            return dateStr.replace(/\//g, "-");
-        },
-
-        /**
          * @param {string} dateString - Date in format DD-MM-YYYY (FORMAT_FORM_DATE).
          * @param {string} currentFormat
          *  - The current format of dateString. Use one of the constants FORMAT_FORM_DATE, FORMAT_FLATPICKR_DATE.
