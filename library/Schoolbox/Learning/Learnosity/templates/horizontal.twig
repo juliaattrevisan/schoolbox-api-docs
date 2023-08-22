@@ -187,12 +187,21 @@
                             let container = report.querySelector(`[data-reference="${learnosityReference}"]`);
                             let guts = document.createElement('div');
 
+                            /* For readability in the giant html slab below
+                             */
+                            let inputId = 'scores-' + learnosityReferenceTuple;
+                            let inputName = 'scores[' + learnosityReferenceTuple + ']';
+
+                            let textareaId = 'responseComments-' + learnosityReferenceTuple;
+                            let textareaName = 'responseComments[' + learnosityReferenceTuple + ']';
+                            let textareaVal = responseComments[learnosityReferenceTuple] ?? '';
+
                             guts.innerHTML = '' +
                                 '<div class="sb-custom-score" style="display:none" data-reference="' + learnosityReference + '">' +
                                 '<label>Customise score</label>' +
-                                '<input id="scores-' + learnosityReferenceTuple + '" name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
+                                '<input id="' + inputId + '" name="' + inputName + '" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
-                                '<textarea id="responseComments-' + learnosityReferenceTuple + '" name="responseComments[' + learnosityReferenceTuple + ']">' + (responseComments[learnosityReferenceTuple] ?? '') + '</textarea>' +
+                                '<textarea id="' + textareaId + '" name="' + textareaName + '" data-response-reference="' + learnosityReferenceTuple + '">' + textareaVal + '</textarea>' +
                                 '</div>';
 
                             container.append(guts);
@@ -207,7 +216,7 @@
                              * TODO make more sophisticated by checking dirtyness first
                              *   just like textboxes I guess
                              */
-                            document.querySelector('#scores-' + learnosityReferenceTuple).addEventListener('blur', function() {
+                            document.querySelector('#' + inputId).addEventListener('blur', function() {
                                 /* TODO Add toaster
                                  */
 
@@ -267,6 +276,8 @@
 
                             /* TODO Send it
                              */
+                            console.log(window.sbProps.editors[key].sourceElement.getAttribute('data-response-reference'));
+                            console.log(window.sbProps.editors[key].getData());
                             console.log('Send ' + key + ' comment to our db');
                         }
                     });
