@@ -225,9 +225,24 @@
                                 /* TODO Add toaster
                                  */
 
-                                /* TODO Send it
+                                /* Send it
                                  */
-                                console.log('Send ' + learnosityReferenceTuple + ' score back to guys');
+                                let payload = new FormData();
+                                payload.append('learnosityReference', learnosityReferenceTuple);
+                                payload.append('score', this.value);
+
+                                /* Figure out the user id from the reportId value
+                                 * (we know it here, unlike when ckeditors load outside of this loop)
+                                 */
+                                let userId = users[reportId].id;
+
+                                fetch(urls[userId].score, {
+                                    method: 'POST',
+                                    body: payload
+                                }).then(response => {
+                                    /* TODO Add toaster
+                                     */
+                                });
                             });
                         }
 

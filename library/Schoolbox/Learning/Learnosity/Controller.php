@@ -948,6 +948,9 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @return void
+     * @throws ValidationException
+     * @throws \DomainException
+     * @throws \RuntimeException
      */
     public function postFeedbackScore(
         IAssessable $assessment,
@@ -958,13 +961,63 @@ class Controller extends Base
         /* Fetch the response id first, because you need a bunch of stuff
          * The response id (learnosity response reference) is in POST
          */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
 
-        /* Update the returned payload with the new score
+        /* Traverse to find the one you want to change, because you don't get
+         * a response_id filter in this endponit...
          */
+        $updatedResponse = null;
+
+        foreach ($responses as $response) {
+            if ($this->requestPost->get('learnosityReference') === $response['response_id']) {
+                /* Update the returned payload with the new score
+                 * This is really similar to the implementation in postFeedback()
+                 */
+                $updatedResponse = $response;
+                $updatedResponse['score'] = $this->requestPost->get('score');
+
+                /* "When setting a non-zero score, the response must also be attempted."
+                 *    -- https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#updateResponseScores
+                 *
+                 * This includes responses that cannot be automagically calculated
+                 */
+                $updatedResponse['attempted'] = true;
+
+                /* If there's no max score, but the teacher gave a score, I guess
+                 * we just assume that to be the max score too...basically bonus
+                 * marks in this scenario
+                 */
+                if (null === $updatedResponse['max_score']) {
+                    $updatedResponse['max_score'] = $updatedResponse['score'];
+                }
+            }
+        }
+
+        /* TODO Couldn't find the response id requested;
+         *  This shouldn't happen, but what do we do now?
+         */
+        if (null === $updatedResponse) {
+            throw new \DomainException('Learnosity response identifier was not found.');
+        }
 
         /* Use the learnosity Data API to send the revised payload which
          * should now contain all the parts Learnosity expected
          */
+        $this->api->dataUpdateRequest('/sessions/responses/scores', [
+            'sessions' => [
+                [
+                    'session_id' => $attempt->getLearnosityReference(),
+                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'responses' => [
+                        $updatedResponse
+                    ]
+                ]
+            ]
+        ]);
     }
 
 
