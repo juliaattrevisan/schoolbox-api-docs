@@ -90,9 +90,16 @@ class NotifierHelper
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
         string $recordType,
-        string $method
+        string $method,
     ): array {
         $targetUsers = [];
+
+        $relatedOnly = in_array($method, [
+            Notifier::TRIGGER_CREATED_RELATED,
+            Notifier::TRIGGER_UPDATED_RELATED,
+            \Schoolbox\Pastoral\Comment\Notifier::TRIGGER_CREATED_RELATED,
+            \Schoolbox\Pastoral\Comment\Notifier::TRIGGER_UPDATED_RELATED,
+        ]);
 
         foreach ($accessRecords as $pastoralAccess) {
             // If the access is denied, fail
@@ -114,30 +121,33 @@ class NotifierHelper
             try {
                 if ($pastoralAccess->getRole() instanceof Role) {
                     $targetUsers += $this->buildTargetUsersForRole(
-                        $pastoralAccess->getRole(),
-                        $student,
-                        $parentAccessEnabled && $nonStaffCommentAllowed,
-                        $studentAccessEnabled && $nonStaffCommentAllowed,
-                        $pastoralAccess->getMatchCampus()
+                                              $pastoralAccess->getRole(),
+                                              $student,
+                        parentAccessEnabled:  $parentAccessEnabled && $nonStaffCommentAllowed,
+                        studentAccessEnabled: $studentAccessEnabled && $nonStaffCommentAllowed,
+                        matchCampus:          $pastoralAccess->getMatchCampus(),
+                        relatedOnly:          $relatedOnly
                     );
                 } elseif ($pastoralAccess->getRoleType()) {
                     $targetUsers += $this->buildTargetUsersForRoleType(
-                        $pastoralAccess->getRoleType(),
-                        $student,
-                        $parentAccessEnabled && $nonStaffCommentAllowed,
-                        $studentAccessEnabled && $nonStaffCommentAllowed,
-                        $pastoralAccess->getMatchCampus()
+                                              $pastoralAccess->getRoleType(),
+                                              $student,
+                        parentAccessEnabled:  $parentAccessEnabled && $nonStaffCommentAllowed,
+                        studentAccessEnabled: $studentAccessEnabled && $nonStaffCommentAllowed,
+                        matchCampus:          $pastoralAccess->getMatchCampus(),
+                        relatedOnly:          $relatedOnly
                     );
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     $targetUsers += $this->buildTargetUsersForGroup(
-                        $pastoralAccess->getGroup()->getId(),
-                        $student,
-                        $parentAccessEnabled && $nonStaffCommentAllowed,
-                        $studentAccessEnabled && $nonStaffCommentAllowed,
-                        $pastoralAccess->getMatchCampus()
+                                              $pastoralAccess->getGroup()->getId(),
+                                              $student,
+                        parentAccessEnabled:  $parentAccessEnabled && $nonStaffCommentAllowed,
+                        studentAccessEnabled: $studentAccessEnabled && $nonStaffCommentAllowed,
+                        matchCampus:          $pastoralAccess->getMatchCampus(),
+                        relatedOnly:          $relatedOnly
                     );
                 } elseif ($pastoralAccess->getUser() instanceof User) {
-                    $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
+                    $user        = $this->userMapper->findById($pastoralAccess->getUser()->getId());
                     $targetUsers += $this->buildTargetUsersForUser(
                         $user,
                         $parentAccessEnabled && $nonStaffCommentAllowed,
@@ -146,7 +156,7 @@ class NotifierHelper
                 }
             } catch (MapperException $e) {
                 // Log an error and move on so we don't break the rest of the notifications
-                $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+                $this->log->error("Error: Unable to send $recordType $method notification. {$e->getMessage()}", ['exception' => $e]);
             }
         }
 
@@ -162,6 +172,7 @@ class NotifierHelper
      * @param bool $parentAccessEnabled
      * @param bool $studentAccessEnabled
      * @param bool $matchCampus
+     * @param bool $relatedOnly
      * @return array
      */
     private function buildTargetUsersForRole(
@@ -169,12 +180,14 @@ class NotifierHelper
         User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
-        bool $matchCampus
+        bool $matchCampus,
+        bool $relatedOnly
     ): array {
         $targetUsers = [];
         if ($role->isStaff() && $role->getAccessPastoral()) {
+            $teachers = $relatedOnly ? $student->getTeacherCollection() : $this->userMapper->findByColumn('group_id', $role->getId());
             // Only notify staff if they are a teacher of the student
-            foreach ($student->getTeacherCollection() as $teacher) {
+            foreach ($teachers as $teacher) {
                 if (
                     $teacher->getRole()->getId() === $role->getId()
                     && (!$matchCampus || AccessLevelCensor::inSameCampus($student, $teacher))
@@ -211,6 +224,7 @@ class NotifierHelper
      * @param bool   $parentAccessEnabled
      * @param bool   $studentAccessEnabled
      * @param bool   $matchCampus
+     * @param bool   $relatedOnly
      * @return array
      */
     private function buildTargetUsersForRoleType(
@@ -218,15 +232,17 @@ class NotifierHelper
         User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
-        bool $matchCampus
+        bool $matchCampus,
+        bool $relatedOnly
     ): array {
         // The system should only notify staff if they are a teacher of the student
         $targetUsers = [];
         switch ($roleType) {
             case Role::STAFF:
                 // Only notify student's teachers,
+                $teachers = $relatedOnly ? $student->getTeacherCollection() : $this->userMapper->findByColumn('g.group_type', Role::STAFF);
                 // if their role allows it
-                foreach ($student->getTeacherCollection() as $teacher) {
+                foreach ($teachers as $teacher) {
                     if (
                         $teacher->getRole()->getAccessPastoral()
                         && (!$matchCampus || AccessLevelCensor::inSameCampus($student, $teacher))
@@ -266,6 +282,7 @@ class NotifierHelper
      * @param bool $parentAccessEnabled
      * @param bool $studentAccessEnabled
      * @param bool $matchCampus
+     * @param bool $relatedOnly
      * @return array
      * @throws MapperException if the pastoral group doesn't exist
      * @throws Deleted
@@ -275,7 +292,8 @@ class NotifierHelper
         User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
-        bool $matchCampus
+        bool $matchCampus,
+        bool $relatedOnly
     ): array {
         // Sending to a pastoral group, make sure its hydrated
         $pastoralGroup = $this->pastoralGroupMapper->findById($groupId);
@@ -288,18 +306,17 @@ class NotifierHelper
                 $this->log->debug("Group Member {$member->getUser()->getId()} is not in campus");
                 continue;
             }
-            // Only staff should be in pastoral groups,
-            // but handle students and parents in case they are there
-            try {
-                $targetUsers += $this->buildTargetUsersForUser(
-                    $memberUser,
-                    $parentAccessEnabled,
-                    $studentAccessEnabled,
-                );
-            } catch (MapperException $e) {
-                // noop: silently refuse to target users which don't exist
+            if ($relatedOnly && !in_array($memberUser->getId(), $student->getTeacherCollection()->getPropertyValues('id'))) {
+                $this->log->debug("Group Member {$member->getUser()->getId()} is not related to the student {$student->getId()}");
                 continue;
             }
+            // Only staff should be in pastoral groups,
+            // but handle students and parents in case they are there
+            $targetUsers += $this->buildTargetUsersForUser(
+                $memberUser,
+                $parentAccessEnabled,
+                $studentAccessEnabled,
+            );
         }
         return $targetUsers;
     }
@@ -333,8 +350,8 @@ class NotifierHelper
     }
 
     /**
-     * @param Model  $pastoral
-     * @param Report $report
+     * @param Model    $pastoral
+     * @param Report   $report
      * @param int<1,2> $accessLevel least required level
      * @return GenericCollection
      */
@@ -357,7 +374,7 @@ class NotifierHelper
             }
             try {
                 $reportUser = $this->userMapper->findById($reportUserId);
-            } catch (MapperException $e) {
+            } catch (MapperException) {
                 continue;
             }
             // if the user is moderator and the report is not limited to involved, add the user

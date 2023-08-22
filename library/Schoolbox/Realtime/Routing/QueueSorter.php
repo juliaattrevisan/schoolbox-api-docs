@@ -81,9 +81,10 @@ class QueueSorter implements FilterInterface
         } catch (FilterException $e) {
             $this->log->notice(
                 sprintf(
-                    'DROP %s:%s -> user %d: %s',
+                    'DROP %s:%s (%s) -> user %d: %s',
                     $instance->getBaseHash(),
                     $instance->getParamHash(),
+                    !empty($instance->getTopics()) ? $instance->getTopics()[0] : '',
                     $userId,
                     $e->getMessage()
                 )
@@ -93,9 +94,10 @@ class QueueSorter implements FilterInterface
 
         $this->log->info(
             sprintf(
-                'SEND %s:%s -> user %d @ %s',
+                'SEND %s:%s (%s) -> user %d @ %s',
                 $instance->getBaseHash(),
                 $instance->getParamHash(),
+                !empty($instance->getTopics()) ? $instance->getTopics()[0] : '',
                 $userId,
                 json_encode($outputLevels)
             )

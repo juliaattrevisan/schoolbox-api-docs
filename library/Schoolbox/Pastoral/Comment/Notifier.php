@@ -39,9 +39,19 @@ use Alaress\Async\Notification\Parameter\Param;
 
 class Notifier extends AbstractModuleNotifier
 {
-    const TRIGGER_CREATED         = 'created';
-    const TRIGGER_UPDATED         = 'updated';
-    const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
+    private const TRIGGER_CREATED         = 'created';
+    public const  TRIGGER_CREATED_RELATED = 'createdRelated';
+    private const TRIGGER_UPDATED         = 'updated';
+    public const  TRIGGER_UPDATED_RELATED = 'updatedRelated';
+    private const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
+
+    // titles must not be the same
+    private const TITLE = [
+        self::TRIGGER_CREATED         => "A :pastoralcare comment has been created",
+        self::TRIGGER_CREATED_RELATED => "A :pastoralcare comment has been created on your student's record",
+        self::TRIGGER_UPDATED         => "A :pastoralcare comment has been updated",
+        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare comment has been updated on your student's record",
+    ];
 
     /** @var Mapper */
     protected $mapper;
@@ -136,13 +146,13 @@ class Notifier extends AbstractModuleNotifier
         $href = NotifierHelper::getRecordHref($pastoral, $model);
 
         $builder = new Builder();
-        $builder->setTitle("A :pastoralcare comment has been {$method}")
+        $builder->setTitle(self::TITLE[$method])
                 ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
                 ->setIcon($this->getUserIcon($owner))
                 ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
-                ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
+                ->addTopic(sprintf("pastoral_comment.%s.%s", $model->getId(), $method));
 
         $message = $builder->build();
 
@@ -195,10 +205,12 @@ class Notifier extends AbstractModuleNotifier
         switch ($bundle->getMethod()) {
             case BaseMapper::METHOD_CREATE:
                 $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_CREATED_RELATED, self::IMMEDIATELY);
                 $bundle->attach(self::TRIGGER_ADDED_TO_REPORT, self::IMMEDIATELY);
                 break;
             case BaseMapper::METHOD_UPDATE:
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_UPDATED_RELATED, self::IMMEDIATELY);
                 break;
         }
     }
@@ -222,9 +234,33 @@ class Notifier extends AbstractModuleNotifier
      *
      * @return Envelope
      */
+    public function notifyCreatedRelated(Model $model, User $effector, $diff = []): Envelope
+    {
+        return $this->buildMessage($model, self::TRIGGER_CREATED_RELATED);
+    }
+
+    /**
+     * @param Model $model
+     * @param User  $effector
+     * @param array $diff
+     *
+     * @return Envelope
+     */
     public function notifyUpdated(Model $model, User $effector, $diff = []): Envelope
     {
         return $this->buildMessage($model, self::TRIGGER_UPDATED);
+    }
+
+    /**
+     * @param Model $model
+     * @param User  $effector
+     * @param array $diff
+     *
+     * @return Envelope
+     */
+    public function notifyUpdatedRelated(Model $model, User $effector, $diff = []): Envelope
+    {
+        return $this->buildMessage($model, self::TRIGGER_UPDATED_RELATED);
     }
 
     /**
