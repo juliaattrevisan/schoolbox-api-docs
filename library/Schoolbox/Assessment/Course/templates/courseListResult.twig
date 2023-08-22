@@ -90,9 +90,9 @@ Usage:
     </div>
     <nav>
         <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ courseSpec.id }}"></a>
-            {% if hasTot %}
-        <a href="#" class="icon-overflow" data-options="align:top" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
-            {% endif %}
+        {% if hasTot %}
+        <wc-actions-dropdown content-id="courseDropdown-{{ courseSpec.id }}"></wc-actions-dropdown>
+        {% endif %}
     </nav>
 
     {% if hasTot %}

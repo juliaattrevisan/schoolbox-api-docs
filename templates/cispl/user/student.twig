@@ -29,7 +29,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ loop.index }}" title="Actions"></a>
+                            <wc-actions-dropdown content-id="row-options-contact-{{ loop.index }}"></wc-actions-dropdown>
                         </nav>
                         <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
                             <li><a class="icon-modify" href="/homepage/4694">Update Contact Details</a></li>
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactSpouseID }}" title="Actions"></a>
+                                <wc-actions-dropdown content-id="row-options-contact-{{ contact.StudentContactSpouseID }}"></wc-actions-dropdown>
                             </nav>
                             <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactSpouseID }}">
                                 {% if contact.StudentContactSpouseDefaultEmail and contact.StudentContactSpouseUseEmail != 'N'%}

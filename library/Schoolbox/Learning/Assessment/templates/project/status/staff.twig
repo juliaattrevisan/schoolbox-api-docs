@@ -166,7 +166,7 @@ Data:
                                 </div>
                                 {% if hasActions %}
                                     <nav>
-                                        <nav><a href="#" class="icon-more" data-dropdown="project-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
+                                        <wc-actions-dropdown content-id="project-options{{ assessable.id }}"></wc-actions-dropdown>
                                     </nav>
                                     <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
                                         {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}

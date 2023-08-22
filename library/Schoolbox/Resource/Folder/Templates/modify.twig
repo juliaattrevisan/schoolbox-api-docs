@@ -249,7 +249,7 @@
     {# The jelly-tot is only really relevant if we are modfying a folder #}
     {% if action == 'Modify' %}
         <nav>
-            <a href="#" class="icon-more" data-dropdown="folder-options" title="Actions"></a>
+            <wc-actions-dropdown content-id="folder-options"></wc-actions-dropdown>
         </nav>
 
         <ul class="f-dropdown" data-dropdown-content id="folder-options">

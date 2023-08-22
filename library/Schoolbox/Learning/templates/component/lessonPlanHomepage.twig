@@ -86,7 +86,7 @@
                     {% if hasAssessmentRoutes or hasCourseRoutes %}
                         {% set dropdownId = "options-component" ~ component.instance.id ~ "-lessonplan" ~ lesson.id %}
                         <nav>
-                            <a href="#" class="icon-more" data-dropdown="{{ dropdownId }}" aria-expanded="false" title="Actions"></a>
+                            <wc-actions-dropdown content-id="{{ dropdownId }}"></wc-actions-dropdown>
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" id="{{ dropdownId }}">
                             {% if hasAssessmentRoutes %}
@@ -142,4 +142,3 @@
     {% endif %}
 </div>
 <div class="toast" data-alert></div>
-

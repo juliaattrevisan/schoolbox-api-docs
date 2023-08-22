@@ -28,7 +28,7 @@
             {% set isAccessRead = userAccess[group.id].read ?? false %}
             {% if (not (group.group and group.group.private) or isAccessWrite or isAccessAdmin) %}
                 <nav>
-                    <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
+                    <wc-actions-dropdown content-id="class-options{{ group.id }}"></wc-actions-dropdown>
                 </nav>
                 <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
                     {% if isAccessWrite or isAccessAdmin %}

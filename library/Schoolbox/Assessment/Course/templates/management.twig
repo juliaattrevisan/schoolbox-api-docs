@@ -169,7 +169,7 @@ Usage:
                         </div>
                     </div>
                     <nav>
-                        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ currentCourse.id }}" aria-expanded="false" title="Actions"></a>
+                        <wc-actions-dropdown content-id="courseDropdown-{{ currentCourse.id }}"></wc-actions-dropdown>
                     </nav>
                     <ul class="f-dropdown" data-dropdown-content="" id="courseDropdown-{{ currentCourse.id }}">
                         {% if not componentNames[currentCourse.id] %}

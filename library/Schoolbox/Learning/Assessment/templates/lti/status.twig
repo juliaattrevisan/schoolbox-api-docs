@@ -79,7 +79,7 @@
 
                 {% set createAttemptIdBase = "createAttempt-" ~ participant.user.id %}
                 <nav>
-                    <a class="icon-more" title="" data-dropdown="feedbackOptions-{{ participant.user.id }}"></a>
+                    <wc-actions-dropdown content-id="feedbackOptions-{{ participant.user.id }}"></wc-actions-dropdown>
                 </nav>
 
                 <ul id="feedbackOptions-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>

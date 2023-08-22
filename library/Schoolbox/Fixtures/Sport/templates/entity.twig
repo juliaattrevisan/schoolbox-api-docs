@@ -83,7 +83,7 @@
         {% endif %}
     </div>
     <nav>
-        <a href="#" class="icon-overflow" data-dropdown="fdrop-sport"></a>
+        <wc-actions-dropdown content-id="fdrop-sport"></wc-actions-dropdown>
     </nav>
     <ul id="fdrop-sport" class="f-dropdown" data-dropdown-content>
         <li><a class="icon-add"    href="{{ routeLookup('sportsfixturesDivision.getCreateForm', { contextId: sport.id }) }}">Add new division</a></li>
@@ -127,7 +127,7 @@
                             </p>
                         </div>
                         <nav>
-                            <a href="#" class="icon-overflow" data-dropdown="division-{{ division.id }}-dropdown" aria-expanded="false" title="Actions"></a>{#-dessicant-#}
+                            <wc-actions-dropdown content-id="division-{{ division.id }}-dropdown"></wc-actions-dropdown>
                         </nav>
                         <ul class="f-dropdown" data-division-dropdown data-dropdown-content id="division-{{ division.id }}-dropdown">
                             <li><a href="{{ routeLookup('sportsfixturesMatch.getList', { contextId: division.id }) }}" class="icon-search">View Fixture</a></li>

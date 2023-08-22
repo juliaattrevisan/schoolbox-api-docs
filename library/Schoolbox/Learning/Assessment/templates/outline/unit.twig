@@ -27,7 +27,7 @@
                 </div>
                 {% if readOnly == false %}
                 <nav>
-                    <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
+                    <wc-actions-dropdown content-id="unit-options{{ unit.id }}"></wc-actions-dropdown>
                 </nav>
                 <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
 
