@@ -289,22 +289,24 @@
                     /* Remove that hash
                      */
                     let key = element.substr(1);
+                    let ckeditorElement = window.sbProps.editors[key];
 
                     /* Detect a change
                      * https://stackoverflow.com/questions/63601901/ckeditor5-how-do-i-write-a-blur-event-handler-in-my-javascript-function
                      */
-                    window.sbProps.editors[key].ui.focusTracker.on("change:isFocused", (event, name, isFocused) => {
+                    ckeditorElement.ui.focusTracker.on("change:isFocused", (event, name, isFocused) => {
                         if (!isFocused) {
                             /* TODO Add toaster
                              */
 
                             /* Send it
                              */
-                            let textareaSourceElement = window.sbProps.editors[key].sourceElement;
+
+                            let textareaSourceElement = ckeditorElement.sourceElement;
 
                             let payload = new FormData();
                             payload.append('learnosityReference', textareaSourceElement.getAttribute('data-response-reference'));
-                            payload.append('comment', window.sbProps.editors[key].getData());
+                            payload.append('comment', ckeditorElement.getData());
 
                             /* Figure out the user id from the data-report-id value
                              */
