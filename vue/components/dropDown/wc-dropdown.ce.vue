@@ -6,8 +6,11 @@ import { ReferenceElement, computePosition, flip, shift } from "@floating-ui/dom
 
 interface Props {
     dataDropdown: string; // the id to target the content to display
+    dataLabel?: string; // the label to display on the button
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    dataLabel: "Dropdown",
+});
 
 const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
 const isOpen = window.Vue.ref(false); // Whether the dropdown is open or not
@@ -106,9 +109,10 @@ window.Vue.onMounted(() => {
         ref="button"
         type="button"
         class="c-button c-button--icon-only c-button--no-bkg f-match-existing-styles"
-        aria-label="Open drop down"
+        :aria-label="`Open ${dataLabel}`"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
+        :aria-pressed="isOpen"
         :data-test="`dropdown-button-${props.dataDropdown}`"
         @click.prevent="onButtonSelected"
     >
