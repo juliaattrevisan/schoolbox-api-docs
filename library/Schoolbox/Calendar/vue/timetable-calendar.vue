@@ -258,12 +258,7 @@ export default {
             console.info("onPopState() event.state: ", event.state);
             // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
             if (event.state !== null) {
-                const dateInUrlFormat = event.state.urlDate; // Format dd-mm-yyyy.
-                const d = dateInUrlFormat.substring(0, 2);
-                const m = dateInUrlFormat.substring(3, 5);
-                const y = dateInUrlFormat.substring(6, 10);
-                const dateObj = new Date(y + "-" + m + "-" + d);
-
+                const dateObj = this.getDateObjFromUrlDate(event.state.urlDate);
                 this.calendarApi.gotoDate(dateObj);
                 this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
                 this.updateListViewDateRangeFields(dateObj, null, false);
@@ -322,15 +317,11 @@ export default {
             this.reloadEvents();
 
             // Generate new URL.
-            const newUrlDateForParsing =
+            const dateObj = this.getDateObjFromUrlDate(
                 newUrlDate === null
-                    ? document.querySelector("#start_date").value // Use currently selected date.
-                    : newUrlDate;
-
-            const d = newUrlDateForParsing.substring(0, 2);
-            const m = newUrlDateForParsing.substring(3, 5);
-            const y = newUrlDateForParsing.substring(6, 10);
-            const dateObj = new Date(y + "-" + m + "-" + d);
+                    ? document.querySelector("#start_date").value.replace(/\//g, "-") // Use currently selected date, and replace '/' with '-' globally.
+                    : newUrlDate
+            );
             const newUrl =
                 "/timetable/calendar/" + dayjs(dateObj).format(FORMAT_FORM_DATE) + "/" + this.selectedOption.userId;
 
@@ -902,6 +893,21 @@ export default {
             this.calendarApi.gotoDate(value.selectedDate);
 
             this.updateListViewDateRangeFields(value.selectedDate, value.selectedDate, true);
+        },
+
+        /**
+         * @param {string} urlDate - Date in format dd-mm-yyyy (as found in the URL).
+         */
+        getDateObjFromUrlDate(urlDate) {
+            if (urlDate[2] !== "-" || urlDate[5] !== "-") {
+                console.error("Date string is in unexpected format.  Expected dd-mm-yyyy, found '" + urlDate + "'.");
+            }
+
+            const d = urlDate.substring(0, 2);
+            const m = urlDate.substring(3, 5);
+            const y = urlDate.substring(6, 10);
+
+            return new Date(y + "-" + m + "-" + d);
         },
     },
 };
