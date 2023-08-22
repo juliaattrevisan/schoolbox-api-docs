@@ -194,18 +194,20 @@ if (count($items)) {
     $i = 0;
     $total = count($items);
     $userHandler = new User();
-    $userList = array();
-    $categoryList = array();
+    $userList = [];
+    $categoryList = [];
+    $previous = [];
 
     if ($items) {
         foreach ($items as $chat) {
             $i++;
 
             // get the datestamp for the post
-            if (isset($previous)) {
+            if (!empty($previous)) {
                 $df = new Alaress_Date_Format($previous['time'], Alaress_Date_Format::DATABASE_FORMAT);
             } else {
                 $df = new Alaress_Date_Format($chat['time'], Alaress_Date_Format::DATABASE_FORMAT);
+                $previous['date'] = null;
             }
 
             $postDay = $df->getLongDateOnly();
@@ -236,7 +238,7 @@ if (count($items)) {
             $this->setVar($output);
             $categoryList[$chat['time']] = 1;
 
-            if ($chat['date'] != $previous['date'] && $i > 1) {
+            if ($chat['date'] !== $previous['date'] && $i > 1) {
                 $this->parse('chat_date_block', 'chat_date', true);
                 $this->setVar("chat_block", "");
                 $this->parse("chat_block", "chat", true);
