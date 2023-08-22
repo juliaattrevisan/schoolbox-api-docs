@@ -177,7 +177,7 @@ class AjaxChat
 
     private function mute($userID)
     {
-        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users') ?? ''))) {
+        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users') ? $this->getConfig('muted_users') : ''))) {
             $mutedUsers = array();
         }
 
