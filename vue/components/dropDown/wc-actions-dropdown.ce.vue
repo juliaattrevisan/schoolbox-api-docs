@@ -82,6 +82,9 @@ async function open() {
  * while also trying to keep it in the viewport
  */
 async function onButtonSelected() {
+    if (!content) {
+        return;
+    }
     if (isOpen.value) {
         close();
         return;
@@ -128,20 +131,23 @@ window.Vue.onMounted(() => {
         :data-test="`dropdown-button-${props.contentId}`"
         @click.prevent="onButtonSelected"
     >
-        <svg
-            version="1.2"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            width="16"
-            height="16"
-            aria-hidden="true"
-            focusable="false"
-            class="c-icon"
-        >
-            <path d="m6 0h4v4h-4z" />
-            <path d="m6 6h4v4h-4z" />
-            <path d="m6 12h4v4h-4z" />
-        </svg>
+        <!-- when an alternative icon should be used -->
+        <slot name="icon">
+            <svg
+                version="1.2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                width="16"
+                height="16"
+                aria-hidden="true"
+                focusable="false"
+                class="c-icon"
+            >
+                <path d="m6 0h4v4h-4z" />
+                <path d="m6 6h4v4h-4z" />
+                <path d="m6 12h4v4h-4z" />
+            </svg>
+        </slot>
     </button>
 </template>
 
