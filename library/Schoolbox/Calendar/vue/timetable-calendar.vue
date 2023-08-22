@@ -258,13 +258,22 @@ export default {
             console.info("onPopState() event.state: ", event.state);
             // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
             if (event.state !== null) {
-                this.changeUserAndReloadEvents(event.state, false);
+                const dateInUrlFormat = event.state.urlDate; // Format dd-mm-yyyy.
+                const d = dateInUrlFormat.substring(0, 2);
+                const m = dateInUrlFormat.substring(3, 5);
+                const y = dateInUrlFormat.substring(6, 10);
+                const dateObj = new Date(y + "-" + m + "-" + d);
+
+                this.calendarApi.gotoDate(dateObj);
+                this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
+                this.updateListViewDateRangeFields(dateObj, null, false);
+                this.changeUserAndReloadEvents(event.state.selectedOption, event.state.urlDate, false);
             }
         };
 
         // Initialise history by setting the current state.
-        window.history.replaceState(this.getCopyOfSelectedOption(), "", window.location.href);
-        console.info("mounted() replaced state ", this.getCopyOfSelectedOption(), window.location.href);
+        window.history.replaceState(this.getPageStateForUrlHistory(), "", window.location.href);
+        console.info("mounted() replaced state ", this.getPageStateForUrlHistory(), window.location.href);
     },
 
     beforeDestroy() {
@@ -273,49 +282,61 @@ export default {
 
     methods: {
         /**
-         * Return a copy of a userOption object.
-         * This is to avoid getting 'Proxy object could not be cloned' errors when trying to window.pushState(this.selectedOption).
-         * @param {object} userOption - The object to copy.
+         * @returns {object} containing the page's state, suitable for restoration in the window.onpopstate() function.
          */
-        getCopyOfSelectedOption(userOption) {
+        getPageStateForUrlHistory() {
             return {
-                userId: this.selectedOption.userId,
-                firstCampusName: this.selectedOption.firstCampusName,
-                formattedName: this.selectedOption.formattedName,
-                yearLevel: this.selectedOption.yearLevel,
+                selectedOption: {
+                    // Must copy each field explicitly to avoid 'Proxy object could not be cloned' error.
+                    userId: this.selectedOption.userId,
+                    firstCampusName: this.selectedOption.firstCampusName,
+                    formattedName: this.selectedOption.formattedName,
+                    yearLevel: this.selectedOption.yearLevel,
+                },
+                urlDate: this.listViewDateRange.start
+                    ? this.listViewDateRange.start.replace(/\//g, "-") // TODO: Maybe not assume date format is dd/mm/yyyy?
+                    : "20-08-2023", // document.querySelector("#start_date").value, // TODO: Get currently selected date somehow.  Should be 20-08-2023.
             };
         },
 
         /**
-         * @param {object} selectedOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
+         * @param {object} newSelectedOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
+         * @param {?string} newUrlDate - Date in format dd-mm-yyyy.
          * @param {boolean} simulateRedirect
          *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
          */
-        changeUserAndReloadEvents(selectedOption, simulateRedirect) {
-            if (simulateRedirect === undefined) {
-                simulateRedirect = true;
-            }
-
+        changeUserAndReloadEvents(newSelectedOption, newUrlDate = null, simulateRedirect = true) {
             if (simulateRedirect) {
                 // Push current state to history.
-                window.history.pushState(this.getCopyOfSelectedOption(), "", window.location.href);
+                window.history.pushState(this.getPageStateForUrlHistory(), "", window.location.href);
                 console.info(
                     "changeUserAndReloadEvents() pushed state ",
-                    this.getCopyOfSelectedOption(),
+                    this.getPageStateForUrlHistory(),
                     window.location.href
                 );
             }
 
             // Update state.
-            this.selectedOption = selectedOption;
+            this.selectedOption = newSelectedOption;
             this.config.userId = this.selectedOption.userId;
             this.reloadEvents();
 
+            // Generate new URL.
+            const newUrlDateForParsing =
+                newUrlDate === null
+                    ? document.querySelector("#start_date").value // Use currently selected date.
+                    : newUrlDate;
+
+            const d = newUrlDateForParsing.substring(0, 2);
+            const m = newUrlDateForParsing.substring(3, 5);
+            const y = newUrlDateForParsing.substring(6, 10);
+            const dateObj = new Date(y + "-" + m + "-" + d);
+            const newUrl =
+                "/timetable/calendar/" + dayjs(dateObj).format(FORMAT_FORM_DATE) + "/" + this.selectedOption.userId;
+
             // Replace current state in history object with the new state (and set the current URL to match that state).
-            const oldUrl = window.location.href;
-            const newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + this.selectedOption.userId;
-            window.history.replaceState(this.getCopyOfSelectedOption(), "", newUrl);
-            console.info("changeUserAndReloadEvents() replaced state ", this.getCopyOfSelectedOption(), newUrl);
+            window.history.replaceState(this.getPageStateForUrlHistory(), "", newUrl);
+            console.info("changeUserAndReloadEvents() replaced state ", this.getPageStateForUrlHistory(), newUrl);
         },
 
         /**
@@ -800,28 +821,16 @@ export default {
          * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
          * I'm not sure if we can use it..
          */
-        updateListViewDateRangeFieldsAndSimulateRedirect(start, end = null) {
-            /* This is the next/previous button on the date selector
-             * It needs to go to the new /timetable/calendar/... route
-             */
-            window.history.pushState(
-                null,
-                "",
-                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
-            );
-            console.info(
-                "updateListViewDateRangeFieldsAndSimulateRedirect() pushed state ",
-                "",
-                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
-            );
+        updateListViewDateRangeFields(start, end = null, simulateRedirect = true) {
+            if (simulateRedirect) {
+                window.history.pushState(this.getPageStateForUrlHistory(), "", window.location.href);
+                console.info(
+                    "updateListViewDateRangeFields() pushed state ",
+                    this.getPageStateForUrlHistory(),
+                    window.location.href
+                );
+            }
 
-            updateListViewDateRangeFields(start, end);
-        },
-
-        /**
-         *
-         */
-        updateListViewDateRangeFields(start, end = null) {
             this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
             this.listViewDateRange.end = dayjs(end || new Date())
                 .add(this.duration.days, "days")
@@ -845,6 +854,17 @@ export default {
                 .val(this.listViewDateRange.end)
                 .attr("data-default-date", this.listViewDateRange.end)
                 .trigger("change");
+
+            window.history.replaceState(
+                this.getPageStateForUrlHistory(),
+                "",
+                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+            );
+            console.info(
+                "updateListViewDateRangeFields() replaced state ",
+                this.getPageStateForUrlHistory(),
+                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+            );
         },
 
         /**
@@ -853,10 +873,7 @@ export default {
         clickPrev() {
             this.calendarApi.prev();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeFieldsAndSimulateRedirect(
-                this.calendarApi.getDate(),
-                this.calendarApi.getDate()
-            );
+            this.updateListViewDateRangeFields(this.calendarApi.getDate(), this.calendarApi.getDate(), true);
         },
 
         /**
@@ -865,10 +882,7 @@ export default {
         clickNext() {
             this.calendarApi.next();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeFieldsAndSimulateRedirect(
-                this.calendarApi.getDate(),
-                this.calendarApi.getDate()
-            );
+            this.updateListViewDateRangeFields(this.calendarApi.getDate(), this.calendarApi.getDate(), true);
         },
 
         /**
@@ -877,7 +891,7 @@ export default {
         clickToday() {
             this.calendarApi.today();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeFieldsAndSimulateRedirect(this.calendarApi.getDate());
+            this.updateListViewDateRangeFields(this.calendarApi.getDate(), true);
         },
 
         /**
@@ -887,7 +901,7 @@ export default {
         onQuickSwitch(value) {
             this.calendarApi.gotoDate(value.selectedDate);
 
-            this.updateListViewDateRangeFieldsAndSimulateRedirect(value.selectedDate, value.selectedDate);
+            this.updateListViewDateRangeFields(value.selectedDate, value.selectedDate, true);
         },
     },
 };
