@@ -421,13 +421,7 @@ export default {
                         "
                     >
                         <nav>
-                            <a
-                                href="#view-actions"
-                                class="icon-more"
-                                :data-dropdown="`class-options${group.id}`"
-                                aria-expanded="false"
-                                title="View actions"
-                            ></a>
+                            <wc-dropdown :data-dropdown="`class-options${group.id}`" data-label="Actions"></wc-dropdown>
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" :id="`class-options${group.id}`">
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">
