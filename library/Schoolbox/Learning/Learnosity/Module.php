@@ -80,7 +80,7 @@ class Module extends BaseModule
 
         /* Conclude an attempt
          */
-        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnosityReference}', 'getCompleteAttempt', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getCompleteAttempt', $learnerPerms, $preloadAttempt);
 
         /* Start a new attempt
          */
@@ -89,27 +89,33 @@ class Module extends BaseModule
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
-        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnosityReference}', 'getReview', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerPerms, $preloadAttempt);
 
         /* Provide feedback to a student's attempt
          */
-        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'getFeedback', $instructorPerms, $preloadAttemptForReview);
+        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'getFeedback', $instructorPerms, $preloadAttemptForReview);
 
         /* Persist feedback to a student's attempt
          */
-        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
 
         /* Start horizontal marking using a Learnosity Report
          */
         $this->register('GET', '/{assessmentId}/horizontal', 'getHorizontalMarking', $instructorPerms, $preloadAssessment);
 
+        /* Provide updated score for a particular student response
+         * (used predominantly in horizontal marking)
+         */
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/{learnositySessionReference}/feedback-score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
+
+        /* Provide updated comment for a particular student response
+         * (used predominantly in horizontal marking)
+         */
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/{learnositySessionReference}/feedback-comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
+
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
-
-        /* Livestream
-         */
-        $this->register('GET', '/{assessmentId}/stream', 'getLiveProgress', $instructorPerms, $preloadAssessment);
 
         /* Older exploratory urls that aren't part of our conventional workflow
          */
@@ -238,7 +244,7 @@ class Module extends BaseModule
         $participantPreload = $this->preloadAssessmentAndStudent($params);
 
         try {
-            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnosityReference']);
+            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnositySessionReference']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new NotFound();
         }
@@ -262,7 +268,9 @@ class Module extends BaseModule
 
 
     /**
-     * Preloads an attempt via its learnosity reference identifier
+     * Preloads an attempt via its learnosity session reference identifier
+     * If you provided a learnosity response reference identifier it'll try
+     * to populate and provide that too
      *
      * @param array $params
      * @return array
@@ -277,17 +285,43 @@ class Module extends BaseModule
     {
         $participantPreload = $this->preloadAssessmentAndStudent($params);
 
+        $dependencies = [];
+
         try {
-            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnosityReference']);
+            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnositySessionReference']);
+
+            $dependencies['attempt'] = $attempt;
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new NotFound();
         }
 
+//        /* If there was a learnosityResponseReference, find the corresponding
+//         * row in quiz_feedback
+//         */
+//        if ('' !== ($params['learnosityResponseReference'] ?? '')) {
+//            try {
+//                $feedback = $this->getFeedbackMapper()->findOneByColumnList([
+//                    'attempt_id' => $attempt->getId(),
+//                    'learnosity_reference' => $params['learnosityResponseReference']
+//                ]);
+//
+//                $dependencies['feedback'] = $feedback;
+//            } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+//                /* We don't have any record of this quiz_feedback row yet
+//                 * Might be a new addition
+//                 */
+//                $dependencies['feedback'] = null;
+//            } catch (\Schoolbox\Mapper\Exception $e) {
+//                /* We expected to find a $feedback but we didn't
+//                 * You probably don't own it
+//                 */
+//                throw new NotFound();
+//            }
+//        }
+
         /* Staff can always see it
          */
-        return array_merge($participantPreload, [
-            'attempt' => $attempt
-        ]);
+        return array_merge($participantPreload, $dependencies);
     }
 
 
@@ -344,6 +378,16 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class);
     }
+
+
+//    /**
+//     * @return Mapper|\Schoolbox\Learning\Learnosity\Feedback\Mapper
+//     * @throws InvalidArgumentException
+//     */
+//    protected function getFeedbackMapper()
+//    {
+//        return $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class);
+//    }
 
 
     /**

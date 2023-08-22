@@ -927,6 +927,63 @@ class Controller extends Base
 
 
     /**
+     * Persists a new score back to Learnosity for it to re-tally
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     */
+    public function postFeedbackScore(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* Fetch the response id first, because you need a bunch of stuff
+         * The response id (learnosity response reference) is in POST
+         */
+
+        /* Update the returned payload with the new score
+         */
+
+        /* Use the learnosity Data API to send the revised payload which
+         * should now contain all the parts Learnosity expected
+         */
+    }
+
+
+    /**
+     * Persists a new comment into quiz_feedback, associated with an attempt_id and a
+     * Learnosity Reference (it's a response id, but there's no official name for this)
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     */
+    public function postFeedbackComment(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void
+    {
+        /* The response id (learnosity response reference) is in POST.
+         *
+         * For the given attempt, see if there's already a row in quiz_feedback
+         * corresponding to the (attempt id, response id) tuple
+         *
+         * If there is, update it; otherwise create it
+         */
+
+        /* Put the new/updated comment in
+         */
+
+        /* Save it
+         */
+    }
+
+
+    /**
      * Archive (soft-delete) multiple Learnosity Activities
      *
      * @return void
