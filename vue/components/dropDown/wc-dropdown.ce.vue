@@ -5,7 +5,7 @@
 import { ReferenceElement, computePosition, flip, shift } from "@floating-ui/dom";
 
 interface Props {
-    dataDropdown: string; // the id of the linked dropdown to display
+    dataDropdown: string; // the id to target the dropdownContent to display
 }
 const props = defineProps<Props>();
 
@@ -14,10 +14,21 @@ const isOpen = window.Vue.ref(false); // Whether the dropdown is open or not
 let dropdownContent: HTMLElement; // The dropdown content, the element that's displayed when the button is selected
 
 /**
- * When the dropdown is closed
+ * Close the dropdown if it's open
+ */
+function close() {
+    if (isOpen.value) {
+        isOpen.value = false;
+        dropdownContent.style.display = "none";
+        dropdownContent.setAttribute("aria-hidden", "true");
+    }
+}
+
+/**
+ * When the document is clicked, close the dropdown if it's open
  * @param {MouseEvent} event - The event that triggered the close
  */
-function close(event?: MouseEvent) {
+function onDocumentClick(event?: MouseEvent) {
     // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
     if (
         event &&
@@ -26,33 +37,28 @@ function close(event?: MouseEvent) {
     ) {
         return;
     }
-
-    dropdownContent.style.display = "none";
-    dropdownContent.setAttribute("aria-hidden", "true");
-    isOpen.value = false;
-
-    if (window.sbProps.activeDropdown) {
-        document.removeEventListener("click", window.sbProps.activeDropdown.close);
-        window.sbProps.activeDropdown = false;
+    // If the clicked target is the dropdown trigger, also do nothing
+    if (
+        event &&
+        event.target &&
+        (event.target as HTMLElement).hasAttribute("data-dropdown") &&
+        (event.target as HTMLElement).getAttribute("data-dropdown") === props.dataDropdown
+    ) {
+        return;
     }
+    close();
+    document.removeEventListener("click", onDocumentClick);
 }
 
 /**
- * When the dropdown button is clicked
+ * When the dropdown button is clicked, close the dropdown content if it's open,
+ * otherwise open it using @floating-ui/dom to position it relative to the trigger
+ * while also trying to keep it in the viewport
  */
 async function onButtonSelected() {
-    // If there's an active dropdown, close it
-    //  This check applies when the user clicks on any dropdown trigger
-    //  As we have stopped the propagation of the click event, the event listener on the document won't be triggered
-    //  If the user clicks anywhere else on the page, the dropdown will be closed by a different event listener
-    const currentActiveDropdown = window.sbProps.activeDropdown;
-    if (currentActiveDropdown) {
-        currentActiveDropdown.close();
-
-        // Prevent the dropdown from reopening
-        if (currentActiveDropdown.id === props.dataDropdown) {
-            return;
-        }
+    if (isOpen.value) {
+        close();
+        return;
     }
 
     dropdownContent.style.display = "block"; // The element must be visible to correctly compute its position
@@ -66,17 +72,9 @@ async function onButtonSelected() {
     dropdownContent.style.top = `${position.y}px`;
     dropdownContent.setAttribute("aria-hidden", "false");
 
-    window.sbProps.activeDropdown = {
-        id: props.dataDropdown,
-        trigger: dropdownTrigger.value as HTMLButtonElement,
-        content: dropdownContent,
-        close,
-    };
-
     isOpen.value = true;
 
-    // Add an event listener to close the dropdown when the user clicks anywhere outside the content
-    document.addEventListener("click", window.sbProps.activeDropdown.close);
+    document.addEventListener("click", onDocumentClick);
 }
 
 /**
@@ -108,7 +106,7 @@ window.Vue.onMounted(() => {
         aria-label="Open drop down"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
-        @click.stop.prevent="onButtonSelected"
+        @click.prevent="onButtonSelected"
     >
         <svg
             version="1.2"
