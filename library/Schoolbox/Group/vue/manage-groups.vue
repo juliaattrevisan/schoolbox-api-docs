@@ -92,7 +92,6 @@ export default {
         onGroupsSelected(groupsSelection) {
             this.selectedGroups = groupsSelection;
             window.location.hash = this.selectedGroups;
-            this.checkForDropdowns();
         },
 
         /**
@@ -122,7 +121,6 @@ export default {
          */
         onGroupEditSuccess(text) {
             this.$refs.toast.timeout(text, true, 3000);
-            this.checkForDropdowns();
         },
 
         /**
