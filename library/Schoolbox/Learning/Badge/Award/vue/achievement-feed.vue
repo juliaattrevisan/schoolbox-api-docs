@@ -232,11 +232,9 @@ export default {
                                 </div>
                                 <template v-if="hasTot(award)">
                                     <nav>
-                                        <a
-                                            class="icon-more"
-                                            title="Actions"
-                                            :data-dropdown="generateIdentifier(award)"
-                                        ></a>
+                                        <wc-actions-dropdown
+                                            :content-id="generateIdentifier(award)"
+                                        ></wc-actions-dropdown>
                                     </nav>
                                     <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
                                         <!-- Only show Withdraw button if you can actually do it
