@@ -285,43 +285,17 @@ class Module extends BaseModule
     {
         $participantPreload = $this->preloadAssessmentAndStudent($params);
 
-        $dependencies = [];
-
         try {
             $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnositySessionReference']);
-
-            $dependencies['attempt'] = $attempt;
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new NotFound();
         }
 
-//        /* If there was a learnosityResponseReference, find the corresponding
-//         * row in quiz_feedback
-//         */
-//        if ('' !== ($params['learnosityResponseReference'] ?? '')) {
-//            try {
-//                $feedback = $this->getFeedbackMapper()->findOneByColumnList([
-//                    'attempt_id' => $attempt->getId(),
-//                    'learnosity_reference' => $params['learnosityResponseReference']
-//                ]);
-//
-//                $dependencies['feedback'] = $feedback;
-//            } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
-//                /* We don't have any record of this quiz_feedback row yet
-//                 * Might be a new addition
-//                 */
-//                $dependencies['feedback'] = null;
-//            } catch (\Schoolbox\Mapper\Exception $e) {
-//                /* We expected to find a $feedback but we didn't
-//                 * You probably don't own it
-//                 */
-//                throw new NotFound();
-//            }
-//        }
-
         /* Staff can always see it
          */
-        return array_merge($participantPreload, $dependencies);
+        return array_merge($participantPreload, [
+            'attempt' => $attempt
+        ]);
     }
 
 
@@ -378,16 +352,6 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class);
     }
-
-
-//    /**
-//     * @return Mapper|\Schoolbox\Learning\Learnosity\Feedback\Mapper
-//     * @throws InvalidArgumentException
-//     */
-//    protected function getFeedbackMapper()
-//    {
-//        return $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class);
-//    }
 
 
     /**
