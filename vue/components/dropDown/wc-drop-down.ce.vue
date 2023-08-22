@@ -9,22 +9,33 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const dropdownTrigger = window.Vue.ref<HTMLButtonElement | null>(null);
-let dropdownContent: HTMLElement;
-const isOpen = window.Vue.ref(false);
+const dropdownTrigger = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
+const isOpen = window.Vue.ref(false); // Whether the dropdown is open or not
+let dropdownContent: HTMLElement; // The dropdown content, the element that's displayed when the button is selected
 
 /**
- * Initialise the dropdown
+ * When the dropdown is closed
+ * @param {MouseEvent} event - The event that triggered the close
  */
-window.Vue.onMounted(() => {
-    window.addEventListener("DOMContentLoaded", () => {
-        dropdownContent = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
-        if (!dropdownContent) {
-            return;
-        }
-        dropdownContent.setAttribute("aria-hidden", "true");
-    });
-});
+function close(event?: MouseEvent) {
+    // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
+    if (
+        event &&
+        dropdownContent.contains(event.target as Node) &&
+        dropdownContent.getAttribute("aria-autoclose") === "false"
+    ) {
+        return;
+    }
+
+    dropdownContent.style.display = "none";
+    dropdownContent.setAttribute("aria-hidden", "true");
+    isOpen.value = false;
+
+    if (window.sbProps.activeDropdown) {
+        document.removeEventListener("click", window.sbProps.activeDropdown.close);
+        window.sbProps.activeDropdown = false;
+    }
+}
 
 /**
  * When the dropdown button is clicked
@@ -51,39 +62,42 @@ async function onButtonSelected() {
         middleware: [flip(), shift()],
     });
 
+    dropdownContent.style.left = `${position.x}px`;
+    dropdownContent.style.top = `${position.y}px`;
+    dropdownContent.setAttribute("aria-hidden", "false");
+
     window.sbProps.activeDropdown = {
         id: props.dataDropdown,
         trigger: dropdownTrigger.value as HTMLButtonElement,
         content: dropdownContent,
-        close: (event?: MouseEvent) => {
-            // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
-            if (
-                event &&
-                dropdownContent.contains(event.target as Node) &&
-                dropdownContent.getAttribute("aria-autoclose") === "false"
-            ) {
-                return;
-            }
-
-            dropdownContent.style.display = "none";
-            dropdownContent.setAttribute("aria-hidden", "true");
-            isOpen.value = false;
-
-            if (window.sbProps.activeDropdown) {
-                document.removeEventListener("click", window.sbProps.activeDropdown.close);
-                window.sbProps.activeDropdown = false;
-            }
-        },
+        close,
     };
-    dropdownContent.style.left = `${position.x}px`;
-    dropdownContent.style.top = `${position.y}px`;
 
-    dropdownContent.setAttribute("aria-hidden", "false");
     isOpen.value = true;
 
     // Add an event listener to close the dropdown when the user clicks anywhere outside the content
     document.addEventListener("click", window.sbProps.activeDropdown.close);
 }
+
+/**
+ * Get the dropdown content, the element that's displayed when the button is selected
+ */
+function getDropdownContent() {
+    window.addEventListener("DOMContentLoaded", () => {
+        dropdownContent = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
+        if (!dropdownContent) {
+            return;
+        }
+        dropdownContent.setAttribute("aria-hidden", "true");
+    });
+}
+
+/**
+ * Initialise the dropdown
+ */
+window.Vue.onMounted(() => {
+    getDropdownContent();
+});
 </script>
 
 <template>
