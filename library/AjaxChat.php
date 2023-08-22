@@ -95,7 +95,7 @@ class AjaxChat
                 break;
 
             case 'mute':
-                $this->mute($post_vars['user_id']);
+                $this->mute((int)$post_vars['user_id']);
                 break;
 
             default:
