@@ -263,7 +263,7 @@ export default {
             if (event.state === null || event.state.urlDate === null) {
                 console.error("Event.state and event.state.urlDate should always be set in window.onPopState()."); // Sanity check.
             }
-            const date = this.getDateObjFromDateString(event.state.urlDate, FORMAT_FORM_DATE);
+            const date = dayjs(event.state.urlDate, FORMAT_FORM_DATE, true).toDate();
             this.calendarApi.gotoDate(date);
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
             this.updateListViewDateRangeFields(date, null, false);
@@ -323,7 +323,7 @@ export default {
             if (newUrlDate === null) {
                 newUrlDateObj = this.getCurrentValueOfUrlDate();
             } else {
-                newUrlDateObj = this.getDateObjFromDateString(newUrlDate, FORMAT_FORM_DATE);
+                newUrlDateObj = dayjs(newUrlDate, FORMAT_FORM_DATE, true).toDate();
             }
 
             const newUrl =
@@ -919,7 +919,7 @@ export default {
                 dateObj = Date(); // Today is the default value for #start_date.
             } else {
                 console.info("getCurrentValueOfUrlDate() #start_date set, so using #start_date.");
-                dateObj = this.getDateObjFromDateString(startDateStr, FORMAT_FLATPICKR_DATE);
+                dateObj = dayjs(startDateStr, FORMAT_FLATPICKR_DATE, true).toDate();
             }
             dateObj = this.setDateObjToMostRecentSunday(dateObj);
             const urlDate = dayjs(dateObj).format(FORMAT_FORM_DATE);
@@ -935,54 +935,6 @@ export default {
         setDateObjToMostRecentSunday(date) {
             date.setDate(date.getDate() - date.getDay());
             return date;
-        },
-
-        /**
-         * @param {string} dateString - Date in format DD-MM-YYYY (FORMAT_FORM_DATE).
-         * @param {string} currentFormat
-         *  - The current format of dateString. Use one of the constants FORMAT_FORM_DATE, FORMAT_FLATPICKR_DATE.
-         * @returns {Date} - The supplied date as a Javascript Date object.
-         *
-         * TODO: This function seems to be equivalent to the following use of dayjs.  Confirm and remove if so.
-         * const date = dayjs(
-         *     document.querySelector("#end_date").value,
-         *     FORMAT_FLATPICKR_DATE,
-         *     true
-         * );
-         */
-        getDateObjFromDateString(dateString, currentFormat) {
-            let d = null;
-            let m = null;
-            let y = null;
-
-            switch (currentFormat) {
-                case "DD-MM-YYYY":
-                    if (dateString[2] !== "-" || dateString[5] !== "-") {
-                        console.error(
-                            "Date string is in unexpected format.  Expected DD-MM-YYYY, found '" + dateString + "'."
-                        );
-                    }
-                    d = dateString.substring(0, 2);
-                    m = dateString.substring(3, 5);
-                    y = dateString.substring(6, 10);
-                    break;
-
-                case "DD/MM/YYYY":
-                    if (dateString[2] !== "/" || dateString[5] !== "/") {
-                        console.error(
-                            "Date string is in unexpected format.  Expected DD/MM/YYYY, found '" + dateString + "'."
-                        );
-                    }
-                    d = dateString.substring(0, 2);
-                    m = dateString.substring(3, 5);
-                    y = dateString.substring(6, 10);
-                    break;
-
-                default:
-                    console.error("Unknown date format '" + currentFormat + "'");
-            }
-
-            return new Date(y + "-" + m + "-" + d);
         },
     },
 };
