@@ -52,7 +52,7 @@ class DueWorkInitialCest
         $this->homepageUrl = $i->getCurrentUrl();
 
         $i->amGoingTo('Add few members into the homepage');
-        $i->click('a#all-actions.icon-more');
+        $i->click('[data-test="dropdown-button-tab-control"]');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $i->waitForText("Manage Group", 5);
         $i->clickWithLeftButton('#search-text');

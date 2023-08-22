@@ -109,6 +109,7 @@ window.Vue.onMounted(() => {
         aria-label="Open drop down"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
+        :data-test="`dropdown-button-${props.dataDropdown}`"
         @click.prevent="onButtonSelected"
     >
         <svg
@@ -126,9 +127,6 @@ window.Vue.onMounted(() => {
             <path d="m6 12h4v4h-4z" />
         </svg>
     </button>
-    <!--
-        <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions" id="all-actions" data-dropdown-initialized="true" aria-haspopup="true" aria-expanded="true"></a>
-    -->
 </template>
 
 <style lang="scss" scoped>
@@ -147,6 +145,11 @@ button.f-match-existing-styles {
     height: 42px !important;
     min-height: 42px !important;
     width: 40px !important;
+    opacity: 0.7;
+    &:hover,
+    &:active {
+        opacity: 1;
+    }
     &:focus {
         box-shadow: 0 0 0 2px currentColor;
     }
