@@ -158,8 +158,17 @@ window.Vue.onMounted(() => {
 @import "../../../www/static/css/core/ui/button/_c-button.scss";
 
 // To match the typical background colour of the dropdown content
-button[aria-expanded="true"] {
+// and better visually connect the button to the content
+button.c-button[aria-expanded="true"] {
     background-color: var(--content-ui-background);
+    opacity: 1;
+    &:hover,
+    &:active {
+        background-color: var(--content-ui-background);
+    }
+    &:focus {
+        box-shadow: none;
+    }
 }
 
 // As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
