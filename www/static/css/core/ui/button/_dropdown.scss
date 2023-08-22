@@ -68,7 +68,7 @@ $f-dropdown-radius: $global-radius !default;
     display: none;
     top: 0;
     left: 0;
-    z-index: 9999; // Show on top
+    z-index: 99; // Show on top
     list-style: $f-dropdown-list-style;
     margin-#{$default-float}: 0;
     position: absolute;
