@@ -123,6 +123,7 @@ window.Vue.onMounted(() => {
         :aria-label="currentLabel"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
+        :aria-controls="props.contentId"
         :aria-pressed="isOpen"
         :data-test="`dropdown-button-${props.contentId}`"
         @click.prevent="onButtonSelected"
