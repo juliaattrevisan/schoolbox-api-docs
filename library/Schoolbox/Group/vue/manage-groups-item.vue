@@ -43,13 +43,6 @@ export default {
         };
     },
 
-    mounted() {
-        // Ensure dropdowns are initialised
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
-
     computed: {
         /**
          * To respond to enrolment changes, joining and leaving group

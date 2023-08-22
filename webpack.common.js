@@ -97,9 +97,6 @@ module.exports = {
 
             // Global property storage
             "./www/static/js/global/sbProps.js",
-
-            // Dropdowns
-            "./www/static/js/dropdown/dropdown.ts",
         ],
         masonry: {
             import: ["./www/static/js/masonry/masonry.js"],

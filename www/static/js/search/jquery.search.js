@@ -115,9 +115,6 @@
                      */
                     paginate();
                     updateStyles();
-
-                    /* dropdown doesn't apply to ajaxed html and needs to be reinitialized */
-                    reflow();
                 });
             } else {
                 /* Add pagination again
@@ -200,13 +197,6 @@
             /* Add active class to the thing you clicked on
              */
             config.sectionElement.parent().addClass("active");
-        }
-
-        /**
-         * Reinit dropdown elements
-         */
-        function reflow() {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
         }
 
         /**

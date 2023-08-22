@@ -93,13 +93,6 @@ export default {
         document.addEventListener("badge-list__onFilterChange", this.onFilterChange);
     },
 
-    updated() {
-        // Ensure dropdowns are initialised
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
-
     methods: {
         /**
          * Opens a modal window for viewing this badge's full details.

@@ -73,15 +73,6 @@ export default {
     },
 
     /**
-     * Ensure dropdowns are initialised when we create them
-     */
-    updated() {
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
-
-    /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */

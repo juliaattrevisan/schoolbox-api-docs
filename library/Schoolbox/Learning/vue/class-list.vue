@@ -271,11 +271,6 @@ export default {
 
         // If the Back button is pressed on this page: set the class code
         window.addEventListener("popstate", () => self.setClassCode(window.location.hash.substring(1)));
-
-        // Ensure dropdowns are initialised
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
     },
     methods: {
         getStudentsPastoralCountsEndpoint: function () {

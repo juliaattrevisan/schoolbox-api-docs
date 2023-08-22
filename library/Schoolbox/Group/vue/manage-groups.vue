@@ -104,17 +104,6 @@ export default {
         onGroupsFiltered(groups, isSearchActive = false) {
             this.filteredGroups = groups;
             this.isSearchActive = isSearchActive;
-            this.checkForDropdowns();
-        },
-
-        /**
-         * If there's no groups visible on the page on initial display, dropdowns won't work
-         * So we need to check for them on every select / filter change to ensure they work properly
-         */
-        checkForDropdowns() {
-            this.$nextTick(() => {
-                document.dispatchEvent(new Event("DROPDOWN__INIT"));
-            });
         },
 
         /**
