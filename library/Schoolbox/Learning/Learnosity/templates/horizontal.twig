@@ -298,6 +298,7 @@
                      */
                     let key = element.substr(1);
                     let ckeditorElement = window.sbProps.editors[key];
+                    let textareaSourceElement = ckeditorElement.sourceElement;
 
                     /* Detect a change
                      * https://stackoverflow.com/questions/63601901/ckeditor5-how-do-i-write-a-blur-event-handler-in-my-javascript-function
@@ -311,8 +312,6 @@
 
                             /* Send it
                              */
-                            let textareaSourceElement = ckeditorElement.sourceElement;
-
                             let payload = new FormData();
                             payload.append('learnosityReference', textareaSourceElement.getAttribute('data-response-reference'));
                             payload.append('comment', ckeditorElement.getData());
