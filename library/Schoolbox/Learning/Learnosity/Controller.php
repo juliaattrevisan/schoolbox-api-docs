@@ -850,7 +850,8 @@ class Controller extends Base
 
                 $urls[$attempt->getUser()->getId()] = [
                     'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
-                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args)
+                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
                 ];
             }
         }
@@ -1068,6 +1069,34 @@ class Controller extends Base
         /* Save it
          */
         $this->feedbackMapper->save($feedback);
+    }
+
+
+    /**
+     * Post a comment about a particular Attempt into assess_attempt.comment
+     * Predominantly used in horizontal marking's final screen
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postFeedbackAttemptComment(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void
+    {
+        /* Put the new/updated comment in
+         */
+        $attempt->setComment($this->requestPost->get('comment'));
+
+        /* Save it
+         */
+        $this->attemptMapper->save($attempt);
     }
 
 

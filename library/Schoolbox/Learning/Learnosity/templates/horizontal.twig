@@ -10,7 +10,7 @@
  # @param array $responseComments   A list of comment tuples that contain per-question comments
  # @param array $attemptComments    A list of comment tuples that contain per-attempt comments
  # @param array $attemptReferences  A list of attempt Learnosity references used in Attempt Comment textarea ids
- # @param array $urls               A pair of (score endpoint, comment endpoint) tuples which tell us each user's persistence urls, indexed by user id
+ # @param array $urls               A pair of (score endpoint, comment endpoint, attempt comment endpoint) tuples which tell us each user's persistence urls, indexed by user id
  #}
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
@@ -70,7 +70,7 @@
         <section class="content">
             {% for user in users %}
                 <h3>{{ user.name }}</h3>
-                <textarea id="attempt-comment-{{ attemptComments[user.id].reference }}" name="attemptComment[{{ attemptComments[user.id].reference }}]">{{ attemptComments[user.id].comment ?? '' }}</textarea>
+                <textarea id="attempt-comment-{{ attemptComments[user.id].reference }}" name="attemptComment[{{ attemptComments[user.id].reference }}]" data-attempt-comment="true" data-report-id="schoolbox-student-{{ user.id }}">{{ attemptComments[user.id].comment ?? '' }}</textarea>
             {% endfor %}
         </section>
     </div>
@@ -296,16 +296,33 @@
 
                             /* Send it
                              */
+                            let textareaSourceElement = window.sbProps.editors[key].sourceElement;
+
                             let payload = new FormData();
-                            payload.append('learnosityReference', window.sbProps.editors[key].sourceElement.getAttribute('data-response-reference'));
+                            payload.append('learnosityReference', textareaSourceElement.getAttribute('data-response-reference'));
                             payload.append('comment', window.sbProps.editors[key].getData());
 
                             /* Figure out the user id from the data-report-id value
                              */
-                            let reportId = window.sbProps.editors[key].sourceElement.getAttribute('data-report-id');
+                            let reportId = textareaSourceElement.getAttribute('data-report-id');
                             let userId = users[reportId].id;
 
-                            fetch(urls[userId].comment, {
+                            /* Special case for attempt comments, whose ckeditors get saved
+                             * in a different place than responses' comments
+                             */
+                            let url;
+
+                            if (textareaSourceElement.getAttribute('data-attempt-comment')) {
+                                /* Attempt comments have a special url
+                                 */
+                                url = urls[userId].attemptComment;
+                            } else {
+                                /* Otherwise, individual response comments get saved per-question
+                                 */
+                                url = urls[userId].comment;
+                            }
+
+                            fetch(url, {
                                 method: 'POST',
                                 body: payload
                             }).then(response => {
