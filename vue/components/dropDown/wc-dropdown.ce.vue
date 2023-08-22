@@ -91,23 +91,26 @@ async function onButtonSelected() {
 }
 
 /**
- * Get the dropdown content, the element that's displayed when the button is selected
+ * Get the content, the element that's displayed when the button is selected
  */
-function getDropdownContent() {
-    window.addEventListener("DOMContentLoaded", () => {
-        content = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
-        if (!content) {
-            return;
-        }
+function getContent() {
+    content = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
+    if (content) {
         content.setAttribute("aria-hidden", "true");
-    });
+    }
 }
 
 /**
  * Initialise the dropdown
  */
 window.Vue.onMounted(() => {
-    getDropdownContent();
+    getContent();
+    // if it's not already in the DOM, wait for the DOM to be ready to try again
+    if (!content) {
+        window.addEventListener("DOMContentLoaded", () => {
+            getContent();
+        });
+    }
 });
 </script>
 

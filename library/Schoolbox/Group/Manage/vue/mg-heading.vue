@@ -78,7 +78,7 @@ function onDisbandSelected() {
             <h1>Manage Group</h1>
         </div>
         <nav v-if="store.hasLoadedOk && settingsStore.isAccessSaved">
-            <a href="#expand" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
+            <wc-dropdown data-dropdown="tab-control" data-label="Actions"></wc-dropdown>
         </nav>
         <ul id="tab-control" class="f-dropdown" data-dropdown-content>
             <li>
