@@ -5,13 +5,13 @@
 import { ReferenceElement, computePosition, flip, shift } from "@floating-ui/dom";
 
 interface Props {
-    dataDropdown: string; // the id to target the dropdownContent to display
+    dataDropdown: string; // the id to target the content to display
 }
 const props = defineProps<Props>();
 
-const dropdownTrigger = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
+const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
 const isOpen = window.Vue.ref(false); // Whether the dropdown is open or not
-let dropdownContent: HTMLElement; // The dropdown content, the element that's displayed when the button is selected
+let content: HTMLElement; // The dropdown content, the element that's displayed when the button is selected
 
 /**
  * Close the dropdown if it's open
@@ -19,8 +19,8 @@ let dropdownContent: HTMLElement; // The dropdown content, the element that's di
 function close() {
     if (isOpen.value) {
         isOpen.value = false;
-        dropdownContent.style.display = "none";
-        dropdownContent.setAttribute("aria-hidden", "true");
+        content.style.display = "none";
+        content.setAttribute("aria-hidden", "true");
     }
 }
 
@@ -33,8 +33,8 @@ function onDocumentClick(event?: MouseEvent) {
     if (
         event &&
         event.target &&
-        dropdownContent.contains(event.target as Node) &&
-        dropdownContent.getAttribute("aria-autoclose") === "false"
+        content.contains(event.target as Node) &&
+        content.getAttribute("aria-autoclose") === "false"
     ) {
         return;
     }
@@ -56,14 +56,14 @@ function onDocumentClick(event?: MouseEvent) {
  */
 async function open() {
     isOpen.value = true;
-    dropdownContent.style.display = "block"; // The element must be visible to correctly compute its position
-    const position = await computePosition(dropdownTrigger.value as ReferenceElement, dropdownContent, {
+    content.style.display = "block"; // The element must be visible to correctly compute its position
+    const position = await computePosition(button.value as ReferenceElement, content, {
         placement: "bottom-end",
         middleware: [flip(), shift()],
     });
-    dropdownContent.style.left = `${position.x}px`;
-    dropdownContent.style.top = `${position.y}px`;
-    dropdownContent.setAttribute("aria-hidden", "false");
+    content.style.left = `${position.x}px`;
+    content.style.top = `${position.y}px`;
+    content.setAttribute("aria-hidden", "false");
 }
 
 /**
@@ -85,11 +85,11 @@ async function onButtonSelected() {
  */
 function getDropdownContent() {
     window.addEventListener("DOMContentLoaded", () => {
-        dropdownContent = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
-        if (!dropdownContent) {
+        content = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
+        if (!content) {
             return;
         }
-        dropdownContent.setAttribute("aria-hidden", "true");
+        content.setAttribute("aria-hidden", "true");
     });
 }
 
@@ -103,7 +103,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <button
-        ref="dropdownTrigger"
+        ref="button"
         type="button"
         class="c-button c-button--icon-only c-button--no-bkg f-match-existing-styles"
         aria-label="Open drop down"
