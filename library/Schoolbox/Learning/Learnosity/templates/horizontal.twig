@@ -10,11 +10,12 @@
  # @param array $responseComments   A list of comment tuples that contain per-question comments
  # @param array $attemptComments    A list of comment tuples that contain per-attempt comments
  # @param array $attemptReferences  A list of attempt Learnosity references used in Attempt Comment textarea ids
- # @param array $urls               A pair of (score, comment, attempt comment) endpoint tuples which tell us each user's persistence urls, indexed by user id
+ # @param array $urls               A list of (score, comment, attempt comment) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #}
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
+{# Title. But add the metadata etc. when you get up to that bit #}
 <div class="row">
     <div class="small-12 columns">
         <h1>Horizontal Marking for {{ assessment.title }}</h1>
@@ -76,6 +77,7 @@
     </div>
 </div>
 
+{# Navigator buttons that uses the Grasso Grid #}
 <div class="row">
     <div class="small-12 columns">
         <div id="navigator-container" style='display:none' class="sb-grid u-gap--l sb-grid--2-col dummy-content highlighter u-margin-m--bottom">
@@ -263,7 +265,7 @@
                         }
                     });
                 });
-            }
+            #}
         };
 
         /* Initialise reports for each attempt
