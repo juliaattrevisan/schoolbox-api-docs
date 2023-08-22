@@ -724,12 +724,9 @@ export default {
                             <td class="no-pad">
                                 <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                     <nav>
-                                        <a
-                                            href="#"
-                                            :data-dropdown="'overflow' + student.id"
-                                            class="icon-more"
-                                            title="Actions"
-                                        ></a>
+                                        <wc-actions-dropdown
+                                            :content-id="`overflow${student.id}`"
+                                        ></wc-actions-dropdown>
                                     </nav>
                                 </div>
                             </td>

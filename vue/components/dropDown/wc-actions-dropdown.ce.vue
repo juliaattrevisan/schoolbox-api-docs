@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * When selected displays a linked dropdown
+ * Used to display a list of actions in a dropdown menu
  */
 import { ReferenceElement, computePosition, flip, shift } from "@floating-ui/dom";
 

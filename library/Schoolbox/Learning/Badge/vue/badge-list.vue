@@ -381,13 +381,9 @@ export default {
                                     </h3>
                                 </div>
                                 <nav v-if="showBadgeMenus">
-                                    <a
-                                        href="#"
-                                        class="icon-overflow"
-                                        :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
-                                        aria-expanded="false"
-                                        title="Actions"
-                                    ></a>
+                                    <wc-actions-dropdown
+                                        :content-id="`badge-${badge.id}-dropdown`"
+                                    ></wc-actions-dropdown>
                                 </nav>
                                 <ul
                                     v-if="showBadgeMenus"

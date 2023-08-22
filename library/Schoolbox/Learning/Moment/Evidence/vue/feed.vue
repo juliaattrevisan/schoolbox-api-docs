@@ -622,13 +622,9 @@ export default {
                                             </a>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
-                                            <a
-                                                href="#"
-                                                class="icon-overflow"
-                                                :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
-                                                aria-expanded="false"
-                                                title="Actions"
-                                            ></a>
+                                            <wc-actions-dropdown
+                                                :content-id="`evidence-${evidence.object.id}-dropdown`"
+                                            ></wc-actions-dropdown>
                                         </nav>
                                         <ul
                                             v-if="hasMenu(evidence.object)"

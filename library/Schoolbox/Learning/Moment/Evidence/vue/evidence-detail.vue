@@ -151,7 +151,7 @@ export default {
                     <div class="actions-small-1">
                         <nav>
                             <template v-if="evidence._links.delete">
-                                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+                                <wc-actions-dropdown content-id="header-options"></wc-actions-dropdown>
                             </template>
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>
