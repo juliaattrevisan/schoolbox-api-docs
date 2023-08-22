@@ -787,6 +787,7 @@ class Controller extends Base
         $users = [];
         $reportPayloads = [];
         $attemptComments = [];
+        $urls = [];
 
         foreach ($attempts as $attempt) {
             $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
@@ -833,6 +834,20 @@ class Controller extends Base
                         ]
                     ],
                 ]);
+
+                /* Pregenerate all the urls for each guy, because you can't manufacture them
+                 * in javascript without risking desync with backend
+                 */
+                $args = [
+                    'assessmentId' => $assessment->getId(),
+                    'studentId' => $attempt->getUser()->getId(),
+                    'learnositySessionReference' => $attempt->getLearnosityReference()
+                ];
+
+                $urls[$attempt->getUser()->getId()] = [
+                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args)
+                ];
             }
         }
 
@@ -917,7 +932,8 @@ class Controller extends Base
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
             'responseComments' => base64_encode(json_encode($responseComments, JSON_THROW_ON_ERROR)),
             'attemptComments' => $attemptComments,
-            'attemptReferences' => json_encode(array_values($sessions), JSON_THROW_ON_ERROR)
+            'attemptReferences' => json_encode(array_values($sessions), JSON_THROW_ON_ERROR),
+            'urls' => json_encode($urls, JSON_THROW_ON_ERROR)
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
@@ -937,7 +953,8 @@ class Controller extends Base
         IAssessable $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
-    ): void {
+    ): void
+    {
         /* Fetch the response id first, because you need a bunch of stuff
          * The response id (learnosity response reference) is in POST
          */
@@ -959,6 +976,9 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postFeedbackComment(
         IAssessable $assessment,
@@ -973,12 +993,24 @@ class Controller extends Base
          *
          * If there is, update it; otherwise create it
          */
+        try {
+            $feedback = $this->feedbackMapper->findOneByColumnList([
+                'attempt_id' => $attempt->getId(),
+                'learnosity_reference' => $this->requestPost->get('learnosityReference')
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $feedback = $this->feedbackMapper->createModel()
+                ->setAttempt($attempt)
+                ->setLearnosityReference($this->requestPost->get('learnosityReference'));
+        }
 
         /* Put the new/updated comment in
          */
+        $feedback->setComment($this->requestPost->get('comment'));
 
         /* Save it
          */
+        $this->feedbackMapper->save($feedback);
     }
 
 

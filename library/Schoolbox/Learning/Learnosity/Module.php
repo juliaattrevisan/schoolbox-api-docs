@@ -106,12 +106,12 @@ class Module extends BaseModule
         /* Provide updated score for a particular student response
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/{learnositySessionReference}/feedback-score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
 
         /* Provide updated comment for a particular student response
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/{learnositySessionReference}/feedback-comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
 
         /* Archive a set of reference identifiers in Learnosity
          */

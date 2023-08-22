@@ -10,6 +10,7 @@
  # @param array $responseComments   A list of comment tuples that contain per-question comments
  # @param array $attemptComments    A list of comment tuples that contain per-attempt comments
  # @param array $attemptReferences  A list of attempt Learnosity references used in Attempt Comment textarea ids
+ # @param array $urls               A pair of (score endpoint, comment endpoint) tuples which tell us each user's persistence urls, indexed by user id
  #}
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
@@ -89,6 +90,10 @@
      */
     let responseScores = JSON.parse('{{ scores|raw }}');
     let responseComments = JSON.parse(atob('{{ responseComments|raw }}'));
+
+    /* Endpoints
+     */
+    let urls = JSON.parse('{{ urls|raw }}');
 
     /* Remember how many reports were loaded
      *
@@ -201,7 +206,7 @@
                                 '<label>Customise score</label>' +
                                 '<input id="' + inputId + '" name="' + inputName + '" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +
-                                '<textarea id="' + textareaId + '" name="' + textareaName + '" data-response-reference="' + learnosityReferenceTuple + '">' + textareaVal + '</textarea>' +
+                                '<textarea id="' + textareaId + '" name="' + textareaName + '" data-response-reference="' + learnosityReferenceTuple + '" data-report-id="' + reportId + '">' + textareaVal + '</textarea>' +
                                 '</div>';
 
                             container.append(guts);
@@ -274,11 +279,24 @@
                             /* TODO Add toaster
                              */
 
-                            /* TODO Send it
+                            /* Send it
                              */
-                            console.log(window.sbProps.editors[key].sourceElement.getAttribute('data-response-reference'));
-                            console.log(window.sbProps.editors[key].getData());
-                            console.log('Send ' + key + ' comment to our db');
+                            let payload = new FormData();
+                            payload.append('learnosityReference', window.sbProps.editors[key].sourceElement.getAttribute('data-response-reference'));
+                            payload.append('comment', window.sbProps.editors[key].getData());
+
+                            /* Figure out the user id from the data-report-id value
+                             */
+                            let reportId = window.sbProps.editors[key].sourceElement.getAttribute('data-report-id');
+                            let userId = users[reportId].id;
+
+                            fetch(urls[userId].comment, {
+                                method: 'POST',
+                                body: payload
+                            }).then(response => {
+                                /* TODO Add toaster
+                                 */
+                            });
                         }
                     });
                 });
