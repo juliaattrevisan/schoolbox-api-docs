@@ -298,7 +298,7 @@ export default {
 
         /**
          * @param {object} newSelectedOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
-         * @param {?string} newUrlDate - Date in format dd-mm-yyyy.
+         * @param {?string} newUrlDate - Date in format DD-MM-YYYY (FORMAT_FORM_DATE).
          * @param {boolean} simulateRedirect
          *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
          */
