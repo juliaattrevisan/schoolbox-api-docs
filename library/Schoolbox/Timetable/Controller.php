@@ -37,12 +37,12 @@ class Controller extends Base
      * This screen is a FullCalendar view of all timetable-related subscriptions
      * for a specific user, $user
      *
-     * @param \Schoolbox\User $requestedUser - The user whose timetable is to be retrieved.
+     * @param \Schoolbox\User $user - The user whose timetable is to be retrieved.
      * @param string          $date
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function getTimetableCalendar(\Schoolbox\User $requestedUser, string $date): void
+    public function getTimetableCalendar(\Schoolbox\User $user, string $date): void
     {
         $loggedInUser = $_SESSION['user'];
 
@@ -62,7 +62,7 @@ class Controller extends Base
             // If the logged-in user is a parent, and not a superuser, and has requested their own timetable...
             count($userOptions) > 0 &&
             !$loggedInUser->isSuperuser() &&
-            $loggedInUser->getId() === $requestedUser->getId()
+            $loggedInUser->getId() === $user->getId()
         ) {
             // Redirect to the timetable of the logged-in user's first child.
             // (Parents do not need to see their own timetable - clarified in Jira comments for SA-16065).
@@ -77,13 +77,13 @@ class Controller extends Base
             return;
         }
 
-        // The selected user is the $requestedUser.
-        $campuses = $requestedUser->getCampusCollection();
+        // The selected user is the $user.
+        $campuses = $user->getCampusCollection();
         $selectedUserOption = [
-            'userId' => $requestedUser->getId(),
+            'userId' => $user->getId(),
             'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
-            'formattedName' => $requestedUser->formatName(),
-            'yearLevel' => $requestedUser->getYear()?->getLongName('Year')
+            'formattedName' => $user->formatName(),
+            'yearLevel' => $user->getYear()?->getLongName('Year')
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -97,7 +97,7 @@ class Controller extends Base
                     'weekends' => 'false' // TODO: Figure out what happens when school weeks start on a weekend.
                 ]
             ],
-            'Timetable Calendar for ' . $requestedUser->getFullName()
+            'Timetable Calendar for ' . $user->getFullName()
         );
     }
 
