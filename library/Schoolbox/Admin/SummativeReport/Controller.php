@@ -276,14 +276,23 @@ class Controller extends ConfigController
         /**
          * grab all available worktypes.
          */
-        $worktypes = [];
-        foreach ($this->workTypeMapper->findAll() as $summaryWorkType) {
-            $worktypes[] = [
+        $allWorktypes = $this->workTypeMapper->findAll();
+        $worktypesSummary = [];
+        $worktypesClass = [];
+        foreach ($allWorktypes as $summaryWorkType) {
+            $worktypesSummary[] = [
                 'id'   => $summaryWorkType->getId(),
                 'name' => $summaryWorkType->getName(),
-                'grade' => false,
-                'comment' => false,
-                'rubric' => false,
+                'grade' => $payload['summary']['workType'][$summaryWorkType->getId()]['grade'] ?? false,
+                'comment' => $payload['summary']['workType'][$summaryWorkType->getId()]['comment'] ?? false,
+                'rubric' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubric'] ?? false,
+            ];
+            $worktypesClass[] = [
+                'id'   => $summaryWorkType->getId(),
+                'name' => $summaryWorkType->getName(),
+                'grade' => $payload['class']['workType'][$summaryWorkType->getId()]['grade'] ?? false,
+                'comment' => $payload['class']['workType'][$summaryWorkType->getId()]['comment'] ?? false,
+                'rubric' => $payload['class']['workType'][$summaryWorkType->getId()]['rubric'] ?? false,
             ];
         }
 
@@ -299,8 +308,8 @@ class Controller extends ConfigController
                 'options' => $payload,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext(),
-                'worktypesSummary' => $worktypes,
-                'worktypesClass' => $worktypes
+                'worktypesSummary' => $worktypesSummary,
+                'worktypesClass' => $worktypesClass
             ]
         );
     }
@@ -457,29 +466,29 @@ class Controller extends ConfigController
 
         /* Summary Work Types
          */
-        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType'] ?? []);
+//        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType'] ?? []);
 
-        $options['summary']['workType'] = [];
+        $options['summary']['workType'] = $optionsPayload['summary']['workType'];
 
-        foreach ($summaryWorkTypes as $summaryWorkType) {
-            $options['summary']['workType'][] = [
-                'id'   => $summaryWorkType->getId(),
-                'name' => $summaryWorkType->getName(),
-            ];
-        }
+//        foreach ($summaryWorkTypes as $summaryWorkType) {
+//            $options['summary']['workType'][] = [
+//                'id'   => $summaryWorkType->getId(),
+//                'name' => $summaryWorkType->getName(),
+//            ];
+//        }
 
         /* Class Work Types
          */
-        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType'] ?? []);
+//        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType'] ?? []);
 
-        $options['class']['workType'] = [];
+        $options['class']['workType'] = $optionsPayload['class']['workType'];
 
-        foreach ($classWorkTypes as $classWorkType) {
-            $options['class']['workType'][] = [
-                'id'   => $classWorkType->getId(),
-                'name' => $classWorkType->getName(),
-            ];
-        }
+//        foreach ($classWorkTypes as $classWorkType) {
+//            $options['class']['workType'][] = [
+//                'id'   => $classWorkType->getId(),
+//                'name' => $classWorkType->getName(),
+//            ];
+//        }
 
         return $options;
     }
