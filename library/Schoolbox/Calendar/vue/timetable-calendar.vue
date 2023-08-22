@@ -74,6 +74,15 @@ export default {
 
     mixins: [fullCalendarHelper],
 
+    props: {
+        options: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
+    },
+
     data() {
         return {
             calendarApi: null, //to access the underlying calendar object
@@ -93,10 +102,6 @@ export default {
 
             selectedOption: null,
         };
-    },
-
-    props: {
-        options: Object,
     },
 
     computed: {
@@ -258,10 +263,10 @@ export default {
             console.info("onPopState() event.state: ", event.state);
             // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
             if (event.state !== null) {
-                const dateObj = this.getDateObjFromUrlDate(event.state.urlDate);
-                this.calendarApi.gotoDate(dateObj);
+                const date = this.getDateObjFromDateString(event.state.urlDate, FORMAT_FORM_DATE);
+                this.calendarApi.gotoDate(date);
                 this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-                this.updateListViewDateRangeFields(dateObj, null, false);
+                this.updateListViewDateRangeFields(date, null, false);
                 this.changeUserAndReloadEvents(event.state.selectedOption, event.state.urlDate, false);
             }
         };
@@ -288,9 +293,7 @@ export default {
                     formattedName: this.selectedOption.formattedName,
                     yearLevel: this.selectedOption.yearLevel,
                 },
-                urlDate: this.listViewDateRange.start
-                    ? this.listViewDateRange.start.replace(/\//g, "-") // TODO: Maybe not assume date format is dd/mm/yyyy?
-                    : "20-08-2023", // document.querySelector("#start_date").value, // TODO: Get currently selected date somehow.  Should be 20-08-2023.
+                urlDate: this.getCurrentValueOfUrlDate(), // Format dd-mm-yyyy (same as ued in this.listViewDateRange.start).
             };
         },
 
@@ -317,13 +320,18 @@ export default {
             this.reloadEvents();
 
             // Generate new URL.
-            const dateObj = this.getDateObjFromUrlDate(
-                newUrlDate === null
-                    ? document.querySelector("#start_date").value.replace(/\//g, "-") // Use currently selected date, and replace '/' with '-' globally.
-                    : newUrlDate
-            );
+            let newUrlDateObj = null; // Declare parameter replacement variable to get around linting rule.
+            if (newUrlDate === null) {
+                newUrlDateObj = this.getCurrentValueOfUrlDate();
+            } else {
+                newUrlDateObj = this.getDateObjFromDateString(newUrlDate, FORMAT_FORM_DATE);
+            }
+
             const newUrl =
-                "/timetable/calendar/" + dayjs(dateObj).format(FORMAT_FORM_DATE) + "/" + this.selectedOption.userId;
+                "/timetable/calendar/" +
+                dayjs(newUrlDateObj).format(FORMAT_FORM_DATE) +
+                "/" +
+                this.selectedOption.userId;
 
             // Replace current state in history object with the new state (and set the current URL to match that state).
             window.history.replaceState(this.getPageStateForUrlHistory(), "", newUrl);
@@ -731,6 +739,11 @@ export default {
                 startDate.setAttribute("name", "start_date");
                 startDate.setAttribute("data-datepicker", "");
                 startDate.setAttribute("data-datepicker-buttontext", "");
+                console.info(
+                    "registerListCustomInputFields() setting value for #start_date: ",
+                    new Date(),
+                    dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
+                );
                 startDate.setAttribute(
                     "value",
                     this.listViewDateRange.start
@@ -811,6 +824,9 @@ export default {
          * Update list view's start and end dates on date navigation
          * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
          * I'm not sure if we can use it..
+         * @param {Date} start -
+         * @param {?Date} end -
+         * @param {boolean} simulateRedirect -
          */
         updateListViewDateRangeFields(start, end = null, simulateRedirect = true) {
             if (simulateRedirect) {
@@ -896,16 +912,114 @@ export default {
         },
 
         /**
-         * @param {string} urlDate - Date in format dd-mm-yyyy (as found in the URL).
+         * @returns {string}
+         *  - Date that ought to be currently displayed in the URL.  This will be the Sunday that starts the currently
+         *    displayed week.
          */
-        getDateObjFromUrlDate(urlDate) {
-            if (urlDate[2] !== "-" || urlDate[5] !== "-") {
-                console.error("Date string is in unexpected format.  Expected dd-mm-yyyy, found '" + urlDate + "'.");
+        getCurrentValueOfUrlDate() {
+            // Parameter newUrlDate will not be set if this function was triggered by a click on one of the
+            // user buttons.  Clicking on one of the user buttons changes the user, but leaves the URL date unchanged.
+            // Therefore, we just need to find the current URL date.  The current URL date will always be the date
+            // of the most recent Sunday on or before the date in #start_date.
+            const startDateStr = document.querySelector("#start_date").value;
+            let dateObj = null;
+            if (startDateStr === null) {
+                console.info("getCurrentValueOfUrlDate() #start_date not set, so using today.");
+                dateObj = Date(); // Today is the default value for #start_date.
+            } else {
+                console.info("getCurrentValueOfUrlDate() #start_date set, so using #start_date.");
+                dateObj = this.getDateObjFromDateString(startDateStr, FORMAT_FLATPICKR_DATE);
             }
+            dateObj = this.setDateObjToMostRecentSunday(dateObj);
+            const urlDate = dayjs(dateObj).format(FORMAT_FORM_DATE);
+            console.info("getCurrentValueOfUrlDate() returning ", urlDate);
 
-            const d = urlDate.substring(0, 2);
-            const m = urlDate.substring(3, 5);
-            const y = urlDate.substring(6, 10);
+            return urlDate;
+        },
+
+        /**
+         * @param {Date} date - Any Date.
+         * @returns {Date} - Date for the most recent Sunday on or before date.
+         */
+        setDateObjToMostRecentSunday(date) {
+            date.setDate(date.getDate() - date.getDay());
+            return date;
+        },
+
+        /**
+         * @param {string} dateStr - In FORMAT_FORM_DATE format (DD-MM-YYYY).
+         * @returns {string} - in FORMAT_FLATPICKR_DATE format ("DD/MM/YYYY").
+         */
+        convertDateStrFromFormToFlatpickrFormat(dateStr) {
+            if (dateStr[2] !== "-" || dateStr[5] !== "-") {
+                console.error(
+                    "Date string is in unexpected format.  Expected FORMAT_FORM_DATE (DD-MM-YYYY), found '" +
+                        dateStr +
+                        "'."
+                );
+            }
+            return dateStr.replace(/-/g, "/");
+        },
+
+        /**
+         * @param {string} dateStr - In FORMAT_FLATPICKR_DATE format (DD/MM/YYYY).
+         * @returns {string} - in FORMAT_FORM_DATE format ("DD-MM-YYYY").
+         */
+        convertDateStrFromFlatpickrToFormFormat(dateStr) {
+            if (dateStr[2] !== "/" || dateStr[5] !== "/") {
+                console.error(
+                    "Date string is in unexpected format.  Expected FORMAT_FLATPICKR_DATE (DD/MM/YYYY), found '" +
+                        dateStr +
+                        "'."
+                );
+            }
+            return dateStr.replace(/\//g, "-");
+        },
+
+        /**
+         * @param {string} dateString - Date in format DD-MM-YYYY (FORMAT_FORM_DATE).
+         * @param {string} currentFormat
+         *  - The current format of dateString. Use one of the constants FORMAT_FORM_DATE, FORMAT_FLATPICKR_DATE.
+         * @returns {Date} - The supplied date as a Javascript Date object.
+         *
+         * TODO: This function seems to be equivalent to the following use of dayjs.  Confirm and remove if so.
+         * const date = dayjs(
+         *     document.querySelector("#end_date").value,
+         *     FORMAT_FLATPICKR_DATE,
+         *     true
+         * );
+         */
+        getDateObjFromDateString(dateString, currentFormat) {
+            let d = null;
+            let m = null;
+            let y = null;
+
+            switch (currentFormat) {
+                case "DD-MM-YYYY":
+                    if (dateString[2] !== "-" || dateString[5] !== "-") {
+                        console.error(
+                            "Date string is in unexpected format.  Expected DD-MM-YYYY, found '" + dateString + "'."
+                        );
+                    }
+                    d = dateString.substring(0, 2);
+                    m = dateString.substring(3, 5);
+                    y = dateString.substring(6, 10);
+                    break;
+
+                case "DD/MM/YYYY":
+                    if (dateString[2] !== "/" || dateString[5] !== "/") {
+                        console.error(
+                            "Date string is in unexpected format.  Expected DD/MM/YYYY, found '" + dateString + "'."
+                        );
+                    }
+                    d = dateString.substring(0, 2);
+                    m = dateString.substring(3, 5);
+                    y = dateString.substring(6, 10);
+                    break;
+
+                default:
+                    console.error("Unknown date format '" + currentFormat + "'");
+            }
 
             return new Date(y + "-" + m + "-" + d);
         },
