@@ -800,7 +800,7 @@ export default {
          * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
          * I'm not sure if we can use it..
          */
-        updateListViewDateRangeField(start, end = null) {
+        updateListViewDateRangeFieldsAndSimulateRedirect(start, end = null) {
             /* This is the next/previous button on the date selector
              * It needs to go to the new /timetable/calendar/... route
              */
@@ -810,11 +810,18 @@ export default {
                 "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
             );
             console.info(
-                "updateListViewDateRangeField() pushed state ",
+                "updateListViewDateRangeFieldsAndSimulateRedirect() pushed state ",
                 "",
                 "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
             );
 
+            updateListViewDateRangeFields(start, end);
+        },
+
+        /**
+         *
+         */
+        updateListViewDateRangeFields(start, end = null) {
             this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
             this.listViewDateRange.end = dayjs(end || new Date())
                 .add(this.duration.days, "days")
@@ -846,7 +853,10 @@ export default {
         clickPrev() {
             this.calendarApi.prev();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeField(this.calendarApi.getDate(), this.calendarApi.getDate());
+            this.updateListViewDateRangeFieldsAndSimulateRedirect(
+                this.calendarApi.getDate(),
+                this.calendarApi.getDate()
+            );
         },
 
         /**
@@ -855,7 +865,10 @@ export default {
         clickNext() {
             this.calendarApi.next();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeField(this.calendarApi.getDate(), this.calendarApi.getDate());
+            this.updateListViewDateRangeFieldsAndSimulateRedirect(
+                this.calendarApi.getDate(),
+                this.calendarApi.getDate()
+            );
         },
 
         /**
@@ -864,7 +877,7 @@ export default {
         clickToday() {
             this.calendarApi.today();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeField(this.calendarApi.getDate());
+            this.updateListViewDateRangeFieldsAndSimulateRedirect(this.calendarApi.getDate());
         },
 
         /**
@@ -874,7 +887,7 @@ export default {
         onQuickSwitch(value) {
             this.calendarApi.gotoDate(value.selectedDate);
 
-            this.updateListViewDateRangeField(value.selectedDate, value.selectedDate);
+            this.updateListViewDateRangeFieldsAndSimulateRedirect(value.selectedDate, value.selectedDate);
         },
     },
 };
