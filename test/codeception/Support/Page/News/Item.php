@@ -23,7 +23,7 @@ class Item
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    public const DOT_MENU   = 'a.icon-more';
+    public const DOT_MENU   = '[data-test="dropdown-button-header-options"]';
     public const LINK_MODIFY   = 'Modify';
     public const LINK_PREVIOUS = Common::ELEMENT_CONTENT . ' .icon-previous';
     public const LINK_NEXT     = Common::ELEMENT_CONTENT . ' .icon-next';

@@ -187,7 +187,7 @@ class DueWorkInitialCest
         $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         sleep(1);
-        $i->click('ul.information-list li div.small-12.column div.row.actions-small-2 nav a.icon-more');
+        $i->click('[data-test="dropdown-button-header-options"]');
         $i->click('a.icon-task');
         $i->canSee('Grading Test Due Work');
     }
@@ -210,7 +210,7 @@ class DueWorkInitialCest
         $i->amOnUrl($this->homepageUrl);
         $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
-        $i->click('ul.information-list li div.small-12.column div.row.actions-small-2 nav a.icon-more');
+        $i->click('[data-test="dropdown-button-header-options"]');
         $i->click('a.icon-task');
         $i->fillField('textarea[name=comment]', 'Not bad, but you should work on your spelling.');
         $i->fillField('input[name=mark]', '65');

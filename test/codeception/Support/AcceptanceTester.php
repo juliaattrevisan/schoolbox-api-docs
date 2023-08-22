@@ -127,7 +127,7 @@ class AcceptanceTester extends Actor
     public function impersonateAnyUser($fullname): void
     {
         $i = $this;
-       // $i->amOnPage('/user/recoverSession');
+        // $i->amOnPage('/user/recoverSession');
         $i->click('#profile-drop');
         $i->executeJS("var scrollableDiv = document.getElementById('account-content');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
@@ -150,7 +150,7 @@ class AcceptanceTester extends Actor
         $i->loginAsAdmin();
         $i->searchBar($fullname);
         $i->click('a[title="Modify User"]');
-        $i->click('a.icon-more');
+        $i->click('[data-test="dropdown-button-header-options"]');
         $i->click('a[title="Login as user"]');
         $i->waitForText($fullname, 5);
         $i->deleteSessionSnapshot($fullname);
