@@ -421,7 +421,7 @@ export default {
                         "
                     >
                         <nav>
-                            <wc-dropdown :data-dropdown="`class-options${group.id}`" data-label="Actions"></wc-dropdown>
+                            <wc-dropdown :content-id="`class-options${group.id}`"></wc-dropdown>
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" :id="`class-options${group.id}`">
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">

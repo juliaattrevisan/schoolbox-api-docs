@@ -5,11 +5,11 @@
 import { ReferenceElement, computePosition, flip, shift } from "@floating-ui/dom";
 
 interface Props {
-    dataDropdown: string; // the id to target the content to display
-    dataLabel?: string; // the label to display on the button
+    contentId: string; // the id of the content to display
+    buttonLabel?: string; // the label to display on the button
 }
 const props = withDefaults(defineProps<Props>(), {
-    dataLabel: "Dropdown",
+    buttonLabel: "Actions Dropdown",
 });
 
 const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
@@ -20,7 +20,7 @@ let content: HTMLElement; // The dropdown content, the element that's displayed 
  * The label to display on the button
  */
 const currentLabel = window.Vue.computed(() => {
-    return isOpen.value ? `Close ${props.dataLabel}` : `Open ${props.dataLabel}`;
+    return isOpen.value ? `Close ${props.buttonLabel}` : `Open ${props.buttonLabel}`;
 });
 
 /**
@@ -52,8 +52,8 @@ function onDocumentClick(event?: MouseEvent) {
     if (
         event &&
         event.target &&
-        (event.target as HTMLElement).hasAttribute("data-dropdown") &&
-        (event.target as HTMLElement).getAttribute("data-dropdown") === props.dataDropdown
+        (event.target as HTMLElement).hasAttribute("content-id") &&
+        (event.target as HTMLElement).getAttribute("content-id") === props.contentId
     ) {
         return;
     }
@@ -94,7 +94,7 @@ async function onButtonSelected() {
  * Get the content, the element that's displayed when the button is selected
  */
 function getContent() {
-    content = document.querySelector(`#${props.dataDropdown}[data-dropdown-content]`) as HTMLElement;
+    content = document.querySelector(`#${props.contentId}[data-dropdown-content]`) as HTMLElement;
     if (content) {
         content.setAttribute("aria-hidden", "true");
     }
@@ -124,7 +124,7 @@ window.Vue.onMounted(() => {
         aria-haspopup="menu"
         :aria-expanded="isOpen"
         :aria-pressed="isOpen"
-        :data-test="`dropdown-button-${props.dataDropdown}`"
+        :data-test="`dropdown-button-${props.contentId}`"
         @click.prevent="onButtonSelected"
     >
         <svg
