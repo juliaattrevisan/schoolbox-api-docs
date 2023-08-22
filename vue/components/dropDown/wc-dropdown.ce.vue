@@ -104,7 +104,7 @@ window.Vue.onMounted(() => {
     <button
         ref="dropdownTrigger"
         type="button"
-        class="c-button c-button--icon-only c-button--no-bkg"
+        class="c-button c-button--icon-only c-button--no-bkg f-match-existing-styles"
         aria-label="Open drop down"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
@@ -135,4 +135,19 @@ window.Vue.onMounted(() => {
 // This means that we cannot use the global styles to style the component
 // It looks like the ability to opt out of the shadow DOM is hopefully coming soon however
 @import "../../../www/static/css/core/ui/button/_c-button.scss";
+
+// To match the typical background colour of the dropdown content
+button[aria-expanded="true"] {
+    background-color: var(--content-ui-background);
+}
+
+// As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
+button.f-match-existing-styles {
+    height: 42px !important;
+    min-height: 42px !important;
+    width: 40px !important;
+    &:focus {
+        box-shadow: 0 0 0 2px currentColor;
+    }
+}
 </style>
