@@ -4,14 +4,14 @@
  * And using Vue with web components here: https://vuejs.org/guide/extras/web-components.html
  */
 
-import WcDropdown from "./components/dropDown/wc-dropdown.ce.vue";
+import WcActionsDropdown from "./components/dropDown/wc-actions-dropdown.ce.vue";
 
 /**
  * Register all web components here
  */
 export function register() {
-    const WcDropdownCE = window.Vue.defineCustomElement(WcDropdown);
-    window.customElements.define("wc-dropdown", WcDropdownCE);
+    const WcActionsDropdownCE = window.Vue.defineCustomElement(WcActionsDropdown);
+    window.customElements.define("wc-actions-dropdown", WcActionsDropdownCE);
 }
 
 register();
