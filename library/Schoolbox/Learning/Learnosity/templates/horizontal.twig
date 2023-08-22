@@ -85,6 +85,9 @@
     </div>
 </div>
 
+{# Random old-school toaster #}
+<div id="toast" class="toast"></div>
+
 <script>
     /* All the scores and comments that people got
      */
@@ -222,8 +225,10 @@
                              *   just like textboxes I guess
                              */
                             document.querySelector('#' + inputId).addEventListener('blur', function() {
-                                /* TODO Add toaster
+                                /* Add toaster
                                  */
+                                let toast = $('#toast');
+                                toast.toastActivate();
 
                                 /* Send it
                                  */
@@ -240,8 +245,11 @@
                                     method: 'POST',
                                     body: payload
                                 }).then(response => {
-                                    /* TODO Add toaster
+                                    /* Add toaster
                                      */
+                                    toast.toastTimeout({
+                                        text: 'Feedback updated.'
+                                    });
                                 });
                             });
                         }
@@ -296,12 +304,13 @@
                      */
                     ckeditorElement.ui.focusTracker.on("change:isFocused", (event, name, isFocused) => {
                         if (!isFocused) {
-                            /* TODO Add toaster
+                            /* Add toaster
                              */
+                            let toast = $('#toast');
+                            toast.toastActivate();
 
                             /* Send it
                              */
-
                             let textareaSourceElement = ckeditorElement.sourceElement;
 
                             let payload = new FormData();
@@ -332,8 +341,11 @@
                                 method: 'POST',
                                 body: payload
                             }).then(response => {
-                                /* TODO Add toaster
+                                /* Add toaster
                                  */
+                                toast.toastTimeout({
+                                    text: 'Feedback updated.'
+                                });
                             });
                         }
                     });
