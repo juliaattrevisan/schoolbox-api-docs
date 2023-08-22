@@ -738,11 +738,6 @@ export default {
                 startDate.setAttribute("name", "start_date");
                 startDate.setAttribute("data-datepicker", "");
                 startDate.setAttribute("data-datepicker-buttontext", "");
-                console.info(
-                    "registerListCustomInputFields() setting value for #start_date: ",
-                    new Date(),
-                    dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
-                );
                 startDate.setAttribute(
                     "value",
                     this.listViewDateRange.start
@@ -911,15 +906,12 @@ export default {
         },
 
         /**
-         * @returns {string}
-         *  - Date that ought to be currently displayed in the URL.  This will be the Sunday that starts the currently
-         *    displayed week.
+         * Return the date that would be displayed in the URL bar, if the /timetable/calendar/{date}/{userId} route was
+         * in use.  There will not always be a date in the URL, because the other route (/timetable/calendar/{userId}
+         * may be in use.  The value to return is the Sunday that starts the currently displayed week.
+         * @returns {string} in FORMAT_FORM_DATE
          */
         getCurrentValueOfUrlDate() {
-            // Parameter newUrlDate will not be set if this function was triggered by a click on one of the
-            // user buttons.  Clicking on one of the user buttons changes the user, but leaves the URL date unchanged.
-            // Therefore, we just need to find the current URL date.  The current URL date will always be the date
-            // of the most recent Sunday on or before the date in #start_date.
             const startDateStr = document.querySelector("#start_date").value;
             let dateObj = null;
             if (startDateStr === null) {
