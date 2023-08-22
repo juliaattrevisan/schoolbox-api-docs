@@ -196,6 +196,19 @@ class Controller extends ConfigController
             ->setMimeFilter('image/*')
             ->setFilesystemContext('images');
 
+        /**
+         *
+         */
+        $worktypes = [];
+        foreach ($this->workTypeMapper->findAll() as $summaryWorkType) {
+            $worktypes[] = [
+                'id'   => $summaryWorkType->getId(),
+                'name' => $summaryWorkType->getName(),
+                'grade' => false,
+                'comment' => false,
+                'rubric' => false,
+            ];
+        }
         $report = $this->reportMapper->createModel();
         $report->setFileName(Model::DEFAULT_FILENAME);
         $this->response = $this->responseFromTemplate(
@@ -206,7 +219,9 @@ class Controller extends ConfigController
                 'report' => $report,
                 'options' => Model::DEFAULT_OPTIONS,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
-                'logoZone' => $logoZone->getTwigContext()
+                'logoZone' => $logoZone->getTwigContext(),
+                'worktypesSummary' => $worktypes,
+                'worktypesClass' => $worktypes
             ]
         );
     }
