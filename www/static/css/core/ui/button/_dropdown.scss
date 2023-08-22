@@ -73,10 +73,6 @@ $f-dropdown-radius: $global-radius !default;
     margin-#{$default-float}: 0;
     position: absolute;
 
-    &.open {
-        display: block;
-    }
-
     > *:first-child {
         margin-top: 0;
     }
