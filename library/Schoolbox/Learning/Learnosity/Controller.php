@@ -322,9 +322,9 @@ class Controller extends Base
             'outroUrl' => $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
                 'assessmentId' => $assessment->getId(),
                 'studentId' => $student->getId(),
-                'learnosityReference' => $attempt->getLearnosityReference()
+                'learnositySessionReference' => $attempt->getLearnosityReference()
             ]),
-            'learnosityReference' => $attempt->getLearnosityReference(),
+            'learnositySessionReference' => $attempt->getLearnosityReference(),
         ], "Attempt {$assessment->getTitle()}");
 
         /* TODO Record the automated result somewhere (idk where)
