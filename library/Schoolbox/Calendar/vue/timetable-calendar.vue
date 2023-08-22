@@ -813,7 +813,8 @@ export default {
          * I'm not sure if we can use it..
          * @param {Date} start -
          * @param {?Date} end -
-         * @param {boolean} simulateRedirect -
+         * @param {boolean} simulateRedirect
+         *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
          */
         updateListViewDateRangeFields(start, end = null, simulateRedirect = true) {
             if (simulateRedirect) {
