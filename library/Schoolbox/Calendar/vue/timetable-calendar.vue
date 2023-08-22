@@ -292,7 +292,7 @@ export default {
                     formattedName: this.selectedOption.formattedName,
                     yearLevel: this.selectedOption.yearLevel,
                 },
-                urlDate: this.getCurrentValueOfUrlDate(), // Format dd-mm-yyyy (same as ued in this.listViewDateRange.start).
+                urlDate: this.getCurrentValueOfUrlDate(), // Format DD-MM-YYY (FORMAT_FORM_DATE).
             };
         },
 
