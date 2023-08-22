@@ -260,15 +260,14 @@ export default {
         this.selectedOption = this.options["selectedUserOption"];
 
         window.onpopstate = (event) => {
-            console.info("onPopState() event.state: ", event.state);
-            // NOTE: event.state will be null unless the state has been saved using history.pushState() or history.replaceState().
-            if (event.state !== null) {
-                const date = this.getDateObjFromDateString(event.state.urlDate, FORMAT_FORM_DATE);
-                this.calendarApi.gotoDate(date);
-                this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-                this.updateListViewDateRangeFields(date, null, false);
-                this.changeUserAndReloadEvents(event.state.selectedOption, event.state.urlDate, false);
+            if (event.state === null || event.state.urlDate === null) {
+                console.error("Event.state and event.state.urlDate should always be set in window.onPopState()."); // Sanity check.
             }
+            const date = this.getDateObjFromDateString(event.state.urlDate, FORMAT_FORM_DATE);
+            this.calendarApi.gotoDate(date);
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
+            this.updateListViewDateRangeFields(date, null, false);
+            this.changeUserAndReloadEvents(event.state.selectedOption, event.state.urlDate, false);
         };
 
         // Initialise history by setting the current state.
