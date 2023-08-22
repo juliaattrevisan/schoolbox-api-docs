@@ -961,8 +961,7 @@ class Controller extends Base
         IAssessable $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
-    ): void
-    {
+    ): void {
         /* Fetch the response id first, because you need a bunch of stuff
          * The response id (learnosity response reference) is in POST
          */
@@ -1042,8 +1041,7 @@ class Controller extends Base
         IAssessable $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
-    ): void
-    {
+    ): void {
         /* The response id (learnosity response reference) is in POST.
          *
          * For the given attempt, see if there's already a row in quiz_feedback
@@ -1088,8 +1086,7 @@ class Controller extends Base
         IAssessable $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
-    ): void
-    {
+    ): void {
         /* Put the new/updated comment in
          */
         $attempt->setComment($this->requestPost->get('comment'));
