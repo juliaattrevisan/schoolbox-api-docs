@@ -262,6 +262,7 @@ export default {
         window.onpopstate = (event) => {
             if (event.state === null || event.state.urlDate === null) {
                 console.error("Event.state and event.state.urlDate should always be set in window.onPopState()."); // Sanity check.
+                // See code pattern for dealing with URL history in https://github.com/alaress/schoolbox/pull/28761.
             }
             const date = dayjs(event.state.urlDate, FORMAT_FORM_DATE, true).toDate();
             this.calendarApi.gotoDate(date);
@@ -272,7 +273,6 @@ export default {
 
         // Initialise history by setting the current state.
         window.history.replaceState(this.getPageStateForUrlHistory(), "", window.location.href);
-        console.info("mounted() replaced state ", this.getPageStateForUrlHistory(), window.location.href);
     },
 
     beforeDestroy() {
@@ -306,11 +306,6 @@ export default {
             if (simulateRedirect) {
                 // Push current state to history.
                 window.history.pushState(this.getPageStateForUrlHistory(), "", window.location.href);
-                console.info(
-                    "changeUserAndReloadEvents() pushed state ",
-                    this.getPageStateForUrlHistory(),
-                    window.location.href
-                );
             }
 
             // Update state.
@@ -319,22 +314,20 @@ export default {
             this.reloadEvents();
 
             // Generate new URL.
-            let newUrlDateObj = null; // Declare parameter replacement variable to get around linting rule.
-            if (newUrlDate === null) {
-                newUrlDateObj = this.getCurrentValueOfUrlDate();
-            } else {
-                newUrlDateObj = dayjs(newUrlDate, FORMAT_FORM_DATE, true).toDate();
-            }
-
-            const newUrl =
-                "/timetable/calendar/" +
-                dayjs(newUrlDateObj).format(FORMAT_FORM_DATE) +
-                "/" +
-                this.selectedOption.userId;
+            let newUrlDateObj =
+                newUrlDate === null
+                    ? this.getCurrentValueOfUrlDate()
+                    : dayjs(newUrlDate, FORMAT_FORM_DATE, true).toDate();
 
             // Replace current state in history object with the new state (and set the current URL to match that state).
-            window.history.replaceState(this.getPageStateForUrlHistory(), "", newUrl);
-            console.info("changeUserAndReloadEvents() replaced state ", this.getPageStateForUrlHistory(), newUrl);
+            window.history.replaceState(
+                this.getPageStateForUrlHistory(),
+                "",
+                "/timetable/calendar/" +
+                    dayjs(newUrlDateObj).format(FORMAT_FORM_DATE) +
+                    "/" +
+                    this.selectedOption.userId
+            );
         },
 
         /**
@@ -825,11 +818,6 @@ export default {
         updateListViewDateRangeFields(start, end = null, simulateRedirect = true) {
             if (simulateRedirect) {
                 window.history.pushState(this.getPageStateForUrlHistory(), "", window.location.href);
-                console.info(
-                    "updateListViewDateRangeFields() pushed state ",
-                    this.getPageStateForUrlHistory(),
-                    window.location.href
-                );
             }
 
             this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
@@ -859,11 +847,6 @@ export default {
             window.history.replaceState(
                 this.getPageStateForUrlHistory(),
                 "",
-                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
-            );
-            console.info(
-                "updateListViewDateRangeFields() replaced state ",
-                this.getPageStateForUrlHistory(),
                 "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
             );
         },
@@ -915,17 +898,13 @@ export default {
             const startDateStr = document.querySelector("#start_date").value;
             let dateObj = null;
             if (startDateStr === null) {
-                console.info("getCurrentValueOfUrlDate() #start_date not set, so using today.");
                 dateObj = Date(); // Today is the default value for #start_date.
             } else {
-                console.info("getCurrentValueOfUrlDate() #start_date set, so using #start_date.");
                 dateObj = dayjs(startDateStr, FORMAT_FLATPICKR_DATE, true).toDate();
             }
             dateObj = this.setDateObjToMostRecentSunday(dateObj);
-            const urlDate = dayjs(dateObj).format(FORMAT_FORM_DATE);
-            console.info("getCurrentValueOfUrlDate() returning ", urlDate);
 
-            return urlDate;
+            return dayjs(dateObj).format(FORMAT_FORM_DATE);
         },
 
         /**
