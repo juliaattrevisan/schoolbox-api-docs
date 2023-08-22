@@ -17,6 +17,13 @@ const isOpen = window.Vue.ref(false); // Whether the dropdown is open or not
 let content: HTMLElement; // The dropdown content, the element that's displayed when the button is selected
 
 /**
+ * The label to display on the button
+ */
+const currentLabel = window.Vue.computed(() => {
+    return isOpen.value ? `Close ${props.dataLabel}` : `Open ${props.dataLabel}`;
+});
+
+/**
  * Close the dropdown if it's open
  */
 function close() {
@@ -109,7 +116,8 @@ window.Vue.onMounted(() => {
         ref="button"
         type="button"
         class="c-button c-button--icon-only c-button--no-bkg f-match-existing-styles"
-        :aria-label="`Open ${dataLabel}`"
+        :title="currentLabel"
+        :aria-label="currentLabel"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
         :aria-pressed="isOpen"
