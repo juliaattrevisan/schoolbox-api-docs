@@ -59,14 +59,14 @@ class ProfilePage
      */
     public function clickBadgeGoalDropdown($badgeId): void
     {
-        $this->tester->click('a[data-dropdown="header-options-1-' . $badgeId . '-goal"]');
+        $this->tester->click('[data-test="dropdown-button-header-options-1-' . $badgeId . '-goal"]');
     }
 
     /**
-    *  Click a badge dropdown
-    */
+     *  Click a badge dropdown
+     */
     public function clickBadgeAchievementDropdown($badgeId): void
     {
-        $this->tester->click('a[data-dropdown="header-options-1-' . $badgeId . '-achievement"]');
+        $this->tester->click('[data-test="dropdown-button-header-options-1-' . $badgeId . '-achievement"]');
     }
 }
