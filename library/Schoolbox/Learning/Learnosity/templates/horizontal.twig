@@ -10,7 +10,7 @@
  # @param array $responseComments   A list of comment tuples that contain per-question comments
  # @param array $attemptComments    A list of comment tuples that contain per-attempt comments
  # @param array $attemptReferences  A list of attempt Learnosity references used in Attempt Comment textarea ids
- # @param array $urls               A pair of (score endpoint, comment endpoint, attempt comment endpoint) tuples which tell us each user's persistence urls, indexed by user id
+ # @param array $urls               A pair of (score, comment, attempt comment) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #}
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
@@ -269,7 +269,11 @@
     let reportsReady = setInterval(function() {
         if (reportsLoaded === reportsExpected) {
             clearInterval(reportsReady);
+
             /* cke all the commentary fields
+             *
+             * Note that this is a set of response ckeditors and attempt comment ckeditors
+             * all in the same place (there's a data var to distinguish them)
              */
             document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
                 detail: {
