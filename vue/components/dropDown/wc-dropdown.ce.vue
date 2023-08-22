@@ -32,6 +32,7 @@ function onDocumentClick(event?: MouseEvent) {
     // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
     if (
         event &&
+        event.target &&
         dropdownContent.contains(event.target as Node) &&
         dropdownContent.getAttribute("aria-autoclose") === "false"
     ) {
@@ -51,6 +52,21 @@ function onDocumentClick(event?: MouseEvent) {
 }
 
 /**
+ * Open the dropdown using @floating-ui/dom to position it relative to the trigger
+ */
+async function open() {
+    isOpen.value = true;
+    dropdownContent.style.display = "block"; // The element must be visible to correctly compute its position
+    const position = await computePosition(dropdownTrigger.value as ReferenceElement, dropdownContent, {
+        placement: "bottom-end",
+        middleware: [flip(), shift()],
+    });
+    dropdownContent.style.left = `${position.x}px`;
+    dropdownContent.style.top = `${position.y}px`;
+    dropdownContent.setAttribute("aria-hidden", "false");
+}
+
+/**
  * When the dropdown button is clicked, close the dropdown content if it's open,
  * otherwise open it using @floating-ui/dom to position it relative to the trigger
  * while also trying to keep it in the viewport
@@ -60,20 +76,7 @@ async function onButtonSelected() {
         close();
         return;
     }
-
-    dropdownContent.style.display = "block"; // The element must be visible to correctly compute its position
-
-    const position = await computePosition(dropdownTrigger.value as ReferenceElement, dropdownContent, {
-        placement: "bottom-end",
-        middleware: [flip(), shift()],
-    });
-
-    dropdownContent.style.left = `${position.x}px`;
-    dropdownContent.style.top = `${position.y}px`;
-    dropdownContent.setAttribute("aria-hidden", "false");
-
-    isOpen.value = true;
-
+    await open();
     document.addEventListener("click", onDocumentClick);
 }
 
