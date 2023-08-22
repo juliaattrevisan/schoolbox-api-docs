@@ -77,7 +77,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <div class="sb-grid u-gap--l sb-grid--2-col dummy-content highlighter u-margin-m--bottom">
+        <div id="navigator-container" style='display:none' class="sb-grid u-gap--l sb-grid--2-col dummy-content highlighter u-margin-m--bottom">
             <div><a id="previous-item" class="button full-width">Previous Question</a></div>
             <div><a id="next-item" class="button full-width">Next Question</a></div>
         </div>
@@ -275,8 +275,12 @@
 
             /* Show list of questions to choose from
              */
-            document.getElementById('item-list').style = 'display: block';
-            document.getElementById('reports').style = 'display: block';
+            document.getElementById('item-list').style = '';
+            document.getElementById('reports').style = '';
+
+            /* Show the navigator
+             */
+            document.getElementById('navigator-container').style = '';
 
             /* Hide the spinny
              */
