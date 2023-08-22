@@ -197,7 +197,7 @@ class Controller extends ConfigController
             ->setFilesystemContext('images');
 
         /**
-         *
+         * grab all available worktypes.
          */
         $worktypes = [];
         foreach ($this->workTypeMapper->findAll() as $summaryWorkType) {
@@ -272,6 +272,20 @@ class Controller extends ConfigController
         if ($report->getLogo()) {
             $logoZone->attachFiles([$report->getLogo()]);
         }
+        $payload = $this->decompilePayload($report);
+        /**
+         * grab all available worktypes.
+         */
+        $worktypes = [];
+        foreach ($this->workTypeMapper->findAll() as $summaryWorkType) {
+            $worktypes[] = [
+                'id'   => $summaryWorkType->getId(),
+                'name' => $summaryWorkType->getName(),
+                'grade' => false,
+                'comment' => false,
+                'rubric' => false,
+            ];
+        }
 
         $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/create.twig',
@@ -282,9 +296,11 @@ class Controller extends ConfigController
                     [['Modify', null]]
                 ),
                 'report' => $report,
-                'options' => $this->decompilePayload($report),
+                'options' => $payload,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
-                'logoZone' => $logoZone->getTwigContext()
+                'logoZone' => $logoZone->getTwigContext(),
+                'worktypesSummary' => $worktypes,
+                'worktypesClass' => $worktypes
             ]
         );
     }
