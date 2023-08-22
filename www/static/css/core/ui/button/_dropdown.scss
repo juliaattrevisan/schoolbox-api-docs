@@ -31,23 +31,24 @@ $f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-s
 $f-dropdown-line-height: rem-calc(18) !default;
 $f-dropdown-list-hover-bg: $content-ui-hover;
 
-//
-// @mixins
-//
-//
-// NOTE: Make default max-width change between list and content types. Can add more width with classes, maybe .small, .medium, .large, etc.;
-// We use this to style the dropdown container element.
-// $content-list - Sets list-style. Default: list. Options: [list, content]
-// $triangle - Sets if dropdown has triangle. Default:true.
-// $max-width - Default: $f-dropdown-max-width || 200px.
-@mixin dropdown-container($content: list, $triangle: true, $max-width: $f-dropdown-max-width) {
+.f-dropdown {
+    background: $f-dropdown-bg;
+    border: $f-dropdown-border-style $f-dropdown-border-width $f-dropdown-border-color;
+    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
     display: none;
-    top: 0;
+    font-size: $f-dropdown-font-size;
+    height: auto;
     left: 0;
-    z-index: 99; // Show on top
     list-style: none;
-    margin-#{$default-float}: 0;
+    margin-bottom: 0;
+    max-height: none;
+    max-width: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 99; // Show on top
 
     > *:first-child {
         margin-top: 0;
@@ -56,86 +57,39 @@ $f-dropdown-list-hover-bg: $content-ui-hover;
         margin-bottom: 0;
     }
 
-    background: $f-dropdown-bg;
-    border: $f-dropdown-border-style $f-dropdown-border-width $f-dropdown-border-color;
-    font-size: $f-dropdown-font-size;
-    height: auto;
-    max-height: none;
-    width: 100%;
-
-    @if $max-width {
-        max-width: $max-width;
-    } @else {
-        max-width: $f-dropdown-max-width;
-    }
-}
-
-// @MIXIN
-//
-// We use this to style the list elements or content inside the dropdown.
-
-@mixin dropdown-style {
-    cursor: $cursor-pointer-value;
-    font-size: $f-dropdown-font-size;
-    line-height: $f-dropdown-line-height;
-    margin: 0;
-
-    &:hover,
-    &:focus {
-        background: $f-dropdown-list-hover-bg;
-    }
-
-    a {
+    li {
+        cursor: $cursor-pointer-value;
         display: block;
-        padding: $f-dropdown-list-padding;
-        color: $f-dropdown-font-color;
-    }
-}
-
-@include exports("dropdown") {
-    @if $include-html-dropdown-classes {
-        /* Foundation Dropdowns */
-        .f-dropdown {
-            @include dropdown-container(list, bottom);
-
-            li {
-                @include dropdown-style;
+        font-size: $f-dropdown-font-size;
+        line-height: $f-dropdown-line-height;
+        margin: 0;
+        width: 100%;
+        &:hover,
+        &:focus {
+            background: $f-dropdown-list-hover-bg;
+        }
+        a {
+            display: block;
+            padding: $f-dropdown-list-padding;
+            color: $f-dropdown-font-color;
+            &:hover {
+                background-color: $content-ui-hover;
+                text-decoration: none;
             }
         }
     }
-}
 
-/*-------------------------------------------------------------------------------------
-    CUSTOM OVERRIDES
--------------------------------------------------------------------------------------*/
-
-$f-dropdown-list-separator-bg: $content-ui-foreground;
-$f-dropdown-icon-align: 0.25rem;
-
-// Dropdown
-.f-dropdown {
-    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
-    overflow-y: auto;
-    overflow-x: hidden;
-    margin-bottom: 0;
-
-    li {
-        display: block;
-        width: 100%;
-        a:hover {
-            background-color: $content-ui-hover;
-            text-decoration: none;
-        }
-    }
     a.menu_disabled {
         cursor: not-allowed;
         opacity: 0.5;
     }
+
     .separator,
     .meta {
         // DONE making this color transparent works okay
         color: css-scale-color($content-ui-foreground, $alpha: -65%);
     }
+
     .separator {
         padding: $f-dropdown-list-padding;
         font-weight: $font-weight-normal;
@@ -147,9 +101,11 @@ $f-dropdown-icon-align: 0.25rem;
             background-color: $content-ui-background;
         }
     }
+
     [class*="icon-"]:before {
         padding-right: 0.8125rem;
     }
+
     @media #{$small-only} {
         /*
             Switched to using vw so that dropdown widths are based on screen space
@@ -178,12 +134,14 @@ $f-dropdown-icon-align: 0.25rem;
         max-width: rem-calc(688);
         width: auto;
     }
+
     .container {
         display: flex;
         @media screen and (max-width: 766px) {
             flex-wrap: wrap;
         }
     }
+
     .category {
         flex: 1 auto;
         min-width: rem-calc(240);
@@ -204,9 +162,11 @@ $f-dropdown-icon-align: 0.25rem;
             margin: 0;
         }
     }
+
     ul {
         margin: 0 2px 0 0;
     }
+
     .separator {
         // DONE use CSS darken
         background-color: css-darken($f-dropdown-bg, 5%);
