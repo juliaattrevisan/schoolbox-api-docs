@@ -2,7 +2,7 @@
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -72,6 +72,7 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -385,9 +386,10 @@ class Controller extends Base
      * show some basic stats about your attempt
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -428,9 +430,10 @@ class Controller extends Base
      * show some in-depth stats about your attempt
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -757,6 +760,7 @@ class Controller extends Base
      * @return void
      * @throws Error
      * @throws Exception
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \JsonException
      * @throws \RuntimeException
