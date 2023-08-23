@@ -57,6 +57,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                 $studentListAdaption[] = [
                     'synergy_id'              => $studentExternalId,
                     'lastname'                => $student['lastname'],
+                    'preferredname'           => $student['preferred_name'],
                     'firstname'               => $student['firstname'],
                     'yearlevel'               => $student['year_level'],
                     'house'                   => $student['house_name'],
@@ -99,6 +100,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                               u.synergy_id,
                               u.title,
                               u.firstname,
+                              u.preferred_name,
                               u.lastname,
                               sups.year_level,
                               sups.house_name,

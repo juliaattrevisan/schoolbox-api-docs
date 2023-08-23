@@ -29,7 +29,8 @@ class External_Synergetic_Ths_Class extends External_Synergetic_Class
 
         $query = "
         SELECT DISTINCT StudentClasses.StudentSurname as lastname,
-                        StudentClasses.StudentPreferred as firstname,
+                        StudentClasses.StudentPreferred as preferredname,
+                        StudentClasses.StudentGiven1 as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel,
                         StudentClasses.StudentHouseDescription as house,
                         uvStudents.StudentMedicalAlert,

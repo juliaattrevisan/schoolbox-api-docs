@@ -125,7 +125,8 @@ class External_Synergetic_Class implements External_ClassInterface
 
         $query = "
         SELECT DISTINCT vStudentsAll.StudentSurname as lastname,
-                        vStudentsAll.StudentPreferred as firstname,
+                        vStudentsAll.StudentPreferred as preferredname,
+                        vStudentsAll.StudentGiven1 as firstname,
                         vStudentsAll.StudentYearLevelDescription as yearlevel,
                         vStudentsAll.StudentHouseDescription as house,
                         CASE WHEN vStudentsAll.StudentMedicalAlertFlag= 1 THEN vStudentsAll.StudentMedicalAlert ELSE '' END as StudentMedicalAlert,

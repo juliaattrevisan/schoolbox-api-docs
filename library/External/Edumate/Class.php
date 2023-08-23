@@ -27,6 +27,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         $stmt = $this->getConnection()->prepareQuery("
             SELECT
                 FIRSTNAME,
+                '' AS preferredname,
                 SURNAME AS LASTNAME,
                 SCHOOLBOX_STUDENTCLASS.STUDENT_NUMBER AS SYNERGY_ID,
                 YEAR_LEVEL AS YEARLEVEL,

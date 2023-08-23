@@ -97,6 +97,7 @@ class External_Schooledge_Class implements External_ClassInterface
         $query      = "
             SELECT DISTINCT
                 s.FirstName    AS firstname,
+                ''             AS preferredname,
                 s.LastName     AS lastname,
                 s.Year         AS StudentYearLevel,
                 s.House        AS StudentHouseDescription,
@@ -121,6 +122,7 @@ class External_Schooledge_Class implements External_ClassInterface
 
             SELECT DISTINCT
                 s.FirstName    AS firstname,
+                ''             AS preferredname,
                 s.LastName     AS lastname,
                 s.Year         AS StudentYearLevel,
                 s.House        AS StudentHouseDescription,
