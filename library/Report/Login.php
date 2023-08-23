@@ -18,11 +18,12 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
     // visible field mapping: index => humanreadable
     private $fields = array(
-        'date'  => 'date',
-        'login' => 'action',
-        'user'  => 'user',
-        'role'  => 'role',
-        'ip'    => 'ip',
+        'date'       => 'date',
+        'login'      => 'action',
+        'user'       => 'user',
+        'role'       => 'role',
+        'ip'         => 'ip',
+        'identifier' => 'identifier',
     );
 
     // csv mappings
@@ -40,7 +41,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('date', 'user', 'ip', 'role');
+    private $sortable = array('date', 'user', 'ip', 'role', 'identifier');
 
     // default sorting if none provided
     private $defaultOrderBy = 'date';
