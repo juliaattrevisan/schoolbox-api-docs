@@ -47,7 +47,7 @@ HELP;
 
             $this->getLogger()->debug(sprintf("Report: #%s", $row['id']));
 
-            $this->getLogger()->debug(sprintf("Old config: s%", print_r($pre)));
+            $this->getLogger()->debug(sprintf("Old config: %s", print_r($pre)));
 
             $new['summary']['workType'] = [];
             $new['class']['workType'] = [];
@@ -55,7 +55,6 @@ HELP;
             foreach ($pre['summary']['workType'] as $id) {
                 // spawn new worktype
                 $new['summary']['workType'][$id] = [
-                    'id' => $id,
                     'grades' => $pre['summary']['grades'],
                     'comments' => $pre['summary']['comments'],
                     'rubrics' => $pre['summary']['rubrics'],
@@ -64,14 +63,13 @@ HELP;
             foreach ($pre['class']['workType'] as $id) {
                 // spawn new worktype
                 $new['class']['workType'][$id] = [
-                    'id' => $id,
                     'grades' => $pre['class']['grades'],
                     'comments' => $pre['class']['comments'],
                     'rubrics' => $pre['class']['rubrics'],
                 ];
             }
 
-            $this->getLogger()->debug(sprintf("New config: s%", print_r($new)));
+            $this->getLogger()->debug(sprintf("New config: %s", print_r($new)));
             $query = (
             "UPDATE summative_report
                  SET options=:newOptions
