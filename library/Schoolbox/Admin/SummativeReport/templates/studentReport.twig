@@ -548,10 +548,8 @@
                                 student: student,
                                 assessment: assessment,
                                 feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
-                                showGrades: showSummaryGrades,
-                                showComments: showSummaryComments,
-                                showRubrics: showSummaryRubrics,
-                                page: 'subject-summary'
+                                page: 'subject-summary',
+                                options: summaryOptions
                             } only %}
                     {% endfor %}
                 {% endif %}
@@ -593,10 +591,8 @@
                             student: student,
                             assessment: assessment,
                             feedback: classAssessmentFeedbacks[assessment.id] ?? null,
-                            showGrades: showClassGrades,
-                            showComments: showClassComments,
-                            showRubrics: showClassRubrics,
-                            page: 'subject'
+                            page: 'subject',
+                            options: classOptions
                         } only %}
                 {% endfor %}
             {% endif %}

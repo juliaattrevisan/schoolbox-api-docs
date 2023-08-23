@@ -900,7 +900,7 @@ class Controller extends ConfigController
         $summaryAssessments = new GenericCollection(IAssessable::class);
 
         if (\count($optionsPayload['summary']['workType'])) {
-            $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType']);
+            $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', array_keys($optionsPayload['summary']['workType']));
 
             /* Instantiate the Work Type instances for each of the sections in the report:
              * Summary and Class Pages
@@ -917,7 +917,7 @@ class Controller extends ConfigController
         $classAssessments = new GenericCollection(IAssessable::class);
 
         if (\count($optionsPayload['class']['workType'])) {
-            $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType']);
+            $classWorkTypes = $this->workTypeMapper->findByColumn('id', array_keys($optionsPayload['class']['workType']));
 
             /* Instantiate the Work Type instances for each of the sections in the report:
              * Summary and Class Pages
@@ -1013,14 +1013,10 @@ class Controller extends ConfigController
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
             'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],
-            'showSummaryGrades'          => (bool)$optionsPayload['summary']['grades'],
-            'showSummaryComments'        => (bool)$optionsPayload['summary']['comments'],
-            'showSummaryRubrics'         => (bool)$optionsPayload['summary']['rubrics'],
+            'summaryOptions'             => $optionsPayload['summary'],
+            'classOptions'               => $optionsPayload['class'],
             'showClass'                  => (bool)$optionsPayload['class']['active'],
             'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
-            'showClassGrades'            => (bool)$optionsPayload['class']['grades'],
-            'showClassComments'          => (bool)$optionsPayload['class']['comments'],
-            'showClassRubrics'           => (bool)$optionsPayload['class']['rubrics'],
 
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
