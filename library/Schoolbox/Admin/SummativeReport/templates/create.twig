@@ -450,25 +450,6 @@
                             <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
                         </div>
                     </fieldset>
-                    <fieldset class="content">
-                        <legend>Assessment Options</legend>
-
-                        <div class="small-12 columns">
-                            <input name="summary[grades]" type="hidden" value="0" />
-                            <input id="report-class-summary-grade" name="summary[grades]" type="checkbox" value="1" {% if options.summary.grades ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-summary-grade" class="checkbox-label">Show grades</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="summary[comments]" type="hidden" value="0" />
-                            <input id="report-summary-show-comments" name="summary[comments]" type="checkbox" value="1" {% if options.summary.comments ?? false %}checked="checked"{% endif %} />
-                            <label for="report-summary-show-comments" class="checkbox-label">Show feedback</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="summary[rubrics]" type="hidden" value="0" />
-                            <input id="report-summary-show-rubrics" name="summary[rubrics]" type="checkbox" value="1" {% if options.summary.rubrics ?? false %}checked="checked"{% endif %} />
-                            <label for="report-summary-show-rubrics" class="checkbox-label">Show rubrics</label>
-                        </div>
-                    </fieldset>
                 </section>
 
                 <div class="row actions-small-1">
@@ -571,24 +552,6 @@
                                 <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
                             </label>
                         </div> #}
-                    </fieldset>
-                    <fieldset class="content">
-                        <legend>Assessment Options</legend>
-                        <div class="small-12 columns">
-                            <input name="class[grades]" type="hidden" value="0" />
-                            <input id="report-class-show-grade" name="class[grades]" type="checkbox" value="1" {% if options.class.grades ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-grade" class="checkbox-label">Show grades</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="class[comments]" type="hidden" value="0" />
-                            <input id="report-class-show-comments" name="class[comments]" type="checkbox" value="1" {% if options.class.comments ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-comments" class="checkbox-label">Show feedback</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="class[rubrics]" type="hidden" value="0" />
-                            <input id="report-class-show-rubrics" name="class[rubrics]" type="checkbox" value="1" {% if options.class.rubrics ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-rubrics" class="checkbox-label">Show rubrics</label>
-                        </div>
                     </fieldset>
                 </section>
             </div>

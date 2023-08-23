@@ -484,32 +484,6 @@ class Controller extends ConfigController
             ];
         }
 
-        /* Summary Work Types
-         */
-//        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType'] ?? []);
-
-        $options['summary']['workType'] = $optionsPayload['summary']['workType'];
-
-//        foreach ($summaryWorkTypes as $summaryWorkType) {
-//            $options['summary']['workType'][] = [
-//                'id'   => $summaryWorkType->getId(),
-//                'name' => $summaryWorkType->getName(),
-//            ];
-//        }
-
-        /* Class Work Types
-         */
-//        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType'] ?? []);
-
-        $options['class']['workType'] = $optionsPayload['class']['workType'];
-
-//        foreach ($classWorkTypes as $classWorkType) {
-//            $options['class']['workType'][] = [
-//                'id'   => $classWorkType->getId(),
-//                'name' => $classWorkType->getName(),
-//            ];
-//        }
-
         return $options;
     }
 
@@ -552,27 +526,6 @@ class Controller extends ConfigController
             $output[] = [
                 'id'   => $yearLevel->getId(),
                 'name' => $yearLevel->getName(),
-            ];
-        }
-
-        $this->response = $this->responseAsJson($output);
-    }
-
-
-    /**
-     * Get work types for selectize
-     * @return void
-     * @api GET /adminv2/summative-report/worktypes
-     */
-    public function getWorkTypes(): void
-    {
-        $output = [];
-        $workTypes = $this->workTypeMapper->findAll()->sortBy('sequence', 'ASC');
-
-        foreach ($workTypes as $workType) {
-            $output[] = [
-                'id'   => $workType->getId(),
-                'name' => $workType->getName(),
             ];
         }
 
