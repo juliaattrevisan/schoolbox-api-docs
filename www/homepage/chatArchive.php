@@ -131,10 +131,8 @@ if ($occupiedDateList) {
         $this->parse('month_block', 'month', true);
 
         // check if we have a next year to work with...
-        $nextYear = null;
-        if (!empty($occupiedDateList[$i + 1])) {
-            $nextYear = $occupiedDateList[$i + 1]['year'];
-        }
+        $nextYear = $occupiedDateList[$i + 1]['year'] ?? null;
+
         /**
          * if we are looking at data for next year, or there are no more next years,
          * then render that year / month, and start the next collection
