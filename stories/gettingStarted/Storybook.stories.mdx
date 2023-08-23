@@ -1,0 +1,68 @@
+import { Meta } from "@storybook/addon-docs";
+import SchoolboxLogo from "../assets/sb-logo-blue.png";
+import StorybookLogo from "../assets/storybook.svg";
+import AddingSecret from "../assets/adding-secret.png";
+import GithubActions from "../assets/github-actions.png";
+
+<Meta title="Getting Started/Using Storybook" />
+
+<style>
+    {`
+
+        .header {
+            align-items: center;
+            background: white;
+            display: flex;
+            margin-bottom: 30px;
+            padding: 15px;
+        }
+
+        .plus {
+            font-size: 40px;
+            padding: 0 20px;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+
+    `}
+</style>
+
+<div className="header">
+    <img src={SchoolboxLogo} alt="Schoolbox Logo" className="logo" />
+    <span className="plus"> + </span>
+    <img src={StorybookLogo} alt="Storybook Logo" className="logo" />
+</div>
+
+The ultimate goal is for [**Storybook**](https://storybook.js.org/) to one day replace [**The Pantry**](https://demo.schoolbox.com.au/pantry) as our single source of truth for Schoolbox's entire [**Design System.**](https://storybook.js.org/tutorials/design-systems-for-developers/react/en/introduction/)
+Moving forward new UI will first be designed and developed in Storybook so we can take advantage of all the handy features it offers.
+
+## Getting Started
+
+To run Storybook locally use: `npm run storybook` within the `schoolbox` repo.
+
+This will fire up a copy of Storybook in your Browser so you can develop your new UI in isolation with the added benefit of live reloading.
+Our Storybook has been set up to implement our existing styles, so any styles used in Schoolbox can be used in Storybook.
+
+Stories are kept within the `/stories` directory and browsing the `/components` directory will give you a good idea of how to structure your own stories. Extensive [**guides**](https://storybook.js.org/docs/react/get-started/install/) and [**tutorials**](https://storybook.js.org/tutorials/) can also be found on the Storybook website.
+
+## Sharing Stories
+
+Before sharing your first story via [**Chromatic**](https://www.chromatic.com/) you'll need to add an Actions secret to your Github. Within your forked `alaress/schoolbox` repo, select _Settings > Secrets > Actions > New repository secret._
+The secret key value is stored in LastPass under: `CHROMATIC_PROJECT_TOKEN`
+
+<a href="static/media/stories/assets/adding-secret.png" target="_blank">
+    <img src={AddingSecret} alt="Adding Github Actions secret" />
+</a>
+
+With this setup, ensure your branch contains `-sb` in its name. For example: `task-develop-sb/SA-13017`
+
+Branches so marked will update our online [**Storybook**](https://www.chromatic.com/builds?appId=619b379b58fbbb003a84d74d) with your latest changes whenever pushed.
+To confirm that the branch is updating our Storybook, view the checks list on the pull request:
+
+<img src={GithubActions} alt="Github actions" className="github" />
+
+Once Storybook has been rebuilt and pushed to Chromatic, your changes will be visible in the latest Storybook build. Now you can prompt others for feedback on your work.
+To always be notified of our latest changes, be sure to join the _#storybook-updates_ Slack channel that is autoatically notified whenever a new Storybook build is pushed.

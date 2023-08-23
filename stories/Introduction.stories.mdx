@@ -1,264 +1,29 @@
-import { Meta } from '@storybook/addon-docs';
-import Code from './assets/code-brackets.svg';
-import Colors from './assets/colors.svg';
-import Comments from './assets/comments.svg';
-import Direction from './assets/direction.svg';
-import Flow from './assets/flow.svg';
-import Plugin from './assets/plugin.svg';
-import Repo from './assets/repo.svg';
-import StackAlt from './assets/stackalt.svg';
-import SchoolboxLogo from './assets/sb-logo-blue.png';
-import StorybookLogo from './assets/storybook.svg';
-import AddingSecret from './assets/adding-secret.png';
-import GithubActions from './assets/github-actions.png';
+import { Meta } from "@storybook/addon-docs";
+import Pantry from "./assets/whale-and-a-pantry.jpg";
 
 <Meta title="Introduction" />
 
 <style>
-  {`
+    {`
+        .container {
+            text-align: center;
+        }
 
-  .sbdocs {
-    font-size: 16px;
-  }
+        .pantry {
+            margin-bottom: 30px;
+        }
 
-  .subheading {
-    --mediumdark: '#999999';
-    font-weight: 900;
-    font-size: 16px;
-    line-height: 24px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    margin-top: 40px;
-  }
-
-  .link-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-    row-gap: 10px;
-  }
-
-  @media (min-width: 620px) {
-    .link-list {
-      row-gap: 20px;
-      column-gap: 20px;
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  @media all and (-ms-high-contrast:none) {
-  .link-list {
-      display: -ms-grid;
-      -ms-grid-columns: 1fr 1fr;
-      -ms-grid-rows: 1fr 1fr;
-    }
-  }
-
-  .link-item {
-    display: block;
-    padding: 20px 30px 20px 15px;
-    border: 1px solid #00000010;
-    border-radius: 5px;
-    transition: background 150ms ease-out, border 150ms ease-out, transform 150ms ease-out;
-    color: #333333;
-    display: flex;
-    align-items: flex-start;
-  }
-
-  .link-item:hover {
-    border-color: #1EA7FD50;
-    transform: translate3d(0, -3px, 0);
-    box-shadow: rgba(0, 0, 0, 0.08) 0 3px 10px 0;
-  }
-
-  .link-item:active {
-    border-color: #1EA7FD;
-    transform: translate3d(0, 0, 0);
-  }
-
-  .link-item strong {
-    font-weight: 700;
-    display: block;
-    margin-bottom: 2px;
-  }
-  
-  .link-item img {
-    height: 40px;
-    width: 40px;
-    margin-right: 15px;
-    flex: none;
-  }
-
-  .link-item span {
-    font-size: 14px;
-    line-height: 20px;
-  }
-
-  .tip {
-    display: inline-block;
-    border-radius: 1em;
-    font-size: 11px;
-    line-height: 12px;
-    font-weight: 700;
-    background: #E7FDD8;
-    color: #66BF3C;
-    padding: 4px 12px;
-    margin-right: 10px;
-    vertical-align: top;
-  }
-
-  .tip-wrapper {
-    font-size: 13px;
-    line-height: 20px;
-    margin-top: 40px;
-    margin-bottom: 40px;
-  }
-
-  .tip-wrapper code {
-    font-size: 12px;
-    display: inline-block;
-  }
-
-  .header {
-    display: flex;
-    margin-bottom: 30px;
-  }
-
-  .plus {
-    font-size: 40px;
-    padding: 0 20px;
-  }
-
-  .schoolbox-logo,
-  .storybook-logo {
-    height: 50px;
-    width: auto;
-  }
-
-  .adding-secret,
-  .github-actions {
-    height: 300px;
-    width: auto;
-  }
-
-  
-  `}
+    `}
 </style>
 
-<div className="header">
-    <img src={SchoolboxLogo} alt="Schoolbox Logo" className="schoolbox-logo" />
-    <span className="plus"> + </span> 
-    <img src={StorybookLogo} alt="Storybook Logo" className="storybook-logo" /> 
-</div>
+<div className="container">
 
-_Storybook helps you build UI components in isolation from your app's business logic, data, and context.
-That makes it easy to develop hard-to-reach states. Save these UI states as **stories** to revisit during development, testing, or QA._
+<img src={Pantry} alt="Whale and a pantry" className="pantry" />
 
-The ultimate goal is for Storybook to one day replace [**The Pantry**](https://demo.schoolbox.com.au/pantry) as our single source of truth for Schoolbox's entire [**Design System.**](https://storybook.js.org/tutorials/design-systems-for-developers/react/en/introduction/) 
-Moving forward new UI will first be designed and developed in Storybook so we can take advantage of all the handy features it offers. 
+# Welcome to the Schoolbox Pantry
 
-<div className="subheading">Getting Started</div>
+### To get started go over [**Using Storybook**](../?path=/docs/getting-started-using-storybook--docs), [**CSS Principles**](../?path=/docs/getting-started-css-principles--docs) and [**Global Properties**](../?path=/docs/getting-started-global-properties--docs).
 
-To run Storybook locally use: `npm run storybook` 
+### Following this refer to the currently existing design system elements as required.
 
-This will fire up a copy of Storybook in your Browser so you can develop your new UI in isolation with the added benefit of live reloading.
-Be sure to add the relevant documentation and stories to new components. The links at the bottom of this page and looking through existing stories should help you get started. 
-
-<div className="subheading">Sharing Stories</div>
-
-Before sharing your first story via [**Chromatic**](https://www.chromatic.com/) you'll need to add an Actions secret to your Github. Within your forked `alaress/schoolbox` repo, select _Settings > Secrets > Actions > New repository secret._
-The secret key value is stored in LastPass under: `CHROMATIC_PROJECT_TOKEN`
-
-<a href="static/media/stories/assets/adding-secret.png" target="_blank"><img src={AddingSecret} alt="Adding Github Actions secret" className="adding-secret" /></a>
-
-With this setup, ensure your branch contains `-sb` in its name. For example: `task-develop-sb/SA-13017`
-
-Branches so marked will update our online [**Storybook**](https://www.chromatic.com/builds?appId=619b379b58fbbb003a84d74d) with your latest changes whenever pushed. 
-To confirm that the branch is updating our Storybook, view the checks list on the pull request:
-
-<img src={GithubActions} alt="Github actions" className="github-actions" />
-
-Once Storybook has been rebuilt and pushed to Chromatic, your changes will be visible in the latest Build. Now you can prompt others for feedback on your work. 
-To always be notified of our latest changes, be sure to join the _#storybook-updates_ Slack channel. 
-
-<div className="subheading">Learn</div>
-
-<div className="link-list">
-  <a className="link-item" href="https://storybook.js.org/docs" target="_blank">
-    <img src={Repo} alt="repo" />
-    <span>
-      <strong>Storybook documentation</strong>
-      Configure, customize, and extend
-    </span>
-  </a>
-  <a className="link-item" href="https://storybook.js.org/tutorials/" target="_blank">
-    <img src={Direction} alt="direction" />
-    <span>
-      <strong>In-depth guides</strong>
-      Best practices from leading teams
-    </span>
-  </a>
-  <a className="link-item" href="https://github.com/storybookjs/storybook" target="_blank">
-    <img src={Code} alt="code" />
-    <span>
-      <strong>GitHub project</strong>
-      View the source and add issues
-    </span>
-  </a>
-  <a className="link-item" href="https://discord.gg/storybook" target="_blank">
-    <img src={Comments} alt="comments" />
-    <span>
-      <strong>Discord chat</strong>
-      Chat with maintainers and the community
-    </span>
-  </a>
-</div>
-
-<div className="subheading">Configure</div>
-
-<div className="link-list">
-  <a
-    className="link-item"
-    href="https://storybook.js.org/docs/vue/addons/addon-types"
-    target="_blank"
-  >
-    <img src={Plugin} alt="plugin" />
-    <span>
-      <strong>Presets for popular tools</strong>
-      Easy setup for TypeScript, SCSS and more.
-    </span>
-  </a>
-  <a
-    className="link-item"
-    href="https://storybook.js.org/docs/vue/configure/webpack"
-    target="_blank"
-  >
-    <img src={StackAlt} alt="Build" />
-    <span>
-      <strong>Build configuration</strong>
-      How to customize webpack and Babel
-    </span>
-  </a>
-  <a
-    className="link-item"
-    href="https://storybook.js.org/docs/vue/configure/styling-and-css"
-    target="_blank"
-  >
-    <img src={Colors} alt="colors" />
-    <span>
-      <strong>Styling</strong>
-      How to load and configure CSS libraries
-    </span>
-  </a>
-  <a
-    className="link-item"
-    href="https://storybook.js.org/docs/vue/get-started/setup#configure-storybook-for-your-stack"
-    target="_blank"
-  >
-    <img src={Flow} alt="flow" />
-    <span>
-      <strong>Data</strong>
-      Providers and mocking for data libraries
-    </span>
-  </a>
 </div>

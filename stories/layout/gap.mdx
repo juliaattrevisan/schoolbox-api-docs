@@ -1,0 +1,17 @@
+import { Canvas, Meta, Stories } from "@storybook/blocks";
+
+import * as GapStories from "./gap.stories";
+
+<Meta of={GapStories} />
+
+# Gap
+
+[**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/gap)
+
+`www/static/css/core/layout/_gap.scss`
+
+Used with `.l-flex-*` and `.l-grid-*`, `gap` is the preferred method for adding space between elements.
+
+Compared to using `margin`, it allows the parent to control spacing. Have a read of [**this article**](https://markus.oberlehner.net/blog/css-the-spacing-between-elements-should-be-determined-by-the-parent-element/) if you'd like to know why this is preferred.
+
+<Stories />
