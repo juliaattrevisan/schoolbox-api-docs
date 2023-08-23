@@ -421,17 +421,17 @@
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][grade]" type="hidden" value="0" />
-                                        <input data-summary-worktype-grade="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grade" name="summary[workType][{{ worktype.id }}][grade]" type="checkbox" value="1" {% if worktype.grade ?? false %}checked="checked"{% endif %} />
+                                        <input data-summary-worktype-grade="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grade" name="summary[workType][{{ worktype.id }}][grade]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} />
                                         <label for="report-summary-worktype-{{ worktype.id }}-grade" class="checkbox-label">Grade</label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][comment]" type="hidden" value="0" />
-                                        <input data-summary-worktype-comment="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comment" name="summary[workType][{{ worktype.id }}][comment]" type="checkbox" value="1" {% if worktype.comment ?? false %}checked="checked"{% endif %} />
+                                        <input data-summary-worktype-comment="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comment" name="summary[workType][{{ worktype.id }}][comment]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} />
                                         <label for="report-summary-worktype-{{ worktype.id }}-comment" class="checkbox-label">Comment</label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][rubric]" type="hidden" value="0" />
-                                        <input data-summary-worktype-rubric="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubric" name="summary[workType][{{ worktype.id }}][rubric]" type="checkbox" value="1" {% if worktype.rubric ?? false %}checked="checked"{% endif %} />
+                                        <input data-summary-worktype-rubric="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubric" name="summary[workType][{{ worktype.id }}][rubric]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} />
                                         <label for="report-summary-worktype-{{ worktype.id }}-rubric" class="checkbox-label">Rubric</label>
                                     </td>
                                 </tr>
@@ -515,17 +515,17 @@
                                         </td>
                                         <td>
                                             <input name="class[workType][{{ worktype.id }}][grade]" type="hidden" value="0" />
-                                            <input data-class-worktype-grade="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-grade" name="class[workType][{{ worktype.id }}][grade]" type="checkbox" value="1" {% if worktype.grade ?? false %}checked="checked"{% endif %} />
+                                            <input data-class-worktype-grade="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-grade" name="class[workType][{{ worktype.id }}][grade]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} />
                                             <label for="report-class-worktype-{{ worktype.id }}-grade" class="checkbox-label">Grade</label>
                                         </td>
                                         <td>
                                             <input name="class[workType][{{ worktype.id }}][comment]" type="hidden" value="0" />
-                                            <input data-class-worktype-comment="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-comment" name="class[workType][{{ worktype.id }}][comment]" type="checkbox" value="1" {% if worktype.comment ?? false %}checked="checked"{% endif %} />
+                                            <input data-class-worktype-comment="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-comment" name="class[workType][{{ worktype.id }}][comment]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} />
                                             <label for="report-class-worktype-{{ worktype.id }}-comment" class="checkbox-label">Comment</label>
                                         </td>
                                         <td>
                                             <input name="class[workType][{{ worktype.id }}][rubric]" type="hidden" value="0" />
-                                            <input data-class-worktype-rubric="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-rubric" name="class[workType][{{ worktype.id }}][rubric]" type="checkbox" value="1" {% if worktype.rubric ?? false %}checked="checked"{% endif %} />
+                                            <input data-class-worktype-rubric="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-rubric" name="class[workType][{{ worktype.id }}][rubric]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} />
                                             <label for="report-class-worktype-{{ worktype.id }}-rubric" class="checkbox-label">Rubric</label>
                                         </td>
                                     </tr>

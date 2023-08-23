@@ -283,16 +283,16 @@ class Controller extends ConfigController
             $worktypesSummary[] = [
                 'id'   => $summaryWorkType->getId(),
                 'name' => $summaryWorkType->getName(),
-                'grade' => $payload['summary']['workType'][$summaryWorkType->getId()]['grade'] ?? false,
-                'comment' => $payload['summary']['workType'][$summaryWorkType->getId()]['comment'] ?? false,
-                'rubric' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubric'] ?? false,
+                'grades' => $payload['summary']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
+                'comments' => $payload['summary']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
+                'rubrics' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
             ];
             $worktypesClass[] = [
                 'id'   => $summaryWorkType->getId(),
                 'name' => $summaryWorkType->getName(),
-                'grade' => $payload['class']['workType'][$summaryWorkType->getId()]['grade'] ?? false,
-                'comment' => $payload['class']['workType'][$summaryWorkType->getId()]['comment'] ?? false,
-                'rubric' => $payload['class']['workType'][$summaryWorkType->getId()]['rubric'] ?? false,
+                'grades' => $payload['class']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
+                'comments' => $payload['class']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
+                'rubrics' => $payload['class']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
             ];
         }
 
