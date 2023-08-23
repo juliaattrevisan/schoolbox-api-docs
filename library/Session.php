@@ -136,10 +136,11 @@ class Session
             if ($this->getUseLoginLog()) {
                 $notif = Notifactory::create(Notif::TOPIC_AUTH);
                 $notif->notice("Login success for $username", [
-                    'username' => $user->getUsername(),
-                    'ip'       => $ip,
-                    'login'    => 1,
-                    'jwtId'    => $jwtId,
+                    'username'   => $user->getUsername(),
+                    'ip'         => $ip,
+                    'login'      => 1,
+                    'jwtId'      => $jwtId,
+//                    'identifier' => $_SESSION['identifier'],
                 ]);
             }
 
