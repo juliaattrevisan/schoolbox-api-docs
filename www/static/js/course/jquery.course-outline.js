@@ -297,6 +297,34 @@
                 handle: ".grip",
                 axis: "y",
             });
+            task_list.sortable({
+                placeholder: "sortable-placeholder",
+                forcePlaceholderSize: true,
+                handle: ".grip",
+                axis: "y",
+                helper: "clone",
+                start: function (event, ui) {
+                    // When the course outline component is filtered, sorting is not possible without seeing the hidden items
+                    // this reveals those hidden items, and provides a placeholder for where the active sort item came from
+                    task_list.find("[data-sortable-hidden]").each(function () {
+                        $(this).attr("data-sortable-hidden", false);
+                    });
+                    ui.item.show();
+                    ui.item.attr("data-sortable-active", true);
+                    $("[data-sortable-hidden]").slideDown({
+                        complete: function () {
+                            task_list.sortable("refreshPositions");
+                        },
+                    });
+                },
+                stop: function (event, ui) {
+                    task_list.find("[data-sortable-hidden]").each(function () {
+                        $(this).attr("data-sortable-hidden", true);
+                    });
+                    ui.item.removeAttr("data-sortable-active");
+                    $("[data-sortable-hidden]").slideUp();
+                },
+            });
             task_list.unbind("sortstop.courseInstance").bind("sortstop.courseInstance", function (event, ui) {
                 // Calculate ordering of all items
                 var unit = ui.item.closest("[data-unit]");

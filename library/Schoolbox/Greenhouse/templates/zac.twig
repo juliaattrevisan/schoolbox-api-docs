@@ -1,20 +1,313 @@
-<div data-image-lightbox="lightbox[greenhouse]">
-    <a href="https://source.unsplash.com/Bkci_8qcdvQ/2000x1500" rel="lightbox[greenhouse]"><img src="https://source.unsplash.com/Bkci_8qcdvQ/200x150" alt="" title=""/></a>
-    <a href="https://source.unsplash.com/phIFdC6lA4E/2000x500" rel="lightbox[greenhouse]"><img src="https://source.unsplash.com/phIFdC6lA4E/200x50" alt="Image Description"/></a>
-    <a
-        rel="lightbox[greenhouse]"
-        data-src="https://youtu.be/IUN664s7N-c"
-        data-poster="https://img.youtube.com/vi/IUN664s7N-c/maxresdefault.jpg"
-        data-sub-html="<h4>Visual Soundscapes - Mountains | Planet Earth II | BBC America</h4><p>On the heels of Planet Earth II’s record-breaking Emmy nominations, BBC America presents stunning visual soundscapes from the series' amazing habitats.</p>"
-    >
-        <img class="img-responsive" src="https://img.youtube.com/vi/IUN664s7N-c/maxresdefault.jpg" style="width: 240px"/>
-    </a>
-    <a
-        rel="lightbox[greenhouse]"
-        data-video='{"source": [{"src":"https://www.lightgalleryjs.com/videos/video1.mp4", "type":"video/mp4"}], "tracks": [{"src": "https://www.lightgalleryjs.com/videos/title.txt", "kind":"captions", "srclang": "en", "label": "English", "default": "true"}], "attributes": {"preload": false, "controls": true, "playsinline": true}}'
-        data-poster="https://www.lightgalleryjs.com/images/demo/html5-video-poster.jpg"
-        data-sub-html="<h4>'Peck Pocketed' by Kevin Herron | Disney Favorite</h4>"
-    >
-        <img class="img-responsive" src="https://www.lightgalleryjs.com/images/demo/html5-video-poster.jpg"  style="width: 240px"/>
-    </a>
-</div>
+<script>
+$(document).ready(function() {
+    $("[data-task-list]").sortable({
+        placeholder: "sortable-placeholder",
+        forcePlaceholderSize: true,
+        handle: ".grip",
+        axis: "y",
+        helper: 'clone',
+        start: function(event, ui) {
+            console.log("start", ui.item.data("unit-assessment"), ui.item);
+            document.querySelectorAll("[data-sortable-hidden]").forEach(function(el) {
+                el.dataset.sortableHidden = false;
+            });
+            ui.item.show();
+            ui.item.attr("data-sortable-active", true);
+            $('[data-sortable-hidden]').slideDown({
+                complete: function() {
+                    $("[data-task-list]").sortable("refreshPositions")
+                }
+            })
+        },
+        stop: function(event, ui) {
+            console.log("stop", ui.item.data("unit-assessment"), ui.item);
+            document.querySelectorAll("[data-sortable-hidden]").forEach(function(el) {
+                el.dataset.sortableHidden = true;
+            });
+            ui.item.removeAttr("data-sortable-active");
+            $('[data-sortable-hidden]').slideUp();
+        },
+    });
+});
+</script>
+
+<style>
+[data-sortable-hidden] {
+    display: none;
+}
+
+[data-sortable-hidden="false"] {
+    opacity: 0.5;
+}
+[data-sortable-active] {
+    background: #dddddd;
+}
+</style>
+
+<section style="background: white">
+	<ul class="action-list sortable-card ui-sortable task-list" data-task-list="">
+		<li class="interact" data-unit-assessment="32">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Formative Assessment Task" href="/learning/assessments/32/1">
+							<span class="icon-quiz"></span>
+							<p>Pre-unit Quiz</p>
+						</a>
+
+						<p class="meta">
+							<span title="Wednesday August 2nd 2023 5:00pm">Due
+								<time datetime="2023-08-02T17:00:00+10:00">Aug 2, 2023 at 5:00pm</time>
+							</span>&nbsp;|&nbsp;<span class="gradient-10">5/5 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task32" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="38" data-sortable-hidden="true">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Summative Assessment Task" href="/learning/assessments/38/1">
+							<span class="icon-due-work"></span>
+							<p>Essay - Final Assessment</p>
+						</a>
+
+						<p class="meta">
+							<span title="Thursday August 17th 2023 5:00pm">Due
+								<time datetime="2023-08-17T17:00:00+10:00">Thursday at 5:00pm</time>
+								(<time datetime="2023-08-17T17:00:00+10:00">2 days remaining</time>)
+							</span>&nbsp;|&nbsp;<span class="gradient-10">5/5 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task38" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="39">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Summative Assessment Task" href="/learning/assessments/39/1">
+							<span class="icon-due-work"></span>
+							<p>Present a scene of Romeo and Juliet</p>
+						</a>
+
+						<p class="meta">
+							<span title="Friday August 18th 2023 5:00pm">Due
+								<time datetime="2023-08-18T17:00:00+10:00">Friday at 5:00pm</time>
+								(<time datetime="2023-08-18T17:00:00+10:00">3 days remaining</time>)
+							</span>&nbsp;|&nbsp;<span class="gradient-8">4/5 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task39" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="40" data-sortable-hidden="true">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Formative Assessment Task" href="/learning/assessments/40/1">
+							<span class="icon-quiz"></span>
+							<p>Post-Unit Quiz</p>
+						</a>
+
+						<p class="meta">
+							<span title="Friday August 18th 2023 5:00pm">Due
+								<time datetime="2023-08-18T17:00:00+10:00">Friday at 5:00pm</time>
+								(<time datetime="2023-08-18T17:00:00+10:00">3 days remaining</time>)
+							</span>&nbsp;|&nbsp;<span class="gradient-8">4/5 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task40" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="33" data-sortable-hidden="true">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Learning Activity" href="/learning/assessments/33/1">
+							<span class="icon-task"></span>
+							<p>Post to Forum: Prologue</p>
+						</a>
+
+						<p class="meta">
+							<span title="Wednesday August 2nd 2023 5:00pm">Due
+								<time datetime="2023-08-02T17:00:00+10:00">Aug 2, 2023 at 5:00pm</time>
+							</span>&nbsp;|&nbsp;<span class="gradient-8">4/5 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task33" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="34" data-sortable-hidden="true">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Learning Activity" href="/learning/assessments/34/1">
+							<span class="icon-task"></span>
+							<p>Key events sequencing task</p>
+						</a>
+
+						<p class="meta">
+							<span title="Thursday August 10th 2023 5:00pm">Due
+								<time datetime="2023-08-10T17:00:00+10:00">last Thursday at 5:00pm</time>
+							</span>&nbsp;|&nbsp;<span class="gradient-7">3/4 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task34" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="35" data-sortable-hidden="true">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Learning Activity" href="/learning/assessments/35/1">
+							<span class="icon-task"></span>
+							<p>Post to forum: Fated to die?</p>
+						</a>
+
+						<p class="meta">
+							<span title="Monday August 14th 2023 5:00pm">Due
+								<time datetime="2023-08-14T17:00:00+10:00">yesterday at 5:00pm</time>
+							</span>&nbsp;|&nbsp;<span class="gradient-6">3/5 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task35" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="36">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Learning Activity" href="/learning/assessments/36/1">
+							<span class="icon-task"></span>
+							<p>Post to forum: Who's to blame?</p>
+						</a>
+
+						<p class="meta">
+							<span title="Thursday August 17th 2023 5:00pm">Due
+								<time datetime="2023-08-17T17:00:00+10:00">Thursday at 5:00pm</time>
+								(<time datetime="2023-08-17T17:00:00+10:00">2 days remaining</time>)
+							</span>&nbsp;|&nbsp;<span class="gradient-5">2/4 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task36" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="37">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Learning Activity" href="/learning/assessments/37/1">
+							<span class="icon-task"></span>
+							<p>Romeo and Juliet - Key Quote Activity</p>
+						</a>
+
+						<p class="meta">
+							<span title="Thursday August 17th 2023 5:00pm">Due
+								<time datetime="2023-08-17T17:00:00+10:00">Thursday at 5:00pm</time>
+								(<time datetime="2023-08-17T17:00:00+10:00">2 days remaining</time>)
+							</span>&nbsp;|&nbsp;<span class="gradient-4">2/5 students completed</span>
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task37" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+
+
+		<li class="interact" data-unit-assessment="434" data-sortable-hidden="true">
+			<div class="actions-small-1">
+				<div class="grip compact ui-sortable-handle"></div>
+				<div class="list-item">
+					<div class="small-12 compact card wrap-down">
+
+						<a title="Lesson Plan" href="/learning/assessments/434/1">
+							<span class="icon-lesson-plan"></span>
+							<p>Romeo and Juliet Character Analysis</p>
+						</a>
+
+						<p class="meta">
+							<span title="Saturday September 2nd 2023 4:00pm">Scheduled
+								<time datetime="2023-09-02T16:00:00+10:00">Sep 2, 2023 at 4:00pm</time>
+							</span>&nbsp;
+						</p>
+					</div>
+				</div>
+
+				<nav>
+					<a href="#" class="icon-more" data-dropdown="options-task434" aria-expanded="false" title="Actions" data-dropdown-initialized="true" aria-haspopup="true"></a>
+				</nav>
+			</div>
+		</li>
+	</ul>
+</section>
