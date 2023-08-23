@@ -863,7 +863,7 @@ class Controller extends ConfigController
             }
         }
 
-        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, (bool)$optionsPayload['summary']['rubrics']);
+        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, $optionsPayload['summary']['workType']);
 
         /* Find the assessments that fulfil $classWorkTypes requirements
          */
@@ -949,7 +949,7 @@ class Controller extends ConfigController
         }
 
 
-        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
+        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['workType']);
 
         /* Build it
          */
@@ -986,10 +986,10 @@ class Controller extends ConfigController
      * @param Collection $folderAssessments
      * @param User       $student
      * @param User       $viewer
-     * @param bool       $includeRubric
+     * @param array      $workTypeOptions
      * @return Collection
      */
-    public function collateFeedbacks(Collection $folderAssessments, User $student, User $viewer, bool $includeRubric): Collection
+    public function collateFeedbacks(Collection $folderAssessments, User $student, User $viewer, array $workTypeOptions): Collection
     {
         $feedbacks = new Collection();
         foreach ($folderAssessments as $folderId => $assessments) {
@@ -1005,7 +1005,7 @@ class Controller extends ConfigController
                 }
                 $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
                 if (
-                    $includeRubric
+                    "1" === $workTypeOptions[$assessment->getWorkType()->getId()]['rubrics']
                     && $assessment instanceof DueWork
                     && $feedback instanceof DueWorkFeedback
                     && $assessment->getUseRubric()
