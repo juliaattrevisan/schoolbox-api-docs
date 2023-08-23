@@ -82,8 +82,9 @@ class Session
         $userMapper   = UserMapper::getInstance();
         $groupHandler = new Group();
 
-        // Clear all remnants of past sessions
-        $_SESSION = [];
+        // Clear all remnants of past sessions, except identifier
+        $sessionIdentifier = $_SESSION['identifier'] ?? null;
+        $_SESSION          = [];
 
         $user = $userMapper->findByUsername($username);
 
@@ -107,8 +108,10 @@ class Session
             }
             $_SESSION['ip'] = $ip;
 
-            // Create a random session ID as well
-            $_SESSION['identifier'] = (new Guid())->generate();
+            // Create a random session ID as well:
+            // however, this survives user authentication and re-authentication
+            $sessionIdentifier ??= (new Guid())->generate();
+            $_SESSION['identifier'] = $sessionIdentifier;
 
             // add mobile session data
             $sbmAuth = new Authenticator();
