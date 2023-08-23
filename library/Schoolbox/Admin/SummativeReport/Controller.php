@@ -204,6 +204,7 @@ class Controller extends ConfigController
             $worktypes[] = [
                 'id'   => $summaryWorkType->getId(),
                 'name' => $summaryWorkType->getName(),
+                'none' => true,
                 'grade' => false,
                 'comment' => false,
                 'rubric' => false,
