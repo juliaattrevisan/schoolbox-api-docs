@@ -95,7 +95,7 @@ class AjaxChat
                 break;
 
             case 'mute':
-                $this->mute($post_vars['user_id']);
+                $this->mute((int)$post_vars['user_id']);
                 break;
 
             default:
@@ -108,7 +108,7 @@ class AjaxChat
     private function send($body)
     {
 
-        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users')))) {
+        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users') ?? ''))) {
             $mutedUsers = array();
         }
 
@@ -177,7 +177,7 @@ class AjaxChat
 
     private function mute($userID)
     {
-        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users')))) {
+        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users') ?? ''))) {
             $mutedUsers = array();
         }
 
@@ -205,7 +205,7 @@ class AjaxChat
     /**
      * Returns the requested config variable, or the entire config as an array if no argument passed
      * @param string $key
-     * @return array|bool
+     * @return mixed
      */
     protected function getConfig($key = '')
     {
@@ -215,7 +215,7 @@ class AjaxChat
         $return = array();
         foreach ($this->config as $key => $config) {
             if ($key == 'muted_users') {
-                $return[$key] = unserialize($config->getValue());
+                $return[$key] = unserialize($config->getValue() ?? '');
             } else {
                 $return[$key] = $config->getValue();
             }
