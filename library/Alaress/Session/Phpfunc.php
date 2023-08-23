@@ -9,31 +9,26 @@
 
 namespace Alaress\Session;
 
+use Predis\ClientInterface;
 use Schoolbox\Auth\Remember;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Pipe\PipeManager;
 
 class Phpfunc extends \Aura\Session\Phpfunc
 {
     /**
-     * @var IConfigLoader
-     */
-    private $config;
-
-    /**
-     * Session rememberer
-     */
-    private Remember\Remember $rememberer;
-
-    /**
      * Constructor
      *
-     * @param IConfigLoader     $config
-     * @param Remember\Remember $rememberer
+     * @param IConfigLoader     $config       Config store
+     * @param Remember\Remember $rememberer   Session rememberer
+     * @param ClientInterface   $sessionRedis The Redis instance which stores session data:
+     *                                        required so that if a session is created it is cut short.
      */
-    public function __construct(IConfigLoader $config, Remember\Remember $rememberer)
-    {
-        $this->config     = $config;
-        $this->rememberer = $rememberer;
+    public function __construct(
+        private IConfigLoader $config,
+        private Remember\Remember $rememberer,
+        private ClientInterface $sessionRedis,
+    ) {
     }
 
 
@@ -54,6 +49,9 @@ class Phpfunc extends \Aura\Session\Phpfunc
         if (!(empty($_SESSION['id']))) {
             return $result;
         }
+
+        // otherwise: this is a new session, treat it as such
+        $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . $this->session_id(), 300);
 
         // no remembery? do nothing more
         if (!$this->config->get('session_remember')) {

@@ -2058,11 +2058,14 @@ abstract class Kernel
                     $config = $di->get('config');
                     /** @var Remember\Remember $rememberer */
                     $rememberer = $di->get('session.rememberer');
+                    /** @var Predis\ClientInterface $redisStorage */
+                    $redisStorage = $di->get('redis.storage');
                     $factory = new Factory(
                         $_COOKIE,
                         $config,
                         $rememberer,
                         $_SERVER['REQUEST_TIME'],
+                        $redisStorage,
                     );
                     return $factory->build();
                 }
