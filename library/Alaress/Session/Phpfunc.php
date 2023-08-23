@@ -23,6 +23,15 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 class Phpfunc extends \Aura\Session\Phpfunc
 {
     /**
+     * Expire sessions created after 5 minutes, instead of the (presumably
+     * longer!) default expiry.
+     *
+     * (If a session created is reused, its expiry will be extended as per
+     * normal.)
+     */
+    private const API_SESSION_EXPIRY = 300;
+
+    /**
      * Constructor
      *
      * @param IConfigLoader     $config       Config store
@@ -56,10 +65,10 @@ class Phpfunc extends \Aura\Session\Phpfunc
             return $result;
         }
 
-        // otherwise, this is a new session: set its expiry to a default value?
+        // otherwise, this is a new session: set its expiry to a default value
         register_shutdown_function(function () {
             session_write_close();
-            $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), 300);
+            $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), self::API_SESSION_EXPIRY);
         });
 
         // no remembery? do nothing more
