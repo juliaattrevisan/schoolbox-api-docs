@@ -345,14 +345,15 @@ class SitePage
                 $rememberer = $this->di->get('session.rememberer');
                 $username   = $rememberer->retrieveUsername();
 
+                // For safety's sake regenerate their session ID, whether or not
+                // the remember me was successful
+                session_regenerate_id(true);
                 if ($username === null || strlen($username) === 0 || !$sessionHandler->create($username)) {
                     $sessionHandler->destroy();
                     $this->goLoginPage();
-                } else {
-                    // For safety's sake regenerate their session ID
-                    session_regenerate_id(true);
                 }
             } else {
+                session_regenerate_id(true);
                 $sessionHandler->destroy();
                 $this->goLoginPage();
             }
