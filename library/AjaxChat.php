@@ -205,7 +205,7 @@ class AjaxChat
     /**
      * Returns the requested config variable, or the entire config as an array if no argument passed
      * @param string $key
-     * @return array|bool|null
+     * @return mixed
      */
     protected function getConfig($key = '')
     {
