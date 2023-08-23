@@ -267,34 +267,6 @@
                 }
             })
         });
-
-
-
-
-        $('[data-worktype-none]').each(function(index, element) {
-            let sectionId = $(element).attr('data-section-enabled');
-            let fieldsets = $('#' + sectionId).find('fieldset');
-
-            /* Make checkboxes unchangeable
-             */
-            fieldsets.find('input:checkbox').each(function(index, input) {
-                $(input).on('click', function (event) {
-                    if ($(this).prop('readonly')) {
-                        event.preventDefault();
-                    }
-                });
-            });
-
-            /* Initialise sections
-             */
-            initSections($(this), fieldsets);
-
-            /* Toggle settings in the section
-             */
-            $(element).on('change', function() {
-                initSections($(this), fieldsets);
-            });
-        });
     });
 </script>
 
