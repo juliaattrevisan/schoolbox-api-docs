@@ -122,7 +122,7 @@ class Classes implements IStrategy
          * because we don't need to load *everything* at the start, just
          * as we go
          */
-        $scheduleCompiler = new ScheduleCompiler($this->api, $timetableDefinition);
+        $scheduleCompiler = new ScheduleCompiler($this->log, $this->api, $timetableDefinition);
 
         /* Shank information about the periods occurring during $timetableDefinition
          */
@@ -193,6 +193,10 @@ class Classes implements IStrategy
          * * shank it into suds town
          */
         foreach ($classes['schedule'] as $scheduleId => $classData) {
+            if ($classData['code'] !== 'MSCPH - 12A') {
+                continue;
+            }
+
             $subject = $scheduleCompiler->findSubject($classData['code']);
 
             /* Save sis_event record

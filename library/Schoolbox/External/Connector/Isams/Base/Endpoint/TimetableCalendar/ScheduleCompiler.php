@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
 /**
@@ -18,29 +19,17 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 class ScheduleCompiler
 {
     /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * The stack of weeks, days and periods that we must now fill
-     * with classes and humans and such
-     * @var array
-     */
-    private array $timetableDefinition;
-
-
-    /**
      * Constructor.
      *
+     * @param LoggerInterface $log
      * @param array $api
-     * @param array $timetableDefinition
+     * @param array $timetableDefinition  The stack of weeks, days and periods that we must now fill with classes and humans and such
      */
-    public function __construct(array $api, array $timetableDefinition)
-    {
-        $this->api = $api;
-        $this->timetableDefinition = $timetableDefinition;
+    public function __construct(
+        private LoggerInterface $log,
+        private array $api,
+        private array $timetableDefinition
+    ) {
     }
 
 
@@ -302,6 +291,11 @@ class ScheduleCompiler
         /* Unknown subject: can't find it via its setCode
          */
         if (empty($node)) {
+            $this->log->warning(sprintf(
+                'SetCode %s as no students in it',
+                $setCode
+            ));
+
             return [];
         }
 
@@ -323,6 +317,11 @@ class ScheduleCompiler
             /* Unknown student; can't find it via its studentId
              */
             if (empty($student)) {
+                $this->log->warning(sprintf(
+                    'Student with PupilId %s was not found',
+                    $studentId
+                ));
+
                 continue;
             }
 
