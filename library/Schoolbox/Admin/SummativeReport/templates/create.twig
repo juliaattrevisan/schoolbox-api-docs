@@ -416,7 +416,7 @@
                                     <td>{{ worktype.name }}</td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][none]" type="hidden" value="0" />
-                                        <input data-summary-worktype-none="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-none" name="summary[workType][{{ worktype.id }}][none]" type="checkbox" value="1"/>
+                                        <input data-summary-worktype-none="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-none" name="summary[workType][{{ worktype.id }}][none]" type="checkbox" value="1" {% if worktype.none ?? false %}checked="checked"{% endif %}/>
                                         <label for="report-summary-worktype-{{ worktype.id }}-none" class="checkbox-label">None</label>
                                     </td>
                                     <td>
@@ -510,7 +510,7 @@
                                         <td>{{ worktype.name }}</td>
                                         <td>
                                             <input name="class[workType][{{ worktype.id }}][none]" type="hidden" value="0" />
-                                            <input data-class-worktype-none="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-none" name="class[workType][{{ worktype.id }}][none]" type="checkbox" value="1"/>
+                                            <input data-class-worktype-none="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-none" name="class[workType][{{ worktype.id }}][none]" type="checkbox" value="1" {% if worktype.none ?? false %}checked="checked"{% endif %}/>
                                             <label for="report-class-worktype-{{ worktype.id }}-none" class="checkbox-label">None</label>
                                         </td>
                                         <td>

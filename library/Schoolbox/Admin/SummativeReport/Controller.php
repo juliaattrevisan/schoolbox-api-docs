@@ -280,20 +280,26 @@ class Controller extends ConfigController
         $worktypesSummary = [];
         $worktypesClass = [];
         foreach ($allWorktypes as $summaryWorkType) {
-            $worktypesSummary[] = [
+            $newSummary = [
                 'id'   => $summaryWorkType->getId(),
                 'name' => $summaryWorkType->getName(),
                 'grades' => $payload['summary']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['summary']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
             ];
-            $worktypesClass[] = [
+            // if no setting was selected display none
+            $newSummary['none'] = !($newSummary['grades'] || $newSummary['comments'] || $newSummary['rubrics']);
+            $worktypesSummary[] = $newSummary;
+            $newClass = [
                 'id'   => $summaryWorkType->getId(),
                 'name' => $summaryWorkType->getName(),
                 'grades' => $payload['class']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['class']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['class']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
             ];
+            // if no setting was selected display none
+            $newClass['none'] = !($newClass['grades'] || $newClass['comments'] || $newClass['rubrics']);
+            $worktypesClass[] = $newClass;
         }
 
         $this->response = $this->responseFromTemplate(
