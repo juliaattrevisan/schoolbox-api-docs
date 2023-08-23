@@ -14,6 +14,12 @@ use Schoolbox\Auth\Remember;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Pipe\PipeManager;
 
+/**
+ * Extends Aura's PHP function wrapper to override `session_start`, so that it:
+ * * sets a max session lifetime of 5 minutes for new sessions, regardless of
+ *   session lifetime
+ * * restores a session from remember me, if there is one
+ */
 class Phpfunc extends \Aura\Session\Phpfunc
 {
     /**
@@ -50,8 +56,11 @@ class Phpfunc extends \Aura\Session\Phpfunc
             return $result;
         }
 
-        // otherwise: this is a new session, treat it as such
-        $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . $this->session_id(), 300);
+        // otherwise, this is a new session: set its expiry to a default value?
+        register_shutdown_function(function () {
+            session_write_close();
+            $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), 300);
+        });
 
         // no remembery? do nothing more
         if (!$this->config->get('session_remember')) {
