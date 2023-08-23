@@ -308,7 +308,8 @@
     z-index: 1000;
 }
 
-.fc-timegrid-slots table {
+.fc-timegrid-slots table,
+.fc-timeline-slots table {
     background: none; //remove the default $white, as we want to see the .fc-day-today background underneath
 }
 
