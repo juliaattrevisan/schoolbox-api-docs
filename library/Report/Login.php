@@ -27,15 +27,16 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
     // csv mappings
     private $csvFields = array(
-        'date'      => 'date',
-        'login'     => 'login success',
-        'username'  => 'username',
-        'user'      => 'user id',
-        'firstname' => 'firstname',
-        'lastname'  => 'lastname',
-        'role'      => 'role',
-        'roletype'  => 'roletype',
-        'ip'        => 'originating ip address',
+        'date'       => 'date',
+        'login'      => 'login success',
+        'username'   => 'username',
+        'user'       => 'user id',
+        'identifier' => 'session identifier',
+        'firstname'  => 'firstname',
+        'lastname'   => 'lastname',
+        'role'       => 'role',
+        'roletype'   => 'roletype',
+        'ip'         => 'originating ip address',
     );
 
     // fields that we will permit sorting on
@@ -46,11 +47,12 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
     // fields we permit filtering by
     private $filterable = array(
-        'user'   => 'username, realname or partial',
-        'role'   => '',
-        'ip'     => 'x.x.x.x',
-        'after'  => 'eg. 2012-01-06, yesterday',
-        'before' => 'eg. July 1, 3 days ago'
+        'user'       => 'username, realname or partial',
+        'identifier' => 'session identifier',
+        'role'       => '',
+        'ip'         => 'x.x.x.x',
+        'after'      => 'eg. 2012-01-06, yesterday',
+        'before'     => 'eg. July 1, 3 days ago'
     );
 
     /**
@@ -213,6 +215,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
         $dataQuery = "SELECT
                         `login_log`.`username`,
                         `date`,
+                        identifier,
                         login,
                         ip,
                         user.id AS user,
@@ -296,14 +299,15 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
                 $page->setVar(
                     array(
-                        'UID'         => Scrub::text($log['user']),
-                        'DATE'        => Scrub::text($log['date']),
-                        'USERNAME'    => Scrub::text($log['username']),
-                        'DISPLAYNAME' => Scrub::text($userHandler->formatName($nameShards)),
-                        'ACTION'      => Scrub::text($action),
-                        'IP'          => Scrub::text($log['ip']),
-                        'ROLE'        => Scrub::text($log['role']),
-                        'BY_TOKEN'    => $log['jwt_id'] ? '&#10004;' : '',
+                        'UID'                => Scrub::text($log['user']),
+                        'DATE'               => Scrub::text($log['date']),
+                        'USERNAME'           => Scrub::text($log['username']),
+                        'SESSION_IDENTIFIER' => Scrub::text($log['identifier'] ?? ''),
+                        'DISPLAYNAME'        => Scrub::text($userHandler->formatName($nameShards)),
+                        'ACTION'             => Scrub::text($action),
+                        'IP'                 => Scrub::text($log['ip']),
+                        'ROLE'               => Scrub::text($log['role']),
+                        'BY_TOKEN'           => $log['jwt_id'] ? '&#10004;' : '',
                     )
                 );
 
