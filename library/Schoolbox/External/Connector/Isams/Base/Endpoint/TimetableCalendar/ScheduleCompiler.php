@@ -107,6 +107,11 @@ class ScheduleCompiler
         /* Unknown subject: can't find it via its setCode
          */
         if (empty($node)) {
+            $this->log->debug(sprintf(
+                'SetCode "%s" does not have any Sets in it',
+                $setCode
+            ));
+
             return [
                 'subjectId' => '',
                 'code' => '',
@@ -121,6 +126,15 @@ class ScheduleCompiler
         $staff = [];
 
         $teachers = $node->xpath('Teachers/Teacher');
+
+        /* No teachers? No trabajo, but log it and keep going
+         */
+        if (!\count($teachers)) {
+            $this->log->debug(sprintf(
+                'SetCode "%s" as no teachers in it',
+                $setCode
+            ));
+        }
 
         /* lol the Teacher @Id attribute is the Set Id, not the teacher's...
          */
@@ -173,6 +187,11 @@ class ScheduleCompiler
         /* 404 room not found.
          */
         if (null === $room) {
+            $this->log->debug(sprintf(
+                'Classroom with id "%s" was not found',
+                $roomId
+            ));
+
             return [
                 'roomId' => $roomId,
                 'name' => '',
@@ -219,6 +238,11 @@ class ScheduleCompiler
         /* Couldn't find this teacher
          */
         if (null === $node) {
+            $this->log->debug(sprintf(
+                'StaffMember with UserCode "%s" was not found',
+                $userCode
+            ));
+
             return [
                 'externalId' => '',
                 'staffId' => '',
@@ -255,6 +279,11 @@ class ScheduleCompiler
         /* Couldn't find this teacher
          */
         if (null === $node) {
+            $this->log->debug(sprintf(
+                'StaffMember with id %s was not found',
+                $id
+            ));
+
             return [
                 'externalId' => '',
                 'staffId' => $id,
@@ -288,21 +317,21 @@ class ScheduleCompiler
     {
         $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
 
+        $students = [];
+
         /* Unknown subject: can't find it via its setCode
          */
         if (empty($node)) {
-            $this->log->warning(sprintf(
+            $this->log->debug(sprintf(
                 'SetCode %s as no students in it',
                 $setCode
             ));
 
-            return [];
+            return $students;
         }
 
         /* Otherwise continue digging
          */
-        $students = [];
-
         $setId = trim((string)$node[0]->xpath('@Id')[0]->Id);
 
         /* Select all the SetList nodes where any of its SetId subnodes contains the value $setId exactly
@@ -313,7 +342,7 @@ class ScheduleCompiler
          * Exit early
          */
         if (!\count($setListNodes)) {
-            $this->log->warning(sprintf(
+            $this->log->debug(sprintf(
                 'Did not find any SetList nodes for Set %s (SetCode/ClassCode "%s") - no students found.',
                 $setId,
                 $setCode
