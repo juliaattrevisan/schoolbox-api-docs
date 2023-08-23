@@ -309,6 +309,21 @@ class ScheduleCompiler
          */
         $setListNodes = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
 
+        /* The Set ("class") doesn't contain any SetList ("people in the class") nodes
+         * Exit early
+         */
+        if (!\count($setListNodes)) {
+            $this->log->warning(sprintf(
+                'Did not find any SetList nodes for Set %s (SetCode/ClassCode "%s") - no students found.',
+                $setId,
+                $setCode
+            ));
+
+            return $students;
+        }
+
+        /* Find out who each guy really is
+         */
         foreach ($setListNodes as $current) {
             $studentId = trim((string)$current->xpath('@PupilId')[0]);
 
