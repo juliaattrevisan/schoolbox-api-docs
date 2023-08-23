@@ -65,10 +65,4 @@
             flex-shrink: 0;
         }
     }
-
-    @each $size in $global-sizes {
-        &-gap--#{$size} {
-            grid-gap: var(--whitespace-#{$size});
-        }
-    }
 }

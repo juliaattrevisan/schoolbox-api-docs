@@ -7,18 +7,27 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
-    title: "Layout/Guide",
+    decorators: [
+        () => ({
+            template: `
+                <div class="l-pad-xl">
+                    <story />
+                </div>
+            `,
+        }),
+    ],
+    title: "Layout/Grid",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
 /**
- * We just add the `c-card--small` modifier class to the card
+ *
  */
-export const Default: Story = {
+export const Classes: Story = {
     render: () => ({
         template: `
-            <p>Coming soon</p>
+
         `,
     }),
 };

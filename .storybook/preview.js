@@ -54,9 +54,9 @@ export const parameters = {
     layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
     options: {
         storySort: {
-            // Sort stories alphabetically, but with Introduction and CSS Principles first
+            // Sort stories alphabetically, but with Introduction related docs first
             method: "alphabetical",
-            order: ["Introduction", "Using Storybook", "CSS Principles", "*"],
+            order: ["Introduction", "Getting Started", ["Using Storybook", "CSS Principles", "Global Properties"], "*"],
         },
     },
 };
