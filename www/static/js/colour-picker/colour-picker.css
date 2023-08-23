@@ -1,3 +1,6 @@
+.clr-picker {
+    z-index: 1100;
+}
 .clr-field {
     min-width: 2.5rem;
 }
