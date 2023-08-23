@@ -130,9 +130,14 @@ if ($occupiedDateList) {
 
         $this->parse('month_block', 'month', true);
 
-        $nextYear = $occupiedDateList[$i + 1]['year'];
+        // check if we have a next year to work with...
+        $nextYear = $occupiedDateList[$i + 1]['year'] ?? null;
 
-        if ($date['year'] != $nextYear || empty($nextYear)) {
+        /**
+         * if we are looking at data for next year, or there are no more next years,
+         * then render that year / month, and start the next collection
+         */
+        if ($date['year'] != $nextYear || null === $nextYear) {
             $this->parse('year_block', 'year', true);
             $this->setVar('month_block', '');
         }
@@ -267,6 +272,8 @@ if (count($items)) {
         $this->setVar('chat_date_block', '');
         $this->setVar('year_block', 'No chat items found.');
     }
+} elseif (!empty($occupiedDateList)) {
+    $this->setVar('chat_date_block', '');
 } else {
     $this->setVar('chat_date_block', '');
     $this->setVar('year_block', 'No chat items found.');
