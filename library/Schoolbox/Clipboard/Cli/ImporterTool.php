@@ -73,6 +73,10 @@ class ImporterTool extends CliTool\App
      */
     private const LOCK_TTL = 60;
 
+    /**
+     * max execution time before we consider the import process timed out.
+     */
+    private const DEFAULT_TIMEOUT = 3600;
 
     /**
      * @inheritdoc
@@ -159,6 +163,8 @@ HELP;
             $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit;
         }
+
+        $this->setMaxExecutionTime(self::DEFAULT_TIMEOUT);
 
         $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
 
