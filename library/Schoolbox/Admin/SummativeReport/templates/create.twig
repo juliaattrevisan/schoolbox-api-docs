@@ -244,6 +244,33 @@
         // when clicked, check if none cell
         // if none now set, alter all other cells in that row to also none
         // if other cell, check if none is selected, change to off
+
+        document.querySelectorAll('[data-summary-worktype-none]').forEach(function(checkboxNone) {
+            checkboxNone.addEventListener('change', function() {
+                let workTypeId = this.dataset.summaryWorktypeNone;
+                // if checked, uncheck the row
+                if (this.checked) {
+                    document.querySelector('[data-summary-worktype-grade="'+workTypeId+'"]').checked = false;
+                    document.querySelector('[data-summary-worktype-comment="'+workTypeId+'"]').checked = false;
+                    document.querySelector('[data-summary-worktype-rubric="'+workTypeId+'"]').checked = false;
+                }
+            })
+        });
+        document.querySelectorAll('[data-class-worktype-none]').forEach(function(checkboxNone) {
+            checkboxNone.addEventListener('change', function() {
+                let workTypeId = this.dataset.classWorktypeNone;
+                // if checked, uncheck the row
+                if (this.checked) {
+                    document.querySelector('[data-class-worktype-grade="'+workTypeId+'"]').checked = false;
+                    document.querySelector('[data-class-worktype-comment="'+workTypeId+'"]').checked = false;
+                    document.querySelector('[data-class-worktype-rubric="'+workTypeId+'"]').checked = false;
+                }
+            })
+        });
+
+
+
+
         $('[data-worktype-none]').each(function(index, element) {
             let sectionId = $(element).attr('data-section-enabled');
             let fieldsets = $('#' + sectionId).find('fieldset');
