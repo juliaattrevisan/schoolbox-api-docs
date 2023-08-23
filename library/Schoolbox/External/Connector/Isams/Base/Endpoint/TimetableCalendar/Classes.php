@@ -193,10 +193,6 @@ class Classes implements IStrategy
          * * shank it into suds town
          */
         foreach ($classes['schedule'] as $scheduleId => $classData) {
-            if ($classData['code'] !== 'MSCPH - 12A') {
-                continue;
-            }
-
             $subject = $scheduleCompiler->findSubject($classData['code']);
 
             /* Save sis_event record
