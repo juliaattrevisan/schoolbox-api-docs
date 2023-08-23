@@ -70,18 +70,25 @@ class Authenticator
      */
     public function createSession(string $username, ?User\Token\Model $userToken = null): bool
     {
-        $this->destroySession();
+//        $this->destroySession();
 
-        // start by creating a desktop session, then we will add the mobile elements into it
-        if (session_start()) {
-            $session = new Session();
-            if (!$session->create($username, $userToken ? $userToken->getJwtId() : null)) {
-                throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
-            }
-
-            return true;
+        $session = new Session();
+        if (!$session->create($username, $userToken?->getJwtId())) {
+            throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
         }
-        return false;
+
+        return true;
+
+//        // start by creating a desktop session, then we will add the mobile elements into it
+//        if (session_start()) {
+//            $session = new Session();
+//            if (!$session->create($username, $userToken ? $userToken->getJwtId() : null)) {
+//                throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
+//            }
+//
+//            return true;
+//        }
+//        return false;
     }
 
     /**
