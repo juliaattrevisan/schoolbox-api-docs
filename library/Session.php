@@ -6,6 +6,7 @@
  */
 
 use League\Flysystem\FilesystemException;
+use Schoolbox\Clipboard\Log\Guid;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -105,6 +106,9 @@ class Session
                 $_SESSION['password'] = $_POST['password'] ?? null;
             }
             $_SESSION['ip'] = $ip;
+
+            // Create a random session ID as well
+            $_SESSION['identifier'] = (new Guid())->generate();
 
             // add mobile session data
             $sbmAuth = new Authenticator();
