@@ -6,7 +6,7 @@ parameters:
 			path: library/AjaxChat.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between array\\|bool and 'Active' will always evaluate to false\\.$#"
+			message: "#^Strict comparison using \\=\\=\\= between array\\|bool\\|null and 'Active' will always evaluate to false\\.$#"
 			count: 1
 			path: library/AjaxChat.php
 
