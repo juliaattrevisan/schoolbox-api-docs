@@ -272,6 +272,8 @@ if (count($items)) {
         $this->setVar('chat_date_block', '');
         $this->setVar('year_block', 'No chat items found.');
     }
+} elseif (!empty($occupiedDateList)) {
+    $this->setVar('chat_date_block', '');
 } else {
     $this->setVar('chat_date_block', '');
     $this->setVar('year_block', 'No chat items found.');
