@@ -47,8 +47,6 @@ HELP;
 
             $this->getLogger()->debug(sprintf("Report: #%s", $row['id']));
 
-            $this->getLogger()->debug(sprintf("Old config: %s", print_r($pre)));
-
             $new['summary']['workType'] = [];
             $new['class']['workType'] = [];
 
@@ -69,7 +67,9 @@ HELP;
                 ];
             }
 
-            $this->getLogger()->debug(sprintf("New config: %s", print_r($new)));
+            // remove old grades / comments / rubrics settings
+            unset($new['class']['grades'], $new['class']['comments'], $new['class']['rubrics'], $new['summary']['grades'], $new['summary']['comments'], $new['summary']['rubrics']);
+
             $query = (
             "UPDATE summative_report
                  SET options=:newOptions
