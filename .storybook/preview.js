@@ -9,6 +9,7 @@
 
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
 import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
+import { themes } from "@storybook/theming";
 import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to load mock data into stories
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
@@ -47,12 +48,15 @@ export const parameters = {
     chromatic: {
         pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
     },
+    docs: {
+        theme: themes.dark,
+    },
     layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
     options: {
         storySort: {
             // Sort stories alphabetically, but with Introduction and CSS Principles first
             method: "alphabetical",
-            order: ["Introduction", "CSS Principles", "*"],
+            order: ["Introduction", "Using Storybook", "CSS Principles", "*"],
         },
     },
 };
