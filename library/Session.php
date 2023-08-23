@@ -82,15 +82,15 @@ class Session
         $userMapper   = UserMapper::getInstance();
         $groupHandler = new Group();
 
-//        //Clear all remnants of past sessions
-//        $this->destroy();
+        // Clear all remnants of past sessions
+        $_SESSION = [];
 
         $user = $userMapper->findByUsername($username);
 
         $ip = self::getIP();
 
         /* if user is found and enabled and session is started create our user record */
-        if ($user instanceof User && $user->getEnabled()/* && session_start()*/) {
+        if ($user instanceof User && $user->getEnabled()) {
             /* Start by creating a fresh ID to ensure ID has not been injected */
             session_regenerate_id(true);
 
