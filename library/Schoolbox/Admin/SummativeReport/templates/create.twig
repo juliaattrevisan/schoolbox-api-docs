@@ -267,6 +267,26 @@
                 }
             })
         });
+        // if selecting an option, we should ensure the none selection for that row is off
+        document.querySelectorAll('[data-summary-worktype-option]').forEach(function(checkboxOption) {
+            checkboxOption.addEventListener('change', function() {
+                let workTypeId = this.dataset.summaryWorktypeOption;
+                // if checked, uncheck the row
+                if (this.checked) {
+                    document.querySelector('[data-summary-worktype-none="'+workTypeId+'"]').checked = false;
+                }
+            })
+        });
+        document.querySelectorAll('[data-class-worktype-option]').forEach(function(checkboxOption) {
+            checkboxOption.addEventListener('change', function() {
+                let workTypeId = this.dataset.classWorktypeOption;
+                // if checked, uncheck the row
+                if (this.checked) {
+                    document.querySelector('[data-class-worktype-none="'+workTypeId+'"]').checked = false;
+                }
+            })
+        });
+
     });
 </script>
 
@@ -424,17 +444,17 @@
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
-                                        <input data-summary-worktype-grades="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grades" name="summary[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-grades="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grades" name="summary[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} />
                                         <label for="report-summary-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
-                                        <input data-summary-worktype-comments="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comments" name="summary[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-comments="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comments" name="summary[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} />
                                         <label for="report-summary-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
-                                        <input data-summary-worktype-rubrics="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubrics" name="summary[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-rubrics="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubrics" name="summary[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} />
                                         <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
                                     </td>
                                 </tr>
