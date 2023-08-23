@@ -14,8 +14,6 @@ use Schoolbox\Database\Factory;
 
 class External_Schooledge_Class implements External_ClassInterface
 {
-
-
     /**
      * @var IConnector
      */
