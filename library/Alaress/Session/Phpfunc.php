@@ -43,21 +43,25 @@ class Phpfunc extends \Aura\Session\Phpfunc
     public function session_start()
     {
         // start of with doing whatever the parent wanted to do
-        parent::__call('session_start', []);
+        $result = parent::__call('session_start', []);
 
-        if (!(empty($_SESSION['id']))) {
-            // if successful, do no more
-            return true;
+        // If session wasn't started: no point doing anything else
+        if (!$result) {
+            return $result;
         }
 
+        // if session ID exists, do no more
+        if (!(empty($_SESSION['id']))) {
+            return $result;
+        }
+
+        // no remembery? do nothing more
         if (!$this->config->get('session_remember')) {
-            // no remembery; well, that's too bad then
-            return false;
+            return $result;
         }
 
         // challenge 'remember me' auth
         $username = $this->rememberer->retrieveUsername();
-
         if (strlen($username ?? '')) {
             // found a redis match; attempt to rebuild that session
 
@@ -69,13 +73,10 @@ class Phpfunc extends \Aura\Session\Phpfunc
             $session = new \Session();
             $session->disableLoginLog();
 
-            $created = $session->create($username);
-            if ($created) {
+            if ($session->create($username)) {
                 $this->rememberer->rememberUsername($username, Remember\Remember::DEFAULT_EXPIRY);
             }
-            return $created;
         }
-
-        return false;
+        return $result;
     }
 }
