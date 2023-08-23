@@ -354,7 +354,22 @@ class Controller extends ConfigController
             'class' => true,
         ];
 
-        $options = json_encode(array_intersect_key($postData, $payloadKeys), JSON_THROW_ON_ERROR);
+        $options = array_intersect_key($postData, $payloadKeys);
+        // strip out the none entries
+        foreach ($options['class']['workType'] as $id => $workType) {
+            if ("1" === $workType['none']) {
+                unset($options['class']['workType'][$id]);
+            } else {
+                unset($options['class']['workType'][$id]['none']);
+            }
+        }
+        foreach ($options['summary']['workType'] as $id => $workType) {
+            if ("1" === $workType['none']) {
+                unset($options['summary']['workType'][$id]);
+            } else {
+                unset($options['summary']['workType'][$id]['none']);
+            }
+        }
 
         /* Title is required
          */
@@ -372,7 +387,7 @@ class Controller extends ConfigController
          */
         $report->setTitle($postData['title'])
             ->setIntroduction($postData['introduction'])
-            ->setOptions($options)
+            ->setOptions(json_encode($options, JSON_THROW_ON_ERROR))
             ->setUpdatedBy($this->getUser())
             ->setFileName($report->sanitiseFilename(trim((string)$postData['filename'])));
 
