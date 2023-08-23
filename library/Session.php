@@ -143,7 +143,7 @@ class Session
                     'ip'         => $ip,
                     'login'      => 1,
                     'jwtId'      => $jwtId,
-//                    'identifier' => $_SESSION['identifier'],
+                    'identifier' => $_SESSION['identifier'],
                 ]);
             }
 
@@ -187,10 +187,11 @@ class Session
 
         $notif              = Notifactory::create(Notif::TOPIC_AUTH);
         $notifFailureParams = [
-            'username' => $username,
-            'ip'       => Session::getIP(),
-            'login'    => 0,
-            'jwtId'    => null,
+            'username'   => $username,
+            'ip'         => Session::getIP(),
+            'login'      => 0,
+            'jwtId'      => null,
+            'identifier' => null,
         ];
 
         $userMapper = UserMapper::getInstance();
