@@ -32,7 +32,7 @@
             .c-chip__icon {
                 &::before {
                     display: inline-block;
-                    margin-inline-end: 0.25rem;
+                    margin-inline-end: var(--whitespace-xs);
                 }
 
                 &::after {
@@ -44,8 +44,7 @@
         & + label {
             align-items: center;
             border: 1px solid var(--content-ui-foreground);
-            //TODO - Eventually tie this back to a global roundness custom property / variable
-            border-radius: 1px;
+            border-radius: var(--roundness-interactibles);
             background-color: var(--content-ui-background);
             color: var(--content-ui-foreground);
             cursor: pointer;
@@ -81,11 +80,11 @@
                     border-radius: 2048px;
                     content: "";
                     display: flex;
-                    height: 0.25rem;
-                    margin-inline-end: 0.5rem;
-                    margin-inline-start: 0.25rem;
+                    height: var(--whitespace-xs);
+                    margin-inline-end: var(--whitespace-s);
+                    margin-inline-start: var(--whitespace-xs);
                     opacity: 0.5;
-                    width: 0.25rem;
+                    width: var(--whitespace-xs);
                 }
             }
         }
