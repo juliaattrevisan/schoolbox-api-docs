@@ -43,7 +43,7 @@ class ComponentsCest
         $i->canSee('Learning (12)');
         $i->canSee('Multimedia (9)');
         $i->canSee('Resources (4)');
-        $i->canSee('Feeds (6)');
+        $i->canSee('Feeds (5)');
 
         $i->amGoingTo('Check the tab Information presents the proper components');
         $homepage->clickComponentsTab($homepage::ELEMENT_COMPONENT_SECTION_INFORMATION);
@@ -155,8 +155,6 @@ class ComponentsCest
         $i->canSee('Podcast');
         $homepage->checkComponentIcon('Component_Homepage_RSSController');
         $i->canSee('RSS Feed');
-        $homepage->checkComponentIcon('Schoolbox_Twitter_Component_Homepage_Controller');
-        $i->canSee('Twitter');
         $homepage->checkComponentIcon('Component_Homepage_WolframController');
         $i->canSee('Wolfram|Alpha');
     }
