@@ -2,7 +2,8 @@
  *
  */
 
-import { ReferenceElement, computePosition, flip, shift } from "@floating-ui/dom";
+import { ReferenceElement, ComputePositionReturn, computePosition, flip, shift, Placement } from "@floating-ui/dom";
+import gsap from "gsap";
 import type { Ref } from "vue";
 
 /**
@@ -64,6 +65,43 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
     }
 
     /**
+     * To get the transform origin of the dropdown content, relative to where it's positioned
+     * @param {Placement} placement - The placement of the dropdown content
+     * @returns {string} - The transform origin
+     */
+    function getTransformOrigin(placement: Placement) {
+        if (placement === "bottom-end") {
+            return "top right";
+        }
+        if (placement === "top-end") {
+            return "bottom right";
+        }
+        if (placement === "bottom-start") {
+            return "top left";
+        }
+        if (placement === "top-start") {
+            return "top right";
+        }
+        return "top right";
+    }
+
+    /**
+     * To animate the opening of the dropdown content, relative to where it's positioned
+     * @param {ComputePositionReturn} position - The position of the dropdown content
+     */
+    function animateOpen(position: ComputePositionReturn) {
+        // dont animate if the user prefers reduced motion
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches ?? false;
+        gsap.from(content, {
+            opacity: 0,
+            scaleX: 0.95,
+            scaleY: 0.95,
+            transformOrigin: getTransformOrigin(position.placement),
+            duration: reduceMotion ? 0 : 0.3,
+        });
+    }
+
+    /**
      * Open the dropdown using @floating-ui/dom to position it relative to the trigger
      */
     async function open() {
@@ -76,6 +114,7 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
         content.style.left = `${position.x}px`;
         content.style.top = `${position.y}px`;
         content.setAttribute("aria-hidden", "false");
+        animateOpen(position);
     }
 
     /**
