@@ -43,7 +43,7 @@ class Common
     public const CLASS_ID_9AENG = 83;
     public const CLASS_ID_DEMO2 = 106;
 
-    public const SELECTOR_JELLY_TOT = '[data-test="dropdown-button-header-options"]';
+    public const SELECTOR_JELLY_TOT = '[data-test="wc-actions-dropdown-button-header-options"]';
 
     /**
      * Content element selector. This is where most of Schoolbox's dynamic

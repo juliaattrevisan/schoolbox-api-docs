@@ -61,7 +61,7 @@ class LessonPlanTemplateList
      */
     public function clickLessonPlanTemplateMenu(int $templateIdNumber): void
     {
-        $this->tester->click('[data-test="dropdown-button-lpt-' . $templateIdNumber . '"]');
+        $this->tester->click('[data-test="wc-actions-dropdown-button-lpt-' . $templateIdNumber . '"]');
     }
 
     /**

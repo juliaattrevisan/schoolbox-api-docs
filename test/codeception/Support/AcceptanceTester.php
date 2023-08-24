@@ -150,7 +150,7 @@ class AcceptanceTester extends Actor
         $i->loginAsAdmin();
         $i->searchBar($fullname);
         $i->click('a[title="Modify User"]');
-        $i->click('[data-test="dropdown-button-header-options"]');
+        $i->click('[data-test="wc-actions-dropdown-button-header-options"]');
         $i->click('a[title="Login as user"]');
         $i->waitForText($fullname, 5);
         $i->deleteSessionSnapshot($fullname);

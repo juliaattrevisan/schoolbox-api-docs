@@ -33,7 +33,7 @@ class Homepage
 
     public const ELEMENT_EDIT_COLUMNS_TAB = '#tabs-2';
 
-    public const LINK_MENU = '[data-test="dropdown-button-tab-control"]';
+    public const LINK_MENU = '[data-test="wc-actions-dropdown-button-tab-control"]';
 
     public const ELEMENT_COMPONENT_LAYOUT = '#component-layout';
     public const ELEMENT_COMPONENT_LAYOUT_TOP = self::ELEMENT_COMPONENT_LAYOUT . ' div.column-top';

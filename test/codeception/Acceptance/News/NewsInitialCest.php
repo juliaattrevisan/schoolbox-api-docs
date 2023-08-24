@@ -58,7 +58,7 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->click(['css' => '[data-test="dropdown-button-header-options"]']);
+        $i->click(['css' => '[data-test="wc-actions-dropdown-button-header-options"]']);
         $i->click('#unpublish-article');
         $i->waitForElementVisible(['css' => 'textarea#rejectedReason'], 5);
         $i->fillField(['css' => "textarea#rejectedReason"], "Testing unpublish");
@@ -187,8 +187,8 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
 
-        $i->waitForElementVisible(['css' => '[data-test="dropdown-button-header-options"]'], 5);
-        $i->click(['css' => '[data-test="dropdown-button-header-options"]']);
+        $i->waitForElementVisible(['css' => '[data-test="wc-actions-dropdown-button-header-options"]'], 5);
+        $i->click(['css' => '[data-test="wc-actions-dropdown-button-header-options"]']);
         $i->click(['css' => 'a.icon-delete']);
         $i->waitForElementVisible('#confirm-dialog-confirm-button', 8);
         $i->click('#confirm-dialog-confirm-button');

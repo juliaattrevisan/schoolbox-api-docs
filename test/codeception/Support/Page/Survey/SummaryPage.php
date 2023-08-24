@@ -85,7 +85,7 @@ class SummaryPage
         $i = $this->tester;
 
         // Jelly Tot!
-        $i->click('[data-test="dropdown-button-section' . $sectionId . '-options"]');
+        $i->click('[data-test="wc-actions-dropdown-button-section' . $sectionId . '-options"]');
         // Add from Question Bank
         $i->click('#section' . $sectionId . '-options a.icon-download');
 
@@ -104,7 +104,7 @@ class SummaryPage
         $i = $this->tester;
 
         // Jelly Tot!
-        $i->click('[data-test="dropdown-button-section' . $sectionId . '-options"]');
+        $i->click('[data-test="wc-actions-dropdown-button-section' . $sectionId . '-options"]');
         // Add from Question Bank
         $i->click('#section' . $sectionId . '-options a.icon-add');
 
