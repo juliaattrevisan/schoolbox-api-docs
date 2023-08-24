@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Link;
 
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Link as LinkModel;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
@@ -69,7 +70,7 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($links, $viewer) {
                 $link = $links->getBy('id', $match->id);
-                if ($link instanceof Link\Model) {
+                if ($link instanceof LinkModel) {
                     // Check if user has access to link's folder
                     $linkAccess = $this->access->getFolderAccess($viewer, $link->getFolder()->getId());
                     if ($linkAccess < UserAccess::ACCESS_READ) {
@@ -81,14 +82,14 @@ class Hydrator extends BaseHydrator
                     return new FullResult(
                         $match,
                         $match->id,
-                        $link->getTitle(),
+                        $link->getDescription(),
                         $this->buildBaseUrl()
                              ->withPath('send.php')
                              ->withQuery(http_build_query(['id' => $link->getId()]))
                              ->__toString(),
                         $match->type,
                         $match->relevance,
-                        $link->getModifiedAt(),
+                        $link->getModified(),
                         $link->getFolder(),
                         null,
                         // Image? show thumbnail, otherwise show mimetype thumb
