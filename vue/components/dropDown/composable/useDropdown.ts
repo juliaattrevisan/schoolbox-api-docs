@@ -89,8 +89,8 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
      * @returns {string} - The transform origin
      */
     function getTransformOrigin(placement: Placement) {
-        if (placement === "bottom-end") {
-            return "top right";
+        if (placement === "top-start") {
+            return "bottom left";
         }
         if (placement === "top-end") {
             return "bottom right";
@@ -98,7 +98,7 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
         if (placement === "bottom-start") {
             return "top left";
         }
-        if (placement === "top-start") {
+        if (placement === "bottom-end") {
             return "top right";
         }
         return "top right";
