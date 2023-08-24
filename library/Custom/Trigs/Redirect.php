@@ -22,7 +22,7 @@ class Redirect extends AbstractRedirect
     protected string $courseIdFormat = '%s_%s';
 
     /**
-     * The column used to find canvas course in course_dim table
+     * The column used to find canvas course in course table
      */
     protected string $courseCodeColumn = "sis_source_id";
 }

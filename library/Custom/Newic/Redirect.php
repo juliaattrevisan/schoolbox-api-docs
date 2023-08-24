@@ -84,8 +84,8 @@ class Redirect extends AbstractRedirect
              */
             $query = "
                 SELECT *
-                FROM assignment_dim
-                WHERE canvas_id = :assessmentCanvasId
+                FROM assignment
+                WHERE id = :assessmentCanvasId
             ";
 
             return $this->buildAssessmentUrl(
@@ -103,8 +103,8 @@ class Redirect extends AbstractRedirect
              */
             $query = "
                 SELECT *
-                FROM quiz_dim
-                WHERE canvas_id = :assessmentCanvasId
+                FROM quizzes
+                WHERE id = :assessmentCanvasId
             ";
 
             return $this->buildAssessmentUrl(

@@ -54,10 +54,7 @@ class CanvasDb
         if ($this->databaseName) {
             return $this->databaseName;
         }
-        if (
-            $this->config->get(ConfigMapper::_CANVAS_DATA2_SECRET)
-            && $this->config->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)
-        ) {
+        if ($this->isCanvasData2()) {
             return 'canvas_data2_' . INSTANCE_ID;
         }
         /**
@@ -65,6 +62,20 @@ class CanvasDb
          * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
          */
         return 'canvas_data_' . INSTANCE_ID;
+    }
+
+
+    /**
+     * @return bool
+     * @deprecated
+     * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
+     */
+    public function isCanvasData2(): bool
+    {
+        return (
+            $this->config->get(ConfigMapper::_CANVAS_DATA2_SECRET)
+            && $this->config->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)
+        );
     }
 
 

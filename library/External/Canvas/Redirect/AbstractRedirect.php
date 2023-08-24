@@ -30,9 +30,9 @@ class AbstractRedirect
     protected string $courseIdFormat = '%s%s';
 
     /**
-     * The column used to find canvas course in course_dim table
+     * The column used to find canvas course in course table
      */
-    protected string $courseCodeColumn = "code";
+    protected string $courseCodeColumn = 'course_code';
 
     /**
      * The host url for canvas instance at this school
@@ -148,8 +148,8 @@ class AbstractRedirect
          * Only care about the states "claimed" and "available", according to the cox
          */
         $query = "
-            SELECT canvas_id
-            FROM course_dim
+            SELECT id
+            FROM course
             WHERE {$this->courseCodeColumn} = :courseCode
             AND workflow_state IN ('claimed', 'available')
         ";
@@ -160,6 +160,6 @@ class AbstractRedirect
 
         $row = $statement->fetch();
 
-        return $row ? (int)$row['canvas_id'] : null;
+        return $row ? (int)$row['id'] : null;
     }
 }
