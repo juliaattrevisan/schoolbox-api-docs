@@ -3,7 +3,7 @@
  * Used to display a list of actions in a dropdown menu upon clicking a button (the jellytot!)
  */
 import type { Ref } from "vue";
-import { useDropdown } from "./composable/useDropdown";
+import { useDropdown } from "@schoolboxVue/composables/popOut/useDropdown";
 
 interface Props {
     /**
