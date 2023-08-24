@@ -3,6 +3,7 @@
  * Used to display a list of actions in a dropdown menu upon clicking a button (the jellytot!)
  */
 import type { Ref } from "vue";
+import WcButton from "@schoolboxVue/components/button/wc-button.ce.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 
 interface Props {
@@ -57,6 +58,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
                 <path d="m6 12h4v4h-4z" />
             </svg>
         </slot>
+        <wc-button></wc-button>
     </button>
 </template>
 
