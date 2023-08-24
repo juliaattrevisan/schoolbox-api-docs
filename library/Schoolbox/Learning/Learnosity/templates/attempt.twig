@@ -26,7 +26,7 @@
     itemsApp.on('test:submit:success', function() {
         let payload = new FormData();
         payload.append('attemptId', '{{ attemptId }}');
-        payload.append('learnosityReference','{{ learnosityReference }}');
+        payload.append('learnosityReference','{{ learnositySessionReference }}');
 
         fetch('{{ completionUrl }}', {
             method: 'POST',

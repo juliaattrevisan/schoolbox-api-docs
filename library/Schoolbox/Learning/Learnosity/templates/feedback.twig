@@ -19,7 +19,7 @@
          # Making this form synchronous and redirecting elsewere solves this random
          # issue, plus, the one in chrome where you can't see the async response
          #}
-        {% set postFeedbackUrl = routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnosityReference: attempt.learnosityReference}) %}
+        {% set postFeedbackUrl = routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnositySessionReference: attempt.learnosityReference}) %}
         <form id="feedback-form" action="{{ postFeedbackUrl }}" method="post">
             <section class="content">
                 <div id="schoolbox-student"></div>

@@ -6240,7 +6240,7 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getLearnosityReference\\(\\)\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/Learning/Learnosity/Controller.php
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setLearnosityReference\\(\\)\\.$#"

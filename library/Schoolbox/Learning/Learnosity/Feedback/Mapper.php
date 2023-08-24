@@ -63,4 +63,27 @@ class Mapper extends \Schoolbox\Mapper
 
         return $comments;
     }
+
+
+    /**
+     * Find all the comments for this set of learnosity references (response ids)
+     */
+    public function findByLearnosityReferences(array $learnosityReferences): array
+    {
+        $feedbacks = $this->findByColumn('learnosity_reference', $learnosityReferences)
+            ->indexBy('learnosityReference');
+
+        $comments = [];
+
+        foreach ($feedbacks as $feedback) {
+            /* Perform oembed replacements in advance because this gets
+             * injected into the dom directly
+             */
+            $feedback->setComment(\Scrub::html($feedback->getComment()));
+
+            $comments[$feedback->getLearnosityReference()] = $feedback->getComment();
+        }
+
+        return $comments;
+    }
 }

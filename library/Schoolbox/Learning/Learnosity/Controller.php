@@ -2,7 +2,7 @@
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -29,6 +29,12 @@ use Twig\Error\Error;
 
 class Controller extends Base
 {
+    /**
+     * A prefix for each report id attr in the front end
+     */
+    private const REPORT_HORIZONTAL_MARKING_PREFIX = 'schoolbox-student-';
+
+
     /**
      * Learnosity API instance is the same for everything afaict
      *
@@ -66,6 +72,7 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -97,7 +104,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'mode'      => 'activity_edit',
+            'mode'  => 'activity_edit',
             /* A Learnosity uuid that we arbitrarily prescribed
              */
             'reference' => $assessment->getLearnosityReference(),
@@ -107,8 +114,8 @@ class Controller extends Base
              *
              * TODO Waiting for learnosity to clarify
              */
-            'user'      => [
-                'id'        => (string)$this->getConfigLoader()->get('learnosity_author_id'),
+            'user' => [
+                'id' => (string)$this->getUser()->getId(),
                 /* These fields are superfluous and are presumably
                  * used for auditing; we attribute an individual user's
                  * name to a collectively-utilised author account
@@ -173,13 +180,14 @@ class Controller extends Base
      * Let a student do an attempt in a Learnosity quiz
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
      * @throws Deleted
+     * @throws Error
      * @throws Exception
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \Alaress\Database\Exception
-     * @throws RouteNotFound
      * @throws \JsonException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
@@ -239,8 +247,42 @@ class Controller extends Base
                     "show_outro" => false
                 ],
                 /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
+                 *
+                 * Perhaps more useful: https://reference.learnosity.com/items-api/initialization/config.regions
                  */
-                'regions'       => 'main',
+                'regions'       => [
+                    'top-left' => [
+                        ['type' => 'title_element'],
+                    ],
+                    'top-right' => [
+                        ['type' => 'itemcount_element'],
+                        ['type' => 'pause_button'],
+                        ['type' => 'reading_timer_element'],
+                        ['type' => 'timer_element'],
+                    ],
+                    'items' => [
+                        ['type' => 'progress_element'],
+                        ['type' => 'slider_element']
+                    ],
+                    'right' => [
+                        ['type' => 'save_button'],
+                        ['type' => 'reviewscreen_button'],
+                        ['type' => 'resource_button'],
+                        ['type' => 'accessibility_button'],
+                        ['type' => 'flagitem_button'],
+                        ['type' => 'masking_button'],
+                        ['type' => 'verticaltoc_element'],
+                    ],
+                    'bottom-left' => [
+                        [
+                            'type' => 'previous_button',
+                            'show_label_option' => true
+                        ],
+                    ],
+                    'bottom-right' => [
+                        ['type' => 'next_button'],
+                    ]
+                ],
                 /* This is our Quiz title, I guess
                  */
                 "title"         => $assessment->getTitle(),
@@ -248,7 +290,7 @@ class Controller extends Base
             ],
             /* Enable livestreaming lol
              */
-            'events' => true,
+            'events' => false,
             /* This is our Quiz title, I guess
              */
             'name'                 => $assessment->getTitle(),
@@ -281,9 +323,9 @@ class Controller extends Base
             'outroUrl' => $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
                 'assessmentId' => $assessment->getId(),
                 'studentId' => $student->getId(),
-                'learnosityReference' => $attempt->getLearnosityReference()
+                'learnositySessionReference' => $attempt->getLearnosityReference()
             ]),
-            'learnosityReference' => $attempt->getLearnosityReference(),
+            'learnositySessionReference' => $attempt->getLearnosityReference(),
         ], "Attempt {$assessment->getTitle()}");
 
         /* TODO Record the automated result somewhere (idk where)
@@ -344,9 +386,10 @@ class Controller extends Base
      * show some basic stats about your attempt
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -387,9 +430,10 @@ class Controller extends Base
      * show some in-depth stats about your attempt
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -460,9 +504,9 @@ class Controller extends Base
      * Provide feedback for an attempt
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
-     * @throws Exception
+     * @param User $student
+     * @param Model $attempt
+     * @throws Error
      * @throws ValidationException
      * @throws \JsonException
      * @throws \RuntimeException
@@ -472,8 +516,6 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
         /* This is what the student did
          */
         $reportPayload = [
@@ -710,54 +752,348 @@ class Controller extends Base
 
 
     /**
-     * Live Progress monitor thing for a quiz
+     * Start horizontal marking for a given quiz
      *
-     * Be sure to hit like and subscribe
-     * It really helps us out a lot
+     * This is grossly inefficient but there aren't many options available to us
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws Error
+     * @throws Exception
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \JsonException
+     * @throws \RuntimeException
      */
-    public function getLiveProgress(IAssessable $assessment): void
+    public function getHorizontalMarking(IAssessable $assessment): void
     {
-        $users = [];
+        /* Get the quiz identifier
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
-        foreach ($assessment->getParticipantUsers() as $user) {
-            $users[] = [
-                'id' => $user->getId(),
-                'name' => $user->getFullName(),
-                'hash' => hash('sha256', $user->getId() . $this->learnosityConsumerSecret)
-            ];
+        /* Get a list of attempts sorted by finish date
+         * This gives us the most recent attempt for a quiz, if a student did multiple attempts
+         *
+         * TODO What was supposed to happen for multiple attempts in a horizontal marking context?
+         */
+        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
+            'order' => [
+                'finish' => 'desc'
+            ]
+        ]);
+
+        /* Fetch all the assess_attempt.learnosity_references for $assessment
+         * for a student's most recent completed attempt and store then in a hashtable
+         *
+         * Remove this deduping if you wanted to show all attempts regardless of completion status.
+         */
+        $sessions = [];
+        $users = [];
+        $reportPayloads = [];
+        $attemptComments = [];
+        $urls = [];
+
+        foreach ($attempts as $attempt) {
+            $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
+
+            if (!isset($users[$key]) && $attempt->isFinished()) {
+                $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
+
+                /* Find all the comments for this attempt (need it later)
+                 */
+                $attemptComments[$attempt->getUser()->getId()] = [
+                    'reference' => $attempt->getLearnosityReference(),
+                    'comment' => $attempt->getComment()
+                ];
+
+                /* ...because Learnosity wants it in this format
+                 */
+                $users[$key] = [
+                    'id' => (string)$attempt->getUser()->getId(),
+                    'name' => $attempt->getUser()->getFullName(),
+                    'firstname' => $attempt->getUser()->getFirstname(),
+                    'lastname' => $attempt->getUser()->getLastname()
+                ];
+
+                /* Collate a report payload for this attempt
+                 * We're going to get them all and display them all at the same time
+                 * using css to hide all the questions except for the item_id
+                 * ($learnosityReference) currently determined.
+                 */
+                $reportPayloads[] = $this->api->initOptions('reports', [
+                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'reports' => [
+                        [
+                            /* DOM element id, where this goes in
+                             *
+                             * It's configurable by us, unlike the other anchors for
+                             * Author and Items api
+                             */
+                            'id' => $key,
+                            'type' => 'session-detail-by-item',
+                            'session_id' => $attempt->getLearnosityReference(),
+                            'questions_api_init_options' => [
+                                'showCorrectAnswers' => true
+                            ]
+                        ]
+                    ],
+                ]);
+
+                /* Pregenerate all the urls for each guy, because you can't manufacture them
+                 * in javascript without risking desync with backend
+                 */
+                $args = [
+                    'assessmentId' => $assessment->getId(),
+                    'studentId' => $attempt->getUser()->getId(),
+                    'learnositySessionReference' => $attempt->getLearnosityReference()
+                ];
+
+                $urls[$attempt->getUser()->getId()] = [
+                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+                ];
+            }
         }
 
-        $payload = [
-            'reports' => [
-                [
-                    'id' => 'live-progress',
-                    'type' => 'live-activitystatus-by-user',
-                    'activity' => [
-                        'id' => $assessment->getLearnosityReference(),
-                        'name' => $assessment->getTitle(),
-                    ],
-                    'show_user_selectors' => true,
-                    'show_action_controls' => true,
-                    'display_activity' => true,
-                    'users' => $users
-                ]
+        /* Sort alphabetically.
+         * Apparently this has been copypasted a bunch of times all over
+         * the place so I might as well add my two rupees to the pile
+         */
+        uasort($users, static function (array $a, array $b) {
+            $last = strnatcasecmp($a['lastname'], $b['lastname']);
+            if ($last === 0) {
+                return strnatcasecmp($a['firstname'], $b['firstname']);
+            }
+            return $last;
+        });
+
+        /* Find a list of Learnosity Items (questions) available in this quiz
+         * These are their references only
+         */
+        $itemReferences = $this->api->dataGetRequest('itembank/activities', [
+            'references' => [
+                $quiz->getLearnosityReference()
             ]
-        ];
+        ])['data'][0]['data']['items'];
 
-        new \Alaress_Probe($payload);
+        /* Find a list of Learnosity Items (questions) available in this quiz
+         * This includes more info about each item
+         */
+        $items = $this->api->dataGetRequest('itembank/items', [
+            'references' => array_column($itemReferences, 'id')
+        ])['data'];
 
-        $this->response = $this->responseFromTemplate('@learnosity/stream.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload),
+        /* Consolidate reference and titles into an in-order lookup
+         * (because $items is in some non-sequenced order)
+         */
+        foreach ($itemReferences as &$itemReference) {
+            $reference = $itemReference['reference'];
+
+            /* Find it in the set of $items
+             */
+            foreach ($items as $item) {
+                if ($reference === $item['reference']) {
+                    $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
+                    $itemReference['title'] = $title;
+                }
+            }
+        }
+
+        unset($itemReference);
+
+        /* Obtain their scores from Learnosity
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => array_values($sessions)
+        ])['data'];
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+
+        foreach ($responses as $session) {
+            foreach ($session['responses'] as $response) {
+                $learnosityReference = $response['response_id'];
+
+                $scores[$learnosityReference] = [
+                    'score' => $response['score'],
+                    'max' => $response['max_score']
+                ];
+            }
+        }
+
+        /* Find all the comments for these responses
+         */
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+
+        $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
+            'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
+            'users' => $users,
+            'usersEncoded' => json_encode($users, JSON_THROW_ON_ERROR),
             'assessment' => $assessment,
+            'itemReferences' => $itemReferences,
+            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
+            'responseComments' => base64_encode(json_encode($responseComments, JSON_THROW_ON_ERROR)),
+            'attemptComments' => $attemptComments,
+            'attemptReferences' => json_encode(array_values($sessions), JSON_THROW_ON_ERROR),
+            'urls' => json_encode($urls, JSON_THROW_ON_ERROR)
         ], sprintf(
-            'Livestream for %s',
+            'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
+    }
+
+
+    /**
+     * Persists a new score back to Learnosity for it to re-tally
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     * @throws ValidationException
+     * @throws \DomainException
+     * @throws \RuntimeException
+     */
+    public function postFeedbackScore(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* Fetch the response id first, because you need a bunch of stuff
+         * The response id (learnosity response reference) is in POST
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
+
+        /* Traverse to find the one you want to change, because you don't get
+         * a response_id filter in this endponit...
+         */
+        $updatedResponse = null;
+
+        foreach ($responses as $response) {
+            if ($this->requestPost->get('learnosityReference') === $response['response_id']) {
+                /* Update the returned payload with the new score
+                 * This is really similar to the implementation in postFeedback()
+                 */
+                $updatedResponse = $response;
+                $updatedResponse['score'] = $this->requestPost->get('score');
+
+                /* "When setting a non-zero score, the response must also be attempted."
+                 *    -- https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#updateResponseScores
+                 *
+                 * This includes responses that cannot be automagically calculated
+                 */
+                $updatedResponse['attempted'] = true;
+
+                /* If there's no max score, but the teacher gave a score, I guess
+                 * we just assume that to be the max score too...basically bonus
+                 * marks in this scenario
+                 */
+                if (null === $updatedResponse['max_score']) {
+                    $updatedResponse['max_score'] = $updatedResponse['score'];
+                }
+            }
+        }
+
+        /* TODO Couldn't find the response id requested;
+         *  This shouldn't happen, but what do we do now?
+         */
+        if (null === $updatedResponse) {
+            throw new \DomainException('Learnosity response identifier was not found.');
+        }
+
+        /* Use the learnosity Data API to send the revised payload which
+         * should now contain all the parts Learnosity expected
+         */
+        $this->api->dataUpdateRequest('/sessions/responses/scores', [
+            'sessions' => [
+                [
+                    'session_id' => $attempt->getLearnosityReference(),
+                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'responses' => [
+                        $updatedResponse
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+
+    /**
+     * Persists a new comment into quiz_feedback, associated with an attempt_id and a
+     * Learnosity Reference (it's a response id, but there's no official name for this)
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postFeedbackComment(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* The response id (learnosity response reference) is in POST.
+         *
+         * For the given attempt, see if there's already a row in quiz_feedback
+         * corresponding to the (attempt id, response id) tuple
+         *
+         * If there is, update it; otherwise create it
+         */
+        try {
+            $feedback = $this->feedbackMapper->findOneByColumnList([
+                'attempt_id' => $attempt->getId(),
+                'learnosity_reference' => $this->requestPost->get('learnosityReference')
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $feedback = $this->feedbackMapper->createModel()
+                ->setAttempt($attempt)
+                ->setLearnosityReference($this->requestPost->get('learnosityReference'));
+        }
+
+        /* Put the new/updated comment in
+         */
+        $feedback->setComment($this->requestPost->get('comment'));
+
+        /* Save it
+         */
+        $this->feedbackMapper->save($feedback);
+    }
+
+
+    /**
+     * Post a comment about a particular Attempt into assess_attempt.comment
+     * Predominantly used in horizontal marking's final screen
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postFeedbackAttemptComment(
+        IAssessable $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* Put the new/updated comment in
+         */
+        $attempt->setComment($this->requestPost->get('comment'));
+
+        /* Save it
+         */
+        $this->attemptMapper->save($attempt);
     }
 
 
@@ -859,163 +1195,6 @@ class Controller extends Base
         ], 'Example Activity List');
     }
 
-
-    /**
-     * Do an attempt
-     */
-    public function getItems(): void
-    {
-        /* This should be stored in assess_attempt and/or $_SESSION
-         * because this lets you resume your attempt where you left off
-         * Generating a new sessionId here causes you spawn a new attempt
-         * in Learnosity
-         */
-        // 381c864b-cb14-45e3-b901-0d5b493ece47 is one of my test attempts
-        $sessionId = Uuid::generate();
-
-        $quiz = [
-            'id' => '733',
-            'title' => 'schoolbox test quiz'
-        ];
-
-        $payload = [
-            /* Our internal Quiz implementation id, it seems?
-             */
-            'activity_id' => $quiz['id'],
-            "config" => [
-                "configuration" => [
-                    "idle_timeout" => [
-                        "interval" => 300
-                    ]
-                ],
-                "navigation" => [
-                    "auto_save" => [
-                        "save_interval_duration" => 300
-                    ],
-                    "show_intro" => true,
-                    "show_outro" => true
-                ],
-                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
-                 */
-                'regions' => 'main',
-                /* This is our Quiz title, I guess
-                 */
-                "title" =>  $quiz['title'],
-                "subtitle" => "This is a random subtitle"
-            ],
-            /* This is our Quiz title, I guess
-             */
-            'name' => $quiz['title'],
-            'rendering_type' => 'assess',
-            /* An "attempt identifier", I think
-             */
-            'session_id' => $sessionId,
-            /* This saves attempt results into Learnosity servers, enabling reporting etc.
-             * You can use 'local_practice' to preview a quiz.
-             * You can use 'feedback' to grade an attempt with feedback etc.
-             */
-            'type' => 'submit_practice',
-            /* A uniquely-identifying string for us, I think
-             */
-            'user_id' => (string)$this->getUser()->getId(),
-            'sections' => [
-                [
-                    'config' => [
-                        "configuration" => [
-                            "idle_timeout" => [
-                                "interval" => 300
-                            ]
-                        ],
-                        "navigation" => [
-                            "auto_save" => [
-                                "save_interval_duration" => 300
-                            ],
-                            "show_intro" => true,
-                            "show_outro" => true
-                        ],
-                        /* Each section can have their own unique
-                         * title/subtitle combo
-                         */
-                        'title' => 'Do this section first',
-                        'subtitle' => 'first section subtitle'
-                    ],
-                    'items' => [
-                        '7d6b64f9-88af-4e40-b74f-7895cccbff00',
-                        '0a64ef3b-eaff-43bc-a2ed-081305c2ee12'
-                    ]
-                ],
-                [
-                    'config' => [
-                        "configuration" => [
-                            "idle_timeout" => [
-                                "interval" => 300
-                            ]
-                        ],
-                        "navigation" => [
-                            "auto_save" => [
-                                "save_interval_duration" => 300
-                            ],
-                            "show_intro" => true,
-                            "show_outro" => true
-                        ],
-                        /* Each section can have their own unique
-                         * title/subtitle combo
-                         */
-                        'title' => 'Do this other section',
-                        'subtitle' => 'second section subtitle'
-                    ],
-                    'items' => [
-                        '572287db-3764-43be-b2e7-2af2e3ee9c2f'
-                    ]
-                ],
-            ],
-        ];
-
-        $this->response = $this->responseFromTemplate('@learnosity/items.twig', [
-            'initOptions' => $this->api->initOptions('items', $payload)
-        ], 'Example Item');
-    }
-
-
-    /**
-     * Get an overview for all the sessions conducted
-     *
-     * This gives teachers a strategic idea of how many questions were
-     * attempted correctly
-     *
-     * @return void
-     * @throws \JsonException
-     * @throws ValidationException
-     */
-    public function getSessionListReport(): void
-    {
-        $payload = [
-            'user_id' => (string)$this->getUser()->getId(),
-            'reports' => [
-                [
-                    /* DOM element id, where this goes in
-                     *
-                     * It's configurable by us, unlike the other anchors for
-                     * Author and Items api
-                     */
-                    'id' => 'schoolbox-result',
-                    'type' => 'sessions-list',
-                    'limit' => 100,
-                    'ui' => 'table',
-                    'activities' => [
-                        [
-                            'id' => '733',
-                            'name' => 'the thing'
-                        ]
-                    ]
-                ]
-            ],
-        ];
-
-        $this->response = $this->responseFromTemplate('@learnosity/sessionList.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload)
-        ], 'Example Session List');
-    }
 
     /**
      * TODO Literally copypasta'd

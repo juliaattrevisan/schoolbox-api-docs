@@ -62,6 +62,10 @@ class Module extends BaseModule
             return $this->preloadAttempt($params);
         };
 
+        $preloadAttemptForReview = function ($params) {
+            return $this->preloadAttemptForReview($params);
+        };
+
         /* Modify Learnosity contents for a given schoolbox quiz id
          */
         $this->register('GET', '/{assessmentId}/content', 'getContent', $instructorPerms, $preloadAssessment);
@@ -76,7 +80,7 @@ class Module extends BaseModule
 
         /* Conclude an attempt
          */
-        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnosityReference}', 'getCompleteAttempt', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getCompleteAttempt', $learnerPerms, $preloadAttempt);
 
         /* Start a new attempt
          */
@@ -85,23 +89,38 @@ class Module extends BaseModule
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
-        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnosityReference}', 'getReview', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerPerms, $preloadAttempt);
 
         /* Provide feedback to a student's attempt
          */
-        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'getFeedback', $instructorPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'getFeedback', $instructorPerms, $preloadAttemptForReview);
 
         /* Persist feedback to a student's attempt
          */
-        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnosityReference}', 'postFeedback', $instructorPerms, $preloadAttempt);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
+
+        /* Start horizontal marking using a Learnosity Report
+         */
+        $this->register('GET', '/{assessmentId}/horizontal', 'getHorizontalMarking', $instructorPerms, $preloadAssessment);
+
+        /* Provide updated score for a particular student response
+         * (used predominantly in horizontal marking)
+         */
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
+
+        /* Provide updated comment for a particular student response
+         * (used predominantly in horizontal marking)
+         */
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
+
+        /* Provide updated comment for a particular student attempt
+         * (used predominantly in horizontal marking)
+         */
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-comment', 'postFeedbackAttemptComment', $instructorPerms, $preloadAttemptForReview);
 
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
-
-        /* Livestream
-         */
-        $this->register('GET', '/{assessmentId}/stream', 'getLiveProgress', $instructorPerms, $preloadAssessment);
 
         /* Older exploratory urls that aren't part of our conventional workflow
          */
@@ -230,7 +249,7 @@ class Module extends BaseModule
         $participantPreload = $this->preloadAssessmentAndStudent($params);
 
         try {
-            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnosityReference']);
+            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnositySessionReference']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new NotFound();
         }
@@ -240,6 +259,9 @@ class Module extends BaseModule
          */
         $student = $participantPreload['student'];
 
+        /* Students can see if if they own it
+         * Otherwise get out
+         */
         if ((int)$student->getId() !== (int)$attempt->getUser()->getId()) {
             throw new NotFound();
         }
@@ -248,6 +270,39 @@ class Module extends BaseModule
             'attempt' => $attempt
         ]);
     }
+
+
+    /**
+     * Preloads an attempt via its learnosity session reference identifier
+     * If you provided a learnosity response reference identifier it'll try
+     * to populate and provide that too
+     *
+     * @param array $params
+     * @return array
+     * @throws Exception
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws NotFound
+     */
+    protected function preloadAttemptForReview(array $params): array
+    {
+        $participantPreload = $this->preloadAssessmentAndStudent($params);
+
+        try {
+            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnositySessionReference']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new NotFound();
+        }
+
+        /* Staff can always see it
+         */
+        return array_merge($participantPreload, [
+            'attempt' => $attempt
+        ]);
+    }
+
 
     /**
      * @inheritdoc

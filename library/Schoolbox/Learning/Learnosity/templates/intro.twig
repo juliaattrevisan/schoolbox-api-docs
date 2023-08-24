@@ -11,9 +11,21 @@
 
 <script src="https://items-au.learnosity.com/?v2023.2.LTS"></script>
 
+<div class="actions-small-2 row">
+    <div class="small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+    </div>
+    <nav>
+        <a class="icon-more" title="Horizontal Marking" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-menu" href="{{ routeLookupIfAuthorized('learnosity.getHorizontalMarking', {assessmentId: assessment.id, studentId: student.id}) }}">Horizontal Marking</a></li>
+    </ul>
+
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ assessment.title }}</h1>
         <section class="content">
             <article>{{ assessment.description | purify }}</article>
         </section>
@@ -38,6 +50,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>User</th>
                     <th>Start</th>
                     <th>Finish</th>
                     <th>Time Taken</th>
@@ -51,6 +64,7 @@
             {% for attempt in attempts %}
                 {% set finished = attempt.finish %}
                 <tr>
+                    <td>{{ attempt.user.fullname }}</td>
                     <td>{{ attempt.start.short }}</td>
                     <td>
                         {% if finished %}
@@ -92,8 +106,8 @@
                             {% if not finished %}
                                 <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                             {% else %}
-                                <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnosityReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
-                                <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnosityReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                                <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
+                                <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
                             {% endif %}
                         </nav>
                     </td>
