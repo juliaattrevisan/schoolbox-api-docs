@@ -37,29 +37,68 @@ class Controller extends Base
      * This screen is a FullCalendar view of all timetable-related subscriptions
      * for a specific user, $user
      *
-     * @param \Schoolbox\User $user
+     * @param \Schoolbox\User $user - The user whose timetable is to be retrieved.
      * @param string          $date
      * @return void
      * @throws \InvalidArgumentException
      */
     public function getTimetableCalendar(\Schoolbox\User $user, string $date): void
     {
-        /* Selected date
-         */
-        $selectedDate = (new \Alaress_Date_Format($date, 'd-m-Y'))->getDatabaseDate();
+        $loggedInUser = $this->getUser();
 
-        /* TODO: Figure out what happens when school weeks start on a weekend
-         */
-        $weekends = 'false';
+        // The children of $loggedInUser will be passed to the Twig template as $userOptions.
+        $userOptions = [];
+        foreach ($loggedInUser->getChildren() as $child) {
+            $campuses = $child->getCampusCollection();
+            $userOptions[] = [
+                'userId' => $child->getId(),
+                'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
+                'formattedName' => $child->formatName(),
+                'yearLevel' => $child->getYear()?->getLongName('Year')
+            ];
+        }
 
-        $this->response = $this->responseFromTemplate('@timetable/timetableCalendar.twig', [
-            'user' => $user,
-            'selectedDate' => $selectedDate,
-            'weekends' => $weekends
-        ], sprintf(
-            'Timetable Calendar for %s',
-            $user->getFullName()
-        ));
+        if (
+            // If the logged-in user is a parent, and not a superuser, and has requested their own timetable...
+            count($userOptions) > 0 &&
+            !$loggedInUser->isSuperuser() &&
+            $loggedInUser->getId() === $user->getId()
+        ) {
+            // Redirect to the timetable of the logged-in user's first child.
+            // (Parents do not need to see their own timetable - clarified in Jira comments for SA-16065).
+            $this->response = $this->redirectFound(
+                $this->routeGenerator->generate(
+                    'timetable.getTimetableCalendarRedirect',
+                    [
+                        'userId' => $userOptions[0]['userId']
+                    ]
+                )
+            );
+            return;
+        }
+
+        // The selected user is the $user.
+        $campuses = $user->getCampusCollection();
+        $selectedUserOption = [
+            'userId' => $user->getId(),
+            'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
+            'formattedName' => $user->formatName(),
+            'yearLevel' => $user->getYear()?->getLongName('Year')
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@timetable/timetableCalendar.twig',
+            // This data structure will be passed through the twig template to the Vue template (timetable-calendar.vue).
+            [
+                'options' => [
+                    'selectedDate' => (new \Alaress_Date_Format($date, 'd-m-Y'))->getDatabaseDate(),
+                    'selectedUserOption' => $selectedUserOption,
+                    'userOptions' => $userOptions,
+                    'weekends' => 'false' // TODO: Figure out what happens when school weeks start on a weekend.
+                ]
+            ],
+            'Timetable Calendar for ' . $user->getFullName()
+        );
     }
 
 

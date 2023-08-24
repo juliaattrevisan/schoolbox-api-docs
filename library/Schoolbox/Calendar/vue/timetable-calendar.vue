@@ -1,4 +1,5 @@
 <script>
+import TimetableCalendarOptions from "@schoolboxLibrary/Calendar/vue/timetable-calendar-options.vue";
 import FullCalendar from "@fullcalendar/vue3";
 import interactionPlugin from "@fullcalendar/interaction";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -61,6 +62,7 @@ export default {
     name: "timetable-calendar",
 
     components: {
+        TimetableCalendarOptions,
         FilterModal,
         ExportModal,
         CreateEventModal,
@@ -71,6 +73,15 @@ export default {
     },
 
     mixins: [fullCalendarHelper],
+
+    props: {
+        options: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
+    },
 
     data() {
         return {
@@ -88,6 +99,8 @@ export default {
             /* For deciding which display format to use
              */
             windowWidth: window.innerWidth,
+
+            selectedOption: null,
         };
     },
 
@@ -243,6 +256,23 @@ export default {
         let quickSwitchIcon = document.createElement("a");
         quickSwitchIcon.setAttribute("class", "adtp-btn icon-calendar no-text");
         document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
+
+        this.selectedOption = this.options["selectedUserOption"];
+
+        window.onpopstate = (event) => {
+            if (event.state === null || event.state.urlDate === null) {
+                console.error("Event.state and event.state.urlDate should always be set in window.onPopState()."); // Sanity check.
+                // See code pattern for dealing with URL history in https://github.com/alaress/schoolbox/pull/28761.
+            }
+            const date = dayjs(event.state.urlDate, FORMAT_FORM_DATE, true).toDate();
+            this.calendarApi.gotoDate(date);
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
+            this.updateListViewDateRangeFields(date, null, false);
+            this.changeUserAndReloadEvents(event.state.selectedOption, event.state.urlDate, false);
+        };
+
+        // Initialise history by setting the current state.
+        window.history.replaceState(this.getPageStateForUrlHistory(), "", window.location.href);
     },
 
     beforeDestroy() {
@@ -250,6 +280,50 @@ export default {
     },
 
     methods: {
+        /**
+         * @returns {object} containing the page's state, suitable for restoration in the window.onpopstate() function.
+         */
+        getPageStateForUrlHistory() {
+            return {
+                selectedOption: {
+                    // Must copy each field explicitly to avoid 'Proxy object could not be cloned' error.
+                    userId: this.selectedOption.userId,
+                    firstCampusName: this.selectedOption.firstCampusName,
+                    formattedName: this.selectedOption.formattedName,
+                    yearLevel: this.selectedOption.yearLevel,
+                },
+                urlDate: this.getCurrentValueOfUrlDate(), // Format DD-MM-YYY (FORMAT_FORM_DATE).
+            };
+        },
+
+        /**
+         * @param {object} newSelectedOption - Object like {userId: number, firstCampusName: string, formattedName: string, yearLevel: string}.
+         * @param {?string} newUrlDate - Date in format DD-MM-YYYY (FORMAT_FORM_DATE).
+         * @param {boolean} simulateRedirect
+         *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
+         */
+        changeUserAndReloadEvents(newSelectedOption, newUrlDate = null, simulateRedirect = true) {
+            if (simulateRedirect) {
+                // Push current state to history.
+                window.history.pushState(this.getPageStateForUrlHistory(), "", window.location.href);
+            }
+
+            // Update state.
+            this.selectedOption = newSelectedOption;
+            this.config.userId = this.selectedOption.userId;
+            this.reloadEvents();
+
+            // Replace current state in history object with the new state (and set the current URL to match that state).
+            window.history.replaceState(
+                this.getPageStateForUrlHistory(),
+                "",
+                "/timetable/calendar/" +
+                    (newUrlDate === null ? this.getCurrentValueOfUrlDate() : newUrlDate) + // Format DD-MM-YYYY (FORMAT_FORM_DATE).
+                    "/" +
+                    this.selectedOption.userId
+            );
+        },
+
         /**
          * Change the display format depending on viewport size
          */
@@ -731,16 +805,15 @@ export default {
          * Update list view's start and end dates on date navigation
          * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
          * I'm not sure if we can use it..
+         * @param {Date} start -
+         * @param {?Date} end -
+         * @param {boolean} simulateRedirect
+         *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
          */
-        updateListViewDateRangeField(start, end = null) {
-            /* This is the next/previous button on the date selector
-             * It needs to go to the new /timetable/calendar/... route
-             */
-            window.history.pushState(
-                "",
-                "",
-                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
-            );
+        updateListViewDateRangeFields(start, end = null, simulateRedirect = true) {
+            if (simulateRedirect) {
+                window.history.pushState(this.getPageStateForUrlHistory(), "", window.location.href);
+            }
 
             this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
             this.listViewDateRange.end = dayjs(end || new Date())
@@ -765,6 +838,12 @@ export default {
                 .val(this.listViewDateRange.end)
                 .attr("data-default-date", this.listViewDateRange.end)
                 .trigger("change");
+
+            window.history.replaceState(
+                this.getPageStateForUrlHistory(),
+                "",
+                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+            );
         },
 
         /**
@@ -773,7 +852,7 @@ export default {
         clickPrev() {
             this.calendarApi.prev();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeField(this.calendarApi.getDate(), this.calendarApi.getDate());
+            this.updateListViewDateRangeFields(this.calendarApi.getDate(), this.calendarApi.getDate(), true);
         },
 
         /**
@@ -782,7 +861,7 @@ export default {
         clickNext() {
             this.calendarApi.next();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeField(this.calendarApi.getDate(), this.calendarApi.getDate());
+            this.updateListViewDateRangeFields(this.calendarApi.getDate(), this.calendarApi.getDate(), true);
         },
 
         /**
@@ -791,7 +870,7 @@ export default {
         clickToday() {
             this.calendarApi.today();
             this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
-            this.updateListViewDateRangeField(this.calendarApi.getDate());
+            this.updateListViewDateRangeFields(this.calendarApi.getDate(), true);
         },
 
         /**
@@ -801,60 +880,109 @@ export default {
         onQuickSwitch(value) {
             this.calendarApi.gotoDate(value.selectedDate);
 
-            this.updateListViewDateRangeField(value.selectedDate, value.selectedDate);
+            this.updateListViewDateRangeFields(value.selectedDate, value.selectedDate, true);
+        },
+
+        /**
+         * Return the date that would be displayed in the URL bar, if the /timetable/calendar/{date}/{userId} route was
+         * in use.  There will not always be a date in the URL, because the other route (/timetable/calendar/{userId}
+         * may be in use.  The value to return is the Sunday that starts the currently displayed week.
+         * @returns {string} in FORMAT_FORM_DATE
+         */
+        getCurrentValueOfUrlDate() {
+            const startDateStr = document.querySelector("#start_date").value;
+            let dateObj = null;
+            if (startDateStr === null) {
+                dateObj = Date(); // Today is the default value for #start_date.
+            } else {
+                dateObj = dayjs(startDateStr, FORMAT_FLATPICKR_DATE, true).toDate();
+            }
+            dateObj = this.setDateObjToMostRecentSunday(dateObj);
+
+            return dayjs(dateObj).format(FORMAT_FORM_DATE);
+        },
+
+        /**
+         * @param {Date} date - Any Date.
+         * @returns {Date} - Date for the most recent Sunday on or before date.
+         */
+        setDateObjToMostRecentSunday(date) {
+            date.setDate(date.getDate() - date.getDay());
+            return date;
         },
     },
 };
 </script>
 
 <template>
-    <div>
-        <create-event-modal
-            ref="createEvent"
-            :user-id="config.userId"
-            :can-invite="config.canInvite"
-            :event-types="config.eventTypes"
-            :event-create-url="urls.create"
-            :event-create-form-url="urls.createForm"
-            :event-modify-form-url="urls.modifyForm"
-            :format-form-date="formats.formDate"
-            :format-form-datetime="formats.formDatetime"
-            :format-display-date="formats.displayDate"
-            :format-display-datetime="formats.displayDatetime"
-            @eventCreated="addEvent"
-        />
+    <timetable-calendar-options
+        :options="options"
+        :selected-option="selectedOption"
+        @option-selected="changeUserAndReloadEvents"
+    />
+    <div class="row">
+        <div class="small-12 columns">
+            <h1>
+                Timetable for
+                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span
+                >,
+                <span data-heading-user-year>{{ selectedOption === null ? "" : selectedOption.yearLevel }}</span>
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <div>
+                    <create-event-modal
+                        ref="createEvent"
+                        :user-id="config.userId"
+                        :can-invite="config.canInvite"
+                        :event-types="config.eventTypes"
+                        :event-create-url="urls.create"
+                        :event-create-form-url="urls.createForm"
+                        :event-modify-form-url="urls.modifyForm"
+                        :format-form-date="formats.formDate"
+                        :format-form-datetime="formats.formDatetime"
+                        :format-display-date="formats.displayDate"
+                        :format-display-datetime="formats.displayDatetime"
+                        @eventCreated="addEvent"
+                    />
 
-        <view-event-modal
-            ref="event"
-            :event-modify-form-url="urls.modifyForm"
-            :event-modify-form-action-url="urls.modifyFormAction"
-            :event-delete-url="urls.delete"
-            :event-update-url="urls.update"
-            :attendance-list-url="urls.attendanceList"
-            :attendance-toggle-url="urls.attendanceToggle"
-            :format-display-date="formats.displayDate"
-            :format-display-time="formats.displayTime"
-            :format-display-datetime="formats.displayDatetime"
-            :return-url="returnUrl()"
-            @eventModified="reloadEvents"
-            @eventDeleted="reloadEvents"
-        />
+                    <view-event-modal
+                        ref="event"
+                        :event-modify-form-url="urls.modifyForm"
+                        :event-modify-form-action-url="urls.modifyFormAction"
+                        :event-delete-url="urls.delete"
+                        :event-update-url="urls.update"
+                        :attendance-list-url="urls.attendanceList"
+                        :attendance-toggle-url="urls.attendanceToggle"
+                        :format-display-date="formats.displayDate"
+                        :format-display-time="formats.displayTime"
+                        :format-display-datetime="formats.displayDatetime"
+                        :return-url="returnUrl()"
+                        @eventModified="reloadEvents"
+                        @eventDeleted="reloadEvents"
+                    />
 
-        <full-calendar ref="fullCalendar" :options="calendarOptions">
-            <template #eventContent="arg">
-                <customised-calendar-event :content="arg" />
-            </template>
-        </full-calendar>
+                    <full-calendar ref="fullCalendar" :options="calendarOptions">
+                        <template #eventContent="arg">
+                            <customised-calendar-event :content="arg" />
+                        </template>
+                    </full-calendar>
 
-        <flat-pickr
-            ref="flatPickr"
-            :config="{
-                defaultDate: config.defaultDate,
-                selector: '.fc-quickSwitchButton-button',
-                disableMobile: true,
-            }"
-            @dateSelected="onQuickSwitch"
-        />
+                    <flat-pickr
+                        ref="flatPickr"
+                        :config="{
+                            defaultDate: config.defaultDate,
+                            selector: '.fc-quickSwitchButton-button',
+                            disableMobile: true,
+                        }"
+                        @dateSelected="onQuickSwitch"
+                    />
+                </div>
+            </section>
+        </div>
     </div>
 </template>
 
