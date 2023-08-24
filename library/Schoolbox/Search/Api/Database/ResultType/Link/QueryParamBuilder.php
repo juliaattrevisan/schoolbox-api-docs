@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api\Database\ResultType\File;
+namespace Schoolbox\Search\Api\Database\ResultType\Link;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
