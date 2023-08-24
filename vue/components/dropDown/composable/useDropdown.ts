@@ -7,14 +7,23 @@ import type { Ref } from "vue";
 
 /**
  * To toggle the display of the content when the button is selected
- * @param {Ref<HTMLElement>} button - The dropdown button
+ * @param {Ref<HTMLButtonElement>} button - The dropdown button
+ * @param {string} buttonLabel - The label to display on the button
  * @param {string} contentId - The id of the dropdown content
  * @returns {object} - The isOpen ref
  */
-export function useDropdown(button: Ref<HTMLElement>, contentId: string) {
+export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string, contentId: string) {
     const contentIdAttribute = "content-id"; // The attribute used to identify the dropdown content
     const isOpen = window.Vue.ref(false); // Whether the dropdown is open or not
     let content: HTMLElement; // The dropdown content, the element that's displayed when the button is selected
+
+    /**
+     * The label to display on the button,
+     * changes depending on whether the dropdown is open or not
+     */
+    const currentLabel = window.Vue.computed(() => {
+        return isOpen.value ? `Close ${buttonLabel}` : `Open ${buttonLabel}`;
+    });
 
     /**
      * Close the dropdown if it's open
@@ -109,5 +118,5 @@ export function useDropdown(button: Ref<HTMLElement>, contentId: string) {
         }
     });
 
-    return { isOpen, onButtonSelected };
+    return { currentLabel, isOpen, onButtonSelected };
 }

@@ -9,6 +9,9 @@
 // @variables
 //
 
+// We use this to control the background color
+$f-dropdown-bg: $content-ui-background;
+
 // We use these to control styles for the list elements.
 $f-dropdown-font-size: rem-calc(($base-font-size - 2));
 $f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-size - 3));
@@ -23,12 +26,11 @@ $f-dropdown-line-height: rem-calc(18) !default;
     height: auto;
     left: 0;
     list-style: none;
-    margin-bottom: 0;
+    margin: 0;
     max-height: none;
     max-width: 300px;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0;
     position: absolute;
     top: 0;
     width: 100%;

@@ -2,6 +2,7 @@
 /**
  * Used to display a list of actions in a dropdown menu upon clicking a button (the jellytot!)
  */
+import type { Ref } from "vue";
 import { useDropdown } from "./composable/useDropdown";
 
 interface Props {
@@ -13,14 +14,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
-const { isOpen, onButtonSelected } = useDropdown(button, props.contentId);
-
-/**
- * The label to display on the button
- */
-const currentLabel = window.Vue.computed(() => {
-    return isOpen.value ? `Close ${props.buttonLabel}` : `Open ${props.buttonLabel}`;
-});
+const { currentLabel, isOpen, onButtonSelected } = useDropdown(
+    button as Ref<HTMLButtonElement>,
+    props.buttonLabel,
+    props.contentId
+);
 </script>
 
 <template>
