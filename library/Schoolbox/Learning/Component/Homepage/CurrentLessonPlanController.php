@@ -8,6 +8,9 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMappe
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
@@ -46,7 +49,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
     public function execute(): bool
     {
         $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
-        $student = $this->getUser();
+        $student        = $this->getUser();
 
         /**
          * If parent role, or user has no subjects
@@ -56,19 +59,36 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             return false;
         }
 
-        $lessonPlanMapper = LessonPlanMapper::getInstance();
+        $lessonPlanMapper     = LessonPlanMapper::getInstance();
         $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
+
+        /**
+         * Get all Courses for the homepage, so we can use these to hydrate the assessment specification later
+         */
+        $courses = CourseImplementationMapper::GetInstance()->findByFolderId($this->getContext()->getFolder()->getId())
+                                             ->indexByCallback(function (CourseImplementationModel $course) {
+                                                 return $course->getSpecification()->getId();
+                                             });
 
         $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
 
-        $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
-        $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
+        $dateStart   = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
+        $dateEnd     = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
         $publishDate = \Alaress_Date_Format::now();
 
         // grab the assessmentID for all lesson plans from the students subject list
         $assessmentIds = $lessonPlanMapper->findForFolder([$this->getContext()->getFolder()->getId()], $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
         // hydrate those assessments
-        $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]);
+        $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order' => ['due_date' => 'DESC']]);
+        /** @var Assessment\LessonPlan\Model $lessonPlan * */
+        foreach ($this->visibleLessonPlans as $lessonPlan) {
+            /**
+             * Use the courses that exist in this homepage, and overwrite the incomplete course specification from the lesson plan
+             */
+            if ($lessonPlan->getContext() instanceof UnitImplementation) {
+                $lessonPlan->getContext()->getSpecification()->setCourse($courses->offsetGet($lessonPlan->getContext()->getSpecification()->getCourse()->getId())->getSpecification());
+            }
+        }
 
         return true;
     }
