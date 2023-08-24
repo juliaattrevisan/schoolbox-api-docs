@@ -11,7 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Link;
 
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Link;
+use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -30,11 +30,11 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param Link\Mapper $linkMapper Used to fetch links for hydration.
+     * @param LinkMapper $linkMapper Used to fetch links for hydration.
      * @param Access      $access     Used to determine if the current user may view this page.
      */
     public function __construct(
-        private Link\Mapper $linkMapper,
+        private LinkMapper $linkMapper,
         private Access $access,
     ) {
     }
