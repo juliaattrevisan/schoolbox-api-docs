@@ -162,10 +162,12 @@ class ScheduleCompiler
     {
         $periodIds = [];
 
-        foreach ($this->timetableDefinition as $weekId => $weekData) {
-            foreach ($weekData['days'] as $day) {
-                foreach ($day['periods'] as $periodId => $periodData) {
-                    $periodIds[$periodId] = $periodId;
+        foreach ($this->timetableDefinition as $divisionId => $division) {
+            foreach ($division as $weekId => $weekData) {
+                foreach ($weekData['days'] as $day) {
+                    foreach ($day['periods'] as $periodId => $periodData) {
+                        $periodIds[$periodId] = $periodId;
+                    }
                 }
             }
         }

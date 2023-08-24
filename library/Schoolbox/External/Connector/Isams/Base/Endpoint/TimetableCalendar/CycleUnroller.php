@@ -95,6 +95,8 @@ class CycleUnroller
          */
         foreach ($timetableAllocations as $timetableAllocation) {
             $weekId = (int)$timetableAllocation->TimetableWeekId;
+            $divisionId = (int)$timetableAllocation->Division;
+
             $week = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/Structure/Week[@Id='{$weekId}']")[0];
 
             /* The ISO Week number in this calendar year
@@ -104,7 +106,7 @@ class CycleUnroller
             /* Make a megastruct that is basically the "timetable definition"
              * for each week, consisting of its days and periods
              */
-            $stack[$weekIndex] = [
+            $stack[$divisionId][$weekIndex] = [
                 'week' => [
                     'isamsId' => $weekId,
                     'index' => $weekIndex,

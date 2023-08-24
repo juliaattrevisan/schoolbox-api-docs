@@ -116,13 +116,13 @@ class Classes implements IStrategy
         /* Unroll the cyclic grid into a flat calendar format
          * (this part is pretty quick)
          */
-        $timetableDefinition = (new CycleUnroller($this->api))->unroll();
+        $timetableDefinitions = (new CycleUnroller($this->api))->unroll();
 
         /* Used to shank info about classes and their humans iteratively
          * because we don't need to load *everything* at the start, just
          * as we go
          */
-        $scheduleCompiler = new ScheduleCompiler($this->log, $this->api, $timetableDefinition);
+        $scheduleCompiler = new ScheduleCompiler($this->log, $this->api, $timetableDefinitions);
 
         /* Shank information about the periods occurring during $timetableDefinition
          */
@@ -132,25 +132,29 @@ class Classes implements IStrategy
          * obtain more detailed info as you iteratively proceed
          * (this part so slow we do it separately)
          */
-        foreach ($timetableDefinition as $weekId => $weekData) {
-            foreach ($weekData['days'] as $dayData) {
-                foreach ($dayData['periods'] as $periodId => $periodData) {
-                    /* guid prefix is serialized with these pieces:
-                     *     isams timetable id
-                     *     isams day id
-                     *     isams period id
-                     */
-                    $guidPrefix = sprintf(
-                        '%s.%s.%s',
-                        $weekId,
-                        $dayData['isamsId'],
-                        $periodId
-                    );
+        foreach ($timetableDefinitions as $divisionId => $division) {
+            foreach ($division as $weekId => $weekData) {
+                foreach ($weekData['days'] as $dayData) {
+                    foreach ($dayData['periods'] as $periodId => $periodData) {
+                        /* guid prefix is serialized with these pieces:
+                         *     isams division id
+                         *     isams timetable id
+                         *     isams day id
+                         *     isams period id
+                         */
+                        $guidPrefix = sprintf(
+                            '%s.%s.%s.%s',
+                            $divisionId,
+                            $weekId,
+                            $dayData['isamsId'],
+                            $periodId
+                        );
 
-                    /* Some periods don't have anything on; that arg is set
-                     * to null in those circumstances
-                     */
-                    $this->processClass($scheduleCompiler, $guidPrefix, $dayData, $periodData, $schedules[$periodId] ?? null);
+                        /* Some periods don't have anything on; that arg is set
+                         * to null in those circumstances
+                         */
+                        $this->processClass($scheduleCompiler, $guidPrefix, (string)$divisionId, $dayData, $periodData, $schedules[$periodId] ?? null);
+                    }
                 }
             }
         }
@@ -173,6 +177,7 @@ class Classes implements IStrategy
     private function processClass(
         ScheduleCompiler $scheduleCompiler,
         string $guidPrefix,
+        string $divisionId,
         array $dayData,
         array $periodData,
         ?array $classes
@@ -194,10 +199,10 @@ class Classes implements IStrategy
          */
         foreach ($classes['schedule'] as $scheduleId => $classData) {
             $subject = $scheduleCompiler->findSubject($classData['code']);
-
+            
             /* Save sis_event record
              */
-            $event = $this->createEvent($guidPrefix, $dayData, $periodData, $classData, $subject);
+            $event = $this->createEvent($guidPrefix, $divisionId, $dayData, $periodData, $classData, $subject);
 
             /* Save sis_class record
              */
@@ -225,6 +230,7 @@ class Classes implements IStrategy
      */
     private function createEvent(
         string $guidPrefix,
+        string $divisionId,
         array $dayData,
         array $periodData,
         array $classData,
@@ -300,10 +306,11 @@ class Classes implements IStrategy
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->info(sprintf(
-            '%s timetable event %s (%s) on day %s, period %s, %s-%s',
+            '%s timetable event %s (%s) in division %s, on day %s, period %s, %s-%s',
             $logPrefix,
             $event->getTitle(),
             $event->getCode(),
+            $divisionId,
             $event->getDay(),
             $event->getPeriod(),
             $event->getStartAt()->getDatabase(),
