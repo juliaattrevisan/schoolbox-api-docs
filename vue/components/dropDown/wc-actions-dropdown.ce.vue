@@ -6,8 +6,14 @@ import type { Ref } from "vue";
 import { useDropdown } from "./composable/useDropdown";
 
 interface Props {
-    contentId: string; // the id of the content to display
-    buttonLabel?: string; // the label to display on the button
+    /**
+     * The id of the content to display
+     */
+    contentId: string;
+    /**
+     * The label to display on the button
+     */
+    buttonLabel?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     buttonLabel: "Actions Dropdown",
@@ -60,33 +66,5 @@ const { currentLabel, isOpen, onButtonSelected } = useDropdown(
 // This means that we cannot use the global styles to style the component
 // It looks like the ability to opt out of the shadow DOM is hopefully coming soon however
 @import "../../../www/static/css/core/ui/button/_c-button.scss";
-
-// To match the typical background colour of the dropdown content
-// and better visually connect the button to the content
-button.c-button[aria-expanded="true"] {
-    background-color: var(--content-ui-background);
-    opacity: 1;
-    &:hover,
-    &:active {
-        background-color: var(--content-ui-background);
-    }
-    &:focus {
-        box-shadow: none;
-    }
-}
-
-// As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
-button.f-match-existing-styles {
-    height: 42px !important;
-    min-height: 42px !important;
-    width: 40px !important;
-    opacity: 0.7;
-    &:hover,
-    &:active {
-        opacity: 1;
-    }
-    &:focus {
-        box-shadow: 0 0 0 2px currentColor;
-    }
-}
+@import "../../../www/static/css/core/components/dropdowns/_actions-dropdown.scss";
 </style>

@@ -1,5 +1,5 @@
 /**
- *
+ *  To toggle the display of the content when the button is selected
  */
 
 import { ReferenceElement, ComputePositionReturn, computePosition, flip, shift, Placement } from "@floating-ui/dom";
@@ -34,7 +34,6 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
             isOpen.value = false;
             content.style.display = "none";
             content.setAttribute("aria-hidden", "true");
-            console.warn("close");
         }
     }
 
