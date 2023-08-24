@@ -202,7 +202,7 @@ class Classes implements IStrategy
 
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!(new Watchlist())->isAnyOnWatchlist($this->findInvolvedExternalids($subject, $classData), $this->watchlist)) {
+            if (!(new Watchlist())->isAnyOnWatchlist($this->findInvolvedExternalIds($subject, $classData), $this->watchlist)) {
                 continue;
             }
 
@@ -226,7 +226,7 @@ class Classes implements IStrategy
      * In iSAMS we build a timetable and find out who's in it,
      * rather than pick a guy and build their timetable
      */
-    private function findInvolvedExternalids(array $subject, array $classData)
+    private function findInvolvedExternalIds(array $subject, array $classData)
     {
         $substituteStaff = [];
 
