@@ -313,18 +313,12 @@ export default {
             this.config.userId = this.selectedOption.userId;
             this.reloadEvents();
 
-            // Generate new URL.
-            let newUrlDateObj =
-                newUrlDate === null
-                    ? this.getCurrentValueOfUrlDate()
-                    : dayjs(newUrlDate, FORMAT_FORM_DATE, true).toDate();
-
             // Replace current state in history object with the new state (and set the current URL to match that state).
             window.history.replaceState(
                 this.getPageStateForUrlHistory(),
                 "",
                 "/timetable/calendar/" +
-                    dayjs(newUrlDateObj).format(FORMAT_FORM_DATE) +
+                    (newUrlDate === null ? this.getCurrentValueOfUrlDate() : newUrlDate) + // Format DD-MM-YYYY (FORMAT_FORM_DATE).
                     "/" +
                     this.selectedOption.userId
             );
