@@ -85,7 +85,13 @@ class Controller extends Base
     public function recoverSession(): void
     {
         if (array_key_exists('previous', $_SESSION)) {
-            $_SESSION = $_SESSION['previous'];
+            $user = $_SESSION['previous']['user'] ?? null;
+            if ($user instanceof User) {
+                $session = new \Session();
+                if (!$session->create($user->getUsername())) {
+                    $session->destroy();
+                }
+            }
         }
         $this->response = $this->redirectFound('/');
     }
