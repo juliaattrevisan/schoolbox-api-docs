@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import WcActionsDropdown from "@schoolboxVue/components/dropDown/wc-actions-dropdown.ce.vue";
+import WcActionsDropdown from "@schoolboxVue/components/dropdown/wc-actions-dropdown.ce.vue";
 
 /**
  * Storybook meta data, any default properties that are passed into every story

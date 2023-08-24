@@ -4,7 +4,7 @@
  * And using Vue with web components here: https://vuejs.org/guide/extras/web-components.html
  */
 
-import WcActionsDropdown from "./components/dropDown/wc-actions-dropdown.ce.vue";
+import WcActionsDropdown from "./components/dropdown/wc-actions-dropdown.ce.vue";
 
 /**
  * Register all web components here
