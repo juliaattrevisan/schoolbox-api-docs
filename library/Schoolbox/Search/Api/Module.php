@@ -89,6 +89,7 @@ class Module extends BaseModule
                 new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
