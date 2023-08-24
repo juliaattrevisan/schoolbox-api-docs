@@ -76,17 +76,16 @@ export default {
     },
     async mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
-        window.onpopstate = async function (event) {
-            // NOTE: event.state will be null unless the state has been saved using history.pushState().
+        window.onpopstate = async (event) => {
+            // NOTE: event.state should never be null because of the history.replaceState() call in this.loadFilteredContent().
             this.setSelectedTagAndFiltersToMatchState(event.state);
-
             await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
-            this.onChangeFilters(this.selectedTag, false);
+            this.loadFilteredContent(this.selectedTag, false);
         };
 
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
         await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
-        this.onChangeFilters(this.selectedTag, false);
+        this.loadFilteredContent(this.selectedTag, false);
 
         // Ensure dropdowns are initialised
         this.$nextTick(() => {
@@ -115,6 +114,8 @@ export default {
 
         /**
          * Appends learning evidence to the data list.
+         *
+         * @param {string} cursor -
          */
         async append(cursor) {
             const params = {};
@@ -142,8 +143,8 @@ export default {
         /**
          * Groups learning evidence / badges by the date which it was posted.
          *
-         * @param {Array} feedResults
-         * @return Array
+         * @param { Array } feedResults -
+         * @returns { Array } -
          */
         groupFeedResults(feedResults) {
             let groupedEvidenceByDate = {};
@@ -176,7 +177,8 @@ export default {
         /**
          * Renders the created-at time as a string.
          *
-         * @param {Moment} createdAt
+         * @param {object} createdAt -
+         * @returns {string} - Created at date in human-readable format.
          */
         renderCreatedAt(createdAt) {
             let now = dayjs().startOf("d"),
@@ -204,17 +206,17 @@ export default {
         /**
          * Does this evidence have a menu?
          *
-         * @param evidence
-         * @returns {Boolean}
+         * @param { object } evidence -
+         * @returns { boolean } -
          */
         hasMenu(evidence) {
-            return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm);
+            return Boolean(evidence?.links?.modifyForm || evidence?._links?.deleteForm);
         },
 
         /**
          * Display the delete modal for a piece of evidence.
          *
-         * @param {Object} evidence
+         * @param { object } evidence -
          */
         showDeleteModal(evidence) {
             this.currentlyDeletingEvidence = evidence;
@@ -224,7 +226,7 @@ export default {
         /**
          * Actually delete this evidence.
          *
-         * @param {Object} evidence
+         * @param { object } evidence -
          */
         async deleteEvidence(evidence) {
             this.$refs.toast.activate("Deleting...");
@@ -262,7 +264,7 @@ export default {
         /**
          * Open the view badge award modal.
          *
-         * @param {Object} badgeAward The badge award object to display
+         * @param {object} badgeAward - The badge award object to display
          */
         openViewBadgeAwardModal(badgeAward) {
             this.$refs.awardDetailModal.open(badgeAward);
@@ -271,10 +273,9 @@ export default {
         /**
          * Format the date as specified
          *
-         * @param { Date }
-         * @param { String }
-         *
-         * @returns { String }
+         * @param {Date} date -
+         * @param {string} format -
+         * @returns {string} -
          */
         formatDate(date, format) {
             return dayjs(date).format(format);
@@ -288,7 +289,7 @@ export default {
         /**
          * to open up the node details modal
          *
-         * @param { Object }
+         * @param {object} node -
          */
         onCodeSelected(node) {
             this.selectedNode = node;
@@ -296,76 +297,70 @@ export default {
         },
 
         /**
-         * @param selectedTag { String } Blank string means no selected tag.
-         * @param saveFiltersState { Boolean }
+         * Load new content based on the changed state of the filters, and optionally simulate a redirect.
+         * The point of simulating a redirect is to enable use of the back button to visit previous filter states, and
+         * enable sharing of the URL of the page in a particular filter state.
+         *
+         * @param { string } selectedTag -
+         * @param { boolean } simulateRedirect
+         *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
          */
-        onChangeFilters(selectedTag, saveFiltersState) {
-            this.selectedTag = selectedTag;
-
+        loadFilteredContent(selectedTag, simulateRedirect) {
             // Note Regarding behaviour when all-checked/none-checked
             // ------------------------------------------------------
             // If all checkboxes are checked, we leave them that way.
             // We could have decided to uncheck all in this situation, to match the default state of all unchecked,
             // which behaves the same as if all were checked.  However, we decided it would be less confusing to the
-            // user if checking the last checkbox resulted in all being checked rather than none being checkked.
+            // user if checking the last checkbox resulted in all being checked rather than none being checked.
 
-            if (saveFiltersState) {
-                this.saveFiltersStateToBrowserHistory();
+            this.selectedTag = selectedTag;
+
+            if (simulateRedirect) {
+                // Push the old filters state to the history object.
+                history.pushState(this.getFiltersStateFromUrl(), "", window.location.href);
             }
 
-            this.load();
-        },
-
-        /**
-         * Save the state of the filters to the browser history.  The purpose of doing this is to enable use of the
-         * back button to visit previous filter states, and to enable sharing of the URL for the page in a particular
-         * filter state.
-         */
-        saveFiltersStateToBrowserHistory() {
+            // Get the new filters state from the DOM, and create a new URL to match that state.
             let filtersState = this.getFiltersStateFromDom();
             let newUrl = new URL(window.location.href);
-
             newUrl.searchParams.delete("tag");
-            if (filtersState.tag !== "") {
-                newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
-            }
-
-            // Only save filter state to URL if not all filters are selected.
             newUrl.searchParams.delete("filterNames[]");
-            if (filtersState.filterNames.length !== Object.keys(this.selectedFilters).length) {
+            if (filtersState !== null) {
+                if (filtersState.tag !== "") {
+                    newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
+                }
+
                 for (let filterName of filtersState.filterNames) {
                     newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
                 }
             }
 
-            history.pushState(filtersState, "", newUrl.toString());
+            // Get new content based on changed filters state.
+            this.load();
+
+            // Replace the current state in the history object with the new state (and set the current URL to match that state).
+            history.replaceState(filtersState, "", newUrl.toString());
         },
 
         /**
          * Generate a filterState object from the URL parameters (if there are any).
-         * If there are no recognised URL parameters, the return value will be null.
          *
          * The URL is expected to have parameters like this:
          *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
-         *    * Both parameters ('tag' and 'filterNames') are optional
-         *    * filterNames are expected to match the keys from this.selectedFilters.
+         *    - Both parameters ('tag' and 'filterNames') are optional
+         *    - filterNames are expected to match the keys from this.selectedFilters.
          *
-         * Example of non-null return value:
+         * Example of return value:
          *    {
-         *       filterNames: ['feedback', 'learningMoments'],
+         *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
          *       tag: '' { String }
          *    }
          *
-         * @return { ?Object }
-         *
+         * @returns {?object} -
          * @see this.getFiltersStateFromDom()
          */
         getFiltersStateFromUrl() {
             let url = new URL(window.location.href);
-
-            if (Array.from(url.searchParams).length === 0) {
-                return null;
-            }
 
             let filtersState = { tag: "", filterNames: [] };
 
@@ -400,8 +395,7 @@ export default {
          *       tag: '' { String }
          *    }
          *
-         * @return { Object }
-         *
+         * @returns {object} -
          * @see this.getFiltersStateFromUrl()
          */
         getFiltersStateFromDom() {
@@ -417,7 +411,7 @@ export default {
         },
 
         /**
-         * @param filtersState { ?Object }
+         * @param  {?object} filtersState -
          *
          * Example of non-null filtersState object:
          *    {
@@ -438,12 +432,8 @@ export default {
                 this.selectedTag = filtersState.tag;
 
                 // Restore state of filter checkboxes.
-                const allFiltersAreSelected =
-                    Array.from(this.selectedFilters).length === filtersState.filterNames.length;
                 for (const filterName of Object.keys(this.selectedFilters)) {
-                    this.selectedFilters[filterName] = allFiltersAreSelected
-                        ? true
-                        : filtersState.filterNames.includes(filterName);
+                    this.selectedFilters[filterName] = filtersState.filterNames.includes(filterName);
                 }
             }
         },
@@ -529,7 +519,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-learningMoments"
                                         name="includeLearningMoments"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.learningMoments"
                                     />
                                     <label for="filter-learningMoments">Learning Moments</label>
@@ -540,7 +530,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-goals"
                                         name="includeGoals"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.goals"
                                         :true-value="true"
                                         :false-value="false"
@@ -553,7 +543,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-achievements"
                                         name="includeAchievements"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.achievements"
                                     />
                                     <label for="filter-achievements">Achievements</label>
@@ -564,7 +554,7 @@ export default {
                                         data-filter-checkbox
                                         id="filter-feedback"
                                         name="includeDueWork"
-                                        @click="onChangeFilters('', true)"
+                                        @click="loadFilteredContent('', true)"
                                         v-model="selectedFilters.feedback"
                                     />
                                     <label for="filter-feedback">Feedback</label>
@@ -575,7 +565,7 @@ export default {
                             <template v-if="selectedTag !== ''">
                                 <p>
                                     Showing tag "{{ selectedTag }}"
-                                    <span class="anchor-style" id="removeFilters" @click="onChangeFilters('', true)"
+                                    <span class="anchor-style" id="removeFilters" @click="loadFilteredContent('', true)"
                                         >(remove)</span
                                     >
                                 </p>
@@ -710,7 +700,7 @@ export default {
                                                     <template v-if="index !== 0">, </template>
                                                     <span
                                                         class="anchor-style"
-                                                        @click="onChangeFilters(tag.name, true)"
+                                                        @click="loadFilteredContent(tag.name, true)"
                                                         title="Click to only show items with this tag."
                                                         >{{ tag.name }}</span
                                                     >
