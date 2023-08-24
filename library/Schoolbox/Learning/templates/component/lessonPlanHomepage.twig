@@ -55,16 +55,18 @@
                 {% endif %}
 
                 <li{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %} data-unit-assessment="{{ lesson.id }}">
-                    <div class="card small-12">
-                        <h3>
-                            <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
-                        </h3>
-                        <p class="meta">
-                            {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% endif %} | {{ unit.title }}
-                        </p>
-                        <p class="meta">
-                            {{ dueDate.forAssessment(lesson) }}
-                        </p>
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <h3>
+                                <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
+                            </h3>
+                            <p class="meta">
+                                {% if unit.specification.course.folder %}{{ unit.specification.course.folder.name }}{% endif %} | {{ unit.title }}
+                            </p>
+                            <p class="meta">
+                                {{ dueDate.forAssessment(lesson) }}
+                            </p>
+                        </div>
                     </div>
                     {% if hasAssessmentRoutes or hasCourseRoutes %}
                         {% set dropdownId = "options-component" ~ component.instance.id ~ "-lessonplan" ~ lesson.id %}
