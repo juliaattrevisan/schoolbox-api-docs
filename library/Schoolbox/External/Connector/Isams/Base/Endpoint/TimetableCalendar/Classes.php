@@ -139,14 +139,12 @@ class Classes implements IStrategy
                 foreach ($weekData['days'] as $dayData) {
                     foreach ($dayData['periods'] as $periodId => $periodData) {
                         /* guid prefix is serialized with these pieces:
-                         *     isams division id
                          *     isams timetable id
                          *     isams day id
                          *     isams period id
                          */
                         $guidPrefix = sprintf(
-                            '%s.%s.%s.%s',
-                            $divisionId,
+                            '%s.%s.%s',
                             $weekId,
                             $dayData['isamsId'],
                             $periodId
