@@ -31,7 +31,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Build WHERE params such that
      * * deleted links are never fetched
      * * hidden links _are_ fetched (as whether the viewer can view the link will be determined in the hydrator)
-     * * links whose url or description contain `$keyword` are fetched
+     * * links whose url or comment or description contain `$keyword` are fetched
      *
      * @param string $keyword
      * @return array
@@ -44,6 +44,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             'l.description LIKE :linkKeywordLike',
+            'l.comment LIKE :linkKeywordLike',
             'l.url LIKE :linkKeywordLike',
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
@@ -84,13 +85,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The link's title is its `description`.
+     * The link's title is its `comment`.
      *
      * @return string
      */
     protected function buildTitleExpression(): string
     {
-        return 'l.description';
+        return 'l.comment';
     }
 
     /**

@@ -82,7 +82,7 @@ class Hydrator extends BaseHydrator
                     return new FullResult(
                         $match,
                         $match->id,
-                        $link->getDescription(),
+                        $link->getComment(),
                         $this->buildBaseUrl()
                              ->withPath('send.php')
                              ->withQuery(http_build_query(['id' => $link->getId()]))
