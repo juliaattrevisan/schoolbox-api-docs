@@ -11,18 +11,16 @@ interface Props {
      */
     contentId: string;
     /**
-     * The label to display on the button
+     * The text to display on the button
      */
-    buttonLabel?: string;
+    buttonText?: string;
 }
-const props = withDefaults(defineProps<Props>(), {
-    buttonLabel: "Actions Dropdown",
-});
+const props = defineProps<Props>();
 
 const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
 const { currentLabel, isOpen, onButtonSelected } = useDropdown(
     button as Ref<HTMLButtonElement>,
-    props.buttonLabel,
+    "Actions Dropdown",
     props.contentId
 );
 </script>
@@ -31,17 +29,18 @@ const { currentLabel, isOpen, onButtonSelected } = useDropdown(
     <button
         ref="button"
         type="button"
-        class="c-button c-button--icon-only c-button--no-bkg f-match-existing-styles"
+        :class="`c-button c-button--no-bkg ${props.buttonText ? `` : `c-button--icon-only f-match-existing-styles`}`"
         :title="currentLabel"
         :aria-label="currentLabel"
         aria-haspopup="menu"
         :aria-expanded="isOpen"
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
-        :data-test="`dropdown-button-${props.contentId}`"
+        :data-test="`wc-actions-dropdown-button-${props.contentId}`"
         @click.prevent="onButtonSelected"
     >
         <!-- when an alternative icon should be used -->
+        <span v-if="buttonText">{{ buttonText }}</span>
         <slot name="icon">
             <svg
                 version="1.2"

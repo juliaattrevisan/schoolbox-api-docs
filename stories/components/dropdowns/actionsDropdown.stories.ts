@@ -60,7 +60,7 @@ export const Default: Story = {
                 </div>
                 <div class="l-flex-row l-flex--justify-space">
                     <div content-id="dropdown-3">
-                        <wc-actions-dropdown content-id="dropdown-3" button-label="Manage Dropdown"></wc-actions-dropdown>
+                        <wc-actions-dropdown content-id="dropdown-3" button-text="Modify Participation"></wc-actions-dropdown>
                     </div>
                     <div content-id="dropdown-4">
                         <wc-actions-dropdown content-id="dropdown-4"></wc-actions-dropdown>
