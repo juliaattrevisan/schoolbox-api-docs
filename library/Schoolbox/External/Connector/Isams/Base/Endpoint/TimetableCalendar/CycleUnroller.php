@@ -30,19 +30,12 @@ class CycleUnroller
 
 
     /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
      * Constructor.
      *
      * @param array $api
      */
-    public function __construct(array $api)
+    public function __construct(private array $api)
     {
-        $this->api = $api;
     }
 
 

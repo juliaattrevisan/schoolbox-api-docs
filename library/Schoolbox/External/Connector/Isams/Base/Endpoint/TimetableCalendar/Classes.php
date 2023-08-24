@@ -24,49 +24,6 @@ use Schoolbox\Mapper\Exception;
  */
 class Classes implements IStrategy
 {
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
 
     /**
      * A list of classEntries that we saw previously
@@ -88,14 +45,14 @@ class Classes implements IStrategy
      * Constructor.
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
         private array $watchlist,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -226,7 +183,7 @@ class Classes implements IStrategy
      * In iSAMS we build a timetable and find out who's in it,
      * rather than pick a guy and build their timetable
      */
-    private function findInvolvedExternalIds(array $subject, array $classData)
+    private function findInvolvedExternalIds(array $subject, array $classData): array
     {
         $substituteStaff = [];
 
@@ -234,13 +191,11 @@ class Classes implements IStrategy
             $substituteStaff = [$classData['substituteStaff']['externalId']];
         }
 
-        $involvedPeople = array_merge(
+        return array_merge(
             array_column($subject['regularStaff'], 'externalId'),
             array_column($subject['students'], 'externalId'),
             $substituteStaff
         );
-
-        return $involvedPeople;
     }
 
 
@@ -248,13 +203,14 @@ class Classes implements IStrategy
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
      * @param string $guidPrefix
-     * @param array  $dayData
-     * @param array  $periodData
-     * @param array  $classData
-     * @param array  $subject
+     * @param string $divisionId
+     * @param array $dayData
+     * @param array $periodData
+     * @param array $classData
+     * @param array $subject
      * @return Model
-     * @throws \PDOException
      * @throws Exception
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     private function createEvent(
