@@ -44,7 +44,7 @@ class Controller extends Base
      */
     public function getTimetableCalendar(\Schoolbox\User $user, string $date): void
     {
-        $loggedInUser = $_SESSION['user'];
+        $loggedInUser = $this->getUser();
 
         // The children of $loggedInUser will be passed to the Twig template as $userOptions.
         $userOptions = [];
