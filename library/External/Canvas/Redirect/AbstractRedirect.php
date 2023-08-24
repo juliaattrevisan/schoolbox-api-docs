@@ -30,7 +30,7 @@ class AbstractRedirect
     protected string $courseIdFormat = '%s%s';
 
     /**
-     * The column used to find canvas course in course table
+     * The column used to find canvas course in courses table
      */
     protected string $courseCodeColumn = 'course_code';
 
@@ -149,7 +149,7 @@ class AbstractRedirect
          */
         $query = "
             SELECT id
-            FROM course
+            FROM courses
             WHERE {$this->courseCodeColumn} = :courseCode
             AND workflow_state IN ('claimed', 'available')
         ";
