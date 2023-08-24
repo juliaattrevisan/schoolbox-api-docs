@@ -124,6 +124,7 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
      * Open the dropdown using @floating-ui/dom to position it relative to the trigger
      */
     async function open() {
+        console.warn("open");
         isOpen.value = true;
         content.style.display = "block"; // The element must be visible to correctly compute its position
         const position = await computePosition(button.value as ReferenceElement, content, {
