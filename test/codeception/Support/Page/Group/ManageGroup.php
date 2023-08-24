@@ -93,6 +93,7 @@ class ManageGroup
      */
     public function selectUser(int $userId): void
     {
+        $this->tester->waitForElementVisible('label[for=checkbox-' . $userId . ']');
         $this->tester->click('label[for=checkbox-' . $userId . ']');
     }
 }
