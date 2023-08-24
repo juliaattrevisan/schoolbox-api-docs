@@ -170,6 +170,7 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    $this->watchlist,
                     Loader::getInstance()->get('zip_dir'),
                     Loader::getInstance()->get('photo_sis_import'),
                     $file,

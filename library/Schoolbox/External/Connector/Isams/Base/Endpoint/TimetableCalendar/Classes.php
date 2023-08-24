@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
@@ -90,6 +91,7 @@ class Classes implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        private array $watchlist,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         ClassEntryMapper $classEntryMapper,
@@ -199,7 +201,13 @@ class Classes implements IStrategy
          */
         foreach ($classes['schedule'] as $scheduleId => $classData) {
             $subject = $scheduleCompiler->findSubject($classData['code']);
-            
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isAnyOnWatchlist($this->findInvolvedExternalids($subject, $classData), $this->watchlist)) {
+                continue;
+            }
+
             /* Save sis_event record
              */
             $event = $this->createEvent($guidPrefix, $divisionId, $dayData, $periodData, $classData, $subject);
@@ -212,6 +220,29 @@ class Classes implements IStrategy
              */
             $this->createInvolvements($dayData, $periodData, $classData, $subject, $event, $classEntry);
         }
+    }
+
+
+    /**
+     * Find out who's in this class for Watchlist support
+     * In iSAMS we build a timetable and find out who's in it,
+     * rather than pick a guy and build their timetable
+     */
+    private function findInvolvedExternalids(array $subject, array $classData)
+    {
+        $substituteStaff = [];
+
+        if ($classData['substituteStaff']['externalId'] ?? false) {
+            $substituteStaff = [$classData['substituteStaff']['externalId']];
+        }
+
+        $involvedPeople = array_merge(
+            array_column($subject['regularStaff'], 'externalId'),
+            array_column($subject['students'], 'externalId'),
+            $substituteStaff
+        );
+
+        return $involvedPeople;
     }
 
 
@@ -290,7 +321,7 @@ class Classes implements IStrategy
         }
 
         $event
-            ->setTitle($title)
+            ->setTitle($title . ' Division ' . $divisionId)
             ->setDetail($detail)
             ->setLocation($room)
             ->setCode($classCode)
