@@ -3,7 +3,7 @@
  * Used to display a list of actions in a dropdown menu upon clicking a button (the jellytot!)
  */
 import type { Ref } from "vue";
-import { useDropdown } from "@schoolboxVue/composables/popOut/useDropdown";
+import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 
 interface Props {
     /**
@@ -18,7 +18,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
-const { currentLabel, isOpen, onButtonSelected } = useDropdown(
+const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
     "Actions Dropdown",
     props.contentId

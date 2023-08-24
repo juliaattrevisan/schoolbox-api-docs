@@ -13,7 +13,7 @@ import type { Ref } from "vue";
  * @param {string} contentId - The id of the dropdown content
  * @returns {object} - The isOpen ref
  */
-export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string, contentId: string) {
+export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, contentId: string) {
     const contentIdAttribute = "content-id"; // The attribute used to identify the dropdown content
     const isOpen = window.Vue.ref(false); // Whether the dropdown is open or not
     let content: HTMLElement; // The dropdown content, the element that's displayed when the button is selected
