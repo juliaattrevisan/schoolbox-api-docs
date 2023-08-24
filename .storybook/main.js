@@ -29,7 +29,6 @@ module.exports = {
             use: ["style-loader", "css-loader", "sass-loader"],
             include: path.resolve(__dirname, "../"),
         });
-        config.compilerOptions.isCustomElement = (tag) => tag.startsWith("wc-"); // allow wc- tags in vue templates, which is our custom element prefix
         config.resolve.alias["@js"] = path.resolve(__dirname, "../www/static/js");
         config.resolve.alias["@schoolboxVue"] = path.resolve(__dirname, "../vue");
         config.resolve.alias["@schoolboxCurriculum"] = path.resolve(
