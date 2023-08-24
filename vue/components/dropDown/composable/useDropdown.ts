@@ -34,14 +34,38 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
             isOpen.value = false;
             content.style.display = "none";
             content.setAttribute("aria-hidden", "true");
+            console.warn("close");
         }
+    }
+
+    /**
+     * Check if the clicked target is inside the button
+     * @param {HTMLElement} eventTarget - The target of the event
+     * @returns {boolean} - Whether the target is within the button
+     */
+    function isWithinButton(eventTarget: HTMLElement) {
+        let isWithin = false;
+        let parentElement = eventTarget;
+        // Stop when you reach the body element
+        while (parentElement !== document.body) {
+            if (
+                parentElement.hasAttribute(contentIdAttribute) &&
+                parentElement.getAttribute(contentIdAttribute) === contentId
+            ) {
+                // The clicked element is a child of an element with data-content-id attribute
+                isWithin = true;
+                break;
+            }
+            parentElement = parentElement.parentElement as HTMLElement;
+        }
+        return isWithin;
     }
 
     /**
      * When the document is clicked, close the dropdown if it's open
      * @param {MouseEvent} event - The event that triggered the close
      */
-    function onDocumentClick(event?: MouseEvent) {
+    function onDocumentClick(event: MouseEvent) {
         // If the clicked target is inside the dropdown content and aria-autoclose is "false", do nothing
         if (
             event &&
@@ -51,15 +75,11 @@ export function useDropdown(button: Ref<HTMLButtonElement>, buttonLabel: string,
         ) {
             return;
         }
-        // If the clicked target is the dropdown trigger, also do nothing
-        if (
-            event &&
-            event.target &&
-            (event.target as HTMLElement).hasAttribute(contentIdAttribute) &&
-            (event.target as HTMLElement).getAttribute(contentIdAttribute) === contentId
-        ) {
+        // If the clicked target is the dropdown button, also do nothing
+        if (event && event.target && isWithinButton(event.target as HTMLElement)) {
             return;
         }
+        // otherwise, close the dropdown
         close();
         document.removeEventListener("click", onDocumentClick);
     }
