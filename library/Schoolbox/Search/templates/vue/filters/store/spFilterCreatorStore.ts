@@ -4,21 +4,28 @@
 
 import { defineStore } from "pinia";
 
+export type Creator = {
+    id: number;
+    name: string;
+};
+
+const emptyCreator: Creator = { id: 0, name: "" };
+
 export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
-    const creator = window.Vue.ref<string>("");
-    const activeCreator = window.Vue.ref<string>("");
+    const creator = window.Vue.ref<Creator>(emptyCreator);
+    const activeCreator = window.Vue.ref<Creator>(emptyCreator);
 
     /**
      * Is the creator filter set
      * @returns {boolean}
      */
-    const isSelected = window.Vue.computed(() => creator.value !== "");
+    const isSelected = window.Vue.computed(() => creator.value.id !== 0);
 
     /**
      * Is the active creator filter set
      * @returns {boolean}
      */
-    const isActive = window.Vue.computed(() => activeCreator.value !== "");
+    const isActive = window.Vue.computed(() => activeCreator.value.id !== 0);
 
     /**
      * set the active creator filter, linked to the currently active search,
@@ -33,9 +40,11 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
      * @returns {string} - the creator filter data
      */
     function getFormData() {
-        const id = isActive.value ? activeCreator.value : "";
+        // only add creator filter if it is set
         return {
-            creator: id,
+            creator: {
+                ...(isSelected.value && { id: activeCreator.value.id }),
+            },
         };
     }
 
@@ -43,8 +52,8 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
      * clear the creator filter
      */
     function clear() {
-        creator.value = "";
-        activeCreator.value = "";
+        creator.value = emptyCreator;
+        activeCreator.value = emptyCreator;
     }
 
     return {
