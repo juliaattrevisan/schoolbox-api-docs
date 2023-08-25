@@ -273,7 +273,7 @@ class Classes implements IStrategy
         }
 
         $event
-            ->setTitle($title . ' Division ' . $divisionId)
+            ->setTitle($title)
             ->setDetail($detail)
             ->setLocation($room)
             ->setCode($classCode)
