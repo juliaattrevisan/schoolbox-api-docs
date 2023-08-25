@@ -24,7 +24,6 @@ use Schoolbox\Mapper\Exception;
  */
 class Classes implements IStrategy
 {
-
     /**
      * A list of classEntries that we saw previously
      *
@@ -89,9 +88,14 @@ class Classes implements IStrategy
                 foreach ($weekData['days'] as $dayData) {
                     foreach ($dayData['periods'] as $periodId => $periodData) {
                         /* guid prefix is serialized with these pieces:
-                         *     isams timetable id
+                         *     isams week id
                          *     isams day id
                          *     isams period id
+                         * 
+                         * Do not use isams division id as part of this tuple as that will
+                         * guarantee dupe events spawning. We only use the division id to
+                         * identify *which students* are associated with a class code that's
+                         * shared between Divisions.
                          */
                         $guidPrefix = sprintf(
                             '%s.%s.%s',
@@ -149,7 +153,7 @@ class Classes implements IStrategy
          * * shank it into suds town
          */
         foreach ($classes['schedule'] as $scheduleId => $classData) {
-            $subject = $scheduleCompiler->findSubject($classData['code']);
+            $subject = $scheduleCompiler->findSubject($classData['code'], $divisionId);
 
             /* Only import data for externalIds in $watchlist, if provided
              */

@@ -89,9 +89,10 @@ class ScheduleCompiler
      * Find a subject's name and humans from its $setCode (that's its subject code equivalent)
      *
      * @param string $setCode
+     * @param string $divisionId
      * @return array
      */
-    public function findSubject(string $setCode): array
+    public function findSubject(string $setCode, string $divisionId): array
     {
         $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0] ?? [];
         //null coalesce fetchXml()[0] as that field might not exist... but don't throw warnings either
@@ -147,7 +148,7 @@ class ScheduleCompiler
             'code' => $setCode,
             'name' => trim((string)$node[0]->Name),
             'regularStaff' => $staff,
-            'students' => $this->findSubjectStudents($setCode)
+            'students' => $this->findSubjectStudents($setCode, $divisionId)
         ];
     }
 
@@ -313,9 +314,10 @@ class ScheduleCompiler
      * Find the students who were in subject $setCode
      *
      * @param string $setCode
+     * @param string $divisionId
      * @return array
      */
-    private function findSubjectStudents(string $setCode): array
+    private function findSubjectStudents(string $setCode, string $divisionId): array
     {
         $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
 
@@ -358,14 +360,28 @@ class ScheduleCompiler
         foreach ($setListNodes as $current) {
             $studentId = trim((string)$current->xpath('@PupilId')[0]);
 
-            $student = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+            /* See if student with PupilId $studentId is also in DivisionId $divisionId
+             * This tuple must match, to prevent students cross-pollinating into other
+             * Division's timetables
+             */
+            $this->log->debug(sprintf(
+                'Looking for %s in division %s',
+                $studentId,
+                $divisionId
+            ));
 
-            /* Unknown student; can't find it via its studentId
+            $student = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}' and @DivisionId='{$divisionId}']")[0] ?? null;
+
+            /* Unknown student; can't find it via its (studentId, divisionId) tuple
+             * Either the student doesn't exist, or it exists for a different Division
+             * than the one we're currently processing. Timetable Calendar stuff allows
+             * a Division to overlap another Division, resulting in duplicate classes.
              */
             if (empty($student)) {
-                $this->log->warning(sprintf(
-                    'Student with PupilId %s was not found',
-                    $studentId
+                $this->log->debug(sprintf(
+                    'Student with PupilId %s was not found in division %s',
+                    $studentId,
+                    $divisionId
                 ));
 
                 continue;
