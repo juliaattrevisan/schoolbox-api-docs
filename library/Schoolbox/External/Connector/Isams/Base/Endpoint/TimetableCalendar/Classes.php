@@ -91,7 +91,7 @@ class Classes implements IStrategy
                          *     isams week id
                          *     isams day id
                          *     isams period id
-                         * 
+                         *
                          * Do not use isams division id as part of this tuple as that will
                          * guarantee dupe events spawning. We only use the division id to
                          * identify *which students* are associated with a class code that's
