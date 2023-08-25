@@ -12,6 +12,7 @@ namespace External\Canvas\Sync\Bridge;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Resource\Folder;
 use UnexpectedValueException;
 
@@ -22,21 +23,12 @@ use function preg_match;
  */
 class Course
 {
-    /** @var IConnector */
-    protected $canvasDb;
-
-    /** @var IConnector */
-    protected $schoolboxDb;
-
-
     /**
-     * @param IConnector $canvasDb
+     * @param CanvasDb $canvasDb
      * @param IConnector $schoolboxDb
      */
-    public function __construct(IConnector $canvasDb, IConnector $schoolboxDb)
+    public function __construct(protected CanvasDb $canvasDb, private IConnector $schoolboxDb)
     {
-        $this->canvasDb = $canvasDb;
-        $this->schoolboxDb = $schoolboxDb;
     }
 
 
@@ -119,10 +111,10 @@ class Course
      */
     public function getCanvasCoursesToImport(string $courseAlias = 'c', string $sectionAlias = 'cs'): Builder
     {
-        $pb = (new Builder($this->canvasDb->getQuoter(), ''))
+        $pb = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
             ->greaterThan('term.date_end', date('Y-m-d'))
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
-        return (new Builder($this->canvasDb->getQuoter(), ''))
+        return (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
             ->all($pb);
     }
 }

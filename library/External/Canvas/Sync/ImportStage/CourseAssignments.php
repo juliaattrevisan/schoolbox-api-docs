@@ -12,6 +12,7 @@ namespace External\Canvas\Sync\ImportStage;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
@@ -42,27 +43,18 @@ class CourseAssignments extends CourseAssessmentAbstract
     use ModelSaveTrait;
 
     /** @var Bridge\Account */
-    private $accountBridge;
-
-    /** @var Bridge\Assignment */
-    private $assignmentBridge;
-
-    /** @var SubmissionBoxMapper */
-    private $submissionBoxMapper;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
+    private Bridge\Account $accountBridge;
 
     // Assignments => SubmissionBox
-    private $countAssignmentsSynchronised;
-    private $countSubmissionBoxCreated;
-    private $countSubmissionBoxUpdated;
-    private $countSubmissionBoxMoved;
-    private $countSubmissionBoxDeleted;
+    private int $countAssignmentsSynchronised;
+    private int $countSubmissionBoxCreated;
+    private int $countSubmissionBoxUpdated;
+    private int $countSubmissionBoxMoved;
+    private int $countSubmissionBoxDeleted;
 
 
     /**
-     * @param IConnector          $canvasDb
+     * @param CanvasDb            $canvasDb
      * @param IConnector          $schoolboxDb
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param Assessment\Mapper   $assessmentMapper
@@ -74,15 +66,15 @@ class CourseAssignments extends CourseAssessmentAbstract
      * @param string              $schoolboxTimezone
      */
     public function __construct(
-        IConnector $canvasDb,
+        CanvasDb $canvasDb,
         IConnector $schoolboxDb,
-        SubmissionBoxMapper $submissionBoxMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         LoggerInterface $log,
         IConfigLoader $config,
-        Bridge\Assignment $assignmentBridge,
+        private Bridge\Assignment $assignmentBridge,
         Bridge\Course $courseBridge,
-        Folder\Mapper $folderMapper,
+        private Folder\Mapper $folderMapper,
         string $schoolboxTimezone
     ) {
         parent::__construct(
@@ -94,9 +86,6 @@ class CourseAssignments extends CourseAssessmentAbstract
             $courseBridge,
             $schoolboxTimezone
         );
-        $this->assignmentBridge    = $assignmentBridge;
-        $this->submissionBoxMapper = $submissionBoxMapper;
-        $this->folderMapper        = $folderMapper;
     }
 
 
@@ -115,7 +104,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         $this->resetCounts();
 
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
-        $courseFilterPb    = (new Builder($this->canvasDb->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql               = "
         SELECT
@@ -138,7 +127,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         WHERE {$courseFilterWhere} AND quiz.id IS NULL
         ORDER BY course.code, course.canvas_id, assignment_group.position, assignment.position
         ";
-        $statement         = $this->canvasDb->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
+        $statement         = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
 
         // Parse results into hierarchical structure
         $coursesData        = [];

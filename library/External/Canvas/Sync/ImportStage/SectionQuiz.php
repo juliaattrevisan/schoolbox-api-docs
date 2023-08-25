@@ -13,6 +13,7 @@ use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use External_ClassInterface;
@@ -62,7 +63,7 @@ class SectionQuiz extends SectionAssessmentAbstract
 
 
     /**
-     * @param IConnector                 $canvasDb
+     * @param CanvasDb                 $canvasDb
      * @param IConnector                 $schoolboxDb
      * @param External_ClassInterface    $externalClass
      * @param string|null                $currentFileYear
@@ -87,7 +88,7 @@ class SectionQuiz extends SectionAssessmentAbstract
      * @param MapperProxy                $assessmentDataSource
      */
     public function __construct(
-        IConnector $canvasDb,
+        CanvasDb $canvasDb,
         IConnector $schoolboxDb,
         External_ClassInterface $externalClass,
         ?string $currentFileYear,
@@ -206,7 +207,7 @@ class SectionQuiz extends SectionAssessmentAbstract
             WHERE {$whereClause}
             ORDER BY course.code, course.canvas_id, section.canvas_id, quiz.canvas_id, override.canvas_id
         ";
-        $statement = $this->canvasDb->executeQuery(
+        $statement = $this->canvasDb->getConnector()->executeQuery(
             $sql,
             array_merge(
                 $pb->getParams(),

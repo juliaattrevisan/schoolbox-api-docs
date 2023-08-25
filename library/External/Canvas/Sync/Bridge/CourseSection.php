@@ -14,6 +14,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\DataStructures\ObjectTree;
+use External\Canvas\Importer\CanvasDb;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -42,22 +43,7 @@ use function preg_replace;
  */
 class CourseSection
 {
-    /** @var IConnector */
-    protected $canvasDb;
-
-    /** @var IConnector */
-    protected $schoolboxDb;
-
-    /** @var Folder\Mapper */
-    protected $folderMapper;
-
-    /** @var Course */
-    protected $courseBridge;
-
-    protected $folderTree;
-
-    /** @var LoggerInterface */
-    protected $log;
+    protected ?ObjectTree $folderTree = null;
 
     /**
      * Maps all SB FolderCodes to a Canvas CourseSections.SisSourceIds (if one is found)
@@ -74,7 +60,7 @@ class CourseSection
      *
      * @var array
      */
-    protected $yearAndFolderCodeToSisSourceIdMap = [];
+    protected array $yearAndFolderCodeToSisSourceIdMap = [];
 
     /**
      * Maps all SB FolderCodes to a SB folder so we can easily fetch the folder by either old folderCode or sisSourceId
@@ -91,7 +77,7 @@ class CourseSection
      *
      * @var array
      */
-    protected $yearAndFolderCodeToFolderMap = [];
+    protected array $yearAndFolderCodeToFolderMap = [];
 
     /**
      * Maps Schoolbox folder ids to SisSourceId
@@ -103,7 +89,7 @@ class CourseSection
      *
      * @var string[]|null[]
      */
-    protected $folderIdToSisSourceIdMap = [];
+    protected array $folderIdToSisSourceIdMap = [];
 
 
     /**
@@ -117,28 +103,23 @@ class CourseSection
      *
      * @var array
      */
-    protected $sisSourceIdToYearAndFolderCodeMap = [];
+    protected array $sisSourceIdToYearAndFolderCodeMap = [];
 
 
     /**
-     * @param IConnector      $canvasDb
+     * @param CanvasDb        $canvasDb
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
      * @param Course          $courseBridge
      * @param LoggerInterface $log
      */
     public function __construct(
-        IConnector $canvasDb,
-        IConnector $schoolboxDb,
-        Folder\Mapper $folderMapper,
-        Course $courseBridge,
-        LoggerInterface $log
+        private CanvasDb $canvasDb,
+        private IConnector $schoolboxDb,
+        private Folder\Mapper $folderMapper,
+        private Course $courseBridge,
+        private LoggerInterface $log
     ) {
-        $this->canvasDb     = $canvasDb;
-        $this->schoolboxDb  = $schoolboxDb;
-        $this->folderMapper = $folderMapper;
-        $this->courseBridge = $courseBridge;
-        $this->log          = $log;
     }
 
     /**
@@ -503,7 +484,7 @@ class CourseSection
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
             WHERE {$whereClause}
         ";
-        return $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll();
+        return $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams())->fetchAll();
     }
 
 
@@ -574,7 +555,7 @@ class CourseSection
         ";
 
         $data      = [];
-        $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
+        $statement = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams());
         while ($row = $statement->fetch()) {
             $courseCanvasId         = $row['course.canvas_id'];
             $sectionCanvasId        = $row['section.canvas_id'];

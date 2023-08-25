@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
+use External\Canvas\Importer\CanvasDb;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,15 +19,14 @@ use Psr\Log\LoggerInterface;
 class Data2Restorer extends DataRestorer
 {
     public function __construct(
-        IConnector $canvasDb,
+        CanvasDb $canvasDb,
         private LoggerInterface $log,
-        private string $canvasDbName,
         bool $persistChanges,
         private array $tableNames,
         array $schema,
         private Data2Connector $data2Connector,
     ) {
-        parent::__construct($canvasDb, $log, $canvasDbName, $persistChanges, $tableNames, $schema);
+        parent::__construct($canvasDb, $log, $persistChanges, $tableNames, $schema);
     }
 
     /**
@@ -70,8 +69,8 @@ class Data2Restorer extends DataRestorer
             }
             $columnSql = implode(",\n", $columnsSqlArray);
             $comment   = str_replace('"', '\"', $tableSchema['properties']['value']['title']);
-            $createSql = "CREATE TABLE IF NOT EXISTS `$this->canvasDbName`.`$tableName` (\n$columnSql\n) COMMENT \"$comment\";";
-            $this->log->debug("Creating table `$this->canvasDbName`.`$tableName`");
+            $createSql = "CREATE TABLE IF NOT EXISTS `{$this->canvasDb->getCanvasDbName()}`.`$tableName` (\n$columnSql\n) COMMENT \"$comment\";";
+            $this->log->debug("Creating table `{$this->canvasDb->getCanvasDbName()}`.`$tableName`");
 
             try {
                 $this->executeIfPersisting($createSql);

@@ -154,7 +154,7 @@ class AbstractRedirect
             AND workflow_state IN ('claimed', 'available')
         ";
 
-        $statement = $this->canvasDb->build()->prepareQuery($query);
+        $statement = $this->canvasDb->getConnector()->prepareQuery($query);
 
         $statement->execute(['courseCode' => $courseCode]);
 

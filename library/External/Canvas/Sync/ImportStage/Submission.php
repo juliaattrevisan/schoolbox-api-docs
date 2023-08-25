@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge\Assignment;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -40,7 +41,7 @@ class Submission extends SubmissionAbstract
     use ModelSaveTrait;
 
     /**
-     * @param IConnector          $canvasDb
+     * @param CanvasDb            $canvasDb
      * @param IConnector          $schoolboxDb
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param ReturnedWorkMapper  $returnedWorkMapper
@@ -51,7 +52,7 @@ class Submission extends SubmissionAbstract
      * @param string              $schoolboxTimezone
      */
     public function __construct(
-        IConnector $canvasDb,
+        CanvasDb $canvasDb,
         IConnector $schoolboxDb,
         private SubmissionBoxMapper $submissionBoxMapper,
         private ReturnedWorkMapper $returnedWorkMapper,
@@ -121,10 +122,10 @@ class Submission extends SubmissionAbstract
                                 && $canvasSubmission['comment_created_at'] > $canvasSubmission['graded_at']
                             )
                         ) {
-                            $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['commenter_id']);
+                            $reviewer     = $this->findUserByCanvasUserId((int)$canvasSubmission['commenter_id']);
                             $feedbackTime = $canvasSubmission['comment_created_at'];
                         } else {
-                            $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['grader_user_id']);
+                            $reviewer     = $this->findUserByCanvasUserId((int)$canvasSubmission['grader_user_id']);
                             $feedbackTime = $canvasSubmission['graded_at'];
                         }
                         // save participant
@@ -325,7 +326,7 @@ class Submission extends SubmissionAbstract
             ORDER BY submission_dim.id
         ";
 
-        $statement = $this->canvasDb->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
+        $statement = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
         return $statement->fetchAll();
     }
 }

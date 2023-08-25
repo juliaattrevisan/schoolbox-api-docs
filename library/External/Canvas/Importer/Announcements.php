@@ -257,7 +257,7 @@ class Announcements
             FROM course_dim
         ";
 
-        $statement = $this->canvasDb->build()->executeQuery($query);
+        $statement = $this->canvasDb->getConnector()->executeQuery($query);
 
         /* For each of the courses you found, figure out which folders are destinations
          * One would have to presume schoolbox folders exist, whose folder codes match

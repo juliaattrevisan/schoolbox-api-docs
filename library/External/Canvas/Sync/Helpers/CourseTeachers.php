@@ -12,6 +12,7 @@ namespace External\Canvas\Sync\Helpers;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Role;
 use UnderflowException;
 
@@ -24,16 +25,8 @@ use function implode;
  */
 class CourseTeachers
 {
-    /** @var IConnector */
-    private $schoolboxDb;
-
-    /** @var IConnector */
-    private $canvasDb;
-
-    public function __construct(IConnector $schoolboxDb, IConnector $canvasDb)
+    public function __construct(private IConnector $schoolboxDb, private CanvasDb $canvasDb)
     {
-        $this->schoolboxDb = $schoolboxDb;
-        $this->canvasDb    = $canvasDb;
     }
 
 
@@ -72,7 +65,7 @@ class CourseTeachers
                 WHERE {$whereClause}
                 GROUP BY course.canvas_id
             ";
-        $statement   = $this->canvasDb->executeQuery($sql, $pb->getParams());
+        $statement   = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams());
 
         $courseTeachers = [];
         while ($row = $statement->fetch()) {

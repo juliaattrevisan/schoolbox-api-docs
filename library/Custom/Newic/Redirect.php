@@ -241,7 +241,7 @@ class Redirect extends AbstractRedirect
 
         /* Otherwise continue shanking
          */
-        $statement = $this->canvasDb->build()->prepareQuery($query);
+        $statement = $this->canvasDb->getConnector()->prepareQuery($query);
 
         $statement->execute([
                                 'assessmentCanvasId' => $canvasId,

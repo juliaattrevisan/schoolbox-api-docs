@@ -15,7 +15,10 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use Evaluation_Section;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\Bridge\Assignment;
+use External\Canvas\Sync\Bridge\Course;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use PDOException;
@@ -45,37 +48,15 @@ use function count;
 class CourseQuiz extends CourseAssessmentAbstract
 {
     use ModelSaveTrait;
-
-    /** @var Bridge\Assignment */
-    private $assignmentBridge;
-
-    /** @var Quiz\Mapper */
-    private $quizMapper;
-
-    /** @var QuizSection\Mapper */
-    private $quizSectionMapper;
-
-    /** @var QuizQuestion\Mapper */
-    private $quizQuestionMapper;
-
-    /** @var QuestionType\Mapper */
-    private $questionTypeMapper;
-
-    /** @var QuizSolution\Mapper */
-    private $quizSolutionMapper;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
     // Quiz => Quiz
-    private $countQuizSynchronised;
-    private $countQuizCreated;
-    private $countQuizUpdated;
-    private $countQuizMoved;
-    private $countQuizDeleted;
+    private int $countQuizSynchronised;
+    private int $countQuizCreated;
+    private int $countQuizUpdated;
+    private int $countQuizMoved;
+    private int $countQuizDeleted;
 
     /**
-     * @param IConnector          $canvasDb
+     * @param CanvasDb            $canvasDb
      * @param IConnector          $schoolboxDb
      * @param Quiz\Mapper         $quizMapper
      * @param QuizSection\Mapper  $quizSectionMapper
@@ -86,23 +67,23 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param Folder\Mapper       $folderMapper
      * @param LoggerInterface     $log
      * @param IConfigLoader       $config
-     * @param Bridge\Assignment   $assignmentBridge
-     * @param Bridge\Course       $courseBridge
+     * @param Assignment          $assignmentBridge
+     * @param Course              $courseBridge
      * @param string              $schoolboxTimezone
      */
     public function __construct(
-        IConnector $canvasDb,
+        CanvasDb $canvasDb,
         IConnector $schoolboxDb,
-        Quiz\Mapper $quizMapper,
-        QuizSection\Mapper $quizSectionMapper,
-        QuizQuestion\Mapper $quizQuestionMapper,
-        QuestionType\Mapper $quizQuestionTypeMapper,
-        QuizSolution\Mapper $quizSolutionMapper,
+        private Quiz\Mapper $quizMapper,
+        private QuizSection\Mapper $quizSectionMapper,
+        private QuizQuestion\Mapper $quizQuestionMapper,
+        private QuestionType\Mapper $quizQuestionTypeMapper,
+        private QuizSolution\Mapper $quizSolutionMapper,
         Assessment\Mapper $assessmentMapper,
-        Folder\Mapper $folderMapper,
+        private Folder\Mapper $folderMapper,
         LoggerInterface $log,
         IConfigLoader $config,
-        Bridge\Assignment $assignmentBridge,
+        private Bridge\Assignment $assignmentBridge,
         Bridge\Course $courseBridge,
         string $schoolboxTimezone
     ) {
@@ -115,13 +96,6 @@ class CourseQuiz extends CourseAssessmentAbstract
             $courseBridge,
             $schoolboxTimezone
         );
-        $this->assignmentBridge   = $assignmentBridge;
-        $this->quizMapper         = $quizMapper;
-        $this->quizSectionMapper  = $quizSectionMapper;
-        $this->quizQuestionMapper = $quizQuestionMapper;
-        $this->questionTypeMapper = $quizQuestionTypeMapper;
-        $this->quizSolutionMapper = $quizSolutionMapper;
-        $this->folderMapper       = $folderMapper;
     }
 
 
@@ -144,7 +118,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         $this->resetCounts();
 
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
-        $courseFilterPb    = (new Builder($this->canvasDb->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql               = "
         SELECT
@@ -170,7 +144,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         -- TODO cater for quiz/assignment positioning
         ORDER BY course.code, course.canvas_id, assignment_group.position, assignment.position
         ";
-        $statement = $this->canvasDb->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
+        $statement = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
 
         // Parse results into hierarchical structure
         $coursesData        = [];
@@ -576,7 +550,7 @@ class CourseQuiz extends CourseAssessmentAbstract
     private function syncWithQuestion(QuizSection\Model $section, ?float $pointsPossible): QuizQuestion\Model
     {
         /** @var QuestionType\Model $questionType */
-        $questionType = $this->questionTypeMapper->findByPredicates($this->assignmentBridge->getQuizQuestionTypePredicate())->first();
+        $questionType = $this->quizQuestionTypeMapper->findByPredicates($this->assignmentBridge->getQuizQuestionTypePredicate())->first();
         $maxMark      = $this->assignmentBridge->getMaxMark($pointsPossible);
         $questionText = "Canvas aggregate question";
         $config       = null;

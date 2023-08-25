@@ -248,7 +248,7 @@ class Redirect1 extends AbstractRedirect
 
         /* Otherwise continue shanking
          */
-        $statement = $this->canvasDb->build()->prepareQuery($query);
+        $statement = $this->canvasDb->getConnector()->prepareQuery($query);
 
         $statement->execute([
                                 'assessmentCanvasId' => $canvasId,
@@ -298,7 +298,7 @@ class Redirect1 extends AbstractRedirect
             AND workflow_state IN ('claimed', 'available')
         ";
 
-        $statement = $this->canvasDb->build()->prepareQuery($query);
+        $statement = $this->canvasDb->getConnector()->prepareQuery($query);
 
         $statement->execute(['courseCode' => $courseCode]);
 
