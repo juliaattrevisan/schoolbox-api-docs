@@ -144,7 +144,7 @@ function onMouseOut(event: MouseEvent) {
     grid-template-columns: 1fr 5rem;
 
     input[type="text"].c-search-input__field {
-        border: 2px solid var(--form-border-color);
+        border: 2px solid var(--navigation-background);
         background-color: var(--foreground-colour);
         color: var(--primary-text-colour);
         font-size: var(--base-font-size);

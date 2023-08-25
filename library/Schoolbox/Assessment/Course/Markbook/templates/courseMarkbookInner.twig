@@ -180,7 +180,7 @@
                     <tr>
                         <th class="profile-cell fixed-left white">
                             <div class="c-card">
-                                <div class="l-flex-row l-gap-m">
+                                <div class="l-flex-row l-gap-m l-pad-m">
                                     {% include "include/portrait.twig" with {user: student, render: "tiny", roundedCorners: true} only %}
                                     <div class="l-flex-col l-flex--justify-center f-no-margins">
                                         <a href="/search/user/{{ student.id }}" title="View Profile">{{ student.fullName }}</a>

@@ -105,22 +105,12 @@
     // Modifier class to round off images.
     &--round {
         .c-img__wrapper {
-            // Very subtly make the image stand out from the background if there is no background contrast
-            // TODO - This border should ideally be controlled with custom properties inside a borders class somewhere.
-            border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 50%;
         }
     }
 
-    /*
-        Some additional rules for rounded images - they need whitespace around them as they generally look bad
-        stretching from edge to edge of their parent.
-    */
+    //  Some additional rules for rounded images
     &--round {
-        .c-img__wrapper {
-            margin: var(--whitespace-xs);
-        }
-
         //Apply to default sizes
         &.c-img .c-img__wrapper {
             flex: 1 calc(var(--image-size-m) - var(--whitespace-xs));

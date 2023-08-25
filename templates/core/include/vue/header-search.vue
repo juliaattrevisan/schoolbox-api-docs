@@ -217,7 +217,7 @@ function formatPortrait(id: string) {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex-row l-flex--align-center l-gap-m">
+                    <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
                         <div class="c-img c-img--round">
                             <div class="c-img__wrapper">
                                 <img
