@@ -118,7 +118,7 @@ class CourseSection
         private IConnector $schoolboxDb,
         private Folder\Mapper $folderMapper,
         private Course $courseBridge,
-        private LoggerInterface $log
+        protected LoggerInterface $log
     ) {
     }
 

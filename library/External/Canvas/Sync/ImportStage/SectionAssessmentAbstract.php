@@ -60,6 +60,7 @@ use function ucfirst;
 abstract class SectionAssessmentAbstract
 {
     use ModelSaveTrait;
+
     // Per-execution counts
 
     // Canvas source entities

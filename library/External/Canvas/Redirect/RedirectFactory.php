@@ -34,7 +34,7 @@ class RedirectFactory
      */
     public function produce(): ?AbstractRedirect
     {
-        $className = $this->canvasDb->isCanvasData2()
+        $className = $this->canvasDb->isCanvasData2
             ? sprintf('Custom\\%s\\Redirect', ucfirst(strtolower($this->siteSchoolCode)))
             : sprintf('Custom\\%s\\Redirect1', ucfirst(strtolower($this->siteSchoolCode)));
         if (class_exists($className)) {

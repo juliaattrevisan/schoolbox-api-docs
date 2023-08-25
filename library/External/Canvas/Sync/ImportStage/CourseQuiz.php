@@ -48,6 +48,7 @@ use function count;
 class CourseQuiz extends CourseAssessmentAbstract
 {
     use ModelSaveTrait;
+
     // Quiz => Quiz
     private int $countQuizSynchronised;
     private int $countQuizCreated;
