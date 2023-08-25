@@ -119,7 +119,33 @@ class CourseSections
                 ->in('section.sis_source_id', $sectionSisSourceIds);
             $whereClause = implode(' AND ', $pb->getWhere());
 
-            $sql       = "
+            $sql = "
+                SELECT
+                    account.id                                         'account.canvas_id',
+                    course.course_code                                 'course.code',
+                    course.id                                          'course.canvas_id',
+                    CONVERT_TZ(course.start_at, 'UTC', :timezone)      'course.start_at',
+                    CONVERT_TZ(course.conclude_at, 'UTC', :timezone)   'course.conclude_at',
+                    CONVERT_TZ(courseTerm.start_at, 'UTC', :timezone)  'courseTerm.date_start',
+                    CONVERT_TZ(courseTerm.end_at, 'UTC', :timezone)    'courseTerm.date_end',
+                    section.id                                         'section.canvas_id',
+                    section.name                                       'section.name',
+                    section.sis_source_id                              'section.sis_source_id',
+                    CONVERT_TZ(section.start_at, 'UTC', :timezone)     'section.start_at',
+                    CONVERT_TZ(section.end_at, 'UTC', :timezone)       'section.end_at',
+                    CONVERT_TZ(sectionTerm.start_at, 'UTC', :timezone) 'sectionTerm.date_start',
+                    CONVERT_TZ(sectionTerm.end_at, 'UTC', :timezone)   'sectionTerm.date_end'
+                FROM course_sections section
+                JOIN courses course ON course.id = section.course_id
+                JOIN accounts account ON account.id = course.account_id
+                LEFT JOIN enrollment_terms sectionTerm ON section.enrollment_term_id = sectionTerm.id
+                LEFT JOIN enrollment_terms courseTerm ON course.enrollment_term_id = courseTerm.id
+                WHERE {$whereClause}
+                ORDER BY account.id, course.course_code, course.id, section.id
+            ";
+
+            if (!$this->canvasDb->isCanvasData2) {
+                $sql = "
                 SELECT
                     account.canvas_id                                   'account.canvas_id',
                     course.code                                         'course.code',
@@ -143,6 +169,8 @@ class CourseSections
                 WHERE {$whereClause}
                 ORDER BY account.canvas_id, course.code, course.canvas_id, section.canvas_id
             ";
+            }
+
             $statement = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
             while ($row = $statement->fetch()) {
                 $accountCanvasId = $row['account.canvas_id'];

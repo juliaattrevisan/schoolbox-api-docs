@@ -85,9 +85,14 @@ class Redirect extends AbstractRedirect
             $query = "
                 SELECT *
                 FROM assignment
-                WHERE id = :assessmentCanvasId
-            ";
+                WHERE id = :assessmentCanvasId";
 
+            if (!$this->canvasDb->isCanvasData2) {
+                $query = "
+                SELECT *
+                FROM assignment_dim
+                WHERE canvas_id = :assessmentCanvasId";
+            }
             return $this->buildAssessmentUrl(
                 $assessment,
                 $query,
@@ -104,9 +109,14 @@ class Redirect extends AbstractRedirect
             $query = "
                 SELECT *
                 FROM quizzes
-                WHERE id = :assessmentCanvasId
-            ";
+                WHERE id = :assessmentCanvasId";
 
+            if (!$this->canvasDb->isCanvasData2) {
+                $query = "
+                SELECT *
+                FROM quiz_dim
+                WHERE canvas_id = :assessmentCanvasId";
+            }
             return $this->buildAssessmentUrl(
                 $assessment,
                 $query,

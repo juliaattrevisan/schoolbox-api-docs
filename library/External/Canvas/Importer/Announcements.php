@@ -249,13 +249,24 @@ class Announcements
          * column, but you'll need to prefix it with "course_" before you can use
          * them in the canvas api
          */
+
         $query = "
+            SELECT
+                CONCAT('course_', id) AS contextCode,
+                name,
+                course_code
+            FROM courses
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $query = "
             SELECT
                 CONCAT('course_', canvas_id) AS contextCode,
                 name,
                 code
             FROM course_dim
         ";
+        }
 
         $statement = $this->canvasDb->getConnector()->executeQuery($query);
 

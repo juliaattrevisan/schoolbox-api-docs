@@ -57,6 +57,17 @@ class CourseTeachers
         $whereClause = implode(' AND ', $pb->getWhere());
         $sql         = "
                 SELECT
+                    course.id             'course.canvas_id',
+                    pseudonym.sis_user_id 'pseudonym.sis_user_id'
+                FROM courses course
+                JOIN enrollments enrollment ON enrollment.course_id = course.id
+                JOIN pseudonyms pseudonym ON pseudonym.user_id = enrollment.user_id
+                WHERE {$whereClause}
+                GROUP BY course.id
+            ";
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql         = "
+                SELECT
                     course.canvas_id      'course.canvas_id',
                     pseudonym.sis_user_id 'pseudonym.sis_user_id'
                 FROM course_dim course
@@ -65,6 +76,7 @@ class CourseTeachers
                 WHERE {$whereClause}
                 GROUP BY course.canvas_id
             ";
+        }
         $statement   = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams());
 
         $courseTeachers = [];

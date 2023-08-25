@@ -24,8 +24,14 @@ class Course extends \External\Canvas\Sync\Bridge\Course
         // TODO: how to determine term?
         $pb = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
 //            ->in('term.sis_source_id', ['2019Whole', '2020Whole', '2020TRANS'])
-            ->greaterThan('term.date_start', '2019-11-23')
+            ->greaterThan('term.start_at', '2019-11-23')
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
+        if (!$this->canvasDb->isCanvasData2) {
+            $pb = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
+//            ->in('term.sis_source_id', ['2019Whole', '2020Whole', '2020TRANS'])
+                ->greaterThan('term.date_start', '2019-11-23')
+                ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
+        }
         return (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
             ->all($pb);
     }

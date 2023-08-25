@@ -295,11 +295,43 @@ class Submission extends SubmissionAbstract
     private function loadCanvasSubmissions(int $assignmentCanvasId): array
     {
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
-        $pb          = (new Builder($mySqlQuoter, ''))->equals('assignment_dim.canvas_id', $assignmentCanvasId);
-        $pb->equals('submission_dim.workflow_state', 'graded');
+
+        $pb          = (new Builder($mySqlQuoter, ''))->equals('assignments.id', $assignmentCanvasId);
+        $pb->equals('submissions.workflow_state', 'graded');
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $sql = "
+            SELECT
+                assignments.id,
+                assignments.id as canvas_id,
+                submissions.id as submission_id,
+                submissions.published_grade as mark,
+                submissions.excused as excused,
+                submissions.posted_at as posted_at,
+                submissions.published_score as norm_mark,
+                reviewee.sis_user_id as reviewee_id,
+                submissions.grader_id as grader_user_id,
+                CONVERT_TZ(submissions.graded_at, 'UTC', :timezone) as graded_at,
+                submission_comments.comment as comment,
+                submission_comments.author_id as commenter_id,
+                CONVERT_TZ(submission_comments.created_at, 'UTC', :timezone) as comment_created_at,
+                CONVERT_TZ(submission_comments.updated_at, 'UTC', :timezone) as comment_updated_at
+            FROM assignments
+            LEFT JOIN submissions ON assignments.id = submissions.assignment_id
+            LEFT JOIN submission_comments ON submission_comments.submission_id = submissions.id
+                                             AND submission_comments.author_id <> submissions.user_id
+            LEFT JOIN pseudonyms as reviewee ON reviewee.user_id = submissions.user_id AND reviewee.workflow_state = 'active'
+
+            WHERE {$whereClause}
+            ORDER BY submissions.id
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $pb          = (new Builder($mySqlQuoter, ''))->equals('assignment_dim.canvas_id', $assignmentCanvasId);
+            $pb->equals('submission_dim.workflow_state', 'graded');
+            $whereClause = implode(' AND ', $pb->getWhere());
+
+            $sql = "
             SELECT
                 assignment_dim.id,
                 assignment_dim.canvas_id,
@@ -325,7 +357,7 @@ class Submission extends SubmissionAbstract
             WHERE {$whereClause}
             ORDER BY submission_dim.id
         ";
-
+        }
         $statement = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
         return $statement->fetchAll();
     }

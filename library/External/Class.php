@@ -38,7 +38,7 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
             usort(
                 $result,
                 function ($a, $b) {
-                    $last = strnatcasecmp($a['lastname'] ?? '', $b['lastname'] ?? '');
+                    $last = strnatcasecmp((string)$a['lastname'] ?? '', (string)$b['lastname'] ?? '');
                     if ($last == 0) {
                         return strnatcasecmp($a['firstname'], $b['firstname']);
                     }

@@ -34,12 +34,10 @@ class RedirectFactory
      */
     public function produce(): ?AbstractRedirect
     {
-        $className = $this->canvasDb->isCanvasData2
-            ? sprintf('Custom\\%s\\Redirect', ucfirst(strtolower($this->siteSchoolCode)))
-            : sprintf('Custom\\%s\\Redirect1', ucfirst(strtolower($this->siteSchoolCode)));
+        $className = sprintf('Custom\\%s\\Redirect', ucfirst(strtolower($this->siteSchoolCode)));
         if (class_exists($className)) {
             // TRIGS and NEWIC are using this
-            /** @var \Custom\Trigs\Redirect|\Custom\Newic\Redirect|\Custom\Trigs\Redirect1|\Custom\Newic\Redirect1 $className */
+            /** @var \Custom\Trigs\Redirect|\Custom\Newic\Redirect $className */
             return new $className(
                 trim($this->canvasUrl),
                 $this->canvasDb,

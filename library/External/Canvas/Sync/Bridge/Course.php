@@ -112,8 +112,15 @@ class Course
     public function getCanvasCoursesToImport(string $courseAlias = 'c', string $sectionAlias = 'cs'): Builder
     {
         $pb = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
-            ->greaterThan('term.date_end', date('Y-m-d'))
+            ->greaterThan('term.end_at', date('Y-m-d'))
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $pb = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
+                ->greaterThan('term.date_end', date('Y-m-d'))
+                ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
+        }
+
         return (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
             ->all($pb);
     }

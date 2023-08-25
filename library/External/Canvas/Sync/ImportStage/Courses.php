@@ -103,6 +103,20 @@ class Courses
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql               = "
         SELECT
+               account.id           'account.canvas_id',
+               course.name          'course.name',
+               course.id            'course.canvas_id',
+               course.course_code   'course.code',
+               enrollment_term.name 'enrollment_term.name'
+        FROM courses course
+        JOIN enrollment_terms enrollment_term ON enrollment_term.id = course.enrollment_term_id
+        JOIN accounts account ON course.account_id = account.id
+        WHERE {$courseFilterWhere}
+        ORDER BY account.id, course.course_code, enrollment_term.start_at, course.id
+        ";
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql = "
+        SELECT
                account.canvas_id           'account.canvas_id',
                course.name                 'course.name',
                course.canvas_id            'course.canvas_id',
@@ -114,6 +128,7 @@ class Courses
         WHERE {$courseFilterWhere}
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id
         ";
+        }
         $statement         = $this->canvasDb->getConnector()->executeQuery($sql, $courseFilterPb->getParams());
 
         // Parse results into hierarchical structure
@@ -189,12 +204,22 @@ class Courses
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
         $sql         = "
+            SELECT DISTINCT c.id
+            FROM courses c
+            JOIN course_sections cs ON cs.course_id = c.id
+            JOIN enrollment_terms term ON term.id = c.enrollment_term_id
+            WHERE {$whereClause}
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql         = "
             SELECT DISTINCT c.canvas_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
             WHERE {$whereClause}
         ";
+        }
         $canvasIds   = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
         return array_map(static function (string $canvasId) {
             return (int)$canvasId;

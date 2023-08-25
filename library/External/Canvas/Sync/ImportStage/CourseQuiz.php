@@ -121,7 +121,34 @@ class CourseQuiz extends CourseAssessmentAbstract
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
         $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
+
         $sql               = "
+        SELECT
+               course.id                   'course.canvas_id',
+               course.name                 'course.name',
+               quiz.id                     'quiz.canvas_id',
+               quiz.title                  'quiz.name',
+               quiz.description            'quiz.description',
+               CONVERT_TZ(quiz.created_at, 'UTC', :timezone) 'quiz.created_at',
+               CONVERT_TZ(quiz.updated_at, 'UTC', :timezone) 'quiz.updated_at',
+               quiz.points_possible        'quiz.points_possible',
+               quiz.quiz_type              'quiz.quiz_type',
+               -- TODO: FIX THIS
+               quiz.hide_results           'quiz.show_results',
+               quiz.anonymous_submissions  'quiz.anonymous_submissions',
+               quiz.time_limit             'quiz_fact.time_limit',
+               quiz.allowed_attempts       'quiz_fact.allowed_attempts'
+        FROM courses course
+        JOIN quizzes quiz ON quiz.context_id = course.id AND quiz.workflow_state = 'available' AND quiz.context_type = 'Course'
+        LEFT JOIN assignments assignment ON quiz.assignment_id = assignment.id
+        LEFT JOIN assignment_groups assignment_group on assignment.assignment_group_id = assignment_group.id
+        WHERE {$courseFilterWhere}
+        -- TODO cater for quiz/assignment positioning
+        ORDER BY course.course_code, course.id, assignment_group.position, assignment.position
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql               = "
         SELECT
                course.canvas_id            'course.canvas_id',
                course.name                 'course.name',
@@ -145,6 +172,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         -- TODO cater for quiz/assignment positioning
         ORDER BY course.code, course.canvas_id, assignment_group.position, assignment.position
         ";
+        }
         $statement = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
 
         // Parse results into hierarchical structure

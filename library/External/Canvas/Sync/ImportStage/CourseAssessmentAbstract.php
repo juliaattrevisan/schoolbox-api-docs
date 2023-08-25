@@ -183,12 +183,22 @@ abstract class CourseAssessmentAbstract
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
         $sql         = "
+            SELECT DISTINCT c.id
+            FROM courses c
+            JOIN course_sections cs ON cs.course_id = c.id
+            JOIN enrollment_terms term ON term.id = c.enrollment_term_id
+             WHERE {$whereClause}
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql         = "
             SELECT DISTINCT c.canvas_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
              WHERE {$whereClause}
         ";
+        }
         $canvasIds   = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
         return array_map(static function (string $canvasId) {
             return (int)$canvasId;

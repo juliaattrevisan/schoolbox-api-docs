@@ -477,13 +477,24 @@ class CourseSection
     {
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
-        $sql         = "
+
+        $sql = "
+            SELECT cs.sis_source_id, term.name as term_name, term.sis_source_id as term_sis_id
+            FROM courses c
+            JOIN course_sections cs ON cs.course_id = c.id
+            JOIN enrollment_terms term ON term.id = c.enrollment_term_id
+            WHERE {$whereClause}
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql = "
             SELECT cs.sis_source_id, term.name as term_name, term.sis_source_id as term_sis_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
             WHERE {$whereClause}
         ";
+        }
         return $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams())->fetchAll();
     }
 
@@ -538,7 +549,25 @@ class CourseSection
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
         $pb          = (new Builder($mySqlQuoter, ''))->in('section.sis_source_id', $sectionSisSourceIds);
         $whereClause = implode(' AND ', $pb->getWhere());
+
         $sql         = "
+            SELECT
+                course.id                   'course.canvas_id',
+                course.name                 'course.name',
+                section.id                  'section.canvas_id',
+                section.sis_source_id       'section.sis_source_id',
+                section_student.id          'section_student.canvas_id',
+                section_student.sis_user_id 'section_student.sis_user_id'
+            FROM courses course
+            JOIN course_sections section ON course.id = section.course_id
+            LEFT JOIN enrollments enrollment ON enrollment.course_section_id = section.id AND enrollment.type = 'StudentEnrollment' AND enrollment.workflow_state = 'active'
+            LEFT JOIN pseudonyms section_student ON section_student.user_id = enrollment.user_id AND section_student.sis_user_id IS NOT NULL
+            WHERE {$whereClause}
+            ORDER BY course.course_code, course.id, section.id
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql         = "
             SELECT
                 course.canvas_id            'course.canvas_id',
                 course.name                 'course.name',
@@ -553,6 +582,7 @@ class CourseSection
             WHERE {$whereClause}
             ORDER BY course.code, course.canvas_id, section.canvas_id
         ";
+        }
 
         $data      = [];
         $statement = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams());

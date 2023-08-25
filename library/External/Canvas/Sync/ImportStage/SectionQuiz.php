@@ -164,7 +164,52 @@ class SectionQuiz extends SectionAssessmentAbstract
         $pb          = (new Builder($mySqlQuoter, ''))->in('section.sis_source_id', $sectionSisSourceIds);
         $whereClause = implode(' AND ', $pb->getWhere());
 
-        $sql       = "
+        $sql = "
+            SELECT
+                course.id                                           'course.canvas_id',
+                quiz.id                                             'assessable.canvas_id',
+                quiz.title                                          'assessable.title',
+                'everyone'         'assessable.visibility',       -- TODO, confirm this logic via functional testing.
+                CONVERT_TZ(quiz.unlock_at, 'UTC', :timezone)        'assessable.unlock_at',
+                CONVERT_TZ(quiz.lock_at, 'UTC', :timezone)          'assessable.lock_at',
+                CONVERT_TZ(quiz.due_at, 'UTC', :timezone)           'assessable.due_at',
+                assignment.all_day                                  'assessable.all_day',
+                assignment.all_day_date                             'assessable.all_day_date',
+                override.id                                         'override.canvas_id',
+                override.title                                      'override.title',
+                CONVERT_TZ(override.unlock_at, 'UTC', :timezone)    'override.unlock_at',
+                CONVERT_TZ(override.lock_at, 'UTC', :timezone)      'override.lock_at',
+                CONVERT_TZ(override.due_at, 'UTC', :timezone)       'override.due_at',
+                override.all_day                                    'override.all_day',
+                override.all_day_date                               'override.all_day_date',
+                override_section.id                                 'override_section.canvas_id',
+                override_section.sis_source_id                      'override_section.sis_source_id',
+                override_group.id                                   'override_group.canvas_id',
+                override_group.name                                 'override_group.name',
+                group_pseudonym.id                                  'group_pseudonym.canvas_id',
+                group_pseudonym.sis_user_id                         'group_pseudonym.sis_user_id',
+                user_pseudonym.id                                   'user_pseudonym.canvas_id',
+                user_pseudonym.sis_user_id                          'user_pseudonym.sis_user_id'
+            FROM courses course
+            JOIN course_sections section ON course.id = section.course_id
+            LEFT JOIN quizzes quiz ON quiz.context_id = section.course_id AND quiz.id IN ({$quizCanvasIdBindings->getPlaceholder()})
+            LEFT JOIN assignments assignment ON assignment.id = quiz.assignment_id
+            LEFT JOIN assignment_overrides override ON override.quiz_id = quiz.id AND override.workflow_state = 'active' AND override.set_type IS NOT NULL -- (master paths have set_type = NULL, not yet supported)
+            -- course sections
+            LEFT JOIN course_sections override_section ON override.set_id = override_section.id AND override.set_type = 'CourseSection'
+            -- course groups
+            LEFT JOIN `groups` override_group ON override_group.id = override.set_id AND override.set_type = 'Group'
+            LEFT JOIN group_memberships group_membership ON group_membership.group_id = override_group.id
+            LEFT JOIN pseudonyms group_pseudonym ON group_pseudonym.user_id = group_membership.user_id
+            -- individual assignees
+            LEFT JOIN assignment_override_students override_user ON override_user.assignment_override_id = override.id AND override.set_type = 'ADHOC'
+            LEFT JOIN pseudonyms user_pseudonym ON user_pseudonym.user_id = override_user.user_id
+            WHERE {$whereClause}
+            ORDER BY course.course_code, course.id, section.id, quiz.id, override.id
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql = "
             SELECT
                 course.canvas_id                                    'course.canvas_id',
                 quiz.canvas_id                                      'assessable.canvas_id',
@@ -207,6 +252,7 @@ class SectionQuiz extends SectionAssessmentAbstract
             WHERE {$whereClause}
             ORDER BY course.code, course.canvas_id, section.canvas_id, quiz.canvas_id, override.canvas_id
         ";
+        }
         $statement = $this->canvasDb->getConnector()->executeQuery(
             $sql,
             array_merge(

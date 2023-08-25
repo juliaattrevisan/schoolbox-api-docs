@@ -106,7 +106,32 @@ class CourseAssignments extends CourseAssessmentAbstract
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
         $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
+
         $sql               = "
+        SELECT
+               course.id                   'course.canvas_id',
+               course.name                 'course.name',
+               assignment.id               'assignment.canvas_id',
+               assignment.title            'assignment.title',
+               assignment.description      'assignment.description',
+               assignment.points_possible  'assignment.points_possible',
+               assignment.grading_type     'assignment.grading_type',
+               assignment.submission_types 'assignment.submission_types',
+               assignment.created_at,
+               CONVERT_TZ(assignment.created_at, 'UTC', :timezone) 'assignment.created_at',
+               CONVERT_TZ(assignment.updated_at, 'UTC', :timezone) 'assignment.updated_at',
+               null                        'assignment.muted',
+               assignment_group.name       'assignment_group.name'
+        FROM courses course
+        JOIN assignments assignment ON assignment.context_id = course.id AND assignment.workflow_state = 'published' AND assignment.context_type = 'Course'
+        LEFT JOIN assignment_groups assignment_group on assignment.assignment_group_id = assignment_group.id
+        LEFT JOIN quizzes quiz ON quiz.assignment_id = assignment.id
+        WHERE {$courseFilterWhere} AND quiz.id IS NULL
+        ORDER BY course.course_code, course.id, assignment_group.position, assignment.position
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql               = "
         SELECT
                course.canvas_id            'course.canvas_id',
                course.name                 'course.name',
@@ -127,6 +152,8 @@ class CourseAssignments extends CourseAssessmentAbstract
         WHERE {$courseFilterWhere} AND quiz.id IS NULL
         ORDER BY course.code, course.canvas_id, assignment_group.position, assignment.position
         ";
+        }
+
         $statement         = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
 
         // Parse results into hierarchical structure

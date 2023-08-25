@@ -157,9 +157,15 @@ abstract class SubmissionAbstract
             return $this->canvasUserIdUserMap[$canvasUserId];
         }
 
-        $sql = "SELECT sis_user_id, unique_name FROM pseudonym_dim
+        $sql = "SELECT sis_user_id, unique_id as unique_name FROM pseudonyms
                  WHERE workflow_state = 'active'
                    AND user_id = :userId";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql = "SELECT sis_user_id, unique_name FROM pseudonym_dim
+                 WHERE workflow_state = 'active'
+                   AND user_id = :userId";
+        }
 
         $statement = $this->canvasDb->getConnector()->executeQuery($sql, ['userId' => $canvasUserId]);
 

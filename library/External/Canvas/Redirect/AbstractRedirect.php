@@ -74,6 +74,9 @@ class AbstractRedirect
         $this->canvasDb     = $canvasDb;
         $this->folderMapper = $folderMapper;
         $this->db           = $folderMapper->getDatabase();
+        if (!$canvasDb->isCanvasData2) {
+            $this->courseCodeColumn = 'code';
+        }
     }
 
     /**
@@ -148,11 +151,18 @@ class AbstractRedirect
          * Only care about the states "claimed" and "available", according to the cox
          */
         $query = "
-            SELECT id
+            SELECT id as canvas_id
             FROM courses
             WHERE {$this->courseCodeColumn} = :courseCode
-            AND workflow_state IN ('claimed', 'available')
-        ";
+            AND workflow_state IN ('claimed', 'available')";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $query = "
+            SELECT canvas_id
+            FROM course_dim
+            WHERE {$this->courseCodeColumn} = :courseCode
+            AND workflow_state IN ('claimed', 'available')";
+        }
 
         $statement = $this->canvasDb->getConnector()->prepareQuery($query);
 
@@ -160,6 +170,6 @@ class AbstractRedirect
 
         $row = $statement->fetch();
 
-        return $row ? (int)$row['id'] : null;
+        return $row ? (int)$row['canvas_id'] : null;
     }
 }
