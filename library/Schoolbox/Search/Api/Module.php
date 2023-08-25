@@ -13,7 +13,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Permission\Access\Access;
@@ -21,6 +20,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
+use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User\Formatter\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
@@ -71,7 +71,7 @@ class Module extends BaseModule
         /** @var IConnector $database */
         $database = $this->injector->get('databaseInternalRead');
 
-        // Need a user name formatter
+        // Need a username formatter
         $userNameFormatter = (new Factory())->buildFromConfig($config);
 
         // Need a route generator
@@ -89,6 +89,7 @@ class Module extends BaseModule
                 new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -113,6 +114,10 @@ class Module extends BaseModule
                 new Database\ResultType\Event\Hydrator(
                     $mapperFactory->get(UserMapper::class),
                     $mapperFactory->get(FolderMapper::class),
+                ),
+                new Database\ResultType\Link\Hydrator(
+                    $mapperFactory->get(LinkMapper::class),
+                    Access::getInstance(),
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
