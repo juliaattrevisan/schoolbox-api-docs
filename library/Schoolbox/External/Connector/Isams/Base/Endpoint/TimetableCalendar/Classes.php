@@ -54,13 +54,6 @@ class Classes implements IStrategy
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
     }
 
 
@@ -122,10 +115,11 @@ class Classes implements IStrategy
      * Process all the classes that occur on period $periodId
      *
      * @param ScheduleCompiler $scheduleCompiler
-     * @param string           $guidPrefix
-     * @param array            $dayData
-     * @param array            $periodData
-     * @param array|null       $classes
+     * @param string $guidPrefix
+     * @param string $divisionId
+     * @param array $dayData
+     * @param array $periodData
+     * @param array|null $classes
      * @return void
      * @throws Exception
      * @throws \PDOException
