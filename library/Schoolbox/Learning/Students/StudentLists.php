@@ -139,7 +139,7 @@ class StudentLists
         usort(
             $students,
             static function (array $a, array $b) {
-                $cmp = strnatcasecmp($a['lastname'], $b['lastname']);
+                $cmp = strnatcasecmp($a['lastname'] ?? '', $b['lastname'] ?? '');
                 if ($cmp !== 0) {
                     return $cmp;
                 }

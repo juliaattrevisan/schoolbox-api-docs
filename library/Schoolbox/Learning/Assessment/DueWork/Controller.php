@@ -486,7 +486,7 @@ class Controller extends Assessment\Controller
         // Sort participant by lastname, firstname, and id
         $participants = $assessment->getParticipantUsers()->sortByCallback(
             static function (User $participantA, User $participantB) {
-                return strnatcasecmp($participantA->getLastname(), $participantB->getLastname())
+                return strnatcasecmp($participantA->getLastname() ?? '', $participantB->getLastname() ?? '')
                     ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
                         ?: strnatcasecmp($participantA->getId(), $participantB->getId());
             }
