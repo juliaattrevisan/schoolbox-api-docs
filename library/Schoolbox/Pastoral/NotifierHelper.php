@@ -121,8 +121,8 @@ class NotifierHelper
             try {
                 if ($pastoralAccess->getRole() instanceof Role) {
                     $targetUsers += $this->buildTargetUsersForRole(
-                                              $pastoralAccess->getRole(),
-                                              $student,
+                        $pastoralAccess->getRole(),
+                        $student,
                         parentAccessEnabled:  $parentAccessEnabled && $nonStaffCommentAllowed,
                         studentAccessEnabled: $studentAccessEnabled && $nonStaffCommentAllowed,
                         matchCampus:          $pastoralAccess->getMatchCampus(),
@@ -130,8 +130,8 @@ class NotifierHelper
                     );
                 } elseif ($pastoralAccess->getRoleType()) {
                     $targetUsers += $this->buildTargetUsersForRoleType(
-                                              $pastoralAccess->getRoleType(),
-                                              $student,
+                        $pastoralAccess->getRoleType(),
+                        $student,
                         parentAccessEnabled:  $parentAccessEnabled && $nonStaffCommentAllowed,
                         studentAccessEnabled: $studentAccessEnabled && $nonStaffCommentAllowed,
                         matchCampus:          $pastoralAccess->getMatchCampus(),
@@ -139,8 +139,8 @@ class NotifierHelper
                     );
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     $targetUsers += $this->buildTargetUsersForGroup(
-                                              $pastoralAccess->getGroup()->getId(),
-                                              $student,
+                        $pastoralAccess->getGroup()->getId(),
+                        $student,
                         parentAccessEnabled:  $parentAccessEnabled && $nonStaffCommentAllowed,
                         studentAccessEnabled: $studentAccessEnabled && $nonStaffCommentAllowed,
                         matchCampus:          $pastoralAccess->getMatchCampus(),
