@@ -62,25 +62,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The relevance of a textbox is its modified time.  TODO: No modified time, so remove this function?
      *
      * @return string
-     *
+     */
     protected function buildRelevanceExpression(): string
     {
-        return $this->buildLinearDecayExpression(
-            ':textboxNow',
-            'l.modified',
-            7,
-            56,
-        );
+        return '0.5';
     }
 
     /**
      * Textboxes are ordered by relevance, as they have a modified time.  TODO: No modified time, so remove this function?
      *
      * @return bool
-     *
+     */
     protected function isOrderedByRelevance(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -125,20 +120,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The textbox's date is its modified date.  TODO: No modified date, so remove this function?
      *
      * @return string|null
-     *
+     */
     protected function buildDateExpression(): ?string
     {
-        return 'l.modified';
+        return null;
     }
 
     /**
      * The textbox's creator is its `owner` column.  TODO: No modified date, so remove this function?
      *
      * @return string|null
-     *
+     */
     protected function buildCreatorExpression(): ?string
     {
-        return 'l.owner';
+        return null;
     }
 
     /**
@@ -159,7 +154,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildFromStatement(): string
     {
         return '
-            FROM textbox l
+            FROM textBox tb
             INNER JOIN folder fo ON tb.categoryID = fo.id
         ';
     }

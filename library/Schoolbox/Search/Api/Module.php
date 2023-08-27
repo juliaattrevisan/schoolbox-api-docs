@@ -21,6 +21,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\User\Formatter\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
