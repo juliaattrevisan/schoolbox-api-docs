@@ -200,6 +200,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                 FROM        sis_class c
                 LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
                 INNER JOIN  sis_user_profile u ON u.external_id = cp.teacher_external_id
+                INNER JOIN  sis_user_profile_staff ups ON u.id = ups.sis_user_profile_id
                 WHERE       c.code IN ({$predicate['placeholders']})
                 ORDER BY    u.lastname,
                             u.firstname
