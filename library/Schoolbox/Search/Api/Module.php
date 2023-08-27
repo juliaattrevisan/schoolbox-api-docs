@@ -90,6 +90,7 @@ class Module extends BaseModule
                 new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -117,6 +118,10 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Link\Hydrator(
                     $mapperFactory->get(LinkMapper::class),
+                    Access::getInstance(),
+                ),
+                new Database\ResultType\Textbox\Hydrator(
+                    $mapperFactory->get(TextboxMapper::class),
                     Access::getInstance(),
                 ),
             ),
