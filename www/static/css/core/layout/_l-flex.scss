@@ -16,13 +16,13 @@
     display: flex;
 
     > * {
-        flex-wrap: wrap; // always allow flex items to wrap
         max-width: 100%; // prevent flex items from overflowing the container
     }
 
     &-col,
     &-row {
         display: flex;
+        flex-wrap: wrap; // always allow flex items to wrap
     }
 
     &-col {
