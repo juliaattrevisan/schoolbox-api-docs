@@ -58,6 +58,7 @@ class External_Isams_Class implements External_ClassInterface
 
         $query = "
             SELECT    V_Student.StudentSurname      AS lastname,
+                      ''                            AS preferredname,
                       V_Student.StudentFirstname    AS firstname,
                       V_Student.Grade               AS yearlevel,
                       ''                            AS house,

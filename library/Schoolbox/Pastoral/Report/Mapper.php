@@ -470,7 +470,7 @@ class Mapper extends BaseMapper
                             if ($a->getUser()->getLastname() === $b->getUser()->getLastname()) {
                                 return strnatcasecmp($a->getUser()->getFirstname(), $b->getUser()->getFirstname());
                             }
-                            return strnatcasecmp($a->getUser()->getLastname(), $b->getUser()->getLastName());
+                            return strnatcasecmp($a->getUser()->getLastname() ?? '', $b->getUser()->getLastName() ?? '');
                         }
                         if ($a->getGroup() && $b->getGroup()) {
                             return strnatcasecmp($a->getGroup()->getName(), $b->getGroup()->getName());

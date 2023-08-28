@@ -14,6 +14,7 @@ interface External_ClassInterface extends External\IConnector
      * Get a list of students in a particular $classCode
      *
      * string      $return[]['lastname']
+     * string      $return[]['preferredname']
      * string      $return[]['firstname']
      * string      $return[]['yearlevel']
      * null|string $return[]['house']                     The name of the student's house. NULL if unknown.

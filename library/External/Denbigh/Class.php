@@ -44,6 +44,7 @@ class External_Denbigh_Class implements External_ClassInterface
                 SELECT      p.denbighID,
                             p.surname,
                             p.preferred_name,
+                            p.given_names,
                             s.academicYear,
                             s.house
                 FROM        Classes c
@@ -63,7 +64,8 @@ class External_Denbigh_Class implements External_ClassInterface
             $students[] = [
                 'synergy_id'              => $student['denbighID'],
                 'lastname'                => $student['surname'],
-                'firstname'               => $student['preferred_name'],
+                'preferredname'           => $student['preferred_name'],
+                'firstname'               => $student['given_names'],
                 'yearlevel'               => $student['academicYear'],
                 'house'                   => $student['house'],
                 'StudentMedicalAlert'     => '',

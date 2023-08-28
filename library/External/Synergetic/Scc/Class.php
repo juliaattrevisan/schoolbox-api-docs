@@ -8,7 +8,6 @@
 
 class External_Synergetic_Scc_Class extends External_Synergetic_Class
 {
-
     /**
      * @inheritdoc
      */
@@ -29,7 +28,9 @@ class External_Synergetic_Scc_Class extends External_Synergetic_Class
         $fileYear = $this->getDatabase()->legacyQuote($this->getExternalUser()->getCurrentYear($userExternalId));
 
         $query = "
-        SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
+        SELECT DISTINCT StudentClasses.StudentSurname as lastname,
+                        StudentClasses.StudentPreferred as preferredname,
+                        StudentClasses.StudentGiven1 as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel,
                         StudentClasses.StudentHouseDescription as house,
                         vStudents.StudentMedicalAlert,

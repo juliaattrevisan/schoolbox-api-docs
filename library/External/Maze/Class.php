@@ -53,6 +53,7 @@ class External_Maze_Class implements External_ClassInterface
             SELECT
                 ST.STKEY AS ID,
                 ST.FIRST_NAME AS Firstname,
+                '' AS Preferredname,
                 ST.SURNAME AS Surname,
                 REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS YearLevel,
                 KGH.DESCRIPTION AS House,
@@ -94,6 +95,7 @@ class External_Maze_Class implements External_ClassInterface
             SELECT
                 ST.STKEY AS ID,
                 ST.FIRST_NAME AS Firstname,
+                '' AS Preferredname,
                 ST.SURNAME AS Surname,
                 REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS YearLevel,
                 KGH.DESCRIPTION AS House,
@@ -123,6 +125,7 @@ class External_Maze_Class implements External_ClassInterface
                 $student = array(
                     'synergy_id' => $currentStudent['ID'],
                     'firstname' => $currentStudent['Firstname'],
+                    'preferredname' => $currentStudent['Preferredname'],
                     'lastname' => $currentStudent['Surname'],
                     'yearlevel' => $currentStudent['YearLevel'],
                     'house' => $currentStudent['House'],

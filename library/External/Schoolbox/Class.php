@@ -18,7 +18,7 @@ use Schoolbox\Role;
 class External_Schoolbox_Class implements External_ClassInterface
 {
     /** @var IConnector $internalDatabase */
-    private $internalDatabase;
+    private IConnector $internalDatabase;
 
 
     /**
@@ -51,12 +51,13 @@ class External_Schoolbox_Class implements External_ClassInterface
         $found               = [];
 
         foreach ($studentIterator as $student) {
-            $studentExternalId = $student['synergy_id'];
+            $studentExternalId = $student['external_id'];
 
             if (!array_key_exists($studentExternalId, $found)) {
                 $studentListAdaption[] = [
                     'synergy_id'              => $studentExternalId,
                     'lastname'                => $student['lastname'],
+                    'preferredname'           => $student['preferred_firstname'],
                     'firstname'               => $student['firstname'],
                     'yearlevel'               => $student['year_level'],
                     'house'                   => $student['house_name'],
@@ -76,53 +77,55 @@ class External_Schoolbox_Class implements External_ClassInterface
 
 
     /**
-     * {@inheritDoc}
      * @param string $classCodes
      * @param string $type Const indicating type of user (e.g. Group::STUDENT_GROUP_TYPE)
      *
-     * @return IIterator
+     * @return IIterator|null
      * @throws \Alaress\Database\Exception
      */
-    protected function getClassIterator($classCodes, $type)
+    protected function getClassIterator(string $classCodes, string $type): ?IIterator
     {
         $codes = array_filter(explode(',', $classCodes));
 
         if (empty($codes)) {
-            return [];
+            return null;
         }
 
         $predicate = PredicateBuilder::getArrayBindings($codes, 'classCode');
 
+        $studentCols = $type === Role::STUDENT
+            ? ', sups.year_level,
+                 sups.house_name,
+                 sups.esl,
+                 sups.alert_medical,
+                 sups.special_needs,
+                 sups.tutor_group,
+                 sups.form_name'
+            : '';
+
+        $roleTypeJoin = match ($type) {
+            Role::STUDENT => ' JOIN sis_user_profile_student sups ON up.id = sups.sis_user_profile_id',
+            Role::STAFF => ' JOIN sis_user_profile_staff sups ON up.id = sups.sis_user_profile_id',
+            default => '',
+        };
+
         return $this->internalDatabase->prepareQuery(
             "
-                SELECT        u.id,
-                              u.synergy_id,
-                              u.title,
-                              u.firstname,
-                              u.lastname,
-                              sups.year_level,
-                              sups.house_name,
-                              sups.esl,
-                              sups.alert_medical,
-                              sups.special_needs,
-                              sups.tutor_group,
-                              sups.form_name
+                SELECT        up.external_id,
+                              up.title,
+                              up.firstname,
+                              up.preferred_firstname,
+                              up.lastname
+                              $studentCols
                 FROM          sis_class c
                     JOIN               sis_class_user cu ON cu.class_id = c.id
-                    JOIN               user u ON u.synergy_id = cu.external_id
-                    JOIN               `groups` g ON g.id = u.group_id
-                    LEFT JOIN          sis_user_profile up ON u.synergy_id = up.external_id
-                    LEFT JOIN          sis_user_profile_student sups ON up.id = sups.sis_user_profile_id
-                WHERE         c.code IN ({$predicate["placeholders"]}) AND
-                              g.group_type = :type AND
-                              u.deleted_at IS NULL
-                ORDER BY      u.lastname,
-                              u.firstname
+                    JOIN               sis_user_profile up ON cu.external_id = up.external_id
+                    $roleTypeJoin
+                WHERE         c.code IN ({$predicate["placeholders"]})
+                ORDER BY      up.lastname,
+                              up.firstname
             ",
-            array_merge(
-                $predicate["bindings"],
-                ['type' => $type]
-            )
+            $predicate["bindings"],
         )->getIterator();
     }
 
@@ -143,7 +146,7 @@ class External_Schoolbox_Class implements External_ClassInterface
 
         if ($classIterator instanceof IIterator) {
             foreach ($classIterator as $teacher) {
-                $teachers[] = $teacher['synergy_id'];
+                $teachers[] = $teacher['external_id'];
             }
         }
 
@@ -151,14 +154,14 @@ class External_Schoolbox_Class implements External_ClassInterface
 
         if ($teacherIterator instanceof IIterator) {
             foreach ($teacherIterator as $teacher) {
-                $teachers[] = $teacher['synergy_id'];
+                $teachers[] = $teacher['external_id'];
             }
         }
 
         /* Schedule Timetable might contain teacher involvements due to LISS
          * combining data sets with the cyclic timetable
          */
-        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
+        $pastThreshold   = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
         $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
 
         $staffExternalIds = (new \Schoolbox\External\Event\TimetableUsers(
@@ -176,13 +179,12 @@ class External_Schoolbox_Class implements External_ClassInterface
 
 
     /**
-     * {@inheritDoc}
      * @param string $classCodes
      *
      * @return IIterator|null
      * @throws \Alaress\Database\Exception
      */
-    protected function getTeacherIterator($classCodes): ?IIterator
+    protected function getTeacherIterator(string $classCodes): ?IIterator
     {
         $codes = array_filter(explode(',', $classCodes));
 
@@ -194,13 +196,12 @@ class External_Schoolbox_Class implements External_ClassInterface
 
         return $this->internalDatabase->prepareQuery(
             "
-                SELECT      u.id,
-                            u.synergy_id
+                SELECT      u.external_id
                 FROM        sis_class c
                 LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
-                INNER JOIN  user u ON u.synergy_id = cp.teacher_external_id
-                WHERE       c.code IN ({$predicate['placeholders']}) AND
-                            u.deleted_at IS NULL
+                INNER JOIN  sis_user_profile u ON u.external_id = cp.teacher_external_id
+                INNER JOIN  sis_user_profile_staff ups ON u.id = ups.sis_user_profile_id
+                WHERE       c.code IN ({$predicate['placeholders']})
                 ORDER BY    u.lastname,
                             u.firstname
             ",

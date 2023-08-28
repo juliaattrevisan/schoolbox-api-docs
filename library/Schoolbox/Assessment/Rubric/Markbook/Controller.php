@@ -834,7 +834,7 @@ class Controller extends Base
         uasort(
             $studentMarks,
             static function (array $a, array $b): int {
-                $last = strnatcasecmp($a['lastname'], $b['lastname']);
+                $last = strnatcasecmp($a['lastname'] ?? '', $b['lastname'] ?? '');
                 if ($last === 0) {
                     return strnatcasecmp($a['firstname'], $b['firstname']);
                 }

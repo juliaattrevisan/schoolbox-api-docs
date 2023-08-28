@@ -647,8 +647,8 @@ export default {
                                     <a :href="'/search/user/' + student.id">
                                         {{ student.lastname + ", " + student.firstname }}
                                         {{
-                                            student.preferred && student.preferred != student.firstname
-                                                ? "‘" + student.preferred + "’"
+                                            student.preferredname && student.preferredname != student.firstname
+                                                ? "‘" + student.preferredname + "’"
                                                 : ""
                                         }}
                                         {{ student.pronoun }}
@@ -657,8 +657,8 @@ export default {
                                 <template v-else>
                                     {{ student.lastname + ", " + student.firstname }}
                                     {{
-                                        student.preferred && student.preferred != student.firstname
-                                            ? "‘" + student.preferred + "’"
+                                        student.preferredname && student.preferredname != student.firstname
+                                            ? "‘" + student.preferredname + "’"
                                             : ""
                                     }}
                                     {{ student.pronoun }}

@@ -49,6 +49,7 @@ class External_Doublefirst_Class implements External_ClassInterface
         $query = "
                 SELECT DISTINCT
                     pbi.Surname as lastname,
+                    pbi.PreferredForeName as preferredname,
                     pbi.ForeName as firstname,
                     pbi.YearGroup as yearlevel,
                     pbi.House as house,

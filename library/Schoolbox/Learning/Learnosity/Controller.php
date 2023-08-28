@@ -861,7 +861,7 @@ class Controller extends Base
          * the place so I might as well add my two rupees to the pile
          */
         uasort($users, static function (array $a, array $b) {
-            $last = strnatcasecmp($a['lastname'], $b['lastname']);
+            $last = strnatcasecmp($a['lastname'] ?? '', $b['lastname'] ?? '');
             if ($last === 0) {
                 return strnatcasecmp($a['firstname'], $b['firstname']);
             }

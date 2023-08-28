@@ -67,7 +67,8 @@ class External_Tass_Class implements External_ClassInterface
         $query        = "
             SELECT DISTINCT
                 studsub.stud_code as synergy_id,
-                student.preferred_name as firstname,
+                student.preferred_name as preferredname,
+                student.given_name as firstname,
                 student.surname as lastname,
                 student.year_grp as yearlevel,
                 student.house,

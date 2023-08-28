@@ -44,6 +44,7 @@ class External_Pcschools_Class implements External_ClassInterface
 
         $query = "SELECT DISTINCT
                     st.LEGAL_SURNAME AS lastname,
+                    st.KNOWN_AS_NAME AS preferredname,
                     st.GIVEN_NAME AS firstname,
                     st.CURRENT_YEAR AS yearlevel,
                     st.HOUSE AS house,
