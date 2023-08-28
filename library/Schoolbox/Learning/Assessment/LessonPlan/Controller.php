@@ -31,6 +31,8 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
@@ -260,13 +262,28 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * APIs
+     * Get the list of all linked assessments for a lesson plan
+     *
+     * @param Model $assessment
+     * @return void
+     * @api GET /learning/assessments/{assessmentId}/activities
      */
     public function getActivities(Model $assessment): void
     {
         $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()));
     }
 
+    /**
+     * Joins an assessment to a lesson plan
+     * Will ensure you are only joining an assessment from the same course this lesson plan is part of
+     *
+     * @param Model       $assessment
+     * @param IAssessable $linkedAssessment
+     * @return void
+     * @throws Exception
+     * @throws Deleted
+     * @api POST /learning/assessments/{assessmentId}/activities/{linkId}
+     */
     public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
         // don't link to my self...
@@ -289,6 +306,15 @@ class Controller extends Assessment\Controller
         }
     }
 
+    /**
+     * Remove an assessment link from a lesson plan
+     *
+     * @param Model       $assessment
+     * @param IAssessable $linkedAssessment
+     * @return void
+     * @throws Exception
+     * @api POST /learning/assessments/{assessmentId}/activities/{linkId}
+     */
     public function deleteActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
         $return = $this->linkedAssessmentsMapper->deleteLink($assessment, $linkedAssessment);
