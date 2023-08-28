@@ -147,8 +147,7 @@ class SectionAssignment extends SectionAssessmentAbstract
                 course.id                                           'course.canvas_id',
                 assignment.id                                       'assessable.canvas_id',
                 assignment.title                                    'assessable.title',
-                -- TODO: find this
-                'assignment.visibility'                               'assessable.visibility',
+                IF(assignment.only_visible_to_overrides, 'only_visible_to_overrides', 'everyone') 'assessable.visibility',
                 CONVERT_TZ(assignment.unlock_at, 'UTC', :timezone)  'assessable.unlock_at',
                 CONVERT_TZ(assignment.lock_at, 'UTC', :timezone)    'assessable.lock_at',
                 CONVERT_TZ(assignment.due_at, 'UTC', :timezone)     'assessable.due_at',

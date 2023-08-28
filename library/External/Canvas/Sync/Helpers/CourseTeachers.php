@@ -51,7 +51,7 @@ class CourseTeachers
         }
 
         $pb          = (new Builder(new Database\Quoter\Mysql\Quoter(), ''))
-            ->in('course.canvas_id', array_keys($courseCanvasIds))
+            ->in('course.id', array_keys($courseCanvasIds))
             ->equals('enrollment.type', 'TeacherEnrollment')
             ->in('pseudonym.sis_user_id', array_keys($externalIdToUserIdMap));
         $whereClause = implode(' AND ', $pb->getWhere());
@@ -66,6 +66,11 @@ class CourseTeachers
                 GROUP BY course.id
             ";
         if (!$this->canvasDb->isCanvasData2) {
+            $pb          = (new Builder(new Database\Quoter\Mysql\Quoter(), ''))
+                ->in('course.canvas_id', array_keys($courseCanvasIds))
+                ->equals('enrollment.type', 'TeacherEnrollment')
+                ->in('pseudonym.sis_user_id', array_keys($externalIdToUserIdMap));
+            $whereClause = implode(' AND ', $pb->getWhere());
             $sql         = "
                 SELECT
                     course.canvas_id      'course.canvas_id',

@@ -169,7 +169,7 @@ class SectionQuiz extends SectionAssessmentAbstract
                 course.id                                           'course.canvas_id',
                 quiz.id                                             'assessable.canvas_id',
                 quiz.title                                          'assessable.title',
-                'everyone'         'assessable.visibility',       -- TODO, confirm this logic via functional testing.
+                IF(assignment.only_visible_to_overrides, 'only_visible_to_overrides', 'everyone') 'assessable.visibility',
                 CONVERT_TZ(quiz.unlock_at, 'UTC', :timezone)        'assessable.unlock_at',
                 CONVERT_TZ(quiz.lock_at, 'UTC', :timezone)          'assessable.lock_at',
                 CONVERT_TZ(quiz.due_at, 'UTC', :timezone)           'assessable.due_at',

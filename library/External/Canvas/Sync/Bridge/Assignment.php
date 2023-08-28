@@ -235,13 +235,16 @@ class Assignment
     /**
      * Returns whether a canvas assignment's submissionTypes indicates it can be submitted online
      *
-     * @param string $submissionTypes
+     * @param string|array $submissionTypes
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function getAcceptOnline(string $submissionTypes): bool
+    public function getAcceptOnline(string|array $submissionTypes): bool
     {
-        foreach (array_filter(array_map('trim', explode(',', $submissionTypes))) as $submissionType) {
+        if (is_string($submissionTypes)) {
+            $submissionTypes = array_filter(array_map('trim', explode(',', $submissionTypes)));
+        }
+        foreach ($submissionTypes as $submissionType) {
             if ($this->acceptsOnline($submissionType)) {
                 return true;
             }
@@ -253,13 +256,16 @@ class Assignment
     /**
      * Returns whether a canvas assignment's submissionTypes indicates it can be submitted online multiple times
      *
-     * @param string $submissionTypes
+     * @param string|array $submissionTypes
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function getAcceptMultiple(string $submissionTypes): bool
+    public function getAcceptMultiple(string|array $submissionTypes): bool
     {
-        foreach (array_filter(array_map('trim', explode(',', $submissionTypes))) as $submissionType) {
+        if (is_string($submissionTypes)) {
+            $submissionTypes = array_filter(array_map('trim', explode(',', $submissionTypes)));
+        }
+        foreach ($submissionTypes as $submissionType) {
             if ($this->acceptsMultiple($submissionType)) {
                 return true;
             }

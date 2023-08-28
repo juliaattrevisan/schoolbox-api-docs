@@ -104,7 +104,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         $this->resetCounts();
 
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
-        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
 
         $sql               = "
@@ -131,6 +131,8 @@ class CourseAssignments extends CourseAssessmentAbstract
         ";
 
         if (!$this->canvasDb->isCanvasData2) {
+            $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+            $courseFilterWhere = $courseFilterPb->getWhere()[0];
             $sql               = "
         SELECT
                course.canvas_id            'course.canvas_id',
@@ -285,6 +287,10 @@ class CourseAssignments extends CourseAssessmentAbstract
         int $position,
         ?string $assignmentGroup
     ): SubmissionBox {
+        if ($this->canvasDb->isCanvasData2) {
+            // The format of submission types is changed in Data 2
+            $submissionTypes = json_decode($submissionTypes);
+        }
         // Translate Canvas attributes to SB attributes if not a 1:1 between systems
         $maxMark           = $this->assignmentBridge->getMaxMark($pointsPossible);
         $markType          = $this->assignmentBridge->getMarkType($gradingType, $pointsPossible);

@@ -99,7 +99,7 @@ class Courses
         // have an assignment, and an assignment may or may not have a quiz.
 
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
-        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql               = "
         SELECT
@@ -115,6 +115,8 @@ class Courses
         ORDER BY account.id, course.course_code, enrollment_term.start_at, course.id
         ";
         if (!$this->canvasDb->isCanvasData2) {
+            $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+            $courseFilterWhere = $courseFilterPb->getWhere()[0];
             $sql = "
         SELECT
                account.canvas_id           'account.canvas_id',

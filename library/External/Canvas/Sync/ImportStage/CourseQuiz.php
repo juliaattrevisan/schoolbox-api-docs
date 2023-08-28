@@ -119,10 +119,10 @@ class CourseQuiz extends CourseAssessmentAbstract
         $this->resetCounts();
 
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
-        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
 
-        $sql               = "
+        $sql = "
         SELECT
                course.id                   'course.canvas_id',
                course.name                 'course.name',
@@ -148,6 +148,8 @@ class CourseQuiz extends CourseAssessmentAbstract
         ";
 
         if (!$this->canvasDb->isCanvasData2) {
+            $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+            $courseFilterWhere = $courseFilterPb->getWhere()[0];
             $sql               = "
         SELECT
                course.canvas_id            'course.canvas_id',
@@ -237,7 +239,7 @@ class CourseQuiz extends CourseAssessmentAbstract
                     $quizData['muted'],
                     $quizData['quiz_type'],
                     $quizData['anonymous_submissions'],
-                    $quizData['time_limit'],
+                    $quizData['time_limit'] ?? -1,
                     $quizData['allowed_attempts'],
                     $quizData['position']
                 );
@@ -783,7 +785,6 @@ class CourseQuiz extends CourseAssessmentAbstract
 
         return $quiz;
     }
-
 
 
     /**
