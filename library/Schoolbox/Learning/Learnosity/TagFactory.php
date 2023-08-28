@@ -18,7 +18,7 @@ namespace Schoolbox\Learning\Learnosity;
  * end up having to generate the entire set correctly each time
  * you change it.
  */
-class TagGenerator
+class TagFactory
 {
     /**
      * $schoolCode is mandatory to prevent one school seeing another's data
@@ -47,7 +47,7 @@ class TagGenerator
      * @param string|null $classCode
      * @return array
      */
-    public function generate(
+    public function produce(
         ?string $courseSpecUuid,
         ?string $courseImplUuid,
         ?string $courseUnitSpecUuid,
