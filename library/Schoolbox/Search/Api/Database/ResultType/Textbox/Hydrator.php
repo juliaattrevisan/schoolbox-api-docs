@@ -74,9 +74,6 @@ class Hydrator extends BaseHydrator
                     if ($textboxAccess < UserAccess::ACCESS_READ) {
                         return null;
                     }
-                    if ($textboxAccess < UserAccess::ACCESS_WRITE) {
-                        return null;
-                    }
                     return new FullResult(
                         $match,
                         $match->id,
