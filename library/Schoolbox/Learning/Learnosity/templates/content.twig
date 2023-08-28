@@ -3,6 +3,7 @@
  #
  # @param IAssessable $assessment    Our schoolbgox quiz instance
  # @param string|array $initOptions  Learnosity API initialisation object
+ # @param array $tags                A set of (type, name) tag tuples
  # @param string $returnUrl          A redirect back to a place from whence you came.
  #}
 <script src="https://authorapi-au.learnosity.com/?v2023.2.LTS"></script>
@@ -41,12 +42,14 @@
 {% autoescape 'js' %}
 <script>
     /* Force tagging to occur immediately
-     * FIXME ...but why must I save it immediately upon spawn? Why can't it have these tags already
+     * tags_on_create requires you to hit the save button or authorApp.saveActivity()
+     * in order to spawn tags. Using authorApp.setActivityTags() allows you have tags
+     * spawned immediately upon authorApp rendering
      */
     let authorAppCallback = {
         readyListener: function () {
             authorApp.on('render:activity', function(event) {
-                authorApp.saveActivity();
+                authorApp.setActivityTags({{ tags|raw }});
             });
         }
     };

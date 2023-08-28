@@ -95,18 +95,6 @@ class Controller extends Base
                     'reference' => [
                         'show' => false,
                     ],
-                    /* Apply activity tags in the authorApp
-                     */
-                    'tags_on_create' => [
-                        [
-                            'type' => 'schoolcode',
-                            'name' => $this->getConfigLoader()->get('site_school_code')
-                        ],
-                        [
-                            'type' => 'classcode',
-                            'name' => $assessment->getContext()->getFolder()->getCodeString()
-                        ],
-                    ]
                 ],
                 'item_edit' => [
                     'item' => [
@@ -139,10 +127,26 @@ class Controller extends Base
             ]
         ];
 
+        /* Tags for presetting without requiring the additional
+         * authorApp.saveActivity() upon spawn. "create" (such as
+         * in "tags_on_create") is when you first hit the Save button,
+         * not when authorApp initialises for the first time
+         */
+        $tags = [
+            [
+                'type' => 'schoolcode',
+                'name' => $this->getConfigLoader()->get('site_school_code')
+            ],
+            [
+                'type' => 'classcode',
+                'name' => $assessment->getContext()->getFolder()->getCodeString()
+            ],
+        ];
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
             'initOptions' => $this->api->initOptions('author', $payload),
+            'tags' => json_encode($tags, JSON_THROW_ON_ERROR),
             'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
         ], sprintf(
             'Modify contents of %s',
