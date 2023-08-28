@@ -9,6 +9,8 @@
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
+use Ramsey\Uuid\Uuid;
+use Twig\Error\Error;
 
 /**
  * The Greenhouse lets you experiment with twig templates and contents without
@@ -29,9 +31,14 @@ class Controller extends Base
      * Load $templateName
      *
      * @param string $templateName
+     * @throws Error
      */
     public function getGreenhouse(string $templateName): void
     {
+        $uuid = Uuid::uuid4();
+
+        new \Alaress_Probe((string)$uuid);
+
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', []);
     }
 }
