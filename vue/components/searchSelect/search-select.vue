@@ -13,17 +13,21 @@ interface Props {
     endpoint: string; // the search api endpoint
     selected: Result[]; // the selected results
     isSingleSelect?: boolean; // whether only one result can be selected
+    formValueName?: string; // the name of the form value
 }
 const props = withDefaults(defineProps<Props>(), {
     isSingleSelect: false,
+    formValueName: "",
 });
 
 const emit = defineEmits<{
-    selected: [result: Result];
+    select: [result: Result];
+    remove: [result: Result];
 }>();
 
 const query = window.Vue.ref<string>("");
 const results = window.Vue.ref<Result[]>([]);
+const canSearch = window.Vue.ref<boolean>(false);
 const minKeywordLength = 2;
 
 const url = window.Vue.computed(() => {
@@ -74,8 +78,11 @@ const {
 async function onInput(value: string) {
     query.value = value;
     if (query.value.length < minKeywordLength) {
+        canSearch.value = false;
+        results.value = [];
         return;
     }
+    canSearch.value = true;
     await execute();
     // await debouncedRequest();
     try {
@@ -86,24 +93,47 @@ async function onInput(value: string) {
 }
 
 /**
+ * Don't show the search results if there's only one result and it's already selected
+ * @returns {boolean} - whether to show the search results
+ */
+const isActive = window.Vue.computed(() => {
+    if (!canSearch.value) {
+        return false;
+    }
+    if (props.isSingleSelect && props.selected.length === 1) {
+        return false;
+    }
+    return true;
+});
+
+/**
  * To toggle the selected state of the result
  * @param {Result} result - the result selected
  */
 function onSelected(result: Result) {
-    emit("selected", result);
+    emit("select", result);
+}
+
+/**
+ * To remove a result
+ * @param {Result} result - the result removed
+ */
+function onRemoved(result: Result) {
+    emit("remove", result);
 }
 </script>
 
 <template>
     <div class="c-search-select">
-        <search-select-selected />
+        <search-select-selected :selected="props.selected" :form-value-name="props.formValueName" @remove="onRemoved" />
         <search-select-input @input="onInput" />
         <search-select-results
-            :selected="selected"
-            :results="results"
+            :is-active="isActive"
             :is-searching="isFetching"
             :is-single-select="props.isSingleSelect"
-            @selected="onSelected"
+            :results="results"
+            :selected="selected"
+            @select="onSelected"
         />
     </div>
 </template>

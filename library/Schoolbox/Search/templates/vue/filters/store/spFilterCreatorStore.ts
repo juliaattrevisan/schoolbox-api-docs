@@ -9,31 +9,14 @@ export type Creator = {
     name: string;
 };
 
-const emptyCreator: Creator = { id: 0, name: "" };
-
 export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
-    const creator = window.Vue.ref<Creator>(emptyCreator);
-    const activeCreator = window.Vue.ref<Creator>(emptyCreator);
+    const creator = window.Vue.ref<Creator[]>([]);
 
     /**
      * Is the creator filter set
      * @returns {boolean}
      */
-    const isSelected = window.Vue.computed(() => creator.value.id !== 0);
-
-    /**
-     * Is the active creator filter set
-     * @returns {boolean}
-     */
-    const isActive = window.Vue.computed(() => activeCreator.value.id !== 0);
-
-    /**
-     * set the active creator filter, linked to the currently active search,
-     * so any filter changes are not applied to more result loads
-     */
-    function setActive() {
-        activeCreator.value = creator.value;
-    }
+    const isActive = window.Vue.computed(() => creator.value.length > 0);
 
     /**
      * Get the creator filter data
@@ -43,7 +26,7 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
         // only add creator filter if it is set
         return {
             creator: {
-                ...(isSelected.value && { id: activeCreator.value.id }),
+                ...(isActive.value && { id: creator.value[0].id }),
             },
         };
     }
@@ -52,15 +35,12 @@ export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
      * clear the creator filter
      */
     function clear() {
-        creator.value = emptyCreator;
-        activeCreator.value = emptyCreator;
+        creator.value = [];
     }
 
     return {
         creator,
-        isSelected,
         isActive,
-        setActive,
         getFormData,
         clear,
     };

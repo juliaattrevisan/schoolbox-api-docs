@@ -22,14 +22,12 @@ export type FilterData = {
 
 export const useFiltersStore = defineStore("spFilters", () => {
     /**
-     * Are there any filters selected
+     * Are there any filters active
      * @returns {boolean}
      */
     const isSelected = window.Vue.computed(
         () =>
-            useFilterDateRangeStore().isSelected ||
-            useFilterCreatorStore().isSelected ||
-            useFilterTypesStore().isSelected
+            useFilterDateRangeStore().isSelected || useFilterCreatorStore().isActive || useFilterTypesStore().isSelected
     );
 
     /**
@@ -45,7 +43,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
      */
     function setActive() {
         useFilterDateRangeStore().setActive();
-        useFilterCreatorStore().setActive();
+        // useFilterCreatorStore().setActive();
         useFilterTypesStore().setActive();
     }
 

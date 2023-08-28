@@ -15,7 +15,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    selected: [result: Result];
+    select: [result: Result];
 }>();
 
 /**
@@ -67,7 +67,7 @@ const isSelected = window.Vue.computed(() => {
  * To toggle the selected state of the result
  */
 function onSelected() {
-    emit("selected", props.result);
+    emit("select", props.result);
 }
 </script>
 

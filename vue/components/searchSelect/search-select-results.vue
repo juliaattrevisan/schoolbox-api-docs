@@ -9,16 +9,17 @@ import SearchSelectSelectAll from "./search-select-select-all.vue";
 import SearchSelectResult from "./search-select-result.vue";
 
 interface Props {
-    selected: Result[]; // the selected results
+    isActive: boolean; // whether to show the search results
     isSearching: boolean; // to notify of searching
-    results: Result[]; // the results returned from the search
     isSingleSelect: boolean; // whether only one result can be selected
+    results: Result[]; // the results returned from the search
+    selected: Result[]; // the selected results
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    selected: [result: Result];
+    select: [result: Result];
 }>();
 
 const searchResultsContainerEl = window.Vue.ref<HTMLDivElement | null>(null);
@@ -56,22 +57,11 @@ const showSelectAll = window.Vue.computed(() => {
 });
 
 /**
- * Don't show the search results if there's only one result and it's already selected
- * @returns {boolean} - whether to show the search results
- */
-const isActive = window.Vue.computed(() => {
-    if (props.isSingleSelect && props.selected.length === 1) {
-        return false;
-    }
-    return true;
-});
-
-/**
  * To toggle the selected state of the result
  * @param {Result} result - the result selected
  */
 function onSelected(result: Result) {
-    emit("selected", result);
+    emit("select", result);
 }
 </script>
 
@@ -92,7 +82,7 @@ function onSelected(result: Result) {
                             :selected="selected"
                             :results="props.results"
                             :result="result"
-                            @selected="onSelected"
+                            @select="onSelected"
                         />
                     </li>
                 </template>
