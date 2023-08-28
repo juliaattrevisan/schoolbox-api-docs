@@ -74,6 +74,7 @@ class Controller extends Base
      * @return void
      * @throws Error
      * @throws ValidationException
+     * @throws \DomainException Thrown when site_school_code is empty string
      * @throws \JsonException
      */
     public function getContent(IAssessable $assessment): void
@@ -130,16 +131,8 @@ class Controller extends Base
          * in "tags_on_create") is when you first hit the Save button,
          * not when authorApp initialises for the first time
          */
-        $tags = [
-            [
-                'type' => 'schoolcode',
-                'name' => $this->getConfigLoader()->get('site_school_code')
-            ],
-            [
-                'type' => 'classcode',
-                'name' => $assessment->getContext()->getFolder()->getCodeString()
-            ],
-        ];
+        $tags = (new TagGenerator($this->getConfigLoader()->get('site_school_code')))
+            ->generate(null, null, null, null, $assessment->getContext()->getFolder()->getCodeString());
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
