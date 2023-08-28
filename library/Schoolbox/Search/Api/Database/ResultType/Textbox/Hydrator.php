@@ -11,7 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Textbox as TextboxModel;
+use Schoolbox\Resource\Textbox\Model as TextboxModel;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
@@ -67,10 +67,10 @@ class Hydrator extends BaseHydrator
         // And map to a full result.
         $fullResults = array_map(
             function (RawResult $match) use ($textboxes, $viewer) {
-                $textbox = $textboxes->getBy('textBoxID', $match->id);
+                $textbox = $textboxes->getBy('id', $match->id);
                 if ($textbox instanceof TextboxModel) {
                     // Check if user has access to textbox's folder
-                    $textboxAccess = $this->access->getFolderAccess($viewer, $textbox->getFolder()->getId());
+                    $textboxAccess = $this->access->getFolderAccess($viewer, $textbox->getCategory()->getId());
                     if ($textboxAccess < UserAccess::ACCESS_READ) {
                         return null;
                     }
@@ -80,25 +80,22 @@ class Hydrator extends BaseHydrator
                     return new FullResult(
                         $match,
                         $match->id,
-                        $textbox->getComment(),
+                        $textbox->getHeading(),
                         $this->buildBaseUrl()
                              ->withPath('send.php')
                              ->withQuery(http_build_query(['id' => $textbox->getId()]))
                              ->__toString(),
                         $match->type,
                         $match->relevance,
-                        $textbox->getModified(),
-                        $textbox->getFolder(),
                         null,
-                        // Image? show thumbnail, otherwise show mimetype thumb
+                        $textbox->getCategory(),
+                        null,
                         null,
                         'textbox',
-                        $textbox->getDescription(),
-                        // Should this be modified by instead?
-                        $textbox->getOwner(),
-                        // Context: textbox's folder
-                        [$textbox->getFolder(),],
-                        [],
+                        $textbox->getBody(),
+                        null,
+                        [$textbox->getCategory(),], // Context: textbox's folder
+                        [], // Links: none.
                     );
                 }
 
