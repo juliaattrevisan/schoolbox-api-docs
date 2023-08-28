@@ -111,8 +111,6 @@ class Controller extends Base
             /* Corresponds to a user in the Learnosity Console who will be
              * considered "the author" of stuff created by the school's teachers
              * Misconfiguring this leads to Error 10000 which has no definition
-             *
-             * TODO Waiting for learnosity to clarify
              */
             'user' => [
                 'id' => (string)$this->getUser()->getId(),
