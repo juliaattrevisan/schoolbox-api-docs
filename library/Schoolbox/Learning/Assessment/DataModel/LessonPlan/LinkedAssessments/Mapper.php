@@ -101,6 +101,9 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
+     * Save the links between the lesson plan and linked assessments, when using the model and appending new assessments.
+     * For API @see \Schoolbox\Learning\Assessment\LessonPlan\Controller::postActivity
+     *
      * @param LessonPlanModel $lessonPlan
      * @param DataModelModel $assessment
      * @return bool|int[]
@@ -128,9 +131,11 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
+     * Creates a new link between a lesson plan and an assessment
+     *
      * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
      * @param IAssessable $assessment
-     * @return bool|int[]
+     * @return bool true if the link did not already exist, false if the link already exists
      * @throws Exception
      * @throws Deleted
      */
@@ -161,9 +166,11 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
+     * Deletes a link between a lesson plan and an assessment
+     *
      * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
      * @param IAssessable                                     $assessment
-     * @return int
+     * @return int Returns the number of records deleted
      */
     public function deleteLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment): int
     {
