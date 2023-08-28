@@ -6,7 +6,7 @@
  */
 
 use League\Flysystem\FilesystemException;
-use Schoolbox\Clipboard\Log\Guid;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -110,7 +110,7 @@ class Session
 
             // Create a random session ID as well:
             // however, this survives user authentication and re-authentication
-            $sessionIdentifier ??= (new Guid())->generate();
+            $sessionIdentifier ??= Uuid::uuid4()->__toString();
             $_SESSION['identifier'] = $sessionIdentifier;
 
             // add mobile session data
