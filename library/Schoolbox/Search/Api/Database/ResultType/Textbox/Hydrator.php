@@ -62,12 +62,12 @@ class Hydrator extends BaseHydrator
         }
 
         // Find the matching textboxes.
-        $textboxes = $this->textboxMapper->findByColumn('id', $ids);
+        $textboxes = $this->textboxMapper->findByColumn('textBoxID', $ids);
 
         // And map to a full result.
         $fullResults = array_map(
             function (RawResult $match) use ($textboxes, $viewer) {
-                $textbox = $textboxes->getBy('id', $match->id);
+                $textbox = $textboxes->getBy('textBoxID', $match->id);
                 if ($textbox instanceof TextboxModel) {
                     // Check if user has access to textbox's folder
                     $textboxAccess = $this->access->getFolderAccess($viewer, $textbox->getFolder()->getId());
