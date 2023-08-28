@@ -106,9 +106,14 @@ class Session extends BaseSession
      * @param array $params
      * @return void
      */
-    public function setCookieParams(array $params)
+    public function setCookieParams(array $params): void
     {
         $this->cookie_params = array_merge($this->cookie_params, $params);
+        /**
+         * Ignore the non-existence of session function in phpfunc:
+         * @noinspection PhpUndefinedMethodInspection
+         * @phpstan-ignore-next-line
+         */
         $this->phpfunc->session_set_cookie_params($this->cookie_params);
     }
 
@@ -123,7 +128,7 @@ class Session extends BaseSession
             ? $this->getRequestTime() + $lifetime
             : 0;
 
-        $this->phpfunc->setcookie($this->getName(), $this->getId(), $cookieParams);
+        setcookie($this->getName(), $this->getId(), $cookieParams);
     }
 
     /**
