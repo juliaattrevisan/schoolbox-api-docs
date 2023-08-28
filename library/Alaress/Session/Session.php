@@ -100,25 +100,30 @@ class Session extends BaseSession
     }
 
     /**
+     * Override to set cookie params as an array, thus allowing the `samesite`
+     * option to be set.
+     *
+     * @param array $params
+     * @return void
+     */
+    public function setCookieParams(array $params)
+    {
+        $this->cookie_params = array_merge($this->cookie_params, $params);
+        $this->phpfunc->session_set_cookie_params($this->cookie_params);
+    }
+
+    /**
      * Set the expiry time on an session cookie that already exists
      * @param int $lifetime
      */
     public function setCookieExpiry($lifetime)
     {
-        $cookieParams  = $this->getCookieParams();
-        $sessionExpiry = $lifetime > 0
+        $cookieParams = $this->getCookieParams();
+        $cookieParams['sessionExpiry'] = $lifetime > 0
             ? $this->getRequestTime() + $lifetime
             : 0;
 
-        $this->phpfunc->setcookie(
-            $this->getName(),
-            $this->getId(),
-            $sessionExpiry,
-            $cookieParams['path'],
-            $cookieParams['domain'],
-            $cookieParams['secure'],
-            $cookieParams['httponly']
-        );
+        $this->phpfunc->setcookie($this->getName(), $this->getId(), $cookieParams);
     }
 
     /**
