@@ -85,13 +85,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The link's title is its `comment`.
+     * The closest thing to a title for a link is link.description.
      *
      * @return string
      */
     protected function buildTitleExpression(): string
     {
-        return 'l.comment';
+        return 'l.description';
     }
 
     /**
@@ -103,7 +103,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A link's type is always 'Link'.
+     * A link's type is always 'link'.
      *
      * @return string
      */

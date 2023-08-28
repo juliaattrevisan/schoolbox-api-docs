@@ -32,7 +32,7 @@ class Hydrator extends BaseHydrator
      * Constructor
      *
      * @param LinkMapper $linkMapper Used to fetch links for hydration.
-     * @param Access      $access     Used to determine if the current user may view this page.
+     * @param Access     $access     Used to determine if the current user may view this page.
      */
     public function __construct(
         private LinkMapper $linkMapper,
@@ -56,17 +56,15 @@ class Hydrator extends BaseHydrator
         // Find all links that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
 
-        // TODO make this part generic
         $ids = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
         if (empty($ids)) {
             return [];
         }
 
         // Find the matching links.
-        // TODO make generic: have 'id' column as a property of class, or use mappers
         $links = $this->linkMapper->findByColumn('id', $ids);
 
-        // And map to a full result
+        // And map to a full result.
         $fullResults = array_map(
             function (RawResult $match) use ($links, $viewer) {
                 $link = $links->getBy('id', $match->id);
@@ -82,24 +80,18 @@ class Hydrator extends BaseHydrator
                     return new FullResult(
                         $match,
                         $match->id,
-                        $link->getComment(),
-                        $this->buildBaseUrl()
-                             ->withPath('send.php')
-                             ->withQuery(http_build_query(['id' => $link->getId()]))
-                             ->__toString(),
+                        $link->getDescription(), // The closest thing to a title for a link is link.description.
+                        $this->getUrl(),
                         $match->type,
                         $match->relevance,
                         $link->getModified(),
                         $link->getFolder(),
                         null,
-                        // Image? show thumbnail, otherwise show mimetype thumb
                         null,
                         'link',
-                        $link->getDescription(),
-                        // Should this be modified by instead?
+                        $link->getComment(), // The closest thing to a description for a link is link.comment.
                         $link->getOwner(),
-                        // Context: link's folder
-                        [$link->getFolder(),],
+                        [$link->getFolder(),], // Context: link's folder
                         [],
                     );
                 }
@@ -109,8 +101,7 @@ class Hydrator extends BaseHydrator
             $matches
         );
 
-        // Filter out anything missing
-        // TODO make generic
+        // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
     }
 }
