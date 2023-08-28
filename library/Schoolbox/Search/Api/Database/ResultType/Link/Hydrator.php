@@ -81,7 +81,7 @@ class Hydrator extends BaseHydrator
                         $match,
                         $match->id,
                         $link->getDescription(), // The closest thing to a title for a link is link.description.
-                        $this->getUrl(),
+                        $link->getUrl(),
                         $match->type,
                         $match->relevance,
                         $link->getModified(),
