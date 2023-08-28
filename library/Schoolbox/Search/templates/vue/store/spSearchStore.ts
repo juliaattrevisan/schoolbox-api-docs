@@ -46,7 +46,6 @@ export const useSearchStore = defineStore("spSearch", () => {
      */
     function setActive() {
         useQueryStore().setActive();
-        useFiltersStore().setActive();
     }
 
     /**

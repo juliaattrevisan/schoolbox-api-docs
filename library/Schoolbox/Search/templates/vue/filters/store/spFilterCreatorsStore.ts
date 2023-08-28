@@ -1,5 +1,7 @@
 /**
  * Store the creator filter, results linked to a specific user
+ * Note that currently only one creator can be selected at a time,
+ * as this is what the API supports for now
  */
 
 import { defineStore } from "pinia";

@@ -25,29 +25,9 @@ export const useFiltersStore = defineStore("spFilters", () => {
      * Are there any filters active
      * @returns {boolean}
      */
-    const isSelected = window.Vue.computed(
-        () =>
-            useFilterDateRangeStore().isSelected ||
-            useFilterCreatorsStore().isActive ||
-            useFilterTypesStore().isSelected
-    );
-
-    /**
-     * Are there any filters active
-     * @returns {boolean}
-     */
     const isActive = window.Vue.computed(
         () => useFilterDateRangeStore().isActive || useFilterCreatorsStore().isActive || useFilterTypesStore().isActive
     );
-
-    /**
-     * set the active filters, linked to the currently active search
-     */
-    function setActive() {
-        useFilterDateRangeStore().setActive();
-        // useFilterCreatorsStore().setActive();
-        useFilterTypesStore().setActive();
-    }
 
     /**
      * Get the filter data
@@ -72,9 +52,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
     }
 
     return {
-        isSelected,
         isActive,
-        setActive,
         getFormData,
         clear,
     };

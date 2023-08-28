@@ -6,9 +6,9 @@
 
 import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import { Creator, useFilterCreatorsStore } from "./store/spFilterCreatorStore";
+import { Creator, useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
 
-const filterCreatorStore = useFilterCreatorsStore();
+const filterCreatorsStore = useFilterCreatorsStore();
 
 /**
  * We only allow one creator to be selected at a time,
@@ -17,12 +17,12 @@ const filterCreatorStore = useFilterCreatorsStore();
  * @param {Result} result - the result selected
  */
 function onSelected(result: Result) {
-    if (!filterCreatorStore.isActive) {
-        filterCreatorStore.creator.push(result);
+    if (!filterCreatorsStore.isActive) {
+        filterCreatorsStore.creator.push(result as Creator);
         return;
     }
-    if (result.id === filterCreatorStore.creator[0].id) {
-        filterCreatorStore.clear();
+    if (result.id === filterCreatorsStore.creator[0].id) {
+        filterCreatorsStore.clear();
     }
 }
 
@@ -31,7 +31,7 @@ function onSelected(result: Result) {
  * we can simply just clear the store
  */
 function onRemoved() {
-    filterCreatorStore.clear();
+    filterCreatorsStore.clear();
 }
 </script>
 <section></section>
@@ -40,7 +40,7 @@ function onRemoved() {
         <label for="creator">Creator</label>
         <search-select
             endpoint="/ajax/user.php?groupID=0&query="
-            :selected="filterCreatorStore.creator"
+            :selected="filterCreatorsStore.creator"
             :is-single-select="true"
             @select="onSelected"
             @remove="onRemoved"
