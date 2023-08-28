@@ -70,92 +70,21 @@ HELP;
             return;
         }
 
-        $db = $this->getDatabaseInternal();
-
         /* Find all the course_specification rows that don't have a uuid already
          *
          * (This should be all of them at this point, but for the sake of safety,
          * you won't be able to accidentally overwrite anything that exists if you
          * accidentally ran this tool again)
          */
-        $this->getLogger()->info('Populating v4 uuids in course_specification');
-
-        $updateStatement = $db->prepareQuery("
-            UPDATE course_specification
-            SET uuid = :uuid
-            WHERE id = :id
-            LIMIT 1
-        ");
-
-        $statement = $db->prepareQuery("
-            SELECT * FROM course_specification
-            WHERE uuid IS NULL
-        ");
-
-        $statement->execute();
-
-        /* Make a new Gordon Ramsey UUID and save it in there cheaply
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $updateStatement->execute([
-                'id' => $row['id'],
-                'uuid' => \Ramsey\Uuid\Uuid::uuid4(),
-            ]);
-        }
+        $this->populateUuids('course_specification');
 
         /* Find all the course_implementation rows that don't have a uuid already
          */
-        $this->getLogger()->info('Populating v4 uuids in course_implementation');
-
-        $updateStatement = $db->prepareQuery("
-            UPDATE course_implementation
-            SET uuid = :uuid
-            WHERE id = :id
-            LIMIT 1
-        ");
-
-        $statement = $db->prepareQuery("
-            SELECT * FROM course_implementation
-            WHERE uuid IS NULL
-        ");
-
-        $statement->execute();
-
-        /* Make a new Gordon Ramsey UUID and save it in there cheaply
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $updateStatement->execute([
-                'id' => $row['id'],
-                'uuid' => \Ramsey\Uuid\Uuid::uuid4(),
-            ]);
-        }
+        $this->populateUuids('course_implementation');
 
         /* Find all the course_unit_specification rows that don't have a uuid already
          */
-        $this->getLogger()->info('Populating v4 uuids in course_unit_specification');
-
-        $updateStatement = $db->prepareQuery("
-            UPDATE course_unit_specification
-            SET uuid = :uuid
-            WHERE id = :id
-            LIMIT 1
-        ");
-
-        $statement = $db->prepareQuery("
-            SELECT * FROM course_unit_specification
-            WHERE uuid IS NULL
-        ");
-
-        $statement->execute();
-
-        /* Make a new Gordon Ramsey UUID and save it in there cheaply
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $updateStatement->execute([
-                'id' => $row['id'],
-                'uuid' => \Ramsey\Uuid\Uuid::uuid4(),
-            ]);
-        }
+        $this->populateUuids('course_unit_specification');
 
         /* Find all the course_unit_implementation rows that don't have a uuid already
          */
@@ -175,7 +104,7 @@ HELP;
         $db = $this->getDatabaseInternal();
 
         $this->getLogger()->info(sprintf(
-            'Populating v4 uuids in %s',
+            'Learnosity: Populating v4 uuids in %s',
             $table
         ));
 
