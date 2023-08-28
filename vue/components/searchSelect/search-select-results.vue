@@ -9,6 +9,7 @@ import SearchSelectSelectAll from "./search-select-select-all.vue";
 import SearchSelectResult from "./search-select-result.vue";
 
 interface Props {
+    query: string; // the search query
     isActive: boolean; // whether to show the search results
     isSearching: boolean; // to notify of searching
     isSingleSelect: boolean; // whether only one result can be selected
@@ -79,6 +80,7 @@ function onSelected(result: Result) {
                     </li>
                     <li v-for="result in props.results" :key="result.id">
                         <search-select-result
+                            :query="query"
                             :selected="selected"
                             :results="props.results"
                             :result="result"

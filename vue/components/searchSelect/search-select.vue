@@ -128,6 +128,7 @@ function onRemoved(result: Result) {
         <search-select-selected :selected="props.selected" :form-value-name="props.formValueName" @remove="onRemoved" />
         <search-select-input @input="onInput" />
         <search-select-results
+            :query="query"
             :is-active="isActive"
             :is-searching="isFetching"
             :is-single-select="props.isSingleSelect"

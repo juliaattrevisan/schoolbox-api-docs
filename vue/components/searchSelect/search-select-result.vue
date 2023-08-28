@@ -3,10 +3,11 @@
  * A single search result that be selected / unselected with a checkbox status
  */
 
-// import { escapeRegExp } from "@js/util/jsUtils";
+import { addMarks } from "@js/util/domUtils";
 import type { Result } from "./types/Result";
 
 interface Props {
+    query: string; // the search query
     selected: Result[]; // the selected results
     results: Result[]; // the results returned from the search
     result: Result; // the result to display
@@ -17,42 +18,6 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     select: [result: Result];
 }>();
-
-/**
- * Add in the code if it's available otherwise just show the title
- * @returns { String }
- */
-// const title = window.Vue.computed(() => {
-//     if (props.result.code && props.result.code !== "") {
-//         return `[${props.result.code}] ${props.result.name}`;
-//     } else {
-//         return props.result.name;
-//     }
-// });
-
-/**
- * To highlight any search selections in the code / title
- * @returns { HTML }
- */
-// const highlightTitleSearch = window.Vue.computed(() => highlightSearchInElement(title.value));
-
-/**
- * To highlight where the search string matches within the settings result
- * (?![^mark>]*mark>) is used to check we are not inside an element node
- *
- * @params { String } the string to find all instanced of the current search string in
- *
- * @returns { String } string for v-html with <mark></mark> wrapped around each found result
- */
-// function highlightSearchInElement(toHighlight) {
-//     let highlighted = toHighlight;
-//     searchStore.queryWordList.forEach((wordInSearch) => {
-//         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
-//             return `<mark>${match}</mark>`;
-//         });
-//     });
-//     return highlighted;
-// }
 
 /**
  * To determine whether the checkbox is currently selected
@@ -78,8 +43,8 @@ function onSelected() {
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
-            <!-- <span v-html="highlightTitleSearch"></span> -->
-            <span>{{ result.name }}</span>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span v-html="addMarks(props.result.name, [props.query])"></span>
         </div>
     </button>
 </template>
