@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
@@ -23,50 +24,6 @@ use Schoolbox\Mapper\Exception;
  */
 class Classes implements IStrategy
 {
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
     /**
      * A list of classEntries that we saw previously
      *
@@ -87,21 +44,15 @@ class Classes implements IStrategy
      * Constructor.
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private array $watchlist,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
     }
 
 
@@ -116,13 +67,13 @@ class Classes implements IStrategy
         /* Unroll the cyclic grid into a flat calendar format
          * (this part is pretty quick)
          */
-        $timetableDefinition = (new CycleUnroller($this->api))->unroll();
+        $timetableDefinitions = (new CycleUnroller($this->api))->unroll();
 
         /* Used to shank info about classes and their humans iteratively
          * because we don't need to load *everything* at the start, just
          * as we go
          */
-        $scheduleCompiler = new ScheduleCompiler($this->api, $timetableDefinition);
+        $scheduleCompiler = new ScheduleCompiler($this->log, $this->api, $timetableDefinitions);
 
         /* Shank information about the periods occurring during $timetableDefinition
          */
@@ -132,25 +83,32 @@ class Classes implements IStrategy
          * obtain more detailed info as you iteratively proceed
          * (this part so slow we do it separately)
          */
-        foreach ($timetableDefinition as $weekId => $weekData) {
-            foreach ($weekData['days'] as $dayData) {
-                foreach ($dayData['periods'] as $periodId => $periodData) {
-                    /* guid prefix is serialized with these pieces:
-                     *     isams timetable id
-                     *     isams day id
-                     *     isams period id
-                     */
-                    $guidPrefix = sprintf(
-                        '%s.%s.%s',
-                        $weekId,
-                        $dayData['isamsId'],
-                        $periodId
-                    );
+        foreach ($timetableDefinitions as $divisionId => $division) {
+            foreach ($division as $weekId => $weekData) {
+                foreach ($weekData['days'] as $dayData) {
+                    foreach ($dayData['periods'] as $periodId => $periodData) {
+                        /* guid prefix is serialized with these pieces:
+                         *     isams week id
+                         *     isams day id
+                         *     isams period id
+                         *
+                         * Do not use isams division id as part of this tuple as that will
+                         * guarantee dupe events spawning. We only use the division id to
+                         * identify *which students* are associated with a class code that's
+                         * shared between Divisions.
+                         */
+                        $guidPrefix = sprintf(
+                            '%s.%s.%s',
+                            $weekId,
+                            $dayData['isamsId'],
+                            $periodId
+                        );
 
-                    /* Some periods don't have anything on; that arg is set
-                     * to null in those circumstances
-                     */
-                    $this->processClass($scheduleCompiler, $guidPrefix, $dayData, $periodData, $schedules[$periodId] ?? null);
+                        /* Some periods don't have anything on; that arg is set
+                         * to null in those circumstances
+                         */
+                        $this->processClass($scheduleCompiler, $guidPrefix, (string)$divisionId, $dayData, $periodData, $schedules[$periodId] ?? null);
+                    }
                 }
             }
         }
@@ -161,10 +119,11 @@ class Classes implements IStrategy
      * Process all the classes that occur on period $periodId
      *
      * @param ScheduleCompiler $scheduleCompiler
-     * @param string           $guidPrefix
-     * @param array            $dayData
-     * @param array            $periodData
-     * @param array|null       $classes
+     * @param string $guidPrefix
+     * @param string $divisionId
+     * @param array $dayData
+     * @param array $periodData
+     * @param array|null $classes
      * @return void
      * @throws Exception
      * @throws \PDOException
@@ -173,6 +132,7 @@ class Classes implements IStrategy
     private function processClass(
         ScheduleCompiler $scheduleCompiler,
         string $guidPrefix,
+        string $divisionId,
         array $dayData,
         array $periodData,
         ?array $classes
@@ -193,11 +153,17 @@ class Classes implements IStrategy
          * * shank it into suds town
          */
         foreach ($classes['schedule'] as $scheduleId => $classData) {
-            $subject = $scheduleCompiler->findSubject($classData['code']);
+            $subject = $scheduleCompiler->findSubject($classData['code'], $divisionId);
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isAnyOnWatchlist($this->findInvolvedExternalIds($subject, $classData), $this->watchlist)) {
+                continue;
+            }
 
             /* Save sis_event record
              */
-            $event = $this->createEvent($guidPrefix, $dayData, $periodData, $classData, $subject);
+            $event = $this->createEvent($guidPrefix, $divisionId, $dayData, $periodData, $classData, $subject);
 
             /* Save sis_class record
              */
@@ -211,20 +177,43 @@ class Classes implements IStrategy
 
 
     /**
+     * Find out who's in this class for Watchlist support
+     * In iSAMS we build a timetable and find out who's in it,
+     * rather than pick a guy and build their timetable
+     */
+    private function findInvolvedExternalIds(array $subject, array $classData): array
+    {
+        $substituteStaff = [];
+
+        if ($classData['substituteStaff']['externalId'] ?? false) {
+            $substituteStaff = [$classData['substituteStaff']['externalId']];
+        }
+
+        return array_merge(
+            array_column($subject['regularStaff'], 'externalId'),
+            array_column($subject['students'], 'externalId'),
+            $substituteStaff
+        );
+    }
+
+
+    /**
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
      * @param string $guidPrefix
-     * @param array  $dayData
-     * @param array  $periodData
-     * @param array  $classData
-     * @param array  $subject
+     * @param string $divisionId
+     * @param array $dayData
+     * @param array $periodData
+     * @param array $classData
+     * @param array $subject
      * @return Model
-     * @throws \PDOException
      * @throws Exception
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     private function createEvent(
         string $guidPrefix,
+        string $divisionId,
         array $dayData,
         array $periodData,
         array $classData,
@@ -300,10 +289,11 @@ class Classes implements IStrategy
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->info(sprintf(
-            '%s timetable event %s (%s) on day %s, period %s, %s-%s',
+            '%s timetable event %s (%s) in division %s, on day %s, period %s, %s-%s',
             $logPrefix,
             $event->getTitle(),
             $event->getCode(),
+            $divisionId,
             $event->getDay(),
             $event->getPeriod(),
             $event->getStartAt()->getDatabase(),

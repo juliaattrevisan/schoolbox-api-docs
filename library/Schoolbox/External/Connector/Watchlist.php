@@ -38,10 +38,29 @@ class Watchlist
             return true;
         }
 
-        /* Third art set to false for storm, who hates
+        /* Third arg set to false for storm, who hates
          * any setting other than true
          */
         return in_array($externalId, $watchlist, false);
+    }
+
+
+    /**
+     * Decide if any $externalIds is in $watchlist, which is a set of externalIds
+     * Filter to specific people; set $watchlist to empty array to disable filtering
+     */
+    public function isAnyOnWatchlist(array $externalIds, array $watchlist): bool
+    {
+        /* "Everyone is on the watchlist"
+         */
+        if (!\count($watchlist)) {
+            return true;
+        }
+
+        /* If any of the guys in $externalIds is also in the $watchlist,
+         * return true
+         */
+        return (bool)\count(array_intersect($externalIds, $watchlist));
     }
 
 

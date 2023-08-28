@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
 /**
@@ -18,29 +19,17 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 class ScheduleCompiler
 {
     /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * The stack of weeks, days and periods that we must now fill
-     * with classes and humans and such
-     * @var array
-     */
-    private array $timetableDefinition;
-
-
-    /**
      * Constructor.
      *
+     * @param LoggerInterface $log
      * @param array $api
-     * @param array $timetableDefinition
+     * @param array $timetableDefinition  The stack of weeks, days and periods that we must now fill with classes and humans and such
      */
-    public function __construct(array $api, array $timetableDefinition)
-    {
-        $this->api = $api;
-        $this->timetableDefinition = $timetableDefinition;
+    public function __construct(
+        private LoggerInterface $log,
+        private array $api,
+        private array $timetableDefinition
+    ) {
     }
 
 
@@ -100,9 +89,10 @@ class ScheduleCompiler
      * Find a subject's name and humans from its $setCode (that's its subject code equivalent)
      *
      * @param string $setCode
+     * @param string $divisionId
      * @return array
      */
-    public function findSubject(string $setCode): array
+    public function findSubject(string $setCode, string $divisionId): array
     {
         $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0] ?? [];
         //null coalesce fetchXml()[0] as that field might not exist... but don't throw warnings either
@@ -118,6 +108,11 @@ class ScheduleCompiler
         /* Unknown subject: can't find it via its setCode
          */
         if (empty($node)) {
+            $this->log->debug(sprintf(
+                'SetCode "%s" does not have any Sets in it',
+                $setCode
+            ));
+
             return [
                 'subjectId' => '',
                 'code' => '',
@@ -133,6 +128,15 @@ class ScheduleCompiler
 
         $teachers = $node->xpath('Teachers/Teacher');
 
+        /* No teachers? No trabajo, but log it and keep going
+         */
+        if (!\count($teachers)) {
+            $this->log->debug(sprintf(
+                'SetCode "%s" as no teachers in it',
+                $setCode
+            ));
+        }
+
         /* lol the Teacher @Id attribute is the Set Id, not the teacher's...
          */
         foreach ($teachers as $teacher) {
@@ -144,7 +148,7 @@ class ScheduleCompiler
             'code' => $setCode,
             'name' => trim((string)$node[0]->Name),
             'regularStaff' => $staff,
-            'students' => $this->findSubjectStudents($setCode)
+            'students' => $this->findSubjectStudents($setCode, $divisionId)
         ];
     }
 
@@ -159,10 +163,12 @@ class ScheduleCompiler
     {
         $periodIds = [];
 
-        foreach ($this->timetableDefinition as $weekId => $weekData) {
-            foreach ($weekData['days'] as $day) {
-                foreach ($day['periods'] as $periodId => $periodData) {
-                    $periodIds[$periodId] = $periodId;
+        foreach ($this->timetableDefinition as $divisionId => $division) {
+            foreach ($division as $weekId => $weekData) {
+                foreach ($weekData['days'] as $day) {
+                    foreach ($day['periods'] as $periodId => $periodData) {
+                        $periodIds[$periodId] = $periodId;
+                    }
                 }
             }
         }
@@ -184,6 +190,11 @@ class ScheduleCompiler
         /* 404 room not found.
          */
         if (null === $room) {
+            $this->log->debug(sprintf(
+                'Classroom with id "%s" was not found',
+                $roomId
+            ));
+
             return [
                 'roomId' => $roomId,
                 'name' => '',
@@ -230,6 +241,11 @@ class ScheduleCompiler
         /* Couldn't find this teacher
          */
         if (null === $node) {
+            $this->log->debug(sprintf(
+                'StaffMember with UserCode "%s" was not found',
+                $userCode
+            ));
+
             return [
                 'externalId' => '',
                 'staffId' => '',
@@ -266,6 +282,11 @@ class ScheduleCompiler
         /* Couldn't find this teacher
          */
         if (null === $node) {
+            $this->log->debug(sprintf(
+                'StaffMember with id %s was not found',
+                $id
+            ));
+
             return [
                 'externalId' => '',
                 'staffId' => $id,
@@ -293,36 +314,76 @@ class ScheduleCompiler
      * Find the students who were in subject $setCode
      *
      * @param string $setCode
+     * @param string $divisionId
      * @return array
      */
-    private function findSubjectStudents(string $setCode): array
+    private function findSubjectStudents(string $setCode, string $divisionId): array
     {
         $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+
+        $students = [];
 
         /* Unknown subject: can't find it via its setCode
          */
         if (empty($node)) {
-            return [];
+            $this->log->debug(sprintf(
+                'SetCode %s as no students in it',
+                $setCode
+            ));
+
+            return $students;
         }
 
         /* Otherwise continue digging
          */
-        $students = [];
-
         $setId = trim((string)$node[0]->xpath('@Id')[0]->Id);
 
         /* Select all the SetList nodes where any of its SetId subnodes contains the value $setId exactly
          */
         $setListNodes = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
 
+        /* The Set ("class") doesn't contain any SetList ("people in the class") nodes
+         * Exit early
+         */
+        if (!\count($setListNodes)) {
+            $this->log->debug(sprintf(
+                'Did not find any SetList nodes for Set %s (SetCode/ClassCode "%s") - no students found.',
+                $setId,
+                $setCode
+            ));
+
+            return $students;
+        }
+
+        /* Find out who each guy really is
+         */
         foreach ($setListNodes as $current) {
             $studentId = trim((string)$current->xpath('@PupilId')[0]);
 
-            $student = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+            /* See if student with PupilId $studentId is also in DivisionId $divisionId
+             * This tuple must match, to prevent students cross-pollinating into other
+             * Division's timetables
+             */
+            $this->log->debug(sprintf(
+                'Looking for %s in division %s',
+                $studentId,
+                $divisionId
+            ));
 
-            /* Unknown student; can't find it via its studentId
+            $student = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}' and @DivisionId='{$divisionId}']")[0] ?? null;
+
+            /* Unknown student; can't find it via its (studentId, divisionId) tuple
+             * Either the student doesn't exist, or it exists for a different Division
+             * than the one we're currently processing. Timetable Calendar stuff allows
+             * a Division to overlap another Division, resulting in duplicate classes.
              */
             if (empty($student)) {
+                $this->log->debug(sprintf(
+                    'Student with PupilId %s was not found in division %s',
+                    $studentId,
+                    $divisionId
+                ));
+
                 continue;
             }
 
