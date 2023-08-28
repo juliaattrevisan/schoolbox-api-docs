@@ -374,19 +374,18 @@ class SitePage
         $_SESSION['lasttime'] = time();
 
         // Resend session cookie
-        $cookieParams  = session_get_cookie_params();
+        $cookieParams = array_intersect_key(
+            session_get_cookie_params(),
+            ['path' => true, 'domain' => true, 'secure' => true, 'httponly' => true, 'samesite' => true],
+        );
         $sessionLength = $this->config->get('session_length');
-        $sessionExpiry = ($sessionLength > 0)
+        $cookieParams['expires'] = ($sessionLength > 0)
             ? $_SERVER['REQUEST_TIME'] + $sessionLength
             : 0;
         setcookie(
             session_name(),
             session_id(),
-            $sessionExpiry,
-            $cookieParams['path'],
-            $cookieParams['domain'],
-            $cookieParams['secure'],
-            $cookieParams['httponly']
+            $cookieParams,
         );
     }
 
