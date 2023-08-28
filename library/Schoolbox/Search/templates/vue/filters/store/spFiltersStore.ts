@@ -6,7 +6,7 @@
 
 import { defineStore } from "pinia";
 import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
-import { useFilterCreatorStore } from "./spFilterCreatorStore";
+import { useFilterCreatorsStore } from "./spFilterCreatorsStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
 
 export type FilterData = {
@@ -27,7 +27,9 @@ export const useFiltersStore = defineStore("spFilters", () => {
      */
     const isSelected = window.Vue.computed(
         () =>
-            useFilterDateRangeStore().isSelected || useFilterCreatorStore().isActive || useFilterTypesStore().isSelected
+            useFilterDateRangeStore().isSelected ||
+            useFilterCreatorsStore().isActive ||
+            useFilterTypesStore().isSelected
     );
 
     /**
@@ -35,7 +37,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
      * @returns {boolean}
      */
     const isActive = window.Vue.computed(
-        () => useFilterDateRangeStore().isActive || useFilterCreatorStore().isActive || useFilterTypesStore().isActive
+        () => useFilterDateRangeStore().isActive || useFilterCreatorsStore().isActive || useFilterTypesStore().isActive
     );
 
     /**
@@ -43,7 +45,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
      */
     function setActive() {
         useFilterDateRangeStore().setActive();
-        // useFilterCreatorStore().setActive();
+        // useFilterCreatorsStore().setActive();
         useFilterTypesStore().setActive();
     }
 
@@ -54,7 +56,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
     function getFormData() {
         const filterData = {
             ...useFilterDateRangeStore().getFormData(),
-            ...useFilterCreatorStore().getFormData(),
+            ...useFilterCreatorsStore().getFormData(),
             // ...useFilterTypesStore().getFormData(),
         };
         return JSON.stringify(filterData);
@@ -65,7 +67,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
      */
     function clear() {
         useFilterDateRangeStore().clear();
-        useFilterCreatorStore().clear();
+        useFilterCreatorsStore().clear();
         useFilterTypesStore().clear();
     }
 

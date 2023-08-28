@@ -9,7 +9,7 @@ export type Creator = {
     name: string;
 };
 
-export const useFilterCreatorStore = defineStore("spFilterCreator", () => {
+export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     const creator = window.Vue.ref<Creator[]>([]);
 
     /**

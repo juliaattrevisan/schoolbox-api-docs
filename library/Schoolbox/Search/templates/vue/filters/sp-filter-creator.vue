@@ -6,9 +6,9 @@
 
 import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import { Creator, useFilterCreatorStore } from "./store/spFilterCreatorStore";
+import { Creator, useFilterCreatorsStore } from "./store/spFilterCreatorStore";
 
-const filterCreatorStore = useFilterCreatorStore();
+const filterCreatorStore = useFilterCreatorsStore();
 
 /**
  * We only allow one creator to be selected at a time,
