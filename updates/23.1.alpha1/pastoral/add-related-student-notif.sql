@@ -6,19 +6,19 @@ INSERT INTO `msg_source` (`namespace`,
 VALUES ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'pastoral'),
         'createdRelated',
         'staff',
-        'a student you are related with has a {:pastoral} record created'),
+        'a student you teach has a {:pastoral} record created'),
        ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'pastoral'),
         'updatedRelated',
         'staff',
-        'a student you are related with has a {:pastoral} record updated'),
+        'a student you teach has a {:pastoral} record updated'),
        ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'pastoral_comment'),
         'createdRelated',
         'staff',
-        'a student you are related with has a {:pastoral} record comment created'),
+        'a student you teach has a {:pastoral} record comment created'),
        ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'pastoral_comment'),
         'updatedRelated',
         'staff',
-        'a student you are related with has a {:pastoral} record comment updated')
+        'a student you teach has a {:pastoral} record comment updated')
 ;
 
 INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)

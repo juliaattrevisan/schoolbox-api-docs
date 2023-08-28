@@ -36,9 +36,11 @@ use Alaress\Async\Notification\Parameter\Param;
 
 class Notifier extends AbstractModuleNotifier
 {
-    private const TRIGGER_CREATED         = 'created';
+    // For staff, this will trigger for user / group based permissions, not for role based permissions
+    private const TRIGGER_CREATED = 'created';
+    private const TRIGGER_UPDATED = 'updated';
+    // For staff, this will trigger and role based permissions, not for user / group based permissions
     public const  TRIGGER_CREATED_RELATED = 'createdRelated';
-    private const TRIGGER_UPDATED         = 'updated';
     public const  TRIGGER_UPDATED_RELATED = 'updatedRelated';
     private const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
 
