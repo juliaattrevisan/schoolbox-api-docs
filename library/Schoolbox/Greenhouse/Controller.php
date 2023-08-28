@@ -9,7 +9,6 @@
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
-use Ramsey\Uuid\Uuid;
 use Twig\Error\Error;
 
 /**
@@ -35,10 +34,6 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $uuid = (string)Uuid::uuid4();
-
-        new \Alaress_Probe($uuid, strlen($uuid));
-
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', []);
     }
 }

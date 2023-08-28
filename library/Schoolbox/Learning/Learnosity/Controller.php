@@ -79,7 +79,7 @@ class Controller extends Base
     public function getContent(IAssessable $assessment): void
     {
         $payload = [
-            'config'    => [
+            'config' => [
                 'activity_edit' => [
                     'back' => false,
                     'item' => [
@@ -94,6 +94,18 @@ class Controller extends Base
                     ],
                     'reference' => [
                         'show' => false,
+                    ],
+                    /* Apply activity tags in the authorApp
+                     */
+                    'tags_on_create' => [
+                        [
+                            'type' => 'schoolcode',
+                            'name' => $this->getConfigLoader()->get('site_school_code')
+                        ],
+                        [
+                            'type' => 'classcode',
+                            'name' => $assessment->getContext()->getFolder()->getCodeString()
+                        ],
                     ]
                 ],
                 'item_edit' => [
@@ -104,7 +116,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'mode'  => 'activity_edit',
+            'mode' => 'activity_edit',
             /* A Learnosity uuid that we arbitrarily prescribed
              */
             'reference' => $assessment->getLearnosityReference(),
@@ -126,6 +138,7 @@ class Controller extends Base
                 'email'     => 'schoolbox@schoolbox.com.au'
             ]
         ];
+
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,

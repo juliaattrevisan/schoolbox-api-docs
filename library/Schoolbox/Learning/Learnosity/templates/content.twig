@@ -40,8 +40,19 @@
 
 {% autoescape 'js' %}
 <script>
+    /* Force tagging to occur immediately
+     * FIXME ...but why must I save it immediately upon spawn? Why can't it have these tags already
+     */
+    let authorAppCallback = {
+        readyListener: function () {
+            authorApp.on('render:activity', function(event) {
+                authorApp.saveActivity();
+            });
+        }
+    };
+
     let authorApp = LearnosityAuthor.init(
-        {{ initOptions | raw }}
+        {{ initOptions | raw }}, authorAppCallback
     );
 </script>
 {% endautoescape %}
