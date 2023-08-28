@@ -47,29 +47,15 @@ class RelationalDelete extends Deletable
     public function remove(string $hash, bool $performDryRun): void
     {
         /** @var GenericCollection|Model[] $studentSubmissionFiles */
-        $studentSubmissionFiles = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true])->indexBy('id');
-
+        $studentSubmissionFiles   = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true])->indexBy('id');
         $studentSubmissionFileIds = $studentSubmissionFiles->getPropertyValues('id');
 
-        // Fetch TurnitinReports models and add to StudentSubmissionFile models
-        $turnitinReports = $this->turnitinReportMapper->findByColumn('student_submission_file_id', $studentSubmissionFileIds, ['deleted' => true]);
-        foreach ($turnitinReports as $turnitinReport) {
-            $studentSubmissionFiles[$turnitinReport->getStudentSubmissionFileId()]->setTurnItIn($turnitinReport);
-        }
-
-        // Fetch Plagscan models and add to StudentSubmissionFile models
-        $plagscanDocuments = $this->plagscanDocumentMapper->findByColumn('student_submission_file_id', $studentSubmissionFileIds, ['deleted' => true]);
-        foreach ($plagscanDocuments as $plagscanDocument) {
-            $studentSubmissionFiles[$plagscanDocument->getStudentSubmissionFileId()]->setPlagscan($plagscanDocument);
-        }
-
-        // Fetch Kami models and add to StudentSubmissionFile models
-        $kamiDocs = $this->kamiMapper->findByColumn('student_submission_file_id', $studentSubmissionFileIds, ['deleted' => true]);
-        foreach ($kamiDocs as $kamiDoc) {
-            $studentSubmissionFiles[$kamiDoc->getStudentSubmissionFile()->getId()]->setKami($kamiDoc);
-        }
-
         if ($studentSubmissionFiles->count() > 0) {
+            // Fetch the related TII/Plagscan/Kami models
+            $turnitinReports   = $this->turnitinReportMapper->findByColumn('student_submission_file_id', $studentSubmissionFileIds, ['deleted' => true]);
+            $plagscanDocuments = $this->plagscanDocumentMapper->findByColumn('student_submission_file_id', $studentSubmissionFileIds, ['deleted' => true]);
+            $kamiDocs          = $this->kamiMapper->findByColumn('student_submission_file_id', $studentSubmissionFileIds, ['deleted' => true]);
+
             if ($performDryRun) {
                 if ($turnitinReports->count()) {
                     $this->logger->notice("Will delete [{$turnitinReports->count()}] record(s) in: {$this->turnitinReportMapper->getTable()}", ['char' => '-']);
@@ -82,13 +68,21 @@ class RelationalDelete extends Deletable
                 }
                 $this->logger->notice("Will delete [{$studentSubmissionFiles->count()}] record(s) in: {$this->mapper->getTable()}", ['char' => '-']);
             } else {
-                foreach ($studentSubmissionFiles as $studentSubmissionFile) {
-                    try {
-                        $this->deleteJoinedModels($studentSubmissionFile);
-                        $this->mapper->hardDelete($studentSubmissionFile);
-                    } catch (\Exception $exception) {
-                        throw new Mapper\Exception($exception->getMessage());
+                // Delete the related TII/Plagscan/Kami models,
+                // and then delete the student submission files themselves
+                try {
+                    if ($turnitinReports->count()) {
+                        $this->turnitinReportMapper->hardDelete($turnitinReports);
                     }
+                    if ($plagscanDocuments->count()) {
+                        $this->plagscanDocumentMapper->hardDelete($plagscanDocuments);
+                    }
+                    if ($kamiDocs->count()) {
+                        $this->kamiMapper->hardDelete($kamiDocs);
+                    }
+                    $this->mapper->hardDelete($studentSubmissionFiles);
+                } catch (\Exception $exception) {
+                    throw new Mapper\Exception($exception->getMessage());
                 }
                 if ($turnitinReports->count()) {
                     $this->logger->notice("[{$turnitinReports->count()}] record(s) deleted in: {$this->turnitinReportMapper->getTable()}", ['char' => '-']);
@@ -101,24 +95,6 @@ class RelationalDelete extends Deletable
                 }
                 $this->logger->notice("[{$studentSubmissionFiles->count()}] record(s) deleted in: {$this->mapper->getTable()}", ['char' => '-']);
             }
-        }
-    }
-
-    /**
-     * Hard deletes any TurnItIn,Plagscan or Kami joined models
-     *
-     * @throws Mapper\Exception
-     */
-    private function deleteJoinedModels(Model $studentSubmissionFile): void
-    {
-        if ($studentSubmissionFile->getTurnItIn()) {
-            $this->turnitinReportMapper->hardDelete($studentSubmissionFile->getTurnItIn());
-        }
-        if ($studentSubmissionFile->getPlagscan()) {
-            $this->plagscanDocumentMapper->hardDelete($studentSubmissionFile->getPlagscan());
-        }
-        if ($studentSubmissionFile->getKami()) {
-            $this->kamiMapper->hardDelete($studentSubmissionFile->getKami());
         }
     }
 }
