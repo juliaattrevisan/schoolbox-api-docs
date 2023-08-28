@@ -264,7 +264,7 @@ class Controller extends Assessment\Controller
      */
     public function getActivities(Model $assessment): void
     {
-        $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->map(new Assessment\Translator\UnitAssessments()));
+        $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()));
     }
 
     public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
@@ -279,7 +279,7 @@ class Controller extends Assessment\Controller
         }
         if ($this->linkedAssessmentsMapper->saveLink($assessment, $linkedAssessment)) {
             $assessment->getLinkedAssessments()->add($linkedAssessment);
-            $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->map(new Assessment\Translator\UnitAssessments()));
+            $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()));
         } else {
             $problem = (new ApiProblem('Link already Exists'))
                 ->setStatus(409)
