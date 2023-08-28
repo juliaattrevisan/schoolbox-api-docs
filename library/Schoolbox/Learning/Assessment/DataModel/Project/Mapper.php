@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as Grad
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\UserMapper;
@@ -106,6 +107,11 @@ class Mapper extends BaseMapper
     {
         if ($model->getAssessmentModel()->getAssessmentContext() instanceof \Schoolbox\Resource\Folder\Model) {
             throw new CallbackException("Projects are unable to created inside a folder");
+        }
+
+        // Disallow save of projects within projects
+        if ($model->getAssessmentModel()->getAssessmentContext() instanceof Model) {
+            throw new CallbackException('Projects may not contain projects');
         }
 
         return true;

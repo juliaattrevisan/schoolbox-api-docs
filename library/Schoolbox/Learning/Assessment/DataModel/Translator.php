@@ -218,19 +218,6 @@ class Translator
         return $dataModel;
     }
 
-
-    /**
-     * @param int $depth
-     * @throws UnexpectedValueException If we have recursed more than the configured level of project
-     */
-    private function checkProjectNestingLevel(int $depth): void
-    {
-        if ($depth >= $this->maxProjectLevels) {
-            throw new UnexpectedValueException("Invalid graph detected. Recursion depth: $depth");
-        }
-    }
-
-
     /**
      * Recursively descend the assessment tree, translating, caching and constructing translated tree as we go.
      *
@@ -243,15 +230,6 @@ class Translator
      */
     private function translateToDataModelRecursive(IAssessable $domainObject, int $depth = 1): IAssessableDataModel
     {
-        // Only check nesting level if a project, as:
-        // * Only projects may contain other assessments
-        // * We don't want projects on the bottom level
-        // TODO SA-5744 when descending tree during logically atomic assessment collection translation, need to use
-        // TODO         a translation id to skip re-translation of entities already translated during the current translation
-        if ($domainObject instanceof Project) {
-            $this->checkProjectNestingLevel($depth);
-        }
-
         // Attempt to translate assessments using the sub-translators
         $subTranslator = $this->getSubTranslatorDomain($domainObject);
         // TODO figure out which fields on assessable sub-objects are now redundant
@@ -386,13 +364,6 @@ class Translator
      */
     private function translateToDomainModelRecursive(IAssessableDataModel $dataModel, int $depth = 1): IAssessable
     {
-        // Only check nesting level if a project, as:
-        // * Only projects may contain other assessments
-        // * We don't want projects on the bottom level
-        if ($dataModel instanceof ProjectModel) {
-            $this->checkProjectNestingLevel($depth);
-        }
-
         $assessmentModel = $dataModel->getAssessmentModel();
         if (!$assessmentModel instanceof AssessmentModel) {
             throw new UnexpectedValueException('$dataModel has no assessment model');

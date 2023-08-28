@@ -1362,10 +1362,6 @@ class MapperProxy
             // Save sub-projects
             if ($assessable instanceof ProjectObject) {
                 foreach ($assessable->getAssessables() as $projectAssessable) {
-                    // Disallow save of projects within projects
-                    if ($projectAssessable instanceof ProjectObject) {
-                        throw new UnexpectedValueException('Projects may not contain projects');
-                    }
                     $this->save($projectAssessable, $currentUser);
                 }
             }
