@@ -84,7 +84,7 @@ class Redirect extends AbstractRedirect
              */
             $query = "
                 SELECT *
-                FROM assignment
+                FROM assignments
                 WHERE id = :assessmentCanvasId";
 
             if (!$this->canvasDb->isCanvasData2) {

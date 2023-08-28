@@ -26,6 +26,9 @@ class Data2Connector
 
     private const MAX_JOB_CHECK_COUNTS = 10;
 
+    // seconds to wait for the job to finish
+    private const RETRY_TIME_PERIOD = 30;
+
     private ?string $accessToken = null;
 
     /**
@@ -79,7 +82,7 @@ class Data2Connector
 
         $jobCheckCount = 0;
         while ($jobCheckCount < self::MAX_JOB_CHECK_COUNTS && !empty($this->jobs)) {
-            sleep(10);
+            sleep(self::RETRY_TIME_PERIOD);
             foreach ($this->jobs as $table => $jobId) {
                 $this->fetchJobData($table, $jobId);
             }
