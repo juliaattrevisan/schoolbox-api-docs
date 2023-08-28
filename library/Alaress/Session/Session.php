@@ -68,6 +68,7 @@ class Session extends BaseSession
         if (!$this->isStarted()) {
             $this->setCookieParams([
                 'lifetime' => $this->getConfig()->get('session_length'),
+                'samesite' => 'Lax',
             ]);
         }
     }
@@ -123,8 +124,11 @@ class Session extends BaseSession
      */
     public function setCookieExpiry($lifetime)
     {
-        $cookieParams = $this->getCookieParams();
-        $cookieParams['sessionExpiry'] = $lifetime > 0
+        $cookieParams = array_intersect_key(
+            $this->getCookieParams(),
+            ['path' => true, 'domain' => true, 'secure' => true, 'httponly' => true, 'samesite' => true],
+        );
+        $cookieParams['expires'] = $lifetime > 0
             ? $this->getRequestTime() + $lifetime
             : 0;
 
