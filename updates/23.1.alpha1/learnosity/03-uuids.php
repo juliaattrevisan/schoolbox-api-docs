@@ -26,13 +26,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
     /**
-     * Decide how long this should be based on your usage
-     * You might have to adjust it, but it should cover the cost of an iteration
-     */
-    private const LOCK_TTL = 60;
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
