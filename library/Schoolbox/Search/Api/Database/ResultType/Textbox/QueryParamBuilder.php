@@ -59,17 +59,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The relevance of a textbox is its modified time.  TODO: No modified time, so remove this function?
+     * Textboxes currently have no modified date or create date from which to determine relevance, so return '1'.
      *
      * @return string
      */
     protected function buildRelevanceExpression(): string
     {
-        return '0.5';
+        return '1';
     }
 
     /**
-     * Textboxes are ordered by relevance, as they have a modified time.  TODO: No modified time, so remove this function?
+     * No way of determining relevance (see this->buildRelevanceExpression()), so return false.
      *
      * @return bool
      */
@@ -117,7 +117,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The textbox's date is its modified date.  TODO: No modified date, so remove this function?
+     * Textboxes currently have no modified date or create date stored in the database, so return null.
      *
      * @return string|null
      */
@@ -127,7 +127,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The textbox's creator is its `owner` column.  TODO: No modified date, so remove this function?
+     * Textboxes currently have no creator stored in the database, so return null.
      *
      * @return string|null
      */
