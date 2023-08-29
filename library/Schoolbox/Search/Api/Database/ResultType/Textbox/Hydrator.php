@@ -84,7 +84,8 @@ class Hydrator extends BaseHydrator
                         $match->id,
                         $textbox->getHeading(),
                         $this->buildBaseUrl()
-                             ->withPath('homepage/' . $textbox->getCategory()->getId() . '#textbox' . $textbox->getId())
+                             ->withPath('homepage/' . $textbox->getCategory()->getId())
+                             ->withFragment('textbox' . $textbox->getId())
                              ->__toString(),
                         $match->type,
                         $match->relevance,
