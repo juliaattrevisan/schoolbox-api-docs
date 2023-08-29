@@ -1104,53 +1104,6 @@ class Controller extends Base
 
 
     /**
-     * Archive (soft-delete) multiple Learnosity Activities
-     *
-     * @return void
-     * @throws ValidationException
-     * @throws DebugBarException
-     */
-    public function getArchiveReferences(): void
-    {
-        $exclusions = [
-            '4d3f93b4-b13d-45b0-b949-db823f1b5ec2'
-        ];
-
-        /* Cleanses everything except references in $exclusions
-         */
-        $activities = $this->api->dataGetRequest('/itembank/activities', []);
-
-        $messages = [];
-
-        foreach ($activities['data'] as $activity) {
-            $activityReference = $activity['reference'];
-
-            /* Skip over exclusions (used when you have meticulously
-             * hand-crafted a quiz for showcase purposes and you don't
-             * want to lose it, for example)
-             */
-            if (in_array($activity['reference'], $exclusions, true)) {
-                $messages[] = "Skipped {$activityReference} - is in exclusions list";
-
-                continue;
-            }
-
-            /* Remove it!
-             */
-            try {
-                $this->getArchiveReference($activityReference);
-
-                $messages[] = "Archived {$activityReference}";
-            } catch (\RuntimeException $e) {
-                $messages[] = $e->getMessage();
-            }
-        }
-
-        new \Alaress_Probe($messages);
-    }
-
-
-    /**
      * Archive (soft-delete) a particular Learnosity Activity
      * Activities must have at least one published item before an activity can be archived
      *

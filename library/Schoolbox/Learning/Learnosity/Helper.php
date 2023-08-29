@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use LearnositySdk\Exceptions\ValidationException;
+use Psr\Log\LoggerInterface;
 
 /**
  * A shortcut to simple operations that involve
@@ -27,8 +28,9 @@ class Helper
      * Constructor.
      *
      * @param Api $api
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(private Api $api)
+    public function __construct(private Api $api, private ?LoggerInterface $logger)
     {
     }
 
@@ -89,6 +91,25 @@ class Helper
              * there might be orphaned data in learnosity; we
              * can check anyway
              */
+            $this->logger?->debug(sprintf(
+                'Fetching items for activity %s',
+                $updatedActivity['reference']
+            ));
+
+            /* No items? No trabajo
+             */
+            if (!\count($references)) {
+                $this->logger?->debug(sprintf(
+                    'No items for activity %s; continuing onwards',
+                    $updatedActivity['reference']
+                ));
+
+                return;
+            }
+
+            /* Archive all the items collated in $references
+             * If this is empty, it returns ALL ITEMS which isn't what you want.
+             */
             $items = $this->api->dataGetRequest('/itembank/items', ['references' => $references]);
 
             $itemsPayload = [
@@ -96,6 +117,11 @@ class Helper
             ];
 
             foreach ($items['data'] as $item) {
+                $this->logger?->debug(sprintf(
+                    'Setting item %s status to archived',
+                    $item['reference']
+                ));
+
                 $updatedItem = $item;
                 $updatedItem['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
 
@@ -104,6 +130,11 @@ class Helper
 
             /* Shank them into the Archived state
              */
+            $this->logger?->debug(sprintf(
+                'Archiving items for activity %s',
+                $updatedActivity['reference']
+            ));
+
             $itemArchiveResult = $this->api->dataSetRequest('/itembank/items', $itemsPayload);
         }
     }
