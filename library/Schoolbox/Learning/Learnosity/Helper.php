@@ -63,6 +63,8 @@ class Helper
             'activities' => []
         ];
 
+        /* $activities['data'] is a one-element stack in this usage
+         */
         foreach ($activities['data'] as $activity) {
             /* Shank the activity into the Archived state
              */
@@ -74,13 +76,13 @@ class Helper
 
             /* Then shank its items into the Archived state
              */
-            $references = [];
+            $itemReferences = [];
 
             /* This quiz might not have any questions (items) in it
              */
             if (isset($activity['data']['items'])) {
                 foreach ($activity['data']['items'] as $item) {
-                    $references[] = $item['reference'];
+                    $itemReferences[] = $item['reference'];
                 }
             }
 
@@ -93,49 +95,49 @@ class Helper
              */
             $this->logger?->debug(sprintf(
                 'Fetching items for activity %s',
-                $updatedActivity['reference']
+                $activity['reference']
             ));
 
             /* No items? No trabajo
              */
-            if (!\count($references)) {
+            if (\count($itemReferences)) {
+                /* Archive all the items collated in $references
+                 * If this is empty, it returns ALL ITEMS which isn't what you want.
+                 */
+                $items = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences]);
+
+                $itemsPayload = [
+                    'items' => []
+                ];
+
+                foreach ($items['data'] as $item) {
+                    $this->logger?->debug(sprintf(
+                        'Setting item %s status to archived',
+                        $item['reference']
+                    ));
+
+                    $updatedItem = $item;
+                    $updatedItem['status'] = 'archived';
+
+                    $itemsPayload['items'][] = $updatedItem;
+                }
+
+                /* Shank them into the Archived state
+                 */
+                $this->logger?->debug(sprintf(
+                    'Archiving items for activity %s',
+                    $activity['reference']
+                ));
+
+                $itemArchiveResult = $this->api->dataSetRequest('/itembank/items', $itemsPayload);
+            } else {
                 $this->logger?->debug(sprintf(
                     'No items for activity %s; continuing onwards',
-                    $updatedActivity['reference']
+                    $activity['reference']
                 ));
 
                 return;
             }
-
-            /* Archive all the items collated in $references
-             * If this is empty, it returns ALL ITEMS which isn't what you want.
-             */
-            $items = $this->api->dataGetRequest('/itembank/items', ['references' => $references]);
-
-            $itemsPayload = [
-                'items' => []
-            ];
-
-            foreach ($items['data'] as $item) {
-                $this->logger?->debug(sprintf(
-                    'Setting item %s status to archived',
-                    $item['reference']
-                ));
-
-                $updatedItem = $item;
-                $updatedItem['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
-
-                $itemsPayload['items'][] = $updatedItem;
-            }
-
-            /* Shank them into the Archived state
-             */
-            $this->logger?->debug(sprintf(
-                'Archiving items for activity %s',
-                $updatedActivity['reference']
-            ));
-
-            $itemArchiveResult = $this->api->dataSetRequest('/itembank/items', $itemsPayload);
         }
     }
 }
