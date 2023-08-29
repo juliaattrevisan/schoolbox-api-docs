@@ -1112,18 +1112,31 @@ class Controller extends Base
      */
     public function getArchiveReferences(): void
     {
-        $activityReferences = [
-            '396b91d9-9fb7-4667-bd4d-6af465a4fc33',
-            'bb7e7594-0653-4f38-a941-270c53878d67',
-            '51320849-d822-4f2c-b7b8-dcffb89dd796',
-            'eaaa75ff-3cad-446a-bc42-483b8800ca86',
-            '74da89a9-5d93-403f-9452-41cb17b1bab8',
-            'b5549cef-2005-42d9-b0dd-51676ebdbc6c',
+        $exclusions = [
+            '4d3f93b4-b13d-45b0-b949-db823f1b5ec2'
         ];
+
+        /* Cleanses everything except references in $exclusions
+         */
+        $activities = $this->api->dataGetRequest('/itembank/activities', []);
 
         $messages = [];
 
-        foreach ($activityReferences as $activityReference) {
+        foreach ($activities['data'] as $activity) {
+            $activityReference = $activity['reference'];
+
+            /* Skip over exclusions (used when you have meticulously
+             * hand-crafted a quiz for showcase purposes and you don't
+             * want to lose it, for example)
+             */
+            if (in_array($activity['reference'], $exclusions, true)) {
+                $messages[] = "Skipped {$activityReference} - is in exclusions list";
+
+                continue;
+            }
+
+            /* Remove it!
+             */
             try {
                 $this->getArchiveReference($activityReference);
 
