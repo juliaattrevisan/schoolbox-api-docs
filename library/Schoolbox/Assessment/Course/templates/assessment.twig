@@ -10,12 +10,10 @@ Usage:
 {% if _writable %}
     {% include '@course/assessment/writable.twig' with {
         assessment: assessment,
-        encodedReturnUrl: encodedReturnUrl,
-        USER: USER
+        encodedReturnUrl: encodedReturnUrl
     } only %}
 {% else %}
     {% include '@course/assessment/readonly.twig' with {
-        assessment: assessment,
-        USER: USER
+        assessment: assessment
     } only %}
 {% endif %}
