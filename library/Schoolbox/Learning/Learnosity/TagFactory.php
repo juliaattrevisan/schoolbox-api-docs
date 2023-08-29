@@ -57,10 +57,7 @@ class TagFactory
         /* Always have a school code tag
          */
         $stack = [
-            [
-                'type' => 'schoolCode',
-                'name' => $this->schoolCode
-            ]
+            $this->produceForSchoolCode()
         ];
 
         /* Everything below here is optional depending on which context
@@ -104,6 +101,20 @@ class TagFactory
 
         return $stack;
     }
+
+
+    /**
+     * Produce a tag for the given School Code
+     * Used to limit content to that which is owned by your school
+     *
+     * @return array
+     */
+    public function produceForSchoolCode(): array
+    {
+        return [
+            'type' => 'schoolCode',
+            'name' => $this->schoolCode
+        ];
+    }
 }
 
-// new TagGenerator($this->getConfigLoader()->get('site_school_code'));
