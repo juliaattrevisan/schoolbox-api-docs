@@ -53,16 +53,6 @@ class Model implements ISoftDeletable, Serializable
      */
     private $body = '';
 
-//    /**
-//     * Check whether this textbox is softdeleted
-//     *
-//     * @return bool
-//     */
-//    public function isDeleted(): bool
-//    {
-//        return $this->getDeletedAt() instanceof \Alaress_Date_Format;
-//    }
-
     /**
      * Constructor
      */
