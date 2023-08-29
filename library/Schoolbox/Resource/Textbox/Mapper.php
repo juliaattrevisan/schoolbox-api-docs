@@ -62,6 +62,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->uses('textboxID', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
         $this->joins('categoryID', FolderMapper::class, 'id', null, null, 'category', 'category');
     }

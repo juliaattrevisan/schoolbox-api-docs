@@ -59,7 +59,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The relevance of a matched textbox is determined by its modified_at time.
+     * The relevance of a matched textbox is determined by its updated_at time.
      *
      * @return string
      */
@@ -67,14 +67,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return $this->buildLinearDecayExpression(
             ':textboxNow',
-            'tb.modified_at',
+            'tb.updated_at',
             7,
             56,
         );
     }
 
     /**
-     * Textboxes are ordered by relevance, as they have a modified_at time.
+     * Textboxes are ordered by relevance, as they have a updated_at time.
      *
      * @return bool
      */
@@ -122,13 +122,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A textbox's date is its modified_at date.
+     * A textbox's date is its updated_at date.
      *
      * @return string|null
      */
     protected function buildDateExpression(): ?string
     {
-        return 'tb.modified_at';
+        return 'tb.updated_at';
     }
 
     /**
