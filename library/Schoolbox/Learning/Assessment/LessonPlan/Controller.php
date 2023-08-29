@@ -14,6 +14,7 @@ use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -295,6 +296,11 @@ class Controller extends Assessment\Controller
             return; //exit early
         }
         if ($this->linkedAssessmentsMapper->saveLink($assessment, $linkedAssessment)) {
+            // If the first link, then create empty collection
+            if (!$assessment->getLinkedAssessments()) {
+                $assessment->setLinkedAssessments(new GenericCollection(IAssessable::class));
+            }
+
             $assessment->getLinkedAssessments()->add($linkedAssessment);
             $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()));
         } else {
