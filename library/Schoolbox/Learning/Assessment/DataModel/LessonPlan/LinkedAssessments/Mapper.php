@@ -141,6 +141,18 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment)
     {
+        /**
+         * Ensure we are creating a link between assessments within the same course
+         */
+        $confirmQuery = "
+        SELECT  * from mv_assessment_relation lessonPlan
+        LEFT JOIN mv_assessment_relation newLink on
+            lessonPlan.folder_id = newLink.folder_id
+        WHERE lessonPlan.assessment_id = :lessonPlanId and newLink.assessment_id = :newLinkId";
+        if (0 === $this->getDatabase()->executeQuery($confirmQuery, ['lessonPlanId' => $lessonPlan->getId(), 'newLinkId' => $assessment->getId()])->rowCount()) {
+            throw new NotFound("Lesson plan and Assessment are not part of the same course");
+        }
+
         // find the ID of the lesson plan
         $query = $this->getDatabase()->executeQuery("SELECT id FROM lesson_plan where assessment_id = :id", ['id' => $lessonPlan->getId()]);
         $lessonPlanId = $query->fetchColumn();
