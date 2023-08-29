@@ -1370,35 +1370,38 @@ class Mapper extends BaseMapper
          */
         $links = $linkedAssessmentsMapper->findByColumn('lesson_plan_id', $lessonPlanIds);
 
-        // get the correct data object to work with
-        $statement = $this->prepareSelect(
-            $this->getSelectString(),
-            $this->getFromString(),
-            new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
-            ['assessment.id' => $links->getPropertyValues('assessmentId')],
-            ['order' => ['sequence' => 'asc']]
-        );
-        $statement->execute();
+        // if we have any links hydrate them
+        if ($links->count()) {
+            // get the correct data object to work with
+            $statement = $this->prepareSelect(
+                $this->getSelectString(),
+                $this->getFromString(),
+                new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
+                ['assessment.id' => $links->getPropertyValues('assessmentId')],
+                ['order' => ['sequence' => 'asc']]
+            );
+            $statement->execute();
 
-        /* Inject linked assessments into each instance of a Lesson Plan
-         * This is used when grabbing stuff out of the db via the custom query elsewhere in this
-         * class so you have to do all these microhydrations manually
-         */
-        $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
-        $lessonPlans = $lessonPlanMapper->createCollection();
-        foreach ($modelList as $model) {
-            if ($model->getSubObject() instanceof LessonPlan\Model) {
-                $lessonPlan = $model->getLessonPlan();
-                if (!$lessonPlan->getLinkedAssessments()) {
-                    $lessonPlan->setLinkedAssessments($this->createCollection());
+            /* Inject linked assessments into each instance of a Lesson Plan
+             * This is used when grabbing stuff out of the db via the custom query elsewhere in this
+             * class so you have to do all these microhydrations manually
+             */
+            $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
+            $lessonPlans      = $lessonPlanMapper->createCollection();
+            foreach ($modelList as $model) {
+                if ($model->getSubObject() instanceof LessonPlan\Model) {
+                    $lessonPlan = $model->getLessonPlan();
+                    if (!$lessonPlan->getLinkedAssessments()) {
+                        $lessonPlan->setLinkedAssessments($this->createCollection());
+                    }
+                    $lessonPlans[$lessonPlan->getId()] = $lessonPlan;
                 }
-                $lessonPlans[$lessonPlan->getId()] = $lessonPlan;
             }
-        }
 
-        foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
-            $lessonPlan = $links->getBy('assessmentId', $subAssessment->getId());
-            $lessonPlans[$lessonPlan->getLessonPlanId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+            foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
+                $lessonPlan                                                                                   = $links->getBy('assessmentId', $subAssessment->getId());
+                $lessonPlans[$lessonPlan->getLessonPlanId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+            }
         }
 
         return $modelList;

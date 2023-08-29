@@ -164,8 +164,7 @@ class Decorator implements DecoratorInterface
         /**
          * Linked assessments
          */
-        $linkedAssessments = $lessonPlanLinkedAssessmentsMapper->findOneByColumn('lesson_plan_id', $assessment->getId());
+        $linkedAssessments = $lessonPlanLinkedAssessmentsMapper->findByColumn('lesson_plan_id', $assessment->getId());
         $assessment->setLinkedAssessments($linkedAssessments);
-
     }
 }
