@@ -35,7 +35,6 @@
     /* MODIFIERS / VARIANTS */
     // Add inline (default left) border and grey background to card.
     &--child {
-        background-color: #f6f6f6;
         border-inline-start: var(--whitespace-s) solid #aaaaaa;
     }
 

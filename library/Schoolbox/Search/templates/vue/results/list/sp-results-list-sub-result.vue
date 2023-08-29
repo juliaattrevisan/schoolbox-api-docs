@@ -30,7 +30,12 @@ const dateFormatted = window.Vue.computed(() => {
         <div class="l-flex-row l-gap-s l-pad-s">
             <div class="c-img c-img--s">
                 <div class="c-img__wrapper">
-                    <div :class="`icon icon-document`"></div>
+                    <img
+                        v-if="props.subResult.image"
+                        :src="(props.subResult.image as string)"
+                        :alt="`Photo of ${props.subResult.title}`"
+                    />
+                    <div v-else-if="props.subResult.icon" :class="`icon icon-${props.subResult.icon}`"></div>
                 </div>
             </div>
             <div class="l-flex-col l-flex--justify-center f-no-margins">
