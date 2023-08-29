@@ -26,7 +26,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     {
         $data = array(
             'textBoxID' => $textBoxID,
-            'deleted' => 'true',
+            'deleted_at' => Alaress_Date_Format::now()->getDatabase(),
         );
         return $this->update($data);
     }
