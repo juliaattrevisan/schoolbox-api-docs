@@ -103,6 +103,18 @@ class Controller extends Base
                             'show' => true
                         ]
                     ]
+                ],
+                'item_list' => [
+                    'filter' => [
+                        'restricted' => [
+                            'tags' => [
+                                /* Show all content belonging to your school, for now, I guess
+                                 * TODO What is the limit of scope for Find Item like this?
+                                 */
+                                'all' => (new TagFactory($this->getConfigLoader()->get('site_school_code')))->produce(null, null, null, null, null)
+                            ]
+                        ]
+                    ]
                 ]
             ],
             'mode' => 'activity_edit',
