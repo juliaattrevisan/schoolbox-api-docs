@@ -261,8 +261,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * This also returns a count of all the items found in the search, not limited
-     * by params
+     * This also returns a count of all the items found in the search, not limited by params.
      *
      * @param ArticleResolver $articleResolver
      * @param User            $user
