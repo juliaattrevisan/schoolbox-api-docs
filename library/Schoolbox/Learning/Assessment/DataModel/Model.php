@@ -994,9 +994,11 @@ class Model implements ISoftDeletable
 
     /**
      * @param GenericCollection|null $linkedAssessments
+     * @return Model
      */
-    public function setLinkedAssessments(?GenericCollection $linkedAssessments): void
+    public function setLinkedAssessments(?GenericCollection $linkedAssessments): self
     {
         $this->linkedAssessments = $linkedAssessments;
+        return $this;
     }
 }
