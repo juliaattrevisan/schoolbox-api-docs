@@ -133,8 +133,9 @@ class CourseQuiz extends CourseAssessmentAbstract
                CONVERT_TZ(quiz.updated_at, 'UTC', :timezone) 'quiz.updated_at',
                quiz.points_possible        'quiz.points_possible',
                quiz.quiz_type              'quiz.quiz_type',
-               -- TODO: FIX THIS
-               quiz.hide_results           'quiz.show_results',
+               -- Canvas Data 2: hide_results: NULL/always/until_after_last_attempt
+               -- Canvas Data 1: show_results: always/always_after_last_attempt/never/only_once_after_last_attempt
+               IF(quiz.hide_results = 'always', 'never', '') 'quiz.show_results',
                quiz.anonymous_submissions  'quiz.anonymous_submissions',
                quiz.time_limit             'quiz_fact.time_limit',
                quiz.allowed_attempts       'quiz_fact.allowed_attempts'
