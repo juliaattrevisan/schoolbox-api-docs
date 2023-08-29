@@ -105,7 +105,7 @@ $app = new class extends CliTool\App {
             'polls'             => 'SELECT count(*) FROM poll',
             'tiles'             => 'SELECT count(*) FROM tile WHERE deleted_at IS NULL',
             'tile_set'          => 'SELECT count(*) FROM tile_layout WHERE deleted_at IS NULL',
-            'textbox'           => 'SELECT count(*) FROM textBox WHERE deleted IS NULL',
+            'textbox'           => 'SELECT count(*) FROM textBox WHERE deleted_at IS NULL',
             'wiki'              => 'SELECT count(*) FROM wiki WHERE deleted = "false"',
             'chat'              => 'SELECT count(*) FROM chat',
             'blog'              => 'SELECT count(*) FROM blog WHERE deleted_at IS NULL',
