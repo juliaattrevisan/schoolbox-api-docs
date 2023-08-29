@@ -123,8 +123,8 @@ class Mapper extends \Schoolbox\Mapper
             return false;
         } catch (NotFound $e) {
             $planLink = $this->createModel()
-                ->setLessonPlanId($lessonPlan->getId())
-                ->setAssessmentId($assessment->getId());
+                ->setLessonPlan($lessonPlan)
+                ->setAssessmentModel($assessment);
             // save if not already exists in the mapper
             return $this->save($planLink);
         }
