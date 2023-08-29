@@ -128,14 +128,14 @@ function onSelected(result: Result) {
     overflow: auto;
     width: 100%;
     &:last-child {
-        border-bottom: 1px solid var(--navigation-hover);
+        border-bottom: 1px solid var(--form-border-color);
     }
 }
 
 .search-status {
     background: var(--foreground-colour);
-    border-left: 1px solid var(--navigation-hover);
-    border-right: 1px solid var(--navigation-hover);
+    border-left: 1px solid var(--form-border-color);
+    border-right: 1px solid var(--form-border-color);
     padding: var(--whitespace-s);
     font-size: 0.825rem;
     font-style: italic;

@@ -50,8 +50,8 @@ function onSelected() {
 .search-result {
     background: var(--foreground-colour);
     border-bottom: 1px solid var(--body-background);
-    border-left: 1px solid var(--navigation-hover);
-    border-right: 1px solid var(--navigation-hover);
+    border-left: 1px solid var(--form-border-color);
+    border-right: 1px solid var(--form-border-color);
     display: flex;
     font-size: 0.825rem;
     padding: var(--whitespace-s);
