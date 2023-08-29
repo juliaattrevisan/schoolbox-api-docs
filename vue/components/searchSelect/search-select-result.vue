@@ -40,23 +40,21 @@ function onSelected() {
     <button class="search-result" :title="result.name" @click.prevent="onSelected">
         <div class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
-            <label :for="`checkbox-${result.id}`"></label>
-        </div>
-        <div>
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <span v-html="addMarks(props.result.name, [props.query])"></span>
+            <label :for="`checkbox-${result.id}`" v-html="addMarks(props.result.name, [props.query])"></label>
         </div>
     </button>
 </template>
 
 <style lang="scss" scoped>
 .search-result {
-    background: white;
+    background: var(--foreground-colour);
+    border-bottom: 1px solid var(--body-background);
+    border-left: 1px solid var(--navigation-hover);
+    border-right: 1px solid var(--navigation-hover);
     display: flex;
     font-size: 0.825rem;
-    margin: 0;
-    padding: 0.5rem 0.75rem;
-    text-align: left;
+    padding: var(--whitespace-s);
     transition: background 0.2s;
     width: 100%;
     &:hover {
@@ -64,17 +62,7 @@ function onSelected() {
     }
 }
 
-.checklist {
-    flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
-    margin: 0;
-}
-
 input[type="checkbox"]:not(.plain) + label {
     margin: 0;
-}
-
-aside {
-    font-size: 0.725rem;
-    font-style: italic;
 }
 </style>
