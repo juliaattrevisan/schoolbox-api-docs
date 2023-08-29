@@ -23,7 +23,6 @@ use Traversable;
 
 class Result extends Base
 {
-
     /**
      * Homepage TextBox component definition id
      * @var int|null
