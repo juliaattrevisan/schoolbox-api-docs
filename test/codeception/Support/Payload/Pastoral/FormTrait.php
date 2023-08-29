@@ -63,6 +63,12 @@ trait FormTrait
         $this->setAccess('group', $groupId, $accessLevel);
     }
 
+    //to create records with match campus on - pass the campus id
+    public function setRoleMatchCampus(): void
+    {
+        $this->setFormParam("roleCampus2", '1');
+    }
+
     public function setDuplicateToUser(int $otherStudentId): void
     {
         $this->setFormParam('duplicate_id[]', $otherStudentId);

@@ -516,6 +516,117 @@ class PastoralCest
         $i->seeResponseCodeIs(400);
     }
 
+    /** Record visibility - grant access by campus
+     * Ensure teachers can only see pastoral records for their campus when there record has campus toggled on
+     * Ensure teachers can see pastoral records for any campus when there record has campus toggled off
+     *  Fires off create a pastoral record step.
+     *
+     * @param IntegrationTester $i
+     */
+    public function recordVisibilityByCampus(IntegrationTester $i): void
+    {
+        #GIVEN
+        $student_jreed = $i->grabUser('jreed');
+        $heading = 'Automated Test Pastoral Record visibility grant access by campus to Jana Reed' . time();
+
+        $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
+        $createPastoral->setHeading($heading);
+        $teacher_role    = $i->grabRoleByTitle('Teacher');
+        $createPastoral->setRoleAccess($teacher_role->getId(), Pastoral\Access\Mapper::ACCESS_PUBLIC);
+        $createPastoral->setRoleMatchCampus();
+        $i->amGoingTo('Send request create pastoral record grant access according to the campus #' . $student_jreed->getId());
+        $i->sendRequest($createPastoral);
+
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}");
+
+        $record = $i->grabPastoralRecordByTitle($heading);
+        $recordID = $i->grabFromDatabase('pastoral', 'id', ['heading' => $heading]);
+
+        #WHEN admin navigates to the pastoral record
+        $i->amGoingTo('as admin, navigate to the pastoral record and ensure they have access to it');
+        $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+
+        #THEN admin can view that record
+        $i->seeResponseCodeIs(200);
+
+        #WHEN Rebecca White navigates to the pastoral record
+        $i->amGoingTo('as Rebecca White, navigate to the pastoral record and ensure they have access to it');
+        $i->impersonateUser(24);
+        $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+
+        #THEN  Rebecca White can view that record
+        $i->seeResponseCodeIs(200);
+
+        #WHEN Alisson Chan navigates to the pastoral record
+        $i->amGoingTo('as Alisson Chan primary teacher, navigate to the secondary student pastoral record and ensure they cannot access to it');
+        $i->impersonateUser(43);
+        $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+
+        #THEN  Alisson Chan cannot view that record
+        $i->seeResponseCodeIs(400);
+        $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+
+        #WHEN Staff1 navigates to the pastoral record
+        $i->amGoingTo('as Staff1 secondary teacher, navigate to the secondary student pastoral record and ensure they have access to it');
+        $i->impersonateUser(65);
+        $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+
+        #THEN  Staff1 can view that record
+        $i->seeResponseCodeIs(200);
+
+        #GIVEN
+        $student_ereed = $i->grabUser('ereed');
+        $heading = 'Automated Test Pastoral Record visibility grant access by campus to Eden Reed' . time();
+
+        $i->impersonateUser(1);
+        $createPastoral = new Payload\Pastoral\Create($student_ereed->getId());
+        $createPastoral->setHeading($heading);
+        $teacher_role    = $i->grabRoleByTitle('Teacher');
+        $createPastoral->setRoleAccess($teacher_role->getId(), Pastoral\Access\Mapper::ACCESS_PUBLIC);
+        $createPastoral->setRoleMatchCampus();
+        $i->amGoingTo('Send request create pastoral record grant access according to the campus #' . $student_ereed->getId());
+        $i->sendRequest($createPastoral);
+
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_ereed->getId()}");
+
+        $record = $i->grabPastoralRecordByTitle($heading);
+        $recordID = $i->grabFromDatabase('pastoral', 'id', ['heading' => $heading]);
+
+        #WHEN admin navigates to the pastoral record
+        $i->amGoingTo('as admin, navigate to the pastoral record and ensure they have access to it');
+        $i->sendGet('/pastoral/student/' . $student_ereed->getId() . '/record/' . $recordID);
+
+        #THEN admin can view that record
+        $i->seeResponseCodeIs(200);
+
+        #WHEN Rebecca White navigates to the pastoral record
+        $i->amGoingTo('as Rebecca White, navigate to the pastoral record and ensure they have access to it');
+        $i->impersonateUser(24);
+        $i->sendGet('/pastoral/student/' . $student_ereed->getId() . '/record/' . $recordID);
+
+        #THEN  Rebecca White can view that record
+        $i->seeResponseCodeIs(200);
+
+        #WHEN Alisson Chan navigates to the pastoral record
+        $i->amGoingTo('as Alisson Chan primary teacher, navigate to the primary student pastoral record and ensure they can access to it');
+        $i->impersonateUser(43);
+        $i->sendGet('/pastoral/student/' . $student_ereed->getId() . '/record/' . $recordID);
+
+        #THEN  Alisson Chan can view that record
+        $i->seeResponseCodeIs(200);
+        $i->sendGet('/pastoral/student/' . $student_ereed->getId() . '/record/' . $recordID);
+
+        #WHEN Staff1 navigates to the pastoral record
+        $i->amGoingTo('as Staff1 secondary teacher, navigate to the primary student pastoral record and ensure they cannot access to it');
+        $i->impersonateUser(65);
+        $i->sendGet('/pastoral/student/' . $student_ereed->getId() . '/record/' . $recordID);
+
+        #THEN  Staff1 can view that record
+        $i->seeResponseCodeIs(400);
+    }
+
     /** Test add pastoral type
      *  Fires off create a pastoral record step with the new pastoral type
      *
