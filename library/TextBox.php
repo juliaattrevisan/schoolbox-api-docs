@@ -12,7 +12,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     function getAllByCategory($categoryID)
     {
-        $query = "SELECT * FROM " . $this->_table . " WHERE categoryID = $categoryID AND deleted = 'false' ORDER BY heading";
+        $query = "SELECT * FROM " . $this->_table . " WHERE categoryID = $categoryID AND deleted_at IS NULL ORDER BY heading";
         return $this->db->query($query)->fetchAll();
     }
 
@@ -42,7 +42,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function homepageClean($cid)
     {
-        $query = "UPDATE {$this->_table} SET deleted = NOW() WHERE categoryID = '{$cid}'";
+        $query = "UPDATE {$this->_table} SET deleted_at = NOW() WHERE categoryID = '{$cid}'";
 
         $this->db->query($query);
     }
@@ -66,7 +66,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             SELECT textBoxID, categoryID, heading, body, folder.name as cname
             FROM textBox
             JOIN folder ON categoryID = folder.id
-            WHERE textBox.deleted = 'false' AND heading like ?
+            WHERE textBox.deleted_at IS NULL AND heading like ?
             AND folder.deleted_at IS NULL
             ORDER BY $sort_by $sort_dir
             LIMIT $offset, $limit
