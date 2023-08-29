@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
+use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
@@ -38,6 +39,7 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Twig\Error\Error;
 
 class Controller extends Assessment\Controller
 {
@@ -118,17 +120,15 @@ class Controller extends Assessment\Controller
     /**
      * Assessment Summary Screen for a Lesson Plan
      *
-     * @param IAssessable $assessment
-     * @param User        $student
+     * @param Model|IAssessable $assessment
+     * @param User              $student
      * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Deleted
+     * @throws Exception
+     * @throws RouteNotFound
+     * @throws Error
      */
-    public function getSummary(IAssessable $assessment, User $student): void
+    public function getSummary(Model|IAssessable $assessment, User $student): void
     {
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
 
