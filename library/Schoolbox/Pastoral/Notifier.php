@@ -47,9 +47,9 @@ class Notifier extends AbstractModuleNotifier
     // titles must not be the same
     private const TITLE = [
         self::TRIGGER_CREATED         => "A :pastoralcare record has been created",
-        self::TRIGGER_CREATED_RELATED => "A :pastoralcare record has been created for your student",
+        self::TRIGGER_CREATED_RELATED => "A :pastoralcare record has been created",
         self::TRIGGER_UPDATED         => "A :pastoralcare record has been updated",
-        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare record has been updated for your student",
+        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare record has been updated",
     ];
 
     // fields to notify when the value is changed
@@ -165,6 +165,7 @@ class Notifier extends AbstractModuleNotifier
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
                 ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
+                ->putMeta('type', $method) // to provide different key for $instance->getBaseHash() . $instance->getParamHash()
                 ->addTopic(sprintf("pastoral.%s.%s", $pastoral->getId(), $method));
         $message = $builder->build();
 

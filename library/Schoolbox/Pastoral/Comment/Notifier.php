@@ -50,9 +50,9 @@ class Notifier extends AbstractModuleNotifier
     // titles must not be the same
     private const TITLE = [
         self::TRIGGER_CREATED         => "A :pastoralcare comment has been created",
-        self::TRIGGER_CREATED_RELATED => "A :pastoralcare comment has been created on your student's record",
+        self::TRIGGER_CREATED_RELATED => "A :pastoralcare comment has been created",
         self::TRIGGER_UPDATED         => "A :pastoralcare comment has been updated",
-        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare comment has been updated on your student's record",
+        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare comment has been updated",
     ];
 
     /** @var Mapper */
@@ -154,6 +154,7 @@ class Notifier extends AbstractModuleNotifier
                 ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
+                ->putMeta('type', $method) // to provide different key for $instance->getBaseHash() . $instance->getParamHash()
                 ->addTopic(sprintf("pastoral_comment.%s.%s", $model->getId(), $method));
 
         $message = $builder->build();
