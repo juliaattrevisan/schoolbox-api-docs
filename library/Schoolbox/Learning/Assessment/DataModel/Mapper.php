@@ -141,17 +141,6 @@ class Mapper extends BaseMapper
             null,
             'contextProject'
         );
-        $this->joinsVia(
-            'lesson_plan_assessment',
-            LessonPlan\Mapper::class,
-            'id',
-            'lesson_plan_id',
-            'assessment_id',
-            'id',
-            self::TYPE_MODEL,
-            null,
-            'linkedAssessments'
-        );
         // the specification of this assessment
         // (if this assessment is within a unit implementation)
         // An implementation may only have one specification,
@@ -513,7 +502,6 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
-                {$this->getJoinColumnString('lesson_plan_assessment', 'lpa')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
 
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
@@ -540,7 +528,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa', true)}
-            LEFT JOIN {$this->getJoinSql('lesson_plan_assessment', '', 'lpa', true)}
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
     }
@@ -1375,11 +1362,20 @@ class Mapper extends BaseMapper
             return $modelList;
         }
 
+        /* Fetch all the Lesson Plan Fields used by this Lesson Plan
+         */
+        $linkedAssessmentsMapper = LessonPlan\LinkedAssessments\Mapper::getInstance();
+
+        /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
+         */
+        $links = $linkedAssessmentsMapper->findByColumn('lesson_plan_id', $lessonPlanIds);
+
+        // get the correct data object to work with
         $statement = $this->prepareSelect(
             $this->getSelectString(),
             $this->getFromString(),
             new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
-            ['v_lpa.lesson_plan_id' => $lessonPlanIds],
+            ['assessment.id' => $links->getPropertyValues('assessmentId')],
             ['order' => ['sequence' => 'asc']]
         );
         $statement->execute();
@@ -1388,16 +1384,21 @@ class Mapper extends BaseMapper
          * This is used when grabbing stuff out of the db via the custom query elsewhere in this
          * class so you have to do all these microhydrations manually
          */
+        $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
+        $lessonPlans = $lessonPlanMapper->createCollection();
         foreach ($modelList as $model) {
             if ($model->getSubObject() instanceof LessonPlan\Model) {
                 $lessonPlan = $model->getLessonPlan();
                 if (!$lessonPlan->getLinkedAssessments()) {
                     $lessonPlan->setLinkedAssessments($this->createCollection());
                 }
-                foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
-                    $lessonPlan->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
-                }
+                $lessonPlans[$lessonPlan->getId()] = $lessonPlan;
             }
+        }
+
+        foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
+            $lessonPlan = $links->getBy('assessmentId', $subAssessment->getId());
+            $lessonPlans[$lessonPlan->getLessonPlanId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
         }
 
         return $modelList;
