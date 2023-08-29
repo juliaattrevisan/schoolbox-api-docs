@@ -1,11 +1,6 @@
 <?php
 
 /**
- * Overrides Aura\Session\Session to provide easy access to the following:
- * * the logged-in user
- * * the history
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -16,9 +11,13 @@ use Aura\Session\Session as BaseSession;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 
+/**
+ * Overrides Aura\Session\Session to:
+ * * provide easy access to the logged-in user and history
+ * * set the `samesite` session cookie attribute to `Lax`
+ */
 class Session extends BaseSession
 {
-
     /**
      * The loader for config settings.
      *
@@ -166,7 +165,6 @@ class Session extends BaseSession
      */
     public function pushHistory($value)
     {
-
         $session = $this->getSegment(null);
         $history = $session->get('history');
         if (empty($history)) {
