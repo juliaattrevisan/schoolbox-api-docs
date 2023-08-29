@@ -115,10 +115,8 @@ class Controller extends Base
              */
             'user' => [
                 'id' => (string)$this->getUser()->getId(),
-                /* These fields are superfluous and are presumably
-                 * used for auditing; we attribute an individual user's
-                 * name to a collectively-utilised author account
-                 * configured in Learnosity itself (that's the id above)
+                /* These fields are superfluous and are presumably used for auditing
+                 * (we don't have a screen for this, it's in Learnosity somewhere else) 
                  */
                 'firstname' => 'Schoolbox',
                 'lastname'  => 'Schoolbox',
