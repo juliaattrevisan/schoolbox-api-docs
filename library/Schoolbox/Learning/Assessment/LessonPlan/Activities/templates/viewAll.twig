@@ -1,3 +1,11 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.assessment-component-tot.js?v={{ config.site_version }}"></script>
+<script type="text/javascript">
+        $(function() {
+            var $component = $('#component{{ componentInstance.id }}');
+            $component.setupAssessmentComponentTot();
+        });
+</script>
+
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learningAssessment/fragments/macro/unit/completed.twig' as status %}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
@@ -16,13 +24,13 @@
     </div>
 </div>
 
-<div class="small-12 island">
+<div class="small-12 island" id="component{{ componentInstance.id }}">
 {% for course in courses %}
-{% if course.specification.folder.id in accessibleFolderIds %}
-    <h2 class="icon-course subheader"><a href="{{ '/homepage/' ~ course.specification.folder.id }}" title="Visit course page">{{ course.specification.title }}</a></h2>
-{% else %}
-    <h2 class="icon-course subheader"><span></span>{{ course.specification.title }}</h2>
-{% endif %}
+    {% if course.specification.folder.id in accessibleFolderIds %}
+        <h2 class="icon-course subheader"><a href="{{ '/homepage/' ~ course.specification.folder.id }}" title="Visit course page">{{ course.specification.title }}</a></h2>
+    {% else %}
+        <h2 class="icon-course subheader"><span></span>{{ course.specification.title }}</h2>
+    {% endif %}
     <section>
         <ul class="action-list">
             <li>
@@ -185,6 +193,7 @@
         </ul>
     </section>
     {% endfor %}
+    <div class="toast" data-alert></div>
 </div>
 
 <style>
