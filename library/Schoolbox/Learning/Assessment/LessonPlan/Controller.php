@@ -221,6 +221,7 @@ class Controller extends Assessment\Controller
             'student'      => $student,
             'returnUrl'    => $returnUrl,
             'courseAssessments' => $courseAssessments,
+            'linkedAssessments' => $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()),
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
