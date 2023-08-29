@@ -116,7 +116,7 @@ class Controller extends Base
             'user' => [
                 'id' => (string)$this->getUser()->getId(),
                 /* These fields are superfluous and are presumably used for auditing
-                 * (we don't have a screen for this, it's in Learnosity somewhere else) 
+                 * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */
                 'firstname' => 'Schoolbox',
                 'lastname'  => 'Schoolbox',
@@ -1113,12 +1113,12 @@ class Controller extends Base
     public function getArchiveReferences(): void
     {
         $activityReferences = [
-            'f0b0a793-7f52-45eb-baba-071e5f12d60b',
-            '9120323f-672f-4e68-8533-94ba8c9abfca',
-            'd1276ea8-5be7-449a-8bea-87ed1a0f7be3',
-            'aed231de-5909-4628-a7e0-c4d5c772d5a8',
-            '8b43fe13-79a1-4ae4-8c08-43e858d9f6d7',
-            'ad45b26f-f3aa-4127-ba59-c61901d9990f',
+            '396b91d9-9fb7-4667-bd4d-6af465a4fc33',
+            'bb7e7594-0653-4f38-a941-270c53878d67',
+            '51320849-d822-4f2c-b7b8-dcffb89dd796',
+            'eaaa75ff-3cad-446a-bc42-483b8800ca86',
+            '74da89a9-5d93-403f-9452-41cb17b1bab8',
+            'b5549cef-2005-42d9-b0dd-51676ebdbc6c',
         ];
 
         $messages = [];
@@ -1180,19 +1180,13 @@ class Controller extends Base
                 ]
             ],
             'user' => [
-                /* Corresponds to a user in the Learnosity Console who will be
-                 * considered "the author" of stuff created by the school's teachers
-                 * Misconfiguring this leads to Error 10000 which has no definition
+                'id' => (string)$this->getUser()->getId(),
+                /* These fields are superfluous and are presumably used for auditing
+                 * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */
-                'id' => (string)$this->getConfigLoader()->get('learnosity_author_id'),
-                /* These fields are superfluous and are presumably
-                 * used for auditing; we attribute an individual user's
-                 * name to a collectively-utilised author account
-                 * configured in Learnosity itself (that's the id above)
-                 */
-                'firstname' => $this->getUser()->getFirstname(),
-                'lastname' => $this->getUser()->getLastname(),
-                'email' => $this->getUser()->getEmail()
+                'firstname' => 'Schoolbox',
+                'lastname'  => 'Schoolbox',
+                'email'     => 'schoolbox@schoolbox.com.au'
             ]
         ];
 

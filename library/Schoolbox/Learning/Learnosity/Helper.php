@@ -74,12 +74,20 @@ class Helper
              */
             $references = [];
 
-            foreach ($activity['data']['items'] as $item) {
-                $references[] = $item['reference'];
+            /* This quiz might not have any questions (items) in it
+             */
+            if (isset($activity['data']['items'])) {
+                foreach ($activity['data']['items'] as $item) {
+                    $references[] = $item['reference'];
+                }
             }
 
             /* Get all the items' details so we can archive it
              * and all its related pieces
+             *
+             * Even thought he activity didn't have items in it,
+             * there might be orphaned data in learnosity; we
+             * can check anyway
              */
             $items = $this->api->dataGetRequest('/itembank/items', ['references' => $references]);
 
