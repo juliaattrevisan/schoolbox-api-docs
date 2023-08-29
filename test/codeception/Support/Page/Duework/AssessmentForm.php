@@ -33,7 +33,7 @@ class AssessmentForm
     public const SELECTOR_MARK_TYPE = self::FORM . ' select[name="markType"]';
     public const SELECTOR_BUTTON_CREATE = self::FORM . ' [type=submit][value="Create"]';
     public const SELECTOR_BUTTON_UPDATE = self::FORM . ' [type=submit][value="Update"]';
-
+    public const SELECTOR_BUTTON_SAVE = 'input[type=submit][value="Save"]';
     // Work type
     public const WORKTYPE_ASSESSMENT_TASK = 1;
     public const WORKTYPE_ASSIGNMENT = 2;
@@ -199,6 +199,19 @@ class AssessmentForm
     }
 
     /**
+     * Sets due date
+     * @param Alaress_Date_Format $openDate
+     * @return AssessmentForm
+     */
+    public function setDueDate(Alaress_Date_Format $openDate): self
+    {
+        // Type in database format, let strtotime do the work
+        // This is because Codeception has no access to the DB config
+        $this->tester->fillDateField(self::SELECTOR_DUE_DATE, $openDate->getDatabase());
+        return $this;
+    }
+
+    /**
      * Excludes an user from participants
      * @param $userId
      * @param $confirm
@@ -221,6 +234,30 @@ class AssessmentForm
             $i->waitForText('Please Confirm');
             $i->click('Yes');
         }
+        return $this;
+    }
+
+    /**
+     * Creates a learning plan
+     * @param $userId
+     * @param $confirm
+     * @param $openSection
+     * @return AssessmentForm
+     * @throws \Exception
+     */
+    public function createLearningPlan(int $userId, string $planName, string $date): self
+    {
+        $i = $this->tester;
+        $i->amGoingTo("Create a learning plan for a student in the assessment");
+        $i->click('#participation-container > legend');
+        $i->waitForElementVisible('#participants > li[data-participant="' . $userId . '"]');
+        $i->click('#participants > li[data-participant="' . $userId . '"]');
+        $i->click('#customise-dropdown');
+        $i->click('a#participant-customise');
+        $i->waitForText('Create New Learning Plan');
+        $i->fillField('input#plan-name', $planName);
+        $i->fillField('input#plan-due-date', $date);
+        $i->click(self::SELECTOR_BUTTON_SAVE);
         return $this;
     }
 }
