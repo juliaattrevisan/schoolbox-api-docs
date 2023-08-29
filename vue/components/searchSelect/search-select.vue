@@ -84,7 +84,7 @@ async function onInput(value: string) {
     }
     canSearch.value = true;
     await execute();
-    // await debouncedRequest();
+    // await debouncedRequest(); // @TODO - resolve debounce issue
     try {
         results.value = data.value as Results;
     } catch (error) {

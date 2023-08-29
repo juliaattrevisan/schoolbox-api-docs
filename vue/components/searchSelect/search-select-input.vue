@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- *
+ * To input the search query
  */
 
 const emit = defineEmits<{

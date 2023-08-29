@@ -11,6 +11,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
+    select: [result: Result];
     remove: [result: Result];
 }>();
 
@@ -25,7 +26,7 @@ const isDisabled = window.Vue.computed(() => false);
  * containing further info on the selected search result
  */
 function onTitleSelected() {
-    //
+    emit("select", props.result);
 }
 
 /**
@@ -37,7 +38,7 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <div class="selected-node">
+    <div class="selected-item l-flex-row l-flex--align-center l-pad-s l-gap-s">
         <button
             type="button"
             class="title-button"
@@ -59,17 +60,13 @@ function onRemoveSelected() {
 </template>
 
 <style lang="scss" scoped>
-.selected-node {
+.selected-item {
     background: var(--body-background);
     color: #000;
-    display: flex;
     font-size: 0.8125rem;
-    gap: 0.5rem;
     min-height: auto;
     overflow: hidden;
-    padding: 5px 10px;
     text-align: left;
-    transition: all 0.3s;
     white-space: nowrap;
 }
 
@@ -83,11 +80,8 @@ function onRemoveSelected() {
 
 .remove-button {
     background: var(--body-background);
-    border-radius: 1rem;
-    flex: 0 0 1rem;
     height: 1rem;
     min-height: 0;
-    margin-top: 3px;
     padding: 0;
 }
 </style>

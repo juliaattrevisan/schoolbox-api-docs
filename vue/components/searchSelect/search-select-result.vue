@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * A single search result that be selected / unselected with a checkbox status
+ * A single search result that can be selected / unselected with a checkbox status
  */
 
 import { addMarks } from "@js/util/domUtils";
