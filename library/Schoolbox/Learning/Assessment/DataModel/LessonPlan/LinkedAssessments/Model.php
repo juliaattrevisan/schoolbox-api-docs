@@ -26,14 +26,6 @@ class Model
     private DataModel|IAssessable $assessment;
 
     /**
-     * @return int
-     */
-    public function getLessonPlanId(): int
-    {
-        return $this->lessonPlan->getId();
-    }
-
-    /**
      * @return LessonPlanData
      */
     public function getLessonPlan(): LessonPlanData
@@ -49,14 +41,6 @@ class Model
     {
         $this->lessonPlan = $lessonPlan;
         return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getAssessmentId(): int
-    {
-        return $this->assessment->getId();
     }
 
     /**

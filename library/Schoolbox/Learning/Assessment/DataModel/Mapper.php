@@ -1368,7 +1368,9 @@ class Mapper extends BaseMapper
 
         /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
          */
-        $links = $linkedAssessmentsMapper->findByColumn('lesson_plan_id', $lessonPlanIds);
+        $links = $linkedAssessmentsMapper->findByColumn('lesson_plan_id', $lessonPlanIds)->indexByCallback(function (LessonPlan\LinkedAssessments\Model $link) {
+            return $link->getAssessmentModel()->getId();
+        });
 
         // if we have any links hydrate them
         if ($links->count()) {
@@ -1377,7 +1379,9 @@ class Mapper extends BaseMapper
                 $this->getSelectString(),
                 $this->getFromString(),
                 new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
-                ['assessment.id' => $links->getPropertyValues('assessmentId')],
+                ['assessment.id' => $links->map(function (LessonPlan\LinkedAssessments\Model $link) {
+                    return $link->getAssessmentModel()->getId();
+                })],
                 ['order' => ['sequence' => 'asc']]
             );
             $statement->execute();
@@ -1399,8 +1403,8 @@ class Mapper extends BaseMapper
             }
 
             foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
-                $lessonPlan                                                                                   = $links->getBy('assessmentId', $subAssessment->getId());
-                $lessonPlans[$lessonPlan->getLessonPlanId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+                $lessonPlan                                                                                   = $links->offsetGet($subAssessment->getId());
+                $lessonPlans[$lessonPlan->getLessonPlan()->getId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
             }
         }
 
