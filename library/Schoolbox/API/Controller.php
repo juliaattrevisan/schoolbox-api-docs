@@ -27,7 +27,6 @@ use SensitiveParameter;
 
 class Controller extends Base
 {
-
     /**
      * Authenticator, for creating a user session.
      */
