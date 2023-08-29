@@ -105,7 +105,13 @@ HELP;
 
         /* Cleanses everything except references in $exclusions
          */
-        $activities = $api->dataGetRequest('/itembank/activities', []);
+        $activities = $api->dataGetRequest('/itembank/activities', [
+            'status' => [
+                /* This is meant to be default behaviour, but it's broken in Learnosity
+                 */
+                'published', 'unpublished'
+            ]
+        ]);
 
         foreach ($activities['data'] as $activity) {
             $activityReference = $activity['reference'];
