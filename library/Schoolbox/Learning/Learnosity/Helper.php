@@ -30,7 +30,7 @@ class Helper
      * @param Api $api
      * @param LoggerInterface|null $logger
      */
-    public function __construct(private Api $api, private ?LoggerInterface $logger)
+    public function __construct(private Api $api, private ?LoggerInterface $logger = null)
     {
     }
 
