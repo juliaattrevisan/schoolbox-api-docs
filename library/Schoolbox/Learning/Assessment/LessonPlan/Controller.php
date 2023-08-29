@@ -130,6 +130,8 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Model|IAssessable $assessment, User $student): void
     {
+        /** @var Model $assessment */
+
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
 
         /* Craft a returnUrl, to redirect back to the place from whence you came
