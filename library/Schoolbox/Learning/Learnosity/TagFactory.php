@@ -64,42 +64,15 @@ class TagFactory
          * a quiz is spawned. Context determines which combination of
          * tags will be generated.
          */
-        if ($courseSpecUuid) {
-            $stack[] = [
-                'type' => 'courseSpec',
-                'name' => $courseSpecUuid
-            ];
-        }
+        $stack[] = $this->produceForCourseSpec($courseSpecUuid);
+        $stack[] = $this->produceForCourseImpl($courseImplUuid);
+        $stack[] = $this->produceForCourseUnitSpec($courseUnitSpecUuid);
+        $stack[] = $this->produceForCourseUnitImpl($courseUnitImplUuid);
+        $stack[] = $this->produceForClassCode($classCode);
 
-        if ($courseImplUuid) {
-            $stack[] = [
-                'type' => 'courseImpl',
-                'name' => $courseImplUuid
-            ];
-        }
-
-        if ($courseUnitSpecUuid) {
-            $stack[] = [
-                'type' => 'courseUnitSpecUuid',
-                'name' => $courseUnitSpecUuid
-            ];
-        }
-
-        if ($courseUnitImplUuid) {
-            $stack[] = [
-                'type' => 'courseUnitImplUuid',
-                'name' => $courseUnitImplUuid
-            ];
-        }
-
-        if ($classCode) {
-            $stack[] = [
-                'type' => 'classCode',
-                'name' => $classCode
-            ];
-        }
-
-        return $stack;
+        /* Remove nulls
+         */
+        return array_filter($stack);
     }
 
 
@@ -115,6 +88,101 @@ class TagFactory
             'type' => 'schoolCode',
             'name' => $this->schoolCode
         ];
+    }
+
+
+    /**
+     * Produce a tag for the given Course Specification UUID
+     *
+     * @param string|null $courseSpecUuid
+     * @return string[]|null
+     */
+    public function produceForCourseSpec(?string $courseSpecUuid): ?array
+    {
+        if ($courseSpecUuid) {
+            return [
+                'type' => 'courseSpec',
+                'name' => $courseSpecUuid
+            ];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Produce a tag for the given Course Implementation UUID
+     *
+     * @param string|null $courseImplUuid
+     * @return string[]|null
+     */
+    public function produceForCourseImpl(?string $courseImplUuid): ?array
+    {
+        if ($courseImplUuid) {
+            return [
+                'type' => 'courseImpl',
+                'name' => $courseImplUuid
+            ];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Produce a tag for the given Course Unit Specification UUID
+     *
+     * @param string|null $courseUnitSpecUuid
+     * @return string[]|null
+     */
+    public function produceForCourseUnitSpec(?string $courseUnitSpecUuid): ?array
+    {
+        if ($courseUnitSpecUuid) {
+            return [
+                'type' => 'courseUnitSpec',
+                'name' => $courseUnitSpecUuid
+            ];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Produce a tag for the given Course Unit Implementation UUID
+     *
+     * @param string|null $courseUnitImplUuid
+     * @return string[]|null
+     */
+    public function produceForCourseUnitImpl(?string $courseUnitImplUuid): ?array
+    {
+        if ($courseUnitImplUuid) {
+            return [
+                'type' => 'courseUnitImpl',
+                'name' => $courseUnitImplUuid
+            ];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Produce a tag for the given Class Code
+     *
+     * @param string|null $classCode
+     * @return string[]|null
+     */
+    public function produceForClassCode(?string $classCode): ?array
+    {
+        if ($classCode) {
+            return [
+                'type' => 'classCode',
+                'name' => $classCode
+            ];
+        }
+
+        return null;
     }
 }
 
