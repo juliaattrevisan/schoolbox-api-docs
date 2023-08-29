@@ -401,11 +401,6 @@ parameters:
 			path: library/Alaress/Session/SegmentFactory.php
 
 		-
-			message: "#^Call to an undefined method Aura\\\\Session\\\\Phpfunc\\:\\:setcookie\\(\\)\\.$#"
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
 			message: "#^Comparison operation \"\\<\" between \\(array\\|float\\|int\\) and int results in an error\\.$#"
 			count: 1
 			path: library/Alaress/Session/Session.php

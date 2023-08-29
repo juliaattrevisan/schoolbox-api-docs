@@ -105,9 +105,9 @@ class Session extends BaseSession
      * option to be set.
      *
      * @param array $params
-     * @return void
+     * @return null
      */
-    public function setCookieParams(array $params): void
+    public function setCookieParams(array $params)
     {
         $this->cookie_params = array_merge($this->cookie_params, $params);
         /**
@@ -116,6 +116,7 @@ class Session extends BaseSession
          * @phpstan-ignore-next-line
          */
         $this->phpfunc->session_set_cookie_params($this->cookie_params);
+        return null;
     }
 
     /**
