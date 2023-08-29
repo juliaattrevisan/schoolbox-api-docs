@@ -25,7 +25,6 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
-
     /**
      * Textbox Homepage Controller classname
      */

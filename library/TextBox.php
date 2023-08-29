@@ -2,7 +2,7 @@
 
 class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
-    function __construct()
+    public function __construct()
     {
         $this->_table = 'textBox';
         $this->_index = 'textBoxID';
@@ -10,19 +10,19 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         parent::__construct();
     }
 
-    function getAllByCategory($categoryID)
+    public function getAllByCategory($categoryID)
     {
         $query = "SELECT * FROM " . $this->_table . " WHERE categoryID = $categoryID AND deleted_at IS NULL ORDER BY heading";
         return $this->db->query($query)->fetchAll();
     }
 
-    function getCurrent($categoryID)
+    public function getCurrent($categoryID)
     {
         $textBoxList = $this->getAllByCategory($categoryID);
         return $textBoxList[0];
     }
 
-    function delete($textBoxID)
+    public function delete($textBoxID)
     {
         $data = array(
             'textBoxID' => $textBoxID,
