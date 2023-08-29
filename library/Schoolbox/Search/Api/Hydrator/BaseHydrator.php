@@ -70,4 +70,72 @@ abstract class BaseHydrator implements IHydrator
                 ])
             );
     }
+
+    /**
+     * Truncates `$content` around the first occurrence of `$keyword`, to a max
+     * of `$maxChars / 2` characters either side.
+     *
+     * If this truncation slices characters off the start/end of `$content`,
+     * show truncation marks (...) before/after the truncated content.
+     *
+     * @param string $keyword  The search keyword.
+     * @param string $content  The content to truncate.
+     * @param int    $maxChars The max character count to include in the
+     *                         description: allows for an equal number of
+     *                         characters before and after the keyword.
+     *
+     * @return string|null
+     */
+    public function truncateAroundKeyword(string $keyword, string $content, int $maxChars): ?string
+    {
+        // As always, encoding is UTF-8
+        $encoding = 'UTF-8';
+
+        // Is $keyword there? Don't truncate anything if it's not
+        $strpos = mb_stripos($content, $keyword, 0, $encoding);
+        if ($strpos !== false) {
+            // How many chars before and after the keyword match?
+            $charsBefore = (int)($maxChars / 2);
+            $charsAfter  = $maxChars - $charsBefore;
+
+            // Determine whether to add truncation marks (...)
+            $keywordStrlen = mb_strlen($keyword, $encoding);
+            $contentStrlen = mb_strlen($content, $encoding);
+
+            // Show marks before if the first character is after the start
+            $cutStart       = $strpos - $charsBefore;
+            $startTruncated = true;
+            if ($cutStart < 0) {
+                // Reduce `$maxChars` so that no more than half of `$maxChars`
+                // are after the keyword
+                $maxChars       += $cutStart;
+                $cutStart       = 0;
+                $startTruncated = false;
+            }
+
+            // Show marks after if the last character is before the end
+            $finishTruncated = true;
+            $cutFinish       = $strpos + $keywordStrlen + $charsAfter;
+            if ($cutFinish > $contentStrlen) {
+                $finishTruncated = false;
+            }
+
+            // And truncate
+            $truncated = trim(
+                preg_replace(
+                    '/\s+/',
+                    ' ',
+                    mb_strcut($content, $cutStart, $maxChars, $encoding),
+                )
+            );
+            if ($startTruncated) {
+                $truncated = '...' . $truncated;
+            }
+            if ($finishTruncated) {
+                $truncated = $truncated . '...';
+            }
+            return $truncated;
+        }
+        return null;
+    }
 }

@@ -24,6 +24,11 @@ use Schoolbox\User;
 class Hydrator extends BaseHydrator
 {
     /**
+     * Maximum length of a description as returned by this hydrator.
+     */
+    private const DESCRIPTION_LENGTH = 300;
+
+    /**
      * Base type for this type of result.
      */
     public const BASE_TYPE = 'textbox';
@@ -66,7 +71,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($textboxes, $viewer) {
+            function (RawResult $match) use ($textboxes, $viewer, $keyword) {
                 $textbox = $textboxes->getBy('id', $match->id);
                 if ($textbox instanceof TextboxModel) {
                     // Check if user has access to textbox's folder
@@ -79,7 +84,7 @@ class Hydrator extends BaseHydrator
                         $match->id,
                         $textbox->getHeading(),
                         $this->buildBaseUrl()
-                             ->withPath('homepage/' . $textbox->getCategory()->getId())
+                             ->withPath('homepage/' . $textbox->getCategory()->getId() . '#textbox' . $textbox->getId())
                              ->__toString(),
                         $match->type,
                         $match->relevance,
@@ -88,7 +93,7 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         'textbox',
-                        $textbox->getBody(),
+                        $this->truncateAroundKeyword($keyword, $textbox->getBody(), self::DESCRIPTION_LENGTH),
                         null,
                         [$textbox->getCategory(),], // Context: textbox's folder
                         [], // Links: none.
