@@ -78,6 +78,8 @@ class Controller extends Base
      */
     public function getContent(IAssessable $assessment): void
     {
+        $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+
         $payload = [
             'config' => [
                 'activity_edit' => [
@@ -110,7 +112,9 @@ class Controller extends Base
                                 /* Show all content belonging to your school, for now, I guess
                                  * TODO What is the limit of scope for Find Item like this?
                                  */
-                                'all' => (new TagFactory($this->getConfigLoader()->get('site_school_code')))->produceForSchoolCode()
+                                'all' => [
+                                    $tagFactory->produceForSchoolCode()
+                                ]
                             ]
                         ]
                     ]
