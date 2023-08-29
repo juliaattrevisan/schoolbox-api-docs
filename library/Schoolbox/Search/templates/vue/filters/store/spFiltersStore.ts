@@ -9,13 +9,18 @@ import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorsStore } from "./spFilterCreatorsStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
 
-export type FilterData = {
+/**
+ * The filter data currently sent through
+ */
+type FilterData = {
     filter: {
         date: {
             from: string;
             to: string;
         };
-        creator: string;
+        creator: {
+            id: number;
+        };
         types: string[];
     };
 };
