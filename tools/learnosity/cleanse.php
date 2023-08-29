@@ -37,11 +37,20 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --input
+     * --reference
      *
-     * An example arg that has an actual value, denoted by the colon
+     * A csv of activity reference you want to remove; omitting will remove
+     * every activity except those specified in --exclusions
      */
-    private const OPT_LONG_INPUT = 'reference:';
+    private const OPT_LONG_REFERENCE = 'reference:';
+
+
+    /**
+     * --exclusions
+     *
+     * A csv of activity references that you want preserve
+     */
+    private const OPT_LONG_EXCLUSIONS = 'exclusions:';
 
 
     /**
@@ -51,7 +60,8 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_INPUT
+            self::OPT_LONG_REFERENCE,
+            self::OPT_LONG_EXCLUSIONS
         ];
     }
 
@@ -75,24 +85,26 @@ In their world, soft-delete is synonymous with "archiving"
 
 It's not very fast. It's an internal tool to help us manage all the broken data we make.
 
-Usage: cleanse.php [--reference]
-Example: cleanse.php --reference=396b91d9-9fb7-4667-bd4d-6af465a4fc33
+Usage: cleanse.php [--reference] [--exclusions]
+
+Example: Remove activity 396bd9...
+    cleanse.php --reference=396b91d9-9fb7-4667-bd4d-6af465a4fc33
+
+Example: Remove every activity except 4d3f93...
+    cleanse.php --exclusions=4d3f93b4-b13d-45b0-b949-db823f1b5ec2
 
 HELP;
             return;
         }
 
         /* Don't have access to $_SERVER superglobal here
+         * TODO Maybe make this into a cli arg if you use this outside of vagrant
          */
         $serverName = 'vagrant.dev.schoolbox.cloud';
 
-        $exclusions = [
-            '4d3f93b4-b13d-45b0-b949-db823f1b5ec2'
-        ];
+        $exclusions = explode(',', $this->getOpt(self::OPT_LONG_EXCLUSIONS) ?? '');
 
-        /* Probably inject this one day, but for now,
-         * I want to avoid dumping Yet Another Thing into the kernel
-         * I don't have a convenient means to access SERVER_NAME except like this, sadly
+        /* Initialise dependencies
          */
         $api = new Api(
             $serverName,
@@ -105,7 +117,10 @@ HELP;
 
         /* Cleanses everything except references in $exclusions
          */
+        $activityReferences = explode(',', $this->getOpt(self::OPT_LONG_REFERENCE) ?? '');
+
         $activities = $api->dataGetRequest('/itembank/activities', [
+            'references' => $activityReferences,
             'status' => [
                 /* This is meant to be default behaviour, but it's broken in Learnosity
                  */
