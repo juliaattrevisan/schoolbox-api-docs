@@ -16,18 +16,9 @@ use Schoolbox\Learning\Assessment\DataModel\Model as DataModel;
 class Model
 {
     /**
-     * Lesson Plan id
-     */
-    private int $lessonPlanId;
-    /**
      * Lesson Plan
      */
     private LessonPlanData $lessonPlan;
-
-    /**
-     * Linked Assessment ID
-     */
-    private int $assessmentId;
 
     /**
      * Linked Assessment
@@ -35,21 +26,11 @@ class Model
     private DataModel|IAssessable $assessment;
 
     /**
-     * @param int $lessonPlanId
-     * @return Model
-     */
-    public function setLessonPlanId(int $lessonPlanId): self
-    {
-        $this->lessonPlanId = $lessonPlanId;
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getLessonPlanId(): int
     {
-        return $this->lessonPlanId;
+        return $this->lessonPlan->getId();
     }
 
     /**
@@ -66,18 +47,7 @@ class Model
      */
     public function setLessonPlan(LessonPlanData $lessonPlan): self
     {
-        $this->lessonPlanId = $lessonPlan->getId();
         $this->lessonPlan = $lessonPlan;
-        return $this;
-    }
-
-    /**
-     * @param int $assessmentId
-     * @return Model
-     */
-    public function setAssessmentId(int $assessmentId): self
-    {
-        $this->assessmentId = $assessmentId;
         return $this;
     }
 
@@ -86,7 +56,7 @@ class Model
      */
     public function getAssessmentId(): int
     {
-        return $this->assessmentId;
+        return $this->assessment->getId();
     }
 
     /**
@@ -103,7 +73,6 @@ class Model
      */
     public function setAssessmentModel(DataModel|IAssessable $assessment): self
     {
-        $this->assessmentId = $assessment->getId();
         $this->assessment = $assessment;
         return $this;
     }
