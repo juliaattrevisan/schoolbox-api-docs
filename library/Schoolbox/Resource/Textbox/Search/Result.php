@@ -62,7 +62,7 @@ class Result extends Base
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
                 {$componentJoin}
             WHERE
-                t.deleted IS NULL AND
+                t.deleted_at IS NULL AND
                 (
                   MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
                   `heading` LIKE :like
@@ -116,7 +116,7 @@ class Result extends Base
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
                 {$componentJoin}
             WHERE
-                t.deleted IS NULL AND
+                t.deleted_at IS NULL AND
                 (
                   MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
                   `heading` LIKE :like
