@@ -39,7 +39,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildBaseWhereParams(string $keyword): array
     {
         $whereParts         = [
-            'tb.deleted IS NULL',
+            'tb.deleted_at IS NULL',
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
@@ -59,23 +59,28 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * Textboxes currently have no modified date or create date from which to determine relevance, so return '1'.
+     * The relevance of a matched textbox is determined by its modified_at time.
      *
      * @return string
      */
     protected function buildRelevanceExpression(): string
     {
-        return '1';
+        return $this->buildLinearDecayExpression(
+            ':textboxNow',
+            'tb.modified_at',
+            7,
+            56,
+        );
     }
 
     /**
-     * No way of determining relevance (see this->buildRelevanceExpression()), so return false.
+     * Textboxes are ordered by relevance, as they have a modified_at time.
      *
      * @return bool
      */
     protected function isOrderedByRelevance(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -117,13 +122,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * Textboxes currently have no modified date or create date stored in the database, so return null.
+     * A textbox's date is its modified_at date.
      *
      * @return string|null
      */
     protected function buildDateExpression(): ?string
     {
-        return null;
+        return 'tb.modified_at';
     }
 
     /**
