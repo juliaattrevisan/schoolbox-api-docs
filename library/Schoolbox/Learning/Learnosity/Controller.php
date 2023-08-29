@@ -98,13 +98,25 @@ class Controller extends Base
                         'show' => false,
                     ],
                 ],
+                /* Editing a particular item
+                 */
                 'item_edit' => [
                     'item' => [
                         'title' => [
                             'show' => true
                         ]
+                    ],
+                    /* Tags are only spawned upon clicking Save, not before
+                     */
+                    'tags_on_create' => [
+                        $tagFactory->produceForSchoolCode(),
+
+                        /* TODO fill in more tags based on context, I guess
+                         */
                     ]
                 ],
+                /* Show a list of Items, which you can see by clicking Find Items
+                 */
                 'item_list' => [
                     'filter' => [
                         'restricted' => [
