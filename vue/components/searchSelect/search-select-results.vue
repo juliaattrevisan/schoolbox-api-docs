@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- *
+ * The search results container
  */
 
 import gsap from "gsap";
@@ -27,6 +27,17 @@ const searchResultsContainerEl = window.Vue.ref<HTMLDivElement | null>(null);
 const searchResultsEl = window.Vue.ref<HTMLDivElement | null>(null);
 
 /**
+ * to animate the height of the search results container
+ * @param {number} targetHeight - the height to animate to
+ */
+function animateHeight(targetHeight: number) {
+    gsap.to(searchResultsContainerEl.value, {
+        duration: 0.3,
+        height: targetHeight,
+    });
+}
+
+/**
  * to slide up and down the search results
  */
 window.Vue.watch(
@@ -36,12 +47,22 @@ window.Vue.watch(
             return;
         }
         await window.Vue.nextTick();
-        await window.Vue.nextTick();
+        await window.Vue.nextTick(); // I don't know why this is needed yet...
         const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
-        gsap.to(searchResultsContainerEl.value, {
-            duration: 0.3,
-            height: targetHeight,
-        });
+        animateHeight(targetHeight);
+    }
+);
+
+/**
+ * to slide up and down the search results
+ */
+window.Vue.watch(
+    () => props.isActive,
+    async (newIsActive) => {
+        await window.Vue.nextTick();
+        await window.Vue.nextTick(); // I don't know why this is needed yet...
+        const targetHeight = newIsActive ? (searchResultsEl.value as HTMLDivElement).offsetHeight : 0;
+        animateHeight(targetHeight);
     }
 );
 
@@ -68,25 +89,26 @@ function onSelected(result: Result) {
     emit("select", result);
 }
 </script>
-
 <template>
-    <div v-if="isActive" ref="searchResultsContainerEl" class="search-results-container">
+    <div ref="searchResultsContainerEl" class="search-results-container">
         <div ref="searchResultsEl" class="search-results">
-            <div v-if="props.isSearching" class="search-status">Searching for results....</div>
-            <div v-else-if="props.results.length === 0" class="search-status">
-                No results found for your current search.
-            </div>
-            <template v-else>
-                <search-select-select-all v-if="showSelectAll" />
-                <search-select-result
-                    v-for="result in props.results"
-                    :key="result.id"
-                    :query="query"
-                    :selected="selected"
-                    :results="props.results"
-                    :result="result"
-                    @select="onSelected"
-                />
+            <template v-if="isActive">
+                <div v-if="props.isSearching" class="search-status">Searching for results....</div>
+                <div v-else-if="props.results.length === 0" class="search-status">
+                    No results found for your current search.
+                </div>
+                <template v-else>
+                    <search-select-select-all v-if="showSelectAll" />
+                    <search-select-result
+                        v-for="result in props.results"
+                        :key="result.id"
+                        :query="query"
+                        :selected="selected"
+                        :results="props.results"
+                        :result="result"
+                        @select="onSelected"
+                    />
+                </template>
             </template>
         </div>
         <!-- .search-results -->
@@ -111,8 +133,11 @@ function onSelected(result: Result) {
 }
 
 .search-status {
-    background-color: #fafafa;
-    padding: 0.75rem;
+    background: var(--foreground-colour);
+    border-left: 1px solid var(--navigation-hover);
+    border-right: 1px solid var(--navigation-hover);
+    padding: var(--whitespace-s);
+    font-size: 0.825rem;
     font-style: italic;
 }
 </style>
