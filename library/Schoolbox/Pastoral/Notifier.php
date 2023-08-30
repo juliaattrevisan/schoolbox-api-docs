@@ -36,9 +36,21 @@ use Alaress\Async\Notification\Parameter\Param;
 
 class Notifier extends AbstractModuleNotifier
 {
-    const TRIGGER_CREATED         = 'created';
-    const TRIGGER_UPDATED         = 'updated';
-    const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
+    // For staff, this will trigger for user / group based permissions, not for role based permissions
+    private const TRIGGER_CREATED = 'created';
+    private const TRIGGER_UPDATED = 'updated';
+    // For staff, this will trigger and role based permissions, not for user / group based permissions
+    public const  TRIGGER_CREATED_RELATED = 'createdRelated';
+    public const  TRIGGER_UPDATED_RELATED = 'updatedRelated';
+    private const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
+
+    // titles must not be the same
+    private const TITLE = [
+        self::TRIGGER_CREATED         => "A :pastoralcare record has been created",
+        self::TRIGGER_CREATED_RELATED => "A :pastoralcare record has been created",
+        self::TRIGGER_UPDATED         => "A :pastoralcare record has been updated",
+        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare record has been updated",
+    ];
 
     // fields to notify when the value is changed
     private const COLS = [
@@ -130,7 +142,7 @@ class Notifier extends AbstractModuleNotifier
         try {
             $pastoral = $this->hydrate($model);
         } catch (MapperException $e) {
-            $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+            $this->log->error("Error: Unable to send pastoral {$method} notification. {$e->getMessage()}", ['exception' => $e]);
             return $envelope;
         }
 
@@ -140,21 +152,21 @@ class Notifier extends AbstractModuleNotifier
         $severity = $pastoral->getSeverity()
             ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
             : '';
-        $type = strtolower($pastoral->getType()->getName());
+        $type     = strtolower($pastoral->getType()->getName());
         if ($pastoral->getSubType() instanceof SubType\Model) {
             $type = sprintf('%s (%s)', $type, strtolower($pastoral->getSubType()->getName()));
         }
 
         $builder = new Builder();
-        $builder->setTitle("A :pastoralcare record has been {$method}")
+        $builder->setTitle(self::TITLE[$method])
                 ->setParam('pastoralcare', new Param("{$severity} {$type}", $href, ParameterInterface::STACKING_APPEND))
                 ->setIcon($this->getUserIcon($effector))
                 ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
                 ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
-                ->addTopic("pastoral.{$pastoral->getId()}.{$method}");
-
+                ->putMeta('type', $method) // to provide different key for $instance->getBaseHash() . $instance->getParamHash()
+                ->addTopic(sprintf("pastoral.%s.%s", $pastoral->getId(), $method));
         $message = $builder->build();
 
         // Work out who to send the message to
@@ -217,10 +229,12 @@ class Notifier extends AbstractModuleNotifier
         switch ($bundle->getMethod()) {
             case BaseMapper::METHOD_CREATE:
                 $bundle->attach(self::TRIGGER_CREATED, $now);
+                $bundle->attach(self::TRIGGER_CREATED_RELATED, $now);
                 $bundle->attach(self::TRIGGER_ADDED_TO_REPORT, $now);
                 break;
             case BaseMapper::METHOD_UPDATE:
                 $bundle->attach(self::TRIGGER_UPDATED, $now);
+                $bundle->attach(self::TRIGGER_UPDATED_RELATED, $now);
                 break;
         }
     }
@@ -244,9 +258,33 @@ class Notifier extends AbstractModuleNotifier
      *
      * @return Envelope
      */
+    public function notifyCreatedRelated(Model $model, User $effector, ?array $diff = []): Envelope
+    {
+        return $this->buildMessage($model, self::TRIGGER_CREATED_RELATED, $effector, $diff);
+    }
+
+    /**
+     * @param Model      $model
+     * @param User       $effector
+     * @param array|null $diff
+     *
+     * @return Envelope
+     */
     public function notifyUpdated(Model $model, User $effector, ?array $diff = []): Envelope
     {
         return $this->buildMessage($model, self::TRIGGER_UPDATED, $effector, $diff);
+    }
+
+    /**
+     * @param Model      $model
+     * @param User       $effector
+     * @param array|null $diff
+     *
+     * @return Envelope
+     */
+    public function notifyUpdatedRelated(Model $model, User $effector, ?array $diff = []): Envelope
+    {
+        return $this->buildMessage($model, self::TRIGGER_UPDATED_RELATED, $effector, $diff);
     }
 
     /**
