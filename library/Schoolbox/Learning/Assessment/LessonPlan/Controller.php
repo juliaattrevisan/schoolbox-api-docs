@@ -223,7 +223,7 @@ class Controller extends Assessment\Controller
             'student'      => $student,
             'returnUrl'    => $returnUrl,
             'courseAssessments' => $courseAssessments,
-            'linkedAssessments' => $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()),
+            'linkedAssessments' => $assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()) : [],
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
@@ -274,7 +274,7 @@ class Controller extends Assessment\Controller
      */
     public function getActivities(Model $assessment): void
     {
-        $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()));
+        $this->response = $this->responseAsJson($assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()) : []);
     }
 
     /**
