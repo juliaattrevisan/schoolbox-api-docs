@@ -6,48 +6,33 @@
 
 import { defineStore } from "pinia";
 import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
-import { useFilterCreatorStore } from "./spFilterCreatorStore";
+import { useFilterCreatorsStore } from "./spFilterCreatorsStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
 
-export type FilterData = {
+/**
+ * The filter data currently sent through
+ */
+type FilterData = {
     filter: {
         date: {
             from: string;
             to: string;
         };
-        creator: string;
+        creator: {
+            id: number;
+        };
         types: string[];
     };
 };
 
 export const useFiltersStore = defineStore("spFilters", () => {
     /**
-     * Are there any filters selected
-     * @returns {boolean}
-     */
-    const isSelected = window.Vue.computed(
-        () =>
-            useFilterDateRangeStore().isSelected ||
-            useFilterCreatorStore().isSelected ||
-            useFilterTypesStore().isSelected
-    );
-
-    /**
      * Are there any filters active
      * @returns {boolean}
      */
     const isActive = window.Vue.computed(
-        () => useFilterDateRangeStore().isActive || useFilterCreatorStore().isActive || useFilterTypesStore().isActive
+        () => useFilterDateRangeStore().isActive || useFilterCreatorsStore().isActive || useFilterTypesStore().isActive
     );
-
-    /**
-     * set the active filters, linked to the currently active search
-     */
-    function setActive() {
-        useFilterDateRangeStore().setActive();
-        useFilterCreatorStore().setActive();
-        useFilterTypesStore().setActive();
-    }
 
     /**
      * Get the filter data
@@ -56,7 +41,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
     function getFormData() {
         const filterData = {
             ...useFilterDateRangeStore().getFormData(),
-            // ...useFilterCreatorStore().getFormData(),
+            ...useFilterCreatorsStore().getFormData(),
             // ...useFilterTypesStore().getFormData(),
         };
         return JSON.stringify(filterData);
@@ -67,14 +52,12 @@ export const useFiltersStore = defineStore("spFilters", () => {
      */
     function clear() {
         useFilterDateRangeStore().clear();
-        useFilterCreatorStore().clear();
+        useFilterCreatorsStore().clear();
         useFilterTypesStore().clear();
     }
 
     return {
-        isSelected,
         isActive,
-        setActive,
         getFormData,
         clear,
     };

@@ -12,28 +12,13 @@ export type FilterType = {
 
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     const allTypes = window.Vue.ref<FilterType[]>([]); // all filter types available
-    const selectedTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
-    const activeTypes = window.Vue.ref<string[]>([]); // the currently active filters, those selected at the time of the latest search
+    const activeTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
 
     /**
      * Are there any types selected
      * @returns {boolean}
      */
-    const isSelected = window.Vue.computed(() => selectedTypes.value.length > 0);
-
-    /**
-     * Are there any types active
-     * @returns {boolean}
-     */
     const isActive = window.Vue.computed(() => activeTypes.value.length > 0);
-
-    /**
-     * set the active types, linked to the currently active search,
-     * so any filter changes are not applied to more result loads
-     */
-    function setActive() {
-        activeTypes.value = selectedTypes.value;
-    }
 
     /**
      * Get the types filter data
@@ -41,7 +26,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function getFormData() {
         return {
-            types: selectedTypes.value,
+            types: activeTypes.value,
         };
     }
 
@@ -49,15 +34,12 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      * clear the current types
      */
     function clear() {
-        selectedTypes.value = [];
+        activeTypes.value = [];
     }
 
     return {
         allTypes,
-        selectedTypes,
-        isSelected,
         isActive,
-        setActive,
         getFormData,
         clear,
     };

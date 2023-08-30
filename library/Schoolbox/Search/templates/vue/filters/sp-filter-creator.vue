@@ -4,15 +4,47 @@
  * currently uses the exisitng jquery selectize plugin
  */
 
-import { useFilterCreatorStore } from "./store/spFilterCreatorStore";
+import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import { Creator, useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
 
-const filterCreatorStore = useFilterCreatorStore();
+const filterCreatorsStore = useFilterCreatorsStore();
+
+/**
+ * We only allow one creator to be selected at a time,
+ * so only select a result if there isn't one already selected
+ * or unselect the current result if it's already selected
+ * @param {Result} result - the result selected
+ */
+function onSelected(result: Result) {
+    if (!filterCreatorsStore.isActive) {
+        filterCreatorsStore.creator.push(result as Creator);
+        return;
+    }
+    if (result.id === filterCreatorsStore.creator[0].id) {
+        filterCreatorsStore.clear();
+    }
+}
+
+/**
+ * Remove the result, as we only allow one creator to be selected at a time
+ * we can simply just clear the store
+ */
+function onRemoved() {
+    filterCreatorsStore.clear();
+}
 </script>
-
+<section></section>
 <template>
-    <div class="small-12 columns">
-        <label>Creator</label>
-        <input v-model="filterCreatorStore.creator" />
+    <div class="l-flex-col">
+        <label for="creator">Creator</label>
+        <search-select
+            endpoint="/ajax/user.php?groupID=0&query="
+            :selected="filterCreatorsStore.creator"
+            :is-single-select="true"
+            @select="onSelected"
+            @remove="onRemoved"
+        />
     </div>
 </template>
 

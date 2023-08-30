@@ -36,7 +36,7 @@ async function onApplySelected() {
         <div class="c-filters">
             <form class="l-flex-col l-gap-m" role="search" aria-label="Apply filters" @submit.prevent="onApplySelected">
                 <sp-filter-date-range />
-                <!-- <sp-filter-creator /> -->
+                <sp-filter-creator />
                 <!-- <sp-filter-types /> -->
                 <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
                 <button class="full-width submit" @click.prevent="onApplySelected">Apply filters and search</button>
