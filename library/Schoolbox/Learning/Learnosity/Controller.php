@@ -78,7 +78,14 @@ class Controller extends Base
      */
     public function getContent(IAssessable $assessment): void
     {
+        /* Tags for presetting without requiring the additional
+         * authorApp.saveActivity() upon spawn. "create" (such as
+         * in "tags_on_create") is when you first hit the Save button,
+         * not when authorApp initialises for the first time
+         */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+
+        $tags = $tagFactory->produce('25745286-8883-4fe4-98e6-39201c931ab2', 'f0fd5b1a-9e07-47c8-9434-af0dc57dfd35', $assessment->getContext()->getFolder()->getCodeString());
 
         $payload = [
             'config' => [
@@ -108,15 +115,7 @@ class Controller extends Base
                     ],
                     /* Tags are only spawned upon clicking Save, not before
                      */
-                    'tags_on_create' => [
-                        $tagFactory->produceForSchoolCode(),
-
-                        /* TODO fill in more tags based on context, I guess
-                            $tagFactory->produceForCourseSpec('e530147c-770c-47a1-9f31-0aa6238379ab'),
-                            $tagFactory->produceForCourseUnitSpec('70a0f249-0731-4901-bb77-da2fe8210cf8'),
-                            $tagFactory->produceForClassCode('3RW')
-                         */
-                    ]
+                    'tags_on_create' => $tags
                 ],
                 /* Show a list of Items, which you can see by clicking Find Items
                  */
@@ -153,14 +152,6 @@ class Controller extends Base
                 'email'     => 'schoolbox@schoolbox.com.au'
             ]
         ];
-
-        /* Tags for presetting without requiring the additional
-         * authorApp.saveActivity() upon spawn. "create" (such as
-         * in "tags_on_create") is when you first hit the Save button,
-         * not when authorApp initialises for the first time
-         */
-        $tags = (new TagFactory($this->getConfigLoader()->get('site_school_code')))
-            ->produce(null, null, $assessment->getContext()->getFolder()->getCodeString());
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
