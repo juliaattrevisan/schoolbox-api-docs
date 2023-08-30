@@ -144,25 +144,6 @@ export function setStylesOnElement(element: HTMLElement, styles: object) {
 }
 
 /**
- * Async inject a <script> tag into the DOM
- * https://stackoverflow.com/a/39008859
- * @param {string} src - the src of the script to inject
- */
-export function injectScript(src: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.setAttribute("data-is-loaded", "false");
-        script.addEventListener("load", () => {
-            script.setAttribute("data-is-loaded", "true");
-            resolve();
-        });
-        script.addEventListener("error", (e) => reject(e.error));
-        script.src = src;
-        document.head.appendChild(script);
-    });
-}
-
-/**
  * Set and get an attribute on an element
  * @param {HTMLElement} element - the element to set the attribute on
  * @param {string} attribute - the attribute to set
@@ -228,6 +209,25 @@ export function getScriptElement(src: string) {
 export function isScriptLoaded(src: string) {
     const scriptElement = document.querySelector(`script[src="${src}"]`);
     return scriptElement && scriptElement.getAttribute("data-is-loaded") === "true";
+}
+
+/**
+ * Async inject a <script> tag into the DOM
+ * https://stackoverflow.com/a/39008859
+ * @param {string} src - the src of the script to inject
+ */
+export function injectScript(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.setAttribute("data-is-loaded", "false");
+        script.addEventListener("load", () => {
+            script.setAttribute("data-is-loaded", "true");
+            resolve();
+        });
+        script.addEventListener("error", (e) => reject(e.error));
+        script.src = src;
+        document.head.appendChild(script);
+    });
 }
 
 /**
