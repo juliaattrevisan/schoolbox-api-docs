@@ -24,10 +24,11 @@ class Data2Connector
 {
     private const API_HOST = 'api-gateway.instructure.com';
 
-    private const MAX_JOB_CHECK_COUNTS = 10;
-
+    // Attempt to check data preparation jobs every minute for 20 times
+    // number of times to try checking job status
+    private const MAX_JOB_CHECK_COUNTS = 20;
     // seconds to wait for the job to finish
-    private const RETRY_TIME_PERIOD = 30;
+    private const RETRY_TIME_PERIOD = 60;
 
     private ?string $accessToken = null;
 
