@@ -252,14 +252,6 @@ class Model implements ISoftDeletable
     private $plans;
 
     /**
-     * Lesson Plans linked assessments
-     *
-     * @var GenericCollection|null
-     */
-    private ?GenericCollection $linkedAssessments = null;
-
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -981,24 +973,6 @@ class Model implements ISoftDeletable
     public function setSebEnabled(?bool $sebEnabled): self
     {
         $this->sebEnabled = $sebEnabled;
-        return $this;
-    }
-
-    /**
-     * @return GenericCollection|null
-     */
-    public function getLinkedAssessments(): ?GenericCollection
-    {
-        return $this->linkedAssessments;
-    }
-
-    /**
-     * @param GenericCollection|null $linkedAssessments
-     * @return Model
-     */
-    public function setLinkedAssessments(?GenericCollection $linkedAssessments): self
-    {
-        $this->linkedAssessments = $linkedAssessments;
         return $this;
     }
 }
