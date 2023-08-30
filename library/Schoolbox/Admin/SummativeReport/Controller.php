@@ -287,8 +287,8 @@ class Controller extends ConfigController
                 'grades' => $payload['summary']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['summary']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
-                 // if we haven't seen this worktype in the payload, then set to none (don't use)
-                'none' => !isset($payload['summary']['workType'][$summaryWorkType->getId()]),
+                 // if we have seen this worktype in the payload, then set to show, and use it
+                'show' => isset($payload['summary']['workType'][$summaryWorkType->getId()]),
             ];
             $worktypesClass[] = [
                 'id'   => $summaryWorkType->getId(),
@@ -296,8 +296,8 @@ class Controller extends ConfigController
                 'grades' => $payload['class']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['class']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['class']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
-                // if we haven't seen this worktype in the payload, then set to none (don't use)
-                'none' => !isset($payload['class']['workType'][$summaryWorkType->getId()]),
+                // if we have seen this worktype in the payload, then set to show, and use it
+                'show' => isset($payload['class']['workType'][$summaryWorkType->getId()]),
             ];
         }
 
@@ -353,19 +353,19 @@ class Controller extends ConfigController
         ];
 
         $options = array_intersect_key($postData, $payloadKeys);
-        // strip out the none entries
+        // strip out the show `off` entries
         foreach ($options['class']['workType'] as $id => $workType) {
-            if ("1" === $workType['none']) {
+            if ("0" === $workType['show']) {
                 unset($options['class']['workType'][$id]);
             } else {
-                unset($options['class']['workType'][$id]['none']);
+                unset($options['class']['workType'][$id]['show']);
             }
         }
         foreach ($options['summary']['workType'] as $id => $workType) {
-            if ("1" === $workType['none']) {
+            if ("0" === $workType['show']) {
                 unset($options['summary']['workType'][$id]);
             } else {
-                unset($options['summary']['workType'][$id]['none']);
+                unset($options['summary']['workType'][$id]['show']);
             }
         }
 
