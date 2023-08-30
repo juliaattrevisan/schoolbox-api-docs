@@ -345,17 +345,24 @@ class Controller extends Assessment\Controller
         $classFolder  = $response->getAssessable()->getBaseContext()->getFolder();
         $isInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
 
-        // 2. Is session user creating for another user, and is not an instructor ?
-        if (!$isInstructor && (int)$submittedFor->getId() !== $this->getUser()->getId()) {
-            throw new InvalidTaskResponseException("Only instructors can mark other users");
+        if (!$isInstructor) {
+            // 2. Is session user creating for another user, and is not an instructor ?
+            if ((int)$submittedFor->getId() !== $this->getUser()->getId()) {
+                throw new InvalidTaskResponseException("Only instructors can mark other users");
+            }
+
+            // 3. Is the task being set as complete by a non-instructor?
+            if ($response->getCompletionStatus() === TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE) {
+                throw new InvalidTaskResponseException("Only instructors can mark a task as complete");
+            }
         }
 
-        // 3. Not yet a participant? And not an instructor or not marking themself?
+        // 4. Not yet a participant? And not an instructor or not marking themself?
         if (!$participant && (!$isInstructor || (int)$submittedFor->getId() !== (int)$this->getUser()->getId())) {
             throw new InvalidTaskResponseException("Only an non-excluded instructor marking themself is permitted to preview a task");
         }
 
-        // 4. Does the most recent response for the student already have the proposed status?
+        // 5. Does the most recent response for the student already have the proposed status?
         if (empty($response->getId())) {
             $mostRecentResponse = $participant ? $participant->findMostRecentResponse() : null;
             if ($mostRecentResponse instanceof TaskResponse && $mostRecentResponse->getCompletionStatus() === $response->getCompletionStatus()) {
@@ -365,12 +372,12 @@ class Controller extends Assessment\Controller
 
         // Is the learner self-assessing ?
         if (!$isInstructor && $response->isSelfAssessed()) {
-            // 5. Is the task not self-assessable ?
+            // 6. Is the task not self-assessable ?
             if (!$response->getAssessable()->isSelfAssessable()) {
                 throw new InvalidTaskResponseException("Learners may not self-assess a task if the task is not self-assessable");
             }
 
-            // 6. Is the task already marked by the teacher as complete ?
+            // 7. Is the task already marked by the teacher as complete ?
             if (isset($mostRecentResponse) && !$mostRecentResponse->isSelfAssessed() && $mostRecentResponse->getMarkedComplete()) {
                 throw new InvalidTaskResponseException("Learners may not change a task completion status if the instructor has marked it complete.");
             }
