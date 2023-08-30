@@ -45,7 +45,7 @@ class Mapper extends \Schoolbox\Mapper
             \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class,
             'id',
             null,
-            self::COLUMN_IDENTIFIER,
+            null,
             'lessonPlan',
             'lessonPlan'
         );
@@ -72,32 +72,6 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
             INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
         ";
-    }
-
-    /**
-     * Hydrate append assessment and lesson plan objects into the model
-     *
-     * @param PDOStatement $statement
-     * @return GenericCollection
-     */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
-        /** @var Model[] $lessonPlans */
-        $lessonPlans = [];
-
-        foreach ($statement as $row) {
-            if (!isset($lessonPlans[$row['lesson_plan_id']])) {
-                $lessonPlan = $this->hydrate($row);
-                $lessonPlan->setLessonPlan($this->hydrateJoin($row, 'lessonPlan', 'lessonPlan'));
-                $lessonPlan->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'assessmentModel'));
-
-                /* Stack it up
-                 */
-                $lessonPlans[$row['lesson_plan_id']] = $lessonPlan;
-            }
-        }
-
-        return $this->createCollection(array_values($lessonPlans));
     }
 
     /**

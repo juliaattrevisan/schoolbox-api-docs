@@ -1368,9 +1368,7 @@ class Mapper extends BaseMapper
 
         /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
          */
-        $links = $linkedAssessmentsMapper->findByColumn('lesson_plan_id', $lessonPlanIds)->indexByCallback(function (LessonPlan\LinkedAssessments\Model $link) {
-            return $link->getAssessmentModel()->getId();
-        });
+        $links = $linkedAssessmentsMapper->findByColumn('lesson_plan_id', $lessonPlanIds);
 
         // if we have any links hydrate them
         if ($links->count()) {
@@ -1401,10 +1399,14 @@ class Mapper extends BaseMapper
                     $lessonPlans[$lessonPlan->getId()] = $lessonPlan;
                 }
             }
+            $links = $links->groupByCallback(function (LessonPlan\LinkedAssessments\Model $link) {
+                return $link->getAssessmentModel()->getId();
+            });
 
             foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
-                $lessonPlan                                                                                   = $links->offsetGet($subAssessment->getId());
-                $lessonPlans[$lessonPlan->getLessonPlan()->getId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+                foreach ($links->offsetGet($subAssessment->getId()) as $lessonPlan) {
+                    $lessonPlans[$lessonPlan->getLessonPlan()->getId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+                }
             }
         }
 
