@@ -25,6 +25,12 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
     private int $range;
 
     /**
+     * Do we have any courses imported on the page, or no?
+     * @var bool
+     */
+    private bool $hasCourses;
+
+    /**
      * The lesson plans visible to the user
      *
      * @var GenericCollection|IAssessable[]
@@ -70,6 +76,9 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
                                                  return $course->getSpecification()->getId();
                                              });
 
+        // Record if we have courses, for use later
+        $this->hasCourses = $courses->count() >= 1;
+
         $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
 
         $dateStart   = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
@@ -108,6 +117,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
                 'component'         => $this,
                 'range'             => $this->range,
                 'lessonPlans'       => $this->visibleLessonPlans,
+                'hasCourses'        => $this->hasCourses,
                 'returnUrlName'     => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'  => Assessment\Redirect::encode('/homepage/' . $this->getContext()->getFolder()->getId()),
                 'readOnly'          => $this->readOnly,

@@ -1,12 +1,27 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/course/jquery.course-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.assessment-component-tot.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
-        $(function() {
-            var $component = $('#component{{ component.instance.id }}');
-            $component.setupAssessmentComponentTot({
-                emptySelector: '.empty-state',
-                contentSelector: '[data-component-content]',
-            });
+    $(function() {
+        var $component = $('#component{{ component.instance.id }}');
+        $component.setupAssessmentComponentTot({
+            emptySelector: '.empty-state',
+            contentSelector: '[data-component-content]',
         });
+
+        /* Attach Course Selector Modal listeners
+         */
+        $.fn.courseSelectorModal({
+            courseSelector: {
+                query: {
+                    folder:           Number('{{ component.getContext.getFolder.getId }}'),
+                    hasAdd:           false,
+                    hasTot:           false,
+                    linkToUnits:      false,
+                    encodedReturnUrl: "{{ encodedReturnUrl | escape('js') }}"
+                }
+            }
+        });
+    });
 </script>
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% if lessonPlans|length %}
@@ -114,6 +129,17 @@
 {% endif %}
 <div class="empty-state" {% if lessonPlans|length %}hidden{% endif %}>
     <i class="icon-lesson-plan"></i>
-    <p>You currently have no scheduled lesson plans available. You may wish to <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}">view all</a> lesson plans</p>
+    {% if not readOnly and not hasCourses %}
+        Lesson plans must be connected to a course, in order to start using lesson plans please
+        <a
+                href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: component.getContext.getFolder.getId }) }}"
+                data-course-selector
+        >import a course</a>
+        to your class page first.
+    {% else %}
+        <p>You currently have no scheduled lesson plans available. You may wish to <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}">view all</a> lesson plans</p>
+    {% endif %}
 </div>
 <div class="toast" data-alert></div>
+<div id="course-selector-modal" class="reveal-modal" data-reveal></div>
+
