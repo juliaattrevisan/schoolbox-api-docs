@@ -44,16 +44,17 @@
 {% if courses is empty %}
     <div class="empty-state">
         <i class="icon-lesson-plan"></i>
+        <p>
         {% if readOnly %}
             You have no scheduled lesson plans.
         {% else %}
-        Lesson plans must be connected to a course, in order to start using lesson plans please
-        <a
-            href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}"
-            data-course-selector
-        >import a course</a>
-        to your class page first.
+            Lesson plans must be connected to a course. To start using lesson plans please
+        <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}" data-course-selector>
+            import a course
+        </a>
+        to your class page.
         {% endif %}
+        </p>
     </div>
 {% endif %}
 {% for course in courses %}
