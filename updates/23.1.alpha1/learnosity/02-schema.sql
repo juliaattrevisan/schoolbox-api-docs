@@ -30,14 +30,6 @@ ALTER TABLE `course_specification`
     ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `subject_code`,
     ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
 
-ALTER TABLE `course_implementation`
-    ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `course_specification_id`,
-    ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
-
 ALTER TABLE `course_unit_specification`
     ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `course_specification_id`,
-    ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
-
-ALTER TABLE `course_unit_implementation`
-    ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `title`,
     ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);

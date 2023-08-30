@@ -41,17 +41,13 @@ class TagFactory
      * Manufacture a complete set of tags
      *
      * @param string|null $courseSpecUuid
-     * @param string|null $courseImplUuid
      * @param string|null $courseUnitSpecUuid
-     * @param string|null $courseUnitImplUuid
      * @param string|null $classCode
      * @return array
      */
     public function produce(
         ?string $courseSpecUuid,
-        ?string $courseImplUuid,
         ?string $courseUnitSpecUuid,
-        ?string $courseUnitImplUuid,
         ?string $classCode
     ): array {
         /* Always have a school code tag
@@ -65,9 +61,7 @@ class TagFactory
          * tags will be generated.
          */
         $stack[] = $this->produceForCourseSpec($courseSpecUuid);
-        $stack[] = $this->produceForCourseImpl($courseImplUuid);
         $stack[] = $this->produceForCourseUnitSpec($courseUnitSpecUuid);
-        $stack[] = $this->produceForCourseUnitImpl($courseUnitImplUuid);
         $stack[] = $this->produceForClassCode($classCode);
 
         /* Remove nulls
@@ -111,25 +105,6 @@ class TagFactory
 
 
     /**
-     * Produce a tag for the given Course Implementation UUID
-     *
-     * @param string|null $uuid
-     * @return string[]|null
-     */
-    public function produceForCourseImpl(?string $uuid): ?array
-    {
-        if ($uuid) {
-            return [
-                'type' => 'courseImpl',
-                'name' => $uuid
-            ];
-        }
-
-        return null;
-    }
-
-
-    /**
      * Produce a tag for the given Course Unit Specification UUID
      *
      * @param string|null $uuid
@@ -140,25 +115,6 @@ class TagFactory
         if ($uuid) {
             return [
                 'type' => 'courseUnitSpec',
-                'name' => $uuid
-            ];
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Produce a tag for the given Course Unit Implementation UUID
-     *
-     * @param string|null $uuid
-     * @return string[]|null
-     */
-    public function produceForCourseUnitImpl(?string $uuid): ?array
-    {
-        if ($uuid) {
-            return [
-                'type' => 'courseUnitImpl',
                 'name' => $uuid
             ];
         }

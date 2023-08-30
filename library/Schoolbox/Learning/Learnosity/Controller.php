@@ -160,7 +160,7 @@ class Controller extends Base
          * not when authorApp initialises for the first time
          */
         $tags = (new TagFactory($this->getConfigLoader()->get('site_school_code')))
-            ->produce(null, null, null, null, $assessment->getContext()->getFolder()->getCodeString());
+            ->produce(null, null, $assessment->getContext()->getFolder()->getCodeString());
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
