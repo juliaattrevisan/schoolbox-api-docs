@@ -1,11 +1,6 @@
 <?php
 
 /**
- * Overrides Aura\Session\Session to provide easy access to the following:
- * * the logged-in user
- * * the history
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -16,9 +11,13 @@ use Aura\Session\Session as BaseSession;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 
+/**
+ * Overrides Aura\Session\Session to:
+ * * provide easy access to the logged-in user and history
+ * * set the `samesite` session cookie attribute to `Lax`
+ */
 class Session extends BaseSession
 {
-
     /**
      * The loader for config settings.
      *
@@ -68,6 +67,7 @@ class Session extends BaseSession
         if (!$this->isStarted()) {
             $this->setCookieParams([
                 'lifetime' => $this->getConfig()->get('session_length'),
+                'samesite' => 'Lax',
             ]);
         }
     }
@@ -100,25 +100,39 @@ class Session extends BaseSession
     }
 
     /**
+     * Override to set cookie params as an array, thus allowing the `samesite`
+     * option to be set.
+     *
+     * @param array $params
+     * @return null
+     */
+    public function setCookieParams(array $params)
+    {
+        $this->cookie_params = array_merge($this->cookie_params, $params);
+        /**
+         * Ignore the non-existence of session function in phpfunc:
+         * @noinspection PhpUndefinedMethodInspection
+         * @phpstan-ignore-next-line
+         */
+        $this->phpfunc->session_set_cookie_params($this->cookie_params);
+        return null;
+    }
+
+    /**
      * Set the expiry time on an session cookie that already exists
      * @param int $lifetime
      */
     public function setCookieExpiry($lifetime)
     {
-        $cookieParams  = $this->getCookieParams();
-        $sessionExpiry = $lifetime > 0
+        $cookieParams = array_intersect_key(
+            $this->getCookieParams(),
+            ['path' => true, 'domain' => true, 'secure' => true, 'httponly' => true, 'samesite' => true],
+        );
+        $cookieParams['expires'] = $lifetime > 0
             ? $this->getRequestTime() + $lifetime
             : 0;
 
-        $this->phpfunc->setcookie(
-            $this->getName(),
-            $this->getId(),
-            $sessionExpiry,
-            $cookieParams['path'],
-            $cookieParams['domain'],
-            $cookieParams['secure'],
-            $cookieParams['httponly']
-        );
+        setcookie($this->getName(), $this->getId(), $cookieParams);
     }
 
     /**
@@ -151,7 +165,6 @@ class Session extends BaseSession
      */
     public function pushHistory($value)
     {
-
         $session = $this->getSegment(null);
         $history = $session->get('history');
         if (empty($history)) {

@@ -11,7 +11,6 @@ namespace Schoolbox\API;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Authenticator;
-use Predis\ClientInterface;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -22,22 +21,12 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
-use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
 use Schoolbox\Url\Uri;
 use SensitiveParameter;
 
 class Controller extends Base
 {
-    /**
-     * Expire sessions created via the API after 5 minutes, instead of the
-     * (presumably longer!) default expiry.
-     *
-     * (If a session created via the API is reused, its expiry will be extended
-     * as per normal.)
-     */
-    private const API_SESSION_EXPIRY = 300;
-
     /**
      * Authenticator, for creating a user session.
      */
@@ -71,15 +60,12 @@ class Controller extends Base
      * @param RegistryMapper    $registryMapper
      * @param ServiceMapper     $serviceMapper
      * @param JwtParser\IParser $jwtParser
-     * @param ClientInterface   $sessionRedis The Redis instance which stores session data:
-     *                                        required so that if a session is created it is cut short.
      */
     public function __construct(
         Authenticator $auth,
         RegistryMapper $registryMapper,
         ServiceMapper $serviceMapper,
         JwtParser\IParser $jwtParser,
-        private ClientInterface $sessionRedis,
     ) {
         $this->auth           = $auth;
         $this->registryMapper = $registryMapper;
@@ -321,8 +307,6 @@ class Controller extends Base
      */
     private function assignJsonResponseForAuthenticatedUser(User $user, ?int $status = null): void
     {
-        $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
-
         $this->response = $this->responseAsJson([
             'id'       => $user->getId(),
             'key'      => $user->getKey(),
@@ -341,30 +325,11 @@ class Controller extends Base
      */
     private function assignRedirectResponseForAuthenticatedUser(string $page): void
     {
-        $this->postOutputCallbacks[] = fn () => $this->shortenSessionLifetime();
         // Redirect somewhere (locally only)
         if ($page && (new Uri($page))->isAbsolutePath()) {
             $this->response = $this->redirectFound($page);
         } else {
             $this->response = $this->redirectFound('/');
         }
-    }
-
-    /**
-     * Shortens the lifetime of the current session.
-     *
-     * This exists so that sessions created with one of the `init*` methods are
-     * by default short-lived, thus protecting against repeated calls to these
-     * methods creating multiple sessions for the same user (and thus causing a
-     * denial-of-service by exhausting Redis' memory).
-     *
-     * @return void
-     */
-    private function shortenSessionLifetime(): void
-    {
-        // Session must be closed before setting its expiry, as the Redis key
-        // doesn't exist before it is closed.
-        session_write_close();
-        $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), self::API_SESSION_EXPIRY);
     }
 }

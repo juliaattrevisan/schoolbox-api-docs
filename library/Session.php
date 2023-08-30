@@ -6,6 +6,7 @@
  */
 
 use League\Flysystem\FilesystemException;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -81,17 +82,18 @@ class Session
         $userMapper   = UserMapper::getInstance();
         $groupHandler = new Group();
 
-        //Clear all remnants of past sessions
-        $this->destroy();
+        // Clear all remnants of past sessions, except identifier
+        $sessionIdentifier = $_SESSION['identifier'] ?? null;
+        $_SESSION          = [];
 
         $user = $userMapper->findByUsername($username);
 
         $ip = self::getIP();
 
         /* if user is found and enabled and session is started create our user record */
-        if ($user instanceof User && $user->getEnabled() && session_start()) {
+        if ($user instanceof User && $user->getEnabled()) {
             /* Start by creating a fresh ID to ensure ID has not been injected */
-            session_regenerate_id();
+            session_regenerate_id(true);
 
             //register users id
             $_SESSION['id']       = $user->getId();
@@ -105,6 +107,11 @@ class Session
                 $_SESSION['password'] = $_POST['password'] ?? null;
             }
             $_SESSION['ip'] = $ip;
+
+            // Create a random session ID as well:
+            // however, this survives user authentication and re-authentication
+            $sessionIdentifier ??= Uuid::uuid4()->__toString();
+            $_SESSION['identifier'] = $sessionIdentifier;
 
             // add mobile session data
             $sbmAuth = new Authenticator();
@@ -132,10 +139,11 @@ class Session
             if ($this->getUseLoginLog()) {
                 $notif = Notifactory::create(Notif::TOPIC_AUTH);
                 $notif->notice("Login success for $username", [
-                    'username' => $user->getUsername(),
-                    'ip'       => $ip,
-                    'login'    => 1,
-                    'jwtId'    => $jwtId,
+                    'username'   => $user->getUsername(),
+                    'ip'         => $ip,
+                    'login'      => 1,
+                    'jwtId'      => $jwtId,
+                    'identifier' => $_SESSION['identifier'],
                 ]);
             }
 
@@ -179,10 +187,11 @@ class Session
 
         $notif              = Notifactory::create(Notif::TOPIC_AUTH);
         $notifFailureParams = [
-            'username' => $username,
-            'ip'       => Session::getIP(),
-            'login'    => 0,
-            'jwtId'    => null,
+            'username'   => $username,
+            'ip'         => Session::getIP(),
+            'login'      => 0,
+            'jwtId'      => null,
+            'identifier' => null,
         ];
 
         $userMapper = UserMapper::getInstance();
