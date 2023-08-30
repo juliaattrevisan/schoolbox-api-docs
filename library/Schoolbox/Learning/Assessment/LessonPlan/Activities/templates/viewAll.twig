@@ -1,10 +1,27 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/course/jquery.course-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.assessment-component-tot.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
-        $(function() {
-            var $component = $('#component{{ componentInstance.id }}');
-            $component.setupAssessmentComponentTot();
+    $(function() {
+        var $component = $('#component{{ componentInstance.id }}');
+        $component.setupAssessmentComponentTot();
+
+        /* Attach Course Selector Modal listeners
+         */
+        $.fn.courseSelectorModal({
+            courseSelector: {
+                query: {
+                    folder:           Number('{{ folder.id }}'),
+                    hasAdd:           false,
+                    hasTot:           false,
+                    linkToUnits:      false,
+                    encodedReturnUrl: "{{ encodedReturnUrl | escape('js') }}"
+                }
+            }
         });
+
+    });
 </script>
+
 
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learningAssessment/fragments/macro/unit/completed.twig' as status %}
@@ -27,7 +44,17 @@
 <div class="small-12 island" id="component{{ componentInstance.id }}">
 {% if courses is empty %}
     <div class="empty-state">
-        You have no scheduled Lesson Plans or Imported Classes to view.
+        <i class="icon-lesson-plan"></i>
+        {% if readOnly %}
+            You have no scheduled lesson plans.
+        {% else %}
+        Lesson plans must be connected to a course, in order to start using lesson plans please
+        <a
+            href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}"
+            data-course-selector
+        >import a course</a>
+        to your class page first.
+        {% endif %}
     </div>
 {% endif %}
 {% for course in courses %}
@@ -199,6 +226,8 @@
     </section>
     {% endfor %}
     <div class="toast" data-alert></div>
+    <div id="course-selector-modal" class="reveal-modal" data-reveal></div>
+
 </div>
 
 <style>
