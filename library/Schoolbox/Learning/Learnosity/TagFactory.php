@@ -94,15 +94,15 @@ class TagFactory
     /**
      * Produce a tag for the given Course Specification UUID
      *
-     * @param string|null $courseSpecUuid
+     * @param string|null $uuid
      * @return string[]|null
      */
-    public function produceForCourseSpec(?string $courseSpecUuid): ?array
+    public function produceForCourseSpec(?string $uuid): ?array
     {
-        if ($courseSpecUuid) {
+        if ($uuid) {
             return [
                 'type' => 'courseSpec',
-                'name' => $courseSpecUuid
+                'name' => $uuid
             ];
         }
 
@@ -113,15 +113,15 @@ class TagFactory
     /**
      * Produce a tag for the given Course Implementation UUID
      *
-     * @param string|null $courseImplUuid
+     * @param string|null $uuid
      * @return string[]|null
      */
-    public function produceForCourseImpl(?string $courseImplUuid): ?array
+    public function produceForCourseImpl(?string $uuid): ?array
     {
-        if ($courseImplUuid) {
+        if ($uuid) {
             return [
                 'type' => 'courseImpl',
-                'name' => $courseImplUuid
+                'name' => $uuid
             ];
         }
 
@@ -132,15 +132,15 @@ class TagFactory
     /**
      * Produce a tag for the given Course Unit Specification UUID
      *
-     * @param string|null $courseUnitSpecUuid
+     * @param string|null $uuid
      * @return string[]|null
      */
-    public function produceForCourseUnitSpec(?string $courseUnitSpecUuid): ?array
+    public function produceForCourseUnitSpec(?string $uuid): ?array
     {
-        if ($courseUnitSpecUuid) {
+        if ($uuid) {
             return [
                 'type' => 'courseUnitSpec',
-                'name' => $courseUnitSpecUuid
+                'name' => $uuid
             ];
         }
 
@@ -151,15 +151,15 @@ class TagFactory
     /**
      * Produce a tag for the given Course Unit Implementation UUID
      *
-     * @param string|null $courseUnitImplUuid
+     * @param string|null $uuid
      * @return string[]|null
      */
-    public function produceForCourseUnitImpl(?string $courseUnitImplUuid): ?array
+    public function produceForCourseUnitImpl(?string $uuid): ?array
     {
-        if ($courseUnitImplUuid) {
+        if ($uuid) {
             return [
                 'type' => 'courseUnitImpl',
-                'name' => $courseUnitImplUuid
+                'name' => $uuid
             ];
         }
 
@@ -185,4 +185,3 @@ class TagFactory
         return null;
     }
 }
-
