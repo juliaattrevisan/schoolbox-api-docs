@@ -72,7 +72,7 @@ class TagFactory
 
         /* Remove nulls
          */
-        return array_filter($stack);
+        return array_values(array_filter($stack));
     }
 
 

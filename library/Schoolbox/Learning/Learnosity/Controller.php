@@ -112,6 +112,9 @@ class Controller extends Base
                         $tagFactory->produceForSchoolCode(),
 
                         /* TODO fill in more tags based on context, I guess
+                            $tagFactory->produceForCourseSpec('e530147c-770c-47a1-9f31-0aa6238379ab'),
+                            $tagFactory->produceForCourseUnitSpec('70a0f249-0731-4901-bb77-da2fe8210cf8'),
+                            $tagFactory->produceForClassCode('3RW')
                          */
                     ]
                 ],
