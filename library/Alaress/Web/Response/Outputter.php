@@ -43,6 +43,12 @@ class Outputter
         // TODO as above: move to middleware
         $response = $response->withHeader('Content-Security-Policy', 'frame-ancestors \'self\'');
 
+        // Output the session identifier, if it's there
+        // TODO as above: move to middleware, and inject session
+        if (isset($_SESSION['identifier'])) {
+            $response = $response->withHeader('X-SB-Session-ID', $_SESSION['identifier']);
+        }
+
         // Output headers
         foreach ($response->getHeaders() as $name => $values) {
             foreach ($values as $value) {
