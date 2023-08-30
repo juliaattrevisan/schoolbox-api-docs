@@ -248,7 +248,9 @@ export async function injectScriptsIfNotLoaded(params: InjectScriptsParams) {
         }
     }
 
-    params.onComplete();
+    if (params.onComplete !== undefined) {
+        params.onComplete();
+    }
 }
 
 /**
