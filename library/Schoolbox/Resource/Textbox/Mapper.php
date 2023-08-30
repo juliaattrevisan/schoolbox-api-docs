@@ -25,7 +25,6 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
-
     /**
      * Textbox Homepage Controller classname
      */
@@ -63,7 +62,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->uses('textboxID', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
-        $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
         $this->joins('categoryID', FolderMapper::class, 'id', null, null, 'category', 'category');
     }
 
@@ -141,7 +142,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             INNER JOIN folder f ON ci.identifier = f.id
             WHERE cd.`class` = :controller
             AND ccd.`key` = :key
-            AND textBox.deleted IS NULL
+            AND textBox.deleted_at IS NULL
             AND f.deleted_at IS NULL
             AND textBox.categoryID = :folderId
             GROUP BY textBox.textBoxID, f.id
@@ -178,7 +179,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             INNER JOIN `groups` ON `groups`.id = ci.identifier
             WHERE cd.`class` = :controller
             AND ccd.`key` = :key
-            AND textBox.deleted IS NULL
+            AND textBox.deleted_at IS NULL
             AND textBox.categoryID = :folderId
             AND `groups`.deleted_at IS NULL
             GROUP BY `groups`.id, textBox.textBoxID
@@ -260,8 +261,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * This also returns a count of all the items found in the search, not limited
-     * by params
+     * This also returns a count of all the items found in the search, not limited by params.
      *
      * @param ArticleResolver $articleResolver
      * @param User            $user

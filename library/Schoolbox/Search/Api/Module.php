@@ -21,6 +21,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\User\Formatter\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
@@ -90,6 +91,7 @@ class Module extends BaseModule
                 new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -117,6 +119,10 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Link\Hydrator(
                     $mapperFactory->get(LinkMapper::class),
+                    Access::getInstance(),
+                ),
+                new Database\ResultType\Textbox\Hydrator(
+                    $mapperFactory->get(TextboxMapper::class),
                     Access::getInstance(),
                 ),
             ),
