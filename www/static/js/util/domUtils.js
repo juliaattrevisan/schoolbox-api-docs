@@ -259,3 +259,20 @@ export function injectScript(src) {
         document.head.appendChild(script);
     });
 }
+
+/**
+ * Inject a list of scripts into the DOM (skipping those that are already present), then run the given function on completion.
+ * @param {array} scripts - The list of scripts to inject.
+ * @param {function} onComplete - Function to be run once all scripts have loaded.
+ */
+export async function injectScriptsIfNotPresent(scripts, onComplete) {
+    // Scripts are injected sequentially here because often sets of scripts need to be added in a particular order.
+    // Example: jstree.min.js must be added before jQuery.resourceTree.js.
+    for (const script of scripts) {
+        if (!isScriptLoaded(script)) {
+            await injectScript(script);
+        }
+    }
+
+    onComplete();
+}

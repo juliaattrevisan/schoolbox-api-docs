@@ -1,38 +1,11 @@
-<script type="text/javascript">
-// This HTML file is intended to be injected a page that is already loaded and ready, so $().ready() is useless to
-// us here.  We want to load the scripts listed below, and only when those scripts have loaded do we want our function
-// to execute.
-loadScriptsThenRunFunction(
+<script>
+sbProps.injectScriptsIfNotPresent(
     [
         "{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}",
-        "{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}",
+        "{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"
     ],
     initSelectizeSelectors
 );
-
-function loadScriptsThenRunFunction(jsFilenames, onAllScriptsLoaded) {
-    let nScriptsLoaded = 0;
-
-    for (let jsFilename of jsFilenames) {
-        // If the file has not yet been loaded, load it, otherwise skip the loading step.
-        if (document.querySelector('script[src="' + jsFilename + '"]') === null) {
-            const scriptElement = document.createElement('script');
-            scriptElement.addEventListener('load', onScriptLoaded);
-            scriptElement.src = jsFilename;
-            document.head.appendChild(scriptElement);
-        } else {
-            onScriptLoaded();
-        }
-    }
-
-    function onScriptLoaded () {
-        nScriptsLoaded++;
-
-        if (nScriptsLoaded === jsFilenames.length) {
-            onAllScriptsLoaded();
-        }
-    }
-}
 
 function initSelectizeSelectors() {
     let options = {
