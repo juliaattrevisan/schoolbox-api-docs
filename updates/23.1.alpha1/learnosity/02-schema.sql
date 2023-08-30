@@ -23,3 +23,21 @@ CREATE TABLE `quiz_feedback` (
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME NULL,
 PRIMARY KEY (`id`));
+
+-- Add a uuid to course spec/impl, unit spec/impl
+ALTER TABLE `course_specification`
+    CHANGE COLUMN `subject_code` `subject_code` VARCHAR(20) NOT NULL DEFAULT '' AFTER `folder_id`,
+    ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `subject_code`,
+    ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
+
+ALTER TABLE `course_implementation`
+    ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `course_specification_id`,
+    ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
+
+ALTER TABLE `course_unit_specification`
+    ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `course_specification_id`,
+    ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
+
+ALTER TABLE `course_unit_implementation`
+    ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `title`,
+    ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
