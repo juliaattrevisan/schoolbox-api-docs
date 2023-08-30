@@ -210,7 +210,7 @@ export default {
          * @returns { boolean } -
          */
         hasMenu(evidence) {
-            return Boolean(evidence?.links?.modifyForm || evidence?._links?.deleteForm);
+            return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm);
         },
 
         /**
