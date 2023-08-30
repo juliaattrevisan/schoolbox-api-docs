@@ -84,12 +84,12 @@ class Hydrator extends BaseHydrator
                         $match->id,
                         $textbox->getHeading(),
                         $this->buildBaseUrl()
-                             ->withPath('homepage/' . $textbox->getCategory()->getId())
+                             ->withPath('/homepage/' . $textbox->getCategory()->getId())
                              ->withFragment('textbox' . $textbox->getId())
                              ->__toString(),
                         $match->type,
                         $match->relevance,
-                        null,
+                        $textbox->getUpdatedAt(),
                         $textbox->getCategory(),
                         null,
                         null,
@@ -97,7 +97,7 @@ class Hydrator extends BaseHydrator
                         $this->truncateAroundKeyword($keyword, $textbox->getBody(), self::DESCRIPTION_LENGTH),
                         null,
                         [$textbox->getCategory(),], // Context: textbox's folder
-                        [], // Links: none.
+                        [], // texbox: none.
                     );
                 }
 
