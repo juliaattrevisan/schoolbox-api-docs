@@ -25,6 +25,11 @@
 </div>
 
 <div class="small-12 island" id="component{{ componentInstance.id }}">
+{% if courses is empty %}
+    <div class="empty-state">
+        You have no scheduled Lesson Plans or Imported Classes to view.
+    </div>
+{% endif %}
 {% for course in courses %}
     {% if course.specification.folder.id in accessibleFolderIds %}
         <h2 class="icon-course subheader"><a href="{{ '/homepage/' ~ course.specification.folder.id }}" title="Visit course page">{{ course.specification.title }}</a></h2>
