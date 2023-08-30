@@ -162,7 +162,7 @@ HELP;
             } catch (\RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
             }
-            
+
             $this->getLogger()->info('');
         }
     }
