@@ -239,7 +239,7 @@ type InjectScriptsParams = {
  * Inject a list of scripts into the DOM (skipping those that are already present), then run the given function on completion.
  * @param {InjectScriptsParams} params - The list of scripts to inject.
  */
-export async function injectScriptsIfNotPresent(params: InjectScriptsParams) {
+export async function injectScriptsIfNotLoaded(params: InjectScriptsParams) {
     // Scripts are injected sequentially here because often sets of scripts need to be added in a particular order.
     // Example: jstree.min.js must be added before jQuery.resourceTree.js.
     for (const src of params.srcList) {
