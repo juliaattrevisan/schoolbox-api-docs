@@ -230,6 +230,27 @@ export function injectScript(src: string): Promise<void> {
     });
 }
 
+type InjectScriptsParams = {
+    srcList: string[];
+    onComplete?: () => void;
+};
+
+/**
+ * Inject a list of scripts into the DOM (skipping those that are already present), then run the given function on completion.
+ * @param {InjectScriptsParams} params - The list of scripts to inject.
+ */
+export async function injectScriptsIfNotPresent(params: InjectScriptsParams) {
+    // Scripts are injected sequentially here because often sets of scripts need to be added in a particular order.
+    // Example: jstree.min.js must be added before jQuery.resourceTree.js.
+    for (const src of params.srcList) {
+        if (!isScriptLoaded(src)) {
+            await injectScript(src);
+        }
+    }
+
+    params.onComplete();
+}
+
 /**
  * To add <mark> elements around the input on any of the matches
  * (?![^>]*>) is used to check we are not inside an element node

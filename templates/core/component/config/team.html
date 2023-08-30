@@ -1,10 +1,12 @@
 <script>
 sbProps.injectScriptsIfNotPresent(
-    [
-        "{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}",
-        "{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"
-    ],
-    initSelectizeSelectors
+    {
+        srcList: [
+            "{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}",
+            "{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"
+        ],
+        onComplete: initSelectizeSelectors
+    }
 );
 
 function initSelectizeSelectors() {
