@@ -40,11 +40,12 @@ class UnitAssessments
             ];
         }
         return [
-            'id'             => $assessment->getId(),
-            'title'          => $assessment->getTitle(),
-            'assessmentType' => $assessment->getFamilyName(),
-            'closeAt'        => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
-            '_links'         => $links,
+            'id'                => $assessment->getId(),
+            'title'             => $assessment->getTitle(),
+            'assessmentType'    => $assessment->getFamilyName(),
+            'closeAt'           => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
+            'closeAtFormatted'  => $assessment->getCloseAt()?->getRelativeDay(),
+            '_links'            => $links,
         ];
     }
 }
