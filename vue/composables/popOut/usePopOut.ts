@@ -10,11 +10,11 @@ import {
     flip,
     shift,
     Placement,
+    Boundary,
 } from "@floating-ui/dom";
 import gsap from "gsap";
 import type { Ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
-import { update } from "lodash";
 
 /**
  * To toggle the display of the content when the button is selected
@@ -92,7 +92,14 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
     async function getPosition() {
         const position = await computePosition(button.value as ReferenceElement, content, {
             placement: "bottom-end",
-            middleware: [flip(), shift()],
+            middleware: [
+                flip({
+                    boundary: document.querySelector("#container") as Boundary,
+                }),
+                shift({
+                    boundary: document.querySelector("#container") as Boundary,
+                }),
+            ],
         });
         return position;
     }
