@@ -52,7 +52,7 @@ class DueWorkInitialCest
         $this->homepageUrl = $i->getCurrentUrl();
 
         $i->amGoingTo('Add few members into the homepage');
-        $i->click('[data-test="wc-actions-dropdown-button-tab-control"]');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $i->waitForText("Manage Group", 5);
         $i->clickWithLeftButton('#search-text');
@@ -187,7 +187,7 @@ class DueWorkInitialCest
         $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         sleep(1);
-        $i->click('[data-test="wc-actions-dropdown-button-header-options"]');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-header-options]', '[data-test=wc-actions-dropdown-header-options-button]');
         $i->click('a.icon-task');
         $i->canSee('Grading Test Due Work');
     }
@@ -210,7 +210,7 @@ class DueWorkInitialCest
         $i->amOnUrl($this->homepageUrl);
         $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
-        $i->click('[data-test="wc-actions-dropdown-button-header-options"]');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-header-options]', '[data-test=wc-actions-dropdown-header-options-button]');
         $i->click('a.icon-task');
         $i->fillField('textarea[name=comment]', 'Not bad, but you should work on your spelling.');
         $i->fillField('input[name=mark]', '65');
