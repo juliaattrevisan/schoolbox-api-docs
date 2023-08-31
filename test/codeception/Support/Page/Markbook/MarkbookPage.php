@@ -47,7 +47,7 @@ class MarkbookPage
         $i->amOnPage('/homepage/' . $classId);
 
         // Jelly tot
-        $i->clickElementInWebComponent(Common::SELECTOR_WC_ACTIONS_DROPDOWN, Common::SELECTOR_WC_ACTIONS_DROPDOWN_BUTTON);
+        $i->clickElementInWebComponent(Common::SELECTOR_JELLY_TOT, Common::SELECTOR_JELLY_TOT_BUTTON);
         // Markbook
         $i->click('#tab-control a.icon-curriculum');
         $i->waitForElement('div[data-loaded="1"]');
