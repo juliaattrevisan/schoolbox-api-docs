@@ -98,6 +98,7 @@ $tabs-vertical-navigation-margin-bottom: 1.25rem !default;
                 &.active {
                     display: block;
                     float: none;
+                    overflow-x: auto;
                 }
                 &.contained {
                     padding: $tabs-content-padding;
