@@ -127,54 +127,6 @@
             },
         });
 
-        $('#report-summary-work-types').selectizeSelector({
-            multiple: true,
-            value: {{ options.summary.workType|json_encode|raw }},
-            selectize: {
-                create: false,
-                placeholder: 'Search work types',
-                preload: true,
-                persist: true,
-                hideSelected: true,
-                load: function (query, callback) {
-                    $.ajax({
-                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {query: query}
-                    }).done(function (result) {
-                        callback(result)
-                    }).fail(function () {
-                        callback()
-                    })
-                }
-            },
-        });
-
-        $('#report-class-work-types').selectizeSelector({
-            multiple: true,
-            value: {{ options.class.workType|json_encode|raw }},
-            selectize: {
-                create: false,
-                placeholder: 'Search work types',
-                preload: true,
-                persist: true,
-                hideSelected: true,
-                load: function (query, callback) {
-                    $.ajax({
-                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {query: query}
-                    }).done(function (result) {
-                        callback(result)
-                    }).fail(function () {
-                        callback()
-                    })
-                }
-            },
-        });
-
         /* Dynamically enable sections
          */
         $('[data-section-enabled]').each(function(index, element) {
@@ -408,11 +360,11 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <label for="report-summary-work-types">Work types</label>
-                            <p class="meta">Select the Work Types you require displayed on the summary page of the summative report.</p>
+                            <label>Work Types</label>
+                            <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
                             <table>
                                 <tr>
-                                    <th>Worktype</th>
+                                    <th>&nbsp;</th>
                                     <th>Show</th>
                                     <th>Grade</th>
                                     <th>Comment</th>
@@ -483,11 +435,11 @@
                 <section id="section-class">
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="report-class-work-types">Work types</label>
-                            <p class="meta">Select the Work Types you require displayed on the class pages of the summative report.</p>
+                            <label>Work Types</label>
+                            <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
                             <table>
                                 <tr>
-                                    <th>Worktype</th>
+                                    <th>&nbsp;</th>
                                     <th>Show</th>
                                     <th>Grade</th>
                                     <th>Comment</th>
