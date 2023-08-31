@@ -40,7 +40,7 @@ const url = window.Vue.computed(() => {
  * Return the default results if the query is empty
  */
 const results = window.Vue.computed(() => {
-    if (props.defaultResults && query.value.length === 0) {
+    if (props.defaultResults && !canSearch.value) {
         return props.defaultResults;
     }
     return searchResults.value;
@@ -105,23 +105,6 @@ async function onInput(value: string) {
 }
 
 /**
- * Don't show the search searchResults if there's only one result and it's already selected
- * @returns {boolean} - whether to show the search searchResults
- */
-const isActive = window.Vue.computed(() => {
-    if (props.defaultResults && props.selected.length === 0) {
-        return true;
-    }
-    if (!canSearch.value) {
-        return false;
-    }
-    if (props.isSingleSelect && props.selected.length === 1) {
-        return false;
-    }
-    return true;
-});
-
-/**
  * To toggle the selected state of the result
  * @param {Result} result - the result selected
  */
@@ -149,7 +132,6 @@ function onRemoved(result: Result) {
         <search-select-input @input="onInput" />
         <search-select-results
             :query="query"
-            :is-active="isActive"
             :is-searching="isFetching"
             :is-single-select="props.isSingleSelect"
             :results="results"

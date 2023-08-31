@@ -10,7 +10,6 @@ import SearchSelectResult from "./search-select-result.vue";
 
 interface Props {
     query: string; // the search query
-    isActive: boolean; // whether to show the search results
     isSearching: boolean; // to notify of searching
     isSingleSelect: boolean; // whether only one result can be selected
     results: Result[]; // the results returned from the search
@@ -62,19 +61,6 @@ window.Vue.watch(
 );
 
 /**
- * to slide up and down the search results
- */
-window.Vue.watch(
-    () => props.isActive,
-    async (newIsActive) => {
-        await window.Vue.nextTick();
-        await window.Vue.nextTick(); // I don't know why this is needed yet...
-        const targetHeight = newIsActive ? (searchResultsEl.value as HTMLDivElement).offsetHeight : 0;
-        animateHeight(targetHeight);
-    }
-);
-
-/**
  * show select all option for adding / removing results only if there's
  * more than one search result and only a single result can't be selected
  * @returns {boolean} - whether to show the select all option
@@ -100,24 +86,22 @@ function onSelected(result: Result) {
 <template>
     <div ref="searchResultsContainerEl" class="search-results-container">
         <div ref="searchResultsEl" class="search-results">
-            <template v-if="isActive">
-                <div v-if="props.isSearching" class="search-status">Searching for results....</div>
-                <div v-else-if="props.results.length === 0" class="search-status">
-                    No results found for your current search.
-                </div>
-                <template v-else>
-                    <search-select-select-all v-if="showSelectAll" />
-                    <search-select-result
-                        v-for="result in props.results"
-                        :key="result.id"
-                        :query="query"
-                        :selected="selected"
-                        :results="props.results"
-                        :result="result"
-                        :is-single-select="props.isSingleSelect"
-                        @select="onSelected"
-                    />
-                </template>
+            <div v-if="props.isSearching" class="search-status">Searching for results....</div>
+            <div v-else-if="props.results.length === 0" class="search-status">
+                No results found for your current search.
+            </div>
+            <template v-else>
+                <search-select-select-all v-if="showSelectAll" />
+                <search-select-result
+                    v-for="result in props.results"
+                    :key="result.id"
+                    :query="query"
+                    :selected="selected"
+                    :results="props.results"
+                    :result="result"
+                    :is-single-select="props.isSingleSelect"
+                    @select="onSelected"
+                />
             </template>
         </div>
         <!-- .search-results -->
