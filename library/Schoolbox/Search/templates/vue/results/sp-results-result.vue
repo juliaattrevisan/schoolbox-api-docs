@@ -9,6 +9,7 @@ import { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
 import { useQueryStore } from "../store/spQueryStore";
 import SpResultsResultImage from "./sp-results-result-image.vue";
+import SpResultsResultDescription from "./sp-results-result-description.vue";
 import SpResultsSubResults from "./sp-results-sub-results.vue";
 
 interface Props {
@@ -75,10 +76,7 @@ const dateFormatted = window.Vue.computed(() => {
                         >
                     </div>
                 </div>
-                <article v-if="props.result.type === ResultTypes.NEWS">
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <p v-html="addMarks(props.result.description as string, queryStore.queryWordList)"></p>
-                </article>
+                <sp-results-result-description v-if="props.result.description" :result="result" />
             </div>
         </div>
         <sp-results-sub-results v-if="hasSubResults" :result="result" />

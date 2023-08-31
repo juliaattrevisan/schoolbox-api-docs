@@ -32,7 +32,7 @@ const resultsStore = useResultsStore();
 <template>
     <div class="c-search-page">
         <sp-input class="c-search-page__input" />
-        <div class="c-search-page__results">
+        <div class="c-search-page__results l-flex-col l-gap-m">
             <sp-results-header />
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
             <loading-table v-else-if="searchStore.isSearching" />
