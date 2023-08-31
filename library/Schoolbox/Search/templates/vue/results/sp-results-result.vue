@@ -4,11 +4,10 @@
  */
 
 import { gsap } from "gsap/all";
-import { addMarks } from "@js/util/domUtils";
 import { Result } from "../../js/types/Result";
-import { ResultTypes } from "../../js/types/ResultTypes";
-import { useQueryStore } from "../store/spQueryStore";
 import SpResultsResultImage from "./sp-results-result-image.vue";
+import SpResultsResultTitle from "./sp-results-result-title.vue";
+import SpResultsResultMeta from "./sp-results-result-meta.vue";
 import SpResultsResultDescription from "./sp-results-result-description.vue";
 import SpResultsSubResults from "./sp-results-sub-results.vue";
 
@@ -19,7 +18,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const resultEl = window.Vue.ref<HTMLDivElement | null>(null);
-const queryStore = useQueryStore();
 
 /**
  * To display the result, stagger to fade on each sequentially
@@ -38,14 +36,6 @@ window.Vue.onMounted(() => {
 const hasSubResults = window.Vue.computed(() => {
     return props.result._subResults && props.result._subResults.data.length > 0;
 });
-
-/**
- * To display the date in format
- * @returns {string} the formatted date
- */
-const dateFormatted = window.Vue.computed(() => {
-    return window.dayjs(props.result.date).format("DD/MM/YYYY");
-});
 </script>
 
 <template>
@@ -55,25 +45,8 @@ const dateFormatted = window.Vue.computed(() => {
                 <div class="l-flex-row l-gap-m">
                     <sp-results-result-image :result="props.result" />
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
-                        <h3>
-                            <!-- eslint-disable-next-line vue/no-v-html -->
-                            <a
-                                :href="props.result.url"
-                                v-html="addMarks(props.result.title, queryStore.queryWordList)"
-                            ></a>
-                        </h3>
-                        <span v-if="props.result.type === ResultTypes.NEWS" class="meta"
-                            >Posted by
-                            <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
-                            {{ dateFormatted }}</span
-                        >
-                        <span v-else-if="props.result.meta" class="meta">{{ props.result.meta }}</span>
-                        <span v-else-if="props.result.context" class="meta"
-                            ><template v-for="(context, index) in props.result.context" :key="context.id"
-                                ><a :href="context._links.view">{{ context.title }}</a
-                                ><template v-if="index < props.result.context.length - 1"> > </template>
-                            </template></span
-                        >
+                        <sp-results-result-title :result="props.result" />
+                        <sp-results-result-meta :result="props.result" />
                     </div>
                 </div>
                 <sp-results-result-description v-if="props.result.description" :result="result" />
