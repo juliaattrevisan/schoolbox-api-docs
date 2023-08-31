@@ -282,4 +282,14 @@ class AcceptanceTester extends Actor
         } catch (Exception $e) {
         }
     }
+
+    /**
+     * To click an element inside a web component
+     * @param $selector - the web component to target
+     * @param $inSelector - the element within the web component to click
+     */
+    public function clickElementInWebComponent($selector, $inSelector): void
+    {
+        $this->executeJS('document.querySelector("[' . $selector . ']").shadowRoot.querySelector("[' . $inSelector . ']").click()');
+    }
 }
