@@ -10,6 +10,7 @@ namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\L10n\Mapper as L10nMapper;
 use Twig\Error\Error;
 
 /**
@@ -20,12 +21,17 @@ use Twig\Error\Error;
 class Controller extends Base
 {
     /**
-     * Controller constructor.
+     * @var L10nMapper
+     */
+    protected static $l10nMapper;
+
+    /**
+     * Lets build this thing!
      */
     public function __construct()
     {
+        self::$l10nMapper = L10nMapper::getInstance();
     }
-
 
     /**
      * Load $templateName
@@ -37,7 +43,7 @@ class Controller extends Base
     {
         $uuid = (string)Uuid::uuid4();
 
-        new \Alaress_Probe($uuid, strlen($uuid));
+//        new \Alaress_Probe($uuid, strlen($uuid));
 
         $filters = $this->getFiltersArray();
 
@@ -54,21 +60,18 @@ class Controller extends Base
      */
     private function getFiltersArray(): array
     {
-        // Strategy:
-        //  1. The set of available filters comes from the list in https://schoolbox.atlassian.net/browse/SA-7782.
-        //  2. Add or do not add filters to the $filters array depending on whether applicable features are enabled.
-        //  3. Add in any applicable terms from the Personalisation > Terminology page.
+        // The hard-coded filters list returned by this function comes from https://schoolbox.atlassian.net/browse/SA-7782.
 
         $filters = [];
 
         if (true) {
             $filters['Assessment'] = [
-                "Due Work",
-                "Lesson Plan",
-                "LTI", // Requested by Justin.
-                "Project",
-                "Quiz",
-                "Task",
+                "Due Work" => null,
+                "Lesson Plan" => null,
+                "LTI" => null, // Requested by Justin.
+                "Project" => null,
+                "Quiz" => null,
+                "Task" => null,
             ];
         }
 
@@ -82,11 +85,11 @@ class Controller extends Base
 
         if (true) {
             $filters["Files"] = [
-                "Audio",
-                "Document",
-                "Image",
-                "Other",
-                "Video",
+                "Audio" => null,
+                "Document" => null,
+                "Image" => null,
+                "Other" => null,
+                "Video" => null,
             ];
         }
 
@@ -104,11 +107,11 @@ class Controller extends Base
 
         if (true) {
             $filters["Pages / Folders"] = [
-                "Course/Unit", // Permission setting for this maybe (check feature matrix used by marketing) See Schoolbox Plan in System Settings -> Site
-                "Current Class",
-                "Folder",
-                "Group",
-                "Homepage",
+                "Course/Unit" => null, // Permission setting for this maybe (check feature matrix used by marketing) See Schoolbox Plan in System Settings -> Site
+                "Current Class" => null,
+                "Folder" => null,
+                "Group" => null,
+                "Homepage" => null,
             ];
         }
 
@@ -122,10 +125,10 @@ class Controller extends Base
 
         if (true) {
             $filters["Users"] = [ // Show option if no users of that type exist?
-                "Guest",
-                "Parent",
-                "Staff",
-                "Student",
+                "Guest" => null,
+                "Parent" => null,
+                "Staff" => null,
+                "Student" => null,
             ];
         }
 
@@ -135,9 +138,56 @@ class Controller extends Base
     /**
      * @param array $filters
      * @return array
+     *  - Example: [
+     *       'Due Work' => [
+     *           'singular'       => 'assignment',
+     *           'plural'         => 'assignments',
+     *           'properSingular' => 'Assignment',
+     *           'properPlural'   => 'Assignments'
+     *       ],
+     *       ...
+     *    ]
+     *
      */
     private function getTerminologyForFilters(array $filters): array
     {
-        return [];
+        $terminologyBySingularForm = [];
+
+        foreach ($filters as $name => $moreFilters) {
+            if (is_array($moreFilters)) {
+                $terminologyBySingularForm = array_merge(
+                    $terminologyBySingularForm,
+                    $this->getTerminologyForFilters($moreFilters)
+                );
+            } else {
+                $terminology = self::getTerminologyMatchingSingularForm(strtolower($name));
+
+                if ($terminology !== null) {
+                    $terminologyBySingularForm[$name] = $terminology;
+                }
+            }
+        }
+
+        return $terminologyBySingularForm;
+    }
+
+    /**
+     * @param $name
+     * @return array|null
+     */
+    private static function getTerminologyMatchingSingularForm($name): array|null
+    {
+        static $terminologyBySingularForm = null;
+
+        if ($terminologyBySingularForm === null) {
+            $terminologyBySingularForm = [];
+
+            foreach (self::$l10nMapper->findAll()->sortNaturally('title') as $termObj) {
+                $singularForm = strtolower($termObj->getSingularForm());
+                $terminologyBySingularForm[$singularForm] = $termObj->allForms();
+            }
+        }
+
+        return (array_key_exists($name, $terminologyBySingularForm)) ? $terminologyBySingularForm[$name] : null;
     }
 }

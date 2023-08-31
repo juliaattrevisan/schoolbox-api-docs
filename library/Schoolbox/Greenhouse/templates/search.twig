@@ -1,3 +1,9 @@
+{#
+Expected data items:
+ - filters
+ - filtersTerminology
+ #}
+
 <div id="search-page-container">
     <search-page
         endpoint="/api/search"
@@ -12,15 +18,28 @@
     {% if value is iterable %}
         {{ key }}
         <ul>
-        {% for v in value %}
-            <li>{{ v }}</li>
+        {% for key2, value2 in value %}
+            <li>{{ key2 }}</li>
         {% endfor %}
         </ul>
     {% else %}
-       {{ value }}
+       {{ key }}
     {% endif %}
     </li>
 {% endfor %}
+</ul>
+
+<ul>
+    {% for term, details in filtersTerminology %}
+        <li>
+            {{ term }}
+            <ul>
+                {% for key, value in details %}
+                    <li>{{ key }}: {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
 </ul>
 
 <style>
