@@ -80,6 +80,13 @@
     };
 
     /**
+     * Custom email validation method: allow any non-ASCII character
+     */
+    $.validator.methods.email = function( value, element ) {
+        return this.optional(element) || value.match(/.+@.+/);
+    };
+
+    /**
      * Validator for a datepicker (format: local date  | local datetime)
      */
     $.validator.addMethod(
