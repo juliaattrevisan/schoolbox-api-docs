@@ -168,9 +168,9 @@ class Controller extends Assessment\Controller
             $course = null;
             if ($assessment->getContext()->isImplementationContext()) {
                 if ($assessment->getContext() instanceof Project) {
-                    $course = $assessment->getContext()->getBaseContext();
+                    $course = $assessment->getContext()->getBaseContext()->getCourse();
                 } else {
-                    $course = $assessment->getContext();
+                    $course = $assessment->getContext()->getCourse();
                 }
                 $course = $this->courseImplementationMapper->findById($course->getId());
                 $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
