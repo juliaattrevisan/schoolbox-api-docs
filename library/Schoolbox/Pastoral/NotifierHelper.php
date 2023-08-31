@@ -155,7 +155,7 @@ class NotifierHelper
                         $studentAccessEnabled && $nonStaffCommentAllowed,
                         $pastoralAccess->getMatchCampus(),
                     );
-                } elseif ($pastoralAccess->getUser() instanceof User) {
+                } elseif (!$roleBased && $pastoralAccess->getUser() instanceof User) {
                     $user        = $this->userMapper->findById($pastoralAccess->getUser()->getId());
                     $targetUsers += $this->buildTargetUsersForUser(
                         $user,
