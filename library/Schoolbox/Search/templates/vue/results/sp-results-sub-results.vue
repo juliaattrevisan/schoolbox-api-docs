@@ -5,13 +5,13 @@
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import { useFetch } from "@vueuse/core";
-import { Results } from "../../../js/types/Results";
-import { Result } from "../../../js/types/Result";
-import { useStore } from "../../store/searchPageStore";
-import { useResultsStore, SUB_RESULT_LIMIT } from "../store/spResultsStore";
-import { useHasMoreResults } from "../composable/useHasMoreResults";
-import SpResultsError from "../sp-results-error.vue";
-import SpResultsListSubResult from "./sp-results-list-sub-result.vue";
+import { Results } from "../../js/types/Results";
+import { Result } from "../../js/types/Result";
+import { useStore } from "../store/searchPageStore";
+import { useResultsStore, SUB_RESULT_LIMIT } from "./store/spResultsStore";
+import { useHasMoreResults } from "./composable/useHasMoreResults";
+import SpResultsError from "./sp-results-error.vue";
+import SpResultsSubResult from "./sp-results-sub-result.vue";
 
 interface Props {
     result: Result; // the result to display
@@ -104,7 +104,7 @@ function isLast(index: number) {
 </script>
 
 <template>
-    <sp-results-list-sub-result
+    <sp-results-sub-result
         v-for="(subResult, index) in props.result._subResults?.data"
         :key="subResult.id"
         :sub-result="subResult"

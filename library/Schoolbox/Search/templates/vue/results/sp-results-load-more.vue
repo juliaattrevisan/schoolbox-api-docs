@@ -4,9 +4,9 @@
  */
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import SpResultsError from "../sp-results-error.vue";
-import { useResultsStore } from "../store/spResultsStore";
-import { useLoadMoreResultsStore } from "../store/spLoadMoreResults";
+import SpResultsError from "./sp-results-error.vue";
+import { useResultsStore } from "./store/spResultsStore";
+import { useLoadMoreResultsStore } from "./store/spLoadMoreResults";
 
 const resultsStore = useResultsStore();
 const loadMoreResultsStore = useLoadMoreResultsStore();
@@ -33,10 +33,10 @@ async function onLoadMoreSelected() {
 <template>
     <loading-table v-if="loadMoreResultsStore.isLoading" :rows="2" />
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
-    <button v-else-if="showLoadMore" data-sp-results-list-load-more-button @click.prevent="onLoadMoreSelected">
+    <button v-else-if="showLoadMore" data-sp-results-load-more-button @click.prevent="onLoadMoreSelected">
         Load more results
     </button>
-    <div v-else-if="resultsStore.hasLoadedAllResults" class="alert-box" data-sp-results-list-load-more-all-loaded>
+    <div v-else-if="resultsStore.hasLoadedAllResults" class="alert-box" data-sp-results-load-more-all-loaded>
         All results have been loaded
     </div>
 </template>

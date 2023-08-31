@@ -5,10 +5,10 @@
 
 import { gsap } from "gsap/all";
 import { addMarks } from "@js/util/domUtils";
-import { Result } from "../../../js/types/Result";
-import { ResultTypes } from "../../../js/types/ResultTypes";
-import { useQueryStore } from "../../store/spQueryStore";
-import SpResultsListSubResults from "./sp-results-list-sub-results.vue";
+import { Result } from "../../js/types/Result";
+import { ResultTypes } from "../../js/types/ResultTypes";
+import { useQueryStore } from "../store/spQueryStore";
+import SpResultsSubResults from "./sp-results-sub-results.vue";
 
 interface Props {
     result: Result; // the result to display
@@ -58,7 +58,7 @@ const dateFormatted = window.Vue.computed(() => {
 
 <template>
     <div ref="resultEl" class="l-flex-col">
-        <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`" data-test-sp-results-list-result>
+        <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`" data-test-sp-results-result>
             <div class="l-flex-col l-gap-m l-pad-m">
                 <div class="l-flex-row l-gap-m">
                     <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''}`">
@@ -99,7 +99,7 @@ const dateFormatted = window.Vue.computed(() => {
                 </article>
             </div>
         </div>
-        <sp-results-list-sub-results v-if="hasSubResults" :result="result" />
+        <sp-results-sub-results v-if="hasSubResults" :result="result" />
     </div>
 </template>
 

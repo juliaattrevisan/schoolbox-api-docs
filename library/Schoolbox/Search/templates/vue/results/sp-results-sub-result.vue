@@ -4,9 +4,9 @@
  */
 
 import { addMarks } from "@js/util/domUtils";
-import { Result } from "../../../js/types/Result";
-import { ResultTypes } from "../../../js/types/ResultTypes";
-import { useQueryStore } from "../../store/spQueryStore";
+import { Result } from "../../js/types/Result";
+import { ResultTypes } from "../../js/types/ResultTypes";
+import { useQueryStore } from "../store/spQueryStore";
 
 interface Props {
     subResult: Result; // the result to display
