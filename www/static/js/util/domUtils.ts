@@ -224,7 +224,10 @@ export function injectScript(src: string): Promise<void> {
             script.setAttribute("data-is-loaded", "true");
             resolve();
         });
-        script.addEventListener("error", (e) => reject(e.error));
+        script.addEventListener("error", (e) => {
+            console.error("injectScript failed for file ", src);
+            reject(e.error);
+        });
         script.src = src;
         document.head.appendChild(script);
     });
