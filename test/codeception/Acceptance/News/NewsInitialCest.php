@@ -58,7 +58,7 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->click(['css' => '[data-test="wc-actions-dropdown-button-header-options"]']);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-header-options]', '[data-test=wc-actions-dropdown-header-options-button]');
         $i->click('#unpublish-article');
         $i->waitForElementVisible(['css' => 'textarea#rejectedReason'], 5);
         $i->fillField(['css' => "textarea#rejectedReason"], "Testing unpublish");
@@ -178,7 +178,6 @@ class NewsInitialCest
 
     /**
      * @throws Exception
-     * @depends createNews
      */
     public function deleteNews(AcceptanceTester $i): void
     {
@@ -187,8 +186,8 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
 
-        $i->waitForElementVisible(['css' => '[data-test="wc-actions-dropdown-button-header-options"]'], 5);
-        $i->click(['css' => '[data-test="wc-actions-dropdown-button-header-options"]']);
+        $i->waitForElementVisible('[data-test=wc-actions-dropdown-header-options]', 5);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-header-options]', '[data-test=wc-actions-dropdown-header-options-button]');
         $i->click(['css' => 'a.icon-delete']);
         $i->waitForElementVisible('#confirm-dialog-confirm-button', 8);
         $i->click('#confirm-dialog-confirm-button');

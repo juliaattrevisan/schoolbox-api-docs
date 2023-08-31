@@ -290,6 +290,6 @@ class AcceptanceTester extends Actor
      */
     public function clickElementInWebComponent($selector, $inSelector): void
     {
-        $this->executeJS('document.querySelector("[' . $selector . ']").shadowRoot.querySelector("[' . $inSelector . ']").click()');
+        $this->executeJS('document.querySelector("' . $selector . '").shadowRoot.querySelector("' . $inSelector . '").click();');
     }
 }
