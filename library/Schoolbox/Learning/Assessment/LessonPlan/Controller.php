@@ -166,7 +166,7 @@ class Controller extends Assessment\Controller
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
             // if we are inside a project get the projects context
-            $unit = null;
+            $course = null;
             if ($assessment->getContext()->isImplementationContext()) {
                 if ($assessment->getContext() instanceof Project) {
                     $unit = $assessment->getContext()->getBaseContext();
@@ -192,7 +192,6 @@ class Controller extends Assessment\Controller
                     ];
                 }
             } else {
-                $course = null;
                 if ($assessment->getContext() instanceof Project) {
                     $unit = $assessment->getContext()->getBaseContext();
                 } else {
