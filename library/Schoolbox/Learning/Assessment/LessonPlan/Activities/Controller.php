@@ -15,7 +15,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment;
@@ -29,7 +28,6 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param UnitSpecificationMapper    $unitSpecificationMapper
      * @param UnitImplementationMapper   $unitImplementationMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param LessonPlanMapper           $lessonPlanMapper
