@@ -270,10 +270,6 @@ class Family
 
         foreach ($families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
-                if (!in_array($parentId, [20656, 20954, 21306], false)) {
-                    continue;
-                }
-print_r($family);
                 /* Everyone coming out of getParents() is a physical parent, known to tass.
                  * The communication rules decide whether this physical parent should be
                  * associated with the student in suds; use validCommRule boolean to decide
