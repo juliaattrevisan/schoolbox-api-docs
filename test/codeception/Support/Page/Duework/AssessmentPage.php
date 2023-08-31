@@ -17,7 +17,8 @@ use Tests\Support\AcceptanceTester;
 class AssessmentPage
 {
     public const URL = '/learning/assessments/{assessment_id}/{user_id}';
-    public const LINK_JELLY_TOT = '[data-test="wc-actions-dropdown-button-header-options"]';
+    public const LINK_JELLY_TOT = '[data-test=wc-actions-dropdown-header-options]';
+    public const LINK_JELLY_TOT_BUTTON = '[data-test=wc-actions-dropdown-header-options-button]';
     public const LINK_MODIFY = '#header-options a.icon-modify';
     public const LINK_STATUS = '#header-options a.icon-progress';
 
@@ -56,7 +57,7 @@ class AssessmentPage
     public function clickModify(): AssessmentForm
     {
         $i = $this->tester;
-        $i->click(self::LINK_JELLY_TOT);
+        $i->clickElementInWebComponent(self::LINK_JELLY_TOT, self::LINK_JELLY_TOT_BUTTON);
         $i->click(self::LINK_MODIFY);
         $i->waitForElement(AssessmentForm::SELECTOR_BUTTON_UPDATE);
 
@@ -87,7 +88,7 @@ class AssessmentPage
     public function openStatusPage(): StatusPage
     {
         $i = $this->tester;
-        $i->click(self::LINK_JELLY_TOT);
+        $i->clickElementInWebComponent(self::LINK_JELLY_TOT, self::LINK_JELLY_TOT_BUTTON);
         $i->click(self::LINK_STATUS);
 
         return new StatusPage($i);

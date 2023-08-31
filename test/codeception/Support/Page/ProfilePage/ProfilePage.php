@@ -59,7 +59,7 @@ class ProfilePage
      */
     public function clickBadgeGoalDropdown($badgeId): void
     {
-        $this->tester->click('[data-test="wc-actions-dropdown-button-header-options-1-' . $badgeId . '-goal"]');
+        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-header-options-1-' . $badgeId . '-goal]', '[data-test=wc-actions-dropdown-header-options-1-' . $badgeId . '-goal-button]');
     }
 
     /**
@@ -67,6 +67,6 @@ class ProfilePage
      */
     public function clickBadgeAchievementDropdown($badgeId): void
     {
-        $this->tester->click('[data-test="wc-actions-dropdown-button-header-options-1-' . $badgeId . '-achievement"]');
+        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-header-options-1-' . $badgeId . '-achievement]', '[data-test=wc-actions-dropdown-header-options-1-' . $badgeId . '-achievement-button]');
     }
 }

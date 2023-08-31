@@ -23,7 +23,8 @@ class Item
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    public const DOT_MENU   = '[data-test="wc-actions-dropdown-button-header-options"]';
+    public const DOT_MENU   = '[data-test=wc-actions-dropdown-header-options]';
+    public const DOT_MENU_BUTTON   = '[data-test=wc-actions-dropdown-header-options-button]';
     public const LINK_MODIFY   = 'Modify';
     public const LINK_PREVIOUS = Common::ELEMENT_CONTENT . ' .icon-previous';
     public const LINK_NEXT     = Common::ELEMENT_CONTENT . ' .icon-next';
@@ -91,7 +92,7 @@ class Item
     public function modifyArticle(): void
     {
         $this->tester->waitForElementVisible(self::DOT_MENU);
-        $this->tester->click(self::DOT_MENU);
+        $this->tester->clickElementInWebComponent(self::DOT_MENU, self::DOT_MENU_BUTTON);
         $this->tester->click(self::LINK_MODIFY);
     }
 }
