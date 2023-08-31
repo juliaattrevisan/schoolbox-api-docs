@@ -144,25 +144,6 @@ export function setStylesOnElement(element: HTMLElement, styles: object) {
 }
 
 /**
- * Async inject a <script> tag into the DOM
- * https://stackoverflow.com/a/39008859
- * @param {string} src - the src of the script to inject
- */
-export function injectScript(src: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.setAttribute("data-is-loaded", "false");
-        script.addEventListener("load", () => {
-            script.setAttribute("data-is-loaded", "true");
-            resolve();
-        });
-        script.addEventListener("error", (e) => reject(e.error));
-        script.src = src;
-        document.head.appendChild(script);
-    });
-}
-
-/**
  * Set and get an attribute on an element
  * @param {HTMLElement} element - the element to set the attribute on
  * @param {string} attribute - the attribute to set
@@ -228,6 +209,51 @@ export function getScriptElement(src: string) {
 export function isScriptLoaded(src: string) {
     const scriptElement = document.querySelector(`script[src="${src}"]`);
     return scriptElement && scriptElement.getAttribute("data-is-loaded") === "true";
+}
+
+/**
+ * Async inject a <script> tag into the DOM
+ * https://stackoverflow.com/a/39008859
+ * @param {string} src - the src of the script to inject
+ */
+export function injectScript(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.setAttribute("data-is-loaded", "false");
+        script.addEventListener("load", () => {
+            script.setAttribute("data-is-loaded", "true");
+            resolve();
+        });
+        script.addEventListener("error", (e) => {
+            console.error("injectScript failed for file ", src);
+            reject(e.error);
+        });
+        script.src = src;
+        document.head.appendChild(script);
+    });
+}
+
+type InjectScriptsParams = {
+    srcList: string[];
+    onComplete?: () => void;
+};
+
+/**
+ * Inject a list of scripts into the DOM (skipping those that are already present), then run the given function on completion.
+ * @param {InjectScriptsParams} params - The list of scripts to inject.
+ */
+export async function injectScriptsIfNotLoaded(params: InjectScriptsParams) {
+    // Scripts are injected sequentially here because often sets of scripts need to be added in a particular order.
+    // Example: jstree.min.js must be added before jQuery.resourceTree.js.
+    for (const src of params.srcList) {
+        if (!isScriptLoaded(src)) {
+            await injectScript(src);
+        }
+    }
+
+    if (params.onComplete !== undefined) {
+        params.onComplete();
+    }
 }
 
 /**

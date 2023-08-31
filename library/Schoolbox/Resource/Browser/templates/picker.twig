@@ -20,53 +20,35 @@
     {% set folderVar = 'category' %}
 {% endif %}
 
+<script src='{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}'></script>
+
 <script>
+    // This is required because chrome.twig might not be included, due to this file being used as a full web page.
+    window.cdnPrefix = "{{ CDN_PREFIX }}";
 
-    /**
-     * As this file is loaded dynamically within a modal, we need to ensure
-     * its script files are fully loaded on the CDN before we call any methods contained within
-     * the files. This is because these script files will not be loaded with render blocking,
-     * so tree.resourceTree() could be called before jquery.resourceTree.js is loaded
-     */
-
-    //check if one of the scripts is already loaded so we don't load it again
-    if (Boolean(document.querySelector(`script[src="{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js?v={{ config.site_version }}"]`))) {
-        initResourceTree();
+    // Although this file is clearly not a full web page (no <html> tag for example), it is used as a full web
+    // page when set as the contents of an iframe by Javascript in attach-browser.html.
+    // Because this file is used as a full web page, the document may not be ready at the time this script runs.
+    if (document.readyState !== 'loading') {
+        main();
     } else {
-        loadScripts();
+        document.addEventListener('DOMContentLoaded', main);
     }
 
-    function loadScripts () {
-
-        let scriptsLoaded = 0;
-        const jsFiles = [
-            '{{ CDN_PREFIX }}/js/bundle/vendors.js?v={{ config.site_version }}',
-            '{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}',
-            '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js?v={{ config.site_version }}',
-            '{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js?v={{ config.site_version }}',
-            '{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js?v={{ config.site_version }}',
-            '{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js?v={{ config.site_version }}'
-        ]
-
-        function loadScript () {
-            const scriptElement = document.createElement('script');
-            scriptElement.addEventListener('load', onScriptLoaded);
-            scriptElement.src = jsFiles[scriptsLoaded];
-            document.head.appendChild(scriptElement);
-        }
-
-        //keep loading scripts sequentially until all are loaded
-        function onScriptLoaded () {
-            if (scriptsLoaded === (jsFiles.length-1)) {
-                initResourceTree();
-            } else {
-                scriptsLoaded++;
-                loadScript();
+    function main() {
+        sbProps.injectScriptsIfNotLoaded(
+            {
+                srcList: [
+                    '{{ CDN_PREFIX }}/js/bundle/vendors.js?v={{ config.site_version }}',
+                    '{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}',
+                    '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js?v={{ config.site_version }}',
+                    '{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js?v={{ config.site_version }}',
+                    '{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js?v={{ config.site_version }}',
+                    '{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js?v={{ config.site_version }}'
+                ],
+                onComplete: initResourceTree
             }
-        }
-
-        loadScript();
-
+        );
     }
 
     function initResourceTree () {

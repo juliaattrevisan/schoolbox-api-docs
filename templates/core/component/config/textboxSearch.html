@@ -1,32 +1,14 @@
 <script type="text/javascript">
-    /**
-     * As this file is loaded dynamically within a modal, we need to ensure
-     * its script files are fully loaded on the CDN before we call any methods contained within
-     * the files. This is because these script files will not be loaded with render blocking,
-     * so $('#textbox_search').selectizeSelector() could be called before jquery.selectize-selector.js is loaded
-     */
-    //if no min script, load that shove in
-    if (!Boolean(document.querySelector(`script[src="{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}"]`))) {
-        loadSelectizeMin();
-    } else if (Boolean(document.querySelector(`script[src="{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"]`))) {
-        initSelectize();
-    } else {
-        loadSelectize();
-    }
 
-    //add the JS file <script> tag into the document head and respond to its load
-    function loadSelectizeMin () {
-        const scriptElement = document.createElement('script');
-        scriptElement.addEventListener('load', loadSelectize); //once its loaded, we can trust that $.selectize will work
-        scriptElement.src = '{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}';
-        document.head.appendChild(scriptElement);
-    }
-    function loadSelectize () {
-        const scriptElement = document.createElement('script');
-        scriptElement.addEventListener('load', initSelectize); //once its loaded, we can trust that $.selectizeSelector() will work
-        scriptElement.src = '{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}';
-        document.head.appendChild(scriptElement);
-    }
+    sbProps.injectScriptsIfNotLoaded(
+        {
+            srcList: [
+                "{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}",
+                "{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"
+            ],
+            onComplete: initSelectize
+        }
+    );
 
     function initSelectize() {
         var options = {

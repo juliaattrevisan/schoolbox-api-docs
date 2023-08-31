@@ -1,33 +1,41 @@
-<script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"></script>
-<script type="text/javascript">
-    $(function () {
-        var options = {
-            ajax: {
-                url:      '/fixtures/divisions/*/teams',
-                type:     'GET',
-                data:     {},
-                dataType: 'json'
-            }
+<script>
+sbProps.injectScriptsIfNotLoaded(
+    {
+        srcList: [
+            "{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}",
+            "{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"
+        ],
+        onComplete: initSelectizeSelectors
+    }
+);
+
+function initSelectizeSelectors() {
+    let options = {
+        ajax: {
+            url:      '/fixtures/divisions/*/teams',
+            type:     'GET',
+            data:     {},
+            dataType: 'json'
         }
+    }
 
-        var id = $('#team-{COMPONENT_INSTANCE_ID}').val();
+    const id = $('#team-{COMPONENT_INSTANCE_ID}').val();
 
-        if (id != 0) {
-            options.value = {
-                id:   id,
-                name: $('#team-placeholder-{COMPONENT_INSTANCE_ID}').val()
-            }
+    if (id != 0) {
+        options.value = {
+            id:   id,
+            name: $('#team-placeholder-{COMPONENT_INSTANCE_ID}').val()
         }
+    }
 
-        $('#team-placeholder-{COMPONENT_INSTANCE_ID}').selectizeSelector(options)
-                .on('selectize.item_add', function(event, value) {
-                    $('#team-{COMPONENT_INSTANCE_ID}').val(value);
-                })
-                .on('selectize.item_remove', function() {
-                    $('#team-{COMPONENT_INSTANCE_ID}').val('');
-                });
-    });
+    $('#team-placeholder-{COMPONENT_INSTANCE_ID}').selectizeSelector(options)
+        .on('selectize.item_add', function (event, value) {
+            $('#team-{COMPONENT_INSTANCE_ID}').val(value);
+        })
+        .on('selectize.item_remove', function () {
+            $('#team-{COMPONENT_INSTANCE_ID}').val('');
+        });
+}
 </script>
 
 <input type="text" id="team-placeholder-{COMPONENT_INSTANCE_ID}" value="{COMPONENT_TEAM_NAME}" placeholder="Search Teams">
