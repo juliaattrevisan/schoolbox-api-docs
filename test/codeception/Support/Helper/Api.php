@@ -13,6 +13,7 @@ use Codeception\TestInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -36,6 +37,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\TypeAction\Mapper as PastoralTypeActionMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
@@ -54,6 +56,7 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Resource\Textbox\Mapper as TextBoxMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -136,7 +139,7 @@ class Api extends \Codeception\Module
         $this->unitImplMapper       = UnitImplMapper::getInstance();
         $this->eventMapper          = EventMapper::getInstance();
         $this->eventTypeMapper      = EventTypeMapper::getInstance();
-        $this->newsMapper = NewsMapper::getInstance();
+        $this->newsMapper           = NewsMapper::getInstance();
     }
 
     private array $users = [];
@@ -613,10 +616,11 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * @param \Schoolbox\User $owner
-     * @param int             $accessLevel
-     * @param int             $attendance
-     * @param bool            $showAttendance
+     * @param User        $owner
+     * @param int         $accessLevel
+     * @param int         $attendance
+     * @param bool        $showAttendance
+     * @param Folder|null $folder
      * @return Event
      * @throws MapperException
      */
@@ -641,6 +645,26 @@ class Api extends \Codeception\Module
         return $event;
     }
 
+
+    /**
+     * @param User   $owner
+     * @param Folder $folder
+     * @return \Schoolbox\Blog\Homepage\Post\Model
+     * @throws MapperException
+     */
+    public function createBlog(User $owner, Folder $folder): \Schoolbox\Blog\Homepage\Post\Model
+    {
+        $blogMapper = BlogMapper::getInstance();
+        $blog       = $blogMapper->createModel();
+        $blog->setFolder($folder)
+             ->setCreatedAt(\Alaress_Date_Format::now())
+             ->setBody($this->generateText(1000))
+             ->setOwner($owner)
+             ->setHeading($this->generateText(50));
+        $blogMapper->save($blog);
+        return $blog;
+    }
+
     /**
      * Return DB module in a type-safe manner.
      *
@@ -654,7 +678,8 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * @param int $length
+     * @param int  $length
+     * @param bool $alphabetOnly
      * @return string
      */
     public function generateText(int $length, bool $alphabetOnly = false): string
@@ -662,12 +687,16 @@ class Api extends \Codeception\Module
         $characters = $alphabetOnly ? 'abcdefghijklmnopqrstuvwxyz' : 'abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+';
 
         $randomString = '';
+        // length of a word so that a single word to be more than 3 chars (for search tests)
+        $wordLen = 0;
         for ($i = 0; $i < $length; $i++) {
-            if (!$alphabetOnly && $length > 8 && rand(1, 7) === 5) {
+            if (!$alphabetOnly && $length > 8 && $wordLen > 3 && rand(1, 7) === 5) {
                 $randomString .= ' ';
                 $i++;
+                $wordLen = 0;
             }
             $randomString .= $characters[rand(0, strlen($characters) - 1)];
+            $wordLen++;
         }
         return $randomString;
     }
@@ -728,11 +757,28 @@ class Api extends \Codeception\Module
 
     /**
      * @return \Schoolbox\Resource\File\Model
+     * @throws MapperException
+     * @throws ModuleException
      */
     public function getExistingFile(): \Schoolbox\Resource\File\Model
     {
-        $db = $this->getDbModule();
+        $db      = $this->getDbModule();
         $fileIds = $db->grabColumnFromDatabase('file', 'id', ['deleted_at' => null]);
         return FileMapper::getInstance()->findById($fileIds[0]);
+    }
+
+    /**
+     * @return \Schoolbox\Resource\Textbox\Model
+     * @throws Deleted
+     * @throws MapperException
+     * @throws ModuleException
+     */
+    public function getExistingTextBox(): \Schoolbox\Resource\Textbox\Model
+    {
+        $db         = $this->getDbModule();
+        $textBoxIds = $db->grabColumnFromDatabase('textBox', 'textBoxID', ['deleted_at' => null]);
+        /** @var \Schoolbox\Resource\Textbox\Model $textBox */
+        $textBox = TextBoxMapper::getInstance()->findById($textBoxIds[0]);
+        return $textBox;
     }
 }

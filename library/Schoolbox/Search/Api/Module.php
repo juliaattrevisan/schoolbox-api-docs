@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Permission\Access\Access;
@@ -92,6 +93,7 @@ class Module extends BaseModule
                 new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -123,6 +125,10 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Textbox\Hydrator(
                     $mapperFactory->get(TextboxMapper::class),
+                    Access::getInstance(),
+                ),
+                new Database\ResultType\Blog\Hydrator(
+                    $mapperFactory->get(BlogMapper::class),
                     Access::getInstance(),
                 ),
             ),
