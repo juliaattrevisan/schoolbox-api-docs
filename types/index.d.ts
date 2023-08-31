@@ -19,6 +19,10 @@ declare global {
             imageSlideshows: { [key: string]: any };
             colourDefaults: { [key: string]: any };
         };
+        schoolboxUser: {
+            id: number;
+            name: string;
+        };
         siteVersion: string;
         STORYBOOK_ENV: string;
         Vue: typeof Vue;

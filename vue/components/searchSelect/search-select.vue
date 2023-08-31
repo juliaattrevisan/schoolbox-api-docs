@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To search for results and select them
+ * To search for searchResults and select them
  */
 
 import { useFetch, useDebounceFn } from "@vueuse/core";
@@ -11,11 +11,13 @@ import SearchSelectResults from "./search-select-results.vue";
 
 interface Props {
     endpoint: string; // the search api endpoint
-    selected: Result[]; // the selected results
+    selected: Result[]; // the selected searchResults
+    defaultResults?: Result[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
 }
 const props = withDefaults(defineProps<Props>(), {
+    defaultResults: undefined,
     isSingleSelect: false,
     formValueName: "",
 });
@@ -26,7 +28,7 @@ const emit = defineEmits<{
 }>();
 
 const query = window.Vue.ref<string>("");
-const results = window.Vue.ref<Result[]>([]);
+const searchResults = window.Vue.ref<Result[]>([]);
 const canSearch = window.Vue.ref<boolean>(false);
 const minKeywordLength = 2;
 
@@ -35,12 +37,22 @@ const url = window.Vue.computed(() => {
 });
 
 /**
+ * Return the default results if the query is empty
+ */
+const results = window.Vue.computed(() => {
+    if (props.defaultResults && query.value.length === 0) {
+        return props.defaultResults;
+    }
+    return searchResults.value;
+});
+
+/**
  * Submit the current query, using _debounce to accommodate for key presses
  * so not sending on every key press
  */
 const {
     execute,
-    data, // the search results
+    data, // the search searchResults
     isFetching, // to notify of searching
     error: hasError, // to notify of a search error
 } = useFetch(url, {
@@ -79,24 +91,27 @@ async function onInput(value: string) {
     query.value = value;
     if (query.value.length < minKeywordLength) {
         canSearch.value = false;
-        results.value = [];
+        searchResults.value = [];
         return;
     }
     canSearch.value = true;
     await execute();
     // await debouncedRequest(); // @TODO - resolve debounce issue
     try {
-        results.value = data.value as Results;
+        searchResults.value = (data as Ref<Result[]>).value;
     } catch (error) {
         hasError.value = true;
     }
 }
 
 /**
- * Don't show the search results if there's only one result and it's already selected
- * @returns {boolean} - whether to show the search results
+ * Don't show the search searchResults if there's only one result and it's already selected
+ * @returns {boolean} - whether to show the search searchResults
  */
 const isActive = window.Vue.computed(() => {
+    if (props.defaultResults && props.selected.length === 0) {
+        return true;
+    }
     if (!canSearch.value) {
         return false;
     }

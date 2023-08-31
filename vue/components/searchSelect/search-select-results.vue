@@ -37,6 +37,14 @@ function animateHeight(targetHeight: number) {
     });
 }
 
+window.Vue.onMounted(async () => {
+    if (props.results.length > 0) {
+        await window.Vue.nextTick(); // I don't know why this is needed yet...
+        const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
+        animateHeight(targetHeight);
+    }
+});
+
 /**
  * to slide up and down the search results
  */
