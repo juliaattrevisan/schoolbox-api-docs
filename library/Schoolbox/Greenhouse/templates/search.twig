@@ -6,6 +6,23 @@
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
 
+<ul>
+{% for key, value in filters %}
+    <li>
+    {% if value is iterable %}
+        {{ key }}
+        <ul>
+        {% for v in value %}
+            <li>{{ v }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+       {{ value }}
+    {% endif %}
+    </li>
+{% endfor %}
+</ul>
+
 <style>
 /* temporarily add extra padding to the container to allow the new styles */
 #container {

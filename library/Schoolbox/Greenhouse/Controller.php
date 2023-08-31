@@ -35,6 +35,49 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', []);
+        $uuid = (string)Uuid::uuid4();
+
+        new \Alaress_Probe($uuid, strlen($uuid));
+
+        $this->response = $this->responseFromTemplate(
+            "@greenhouse/$templateName.twig", [
+                'filters' => [
+                    "Assessment" => [
+                        "Due Work",
+                        "Lesson Plan",
+                        "Project",
+                        "Quiz",
+                        "Task",
+                    ],
+                    "Badges",
+                    "Events",
+                    "Files" => [
+                        "Audio",
+                        "Document",
+                        "Image",
+                        "Other",
+                        "Video",
+                    ],
+                    "Forums",
+                    "Links",
+                    "News",
+                    "Pages / Folders" => [
+                        "Course/Unit",
+                        "Current Class",
+                        "Folder",
+                        "Group",
+                        "Homepage",
+                    ],
+                    "Textboxes",
+                    "Tiles",
+                    "Users" => [
+                        "Guest",
+                        "Parent",
+                        "Staff",
+                        "Student",
+                    ]
+                ]
+            ]
+        );
     }
 }
