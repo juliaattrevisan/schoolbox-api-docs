@@ -196,6 +196,20 @@ class Controller extends ConfigController
             ->setMimeFilter('image/*')
             ->setFilesystemContext('images');
 
+        /**
+         * grab all available worktypes.
+         */
+        $worktypes = [];
+        foreach ($this->workTypeMapper->findAll() as $summaryWorkType) {
+            $worktypes[] = [
+                'id'   => $summaryWorkType->getId(),
+                'name' => $summaryWorkType->getName(),
+                'none' => true,
+                'grade' => false,
+                'comment' => false,
+                'rubric' => false,
+            ];
+        }
         $report = $this->reportMapper->createModel();
         $report->setFileName(Model::DEFAULT_FILENAME);
         $this->response = $this->responseFromTemplate(
@@ -206,7 +220,9 @@ class Controller extends ConfigController
                 'report' => $report,
                 'options' => Model::DEFAULT_OPTIONS,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
-                'logoZone' => $logoZone->getTwigContext()
+                'logoZone' => $logoZone->getTwigContext(),
+                'worktypesSummary' => $worktypes,
+                'worktypesClass' => $worktypes
             ]
         );
     }
@@ -257,6 +273,33 @@ class Controller extends ConfigController
         if ($report->getLogo()) {
             $logoZone->attachFiles([$report->getLogo()]);
         }
+        $payload = $this->decompilePayload($report);
+        /**
+         * grab all available worktypes.
+         */
+        $allWorktypes = $this->workTypeMapper->findAll();
+        $worktypesSummary = [];
+        $worktypesClass = [];
+        foreach ($allWorktypes as $summaryWorkType) {
+            $worktypesSummary[] = [
+                'id'   => $summaryWorkType->getId(),
+                'name' => $summaryWorkType->getName(),
+                'grades' => $payload['summary']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
+                'comments' => $payload['summary']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
+                'rubrics' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
+                 // if we have seen this worktype in the payload, then set to show, and use it
+                'show' => isset($payload['summary']['workType'][$summaryWorkType->getId()]),
+            ];
+            $worktypesClass[] = [
+                'id'   => $summaryWorkType->getId(),
+                'name' => $summaryWorkType->getName(),
+                'grades' => $payload['class']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
+                'comments' => $payload['class']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
+                'rubrics' => $payload['class']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
+                // if we have seen this worktype in the payload, then set to show, and use it
+                'show' => isset($payload['class']['workType'][$summaryWorkType->getId()]),
+            ];
+        }
 
         $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/create.twig',
@@ -267,9 +310,11 @@ class Controller extends ConfigController
                     [['Modify', null]]
                 ),
                 'report' => $report,
-                'options' => $this->decompilePayload($report),
+                'options' => $payload,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
-                'logoZone' => $logoZone->getTwigContext()
+                'logoZone' => $logoZone->getTwigContext(),
+                'worktypesSummary' => $worktypesSummary,
+                'worktypesClass' => $worktypesClass
             ]
         );
     }
@@ -307,7 +352,22 @@ class Controller extends ConfigController
             'class' => true,
         ];
 
-        $options = json_encode(array_intersect_key($postData, $payloadKeys), JSON_THROW_ON_ERROR);
+        $options = array_intersect_key($postData, $payloadKeys);
+        // strip out the show `off` entries
+        foreach ($options['class']['workType'] as $id => $workType) {
+            if ("0" === $workType['show']) {
+                unset($options['class']['workType'][$id]);
+            } else {
+                unset($options['class']['workType'][$id]['show']);
+            }
+        }
+        foreach ($options['summary']['workType'] as $id => $workType) {
+            if ("0" === $workType['show']) {
+                unset($options['summary']['workType'][$id]);
+            } else {
+                unset($options['summary']['workType'][$id]['show']);
+            }
+        }
 
         /* Title is required
          */
@@ -325,7 +385,7 @@ class Controller extends ConfigController
          */
         $report->setTitle($postData['title'])
             ->setIntroduction($postData['introduction'])
-            ->setOptions($options)
+            ->setOptions(json_encode($options, JSON_THROW_ON_ERROR))
             ->setUpdatedBy($this->getUser())
             ->setFileName($report->sanitiseFilename(trim((string)$postData['filename'])));
 
@@ -424,32 +484,6 @@ class Controller extends ConfigController
             ];
         }
 
-        /* Summary Work Types
-         */
-        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType'] ?? []);
-
-        $options['summary']['workType'] = [];
-
-        foreach ($summaryWorkTypes as $summaryWorkType) {
-            $options['summary']['workType'][] = [
-                'id'   => $summaryWorkType->getId(),
-                'name' => $summaryWorkType->getName(),
-            ];
-        }
-
-        /* Class Work Types
-         */
-        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType'] ?? []);
-
-        $options['class']['workType'] = [];
-
-        foreach ($classWorkTypes as $classWorkType) {
-            $options['class']['workType'][] = [
-                'id'   => $classWorkType->getId(),
-                'name' => $classWorkType->getName(),
-            ];
-        }
-
         return $options;
     }
 
@@ -492,27 +526,6 @@ class Controller extends ConfigController
             $output[] = [
                 'id'   => $yearLevel->getId(),
                 'name' => $yearLevel->getName(),
-            ];
-        }
-
-        $this->response = $this->responseAsJson($output);
-    }
-
-
-    /**
-     * Get work types for selectize
-     * @return void
-     * @api GET /adminv2/summative-report/worktypes
-     */
-    public function getWorkTypes(): void
-    {
-        $output = [];
-        $workTypes = $this->workTypeMapper->findAll()->sortBy('sequence', 'ASC');
-
-        foreach ($workTypes as $workType) {
-            $output[] = [
-                'id'   => $workType->getId(),
-                'name' => $workType->getName(),
             ];
         }
 
@@ -840,7 +853,7 @@ class Controller extends ConfigController
         $summaryAssessments = new GenericCollection(IAssessable::class);
 
         if (\count($optionsPayload['summary']['workType'])) {
-            $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType']);
+            $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', array_keys($optionsPayload['summary']['workType']));
 
             /* Instantiate the Work Type instances for each of the sections in the report:
              * Summary and Class Pages
@@ -850,14 +863,14 @@ class Controller extends ConfigController
             }
         }
 
-        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, (bool)$optionsPayload['summary']['rubrics']);
+        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, $optionsPayload['summary']['workType']);
 
         /* Find the assessments that fulfil $classWorkTypes requirements
          */
         $classAssessments = new GenericCollection(IAssessable::class);
 
         if (\count($optionsPayload['class']['workType'])) {
-            $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType']);
+            $classWorkTypes = $this->workTypeMapper->findByColumn('id', array_keys($optionsPayload['class']['workType']));
 
             /* Instantiate the Work Type instances for each of the sections in the report:
              * Summary and Class Pages
@@ -936,7 +949,7 @@ class Controller extends ConfigController
         }
 
 
-        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
+        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['workType']);
 
         /* Build it
          */
@@ -953,14 +966,10 @@ class Controller extends ConfigController
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
             'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],
-            'showSummaryGrades'          => (bool)$optionsPayload['summary']['grades'],
-            'showSummaryComments'        => (bool)$optionsPayload['summary']['comments'],
-            'showSummaryRubrics'         => (bool)$optionsPayload['summary']['rubrics'],
+            'summaryOptions'             => $optionsPayload['summary'],
+            'classOptions'               => $optionsPayload['class'],
             'showClass'                  => (bool)$optionsPayload['class']['active'],
             'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
-            'showClassGrades'            => (bool)$optionsPayload['class']['grades'],
-            'showClassComments'          => (bool)$optionsPayload['class']['comments'],
-            'showClassRubrics'           => (bool)$optionsPayload['class']['rubrics'],
 
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
@@ -977,10 +986,10 @@ class Controller extends ConfigController
      * @param Collection $folderAssessments
      * @param User       $student
      * @param User       $viewer
-     * @param bool       $includeRubric
+     * @param array      $workTypeOptions
      * @return Collection
      */
-    public function collateFeedbacks(Collection $folderAssessments, User $student, User $viewer, bool $includeRubric): Collection
+    public function collateFeedbacks(Collection $folderAssessments, User $student, User $viewer, array $workTypeOptions): Collection
     {
         $feedbacks = new Collection();
         foreach ($folderAssessments as $folderId => $assessments) {
@@ -996,7 +1005,7 @@ class Controller extends ConfigController
                 }
                 $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
                 if (
-                    $includeRubric
+                    "1" === $workTypeOptions[$assessment->getWorkType()->getId()]['rubrics']
                     && $assessment instanceof DueWork
                     && $feedback instanceof DueWorkFeedback
                     && $assessment->getUseRubric()

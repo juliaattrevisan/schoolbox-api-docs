@@ -127,54 +127,6 @@
             },
         });
 
-        $('#report-summary-work-types').selectizeSelector({
-            multiple: true,
-            value: {{ options.summary.workType|json_encode|raw }},
-            selectize: {
-                create: false,
-                placeholder: 'Search work types',
-                preload: true,
-                persist: true,
-                hideSelected: true,
-                load: function (query, callback) {
-                    $.ajax({
-                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {query: query}
-                    }).done(function (result) {
-                        callback(result)
-                    }).fail(function () {
-                        callback()
-                    })
-                }
-            },
-        });
-
-        $('#report-class-work-types').selectizeSelector({
-            multiple: true,
-            value: {{ options.class.workType|json_encode|raw }},
-            selectize: {
-                create: false,
-                placeholder: 'Search work types',
-                preload: true,
-                persist: true,
-                hideSelected: true,
-                load: function (query, callback) {
-                    $.ajax({
-                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {query: query}
-                    }).done(function (result) {
-                        callback(result)
-                    }).fail(function () {
-                        callback()
-                    })
-                }
-            },
-        });
-
         /* Dynamically enable sections
          */
         $('[data-section-enabled]').each(function(index, element) {
@@ -236,6 +188,41 @@
                 });
             }
         }
+
+        /**
+         * listen to each data workTypes
+         */
+        // if selecting show for a row, we should enable all options for that row
+        document.querySelectorAll('[data-summary-worktype-show]').forEach(function(checkboxShow) {
+            checkboxShow.addEventListener('change', function() {
+                let workTypeId = this.dataset.summaryWorktypeShow;
+                // if checked, enable the row
+                if (this.checked) {
+                    document.querySelector('[data-summary-worktype-grades="'+workTypeId+'"]').disabled = false;
+                    document.querySelector('[data-summary-worktype-comments="'+workTypeId+'"]').disabled = false;
+                    document.querySelector('[data-summary-worktype-rubrics="'+workTypeId+'"]').disabled = false;
+                } else {
+                    document.querySelector('[data-summary-worktype-grades="'+workTypeId+'"]').disabled = true;
+                    document.querySelector('[data-summary-worktype-comments="'+workTypeId+'"]').disabled = true;
+                    document.querySelector('[data-summary-worktype-rubrics="'+workTypeId+'"]').disabled = true;
+                }
+            })
+        });
+        document.querySelectorAll('[data-class-worktype-show]').forEach(function(checkboxShow) {
+            checkboxShow.addEventListener('change', function() {
+                let workTypeId = this.dataset.classWorktypeShow;
+                // if checked, enable the row
+                if (this.checked) {
+                    document.querySelector('[data-class-worktype-grades="'+workTypeId+'"]').disabled = false;
+                    document.querySelector('[data-class-worktype-comments="'+workTypeId+'"]').disabled = false;
+                    document.querySelector('[data-class-worktype-rubrics="'+workTypeId+'"]').disabled = false;
+                } else {
+                    document.querySelector('[data-class-worktype-grades="'+workTypeId+'"]').disabled = true;
+                    document.querySelector('[data-class-worktype-comments="'+workTypeId+'"]').disabled = true;
+                    document.querySelector('[data-class-worktype-rubrics="'+workTypeId+'"]').disabled = true;
+                }
+            })
+        });
     });
 </script>
 
@@ -373,9 +360,42 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <label for="report-summary-work-types">Work types</label>
-                            <p class="meta">Select the Work Types you require displayed on the summary page of the summative report.</p>
-                            <select id="report-summary-work-types" name="summary[workType][]" multiple></select>
+                            <label>Work Types</label>
+                            <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
+                            <table>
+                                <tr>
+                                    <th>&nbsp;</th>
+                                    <th>Show</th>
+                                    <th>Grade</th>
+                                    <th>Comment</th>
+                                    <th>Rubric</th>
+                                </tr>
+                                {% for worktype in worktypesSummary %}
+                                <tr data-summary-worktype-id="{{ worktype.id }}">
+                                    <td>{{ worktype.name }}</td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][show]" type="hidden" value="0" />
+                                        <input data-summary-worktype-show="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-show" name="summary[workType][{{ worktype.id }}][show]" type="checkbox" value="1" {% if worktype.show ?? false %}checked="checked"{% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-show" class="checkbox-label"></label>
+                                    </td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-grades="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grades" name="summary[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
+                                    </td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-comments="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comments" name="summary[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
+                                    </td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-rubrics="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubrics" name="summary[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
                         </div>
 
                         <div class="small-12 columns">
@@ -387,25 +407,6 @@
                             <input name="summary[cohort]" type="hidden" value="0" />
                             <input id="report-summary-show-cohort" name="summary[cohort]" type="checkbox" value="1" {% if options.summary.cohort ?? false %}checked="checked"{% endif %} />
                             <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
-                        </div>
-                    </fieldset>
-                    <fieldset class="content">
-                        <legend>Assessment Options</legend>
-
-                        <div class="small-12 columns">
-                            <input name="summary[grades]" type="hidden" value="0" />
-                            <input id="report-class-summary-grade" name="summary[grades]" type="checkbox" value="1" {% if options.summary.grades ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-summary-grade" class="checkbox-label">Show grades</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="summary[comments]" type="hidden" value="0" />
-                            <input id="report-summary-show-comments" name="summary[comments]" type="checkbox" value="1" {% if options.summary.comments ?? false %}checked="checked"{% endif %} />
-                            <label for="report-summary-show-comments" class="checkbox-label">Show feedback</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="summary[rubrics]" type="hidden" value="0" />
-                            <input id="report-summary-show-rubrics" name="summary[rubrics]" type="checkbox" value="1" {% if options.summary.rubrics ?? false %}checked="checked"{% endif %} />
-                            <label for="report-summary-show-rubrics" class="checkbox-label">Show rubrics</label>
                         </div>
                     </fieldset>
                 </section>
@@ -434,9 +435,42 @@
                 <section id="section-class">
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="report-class-work-types">Work types</label>
-                            <p class="meta">Select the Work Types you require displayed on the class pages of the summative report.</p>
-                            <select id="report-class-work-types" name="class[workType][]" multiple></select>
+                            <label>Work Types</label>
+                            <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
+                            <table>
+                                <tr>
+                                    <th>&nbsp;</th>
+                                    <th>Show</th>
+                                    <th>Grade</th>
+                                    <th>Comment</th>
+                                    <th>Rubric</th>
+                                </tr>
+                                {% for worktype in worktypesClass %}
+                                    <tr data-class-worktype-id="{{ worktype.id }}">
+                                        <td>{{ worktype.name }}</td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][show]" type="hidden" value="0" />
+                                            <input data-class-worktype-show="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-show" name="class[workType][{{ worktype.id }}][show]" type="checkbox" value="1" {% if worktype.show ?? false %}checked="checked"{% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-show" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-grades="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-grades" name="class[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-comments="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-comments" name="class[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-rubrics="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-rubrics" name="class[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
                         </div>
 
                         <div class="small-12 columns">
@@ -477,24 +511,6 @@
                                 <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
                             </label>
                         </div> #}
-                    </fieldset>
-                    <fieldset class="content">
-                        <legend>Assessment Options</legend>
-                        <div class="small-12 columns">
-                            <input name="class[grades]" type="hidden" value="0" />
-                            <input id="report-class-show-grade" name="class[grades]" type="checkbox" value="1" {% if options.class.grades ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-grade" class="checkbox-label">Show grades</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="class[comments]" type="hidden" value="0" />
-                            <input id="report-class-show-comments" name="class[comments]" type="checkbox" value="1" {% if options.class.comments ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-comments" class="checkbox-label">Show feedback</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="class[rubrics]" type="hidden" value="0" />
-                            <input id="report-class-show-rubrics" name="class[rubrics]" type="checkbox" value="1" {% if options.class.rubrics ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-rubrics" class="checkbox-label">Show rubrics</label>
-                        </div>
                     </fieldset>
                 </section>
             </div>
