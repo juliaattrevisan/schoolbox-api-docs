@@ -39,9 +39,12 @@ class Controller extends Base
 
         new \Alaress_Probe($uuid, strlen($uuid));
 
+        $filters = $this->getFiltersArray();
+
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
-                'filters' => $this->getFiltersArray()
+                'filters' => $filters,
+                'filtersTerminology' => $this->getTerminologyForFilters($filters)
             ]
         );
     }
@@ -127,5 +130,14 @@ class Controller extends Base
         }
 
         return $filters;
+    }
+
+    /**
+     * @param array $filters
+     * @return array
+     */
+    private function getTerminologyForFilters(array $filters): array
+    {
+        return [];
     }
 }
