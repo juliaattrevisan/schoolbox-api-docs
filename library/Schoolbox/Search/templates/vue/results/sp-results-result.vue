@@ -8,6 +8,7 @@ import { addMarks } from "@js/util/domUtils";
 import { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
 import { useQueryStore } from "../store/spQueryStore";
+import SpResultsResultImage from "./sp-results-result-image.vue";
 import SpResultsSubResults from "./sp-results-sub-results.vue";
 
 interface Props {
@@ -38,16 +39,6 @@ const hasSubResults = window.Vue.computed(() => {
 });
 
 /**
- * Whether to use a rounded image
- */
-const isImgRounded = window.Vue.computed(() => {
-    if (props.result.type.includes(ResultTypes.USER)) {
-        return true;
-    }
-    return false;
-});
-
-/**
  * To display the date in format
  * @returns {string} the formatted date
  */
@@ -61,16 +52,7 @@ const dateFormatted = window.Vue.computed(() => {
         <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`" data-test-sp-results-result>
             <div class="l-flex-col l-gap-m l-pad-m">
                 <div class="l-flex-row l-gap-m">
-                    <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''}`">
-                        <div class="c-img__wrapper">
-                            <img
-                                v-if="props.result.image"
-                                :src="(props.result.image as string)"
-                                :alt="`Photo of ${props.result.title}`"
-                            />
-                            <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
-                        </div>
-                    </div>
+                    <sp-results-result-image :result="props.result" />
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                         <h3>
                             <!-- eslint-disable-next-line vue/no-v-html -->
