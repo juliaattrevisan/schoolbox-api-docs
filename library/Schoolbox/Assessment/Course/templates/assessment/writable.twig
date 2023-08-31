@@ -10,13 +10,8 @@ Usage:
 
 {% if assessment is quiz %}
     {% set textLinkRoute = 'learningQuiz.getQuizSummary' %}
-{% elseif assessment is project %}
-    {% set textLinkRoute = 'learningAssessment.getStatus' %}
-{% elseif assessment is lessonPlan %}
-{# We should be able to preview the Lesson plans from within the course builder component and page #}
-    {% set textLinkRoute = 'learningAssessment.getSummary' %}
 {% else %}
-    {% set textLinkRoute = '' %}
+    {% set textLinkRoute = 'learningAssessment.getStatus' %}
 {% endif %}
 
 <li data-assessment="{{ assessment.id }}">
