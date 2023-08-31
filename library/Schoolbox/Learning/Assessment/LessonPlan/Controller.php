@@ -185,6 +185,7 @@ class Controller extends Assessment\Controller
                         'id' => $unitImplId,
                         'title' => $unitImpl->getTitle(),
                         'closeDate' => $unitImpl->getDueDate()?->getUsingFormat(DATE_ATOM),
+                        'openDate' => $unitImpl->getOpenDate()?->getUsingFormat(DATE_ATOM),
                         'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
@@ -205,6 +206,7 @@ class Controller extends Assessment\Controller
                         'id' => $unitSpecId,
                         'title' => $unitSpec->getTitle(),
                         'closeDate' => null, // No Close Date for specifications
+                        'openDate' => null, // No Close Date for specifications
                         'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
@@ -218,7 +220,7 @@ class Controller extends Assessment\Controller
             'student'      => $student,
             'returnUrl'    => $returnUrl,
             'courseAssessments' => $courseAssessments,
-            'linkedAssessments' => $assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments()) : [],
+            'linkedAssessments' => $assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments($this->routeGenerator, $student)) : [],
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
