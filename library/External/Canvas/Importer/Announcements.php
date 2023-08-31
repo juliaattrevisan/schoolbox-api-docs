@@ -254,7 +254,7 @@ class Announcements
             SELECT
                 CONCAT('course_', id) AS contextCode,
                 name,
-                course_code
+                course_code as code
             FROM courses
         ";
 
