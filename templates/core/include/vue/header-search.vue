@@ -217,8 +217,8 @@ function formatPortrait(id: string) {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
-                        <div class="c-img c-img--round">
+                    <div class="l-flex-row l-flex--align-center l-gap-s l-pad-s">
+                        <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <img
                                     :src="formatPortrait(result.id)"
@@ -242,7 +242,7 @@ function formatPortrait(id: string) {
                     <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="l-flex-row l-gap-m">
+                    <div class="l-flex-row l-gap-s">
                         <div class="c-img c-img--round">
                             <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>
