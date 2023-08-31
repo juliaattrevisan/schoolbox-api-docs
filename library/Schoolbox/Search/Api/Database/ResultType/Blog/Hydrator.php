@@ -64,7 +64,7 @@ class Hydrator extends BaseHydrator
 
         // And map them to a full result
         $fullResults = array_map(
-            function (RawResult $match) use ($blogs, $viewer) {
+            function (RawResult $match) use ($blogs, $keyword, $viewer) {
                 $blog = $blogs->offsetGet($match->id);
                 if (!$blog instanceof Blog) {
                     return null;
@@ -87,7 +87,7 @@ class Hydrator extends BaseHydrator
                     null,
                     null,
                     self::BASE_TYPE,
-                    $blog->getBody(),
+                    $this->truncateAroundKeyword($keyword, $blog->getBody(), self::DESCRIPTION_LENGTH),
                     $blog->getOwner(),
                     [],
                     []

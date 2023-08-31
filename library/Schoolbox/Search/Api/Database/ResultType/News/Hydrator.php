@@ -29,11 +29,6 @@ use Schoolbox\User;
 class Hydrator extends BaseHydrator
 {
     /**
-     * Maximum length of a description as returned by this hydrator.
-     */
-    private const DESCRIPTION_LENGTH = 300;
-
-    /**
      * This hydrator's base type.
      */
     public const BASE_TYPE = 'news';
