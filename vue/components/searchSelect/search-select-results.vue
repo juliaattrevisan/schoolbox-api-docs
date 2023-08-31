@@ -106,6 +106,7 @@ function onSelected(result: Result) {
                         :selected="selected"
                         :results="props.results"
                         :result="result"
+                        :is-single-select="props.isSingleSelect"
                         @select="onSelected"
                     />
                 </template>

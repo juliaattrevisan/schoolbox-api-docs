@@ -125,7 +125,12 @@ function onRemoved(result: Result) {
 
 <template>
     <div class="c-search-select">
-        <search-select-selected :selected="props.selected" :form-value-name="props.formValueName" @remove="onRemoved" />
+        <search-select-selected
+            :selected="props.selected"
+            :form-value-name="props.formValueName"
+            :is-single-select="props.isSingleSelect"
+            @remove="onRemoved"
+        />
         <search-select-input @input="onInput" />
         <search-select-results
             :query="query"

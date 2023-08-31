@@ -11,6 +11,7 @@ interface Props {
     selected: Result[]; // the selected results
     results: Result[]; // the results returned from the search
     result: Result; // the result to display
+    isSingleSelect: boolean; // whether only one result can be selected
 }
 
 const props = defineProps<Props>();
@@ -38,7 +39,9 @@ function onSelected() {
 
 <template>
     <button class="search-result" :title="result.name" @click.prevent="onSelected">
-        <div class="checklist">
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <span v-if="props.isSingleSelect" v-html="addMarks(props.result.name, [props.query])"></span>
+        <div v-else class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
             <!-- eslint-disable-next-line vue/no-v-html -->
             <label :for="`checkbox-${result.id}`" v-html="addMarks(props.result.name, [props.query])"></label>
