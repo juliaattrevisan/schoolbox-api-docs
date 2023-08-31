@@ -348,16 +348,17 @@ class Classes implements IStrategy
 
         /* Datetimes for when this class occurs
          */
+        $allday = !$class['attributes']['startTime'] && !$class['attributes']['endTime'];
         $startAt = \Alaress_Date_Format::newDatabaseDate(sprintf(
             '%s %s',
             $class['attributes']['date'],
-            $class['attributes']['startTime']
+            $class['attributes']['startTime'] ?? '00:00:00'
         ));
 
         $finishAt = \Alaress_Date_Format::newDatabaseDate(sprintf(
             '%s %s',
             $class['attributes']['date'],
-            $class['attributes']['endTime']
+            $class['attributes']['endTime'] ?? '00:00:00'
         ));
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
@@ -380,6 +381,7 @@ class Classes implements IStrategy
             ->setLocation($room)
             ->setCode($classCode)
             ->setDay($day)
+            ->setAllday($allday)
             ->setPeriod($period)
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
