@@ -994,7 +994,7 @@ class Module extends BaseModule
                 new ValidAssessmentType([AssessmentType::TYPE_PROJECT]),
                 new Rule\All(
                     new IsSpecification(),
-                    new ValidAssessmentType([AssessmentType::TYPE_QUIZ])
+                    $this->buildAuthRuleHasInstructorAccess()
                 )
             )
         );
