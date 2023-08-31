@@ -23,8 +23,12 @@
 <script src='{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}'></script>
 
 <script>
-    // This file is used as an entire web page (inside an iframe - see attach-browser.html).
-    // Therefore, the document may not be ready at the time this script runs.
+    // This is required because chrome.twig might not be included, due to this file being used as a full web page.
+    window.cdnPrefix = "{{ CDN_PREFIX }}";
+
+    // Although this file is clearly not a full web page (no <html> tag for example), it is used as a full web
+    // page when set as the contents of an iframe by Javascript in attach-browser.html.
+    // Because this file is used as a full web page, the document may not be ready at the time this script runs.
     if (document.readyState !== 'loading') {
         main();
     } else {
