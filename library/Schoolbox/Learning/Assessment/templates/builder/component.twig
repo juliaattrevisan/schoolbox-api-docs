@@ -4,6 +4,8 @@ $data = [
     unitSpec:          UnitSpecification    - never null (if null, component displays empty-state template)
     returnUrlName:     string               - key value of returnUrl key-value pair to insert in URL
     encodedReturnUrl:  string               - encoded address of this page to return to after creating new assessments
+    USER:              User                 - the user object of the currently signed in user
+
 ];
 #}
 
@@ -38,7 +40,8 @@ $data = [
                 '_writable': true,
                 assessment:  assessment,
                 returnUrl: encodedReturnUrl,
-                returnUrlName: returnUrlName
+                returnUrlName: returnUrlName,
+                USER: USER
                 } only %}
             {% endfor %}
         </ul>

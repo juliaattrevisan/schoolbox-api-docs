@@ -69,6 +69,26 @@
 
             {# Attached files #}
             {% include '@learningAssessment/fragments/attachments.twig' with { attachments: assessment.attachments } %}
+            {# Linked Assessments #}
+            {# all assessments that I could link to... #}
+            <pre>
+                {{ courseAssessments |json_encode }}
+            </pre>
+            {% if assessment.linkedAssessments is not empty %}
+                Linked Assessments:
+                <ul>
+                {% for linked in assessment.linkedAssessments %}
+                    {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                        assessmentId: linked.id,
+                        assessment: linked,
+                        studentId: USER.id,
+                        student: USER
+                    })
+                    %}
+                    <li>{{ linked.id }} | {{ linked.title }} | {{ textLinkRoute }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
         </section>
 
         <a href="{{ returnUrl }}" class="submit button full-width">Return</a>

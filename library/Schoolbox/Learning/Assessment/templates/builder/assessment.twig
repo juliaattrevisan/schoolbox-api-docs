@@ -2,7 +2,8 @@
 Usage:
     {% include '@learningAssessment/builder/unitAssessment.twig' with {
             _writable:   bool,
-            assessment:  IAssessable
+            assessment:  IAssessable,
+            USER:        User
     } only %}
 #}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
@@ -16,6 +17,15 @@ Usage:
     {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {
         assessmentId: assessment.id,
         assessment: assessment})
+    %}
+{% elseif assessment is lessonPlan %}
+{# We should be able to preview the Lesson plans from within the course builder component and page #}
+    {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+        studentId: USER.id,
+        student: USER
+        })
     %}
 {% else %}
     {% set textLinkRoute = '' %}

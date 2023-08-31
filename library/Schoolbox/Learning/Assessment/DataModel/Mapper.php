@@ -937,6 +937,8 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithCurriculumNodes($modelList);
         // Project sub-assessments
         $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+        // Lesson Plan Linked Assessments
+        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
         return $modelList;
     }
 
@@ -1338,6 +1340,73 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             if ($model->getSubObject() instanceof LessonPlan\Model) {
                 $model->getLessonPlan()->setFields($fields->getOffset($model->getLessonPlan()->getId()));
+            }
+        }
+
+        return $modelList;
+    }
+
+    /**
+     * Assign Lesson Plan Linked assessments to each Lesson Plan instance
+     *
+     * @param Collection $modelList
+     * @param array      $lessonPlanIds
+     * @return Collection
+     * @throws Exception
+     * @throws Deleted
+     */
+    private function augmentWithLessonPlanAssessments(Collection $modelList, array $lessonPlanIds): Collection
+    {
+        // Project sub-assessments
+        if (!\count($lessonPlanIds)) {
+            return $modelList;
+        }
+
+        /* Fetch all the Lesson Plan Fields used by this Lesson Plan
+         */
+        $linkedAssessmentsMapper = LessonPlan\LinkedAssessments\Mapper::getInstance();
+
+        /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
+         */
+        $links = $linkedAssessmentsMapper->findByColumn('lesson_plan_id', $lessonPlanIds);
+
+        // if we have any links hydrate them
+        if ($links->count()) {
+            // get the correct data object to work with
+            $statement = $this->prepareSelect(
+                $this->getSelectString(),
+                $this->getFromString(),
+                new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
+                ['assessment.id' => $links->map(function (LessonPlan\LinkedAssessments\Model $link) {
+                    return $link->getAssessmentModel()->getId();
+                })],
+                ['order' => ['sequence' => 'asc']]
+            );
+            $statement->execute();
+
+            /* Inject linked assessments into each instance of a Lesson Plan
+             * This is used when grabbing stuff out of the db via the custom query elsewhere in this
+             * class so you have to do all these microhydrations manually
+             */
+            $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
+            $lessonPlans      = $lessonPlanMapper->createCollection();
+            foreach ($modelList as $model) {
+                if ($model->getSubObject() instanceof LessonPlan\Model) {
+                    $lessonPlan = $model->getLessonPlan();
+                    if (!$lessonPlan->getLinkedAssessments()) {
+                        $lessonPlan->setLinkedAssessments($this->createCollection());
+                    }
+                    $lessonPlans[$lessonPlan->getId()] = $lessonPlan;
+                }
+            }
+            $links = $links->groupByCallback(function (LessonPlan\LinkedAssessments\Model $link) {
+                return $link->getAssessmentModel()->getId();
+            });
+
+            foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
+                foreach ($links->offsetGet($subAssessment->getId()) as $lessonPlan) {
+                    $lessonPlans[$lessonPlan->getLessonPlan()->getId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+                }
             }
         }
 

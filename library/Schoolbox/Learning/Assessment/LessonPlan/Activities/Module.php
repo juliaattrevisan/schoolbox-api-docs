@@ -18,16 +18,12 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as AccessMapper;
-use Schoolbox\Role;
 
 class Module extends BaseModule
 {
@@ -46,17 +42,6 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         /**
-         * Same users who can access /course can edit this
-         */
-        $perms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
-        );
-
-        /**
          * All users should be able to view the classes lesson plans if they can see the class page
          */
         $permsAll = new Rule\All(
@@ -66,31 +51,6 @@ class Module extends BaseModule
             }, $this->getAccessMapper())
         );
 
-        $preloadCourseSpec = function (array $params) {
-            try {
-                $courseSpec = $this->getCourseSpecificationMapper()->findById($params['specId']);
-            } catch (MapperException\Deleted $e) {
-                $courseSpec = $e->getDeletedObject();
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-            }
-            // there may be no courses on class pages yet, so ignore these entries.
-            $courseImplementation = null;
-            if (null !== $params['implId']) {
-                try {
-                    $courseImplementation = $this->getCourseImplementationMapper()->findById($params['implId']);
-                } catch (MapperException\Deleted $e) {
-                    $courseImplementation = $e->getDeletedObject();
-                } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-                }
-            }
-            return [
-                'courseSpec' => $courseSpec,
-                'courseImpl' => $courseImplementation,
-            ];
-        };
-
         $preloadFolder = function (array $params) {
             try {
                 return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
@@ -98,9 +58,6 @@ class Module extends BaseModule
                 throw new NotFound();
             }
         };
-
-        // Get all activities contained within a course
-        $this->register('GET', '/course/{specId:\d+}{/implId:\d+}', 'getCourse', $perms, $preloadCourseSpec);
 
         // get lessonplans for homepage
         $this->register('GET', '/class/{folderId:\d+}', 'getHomepage', $permsAll, $preloadFolder);
@@ -121,7 +78,6 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getUnitSpecificationMapper(),
             $this->getUnitImplementationMapper(),
             $this->getCourseImplementationMapper(),
             $this->getLessonPlanMapper(),
@@ -132,26 +88,11 @@ class Module extends BaseModule
     }
 
     /**
-     * @return CourseSpecificationMapper
-     */
-    protected function getCourseSpecificationMapper(): CourseSpecificationMapper
-    {
-        return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
-    }
-    /**
      * @return CourseImplementationMapper
      */
     protected function getCourseImplementationMapper(): CourseImplementationMapper
     {
         return $this->getMapperFactory()->get(CourseImplementationMapper::class);
-    }
-
-    /**
-     * @return UnitSpecificationMapper
-     */
-    protected function getUnitSpecificationMapper(): UnitSpecificationMapper
-    {
-        return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
     }
 
     /**

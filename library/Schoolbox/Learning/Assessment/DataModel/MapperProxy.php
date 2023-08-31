@@ -1333,6 +1333,13 @@ class MapperProxy
             $lessonPlanMapper->save($subObject);
             $lessonPlanMapper->saveFields($subObject);
             $lessonPlanMapper->saveFiles($subObject);
+            $linkedAssessmentMapper = LessonPlan\LinkedAssessments\Mapper::getInstance();
+            // Only work with linked assessments if they exist
+            if ($subObject->getLinkedAssessments()) {
+                foreach ($subObject->getLinkedAssessments() as $linkedAssessment) {
+                    $linkedAssessmentMapper->persistLink($subObject, $linkedAssessment);
+                }
+            }
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }
@@ -1358,10 +1365,6 @@ class MapperProxy
             // Save sub-projects
             if ($assessable instanceof ProjectObject) {
                 foreach ($assessable->getAssessables() as $projectAssessable) {
-                    // Disallow save of projects within projects
-                    if ($projectAssessable instanceof ProjectObject) {
-                        throw new UnexpectedValueException('Projects may not contain projects');
-                    }
                     $this->save($projectAssessable, $currentUser);
                 }
             }

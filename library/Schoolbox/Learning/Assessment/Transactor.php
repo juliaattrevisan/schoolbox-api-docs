@@ -376,10 +376,6 @@ class Transactor
      */
     private function transactProjectContext(User $currentUser): string
     {
-        if ($this->assessment instanceof Project) {
-            throw new DomainException('You cannot create nested projects.');
-        }
-
         // TODO figure out what to do about this
         $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 

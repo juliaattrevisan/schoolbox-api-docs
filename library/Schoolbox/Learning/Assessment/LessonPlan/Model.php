@@ -94,6 +94,10 @@ class Model extends AbstractAssessment
      */
     private ?string $visibility = null;
 
+    /**
+     * Assessments that are linked to this lesson plan
+     */
+    private ?GenericCollection $linkedAssessments = null;
 
     /**
      * Creates a clone of this assessment.
@@ -527,5 +531,22 @@ class Model extends AbstractAssessment
     public function getCloseAt(): ?\Alaress_Date_Format
     {
         return $this->getDueAt();
+    }
+
+    /**
+     * @param GenericCollection|null $linkedAssessments
+     */
+    public function setLinkedAssessments(?GenericCollection $linkedAssessments): self
+    {
+        $this->linkedAssessments = $linkedAssessments;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getLinkedAssessments(): ?GenericCollection
+    {
+        return $this->linkedAssessments;
     }
 }

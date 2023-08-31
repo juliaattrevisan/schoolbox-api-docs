@@ -13,10 +13,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Course\Markbook\CourseMarkbook;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment;
@@ -30,7 +28,6 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param UnitSpecificationMapper    $unitSpecificationMapper
      * @param UnitImplementationMapper   $unitImplementationMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param LessonPlanMapper           $lessonPlanMapper
@@ -39,7 +36,6 @@ class Controller extends Base
      * @param AccessMapper               $accessMapper
      */
     public function __construct(
-        private UnitSpecificationMapper $unitSpecificationMapper,
         private UnitImplementationMapper $unitImplementationMapper,
         private CourseImplementationMapper $courseImplementationMapper,
         private LessonPlanMapper $lessonPlanMapper,
@@ -47,47 +43,6 @@ class Controller extends Base
         private \Component_InstanceMapper $componentInstanceMapper,
         private AccessMapper $accessMapper,
     ) {
-    }
-
-    /**
-     * Provide form
-     *
-     * @param CourseSpecification       $courseSpec
-     * @param CourseImplementation|null $courseImpl
-     */
-    public function getCourse(CourseSpecification $courseSpec, ?CourseImplementation $courseImpl): void
-    {
-        /**
-         * Assessments within the course grouped by units
-         */
-        $results = [];
-
-        // if we have specified a course implementation... then we should just return assessments within that
-        if ($courseImpl) {
-            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
-
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitImplId = $unitImpl->getId();
-                $folderId = $unitImpl->getFolder()->getId();
-                $options = ['order' => ['sequence' => 'ASC']];
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImplId], $options);
-                $unitImpl->setAssessables($assessments);
-                $results[$unitImplId] = $assessments;
-            }
-        } else {
-            $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
-
-            foreach ($courseSpec->getUnits() as $unitSpec) {
-                $unitSpecId = $unitSpec->getId();
-                $folderId = $unitSpec->getFolder()->getId();
-                $options = ['order' => ['sequence' => 'ASC']];
-                $assessments = $this->assessmentMapperProxy->findAllByUnitSpecificationId($unitSpecId, $options);
-                $unitSpec->setAssessables($assessments);
-                $results[$unitSpecId] = $assessments;
-            }
-        }
-
-        $this->response = $this->responseAsJson($results);
     }
 
     /**

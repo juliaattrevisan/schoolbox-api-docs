@@ -251,7 +251,6 @@ class Model implements ISoftDeletable
     /** @var Plan\Model[]|GenericCollection */
     private $plans;
 
-
     /**
      * Constructor
      */

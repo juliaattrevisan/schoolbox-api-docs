@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\LessonPlan\Decorator;
 use Schoolbox\Collection;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Learning\Assessment\AttachedFilesTrait;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
@@ -66,6 +67,7 @@ class Decorator implements DecoratorInterface
          */
         $lessonPlanFieldMapper = LessonPlanFieldMapper::getInstance();
         $lessonPlanTemplateMapper = LessonPlanTemplateMapper::getInstance();
+        $lessonPlanLinkedAssessmentsMapper = LinkedAssessmentsMapper::getInstance();
 
         $assessment->setLessonPlanTemplate($this->lessonPlanTemplateId);
 
@@ -158,5 +160,11 @@ class Decorator implements DecoratorInterface
         }
 
         $assessment->setAttachments($newList);
+
+        /**
+         * Linked assessments
+         */
+        $linkedAssessments = $lessonPlanLinkedAssessmentsMapper->findByColumn('lesson_plan_id', $assessment->getId());
+        $assessment->setLinkedAssessments($linkedAssessments);
     }
 }

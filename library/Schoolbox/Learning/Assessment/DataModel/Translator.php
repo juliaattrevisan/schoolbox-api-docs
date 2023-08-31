@@ -218,7 +218,6 @@ class Translator
         return $dataModel;
     }
 
-
     /**
      * @param int $depth
      * @throws UnexpectedValueException If we have recursed more than the configured level of project
@@ -229,7 +228,6 @@ class Translator
             throw new UnexpectedValueException("Invalid graph detected. Recursion depth: $depth");
         }
     }
-
 
     /**
      * Recursively descend the assessment tree, translating, caching and constructing translated tree as we go.
@@ -248,6 +246,7 @@ class Translator
         // * We don't want projects on the bottom level
         // TODO SA-5744 when descending tree during logically atomic assessment collection translation, need to use
         // TODO         a translation id to skip re-translation of entities already translated during the current translation
+        // We are also preventing projects within projects in the project mapper presave
         if ($domainObject instanceof Project) {
             $this->checkProjectNestingLevel($depth);
         }
@@ -389,6 +388,7 @@ class Translator
         // Only check nesting level if a project, as:
         // * Only projects may contain other assessments
         // * We don't want projects on the bottom level
+        // We are also preventing projects within projects in the project mapper presave
         if ($dataModel instanceof ProjectModel) {
             $this->checkProjectNestingLevel($depth);
         }
@@ -478,6 +478,21 @@ class Translator
                     $domainChild = $this->translateToDomainModelRecursive($subModel, $depth + 1);
                     $domainChild->setContext($domainObject);
                     $domainObject->getAssessables()[$idx] = $domainChild;
+                }
+            }
+        }
+
+        // As above:
+        // Ideally this would exist in the Lesson Plan translator, but that would require making this method public.
+        // That is too dangerous, best to perform an instanceof here.
+        if ($dataModel instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model && $dataModel->getLinkedAssessments() !== null) {
+            /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $domainObject */
+            $domainObject->setLinkedAssessments(new GenericCollection(IAssessable::class));
+            foreach ($dataModel->getLinkedAssessments() as $idx => $dataChild) {
+                $subModel = $dataChild->getSubObject();
+                if ($subModel) {
+                    $domainChild = $this->translateToDomainModelRecursive($subModel, $depth + 1);
+                    $domainObject->getLinkedAssessments()[$idx] = $domainChild;
                 }
             }
         }
