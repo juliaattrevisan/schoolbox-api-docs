@@ -158,7 +158,7 @@ class ScheduleCompiler
          *
          * Anyway, it's where you find a nice human-readable version of a subject's class code ($setCode)
          */
-        $subject = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0];
+        $subject = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0] ?? null;
 
         if ($subject && '' !== trim((string)$subject->Name)) {
             $subjectName = trim((string)$subject->Name);
