@@ -9,12 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments;
 
-use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Model;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan as LessonPlanData;
 use Schoolbox\Learning\Assessment\DataModel\Model as DataModelModel;
 use Schoolbox\Learning\Assessment\IAssessable;
