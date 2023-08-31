@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
+use Schoolbox\Learning\Course\DataModel\AbstractUnit;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -165,12 +166,15 @@ class Controller extends Assessment\Controller
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
             // if we are inside a project get the projects context
-            $course = null;
+            $unit = null;
             if ($assessment->getContext()->isImplementationContext()) {
                 if ($assessment->getContext() instanceof Project) {
-                    $course = $assessment->getContext()->getBaseContext()->getCourse();
+                    $unit = $assessment->getContext()->getBaseContext();
                 } else {
-                    $course = $assessment->getContext()->getCourse();
+                    $unit = $assessment->getContext();
+                }
+                if ($unit instanceof AbstractUnit) {
+                    $course = $unit->getCourse();
                 }
                 $course = $this->courseImplementationMapper->findById($course->getId());
                 $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
@@ -188,16 +192,14 @@ class Controller extends Assessment\Controller
                     ];
                 }
             } else {
-                /**
-                 * Stan complains due to the possibility of the project or assessment will only exist within a project, or unit.
-                 * It will never exist on a folder.
-                 */
+                $course = null;
                 if ($assessment->getContext() instanceof Project) {
-                    /** @phpstan-ignore-next-line */
-                    $course = $assessment->getContext()->getBaseContext()->getCourse();
+                    $unit = $assessment->getContext()->getBaseContext();
                 } else {
-                    /** @phpstan-ignore-next-line */
-                    $course = $assessment->getContext()->getCourse();
+                    $unit = $assessment->getContext();
+                }
+                if ($unit instanceof AbstractUnit) {
+                    $course = $unit->getCourse();
                 }
                 $course->setUnits($this->unitSpecificationMapper->findAllByCourseId($course->getId()));
                 foreach ($course->getUnits() as $unitSpec) {
