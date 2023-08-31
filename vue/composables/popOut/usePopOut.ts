@@ -2,10 +2,19 @@
  *  To toggle the display of the content when the button is selected
  */
 
-import { ReferenceElement, ComputePositionReturn, computePosition, flip, shift, Placement } from "@floating-ui/dom";
+import {
+    ReferenceElement,
+    ComputePositionReturn,
+    computePosition,
+    autoUpdate,
+    flip,
+    shift,
+    Placement,
+} from "@floating-ui/dom";
 import gsap from "gsap";
 import type { Ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
+import { update } from "lodash";
 
 /**
  * To toggle the display of the content when the button is selected
@@ -17,6 +26,7 @@ import { onClickOutside } from "@vueuse/core";
 export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, contentId: string) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     let content: HTMLElement; // The content to display when the button is selected
+    let cleanup: () => void; // The cleanup function returned by @floating-ui/dom
 
     /**
      * The label to display on the button,
@@ -34,6 +44,7 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
             isOpen.value = false;
             content.style.display = "none";
             content.setAttribute("aria-hidden", "true");
+            cleanup();
         }
     }
 
@@ -75,17 +86,35 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
     }
 
     /**
+     * To compute the position of the content relative to the button
+     * @returns {Promise<ComputePositionReturn>} - The position of the content
+     */
+    async function getPosition() {
+        const position = await computePosition(button.value as ReferenceElement, content, {
+            placement: "bottom-end",
+            middleware: [flip(), shift()],
+        });
+        return position;
+    }
+
+    /**
+     * To update the position of the content when the button
+     * is selected or there's a layout shift
+     */
+    async function updatePosition() {
+        const position = await getPosition();
+        content.style.left = `${position.x}px`;
+        content.style.top = `${position.y}px`;
+    }
+
+    /**
      * Open the content using @floating-ui/dom to position it relative to the button
      */
     async function open() {
         isOpen.value = true;
         content.style.display = "block"; // The element must be visible to correctly compute its position
-        const position = await computePosition(button.value as ReferenceElement, content, {
-            placement: "bottom-end",
-            middleware: [flip(), shift()],
-        });
-        content.style.left = `${position.x}px`;
-        content.style.top = `${position.y}px`;
+        cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition);
+        const position = await getPosition();
         content.setAttribute("aria-hidden", "false");
         animateOpen(position);
     }
