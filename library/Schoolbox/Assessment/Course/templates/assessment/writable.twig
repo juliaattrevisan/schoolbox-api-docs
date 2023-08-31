@@ -11,7 +11,7 @@ Usage:
 {% if assessment is quiz %}
     {% set textLinkRoute = 'learningQuiz.getQuizSummary' %}
 {% else %}
-    {% set textLinkRoute = 'learningAssessment.getStatus' %}
+    {% set textLinkRoute = 'learningAssessment.getSummary' %}
 {% endif %}
 
 <li data-assessment="{{ assessment.id }}">
