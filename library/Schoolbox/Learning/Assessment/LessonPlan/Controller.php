@@ -168,11 +168,8 @@ class Controller extends Assessment\Controller
             // if we are inside a project get the projects context
             $course = null;
             if ($assessment->getContext()->isImplementationContext()) {
-                if ($assessment->getContext() instanceof Project) {
-                    $unit = $assessment->getContext()->getBaseContext();
-                } else {
-                    $unit = $assessment->getContext();
-                }
+                $unit = $assessment->getContext()->getBaseContext();
+
                 if ($unit instanceof AbstractUnit) {
                     $course = $unit->getCourse();
                 }
@@ -192,11 +189,8 @@ class Controller extends Assessment\Controller
                     ];
                 }
             } else {
-                if ($assessment->getContext() instanceof Project) {
-                    $unit = $assessment->getContext()->getBaseContext();
-                } else {
-                    $unit = $assessment->getContext();
-                }
+                $unit = $assessment->getContext()->getBaseContext();
+
                 if ($unit instanceof AbstractUnit) {
                     $course = $unit->getCourse();
                 }
