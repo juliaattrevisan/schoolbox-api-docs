@@ -87,16 +87,6 @@ class Classes implements IStrategy
             foreach ($division as $weekId => $weekData) {
                 foreach ($weekData['days'] as $dayData) {
                     foreach ($dayData['periods'] as $periodId => $periodData) {
-                        if (!in_array($dayData['date'], [
-                            '2023-08-28',
-                            '2023-08-29',
-                            '2023-08-30',
-                            '2023-08-31',
-                            '2023-09-01',
-                        ])) {
-                            continue;
-                        }
-
                         /* guid prefix is serialized with these pieces:
                          *     isams week id
                          *     isams day id
