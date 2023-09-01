@@ -22,6 +22,11 @@ use Schoolbox\Url\Uri;
 abstract class BaseHydrator implements IHydrator
 {
     /**
+     * Maximum length of a description as returned by this hydrator.
+     */
+    public const DESCRIPTION_LENGTH = 300;
+
+    /**
      * This hydrator accepts any raw result whose:
      * * type matches `$this->getBaseType()`
      * * type starts with `$this->getBaseType() . '.'`
