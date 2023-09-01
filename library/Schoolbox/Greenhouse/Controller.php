@@ -46,14 +46,12 @@ class Controller extends Base
 //        new \Alaress_Probe($uuid, strlen($uuid));
 
         $filtersRaw = $this->getFiltersRawArray();
-        $filtersExpanded = $this->expandFiltersRawArray($filtersRaw);
 
 //var_dump(
 //    json_encode(
 //        [
 //            'filtersRaw' => $filtersRaw,
-//            'filters' => $filtersExpanded,
-//            'filtersTerminology' => $this->getTerminologyForFilters($filtersRaw)
+//            'filters' => $this->substituteTerminologyIntoFilters($filtersRaw)
 //        ]
 //    )
 //);
@@ -61,8 +59,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
-                'filters' => $filtersExpanded,
-                'filtersTerminology' => $this->getTerminologyForFilters($filtersRaw)
+                'filters' => $this->substituteTerminologyIntoFilters($filtersRaw)
             ]
         );
     }
@@ -79,70 +76,88 @@ class Controller extends Base
         $filtersRaw = [];
 
         if (true) {
-            $filtersRaw['Assessment'] = [
-                "Due Work" => null,
-                "Lesson Plan" => null,
-                "LTI" => null, // Requested by Justin.
-                "Project" => null,
-                "Quiz" => null,
-                "Task" => null,
+            $filtersRaw[] = [
+                "title" => "Assessment",
+                "value" => "assessment",
+                "subTypes" => [
+                    ["title" => "Due Work"   , "value" => "assessment.dueWork"      ],
+                    ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"   ],
+                    ["title" => "LTI"        , "value" => "assessment.ltiAssessment"],
+                    ["title" => "Project"    , "value" => "assessment.project"      ],
+                    ["title" => "Quiz"       , "value" => "assessment.quiz"         ],
+                    ["title" => "Task"       , "value" => "assessment.task"         ],
+                ]
             ];
         }
 
         if (true) { // Toggle in Modules > Home (Enable Badges Module)
-            $filtersRaw['Badges'] = null;
+            $filtersRaw[] = ["title" => "Badges", "value" => "badges"];
         }
 
         if (true) {
-            $filtersRaw["Events"] = null;
+            $filtersRaw[] = ["title" => "Events", "value" => "events"];
         }
 
         if (true) {
-            $filtersRaw["Files"] = [
-                "Audio" => null,
-                "Document" => null,
-                "Image" => null,
-                "Other" => null,
-                "Video" => null,
+            $filtersRaw[] = [
+                "title" => "Files",
+                "value" => "file",
+                "subTypes" => [
+                    ["title" => "Audio"   , "value" => "file.audio"   ],
+                    ["title" => "Document", "value" => "file.document"],
+                    ["title" => "Image"   , "value" => "file.image"   ],
+                    ["title" => "Other"   , "value" => "file.other"   ],
+                    ["title" => "Video"   , "value" => "file.video"   ],
+                ]
             ];
         }
 
         if (true) {
-            $filtersRaw["Forums"] = null;
+            $filtersRaw[] = ["title" => "Forums", "value" => "forum"];
         }
 
         if (true) {
-            $filtersRaw["Links"] = null;
+            $filtersRaw[] = ["title" => "Links", "value" => "link"];
         }
 
         if (true) {
-            $filtersRaw["News"] = null;
+            $filtersRaw[] = ["title" => "News", "value" => "news"];
         }
 
         if (true) {
-            $filtersRaw["Pages / Folders"] = [
-                "Course/Unit" => null, // Permission setting for this maybe (check feature matrix used by marketing) See Schoolbox Plan in System Settings -> Site
-                "Current Class" => null,
-                "Folder" => null,
-                "Group" => null,
-                "Homepage" => null,
+            $filtersRaw[] = [
+                "title" => "Pages / Folders",
+                "value" => "page",
+                "subTypes" => [
+                    ["title" => "Course"       , "value" => "page.course"  ], // Permission setting for this maybe (check feature matrix used by marketing) See Schoolbox Plan in System Settings -> Site
+                    ["title" => "Unit"         , "value" => "page.unit"    ],
+                    ["title" => "Current Class", "value" => "page.class"   ],
+                    ["title" => "Folder"       , "value" => "page.other"   ],
+                    ["title" => "Group"        , "value" => "page.other"   ],
+                    ["title" => "Homepage"     , "value" => "page.homepage"],
+                ]
             ];
         }
 
         if (true) {
-            $filtersRaw["Textboxes"] = null;
+            $filtersRaw[] = ["title" => "Textboxes", "value" => "textbox"];
         }
 
         if (true) {
-            $filtersRaw["Tiles"] = null;
+            $filtersRaw[] = ["title" => "Tiles", "value" => "tile"];
         }
 
         if (true) {
-            $filtersRaw["Users"] = [ // Show option if no users of that type exist?
-                "Guest" => null,
-                "Parent" => null,
-                "Staff" => null,
-                "Student" => null,
+            $filtersRaw[] = [
+                "title" => "Users",
+                "value" => "user",
+                "subTypes" => [
+                    // Show option if no users of that type exist?
+                    ["title" => "Guest"  , "value" => "user.guest"  ],
+                    ["title" => "Parent" , "value" => "user.parent" ],
+                    ["title" => "Staff"  , "value" => "user.staff"  ],
+                    ["title" => "Student", "value" => "user.student"],
+                ]
             ];
         }
 
@@ -152,57 +167,27 @@ class Controller extends Base
     /**
      * @param array $filtersRaw
      * @return array
-     *  - Example: [
-     *       'Due Work' => [
-     *           'singular'       => 'assignment',
-     *           'plural'         => 'assignments',
-     *           'properSingular' => 'Assignment',
-     *           'properPlural'   => 'Assignments'
-     *       ],
-     *       ...
-     *    ]
-     *
      */
-    private function getTerminologyForFilters(array $filtersRaw): array
+    private function substituteTerminologyIntoFilters(array $filtersRaw): array
     {
-        $terminologyBySingularForm = [];
+        $filtersWithTerminology = [];
 
-        foreach ($filtersRaw as $name => $moreFilters) {
-            if (is_array($moreFilters)) {
-                $terminologyBySingularForm = array_merge(
-                    $terminologyBySingularForm,
-                    $this->getTerminologyForFilters($moreFilters)
-                );
-            } else {
-                $terminology = self::getTerminologyMatchingSingularForm(strtolower($name));
+        foreach ($filtersRaw as $filterRaw) {
+            $terminology = self::getTerminologyMatchingSingularForm(strtolower($filterRaw["title"]));
 
-                if ($terminology !== null) {
-                    $terminologyBySingularForm[$name] = $terminology;
-                }
-            }
-        }
-
-        return $terminologyBySingularForm;
-    }
-
-    /**
-     * @param array $filtersRaw
-     * @return array
-     */
-    private function expandFiltersRawArray(array $filtersRaw): array
-    {
-        $filtersExpanded = [];
-
-        foreach ($filtersRaw as $filterName => $moreFiltersRaw) {
-            $terminology = self::getTerminologyMatchingSingularForm(strtolower($filterName));
-            $filtersExpanded[] = [
-                "title" => $filterName,
-                "value" => ($terminology === null ? null : $terminology['term']),
-                "subTypes" => is_array($moreFiltersRaw) ? $this->expandFiltersRawArray($moreFiltersRaw) : []
+            $filterWithTerminology = [
+                "title" => (($terminology === null) ? $filterRaw["title"]: $terminology["singular"]),
+                "value" => $filterRaw["value"],
             ];
+
+            if (array_key_exists('subTypes', $filterRaw) && count($filterRaw["subTypes"]) > 0) {
+                $filterWithTerminology["subTypes"] = $this->substituteTerminologyIntoFilters($filterRaw["subTypes"]);
+            }
+
+            $filtersWithTerminology[] = $filterWithTerminology;
         }
 
-        return $filtersExpanded;
+        return $filtersWithTerminology;
     }
 
     /**
@@ -217,8 +202,7 @@ class Controller extends Base
             $terminologyBySingularForm = [];
 
             foreach (self::$l10nMapper->findAll()->sortNaturally('title') as $termObj) {
-                $singularForm = strtolower($termObj->getSingularForm());
-                $terminologyBySingularForm[$singularForm] = array_merge(
+                $terminologyBySingularForm[strtolower($termObj->getSingularForm())] = array_merge(
                     $termObj->allForms(),
                     ['term' => $termObj->getTerm()]
                 );
