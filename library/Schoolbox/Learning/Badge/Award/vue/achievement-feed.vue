@@ -234,6 +234,7 @@ export default {
                                     <nav>
                                         <wc-actions-dropdown
                                             :content-id="generateIdentifier(award)"
+                                            :data-test="`wc-actions-dropdown-${generateIdentifier(award)}`"
                                         ></wc-actions-dropdown>
                                     </nav>
                                     <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
