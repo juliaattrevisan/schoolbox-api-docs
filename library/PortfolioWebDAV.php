@@ -147,7 +147,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings = [
                         'baseUri' => $dav->getUri(),
                         'userName' => $dav->getUsernamePrefix() . $_SESSION['username'] . $dav->getUsernameSuffix(),
-                        'password' => $_SESSION['password'],
+                        'password' => $_SESSION['password'] ?? '',
                     ];
                 }
 
