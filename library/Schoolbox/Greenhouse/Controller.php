@@ -47,15 +47,15 @@ class Controller extends Base
 
         $filtersRaw = $this->getFiltersRawArray();
 
-//var_dump(
-//    json_encode(
-//        [
-//            'filtersRaw' => $filtersRaw,
-//            'filters' => $this->substituteTerminologyIntoFilters($filtersRaw)
-//        ]
-//    )
-//);
-//die;
+var_dump(
+    json_encode(
+        [
+            'filtersRaw' => $filtersRaw,
+            'filters' => $this->substituteTerminologyIntoFilters($filtersRaw)
+        ]
+    )
+);
+die;
 
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
