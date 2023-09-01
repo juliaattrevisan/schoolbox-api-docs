@@ -185,7 +185,9 @@ class Controller extends Assessment\Controller
                         'id' => $unitImplId,
                         'title' => $unitImpl->getTitle(),
                         'closeDate' => $unitImpl->getDueDate()?->getUsingFormat(DATE_ATOM),
+                        'closeDateFormatted'  => $unitImpl->getDueDate()?->getRelativeTime(),
                         'openDate' => $unitImpl->getOpenDate()?->getUsingFormat(DATE_ATOM),
+                        'openDateFormatted'  => $unitImpl->getOpenDate()?->getRelativeTime(),
                         'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
@@ -206,7 +208,9 @@ class Controller extends Assessment\Controller
                         'id' => $unitSpecId,
                         'title' => $unitSpec->getTitle(),
                         'closeDate' => null, // No Close Date for specifications
-                        'openDate' => null, // No Close Date for specifications
+                        'closeDateFormatted' => null, // No Close Date for specifications
+                        'openDate' => null, // No Open Date for specifications
+                        'openDateFormatted' => null, // No Open Date for specifications
                         'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
