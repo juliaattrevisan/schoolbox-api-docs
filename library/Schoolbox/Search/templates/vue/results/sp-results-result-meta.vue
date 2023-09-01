@@ -22,15 +22,23 @@ const props = withDefaults(defineProps<Props>(), {
  * To display the date in format
  * @returns {string} the formatted date
  */
-const dateFormatted = window.Vue.computed(() => {
+function getDateShort() {
     return window.dayjs(props.result.date).format("DD/MM/YYYY");
-});
+}
+
+/**
+ * To display the date in format
+ * @returns {string} the formatted date
+ */
+function getDateLong() {
+    return window.dayjs(props.result.date).format("dddd, MMMM D, YYYY");
+}
 </script>
 
 <template>
     <span v-if="props.result.type === ResultTypes.NEWS" class="meta"
         >Posted by <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
-        {{ dateFormatted }}</span
+        {{ getDateShort() }}</span
     >
     <span v-else-if="props.result.meta" class="meta">{{ props.result.meta }}</span>
     <span v-else-if="props.result.context && !props.isSubResult" class="meta"
@@ -41,8 +49,9 @@ const dateFormatted = window.Vue.computed(() => {
     >
     <span v-else-if="props.result.type.includes(ResultTypes.FILE)" class="meta"
         >Created by <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
-        {{ dateFormatted }}</span
+        {{ getDateShort() }}</span
     >
+    <span v-else-if="props.result.type === ResultTypes.EVENT" class="meta"> {{ getDateLong() }}</span>
 </template>
 
 <style scoped></style>
