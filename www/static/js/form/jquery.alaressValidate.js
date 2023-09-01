@@ -83,7 +83,19 @@
      * Custom email validation method: allow any non-ASCII character
      */
     $.validator.methods.email = function( value, element ) {
-        return this.optional(element) || value.match(/.+@.+/);
+        if (this.optional(element)) {
+            return true;
+        }
+        // The "official" email validation regexp from
+        // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address,
+        // extended to allow support for multibyte characters.
+        // Basic matches: letters, numbers, any non-ASCII char
+        const letterClass = 'a-zA-Z0-9\\P{ASCII}';
+        const emailRegexp = new RegExp(
+            `^[${letterClass}.!#$%&'*+\\/=?^_\`{|}~-]+@[${letterClass}](?:[${letterClass}-]{0,61}[${letterClass}])?(?:\\.[${letterClass}](?:[${letterClass}-]{0,61}[${letterClass}])?)*$`,
+            'u'
+        );
+        return value.match(emailRegexp);
     };
 
     /**
