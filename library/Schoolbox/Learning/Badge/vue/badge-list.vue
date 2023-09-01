@@ -376,6 +376,7 @@ export default {
                                 <nav v-if="showBadgeMenus">
                                     <wc-actions-dropdown
                                         :content-id="`badge-${badge.id}-dropdown`"
+                                        :data-test="`wc-actions-dropdown-badge-${badge.id}-dropdown`"
                                     ></wc-actions-dropdown>
                                 </nav>
                                 <ul
