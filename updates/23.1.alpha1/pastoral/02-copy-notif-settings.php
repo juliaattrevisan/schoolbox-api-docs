@@ -25,7 +25,7 @@ $app = new class extends CliTool\App {
         $statement = $this->getDatabaseInternal()->executeQuery($query);
         $roleIds   = $statement->fetchColumnArray('id');
 
-        // find userAccess without userGroups
+        // find msg_source_id to copy from/to
         $query       = "SELECT `msg_source`.`id`, `slug`, `key`
                 FROM `msg_source`
                 JOIN `msg_namespace` ON `msg_namespace`.`id` = `msg_source`.`namespace`
@@ -40,26 +40,26 @@ $app = new class extends CliTool\App {
         foreach ($msgSources as $msgSource) {
             if ($msgSource['key'] === 'createdRelated') {
                 $toSources[$msgSource['slug']]['created'] = $msgSource['id'];
+            } elseif ($msgSource['key'] === 'updatedRelated') {
+                $toSources[$msgSource['slug']]['updated'] = $msgSource['id'];
             } else {
-                if ($msgSource['key'] === 'updatedRelated') {
-                    $toSources[$msgSource['slug']]['updated'] = $msgSource['id'];
-                } else {
-                    $fromSources[] = $msgSource;
-                }
+                $fromSources[] = $msgSource;
             }
         }
-        $roleBindings  = \Alaress\Database\Predicate\Builder::getBindings($roleIds, 'role');
+        $roleBindings = \Alaress\Database\Predicate\Builder::getBindings($roleIds, 'role');
+
+        // copy role settings for existing notifications to new notifications
         $insertForRole = "
             INSERT INTO msg_route_perm (msg_source_id, role_id, mask, role_default)
             SELECT :to_source_id, role_id, mask, role_default FROM msg_route_perm
             WHERE msg_source_id = :from_source_id AND role_id IN ({$roleBindings->getPlaceholder()})
         ";
+        // copy user settings for existing notifications to new notifications
         $insertForUser = "
             INSERT INTO msg_reroute (msg_source_id, user_id, delivery)
             SELECT :to_source_id, user_id, delivery FROM msg_reroute
             WHERE msg_source_id = :from_source_id
         ";
-
 
         foreach ($fromSources as $fromSource) {
             $this->getDatabaseInternal()->executeQuery(
