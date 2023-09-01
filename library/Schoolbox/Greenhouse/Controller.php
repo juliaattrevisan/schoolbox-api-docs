@@ -45,13 +45,15 @@ class Controller extends Base
 
 //        new \Alaress_Probe($uuid, strlen($uuid));
 
-        $filters = $this->getFiltersArray();
+        $filtersRaw = $this->getFiltersRawArray();
+        $filtersExpanded = $this->expandFiltersRawArray($filtersRaw);
 
 //var_dump(
 //    json_encode(
 //        [
-//            'filters' => $filters,
-//            'filtersTerminology' => $this->getTerminologyForFilters($filters)
+//            'filtersRaw' => $filtersRaw,
+//            'filters' => $filtersExpanded,
+//            'filtersTerminology' => $this->getTerminologyForFilters($filtersRaw)
 //        ]
 //    )
 //);
@@ -59,8 +61,8 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
-                'filters' => $filters,
-                'filtersTerminology' => $this->getTerminologyForFilters($filters)
+                'filters' => $filtersExpanded,
+                'filtersTerminology' => $this->getTerminologyForFilters($filtersRaw)
             ]
         );
     }
@@ -68,16 +70,16 @@ class Controller extends Base
     /**
      * @return array - Array of filter names indexed by group name.
      */
-    private function getFiltersArray(): array
+    private function getFiltersRawArray(): array
     {
         // The hard-coded filters list returned by this function comes from https://schoolbox.atlassian.net/browse/SA-7782.
 
         // TODO: All the feature toggles relevant to filters are used in conf/modules/Learning.php.
 
-        $filters = [];
+        $filtersRaw = [];
 
         if (true) {
-            $filters['Assessment'] = [
+            $filtersRaw['Assessment'] = [
                 "Due Work" => null,
                 "Lesson Plan" => null,
                 "LTI" => null, // Requested by Justin.
@@ -88,15 +90,15 @@ class Controller extends Base
         }
 
         if (true) { // Toggle in Modules > Home (Enable Badges Module)
-            $filters['Badges'] = null;
+            $filtersRaw['Badges'] = null;
         }
 
         if (true) {
-            $filters["Events"] = null;
+            $filtersRaw["Events"] = null;
         }
 
         if (true) {
-            $filters["Files"] = [
+            $filtersRaw["Files"] = [
                 "Audio" => null,
                 "Document" => null,
                 "Image" => null,
@@ -106,19 +108,19 @@ class Controller extends Base
         }
 
         if (true) {
-            $filters["Forums"] = null;
+            $filtersRaw["Forums"] = null;
         }
 
         if (true) {
-            $filters["Links"] = null;
+            $filtersRaw["Links"] = null;
         }
 
         if (true) {
-            $filters["News"] = null;
+            $filtersRaw["News"] = null;
         }
 
         if (true) {
-            $filters["Pages / Folders"] = [
+            $filtersRaw["Pages / Folders"] = [
                 "Course/Unit" => null, // Permission setting for this maybe (check feature matrix used by marketing) See Schoolbox Plan in System Settings -> Site
                 "Current Class" => null,
                 "Folder" => null,
@@ -128,15 +130,15 @@ class Controller extends Base
         }
 
         if (true) {
-            $filters["Textboxes"] = null;
+            $filtersRaw["Textboxes"] = null;
         }
 
         if (true) {
-            $filters["Tiles"] = null;
+            $filtersRaw["Tiles"] = null;
         }
 
         if (true) {
-            $filters["Users"] = [ // Show option if no users of that type exist?
+            $filtersRaw["Users"] = [ // Show option if no users of that type exist?
                 "Guest" => null,
                 "Parent" => null,
                 "Staff" => null,
@@ -144,11 +146,11 @@ class Controller extends Base
             ];
         }
 
-        return $filters;
+        return $filtersRaw;
     }
 
     /**
-     * @param array $filters
+     * @param array $filtersRaw
      * @return array
      *  - Example: [
      *       'Due Work' => [
@@ -161,11 +163,11 @@ class Controller extends Base
      *    ]
      *
      */
-    private function getTerminologyForFilters(array $filters): array
+    private function getTerminologyForFilters(array $filtersRaw): array
     {
         $terminologyBySingularForm = [];
 
-        foreach ($filters as $name => $moreFilters) {
+        foreach ($filtersRaw as $name => $moreFilters) {
             if (is_array($moreFilters)) {
                 $terminologyBySingularForm = array_merge(
                     $terminologyBySingularForm,
@@ -184,7 +186,27 @@ class Controller extends Base
     }
 
     /**
-     * @param $name
+     * @param array $filtersRaw
+     * @return array
+     */
+    private function expandFiltersRawArray(array $filtersRaw): array
+    {
+        $filtersExpanded = [];
+
+        foreach ($filtersRaw as $filterName => $moreFiltersRaw) {
+            $terminology = self::getTerminologyMatchingSingularForm(strtolower($filterName));
+            $filtersExpanded[] = [
+                "title" => $filterName,
+                "value" => ($terminology === null ? null : $terminology['term']),
+                "subTypes" => is_array($moreFiltersRaw) ? $this->expandFiltersRawArray($moreFiltersRaw) : []
+            ];
+        }
+
+        return $filtersExpanded;
+    }
+
+    /**
+     * @param string $name
      * @return array|null
      */
     private static function getTerminologyMatchingSingularForm($name): array|null
@@ -196,7 +218,10 @@ class Controller extends Base
 
             foreach (self::$l10nMapper->findAll()->sortNaturally('title') as $termObj) {
                 $singularForm = strtolower($termObj->getSingularForm());
-                $terminologyBySingularForm[$singularForm] = $termObj->allForms();
+                $terminologyBySingularForm[$singularForm] = array_merge(
+                    $termObj->allForms(),
+                    ['term' => $termObj->getTerm()]
+                );
             }
         }
 
