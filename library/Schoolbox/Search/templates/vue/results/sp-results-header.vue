@@ -17,7 +17,21 @@ const searchStore = useSearchStore();
  * @returns {boolean}
  */
 const showHeader = window.Vue.computed(() => {
-    return !searchStore.hasNotSearched && !searchStore.isSearching && !searchStore.hasLoadError;
+    return !searchStore.hasNotSearched;
+});
+
+/**
+ * To show that no results match the current search
+ * @returns {boolean}
+ */
+const titleStart = window.Vue.computed(() => {
+    if (searchStore.isSearching) {
+        return "Searching for";
+    }
+    if (resultsStore.hasResults) {
+        return "Showing";
+    }
+    return "No";
 });
 
 /**
@@ -25,8 +39,7 @@ const showHeader = window.Vue.computed(() => {
  * @returns {boolean}
  */
 const title = window.Vue.computed(() => {
-    const showing = resultsStore.hasResults ? "Showing" : "No";
-    return `${showing} results for <strong>${queryStore.activeQuery}</strong>`;
+    return `${titleStart.value} results for <em>${queryStore.activeQuery}</em>`;
 });
 </script>
 

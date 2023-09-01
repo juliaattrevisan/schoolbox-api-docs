@@ -87,7 +87,7 @@ function onSelected(result: Result) {
     <div ref="searchResultsContainerEl" class="search-results-container">
         <div ref="searchResultsEl" class="search-results">
             <div v-if="props.isSearching" class="search-status">Searching for results....</div>
-            <div v-else-if="props.results.length === 0" class="search-status">
+            <div v-else-if="props.results.length === 0 && props.selected.length === 0" class="search-status">
                 No results found for your current search.
             </div>
             <template v-else>

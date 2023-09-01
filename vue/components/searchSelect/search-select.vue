@@ -37,9 +37,12 @@ const url = window.Vue.computed(() => {
 });
 
 /**
- * Return the default results if the query is empty
+ * Return the results depending on the current state
  */
 const results = window.Vue.computed(() => {
+    if (props.selected.length === 1 && props.isSingleSelect) {
+        return [];
+    }
     if (props.defaultResults && !canSearch.value) {
         return props.defaultResults;
     }
