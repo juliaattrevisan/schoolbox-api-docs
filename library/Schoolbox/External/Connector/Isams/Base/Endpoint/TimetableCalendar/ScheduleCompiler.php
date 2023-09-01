@@ -319,7 +319,7 @@ class ScheduleCompiler
      */
     private function findSubjectStudents(string $setCode, string $divisionId): array
     {
-        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]");
 
         $students = [];
 
