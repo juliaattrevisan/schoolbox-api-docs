@@ -7,7 +7,7 @@ import type { Results } from "../../../js/types/Results";
 import type { Result } from "../../../js/types/Result";
 import { useHasMoreResults } from "../composable/useHasMoreResults";
 
-export const RESULT_LIMIT = 20; // number of results returned by the api on a single call
+export const RESULT_LIMIT = 10; // number of results returned by the api on a single call
 export const SUB_RESULT_LIMIT = 10; // number of sub results returned by the api on a single call
 
 export const useResultsStore = defineStore("spResults", () => {
@@ -42,6 +42,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @param {Result[]} firstResults - the results to set
      */
     function setFirstResults(firstResults: Result[]) {
+        hasLoadedAllResults.value = false;
         results.value = firstResults;
         // if we have less results than the limit, we have loaded all results
         if (results.value.length < RESULT_LIMIT) {
