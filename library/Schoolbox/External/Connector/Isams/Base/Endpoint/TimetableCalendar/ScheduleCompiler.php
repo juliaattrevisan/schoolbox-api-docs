@@ -143,10 +143,31 @@ class ScheduleCompiler
             $staff[] = $this->findSubjectStaff((string)$teacher->xpath('@StaffId')[0]);
         }
 
+        /* Subject name is found in this random place, Departments > Subjects
+         * But start with a default in case Departments and Subjects was not turned on
+         */
+        $subjectName = trim((string)$node[0]->Name);
+
+        /* Try to find a nice human-readable version of the $subjectName
+         * (at this point it's actually the set code, despite what the xml says)
+         */
+        $subjectId = trim((string)$node->xpath('@SubjectId')[0]->SubjectId);
+
+        /* This node won't exist unless "Departments and Subjects" is turned on in schools' iSAMS
+         * (it's some kind of isams configuration setting, and thus, optional)
+         *
+         * Anyway, it's where you find a nice human-readable version of a subject's class code ($setCode)
+         */
+        $subject = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0] ?? null;
+
+        if ($subject && '' !== trim((string)$subject->Name)) {
+            $subjectName = trim((string)$subject->Name);
+        }
+
         return [
             'subjectId' => (string)$node->SubjectId,
             'code' => $setCode,
-            'name' => trim((string)$node[0]->Name),
+            'name' => $subjectName,
             'regularStaff' => $staff,
             'students' => $this->findSubjectStudents($setCode, $divisionId)
         ];

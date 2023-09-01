@@ -249,7 +249,7 @@ class Classes implements IStrategy
 
         $period = trim((string)$periodData['name']);
         $room = trim((string)$classData['room']['name']);
-        $title = $classData['code'];
+        $title = $subject['name'];
 
         /* Datetimes for when this class occurs
          */
