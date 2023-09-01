@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import { kebabCase } from "lodash";
+import { useLinkedActivitiesStore, Activity } from "./store/linkedActivitiesStore";
+
+/**
+ *
+ */
+
+interface Props {
+    activity: Activity;
+    sourceId: number;
+}
+
+const props = defineProps<Props>();
+
+const store = useLinkedActivitiesStore();
+
+const activityIsLinked = window.Vue.computed(() => {
+    return store.linkedActivities.some((assessmentItem) => assessmentItem.id === props.activity.id);
+});
+
+const activityIsSelected = window.Vue.computed(() => {
+    return store.selectedActivities.some((assessmentItem) => assessmentItem.id === props.activity.id);
+});
+
+/**
+ * Toggle the selected state of an activity
+ */
+function toggleActivitySelection() {
+    const linked = activityIsSelected.value;
+    if (linked) {
+        store.removeActivity(props.activity);
+    } else {
+        store.addActivity(props.activity);
+    }
+}
+</script>
+
+<template>
+    <div>
+        <div class="selector">
+            <input
+                :id="'chk-assessment-' + props.activity.id"
+                type="checkbox"
+                :checked="activityIsSelected"
+                @change="toggleActivitySelection()"
+            />
+            <label :for="'chk-assessment-' + props.activity.id" class="checkbox-label"></label>
+        </div>
+        <div class="small-12 compact card wrap-down">
+            <span :class="'icon-' + kebabCase(props.activity.assessmentType)"></span>
+            <p>{{ props.activity.title }}</p>
+            <p v-if="props.activity.closeAt !== null" class="meta">
+                <span class="unit-task-due-date"> Due {{ props.activity.closeAtFormatted }} </span>
+            </p>
+        </div>
+    </div>
+</template>
+
+<style scoped></style>

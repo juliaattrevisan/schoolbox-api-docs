@@ -151,6 +151,7 @@ module.exports = {
         checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js",
         similarityReport:
             "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js",
+        linkedActivities: "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",

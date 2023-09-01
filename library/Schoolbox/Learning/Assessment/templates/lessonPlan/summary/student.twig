@@ -8,6 +8,8 @@
  # @param bool $isInstructor           A bool for whether currently logged in user is instructor (they see staff-only fields)
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row actions-small-1">
@@ -66,31 +68,55 @@
                     });
                 </script>
             {% endif %}
+        </section>
+    </div>
 
-            {# Attached files #}
-            {% include '@learningAssessment/fragments/attachments.twig' with { attachments: assessment.attachments } %}
+    <div class="small-12 island">
+        <section>
+            {% if assessment.attachments is not empty %}
+                <fieldset>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <h2>Attachments</h2>
+                            <section>
+                                {# Attached files #}
+                                {% include '@learningAssessment/fragments/attachments.twig' with { attachments: assessment.attachments } %}
+                            </section>
+                        </div>
+                    </div>
+                </fieldset>
+            {% endif %}
+
             {# Linked Assessments #}
-            {# all assessments that I could link to... #}
-            <pre>
-                {{ courseAssessments |json_encode }}
-            </pre>
-            {% if assessment.linkedAssessments is not empty %}
-                Linked Assessments:
-                <ul>
-                {% for linked in assessment.linkedAssessments %}
-                    {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                        assessmentId: linked.id,
-                        assessment: linked,
-                        studentId: USER.id,
-                        student: USER
-                    })
-                    %}
-                    <li>{{ linked.id }} | {{ linked.title }} | {{ textLinkRoute }}</li>
-                {% endfor %}
-                </ul>
+            {% if assessment.linkedAssessments is not empty or isInstructor %}
+                <fieldset>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <h2>Linked Activities</h2>
+
+                            <div id="linked-activities-container">
+                                <linked-activities
+                                    :source-id = '{{ assessment.id }}'
+                                    :course-assessments = '{{ courseAssessments |json_encode }}'
+                                    :linked-activities = '{{ linkedAssessments |json_encode }}'
+                                    :is-instructor = '{% if isInstructor %}true{% else %}false{% endif %}'
+                                />
+                            </div>
+                            <script src="{{ CDN_PREFIX }}/js/bundle/linkedActivities.js?v={{ config.site_version }}"></script>
+
+                            {% if isInstructor %}
+                                <section>
+                                    <a href="#"
+                                        class="button icon-link"
+                                        data-reveal-id="link-activities-modal-{{ assessment.id }}"
+                                    >Link Activities</a>
+                                </section>
+                            {% endif %}
+                        </div>
+                    </div>
+                </fieldset>
             {% endif %}
         </section>
-
         <a href="{{ returnUrl }}" class="submit button full-width">Return</a>
     </div>
 </div>
