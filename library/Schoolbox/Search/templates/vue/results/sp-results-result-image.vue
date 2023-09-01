@@ -8,8 +8,11 @@ import { ResultTypes } from "../../js/types/ResultTypes";
 
 interface Props {
     result: Result; // the result to display
+    isSubResult?: boolean; // whether this is a sub result
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    isSubResult: false,
+});
 
 /**
  * Whether to use a rounded image
@@ -23,7 +26,7 @@ const isImgRounded = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''}`">
+    <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`">
         <div class="c-img__wrapper">
             <img
                 v-if="props.result.image"

@@ -110,11 +110,9 @@ function isLast(index: number) {
         :sub-result="subResult"
         :is-last="isLast(index)"
     />
-    <div class="load-more-container">
-        <loading-table v-if="isLoading" :rows="2" />
-        <sp-results-error v-else-if="hasLoadError" />
-        <button v-else-if="showLoadMore" @click.prevent="onLoadMoreSelected">Load more sub results</button>
-    </div>
+    <loading-table v-if="isLoading" :rows="2" />
+    <sp-results-error v-else-if="hasLoadError" />
+    <button v-else-if="showLoadMore" @click.prevent="onLoadMoreSelected">Load more sub results</button>
 </template>
 
 <style scoped></style>

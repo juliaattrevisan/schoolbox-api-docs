@@ -10,8 +10,11 @@ import { ResultTypes } from "../../js/types/ResultTypes";
 
 interface Props {
     result: Result; // the result to display
+    isSubResult?: boolean; // whether this is a sub result
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    isSubResult: false,
+});
 
 // const queryStore = useQueryStore();
 
@@ -30,11 +33,15 @@ const dateFormatted = window.Vue.computed(() => {
         {{ dateFormatted }}</span
     >
     <span v-else-if="props.result.meta" class="meta">{{ props.result.meta }}</span>
-    <span v-else-if="props.result.context" class="meta"
+    <span v-else-if="props.result.context && !props.isSubResult" class="meta"
         ><template v-for="(context, index) in props.result.context" :key="context.id"
             ><a :href="context._links.view">{{ context.title }}</a
             ><template v-if="index < props.result.context.length - 1"> > </template>
         </template></span
+    >
+    <span v-else-if="props.result.type.includes(ResultTypes.FILE)" class="meta"
+        >Created by <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
+        {{ dateFormatted }}</span
     >
 </template>
 

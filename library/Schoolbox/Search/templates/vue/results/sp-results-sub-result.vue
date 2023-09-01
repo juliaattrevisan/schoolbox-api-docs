@@ -3,55 +3,30 @@
  * To display a single linked sub result within a result
  */
 
-import { addMarks } from "@js/util/domUtils";
 import { Result } from "../../js/types/Result";
-import { ResultTypes } from "../../js/types/ResultTypes";
-import { useQueryStore } from "../store/spQueryStore";
+import SpResultsResultImage from "./sp-results-result-image.vue";
+import SpResultsResultTitle from "./sp-results-result-title.vue";
+import SpResultsResultMeta from "./sp-results-result-meta.vue";
+import SpResultsResultDescription from "./sp-results-result-description.vue";
 
 interface Props {
     subResult: Result; // the result to display
-    isLast: boolean; // whether this is the last result
+    isLast: boolean; // whether this is the last result, currently to determine whether to show the border
 }
 const props = defineProps<Props>();
-
-const queryStore = useQueryStore();
-
-/**
- * To display the date in format
- * @returns {string} the formatted date
- */
-const dateFormatted = window.Vue.computed(() => {
-    return window.dayjs(props.subResult.date).format("DD/MM/YYYY");
-});
 </script>
 
 <template>
     <div :class="`c-card c-card--child ${!props.isLast ? `c-card--border-end` : ''}`">
-        <div class="l-flex-row l-gap-s l-pad-s">
-            <div class="c-img c-img--s">
-                <div class="c-img__wrapper">
-                    <img
-                        v-if="props.subResult.image"
-                        :src="(props.subResult.image as string)"
-                        :alt="`Photo of ${props.subResult.title}`"
-                    />
-                    <div v-else-if="props.subResult.icon" :class="`icon icon-${props.subResult.icon}`"></div>
+        <div class="l-flex-col l-gap-s l-pad-s">
+            <div class="l-flex-row l-gap-s l-pad-s">
+                <sp-results-result-image :result="props.subResult" :is-sub-result="true" />
+                <div class="l-flex-col l-flex--justify-center f-no-margins">
+                    <sp-results-result-title :result="props.subResult" :is-sub-result="true" />
+                    <sp-results-result-meta :result="props.subResult" :is-sub-result="true" />
                 </div>
             </div>
-            <div class="l-flex-col l-flex--justify-center f-no-margins">
-                <h6 class="">
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <a
-                        :href="props.subResult.url"
-                        v-html="addMarks(props.subResult.title, queryStore.queryWordList)"
-                    ></a>
-                </h6>
-                <span v-if="props.subResult.type.includes(ResultTypes.FILE)" class="meta"
-                    >Created by
-                    <a :href="props.subResult.creator?._links?.profile">{{ props.subResult.creator?.fullName }}</a> on
-                    {{ dateFormatted }}</span
-                >
-            </div>
+            <sp-results-result-description v-if="props.subResult.description" :result="props.subResult" />
         </div>
     </div>
 </template>
