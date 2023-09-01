@@ -360,6 +360,17 @@
                         </div>
 
                         <div class="small-12 columns">
+                            <input name="summary[overallGrade]" type="hidden" value="0" />
+                            <input id="report-summary-show-overall-grade" name="summary[overallGrade]" type="checkbox" value="1" {% if options.summary.overallGrade ?? false %}checked="checked"{% endif %} />
+                            <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="summary[cohort]" type="hidden" value="0" />
+                            <input id="report-summary-show-cohort" name="summary[cohort]" type="checkbox" value="1" {% if options.summary.cohort ?? false %}checked="checked"{% endif %} />
+                            <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
+                        </div>
+
+                        <div class="small-12 columns">
                             <label>Work Types</label>
                             <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
                             <table>
@@ -397,17 +408,6 @@
                                 {% endfor %}
                             </table>
                         </div>
-
-                        <div class="small-12 columns">
-                            <input name="summary[overallGrade]" type="hidden" value="0" />
-                            <input id="report-summary-show-overall-grade" name="summary[overallGrade]" type="checkbox" value="1" {% if options.summary.overallGrade ?? false %}checked="checked"{% endif %} />
-                            <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input name="summary[cohort]" type="hidden" value="0" />
-                            <input id="report-summary-show-cohort" name="summary[cohort]" type="checkbox" value="1" {% if options.summary.cohort ?? false %}checked="checked"{% endif %} />
-                            <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
-                        </div>
                     </fieldset>
                 </section>
 
@@ -434,6 +434,18 @@
 
                 <section id="section-class">
                     <fieldset class="content">
+                        <div class="small-12 columns">
+                            <input name="class[overallGrade]" type="hidden" value="0" />
+                            <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[cohort]" type="hidden" value="0" />
+                            <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
+                        </div>
+
                         <div class="small-12 columns">
                             <label>Work Types</label>
                             <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
@@ -473,17 +485,6 @@
                             </table>
                         </div>
 
-                        <div class="small-12 columns">
-                            <input name="class[overallGrade]" type="hidden" value="0" />
-                            <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
-                        </div>
-
-                        <div class="small-12 columns">
-                            <input name="class[cohort]" type="hidden" value="0" />
-                            <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
-                        </div>
                         {# NONE of this exists yet....
                         <div class="small-12 columns">
                             <input disabled="disabled" name="class[learningLevels]" type="hidden" value="0" />
