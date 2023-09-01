@@ -47,6 +47,16 @@ class Controller extends Base
 
         $filters = $this->getFiltersArray();
 
+//var_dump(
+//    json_encode(
+//        [
+//            'filters' => $filters,
+//            'filtersTerminology' => $this->getTerminologyForFilters($filters)
+//        ]
+//    )
+//);
+//die;
+
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
                 'filters' => $filters,
@@ -61,6 +71,8 @@ class Controller extends Base
     private function getFiltersArray(): array
     {
         // The hard-coded filters list returned by this function comes from https://schoolbox.atlassian.net/browse/SA-7782.
+
+        // TODO: All the feature toggles relevant to filters are used in conf/modules/Learning.php.
 
         $filters = [];
 
