@@ -35,10 +35,6 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $uuid = (string)Uuid::uuid4();
-
-        new \Alaress_Probe($uuid, strlen($uuid));
-
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', []);
     }
 }
