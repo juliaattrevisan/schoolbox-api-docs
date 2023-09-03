@@ -71,7 +71,7 @@
 /**
  * add a custom highlight style
  */
-.ck.ck-content span.highlighted-note {
+.ck.ck-content .highlighted-note {
     background-color: #ffffb5;
     display: block;
     padding: 0.75rem;

@@ -25,7 +25,7 @@ export function getStyleSettings() {
                 }, */
                 {
                     name: "Highlighted Note",
-                    element: "span",
+                    element: "p",
                     classes: ["highlighted-note"],
                 },
                 {
