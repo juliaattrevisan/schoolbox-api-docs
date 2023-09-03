@@ -168,10 +168,10 @@ die;
         $filtersWithTerminology = [];
 
         foreach ($filtersRaw as $filterRaw) {
-            $terminology = self::getTerminologyMatchingSingularForm(strtolower($filterRaw["title"]));
+            $singularForm = self::getSingularFormMatchingTitle(strtolower($filterRaw["title"]));
 
             $filterWithTerminology = [
-                "title" => (($terminology === null) ? $filterRaw["title"]: $terminology["singular"]),
+                "title" => (($singularForm === null) ? $filterRaw["title"]: $singularForm),
                 "value" => $filterRaw["value"],
             ];
 
@@ -186,24 +186,21 @@ die;
     }
 
     /**
-     * @param string $name
-     * @return array|null
+     * @param string $title
+     * @return string|null
      */
-    private static function getTerminologyMatchingSingularForm($name): array|null
+    private static function getSingularFormMatchingTitle(string $title): string|null
     {
-        static $terminologyBySingularForm = null;
+        static $singularFormByTitle = null;
 
-        if ($terminologyBySingularForm === null) {
-            $terminologyBySingularForm = [];
+        if ($singularFormByTitle === null) {
+            $singularFormByTitle = [];
 
             foreach (self::$l10nMapper->findAll()->sortNaturally('title') as $termObj) {
-                $terminologyBySingularForm[strtolower($termObj->getSingularForm())] = array_merge(
-                    $termObj->allForms(),
-                    ['term' => $termObj->getTerm()]
-                );
+                $singularFormByTitle[strtolower($termObj->getTitle())] = $termObj->getSingularForm();
             }
         }
 
-        return (array_key_exists($name, $terminologyBySingularForm)) ? $terminologyBySingularForm[$name] : null;
+        return (array_key_exists($title, $singularFormByTitle)) ? $singularFormByTitle[$title] : null;
     }
 }
