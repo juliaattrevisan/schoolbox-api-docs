@@ -332,7 +332,7 @@ class Family
                                 $subfamily['user_code'],
                                 $this->addnumFather,
                                 $this->addnumMother,
-                                implode(array_keys($subfamily['address']))
+                                implode(',', array_keys($subfamily['address']))
                             ));
 
                             continue;
