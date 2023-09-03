@@ -40,13 +40,12 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $filtersRaw = $this->getFiltersRawArray();
+        $filters = $this->getFiltersRawArray();
 
 var_dump(
     json_encode(
         [
-            'filtersRaw' => $filtersRaw,
-            'filters' => $this->substituteTerminologyIntoFilters($filtersRaw)
+            'filters' => $this->substituteTerminologyIntoFilters($filters)
         ]
     )
 );
@@ -54,7 +53,7 @@ die;
 
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
-                'filters' => $this->substituteTerminologyIntoFilters($filtersRaw)
+                'filters' => $this->substituteTerminologyIntoFilters($filters)
             ]
         );
     }
@@ -68,10 +67,10 @@ die;
 
         // TODO: All the feature toggles relevant to filters are used in conf/modules/Learning.php.
 
-        $filtersRaw = [];
+        $filters = [];
 
         if (true) {
-            $filtersRaw[] = [
+            $filters[] = [
                 "title" => "Assessment",
                 "value" => "assessment",
                 "subTypes" => [
@@ -86,15 +85,15 @@ die;
         }
 
         if (true) { // Toggle in Modules > Home (Enable Badges Module)
-            $filtersRaw[] = ["title" => "Badges", "value" => "badges"];
+            $filters[] = ["title" => "Badges", "value" => "badges"];
         }
 
         if (true) {
-            $filtersRaw[] = ["title" => "Events", "value" => "events"];
+            $filters[] = ["title" => "Events", "value" => "events"];
         }
 
         if (true) {
-            $filtersRaw[] = [
+            $filters[] = [
                 "title" => "Files",
                 "value" => "file",
                 "subTypes" => [
@@ -108,19 +107,19 @@ die;
         }
 
         if (true) {
-            $filtersRaw[] = ["title" => "Forums", "value" => "forum"];
+            $filters[] = ["title" => "Forums", "value" => "forum"];
         }
 
         if (true) {
-            $filtersRaw[] = ["title" => "Links", "value" => "link"];
+            $filters[] = ["title" => "Links", "value" => "link"];
         }
 
         if (true) {
-            $filtersRaw[] = ["title" => "News", "value" => "news"];
+            $filters[] = ["title" => "News", "value" => "news"];
         }
 
         if (true) {
-            $filtersRaw[] = [
+            $filters[] = [
                 "title" => "Pages / Folders",
                 "value" => "page",
                 "subTypes" => [
@@ -135,15 +134,15 @@ die;
         }
 
         if (true) {
-            $filtersRaw[] = ["title" => "Textboxes", "value" => "textbox"];
+            $filters[] = ["title" => "Textboxes", "value" => "textbox"];
         }
 
         if (true) {
-            $filtersRaw[] = ["title" => "Tiles", "value" => "tile"];
+            $filters[] = ["title" => "Tiles", "value" => "tile"];
         }
 
         if (true) {
-            $filtersRaw[] = [
+            $filters[] = [
                 "title" => "Users",
                 "value" => "user",
                 "subTypes" => [
@@ -156,27 +155,27 @@ die;
             ];
         }
 
-        return $filtersRaw;
+        return $filters;
     }
 
     /**
-     * @param array $filtersRaw
+     * @param array $filters
      * @return array
      */
-    private function substituteTerminologyIntoFilters(array $filtersRaw): array
+    private function substituteTerminologyIntoFilters(array $filters): array
     {
         $filtersWithTerminology = [];
 
-        foreach ($filtersRaw as $filterRaw) {
-            $singularForm = self::getSingularFormMatchingTitle(strtolower($filterRaw["title"]));
+        foreach ($filters as $filter) {
+            $singularForm = self::getSingularFormMatchingTitle(strtolower($filter["title"]));
 
             $filterWithTerminology = [
-                "title" => (($singularForm === null) ? $filterRaw["title"]: $singularForm),
-                "value" => $filterRaw["value"],
+                "title" => (($singularForm === null) ? $filter["title"]: $singularForm),
+                "value" => $filter["value"],
             ];
 
-            if (array_key_exists('subTypes', $filterRaw) && count($filterRaw["subTypes"]) > 0) {
-                $filterWithTerminology["subTypes"] = $this->substituteTerminologyIntoFilters($filterRaw["subTypes"]);
+            if (array_key_exists('subTypes', $filter) && count($filter["subTypes"]) > 0) {
+                $filterWithTerminology["subTypes"] = $this->substituteTerminologyIntoFilters($filter["subTypes"]);
             }
 
             $filtersWithTerminology[] = $filterWithTerminology;
