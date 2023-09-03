@@ -173,9 +173,12 @@ export default {
                         <div class="small-12 island">
                             <section class="banner content">
                                 <!-- Is there an attachment? Display it appropriately -->
-                                <article v-if="evidence.filename && evidence.storage">
-                                    <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
-                                </article>
+                                <!-- The wrapping div is expected by mepUtils.fixVideoPlayerDimensions(). -->
+                                <div v-if="evidence.filename && evidence.storage" class="feed-body small-12 columns">
+                                    <article>
+                                        <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
+                                    </article>
+                                </div>
                             </section>
                             <section class="detail content">
                                 <p class="meta">
