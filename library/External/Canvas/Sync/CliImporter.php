@@ -500,6 +500,13 @@ class CliImporter extends CliTool\App
                     $client->get($tableFile['url'], ['sink' => $tableDataFile]);
                 } catch (GuzzleException $e) {
                     $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
+                    // Re-trying one more time
+                    try {
+                        $this->getLogger()->debug("Retry downloading $tableName to $fileName");
+                        $client->get($tableFile['url'], ['sink' => $tableDataFile]);
+                    } catch (GuzzleException $e) {
+                        $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
+                    }
                 }
             }
         }
