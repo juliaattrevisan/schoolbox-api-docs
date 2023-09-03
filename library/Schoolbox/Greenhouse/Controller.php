@@ -45,7 +45,7 @@ class Controller extends Base
 var_dump(
     json_encode(
         [
-            'filters' => $this->substituteTerminologyIntoFilters($filters)
+            'filters' => $this->substituteLocalisedTermsIntoFilters($filters)
         ]
     )
 );
@@ -53,7 +53,7 @@ die;
 
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
-                'filters' => $this->substituteTerminologyIntoFilters($filters)
+                'filters' => $this->substituteLocalisedTermsIntoFilters($filters)
             ]
         );
     }
@@ -159,12 +159,14 @@ die;
     }
 
     /**
+     * For each title in $filters, look for a row in the schoolbox.localisation DB table with a matching title.
+     * If one is found, replace the title in $filters with schoolbox.localisation.singular_form.
      * @param array $filters
      * @return array
      */
-    private function substituteTerminologyIntoFilters(array $filters): array
+    private function substituteLocalisedTermsIntoFilters(array $filters): array
     {
-        $filtersWithTerminology = [];
+        $filtersLocalised = [];
 
         foreach ($filters as $filter) {
             $singularForm = self::getSingularFormMatchingTitle(strtolower($filter["title"]));
@@ -175,13 +177,13 @@ die;
             ];
 
             if (array_key_exists('subTypes', $filter) && count($filter["subTypes"]) > 0) {
-                $filterWithTerminology["subTypes"] = $this->substituteTerminologyIntoFilters($filter["subTypes"]);
+                $filterWithTerminology["subTypes"] = $this->substituteLocalisedTermsIntoFilters($filter["subTypes"]);
             }
 
-            $filtersWithTerminology[] = $filterWithTerminology;
+            $filtersLocalised[] = $filterWithTerminology;
         }
 
-        return $filtersWithTerminology;
+        return $filtersLocalised;
     }
 
     /**
