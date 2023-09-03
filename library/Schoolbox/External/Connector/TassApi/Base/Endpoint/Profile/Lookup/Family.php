@@ -186,7 +186,6 @@ class Family
      */
     public function generate(): array
     {
-
         /* Grab all the families
          */
         $families = $this->api->retrieveDocument('getParents', [
@@ -327,6 +326,14 @@ class Family
                          */
                         if (!isset($subfamily['address'][$this->addnumFather]) && !isset($subfamily['address'][$this->addnumMother])) {
                             $unknown[] = $subfamily['user_code'];
+
+                            $this->log->debug(sprintf(
+                                'Parent %s does not have an address block for father (%s) or mother (%s) in split family; found address blocks (%s) instead. Skipping',
+                                $subfamily['user_code'],
+                                $this->addnumFather,
+                                $this->addnumMother,
+                                implode(',', array_keys($subfamily['address']))
+                            ));
 
                             continue;
                         }
