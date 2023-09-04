@@ -612,6 +612,7 @@ export default {
                                         <nav v-if="hasMenu(evidence.object)">
                                             <wc-actions-dropdown
                                                 :content-id="`evidence-${evidence.object.id}-dropdown`"
+                                                :data-test="`wc-actions-dropdown-evidence-${evidence.object.id}`"
                                             ></wc-actions-dropdown>
                                         </nav>
                                         <ul

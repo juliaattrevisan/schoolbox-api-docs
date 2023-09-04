@@ -23,7 +23,6 @@ class LearningMoments
     public const SUBMIT_BUTTON = '#evidence-submit';
     public const ADD_COMMENT_BUTTON = 'button.show-ckeditor-button';
     public const COMMENT_SUBMIT_BUTTON = 'button[class=button\ submit]';
-    public const DROPDOWN_MENU = 'a.icon-overflow';
     public const COMMENT_DELETE_BUTTON = 'a[title="Delete comment"]';
     public const COMMENT_CONFIRM_DELETE_BUTTON = 'ID to be added and replaced here';
     public const LEARNING_MOMENT_DELETE_BUTTON = 'a[title="Delete"]';
@@ -144,11 +143,12 @@ class LearningMoments
         $this->tester->click(self::COMMENT_SUBMIT_BUTTON);
     }
     /**
-     * click the 3-dot dropdown mennu
+     * click the 3-dot dropdown menu
+     * @param int $studentId
      */
-    public function clickDropdownMenu(): void
+    public function clickDropdownMenu(int $id): void
     {
-        $this->tester->click(self::DROPDOWN_MENU);
+        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-evidence-' . $id . ']', '[data-test=wc-actions-dropdown-evidence-' . $id . '-dropdown-button]');
     }
 
     /**
