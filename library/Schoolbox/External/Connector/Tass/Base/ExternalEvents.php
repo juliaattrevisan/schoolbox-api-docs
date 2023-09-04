@@ -85,7 +85,7 @@ class ExternalEvents extends Base implements IExternalEvents
                 END as start,
                 CASE
                     WHEN ec.end_time IS NOT NULL THEN CAST(ec.end_date + CAST(ec.end_time AS TIME(0)) AS SMALLDATETIME)
-                    ELSE CAST(ec.end_date AS SMALLDATETIME)
+                    ELSE CAST(ec.end_date + '23:59:59' AS DATETIME2(0))
                 END AS finish,
                 ec.campus_code AS location,
                 '' AS team
