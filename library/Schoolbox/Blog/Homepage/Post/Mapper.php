@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Blog\Homepage\Post;
 
+use Alaress\Database\Wrapper\Db2\PDOStatement;
 use PDO;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
@@ -52,26 +53,70 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
 
         $this->hasJoin(
             'perms',
-            array(
-                'mapper' => RoleAccessMapper::class,
-                'this_key' => 'folder_id',
-                'other_key' => 'cid'
-            )
+            [
+                'mapper'    => RoleAccessMapper::class,
+                'this_key'  => 'folder_id',
+                'other_key' => 'cid',
+            ]
         );
 
         $this->hasJoin(
             'userAccess',
-            array(
-                'mapper' => UserAccessMapper::class,
-                'this_key' => 'folder_id',
-                'other_key' => 'sid'
-            )
+            [
+                'mapper'    => UserAccessMapper::class,
+                'this_key'  => 'folder_id',
+                'other_key' => 'sid',
+            ]
         );
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteComments']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteImages']);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getSelectString()
+    {
+        return "SELECT
+                {$this->getColumnString()},
+                {$this->getJoinMapper('owner')->getColumnString('u')}
+        ";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFromString()
+    {
+        return "FROM
+                `{$this->getTable()}`
+                JOIN {$this->getJoinSql('owner', 'blog', 'u')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        // Return pastoral records fully hydrated by default
+
+        $collection = $this->createCollection();
+
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+
+            /** @var User $owner */
+            $owner = $this->hydrateJoin($row, 'owner', 'u');
+            $model->setOwner($owner);
+
+            $collection->add($model);
+        }
+
+        return $collection;
+    }
 
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
@@ -96,12 +141,11 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
         $sortProperty = '',
         $sortDirection = 'DESC'
     ) {
-
-        $sortBy = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->getIdentifierColumn();
+        $sortBy  = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->getIdentifierColumn();
         $sortDir = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
 
         $offset = (int)$offset;
-        $limit = (int)$limit;
+        $limit  = (int)$limit;
 
         $stmt = $this->database->prepare(
             "
@@ -130,13 +174,13 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
         );
 
         $stmt->execute(
-            array(
-                'keyword' => $keyword,
-                'role_id' => $user->getRole()->getId(),
-                'service' => UserAccess::SERVICE_HOMEPAGE,
+            [
+                'keyword'    => $keyword,
+                'role_id'    => $user->getRole()->getId(),
+                'service'    => UserAccess::SERVICE_HOMEPAGE,
                 'min_access' => UserAccess::ACCESS_READ,
-                'user_id' => $user->getId()
-            )
+                'user_id'    => $user->getId(),
+            ]
         );
 
         $collection = $this->createCollection();
@@ -144,8 +188,8 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $collection->add(
                 $this->hydrate($r, 'b')
-                    ->setOwner($this->hydrateJoin($r, 'owner', 'u'))
-                    ->setFolder($this->hydrateJoin($r, 'folder', 'c'))
+                     ->setOwner($this->hydrateJoin($r, 'owner', 'u'))
+                     ->setFolder($this->hydrateJoin($r, 'folder', 'c'))
             );
         }
     }
@@ -159,9 +203,9 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
      */
     public function findForFeed($folderId, $limit, $offset = 0, $time = 0)
     {
-        $time = date('Y-m-d H:i:s', $time ? : time());
+        $time = date('Y-m-d H:i:s', $time ?: time());
 
-        $limit = (int)$limit;
+        $limit  = (int)$limit;
         $offset = (int)$offset;
 
         $stmt = $this->database->prepare(
@@ -184,10 +228,10 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
         );
 
         $stmt->execute(
-            array(
+            [
                 'folder_id' => $folderId,
-                'time' => $time
-            )
+                'time'      => $time,
+            ]
         );
 
         $c = $this->createCollection();
@@ -216,7 +260,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
      * TODO: But I don't think this is used?
      *
      * @param FolderModel $folder
-     * @param int|null $limit
+     * @param int|null    $limit
      * @return Collection
      */
     public function findForCategory(FolderModel $folder, $limit = 0)
@@ -242,9 +286,9 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
         $stmt = $this->database->prepare($query);
 
         $stmt->execute(
-            array(
+            [
                 'folder_id' => $folder->getId(),
-            )
+            ]
         );
 
         $c = $this->createCollection();
@@ -279,7 +323,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
      * Called as a post soft-delete callback.
      *
      * @param Model $model
-     * @throws DefinitionException If specified join mapper not found
      */
     public function softDeleteComments(Model $model)
     {
@@ -293,7 +336,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
      * Called as a post soft-delete callback.
      *
      * @param Model $model
-     * @throws DefinitionException If specified join mapper not found
      */
     public function softDeleteImages(Model $model)
     {
