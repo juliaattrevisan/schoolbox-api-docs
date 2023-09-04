@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\API\Token\JwtParser\OauthProviderIssued;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
 
@@ -263,7 +263,7 @@ class OauthProviderIssuedTest extends TestCase
     {
         return new OauthProviderIssued(
             $this->createMock(UserMapper::class),
-            new TestLoader($config),
+            new ArrayLoader($config),
             $this->createMock(Client::class),
         );
     }

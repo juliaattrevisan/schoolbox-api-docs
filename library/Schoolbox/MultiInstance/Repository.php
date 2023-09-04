@@ -12,7 +12,7 @@ namespace Schoolbox\MultiInstance;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory as DatabaseFactory;
 use OutOfBoundsException;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -102,7 +102,7 @@ class Repository
     public function getConfigForInstance(string $instanceId): IConfigLoader
     {
         if (!isset($this->instanceConfigs[$instanceId])) {
-            $this->instanceConfigs[$instanceId] = new TestLoader($this->loadConfig($instanceId));
+            $this->instanceConfigs[$instanceId] = new ArrayLoader($this->loadConfig($instanceId));
         }
         return $this->instanceConfigs[$instanceId];
     }

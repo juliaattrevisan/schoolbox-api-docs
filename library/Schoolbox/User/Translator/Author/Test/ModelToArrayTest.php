@@ -14,7 +14,7 @@ use House;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -36,7 +36,7 @@ class ModelToArrayTest extends TestCase
      */
     public function getTestInvokeData(): iterable
     {
-        $configLoader = new TestLoader([
+        $configLoader = new ArrayLoader([
             ConfigMapper::NAME_MAIL_ADDRESS => 'test.schoolbox.com.au',
             ConfigMapper::NAME_NAME_FORMAT  => '{title} {firstname} {lastname}',
         ]);

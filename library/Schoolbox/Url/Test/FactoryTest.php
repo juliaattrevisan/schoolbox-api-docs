@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Url\Test;
 
 use Psr\Http\Message\UriInterface;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Url\Factory;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Url\Uri;
@@ -29,7 +29,7 @@ class FactoryTest extends TestCase
      */
     public function testBuildFullyQualified(UriInterface $expected, array $config): void
     {
-        $configLoader = new TestLoader($config);
+        $configLoader = new ArrayLoader($config);
         $factory      = new Factory($configLoader);
         $this->assertSame(
             $expected->getHost(),

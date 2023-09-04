@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Version\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Version\Version;
 
 /**
@@ -33,7 +33,7 @@ class VersionTest extends TestCase
      */
     public function testGetMajor(?string $expected, array $config): void
     {
-        $factoryVersion = new Version(new TestLoader($config));
+        $factoryVersion = new Version(new ArrayLoader($config));
         $this->assertSame($expected, $factoryVersion->getMajor());
     }
 
@@ -77,7 +77,7 @@ class VersionTest extends TestCase
      */
     public function testGetMinor(?string $expected, array $config): void
     {
-        $factoryVersion = new Version(new TestLoader($config));
+        $factoryVersion = new Version(new ArrayLoader($config));
         $this->assertSame($expected, $factoryVersion->getMinor());
     }
 
@@ -120,7 +120,7 @@ class VersionTest extends TestCase
      */
     public function testIsClientHosted(?bool $expected, array $config): void
     {
-        $factoryVersion = new Version(new TestLoader($config));
+        $factoryVersion = new Version(new ArrayLoader($config));
         $this->assertEquals($expected, $factoryVersion->isClientHosted());
     }
 
@@ -167,7 +167,7 @@ class VersionTest extends TestCase
      */
     public function testIsCloudHosted(?bool $expected, array $config): void
     {
-        $factoryVersion = new Version(new TestLoader($config));
+        $factoryVersion = new Version(new ArrayLoader($config));
         $this->assertEquals($expected, $factoryVersion->isCloudHosted());
     }
 
@@ -209,7 +209,7 @@ class VersionTest extends TestCase
      */
     public function testShowUpgradeReminder(?bool $expected, array $config): void
     {
-        $factoryVersion = new Version(new TestLoader($config));
+        $factoryVersion = new Version(new ArrayLoader($config));
         $this->assertEquals($expected, $factoryVersion->showUpgradeReminder());
     }
 
