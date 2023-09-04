@@ -13,7 +13,6 @@ use InvalidArgumentException;
 use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Ramsey\Uuid\Uuid;
 use RangeException;
 use Schoolbox\Resource\Folder\Ancestry;
 use UnexpectedValueException;
@@ -499,8 +498,7 @@ class Controller extends Base\Base
 
             $courseSpec = $this->courseSpecificationMapper->createModel()
                 ->setFolder($courseFolder)
-                ->setSubjectCode(trim($post->get('subjectCode', '')))
-                ->setUuid((string)Uuid::uuid4());
+                ->setSubjectCode(trim($post->get('subjectCode', '')));
 
             $courseFolder->setCourseSpecification($courseSpec);
 
@@ -822,8 +820,7 @@ class Controller extends Base\Base
             // Persist the unit too
             $unitSpec = $this->unitSpecificationMapper->createModel()
                 ->setFolder($folder)
-                ->setCourse($courseSpec)
-                ->setUuid((string)Uuid::uuid4());
+                ->setCourse($courseSpec);
 
             $this->unitSpecificationMapper->save($unitSpec);
 
