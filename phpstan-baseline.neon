@@ -2136,11 +2136,6 @@ parameters:
 			path: library/Schoolbox/Blog/Homepage/Comment/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @throws with type Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\DefinitionException is not subtype of Throwable$#"
-			count: 2
-			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
-
-		-
 			message: "#^Return type \\(iterable\\<Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\Model\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\Mapper\\:\\:findForFeed\\(\\) should be compatible with return type \\(iterable\\<Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Feed\\\\FeedableMapperInterface\\:\\:findForFeed\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
