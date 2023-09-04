@@ -100,10 +100,10 @@ class GroupPermissionCest
         $i->amGoingTo('get logged in as Eloise White and check she is able to leave the group');
         $i->impersonateViaModifyUserPage($groupMember);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
-        $i->clickElementInWebComponent(Common::SELECTOR_JELLY_TOT, Common::SELECTOR_JELLY_TOT_BUTTON);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->canSee('Leave Group');
         $i->click('Leave Group');
-        $i->clickElementInWebComponent(Common::SELECTOR_JELLY_TOT, Common::SELECTOR_JELLY_TOT_BUTTON);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->canSee('Join Group');
     }
 
@@ -177,11 +177,11 @@ class GroupPermissionCest
         $i->amGoingTo('get logged in as Eloise White and check she is able to leave the group');
         $i->impersonateViaModifyUserPage($groupMember);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
-        $i->clickElementInWebComponent(Common::SELECTOR_JELLY_TOT, Common::SELECTOR_JELLY_TOT_BUTTON);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         sleep(1);
         $i->canSee('Leave Group');
         $i->click('Leave Group');
-        $i->clickElementInWebComponent(Common::SELECTOR_JELLY_TOT, Common::SELECTOR_JELLY_TOT_BUTTON);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         sleep(1);
         $i->cantSee('Cancel Application');
     }
@@ -256,7 +256,7 @@ class GroupPermissionCest
         $i->amGoingTo('get logged in as Jana Reed and check she is unable to leave the group');
         $i->impersonateViaModifyUserPage($groupMember);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
-        $i->clickElementInWebComponent(Common::SELECTOR_JELLY_TOT, Common::SELECTOR_JELLY_TOT_BUTTON);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->cantSee('Leave Group');
     }
 

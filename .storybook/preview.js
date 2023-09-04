@@ -56,7 +56,12 @@ export const parameters = {
         storySort: {
             // Sort stories alphabetically, but with Introduction related docs first
             method: "alphabetical",
-            order: ["Introduction", "Getting Started", ["Contributing", "CSS Principles", "Design Tokens"], "*"],
+            order: [
+                "Introduction",
+                "Getting Started",
+                ["Design Systems", "CSS Principles", "Design Tokens", "Contributing"],
+                "*",
+            ],
         },
     },
 };
