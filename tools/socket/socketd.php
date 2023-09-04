@@ -36,14 +36,19 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';
 
+    // Can it be assumed the Redis instance is the same for all instances?
     $redis = Redis::getStorageClientInstance();
 
+    // Config will always be per-instance: need some method to load them all
     /** @var IConfigLoader $config */
     $config = $di->get('config');
 
+    // The signal queue should always be global?
+    // This is used for subscribing to retrieve new messages
     /** @var Async\Client $asyncRedis */
     $asyncRedis = $di->get('redis.signalQueue.sub');
 
+    // Database will certainly be per-instance
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
 
