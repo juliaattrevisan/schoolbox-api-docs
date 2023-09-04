@@ -31,11 +31,9 @@ class Hydrator extends BaseHydrator
      * Constructor
      *
      * @param BadgeMapper $badgeMapper Used to fetch badge for hydration.
-     * @param Access      $access     Used to determine if the current user may view this page.
      */
     public function __construct(
-        private BadgeMapper $badgeMapper,
-        private Access $access,
+        private BadgeMapper $badgeMapper
     ) {
     }
 

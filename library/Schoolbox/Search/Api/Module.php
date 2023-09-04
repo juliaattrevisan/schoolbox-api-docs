@@ -134,8 +134,7 @@ class Module extends BaseModule
                     Access::getInstance(),
                 ),
                 new Database\ResultType\Badge\Hydrator(
-                    $mapperFactory->get(BadgeMapper::class),
-                    Access::getInstance(),
+                    $mapperFactory->get(BadgeMapper::class)
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
