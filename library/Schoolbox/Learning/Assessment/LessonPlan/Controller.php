@@ -162,7 +162,7 @@ class Controller extends Assessment\Controller
          * get list of all activities within this course
          * only for staff
          */
-        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments();
+        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments($this->routeGenerator, $student);
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
             // if we are inside a project get the projects context
@@ -224,7 +224,7 @@ class Controller extends Assessment\Controller
             'student'      => $student,
             'returnUrl'    => $returnUrl,
             'courseAssessments' => $courseAssessments,
-            'linkedAssessments' => $assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments($this->routeGenerator, $student)) : [],
+            'linkedAssessments' => $assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map($unitAssessmentsTranslator) : [],
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
