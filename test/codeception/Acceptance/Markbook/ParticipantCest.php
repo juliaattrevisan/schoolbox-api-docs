@@ -95,7 +95,7 @@ class ParticipantCest
         $i->waitForText('Status of ' . $dueworkTitle1);
 
         // exclude the user from the task
-        $i->clickElementInWebComponent(StatusPage::LINK_JELLY_TOT, StatusPage::LINK_JELLY_TOT_BUTTON);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-duework-options741]', '[data-test=wc-actions-dropdown-duework-options741-button]');
         $i->click(StatusPage::LINK_MODIFY);
 
         // remove Jack Coles from participants
@@ -117,7 +117,7 @@ class ParticipantCest
         $i->waitForText('Status of ' . $dueworkTitle1);
 
         // exclude the user from the task
-        $i->clickElementInWebComponent(StatusPage::LINK_JELLY_TOT, StatusPage::LINK_JELLY_TOT_BUTTON);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-duework-options741]', '[data-test=wc-actions-dropdown-duework-options741-button]');
         $i->click(StatusPage::LINK_MODIFY);
 
         // remove Louisa Smith from participants
