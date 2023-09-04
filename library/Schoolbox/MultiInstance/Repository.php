@@ -15,6 +15,28 @@ use OutOfBoundsException;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\IConfigLoader;
 
+/**
+ * Repository of connectors for all instances this node knows about.
+ *
+ * May retrieve the following fully-realised objects for an instance:
+ * * Database connector
+ * * Config loader
+ *
+ * Cannot yet retrieve:
+ * * DI container
+ * * Mappers
+ *
+ * @template TInstanceConfig as array{
+ *     db_host: string,
+ *     db_schema: string,
+ *     db_user: string,
+ *     db_pass: string,
+ *     db_host_read?: string,
+ *     db_schema_read?: string,
+ *     db_user_read?: string,
+ *     db_pass_read?: string,
+ * }
+ */
 class Repository
 {
     public const FIELD_BOOLEAN       =  3;
@@ -34,13 +56,25 @@ class Repository
      */
     private array $instanceConfigs = [];
 
+    /**
+     * Constructor
+     *
+     * @param array<string, TInstanceConfig> $instances A list of instances, as parsed from an .ini file.
+     * @param DatabaseFactory                $factory   A factory for building database connections.
+     */
     public function __construct(
         private array $instances,
         private DatabaseFactory $factory
     ) {
     }
 
-
+    /**
+     * Retrieve a database connection for a given instance.
+     *
+     * @param string $instanceId
+     * @return IConnector
+     * @throws OutOfBoundsException if `$instanceId` is unknown
+     */
     public function getDatabaseForInstance(string $instanceId): IConnector
     {
         $instanceData = $this->getInstanceData($instanceId);
@@ -58,6 +92,13 @@ class Repository
         return $this->instanceConnectors[$instanceId];
     }
 
+    /**
+     * Retrieve a config for a given instance.
+     *
+     * @param string $instanceId
+     * @return IConfigLoader
+     * @throws OutOfBoundsException if `$instanceId` is unknown
+     */
     public function getConfigForInstance(string $instanceId): IConfigLoader
     {
         if (!isset($this->instanceConfigs[$instanceId])) {
@@ -66,6 +107,13 @@ class Repository
         return $this->instanceConfigs[$instanceId];
     }
 
+    /**
+     * Return the instance data for a given instance.
+     *
+     * @param string $instanceId
+     * @return TInstanceConfig
+     * @throws OutOfBoundsException if `$instanceId` is unknown
+     */
     private function getInstanceData(string $instanceId): array
     {
         if (!isset($this->instances[$instanceId])) {
@@ -74,6 +122,13 @@ class Repository
         return $this->instances[$instanceId];
     }
 
+    /**
+     * Loads configuration for the given instance.
+     *
+     * @param string $instanceId
+     * @return array The instance's configuration.
+     * @throws OutOfBoundsException if `$instanceId` is unknown
+     */
     private function loadConfig(string $instanceId): array
     {
         $database = $this->getDatabaseForInstance($instanceId);
@@ -88,11 +143,14 @@ class Repository
     /**
      * Light-weight hydration to respect boolean fields
      *
+     * @todo copied from `\Schoolbox\Config\ConfigMapper::findAllConfigs`:
+     *       extract to its own class
+     *
      * @param int   $fieldId
      * @param mixed $value
      * @return mixed
      */
-    private function hydrateValue(int $fieldId, $value)
+    private function hydrateValue(int $fieldId, mixed $value): mixed
     {
         switch ($fieldId) {
             case self::FIELD_BOOLEAN:
