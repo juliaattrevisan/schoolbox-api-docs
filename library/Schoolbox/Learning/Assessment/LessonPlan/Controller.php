@@ -193,6 +193,8 @@ class Controller extends Assessment\Controller
                         'closeDateFormatted'  => $unitImpl->getDueDate()?->getRelativeTime(),
                         'openDate' => $unitImpl->getOpenDate()?->getUsingFormat(DATE_ATOM),
                         'openDateFormatted'  => $unitImpl->getOpenDate()?->getRelativeTime(),
+                        'relativeCloseDateFormatted' => $unitImpl->getRelativeDueDate()?->getRelativeTime(),
+                        'relativeOpenDateFormatted' => $unitImpl->getRelativeOpenDate()?->getRelativeTime(),
                         'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
@@ -221,6 +223,8 @@ class Controller extends Assessment\Controller
                         'closeDateFormatted' => null, // No Close Date for specifications
                         'openDate' => null, // No Open Date for specifications
                         'openDateFormatted' => null, // No Open Date for specifications
+                        'relativeCloseDateFormatted' => null, // No Close Date for specifications
+                        'relativeOpenDateFormatted' => null, // No Open Date for specifications
                         'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
@@ -229,7 +233,7 @@ class Controller extends Assessment\Controller
 
         $twigData = [
             'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
-            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment'   => $assessment,
             'student'      => $student,
             'returnUrl'    => $returnUrl,

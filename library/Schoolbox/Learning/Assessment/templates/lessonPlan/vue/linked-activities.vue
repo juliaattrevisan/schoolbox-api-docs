@@ -11,6 +11,8 @@ type Unit = {
     title: string;
     openDate: string;
     closeDate: string;
+    relativeOpenDateFormatted: string;
+    relativeCloseDateFormatted: string;
     assessments: Activity[];
 };
 
@@ -55,9 +57,35 @@ const unitUrgency = window.Vue.computed(() => {
     return "gradient";
 });
 
-const unitCompletion = window.Vue.computed(() => {
-    return "This unit will open ? weeks from now";
-});
+/**
+ * Get the urgency class for the unit
+ * @param {Unit} unit The unit to get the urgency class for
+ * @returns {string} The urgency class
+ */
+function getUnitUrgency(unit: Unit): string {
+    if (window.dayjs().isBefore(window.dayjs(unit.openDate))) {
+        return "gradient";
+    }
+    if (isUnitOpen(unit)) {
+        return "gradient-10";
+    }
+    return "gradient-0";
+}
+
+/**
+ * Get the completion message for the unit
+ * @param {Unit} unit The unit to get the completion message for
+ * @returns {string} The completion message
+ */
+function getUnitCompletion(unit: Unit): string {
+    if (window.dayjs().isBefore(window.dayjs(unit.openDate))) {
+        return `This unit will open ${unit.relativeOpenDateFormatted}`;
+    }
+    if (isUnitOpen(unit)) {
+        return `This unit will close ${unit.relativeCloseDateFormatted}`;
+    }
+    return `This unit closed ${unit.relativeCloseDateFormatted}`;
+}
 
 const linkedActivitiesButtonText = window.Vue.computed(() => {
     const addedActivitiesCount = store.getAddedActivities().length;
@@ -72,8 +100,14 @@ const linkedActivitiesButtonText = window.Vue.computed(() => {
     if (addedActivitiesCount === 0 && removedActivitiesCount > 0) {
         return `Unlink ${removedActivitiesCount} Activities`;
     }
-
     return `Unlink ${removedActivitiesCount} Activities and Link ${addedActivitiesCount} Activities`;
+});
+
+const sortedUnitsByDate = window.Vue.computed(() => {
+    const unsortedUnits = props.courseAssessments.units;
+    return unsortedUnits.sort((a, b) => {
+        return window.dayjs(a.openDate).diff(window.dayjs(b.openDate));
+    });
 });
 
 window.Vue.onMounted(() => {
@@ -84,11 +118,7 @@ window.Vue.onMounted(() => {
 <template>
     <section>
         <ul class="information-list">
-            <li
-                v-for="unit in props.courseAssessments.units"
-                :key="unit.id"
-                :class="isUnitOpen(unit) ? 'expanded' : 'collapsed'"
-            >
+            <li v-for="unit in sortedUnitsByDate" :key="unit.id" :class="isUnitOpen(unit) ? 'expanded' : 'collapsed'">
                 <div class="actions-small-1">
                     <div class="list-item">
                         <div class="card small-12">
@@ -101,7 +131,9 @@ window.Vue.onMounted(() => {
                                 ></a>
                                 {{ unit.title }}
                             </h3>
-                            <p v-if="unit.closeDate !== null" :class="unitUrgency">{{ unitCompletion }}</p>
+                            <p v-if="unit.closeDate !== null" :class="getUnitUrgency(unit)">
+                                {{ getUnitCompletion(unit) }}
+                            </p>
                         </div>
                     </div>
                 </div>
