@@ -470,6 +470,7 @@ function snapBackActiveComponent() {
 function onSnapBackActiveComponentComplete() {
     gsap.set(__activeComponent, { x: 0, y: 0, width: "100%" }); //reset the animation properties for another animate
     __activeComponent.style.position = "static"; //was absolute, now sitting as it should
+    __activeComponent.style.transform = "none"; //was translate3d(0px, 0px, 0px), changed this to none to fix the ck editor was opening behind the home page components
     __activeComponent.setAttribute("data-component", ""); //so it can be dragged again
     removeActiveComponentComputedStyles(); //ensure the defined colours are respected
 
