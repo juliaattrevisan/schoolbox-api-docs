@@ -43,6 +43,13 @@ class Model extends AbstractUnit
      */
     private $unitImplementations;
 
+
+    /**
+     * @var null|string
+     */
+    private ?string $uuid = '';
+
+
     /**
      * Constructor
      */
@@ -137,5 +144,25 @@ class Model extends AbstractUnit
     public function isImplementationContext()
     {
         return false;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+
+    /**
+     * @param string|null $uuid
+     * @return Model
+     */
+    public function setUuid(?string $uuid): self
+    {
+        $this->uuid = $uuid;
+        return $this;
     }
 }

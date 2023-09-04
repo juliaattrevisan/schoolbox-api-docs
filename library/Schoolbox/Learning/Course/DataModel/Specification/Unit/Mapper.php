@@ -12,7 +12,6 @@ use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\IModel;
 use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
@@ -44,6 +43,7 @@ class Mapper extends AbstractUnitMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('course_specification_id', CourseSpecificationMapper::class, 'id', null, null, 'course', 'course');
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
+        $this->uses('uuid', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
