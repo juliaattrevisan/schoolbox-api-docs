@@ -67,7 +67,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         }
 
         saveInProgress.value = true;
-        toastEl.value.activate({ text: "Saving..." });
+        toastEl.value.activate("Saving...");
         try {
             // Delete the removed activities
             const deleteRequests = removedActivities.map((removedActivity) =>
