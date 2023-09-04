@@ -43,14 +43,14 @@ class Controller extends Base
     {
         $filters = $this->getFiltersRawArray();
 
-var_dump(
-    json_encode(
-        [
-            'filters' => $this->substituteLocalisedTermsIntoFilters($filters)
-        ]
-    )
-);
-die;
+//var_dump(
+//    json_encode(
+//        [
+//            'filters' => $this->substituteLocalisedTermsIntoFilters($filters)
+//        ]
+//    )
+//);
+//die;
 
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig", [
@@ -165,7 +165,7 @@ die;
             $singularForm = self::getSingularFormMatchingTitle(strtolower($filter["title"]));
 
             $filterWithTerminology = [
-                "title" => (($singularForm === null) ? $filter["title"]: $singularForm),
+                "title" => (($singularForm === null) ? $filter["title"]: ucwords($singularForm)),
                 "value" => $filter["value"],
             ];
 
