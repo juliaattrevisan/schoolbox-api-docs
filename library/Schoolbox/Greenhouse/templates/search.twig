@@ -13,33 +13,20 @@ Expected data items:
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
 
 <ul>
-{% for key, value in filters %}
+{% for filter in filters %}
     <li>
-    {% if value is iterable %}
-        {{ key }}
+    {% if filter.subTypes is defined %}
+        {{ filter.title }}
         <ul>
-        {% for key2, value2 in value %}
-            <li>{{ key2 }}</li>
+        {% for filter2 in filter.subTypes %}
+            <li>{{ filter2.title }}</li>
         {% endfor %}
         </ul>
     {% else %}
-       {{ key }}
+       {{ filter.title }}
     {% endif %}
     </li>
 {% endfor %}
-</ul>
-
-<ul>
-    {% for term, details in filtersTerminology %}
-        <li>
-            {{ term }}
-            <ul>
-                {% for key, value in details %}
-                    <li>{{ key }}: {{ value }}</li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% endfor %}
 </ul>
 
 <style>
