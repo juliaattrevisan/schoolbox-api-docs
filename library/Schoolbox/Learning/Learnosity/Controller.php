@@ -106,6 +106,9 @@ class Controller extends Base
                     'reference' => [
                         'show' => false,
                     ],
+                    /* Tags are only spawned upon clicking Save, not before
+                     */
+                    'tags_on_create' => $tags
                 ],
                 /* Editing a particular item
                  */
