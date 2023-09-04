@@ -9,6 +9,7 @@
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Twig\Error\Error;
 
@@ -25,7 +26,7 @@ class Controller extends Base
     protected static $l10nMapper;
 
     /**
-     * Lets build this thing!
+     * Let's build this thing!
      */
     public function __construct()
     {
@@ -63,13 +64,15 @@ die;
      */
     private function getFiltersRawArray(): array
     {
-        // The hard-coded filters list returned by this function comes from https://schoolbox.atlassian.net/browse/SA-7782.
-
-        // TODO: All the feature toggles relevant to filters are used in conf/modules/Learning.php.
+        // The hard-coded filters list returned by this function originated in https://schoolbox.atlassian.net/browse/SA-7782.
 
         $filters = [];
 
-        if (true) {
+        $loggedInUserRole = $this->getUser()->getRole();
+        $configLoader = $this->getConfigLoader();
+
+        // Modules are enabled or disabled based on the state of NAME_LMS_ENABLED in conf/modules/Learning.php.
+        if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $filters[] = [
                 "title" => "Assessment",
                 "value" => "assessment",
@@ -84,11 +87,11 @@ die;
             ];
         }
 
-        if (true) { // Toggle in Modules > Home (Enable Badges Module)
+        if ($configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)) {
             $filters[] = ["title" => "Badges", "value" => "badges"];
         }
 
-        if (true) {
+        if ($configLoader->get(ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED)) {
             $filters[] = ["title" => "Events", "value" => "events"];
         }
 
@@ -142,16 +145,27 @@ die;
         }
 
         if (true) {
+            // TODO: Should user type be included in filters if no users of that type exist?
+
+            $subTypes = [
+                ["title" => "Guest", "value" => "user.guest" ],
+                ["title" => "Staff", "value" => "user.staff" ],
+            ];
+
+            if ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) {
+                if ($configLoader->get('student_search_enable')) {
+                    $subTypes[] = ["title" => "Student", "value" => "user.student"];
+                }
+
+                if ($configLoader->get('parent_search_enable')) {
+                    $subTypes[] = ["title" => "Parent" , "value" => "user.parent"];
+                }
+            }
+
             $filters[] = [
                 "title" => "Users",
                 "value" => "user",
-                "subTypes" => [
-                    // Show option if no users of that type exist?
-                    ["title" => "Guest"  , "value" => "user.guest"  ],
-                    ["title" => "Parent" , "value" => "user.parent" ],
-                    ["title" => "Staff"  , "value" => "user.staff"  ],
-                    ["title" => "Student", "value" => "user.student"],
-                ]
+                "subTypes" => $subTypes
             ];
         }
 
