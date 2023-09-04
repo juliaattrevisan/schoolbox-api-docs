@@ -30,7 +30,7 @@
 
     {# TODO Known bug SA-5985 - this nav tot should not appear if no actions are available (eg user is staff with read access only) #}
     <nav>
-        <wc-actions-dropdown content-id="header-options"></wc-actions-dropdown>
+        <wc-actions-dropdown content-id="header-options" data-test="wc-actions-dropdown-header-options"></wc-actions-dropdown>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
         {% if routeModify %}
