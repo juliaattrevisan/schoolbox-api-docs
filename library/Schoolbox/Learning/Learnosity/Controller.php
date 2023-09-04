@@ -85,6 +85,8 @@ class Controller extends Base
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
 
+        /* TODO replace with actual course and unit identifiers from the course workflow
+         */
         $tags = $tagFactory->produce('25745286-8883-4fe4-98e6-39201c931ab2', 'f0fd5b1a-9e07-47c8-9434-af0dc57dfd35', $assessment->getContext()->getFolder()->getCodeString());
 
         $payload = [
