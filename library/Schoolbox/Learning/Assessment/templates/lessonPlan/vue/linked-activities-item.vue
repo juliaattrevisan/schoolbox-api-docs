@@ -1,0 +1,62 @@
+<script setup lang="ts">
+import { kebabCase } from "lodash";
+import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
+import { CourseAssessments, Activity } from "./linkedActivitiesTypes";
+
+interface Props {
+    activity: Activity;
+    courseAssessments: CourseAssessments;
+    isInstructor: boolean;
+    returnUrl: string;
+}
+
+const props = defineProps<Props>();
+
+const store = useLinkedActivitiesStore();
+
+/**
+ * Get the title of the course that the activity belongs to
+ * @param { Activity } activity The activity to get the course title for
+ * @returns { string } Course title
+ */
+function getActivityCourseTitle(activity: Activity): string {
+    const selectedUnit = props.courseAssessments.units.find((unit) => {
+        return unit.assessments.find((a) => a.id === activity.id);
+    });
+    return selectedUnit ? selectedUnit.title : "";
+}
+
+/**
+ * Handle the unlink button click event
+ */
+function handleUnlinkClick() {
+    store.clearChanges();
+    store.removeActivity(props.activity);
+    store.isSingleUnlinkOpen = true;
+}
+</script>
+
+<template>
+    <div class="card small-12">
+        <h3>
+            <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
+            <a
+                v-if="activity._links !== null"
+                class="title"
+                :href="activity._links.status + '?returnUrl=' + returnUrl"
+                >{{ activity.title }}</a
+            >
+            <span v-else class="title">{{ activity.title }}</span>
+        </h3>
+        <p class="meta">
+            {{ getActivityCourseTitle(activity) }} |
+            {{ activity.title }}
+        </p>
+        <p class="meta">Due {{ activity.closeAtFormatted }}</p>
+    </div>
+    <nav v-if="isInstructor">
+        <a class="icon-unlink no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
+    </nav>
+</template>
+
+<style scoped></style>

@@ -29,6 +29,13 @@ const props = defineProps({
         default: false,
     },
     /**
+     * To move to the previous in sequence
+     */
+    isPreviousSelected: {
+        type: Boolean,
+        default: false,
+    },
+    /**
      * The size of the modal to display.
      * This is added as a class to the modal.
      */
@@ -92,6 +99,18 @@ window.Vue.watch(
     () => props.isNextSelected,
     (isNextSelected) => {
         if (isNextSelected) {
+            close();
+        }
+    }
+);
+
+/**
+ * to move to the previous modal in sequence
+ */
+window.Vue.watch(
+    () => props.isPreviousSelected,
+    (isPreviousSelected) => {
+        if (isPreviousSelected) {
             close();
         }
     }

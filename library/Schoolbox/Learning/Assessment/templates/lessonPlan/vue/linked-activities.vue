@@ -1,24 +1,10 @@
 <script setup lang="ts">
-/**
- *
- */
-import { kebabCase } from "lodash";
-import { useLinkedActivitiesStore, Activity } from "./store/linkedActivitiesStore";
+import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
+import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
+import linkedActivitiesItem from "./linked-activities-item.vue";
+import LinkedActivitiesUnlink from "./linked-activities-unlink.vue";
+import { Unit, CourseAssessments, Activity } from "./linkedActivitiesTypes";
 import linkedActivitiesModalItem from "./linked-activities-modal-item.vue";
-
-type Unit = {
-    id: number;
-    title: string;
-    openDate: string;
-    closeDate: string;
-    relativeOpenDateFormatted: string;
-    relativeCloseDateFormatted: string;
-    assessments: Activity[];
-};
-
-type CourseAssessments = {
-    units: Unit[];
-};
 
 interface Props {
     courseAssessments: CourseAssessments;
@@ -31,18 +17,6 @@ const props = defineProps<Props>();
 
 useLinkedActivitiesStore().init(props.linkedActivities);
 const store = useLinkedActivitiesStore();
-
-/**
- * Get the title of the course that the activity belongs to
- * @param { Activity } activity The activity to get the course title for
- * @returns { string } Course title
- */
-function getActivityCourseTitle(activity: Activity): string {
-    const selectedUnit = props.courseAssessments.units.find((unit) => {
-        return unit.assessments.find((a) => a.id === activity.id);
-    });
-    return selectedUnit ? selectedUnit.title : "";
-}
 
 /**
  * Check if the unit is open (Between open and close date)
@@ -95,12 +69,13 @@ const linkedActivitiesButtonText = window.Vue.computed(() => {
         return "No Activities to Link";
     }
     if (addedActivitiesCount > 0 && removedActivitiesCount === 0) {
-        return `Link ${addedActivitiesCount} Activities`;
+        return `Link ${addedActivitiesCount} ${addedActivitiesCount > 1 ? "Activities" : "Activity"}`;
     }
     if (addedActivitiesCount === 0 && removedActivitiesCount > 0) {
-        return `Unlink ${removedActivitiesCount} Activities`;
+        return `Unlink ${removedActivitiesCount} ${removedActivitiesCount > 1 ? "Activities" : "Activity"}`;
     }
-    return `Unlink ${removedActivitiesCount} Activities and Link ${addedActivitiesCount} Activities`;
+    return `Unlink ${removedActivitiesCount} ${removedActivitiesCount > 1 ? "Activities" : "Activity"}
+            and Link ${addedActivitiesCount} ${addedActivitiesCount > 1 ? "Activities" : "Activity"}`;
 });
 
 const sortedUnitsByDate = window.Vue.computed(() => {
@@ -117,86 +92,110 @@ window.Vue.onMounted(() => {
 
 <template>
     <section>
-        <ul class="information-list">
-            <li v-for="unit in sortedUnitsByDate" :key="unit.id" :class="isUnitOpen(unit) ? 'expanded' : 'collapsed'">
-                <div class="actions-small-1">
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <h3>
-                                <a
-                                    class="expand-link"
-                                    :class="isUnitOpen(unit) ? 'icon-up-arrow' : 'icon-down-arrow'"
-                                    :data-collapser="'collap-unit-' + unit.id"
-                                    :data-interaction-state="isUnitOpen(unit) ? 'expanded' : 'collapsed'"
-                                ></a>
-                                {{ unit.title }}
-                            </h3>
-                            <p v-if="unit.closeDate !== null" :class="getUnitUrgency(unit)">
-                                {{ getUnitCompletion(unit) }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div
-                    :class="{ hide: !isUnitOpen(unit) }"
-                    :data-collapse-state="isUnitOpen(unit) ? 'uncollapsed' : 'collapsed'"
-                    :data-collapsable="'collap-unit-' + unit.id"
-                >
-                    <ul class="information-list card-selectable threaded" data-task-list>
-                        <li
-                            v-for="activity in unit.assessments"
-                            :key="activity.id"
-                            class="interact child"
-                            :data-unit-assessment="activity.id"
-                        >
-                            <linked-activities-modal-item
-                                :activity="activity"
-                                :source-id="props.sourceId"
-                            ></linked-activities-modal-item>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-        <a
-            href="#"
-            class="button expand icon-link"
-            :class="{ disabled: store.getAddedActivities().length === 0 && store.getRemovedActivities().length === 0 }"
-            @click.prevent="store.saveSelectedActivities()"
-        >
-            {{ linkedActivitiesButtonText }}
-        </a>
-    </section>
-
-    <section>
         <ul class="action-list grid">
             <li
                 v-for="activity in store.linkedActivities"
                 :key="activity.id"
                 :class="{ 'actions-small-1': isInstructor }"
             >
-                <div class="card small-12">
-                    <h3>
-                        <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
-                        <a class="title" :href="activity._links.status + '?returnUrl=' + returnUrl">{{
-                            activity.title
-                        }}</a>
-                    </h3>
-                    <p class="meta">
-                        {{ getActivityCourseTitle(activity) }} |
-                        {{ activity.title }}
-                    </p>
-                    <p class="meta">Due {{ activity.closeAtFormatted }}</p>
-                </div>
-                <nav v-if="isInstructor">
-                    <a
-                        class="icon-unlink no-text"
-                        title="Unlink Assessment"
-                        @click.prevent="store.removeActivity(activity, true)"
-                    ></a>
-                </nav>
+                <linked-activities-item
+                    :activity="activity"
+                    :course-assessments="props.courseAssessments"
+                    :is-instructor="isInstructor"
+                    :return-url="returnUrl"
+                ></linked-activities-item>
             </li>
         </ul>
+    </section>
+
+    <sequential-reveal-modal
+        size="medium"
+        :is-open="store.isOpen"
+        :is-next-selected="store.isNextSelected"
+        :is-previous-selected="store.isPreviousSelected"
+        @next-opened="store.isNextSelected = false"
+        @previous-opened="store.isPreviousSelected = false"
+        @closed="
+            store.isPreviousSelected = false;
+            store.isOpen = false;
+        "
+    >
+        <template #sequence-1>
+            <section>
+                <ul class="information-list expandable-card">
+                    <li
+                        v-for="unit in sortedUnitsByDate"
+                        :key="unit.id"
+                        :class="isUnitOpen(unit) ? 'expanded' : 'collapsed'"
+                    >
+                        <div class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <h3>
+                                        <a
+                                            class="expand-link"
+                                            :class="isUnitOpen(unit) ? 'icon-up-arrow' : 'icon-down-arrow'"
+                                            :data-collapser="'collap-unit-' + unit.id"
+                                            :data-interaction-state="isUnitOpen(unit) ? 'expanded' : 'collapsed'"
+                                        ></a>
+                                        {{ unit.title }}
+                                    </h3>
+                                    <p v-if="unit.closeDate !== null" :class="getUnitUrgency(unit)">
+                                        {{ getUnitCompletion(unit) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            :class="{ hide: !isUnitOpen(unit) }"
+                            :data-collapse-state="isUnitOpen(unit) ? 'uncollapsed' : 'collapsed'"
+                            :data-collapsable="'collap-unit-' + unit.id"
+                        >
+                            <ul class="information-list card-selectable threaded" data-task-list>
+                                <li
+                                    v-for="activity in unit.assessments"
+                                    :key="activity.id"
+                                    class="interact child"
+                                    :data-unit-assessment="activity.id"
+                                >
+                                    <linked-activities-modal-item
+                                        :activity="activity"
+                                        :source-id="props.sourceId"
+                                    ></linked-activities-modal-item>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+                <a
+                    href="#"
+                    class="button expand icon-link"
+                    :class="{
+                        disabled: store.getAddedActivities().length === 0 && store.getRemovedActivities().length === 0,
+                    }"
+                    @click.prevent="store.saveSelectedActivities()"
+                >
+                    {{ linkedActivitiesButtonText }}
+                </a>
+            </section>
+        </template>
+        <template #sequence-2>
+            <linked-activities-unlink></linked-activities-unlink>
+        </template>
+    </sequential-reveal-modal>
+
+    <sequential-reveal-modal
+        size="medium"
+        :is-open="store.isSingleUnlinkOpen"
+        @closed="store.isSingleUnlinkOpen = false"
+    >
+        <template #sequence-1>
+            <linked-activities-unlink></linked-activities-unlink>
+        </template>
+    </sequential-reveal-modal>
+
+    <section v-if="isInstructor">
+        <a href="#" class="button icon-link" @click.prevent="store.isOpen = true">Link Activities</a>
     </section>
 </template>
 

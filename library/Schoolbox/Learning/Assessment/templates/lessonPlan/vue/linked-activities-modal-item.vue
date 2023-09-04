@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
-import { useLinkedActivitiesStore, Activity } from "./store/linkedActivitiesStore";
-
-/**
- *
- */
+import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
+import { Activity } from "./linkedActivitiesTypes";
 
 interface Props {
     activity: Activity;
@@ -14,10 +11,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useLinkedActivitiesStore();
-
-const activityIsLinked = window.Vue.computed(() => {
-    return store.linkedActivities.some((assessmentItem) => assessmentItem.id === props.activity.id);
-});
 
 const activityIsSelected = window.Vue.computed(() => {
     return store.selectedActivities.some((assessmentItem) => assessmentItem.id === props.activity.id);
@@ -43,6 +36,7 @@ function toggleActivitySelection() {
                 :id="'chk-assessment-' + props.activity.id"
                 type="checkbox"
                 :checked="activityIsSelected"
+                :disabled="props.activity.id === props.sourceId"
                 @change="toggleActivitySelection()"
             />
             <label :for="'chk-assessment-' + props.activity.id" class="checkbox-label"></label>
