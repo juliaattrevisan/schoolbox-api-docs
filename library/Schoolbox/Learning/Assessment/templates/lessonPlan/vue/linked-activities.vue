@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
+import Toast from "@schoolboxVue/components/toast.vue";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 import linkedActivitiesItem from "./linked-activities-item.vue";
 import LinkedActivitiesUnlink from "./linked-activities-unlink.vue";
@@ -15,7 +16,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
-useLinkedActivitiesStore().init(props.linkedActivities);
+const toastEl = window.Vue.ref<Toast | null>(null);
+
 const store = useLinkedActivitiesStore();
 
 /**
@@ -86,6 +88,7 @@ const sortedUnitsByDate = window.Vue.computed(() => {
 });
 
 window.Vue.onMounted(() => {
+    useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities, toastEl);
     $("[data-collapser]").collapsable();
 });
 </script>
@@ -197,6 +200,8 @@ window.Vue.onMounted(() => {
     <section v-if="isInstructor">
         <a href="#" class="button icon-link" @click.prevent="store.isOpen = true">Link Activities</a>
     </section>
+
+    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped></style>

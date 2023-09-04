@@ -1,13 +1,9 @@
-/**
- * Store all the filters.
- * Selected filters relate to those currently selected
- * Active filters are those selected at the time of the latest search
- */
-
 import { defineStore } from "pinia";
+import Toast from "@schoolboxVue/components/toast.vue";
 import { Activity } from "../linkedActivitiesTypes";
 
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
+    const sourceId = window.Vue.ref(0); // The id of the source lesson plan
     const linkedActivities = window.Vue.ref<Activity[]>([]);
     const selectedActivities = window.Vue.ref<Activity[]>([]); // Current state of the selected activities in the modal
 
@@ -17,13 +13,20 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
     const isNextSelected = window.Vue.ref(false);
     const isPreviousSelected = window.Vue.ref(false);
 
+    const saveInProgress = window.Vue.ref(false);
+    const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
+
     /**
      * store any passed through properties
+     * @param {number} $sourceId - the id of the source lesson plan
      * @param {Activity[]} $linkedActivities - the linked activities
+     * @param {typeof Toast} toastElement - the toast element
      */
-    function init($linkedActivities: Activity[]) {
+    function init($sourceId: number, $linkedActivities: Activity[], toastElement: typeof Toast) {
+        sourceId.value = $sourceId;
         linkedActivities.value = $linkedActivities;
         selectedActivities.value = [...linkedActivities.value];
+        toastEl.value = toastElement.value;
     }
 
     /**
@@ -54,7 +57,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
      * Save the selected activities
      * @param {boolean} confirmUnlinks - whether the user has confirmed they want to unlink activities
      */
-    function saveSelectedActivities(confirmUnlinks = false) {
+    async function saveSelectedActivities(confirmUnlinks = false) {
         const addedActivities = getAddedActivities();
         const removedActivities = getRemovedActivities();
 
@@ -63,8 +66,33 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
             return;
         }
 
-        // console.log("Added activities", addedActivities);
-        // console.log("Removed activities", removedActivities);
+        saveInProgress.value = true;
+        toastEl.value.activate({ text: "Saving..." });
+        try {
+            // Delete the removed activities
+            const deleteRequests = removedActivities.map((removedActivity) =>
+                fetch(`/learning/assessments/${sourceId.value}/activities/${removedActivity.id}`, {
+                    method: "DELETE",
+                })
+            );
+
+            await Promise.all(deleteRequests);
+
+            // Add the added activities
+            const postRequests = addedActivities.map((addedActivity) =>
+                fetch(`/learning/assessments/${sourceId.value}/activities/${addedActivity.id}`, {
+                    method: "POST",
+                })
+            );
+
+            await Promise.all(postRequests);
+
+            toastEl.value.timeout("Saved", true, 2000);
+        } catch (error) {
+            toastEl.value.timeout("Save failed", false, 5000);
+        } finally {
+            saveInProgress.value = false;
+        }
 
         linkedActivities.value = [...selectedActivities.value];
 
@@ -82,7 +110,9 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         selectedActivities.value.push(activity);
 
         if (save) {
-            saveSelectedActivities();
+            saveSelectedActivities().catch(() => {
+                // noop
+            });
         }
     }
 
@@ -97,7 +127,9 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         });
 
         if (save) {
-            saveSelectedActivities();
+            saveSelectedActivities().catch(() => {
+                // noop
+            });
         }
     }
 
@@ -119,6 +151,8 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     return {
         init,
+        saveInProgress,
+        toastEl,
         isSingleUnlinkOpen,
         isOpen,
         isNextSelected,
