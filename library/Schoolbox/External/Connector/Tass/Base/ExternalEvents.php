@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 class ExternalEvents extends Base implements IExternalEvents
 {
-
     /**
      * Student product code
      */
@@ -91,7 +90,6 @@ class ExternalEvents extends Base implements IExternalEvents
                 '' AS team
             FROM eventcalendar ec
         ";
-
 
         $whereQuery = "
             NOT (
