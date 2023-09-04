@@ -71,8 +71,8 @@ die;
         $loggedInUserRole = $this->getUser()->getRole();
         $configLoader = $this->getConfigLoader();
 
-        // Modules are enabled or disabled based on the state of NAME_LMS_ENABLED in conf/modules/Learning.php.
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            // NOTE: Features to include based on NAME_LMS_ENABLED were found by inspecting code in conf/modules/Learning.php.
             $filters[] = [
                 "title" => "Assessment",
                 "value" => "assessment",
@@ -95,79 +95,58 @@ die;
             $filters[] = ["title" => "Events", "value" => "events"];
         }
 
-        if (true) {
-            $filters[] = [
-                "title" => "Files",
-                "value" => "file",
-                "subTypes" => [
-                    ["title" => "Audio"   , "value" => "file.audio"   ],
-                    ["title" => "Document", "value" => "file.document"],
-                    ["title" => "Image"   , "value" => "file.image"   ],
-                    ["title" => "Other"   , "value" => "file.other"   ],
-                    ["title" => "Video"   , "value" => "file.video"   ],
-                ]
-            ];
-        }
+        $filters[] = [
+            "title" => "Files",
+            "value" => "file",
+            "subTypes" => [
+                ["title" => "Audio"   , "value" => "file.audio"   ],
+                ["title" => "Document", "value" => "file.document"],
+                ["title" => "Image"   , "value" => "file.image"   ],
+                ["title" => "Other"   , "value" => "file.other"   ],
+                ["title" => "Video"   , "value" => "file.video"   ],
+            ]
+        ];
 
-        if (true) {
-            $filters[] = ["title" => "Forums", "value" => "forum"];
-        }
+        $filters[] = [
+            "title" => "Pages / Folders",
+            "value" => "page",
+            "subTypes" => [
+                ["title" => "Course"       , "value" => "page.course"  ],
+                ["title" => "Unit"         , "value" => "page.unit"    ],
+                ["title" => "Current Class", "value" => "page.class"   ],
+                ["title" => "Folder"       , "value" => "page.other"   ],
+                ["title" => "Group"        , "value" => "page.other"   ],
+                ["title" => "Homepage"     , "value" => "page.homepage"],
+            ]
+        ];
 
-        if (true) {
-            $filters[] = ["title" => "Links", "value" => "link"];
-        }
+        // TODO: Should user type be included in filters if no users of that type exist?
+        $userSubTypes = [
+            ["title" => "Guest", "value" => "user.guest" ],
+            ["title" => "Staff", "value" => "user.staff" ],
+        ];
 
-        if (true) {
-            $filters[] = ["title" => "News", "value" => "news"];
-        }
-
-        if (true) {
-            $filters[] = [
-                "title" => "Pages / Folders",
-                "value" => "page",
-                "subTypes" => [
-                    ["title" => "Course"       , "value" => "page.course"  ], // Permission setting for this maybe (check feature matrix used by marketing) See Schoolbox Plan in System Settings -> Site
-                    ["title" => "Unit"         , "value" => "page.unit"    ],
-                    ["title" => "Current Class", "value" => "page.class"   ],
-                    ["title" => "Folder"       , "value" => "page.other"   ],
-                    ["title" => "Group"        , "value" => "page.other"   ],
-                    ["title" => "Homepage"     , "value" => "page.homepage"],
-                ]
-            ];
-        }
-
-        if (true) {
-            $filters[] = ["title" => "Textboxes", "value" => "textbox"];
-        }
-
-        if (true) {
-            $filters[] = ["title" => "Tiles", "value" => "tile"];
-        }
-
-        if (true) {
-            // TODO: Should user type be included in filters if no users of that type exist?
-
-            $subTypes = [
-                ["title" => "Guest", "value" => "user.guest" ],
-                ["title" => "Staff", "value" => "user.staff" ],
-            ];
-
-            if ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) {
-                if ($configLoader->get('student_search_enable')) {
-                    $subTypes[] = ["title" => "Student", "value" => "user.student"];
-                }
-
-                if ($configLoader->get('parent_search_enable')) {
-                    $subTypes[] = ["title" => "Parent" , "value" => "user.parent"];
-                }
+        if ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) {
+            if ($configLoader->get('student_search_enable')) {
+                $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
             }
 
-            $filters[] = [
-                "title" => "Users",
-                "value" => "user",
-                "subTypes" => $subTypes
-            ];
+            if ($configLoader->get('parent_search_enable')) {
+                $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
+            }
         }
+
+        $filters[] = [
+            "title" => "Users",
+            "value" => "user",
+            "subTypes" => $userSubTypes
+        ];
+
+        $filters[] = ["title" => "Forums", "value" => "forum"];
+        $filters[] = ["title" => "Links", "value" => "link"];
+        $filters[] = ["title" => "News", "value" => "news"];
+        $filters[] = ["title" => "Textboxes", "value" => "textbox"];
+        $filters[] = ["title" => "Tiles", "value" => "tile"];
 
         return $filters;
     }
