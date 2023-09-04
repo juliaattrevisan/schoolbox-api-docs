@@ -53,8 +53,8 @@ function isUnitOpen(unit: Unit): boolean {
     return window.dayjs().isBetween(window.dayjs(unit.openDate), window.dayjs(unit.closeDate));
 }
 
-const unitUrgency = window.Vue.computed(() => {
-    return "gradient";
+const returnUrl = window.Vue.computed(() => {
+    return window.btoa(window.location.pathname);
 });
 
 /**
@@ -178,7 +178,9 @@ window.Vue.onMounted(() => {
                 <div class="card small-12">
                     <h3>
                         <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
-                        <a class="title">{{ activity.title }}</a>
+                        <a class="title" :href="activity._links.status + '?returnUrl=' + returnUrl">{{
+                            activity.title
+                        }}</a>
                     </h3>
                     <p class="meta">
                         {{ getActivityCourseTitle(activity) }} |

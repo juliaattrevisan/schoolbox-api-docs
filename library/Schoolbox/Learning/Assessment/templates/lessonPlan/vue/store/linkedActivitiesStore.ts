@@ -12,6 +12,9 @@ export type Activity = {
     assessmentType: string;
     closeAt: string;
     closeAtFormatted: string;
+    _links: {
+        status: string;
+    };
 };
 
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
