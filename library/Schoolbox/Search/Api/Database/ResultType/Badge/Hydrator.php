@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -69,31 +68,25 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($badges, $viewer) {
                 $badge = $badges->getBy('id', $match->id);
                 if ($badge instanceof BadgeModel) {
-                    // Check if user has access to badge's folder
-//                    $badgeAccess = $this->access->getFolderAccess($viewer, $badge->getFolder()->getId());
-//                    if ($badgeAccess < UserAccess::ACCESS_READ) {
-//                        return null;
-//                    }
-//                    if ($badgeAccess < UserAccess::ACCESS_WRITE && $badge->isHidden()) {
-//                        return null;
-//                    }
+                    // For other searched items, permission checks are done here.
+                    // But badges are not linked to folders, so no permission checks.
 
                     return new FullResult(
                         $match,
                         $match->id,
                         $badge->getName(), // The closest thing to a title for a badge is badge.name.
-                        '', // TODO: What to put here?  There is no 'view specific badge' page.
+                        '', // There is no 'view specific badge' page, so blank string here.
                         $match->type,
                         $match->relevance,
                         $badge->getUpdatedAt(),
-                        null, // TODO: What to do about folder?
+                        null, // A badges is not linked to any folder.
                         null,
                         $badge->getImage(),
                         'badge',
                         $badge->getBody(), // The closest thing to a description for a badge is badge.body.
                         $badge->getCreatedBy(),
-                        [], // TODO: Context.  Normally put the ID of a linked folder here, but no linked folders.
-                        [],
+                        [], // Context.  Empty since no linked folder.
+                        [], // Links.  None for badges.
                     );
                 }
 
