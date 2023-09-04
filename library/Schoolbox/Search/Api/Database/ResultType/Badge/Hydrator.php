@@ -63,7 +63,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($badges, $viewer) {
+            function (RawResult $match) use ($badges) {
                 $badge = $badges->getBy('id', $match->id);
                 if ($badge instanceof BadgeModel) {
                     // For other searched items, permission checks are done here.
@@ -77,7 +77,7 @@ class Hydrator extends BaseHydrator
                         $match->type,
                         $match->relevance,
                         $badge->getUpdatedAt(),
-                        null, // A badges is not linked to any folder.
+                        null, // A badge is not linked to any folder.
                         null,
                         $badge->getImage(),
                         'badge',
