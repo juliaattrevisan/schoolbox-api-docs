@@ -146,9 +146,9 @@ class LearningMoments
      * click the 3-dot dropdown menu
      * @param int $studentId
      */
-    public function clickDropdownMenu(int $id): void
+    public function clickDropdownMenu(int $studentId): void
     {
-        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-evidence-' . $id . ']', '[data-test=wc-actions-dropdown-evidence-' . $id . '-dropdown-button]');
+        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-evidence-' . $studentId . ']', '[data-test=wc-actions-dropdown-evidence-' . $studentId . '-dropdown-button]');
     }
 
     /**
