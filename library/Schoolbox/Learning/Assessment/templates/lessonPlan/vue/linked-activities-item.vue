@@ -30,10 +30,7 @@ function getActivityCourseTitle(activity: Activity): string {
 
     const selectedProject =
         selectedUnit &&
-        selectedUnit.assessments.find(
-            (assessment) =>
-                assessment.id === activity.id || (assessment.assessments && assessment.assessments[activity.id])
-        );
+        selectedUnit.assessments.find((assessment) => assessment.assessments && assessment.assessments[activity.id]);
 
     return (selectedUnit ? selectedUnit.title : "") + (selectedProject ? ` | ${selectedProject.title}` : "");
 }
@@ -61,8 +58,7 @@ function handleUnlinkClick() {
             <span v-else class="title">{{ activity.title }}</span>
         </h3>
         <p class="meta">
-            {{ getActivityCourseTitle(activity) }} |
-            {{ activity.title }}
+            {{ getActivityCourseTitle(activity) }}
         </p>
         <p class="meta">Due {{ activity.closeAtFormatted }}</p>
     </div>
