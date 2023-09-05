@@ -57,10 +57,19 @@ class PipeManagerFactory
      */
     public function build()
     {
+        // Requires multi-instance version
         $validator   = new SessionValidator($this->redis, $this->handler, $this->sessionLength, $this->db);
+
+        // Requires multi-instance version
         $pipes       = new PipeCollection($validator, $this->log);
+
+        // Shouldn't need multi-instance?
         $subFactory  = new Subscription\Redis\SubscriptionFactory($this->redis, $this->asyncRedis);
+
+        // Shouldn't need multi-instance?
         $subManager  = new Subscription\SubscriptionManager($subFactory, $this->log);
+
+        // Needs multi-instance, as it uses $pipes
         $pipeManager = new PipeManager($this->loop, $pipes, $subManager, $this->log, $this->strat, $this->fdLimit);
 
         // setup the listener
