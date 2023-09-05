@@ -97,10 +97,6 @@ class Controller extends Base
             $filters[] = ["title" => "Badges", "value" => "badges"];
         }
 
-        if ($configLoader->get(ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED)) {
-            $filters[] = ["title" => "Events", "value" => "events"];
-        }
-
         $filters[] = [
             "title" => "Files",
             "value" => "file",
@@ -148,6 +144,7 @@ class Controller extends Base
             "subTypes" => $userSubTypes
         ];
 
+        $filters[] = ["title" => "Events", "value" => "events"];
         $filters[] = ["title" => "Forums", "value" => "forum"];
         $filters[] = ["title" => "Links", "value" => "link"];
         $filters[] = ["title" => "News", "value" => "news"];
