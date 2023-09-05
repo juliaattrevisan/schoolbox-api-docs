@@ -142,6 +142,7 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Tile\Hydrator(
                     $mapperFactory->get(TileMapper::class),
+                    $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
                 ),
             ),
