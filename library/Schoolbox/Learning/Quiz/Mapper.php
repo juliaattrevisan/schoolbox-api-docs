@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Lumberjack\Logger;
+use LearnositySdk\Exceptions\ValidationException;
 use PDO;
 use PDOStatement;
 use Ramsey\Uuid\Uuid;
@@ -226,6 +227,8 @@ class Mapper extends BaseMapper
      * @param IAssessable $destination
      * @return string
      * @throws \DomainException
+     * @throws ValidationException
+     * @throws \RuntimeException
      */
     public function copyQuizConstituents(IAssessable $source, IAssessable $destination): string
     {
@@ -254,6 +257,8 @@ class Mapper extends BaseMapper
         /* Make a massive assumption that this _jsut worked_
          * You could lean on the polling system to find out when this cloning has finished,
          * or just blindly assume the uuidv4() was unique
+         *
+         * TODO make this safer
          */
         $response = $api->dataSetRequest('/itembank/activities/duplicate', [
             'activities' => [
