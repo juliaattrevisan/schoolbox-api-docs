@@ -73,18 +73,23 @@ class Controller extends Base
         $configLoader = $this->getConfigLoader();
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            $subTypes = [
+                ["title" => "Due Work"   , "value" => "assessment.dueWork"      ],
+                ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"   ],
+                ["title" => "Project"    , "value" => "assessment.project"      ],
+                ["title" => "Quiz"       , "value" => "assessment.quiz"         ],
+                ["title" => "Task"       , "value" => "assessment.task"         ],
+            ];
+
+            if ($configLoader->get('lti_assessments_enable')) {
+                $subTypes[] = ["title" => "LTI", "value" => "assessment.ltiAssessment"];
+            }
+
             // NOTE: Features to include based on NAME_LMS_ENABLED were found by inspecting code in conf/modules/Learning.php.
             $filters[] = [
                 "title" => "Assessment",
                 "value" => "assessment",
-                "subTypes" => [
-                    ["title" => "Due Work"   , "value" => "assessment.dueWork"      ],
-                    ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"   ],
-                    ["title" => "LTI"        , "value" => "assessment.ltiAssessment"],
-                    ["title" => "Project"    , "value" => "assessment.project"      ],
-                    ["title" => "Quiz"       , "value" => "assessment.quiz"         ],
-                    ["title" => "Task"       , "value" => "assessment.task"         ],
-                ]
+                "subTypes" => $subTypes
             ];
         }
 
