@@ -90,6 +90,8 @@ class Controller extends Base
              *     * supply a School Code tag
              *     * supply a Course Spec tag
              *     * supply a Course Unit Spec tag
+             *
+             * This occurs when you're creating courses themselves
              */
             $tags = $tagFactory->produce(
                 $assessment->getContext()->getCourse()->getUuid(),
@@ -115,6 +117,9 @@ class Controller extends Base
             /* If we're in a homepage:
              *     * supply a School Code tag
              *     * supply a Folder Code tag
+             *
+             * This occurs when you're using the Quizzes component directly
+             * in a homepage, and not in any Course workflow
              */
             $tags = $tagFactory->produce(
                 null,
