@@ -71,18 +71,9 @@ HELP;
          */
         $this->populateUuids('course_specification');
 
-        /* Find all the course_implementation rows that don't have a uuid already
-         */
-        $this->populateUuids('course_implementation');
-
         /* Find all the course_unit_specification rows that don't have a uuid already
          */
         $this->populateUuids('course_unit_specification');
-
-        /* Find all the course_unit_implementation rows that don't have a uuid already
-         */
-        $this->populateUuids('course_unit_implementation');
-
     }
 
 

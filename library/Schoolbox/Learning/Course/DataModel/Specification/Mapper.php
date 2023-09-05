@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use PDOStatement;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractCourseMapper;
@@ -45,81 +46,21 @@ class Mapper extends AbstractCourseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
+        $this->uses('subject_code', self::TYPE_STRING);
+        $this->uses('uuid', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->uses('subject_code', self::TYPE_STRING);
 
         // SoftDelete/Restore UnitSpecifications in CourseSpecification
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteUnits'));
-
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFolder'));
+
+        /* Assign a uuid if it doesn't already exist
+         */
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assignUuid']);
     }
 
-    /**
-     * Soft deletes all Units for the specified CourseSpecification
-     *
-     * @param Model $courseSpec
-     * @return bool
-     */
-    public function softDeleteUnits(Model $courseSpec)
-    {
-        $unitMapper = UnitSpecificationMapper::getInstance();
-        $units = $unitMapper->findByColumn('course_specification_id', $courseSpec->getId(), ['deleted' => true]);
-        $unitMapper->delete($units);
-        return true;
-    }
-
-
-    /**
-     * Ensures that if we restore a CourseSpec, the folder it is linked to is restored also
-     *
-     * Intentionally no corresponding post-delete callback. Deleting a CourseSpec should not automatically
-     * cascade to the folder. The Controller should explicitly do that if desired.
-     *
-     * @param Model $courseSpec
-     * @return bool
-     * @throws BaseMapper\DefinitionException If join $name isn't on this mapper
-     */
-    public function restoreFolder(Model $courseSpec)
-    {
-        /** @var FolderMapper $folderMapper */
-        $folderMapper = $this->getJoinMapper('folder');
-        $folder = $folderMapper->findByColumn('id', $courseSpec->getFolder()->getId(), ['deleted' => true]);
-        $folderMapper->restoreSoftDeleted($folder);
-        return true;
-    }
-
-
-    /**
-     * Return whether the configured faculty root is valid.
-     *
-     * This will be false if syntax is invalid, or because the folder is missing, or soft-deleted
-     *
-     * @return bool
-     */
-    public function isConfiguredFacultyRootValid()
-    {
-        return (int)$this->getFacultyRootFolder()->getId() === $this->getConfiguredFacultyRootFolderId();
-    }
-
-
-    /**
-     * Load the faculty root folder - this is used for validating whether a
-     * folder can be made into a course.
-     */
-    protected function loadFacultyRootFolder()
-    {
-        /** @var FolderMapper $folderMapper */
-        $folderMapper        = $this->getJoinMapper('folder');
-        $facultyRootFolderId = $this->getConfiguredFacultyRootFolderId();
-        try {
-            $facultyRoot = $folderMapper->findCheaplyById($facultyRootFolderId);
-        } catch (BaseMapper\Exception $e) {
-            $facultyRoot = $folderMapper->findCheaplyById(0);
-        }
-        $this->setFacultyRootFolder($facultyRoot);
-    }
 
     /**
      * Folders are selected by default.
@@ -286,5 +227,90 @@ class Mapper extends AbstractCourseMapper
             return null;
         }
         return (int)$configuredId;
+    }
+
+
+    /**
+     * Soft deletes all Units for the specified CourseSpecification
+     *
+     * @param Model $courseSpec
+     * @return bool
+     */
+    public function softDeleteUnits(Model $courseSpec)
+    {
+        $unitMapper = UnitSpecificationMapper::getInstance();
+        $units = $unitMapper->findByColumn('course_specification_id', $courseSpec->getId(), ['deleted' => true]);
+        $unitMapper->delete($units);
+        return true;
+    }
+
+
+    /**
+     * Ensures that if we restore a CourseSpec, the folder it is linked to is restored also
+     *
+     * Intentionally no corresponding post-delete callback. Deleting a CourseSpec should not automatically
+     * cascade to the folder. The Controller should explicitly do that if desired.
+     *
+     * @param Model $courseSpec
+     * @return bool
+     * @throws BaseMapper\DefinitionException If join $name isn't on this mapper
+     */
+    public function restoreFolder(Model $courseSpec)
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getJoinMapper('folder');
+        $folder = $folderMapper->findByColumn('id', $courseSpec->getFolder()->getId(), ['deleted' => true]);
+        $folderMapper->restoreSoftDeleted($folder);
+        return true;
+    }
+
+
+    /**
+     * Return whether the configured faculty root is valid.
+     *
+     * This will be false if syntax is invalid, or because the folder is missing, or soft-deleted
+     *
+     * @return bool
+     */
+    public function isConfiguredFacultyRootValid()
+    {
+        return (int)$this->getFacultyRootFolder()->getId() === $this->getConfiguredFacultyRootFolderId();
+    }
+
+
+    /**
+     * Load the faculty root folder - this is used for validating whether a
+     * folder can be made into a course.
+     */
+    protected function loadFacultyRootFolder()
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper        = $this->getJoinMapper('folder');
+        $facultyRootFolderId = $this->getConfiguredFacultyRootFolderId();
+        try {
+            $facultyRoot = $folderMapper->findCheaplyById($facultyRootFolderId);
+        } catch (BaseMapper\Exception $e) {
+            $facultyRoot = $folderMapper->findCheaplyById(0);
+        }
+        $this->setFacultyRootFolder($facultyRoot);
+    }
+
+
+    /**
+     * Asserts that every $courseSpec has a uuid prior to saving
+     *
+     * If it didn't already have one, it will be assigned one
+     * Otherwise it'll maintain what it previously knew
+     *
+     * @param Model $courseSpec
+     * @return bool
+     */
+    public function assignUuid(Model $courseSpec): bool
+    {
+        if ('' === trim((string)$courseSpec->getUuid())) {
+            $courseSpec->setUuid((string)Uuid::uuid4());
+        }
+
+        return true;
     }
 }

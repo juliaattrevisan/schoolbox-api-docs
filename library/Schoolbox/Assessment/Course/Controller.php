@@ -496,9 +496,10 @@ class Controller extends Base\Base
                 []
             );
 
-            $courseSpec = $this->courseSpecificationMapper->createModel();
-            $courseSpec->setFolder($courseFolder);
-            $courseSpec->setSubjectCode(trim($post->get('subjectCode', '')));
+            $courseSpec = $this->courseSpecificationMapper->createModel()
+                ->setFolder($courseFolder)
+                ->setSubjectCode(trim($post->get('subjectCode', '')));
+
             $courseFolder->setCourseSpecification($courseSpec);
 
             $this->courseSpecificationMapper->save($courseSpec);
@@ -817,9 +818,10 @@ class Controller extends Base\Base
             );
 
             // Persist the unit too
-            $unitSpec = new UnitSpecification();
-            $unitSpec->setFolder($folder);
-            $unitSpec->setCourse($courseSpec);
+            $unitSpec = $this->unitSpecificationMapper->createModel()
+                ->setFolder($folder)
+                ->setCourse($courseSpec);
+
             $this->unitSpecificationMapper->save($unitSpec);
 
             $encodedReturnUrl = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
