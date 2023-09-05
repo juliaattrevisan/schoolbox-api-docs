@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <table class="skeleton" data-test-loading-table>
+    <table class="skeleton" data-test="loading-table">
         <tbody>
             <tr v-for="(row, index) in props.rows" :key="index">
                 <td></td>

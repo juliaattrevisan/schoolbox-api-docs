@@ -16,5 +16,5 @@ beforeEach(() => {
 test("if there are no search results, no results should be displayed", async () => {
     const store = useSearchStore();
     await store.$patch({ hasNotSearched: false });
-    expect(wrapper.get("[data-test-sp-results-none]").isVisible()).toBe(true);
+    expect(wrapper.get("[data-test=sp-results-none]").isVisible()).toBe(true);
 });

@@ -48,9 +48,11 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
     if (!props.type.subTypes) {
         return false;
     }
+    // return the sub types that are selected
     const activeSubTypes = filterTypesStore.activeTypes.filter((activeType) => {
         return props.type.subTypes?.some((subType) => activeType === subType.value);
     });
+    // if some but not all sub types are selected, return true
     return activeSubTypes.length >= 1 && activeSubTypes.length !== props.type.subTypes.length;
 });
 </script>

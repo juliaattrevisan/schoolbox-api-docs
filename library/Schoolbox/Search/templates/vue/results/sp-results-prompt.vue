@@ -5,7 +5,7 @@
 </script>
 
 <template>
-    <div class="empty-state-flex-centered" data-test-sp-results-prompt>
+    <div class="empty-state-flex-centered" data-test="sp-results-prompt">
         <i class="icon-search"></i>
         <p>To begin, enter a search term in the textbox above.</p>
     </div>
