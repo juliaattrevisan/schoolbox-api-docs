@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\MultiInstance;
 
 use OutOfBoundsException;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
 
@@ -49,7 +50,9 @@ class ConfigRepository
     {
         $instanceConnector = $this->connectorRepository->fetchConnectorForInstance($instanceId);
         if (!isset($this->instanceConfigs[$instanceId])) {
-            $this->instanceConfigs[$instanceId] = $this->dataSource->findAllConfigs($instanceConnector);
+            $this->instanceConfigs[$instanceId] = new ArrayLoader(
+                $this->dataSource->findAllConfigs($instanceConnector),
+            );
         }
         return $this->instanceConfigs[$instanceId];
     }
