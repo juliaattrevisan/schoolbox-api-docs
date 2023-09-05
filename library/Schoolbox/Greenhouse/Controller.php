@@ -127,7 +127,6 @@ class Controller extends Base
             "subTypes" => $pagesFoldersSubTypes
         ];
 
-        // TODO: Should user type be included in filters if no users of that type exist?
         $userSubTypes = [
             ["title" => "Guest", "value" => "user.guest" ],
             ["title" => "Staff", "value" => "user.staff" ],
