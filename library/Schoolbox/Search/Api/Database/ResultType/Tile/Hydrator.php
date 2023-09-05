@@ -72,11 +72,8 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($tiles, $viewer) {
                 $tile = $tiles->getBy('id', $match->id);
                 if ($tile instanceof TileModel) {
-                    // FolderId is found this way because tile_layout details are not hydrated in $tile.
-                    $folderId = self::getFolderIdMatchingTileLayoutId($tile->getTileLayout()->getId());
-
                     try {
-                        $tileFolder = $this->folderMapper->findById($folderId);
+                        $tileFolder = $this->folderMapper->findById($match->folderId);
                     } catch (MapperException $e) {
                         $tileFolder = null;
                     }
@@ -102,7 +99,7 @@ class Hydrator extends BaseHydrator
                         $tile->getModifiedAt(),
                         $tileFolder,
                         null,
-                        $tile->getBackgroundImage(),
+                        $tile->getBackgroundImage()?->getFilename(),
                         'tile',
                         '',
                         null,
@@ -118,27 +115,5 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
-    }
-
-    /**
-     * @param int $tileLayoutId
-     * @return int|null
-     */
-    private static function getFolderIdMatchingTileLayoutId(int $tileLayoutId): int|null
-    {
-        static $folderIdByTileLayoutId = null;
-
-        if ($folderIdByTileLayoutId === null) {
-            $database = FolderMapper::getInstance()->getDatabase();
-            // Fetching all tile_layout_for_folder rows here is not ideal, but the alternative of a separate query
-            // for each tile would be too slow for a search that returns many tiles.
-            $rows = $database->executeQuery('SELECT tile_layout_id, folder_id FROM tile_layout_for_folder')->fetchAll();
-
-            foreach ($rows as $row) {
-                $folderIdByTileLayoutId[$row['tile_layout_id']] = $row['folder_id'];
-            }
-        }
-
-        return array_key_exists($tileLayoutId, $folderIdByTileLayoutId) ? $folderIdByTileLayoutId[$tileLayoutId] : null;
     }
 }

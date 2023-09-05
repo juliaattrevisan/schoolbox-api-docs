@@ -25,12 +25,14 @@ class RawResult
      * @param string $title     The title of the search result.
      * @param string $type      The type of search result.
      * @param float  $relevance A relevancy score for this result: should be between 0 and 1
+     * @param ?int   $folderId  The ID of the folder to which the search result belongs
      */
     public function __construct(
         public int $id,
         public string $title,
         public string $type,
         public float $relevance,
+        public ?int $folderId
     ) {
     }
 }
