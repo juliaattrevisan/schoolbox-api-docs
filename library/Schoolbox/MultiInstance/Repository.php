@@ -28,6 +28,7 @@ use Schoolbox\IConfigLoader;
  * * Mappers
  *
  * @template TInstanceConfig as array{
+ *     hostnames: list<string>,
  *     db_host: string,
  *     db_schema: string,
  *     db_user: string,
@@ -57,12 +58,15 @@ class Repository
     /**
      * Constructor
      *
-     * @param array<string, TInstanceConfig> $instances A list of instances, as parsed from an .ini file.
-     * @param DatabaseFactory                $factory   A factory for building database connections.
+     * @param array<string, TInstanceConfig> $instances       A list of instances, as parsed from an .ini file.
+     * @param DatabaseFactory                $databaseFactory A factory for building database connections.
+     * @param DataSource                     $dataSource      Data source for configuration data: can fetch config data
+     *                                                        from a database retrieved from `$databaseFactory`.
      */
     public function __construct(
         private array $instances,
-        private DatabaseFactory $factory
+        private DatabaseFactory $databaseFactory,
+        private DataSource $dataSource,
     ) {
     }
 
@@ -79,7 +83,7 @@ class Repository
 
         // Build a connection if required: assuming read-only for now
         if (!isset($this->instanceConnectors[$instanceId])) {
-            $this->instanceConnectors[$instanceId] = $this->factory->createMysql();
+            $this->instanceConnectors[$instanceId] = $this->databaseFactory->createMysql();
             $this->instanceConnectors[$instanceId]->connect(
                 $instanceData['db_host'],
                 $instanceData['db_schema'],
@@ -129,6 +133,6 @@ class Repository
      */
     private function loadConfig(string $instanceId): array
     {
-        return (new DataSource())->findAllConfigs($this->getDatabaseForInstance($instanceId));
+        return $this->dataSource->findAllConfigs($this->getDatabaseForInstance($instanceId));
     }
 }
