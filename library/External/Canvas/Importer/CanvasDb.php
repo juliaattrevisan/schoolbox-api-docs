@@ -36,10 +36,18 @@ class CanvasDb
     private ?string $databaseName = null;
 
     /**
+     * @deprecated
+     * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
+     */
+    public bool $isCanvasData2 = false;
+
+    /**
      * @param IConfigLoader $config
      */
-    public function __construct(private IConfigLoader $config)
+    public function __construct(IConfigLoader $config)
     {
+        $this->isCanvasData2 = $config->get(ConfigMapper::_CANVAS_DATA2_SECRET)
+            && $config->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID);
     }
 
     /**
@@ -49,24 +57,17 @@ class CanvasDb
      *
      * @return string
      */
-    private function getCanvasDbName(): string
+    public function getCanvasDbName(): string
     {
-        if ($this->databaseName) {
-            return $this->databaseName;
+        if (!$this->databaseName) {
+            /**
+             * @deprecated
+             * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
+             */
+            $this->databaseName = $this->isCanvasData2 ? 'canvas_data2_' . INSTANCE_ID : 'canvas_data_' . INSTANCE_ID;
         }
-        if (
-            $this->config->get(ConfigMapper::_CANVAS_DATA2_SECRET)
-            && $this->config->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)
-        ) {
-            return 'canvas_data2_' . INSTANCE_ID;
-        }
-        /**
-         * @deprecated
-         * TODO: OLD CANVAS DATA - REMOVE THIS IN V24
-         */
-        return 'canvas_data_' . INSTANCE_ID;
+        return $this->databaseName;
     }
-
 
     /**
      * Returns a connection to the Canvas staging database
@@ -74,7 +75,7 @@ class CanvasDb
      * @return IConnector
      * @throws Database\Exception
      */
-    public function build(): IConnector
+    public function getConnector(): IConnector
     {
         /* Only spawn this once
          */

@@ -12,6 +12,7 @@ namespace External\Canvas\Sync\Helpers;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Role;
 use UnderflowException;
 
@@ -24,16 +25,8 @@ use function implode;
  */
 class CourseTeachers
 {
-    /** @var IConnector */
-    private $schoolboxDb;
-
-    /** @var IConnector */
-    private $canvasDb;
-
-    public function __construct(IConnector $schoolboxDb, IConnector $canvasDb)
+    public function __construct(private IConnector $schoolboxDb, private CanvasDb $canvasDb)
     {
-        $this->schoolboxDb = $schoolboxDb;
-        $this->canvasDb    = $canvasDb;
     }
 
 
@@ -58,11 +51,27 @@ class CourseTeachers
         }
 
         $pb          = (new Builder(new Database\Quoter\Mysql\Quoter(), ''))
-            ->in('course.canvas_id', array_keys($courseCanvasIds))
+            ->in('course.id', array_keys($courseCanvasIds))
             ->equals('enrollment.type', 'TeacherEnrollment')
             ->in('pseudonym.sis_user_id', array_keys($externalIdToUserIdMap));
         $whereClause = implode(' AND ', $pb->getWhere());
         $sql         = "
+                SELECT
+                    course.id             'course.canvas_id',
+                    pseudonym.sis_user_id 'pseudonym.sis_user_id'
+                FROM courses course
+                JOIN enrollments enrollment ON enrollment.course_id = course.id
+                JOIN pseudonyms pseudonym ON pseudonym.user_id = enrollment.user_id
+                WHERE {$whereClause}
+                GROUP BY course.id
+            ";
+        if (!$this->canvasDb->isCanvasData2) {
+            $pb          = (new Builder(new Database\Quoter\Mysql\Quoter(), ''))
+                ->in('course.canvas_id', array_keys($courseCanvasIds))
+                ->equals('enrollment.type', 'TeacherEnrollment')
+                ->in('pseudonym.sis_user_id', array_keys($externalIdToUserIdMap));
+            $whereClause = implode(' AND ', $pb->getWhere());
+            $sql         = "
                 SELECT
                     course.canvas_id      'course.canvas_id',
                     pseudonym.sis_user_id 'pseudonym.sis_user_id'
@@ -72,7 +81,8 @@ class CourseTeachers
                 WHERE {$whereClause}
                 GROUP BY course.canvas_id
             ";
-        $statement   = $this->canvasDb->executeQuery($sql, $pb->getParams());
+        }
+        $statement   = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams());
 
         $courseTeachers = [];
         while ($row = $statement->fetch()) {

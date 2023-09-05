@@ -13,7 +13,12 @@ use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\Bridge\AssignmentDates;
+use External\Canvas\Sync\Bridge\AssignmentOverride;
+use External\Canvas\Sync\Bridge\Course;
+use External\Canvas\Sync\Bridge\CourseSection;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use External_ClassInterface;
 use PDOException;
@@ -56,129 +61,66 @@ abstract class SectionAssessmentAbstract
 {
     use ModelSaveTrait;
 
-    /** @var IConnector */
-    protected $canvasDb;
-
-    /** @var IConnector */
-    protected $schoolboxDb;
-
-    /** @var External_ClassInterface */
-    protected $externalClass;
-
-    /** @var null|string */
-    protected $currentFileYear;
-
-    /** @var UnitImpl\Mapper */
-    protected $unitImplMapper;
-
-    /** @var UnitSpec\Mapper */
-    protected $unitSpecMapper;
-
-    /** @var Assessment\Mapper */
-    protected $assessmentMapper;
-
-    /** @var Participant\Plan\Mapper */
-    protected $participantPlanMapper;
-
-    /** @var Participant\Mapper */
-    protected $participantMapper;
-
-    /** @var UserMapper */
-    protected $userMapper;
-
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var Bridge\AssignmentDates */
-    protected $assignmentDatesBridge;
-
-    /** @var Bridge\Course */
-    protected $courseBridge;
-
-    /** @var Bridge\CourseSection */
-    protected $courseSectionBridge;
-
-    /** @var Bridge\AssignmentOverride */
-    protected $assignmentOverrideBridge;
-
-
     // Per-execution counts
 
     // Canvas source entities
-    private $countCanvasSectionAssessmentsSynchronised; // Σ[CourseSections * CourseAssessment] for all Course.
-    private $countCanvasAssessmentOverridesSynchronised;
+    private int $countCanvasSectionAssessmentsSynchronised; // Σ[CourseSections * CourseAssessment] for all Course.
+    private int $countCanvasAssessmentOverridesSynchronised;
 
     // Schoolbox destination entities
-    private $countAssessablesCreated;
-    private $countAssessablesMoved;
-    private $countAssessablesUpdated;
-    protected $countAssessablesDeleted;
+    private int $countAssessablesCreated;
+    private int $countAssessablesMoved;
+    private int $countAssessablesUpdated;
+    protected int $countAssessablesDeleted;
 
-    private $countPlansCreated;
-    private $countPlansUpdated;
-    private $countPlansDeleted;
+    private int $countPlansCreated;
+    private int $countPlansUpdated;
+    private int $countPlansDeleted;
 
-    private $countParticipantsCreated;
-    private $countParticipantsUpdated;
-    private $countParticipantsDeleted;
+    private int $countParticipantsCreated;
+    private int $countParticipantsUpdated;
+    private int $countParticipantsDeleted;
 
-    protected string $schoolboxTimezone;
-    public $submissionimporter = null;
+    public ?SubmissionAbstract $submissionimporter = null;
 
     /**
-     * @param IConnector                $canvasDb
-     * @param IConnector                $schoolboxDb
-     * @param External_ClassInterface   $externalClass
-     * @param string|null               $currentFileYear
-     * @param UnitImpl\Mapper           $unitImplMapper
-     * @param UnitSpec\Mapper           $unitSpecMapper
-     * @param Assessment\Mapper         $assessmentMapper
-     * @param Participant\Plan\Mapper   $planMapper
-     * @param Participant\Mapper        $participantMapper
-     * @param UserMapper                $userMapper
-     * @param LoggerInterface           $log
-     * @param Bridge\AssignmentDates    $assignmentDatesBridge
-     * @param Bridge\Course             $courseBridge
-     * @param Bridge\CourseSection      $courseSectionBridge
-     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
-     * @param string                    $schoolboxTimezone
-     * @param MapperProxy               $assessmentDataSource
+     * @param CanvasDb                $canvasDb
+     * @param IConnector              $schoolboxDb
+     * @param External_ClassInterface $externalClass
+     * @param string|null             $currentFileYear
+     * @param UnitImpl\Mapper         $unitImplMapper
+     * @param UnitSpec\Mapper         $unitSpecMapper
+     * @param Assessment\Mapper       $assessmentMapper
+     * @param Participant\Plan\Mapper $participantPlanMapper
+     * @param Participant\Mapper      $participantMapper
+     * @param UserMapper              $userMapper
+     * @param LoggerInterface         $log
+     * @param AssignmentDates         $assignmentDatesBridge
+     * @param Course                  $courseBridge
+     * @param CourseSection           $courseSectionBridge
+     * @param AssignmentOverride      $assignmentOverrideBridge
+     * @param string                  $schoolboxTimezone
+     * @param MapperProxy             $assessmentDataSource
      */
     public function __construct(
-        IConnector $canvasDb,
-        IConnector $schoolboxDb,
-        External_ClassInterface $externalClass,
-        ?string $currentFileYear,
-        UnitImpl\Mapper $unitImplMapper,
-        UnitSpec\Mapper $unitSpecMapper,
-        Assessment\Mapper $assessmentMapper,
-        Participant\Plan\Mapper $planMapper,
-        Participant\Mapper $participantMapper,
-        UserMapper $userMapper,
-        LoggerInterface $log,
-        Bridge\AssignmentDates $assignmentDatesBridge,
-        Bridge\Course $courseBridge,
-        Bridge\CourseSection $courseSectionBridge,
-        Bridge\AssignmentOverride $assignmentOverrideBridge,
-        string $schoolboxTimezone,
+        protected CanvasDb $canvasDb,
+        protected IConnector $schoolboxDb,
+        protected External_ClassInterface $externalClass,
+        protected ?string $currentFileYear,
+        protected UnitImpl\Mapper $unitImplMapper,
+        protected UnitSpec\Mapper $unitSpecMapper,
+        protected Assessment\Mapper $assessmentMapper,
+        protected Participant\Plan\Mapper $participantPlanMapper,
+        protected Participant\Mapper $participantMapper,
+        protected UserMapper $userMapper,
+        protected LoggerInterface $log,
+        protected Bridge\AssignmentDates $assignmentDatesBridge,
+        protected Bridge\Course $courseBridge,
+        protected Bridge\CourseSection $courseSectionBridge,
+        protected Bridge\AssignmentOverride $assignmentOverrideBridge,
+        protected string $schoolboxTimezone,
         protected MapperProxy $assessmentDataSource
     ) {
-        $this->canvasDb                 = $canvasDb;
-        $this->schoolboxDb              = $schoolboxDb;
-        $this->externalClass            = $externalClass;
-        $this->currentFileYear          = $currentFileYear;
-        $this->unitImplMapper           = $unitImplMapper;
-        $this->unitSpecMapper           = $unitSpecMapper;
-        $this->assessmentMapper         = $assessmentMapper;
-        $this->participantPlanMapper    = $planMapper;
-        $this->participantMapper        = $participantMapper;
-        $this->userMapper               = $userMapper;
-        $this->log                      = $log;
-        $this->assignmentDatesBridge    = $assignmentDatesBridge;
-        $this->courseBridge             = $courseBridge;
-        $this->courseSectionBridge      = $courseSectionBridge;
-        $this->assignmentOverrideBridge = $assignmentOverrideBridge;
-        $this->schoolboxTimezone        = $schoolboxTimezone;
     }
 
 

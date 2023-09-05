@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace External\Canvas\Sync;
 
 use Alaress\Database\Connector\IConnector;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge\Assignment;
 use External\Canvas\Sync\Bridge\AssignmentDates;
 use External\Canvas\Sync\Bridge\Course;
@@ -75,11 +76,11 @@ class BridgeFactory
 
     /**
      * Gets class for course
-     * @param IConnector $canvasDb
+     * @param CanvasDb $canvasDb
      * @param IConnector $schoolboxDb
      * @return Course
      */
-    public function getCourse(IConnector $canvasDb, IConnector $schoolboxDb): Course
+    public function getCourse(CanvasDb $canvasDb, IConnector $schoolboxDb): Course
     {
         $className = $this->getClassName('Course');
         return new $className($canvasDb, $schoolboxDb);
@@ -87,7 +88,7 @@ class BridgeFactory
 
     /**
      * Gets class for course section
-     * @param IConnector      $canvasDb
+     * @param CanvasDb        $canvasDb
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
      * @param Course          $courseBridge
@@ -95,7 +96,7 @@ class BridgeFactory
      * @return CourseSection
      */
     public function getCourseSection(
-        IConnector $canvasDb,
+        CanvasDb $canvasDb,
         IConnector $schoolboxDb,
         Folder\Mapper $folderMapper,
         Course $courseBridge,

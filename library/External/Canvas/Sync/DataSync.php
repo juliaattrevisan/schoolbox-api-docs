@@ -11,6 +11,7 @@ namespace External\Canvas\Sync;
 
 use Alaress\Database\Connector\IConnector;
 use DomainException;
+use External\Canvas\Importer\CanvasDb;
 use External_ClassInterface;
 use External_UserInterface;
 use InvalidArgumentException;
@@ -52,7 +53,7 @@ class DataSync
     private string $schoolboxTimezone;
 
     /**
-     * @param IConnector                 $canvasDb
+     * @param CanvasDb                   $canvasDb
      * @param IConnector                 $schoolboxDb
      * @param External_ClassInterface    $externalClass
      * @param External_UserInterface     $externalUser
@@ -84,7 +85,7 @@ class DataSync
      * @param LoggerInterface            $log
      */
     public function __construct(
-        private IConnector $canvasDb,
+        private CanvasDb $canvasDb,
         private IConnector $schoolboxDb,
         private External_ClassInterface $externalClass,
         private External_UserInterface $externalUser,

@@ -249,15 +249,26 @@ class Announcements
          * column, but you'll need to prefix it with "course_" before you can use
          * them in the canvas api
          */
+
         $query = "
+            SELECT
+                CONCAT('course_', id) AS contextCode,
+                name,
+                course_code as code
+            FROM courses
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $query = "
             SELECT
                 CONCAT('course_', canvas_id) AS contextCode,
                 name,
                 code
             FROM course_dim
         ";
+        }
 
-        $statement = $this->canvasDb->build()->executeQuery($query);
+        $statement = $this->canvasDb->getConnector()->executeQuery($query);
 
         /* For each of the courses you found, figure out which folders are destinations
          * One would have to presume schoolbox folders exist, whose folder codes match

@@ -10,10 +10,11 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database;
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\DataStructures\ObjectTree;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\Bridge\Account;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
@@ -44,50 +45,32 @@ use function reset;
  */
 class CourseAccounts
 {
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /** @var Bridge\Account */
-    private $accountBridge;
-
-    /** @var LoggerInterface */
-    private $log;
-
     /** @var int */
-    private $facultyFolderId;
+    private int $facultyFolderId;
 
     // Per-execution counts
-    private $countCanvasAccountsSynchronised;
+    private int $countCanvasAccountsSynchronised;
 
-    private $countFoldersCreated;
-    private $countFoldersUpdated;  // if any non-parent-relationship attribute changes
-    private $countFoldersMoved;    // if a folder's parent changes
-    private $countFoldersDeleted;
+    private int $countFoldersCreated;
+    private int $countFoldersUpdated;  // if any non-parent-relationship attribute changes
+    private int $countFoldersMoved;    // if a folder's parent changes
+    private int $countFoldersDeleted;
 
 
     /**
-     * @param IConnector      $canvasDb
+     * @param CanvasDb        $canvasDb
      * @param Folder\Mapper   $folderMapper
      * @param IConfigLoader   $config
      * @param LoggerInterface $log
-     * @param Bridge\Account  $accountBridge
-     * @throws UnexpectedValueException
+     * @param Account         $accountBridge
      */
     public function __construct(
-        IConnector $canvasDb,
-        Folder\Mapper $folderMapper,
+        private CanvasDb $canvasDb,
+        private Folder\Mapper $folderMapper,
         IConfigLoader $config,
-        LoggerInterface $log,
-        Bridge\Account $accountBridge
+        private LoggerInterface $log,
+        private Bridge\Account $accountBridge
     ) {
-        $this->canvasDb      = $canvasDb;
-        $this->folderMapper  = $folderMapper;
-        $this->accountBridge = $accountBridge;
-        $this->log           = $log;
-
         $facultyFolderId = preg_replace('/[\D]/', '', $config->get('course_homepage'));
         if (!$facultyFolderId) {
             throw new UnexpectedValueException('Faculty root not configured. Please configure in schoolbox admin');
@@ -192,10 +175,15 @@ class CourseAccounts
             $whereClause = "parent_account_id IN ({$bindings->getPlaceholder()})";
             $params      = $bindings->getParams();
         }
-        $sql = "SELECT id, parent_account_id, canvas_id, name FROM account_dim WHERE {$whereClause}";
+
+        if ($this->canvasDb->isCanvasData2) {
+            $sql = "SELECT id, parent_account_id, id as canvas_id, name FROM accounts WHERE {$whereClause}";
+        } else {
+            $sql = "SELECT id, parent_account_id, canvas_id, name FROM account_dim WHERE {$whereClause}";
+        }
 
         $accounts = [];
-        foreach ($this->canvasDb->executeQuery($sql, $params)->fetchAll() as $row) {
+        foreach ($this->canvasDb->getConnector()->executeQuery($sql, $params)->fetchAll() as $row) {
             $row['children']      = [];
             $accounts[$row['id']] = $row;
         }
@@ -239,7 +227,7 @@ class CourseAccounts
         }
 
         $folder     = $sbFolderTree->getElementByHash($canvasAccount['canvas_id']);
-        $folderName = $this->accountBridge->generateLinkedFolderName($canvasAccount['name'], $canvasAccount['canvas_id']);
+        $folderName = $this->accountBridge->generateLinkedFolderName($canvasAccount['name'], (string)$canvasAccount['canvas_id']);
 
         // Does folder not exist yet in SB?
         if (!$folder) {

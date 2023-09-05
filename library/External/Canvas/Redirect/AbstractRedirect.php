@@ -30,9 +30,9 @@ class AbstractRedirect
     protected string $courseIdFormat = '%s%s';
 
     /**
-     * The column used to find canvas course in course_dim table
+     * The column used to find canvas course in courses table
      */
-    protected string $courseCodeColumn = "code";
+    protected string $courseCodeColumn = 'course_code';
 
     /**
      * The host url for canvas instance at this school
@@ -74,6 +74,9 @@ class AbstractRedirect
         $this->canvasDb     = $canvasDb;
         $this->folderMapper = $folderMapper;
         $this->db           = $folderMapper->getDatabase();
+        if (!$canvasDb->isCanvasData2) {
+            $this->courseCodeColumn = 'code';
+        }
     }
 
     /**
@@ -148,13 +151,20 @@ class AbstractRedirect
          * Only care about the states "claimed" and "available", according to the cox
          */
         $query = "
+            SELECT id as canvas_id
+            FROM courses
+            WHERE {$this->courseCodeColumn} = :courseCode
+            AND workflow_state IN ('claimed', 'available')";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $query = "
             SELECT canvas_id
             FROM course_dim
             WHERE {$this->courseCodeColumn} = :courseCode
-            AND workflow_state IN ('claimed', 'available')
-        ";
+            AND workflow_state IN ('claimed', 'available')";
+        }
 
-        $statement = $this->canvasDb->build()->prepareQuery($query);
+        $statement = $this->canvasDb->getConnector()->prepareQuery($query);
 
         $statement->execute(['courseCode' => $courseCode]);
 

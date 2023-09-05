@@ -12,6 +12,7 @@ namespace External\Canvas\Sync\ImportStage;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use External_ClassInterface;
@@ -50,7 +51,7 @@ class SectionAssignment extends SectionAssessmentAbstract
     private array $submissionBoxSpecCache = [];
 
     /**
-     * @param IConnector                       $canvasDb
+     * @param CanvasDb                       $canvasDb
      * @param IConnector                       $schoolboxDb
      * @param External_ClassInterface          $externalClass
      * @param string|null                      $currentFileYear
@@ -71,7 +72,7 @@ class SectionAssignment extends SectionAssessmentAbstract
      * @param MapperProxy                      $assessmentDataSource
      */
     public function __construct(
-        IConnector $canvasDb,
+        CanvasDb $canvasDb,
         IConnector $schoolboxDb,
         External_ClassInterface $externalClass,
         ?string $currentFileYear,
@@ -141,7 +142,51 @@ class SectionAssignment extends SectionAssessmentAbstract
         $pb                         = (new Builder($mySqlQuoter, ''))->in('section.sis_source_id', $sectionSisSourceIds);
         $whereClause                = implode(' AND ', $pb->getWhere());
         $assignmentCanvasIdBindings = Builder::getBindings($assignmentCanvasIds, 'a_cid');
-        $sql                        = "
+        $sql = "
+            SELECT
+                course.id                                           'course.canvas_id',
+                assignment.id                                       'assessable.canvas_id',
+                assignment.title                                    'assessable.title',
+                IF(assignment.only_visible_to_overrides, 'only_visible_to_overrides', 'everyone') 'assessable.visibility',
+                CONVERT_TZ(assignment.unlock_at, 'UTC', :timezone)  'assessable.unlock_at',
+                CONVERT_TZ(assignment.lock_at, 'UTC', :timezone)    'assessable.lock_at',
+                CONVERT_TZ(assignment.due_at, 'UTC', :timezone)     'assessable.due_at',
+                assignment.all_day                                  'assessable.all_day',
+                assignment.all_day_date                             'assessable.all_day_date',
+                override.id                                         'override.canvas_id',
+                override.title                                      'override.title',
+                CONVERT_TZ(override.unlock_at, 'UTC', :timezone)    'override.unlock_at',
+                CONVERT_TZ(override.lock_at, 'UTC', :timezone)      'override.lock_at',
+                CONVERT_TZ(override.due_at, 'UTC', :timezone)       'override.due_at',
+                override.all_day                                    'override.all_day',
+                override.all_day_date                               'override.all_day_date',
+                override_section.id                                 'override_section.canvas_id',
+                override_section.sis_source_id                      'override_section.sis_source_id',
+                override_group.id                                   'override_group.canvas_id',
+                override_group.name                                 'override_group.name',
+                group_pseudonym.id                                  'group_pseudonym.canvas_id',
+                group_pseudonym.sis_user_id                         'group_pseudonym.sis_user_id',
+                user_pseudonym.id                                   'user_pseudonym.canvas_id',
+                user_pseudonym.sis_user_id                          'user_pseudonym.sis_user_id'
+            FROM courses course
+            JOIN course_sections section ON course.id = section.course_id
+            LEFT JOIN assignments assignment ON assignment.context_id = section.course_id AND assignment.id IN ({$assignmentCanvasIdBindings->getPlaceholder()})
+            LEFT JOIN assignment_overrides override ON override.assignment_id = assignment.id AND override.workflow_state = 'active' AND override.set_type IS NOT NULL -- (master paths have set_type = NULL, not yet supported)
+            -- course sections
+            LEFT JOIN course_sections override_section ON override.set_id = override_section.id AND override.set_type = 'CourseSection'
+            -- course groups
+            LEFT JOIN `groups` override_group ON override_group.id = override.set_id AND override.set_type = 'Group'
+            LEFT JOIN group_memberships group_membership ON group_membership.group_id = override_group.id
+            LEFT JOIN pseudonyms group_pseudonym ON group_pseudonym.user_id = group_membership.user_id
+            -- individual assignees
+            LEFT JOIN assignment_override_students override_user ON override_user.assignment_override_id = override.id AND override.set_type = 'ADHOC'
+            LEFT JOIN pseudonyms user_pseudonym ON user_pseudonym.user_id = override_user.user_id
+            WHERE {$whereClause}
+            ORDER BY course.course_code, course.id, section.id, assignment.id, override.id
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql = "
             SELECT
                 course.canvas_id                                    'course.canvas_id',
                 assignment.canvas_id                                'assessable.canvas_id',
@@ -183,7 +228,8 @@ class SectionAssignment extends SectionAssessmentAbstract
             WHERE {$whereClause}
             ORDER BY course.code, course.canvas_id, section.canvas_id, assignment.canvas_id, override.canvas_id
         ";
-        $statement = $this->canvasDb->executeQuery(
+        }
+        $statement = $this->canvasDb->getConnector()->executeQuery(
             $sql,
             array_merge(
                 $pb->getParams(),

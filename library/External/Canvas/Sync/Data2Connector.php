@@ -24,7 +24,11 @@ class Data2Connector
 {
     private const API_HOST = 'api-gateway.instructure.com';
 
-    private const MAX_JOB_CHECK_COUNTS = 10;
+    // Attempt to check data preparation jobs every minute for 20 times
+    // number of times to try checking job status
+    private const MAX_JOB_CHECK_COUNTS = 20;
+    // seconds to wait for the job to finish
+    private const RETRY_TIME_PERIOD = 60;
 
     private ?string $accessToken = null;
 
@@ -79,7 +83,8 @@ class Data2Connector
 
         $jobCheckCount = 0;
         while ($jobCheckCount < self::MAX_JOB_CHECK_COUNTS && !empty($this->jobs)) {
-            sleep(10);
+            $this->logger->debug(sprintf('%d jobs remaining. Sleeping %d seconds before re-fetching.', count($this->jobs), self::RETRY_TIME_PERIOD));
+            sleep(self::RETRY_TIME_PERIOD);
             foreach ($this->jobs as $table => $jobId) {
                 $this->fetchJobData($table, $jobId);
             }
@@ -89,6 +94,8 @@ class Data2Connector
             foreach ($this->jobs as $table => $jobId) {
                 $this->logger->warning(sprintf('Could not complete job for table: %s job:%s', $table, $jobId));
             }
+            $this->logger->critical('Could not download all data');
+            exit();
         }
         return $this->urls;
     }
@@ -263,12 +270,15 @@ class Data2Connector
             case 'waiting':
             case 'running':
                 $this->jobs[$table] = $response['id'];
+                $this->logger->debug("Data preparation for $table (job:{$response['id']}) is {$status}");
                 return;
             case 'complete':
                 unset($this->jobs[$table]);
                 $this->urls[$table]['files'] ??= [];
                 foreach ($response['objects'] as $objectData) {
-                    $this->urls[$table]['files'][] = $this->fetchUrl($objectData['id']);
+                    $url                           = $this->fetchUrl($objectData['id']);
+                    $this->urls[$table]['files'][] = $url;
+                    $this->logger->debug("Data preparation for $table completed: {$url['url']}");
                 }
                 return;
             case 'failed':

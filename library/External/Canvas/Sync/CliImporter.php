@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace External\Canvas\Sync;
 
 use Alaress\Database;
-use Alaress\Database\Connector\IConnector;
 use Alaress_Byte_Format;
 use External\Canvas\Importer\CanvasDb;
 use External_ClassInterface;
@@ -201,7 +200,6 @@ class CliImporter extends CliTool\App
             $dataRestorer = new Data2Restorer(
                 $canvasDb,
                 $this->getLogger(),
-                'canvas_data2_' . INSTANCE_ID,
                 $this->perform(),
                 self::TABLES_TO_IMPORT,
                 [],
@@ -243,7 +241,6 @@ class CliImporter extends CliTool\App
             $dataRestorer    = new DataRestorer(
                 $canvasDb,
                 $this->getLogger(),
-                'canvas_data_' . INSTANCE_ID,
                 $this->perform(),
                 self::TABLES_TO_IMPORT_DEPRECATED,
                 $schemaContainer['schema']
@@ -268,12 +265,14 @@ class CliImporter extends CliTool\App
     /**
      * Builds and returns a Canvas DB connection if possible, otherwise exits
      *
-     * @return IConnector
+     * @return CanvasDb
      */
-    private function buildCanvasDbConnectionOrExit(): IConnector
+    private function buildCanvasDbConnectionOrExit(): CanvasDb
     {
         try {
-            return (new CanvasDb($this->getConfig()))->build();
+            $canvasDb = new CanvasDb($this->getConfig());
+            $canvasDb->getConnector();
+            return $canvasDb;
         } catch (Database\Exception $e) {
             $this->getLogger()->error(
                 sprintf(
@@ -293,7 +292,7 @@ class CliImporter extends CliTool\App
      * @param string       $tempDir
      * @param DataRestorer $dataRestorer
      * @param array        $tablesToImport
-     * @param bool         $ignoreFirstLine  Whether the first row of the data file is header
+     * @param bool         $ignoreFirstLine Whether the first row of the data file is header
      */
     private function loadCanvasDataFilesToStagingDatabase(
         string $tempDir,
@@ -356,12 +355,12 @@ class CliImporter extends CliTool\App
     /**
      * Syncs data from canvas staging db to schoolbox db
      *
-     * @param IConnector $canvasDb
+     * @param CanvasDb $canvasDb
      * @throws Mapper\Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    private function syncStagingDataWithSchoolbox(IConnector $canvasDb): void
+    private function syncStagingDataWithSchoolbox(CanvasDb $canvasDb): void
     {
         if ($this->getOpt(self::OPT_LONG_SKIP_SYNC)) {
             $this->getLogger()->notice("Sync from staging to schoolbox database skipped");
@@ -373,7 +372,7 @@ class CliImporter extends CliTool\App
         /** @var External_ClassInterface $externalClass */
         $externalClass = $this->getDi()->get('externalClass');
         /** @var External_UserInterface $externalUser */
-        $externalUser  = $this->getDi()->get('externalUser');
+        $externalUser = $this->getDi()->get('externalUser');
         /** @var MarkTypeMapper $markTypeMapper */
         $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
         /** @var GradeLevelGroupMapper $gradeLevelGroupMapper */
@@ -501,6 +500,13 @@ class CliImporter extends CliTool\App
                     $client->get($tableFile['url'], ['sink' => $tableDataFile]);
                 } catch (GuzzleException $e) {
                     $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
+                    // Re-trying one more time
+                    try {
+                        $this->getLogger()->debug("Retry downloading $tableName to $fileName");
+                        $client->get($tableFile['url'], ['sink' => $tableDataFile]);
+                    } catch (GuzzleException $e) {
+                        $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
+                    }
                 }
             }
         }

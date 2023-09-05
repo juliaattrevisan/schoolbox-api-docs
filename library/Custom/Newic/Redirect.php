@@ -84,10 +84,15 @@ class Redirect extends AbstractRedirect
              */
             $query = "
                 SELECT *
-                FROM assignment_dim
-                WHERE canvas_id = :assessmentCanvasId
-            ";
+                FROM assignments
+                WHERE id = :assessmentCanvasId";
 
+            if (!$this->canvasDb->isCanvasData2) {
+                $query = "
+                SELECT *
+                FROM assignment_dim
+                WHERE canvas_id = :assessmentCanvasId";
+            }
             return $this->buildAssessmentUrl(
                 $assessment,
                 $query,
@@ -103,10 +108,15 @@ class Redirect extends AbstractRedirect
              */
             $query = "
                 SELECT *
-                FROM quiz_dim
-                WHERE canvas_id = :assessmentCanvasId
-            ";
+                FROM quizzes
+                WHERE id = :assessmentCanvasId";
 
+            if (!$this->canvasDb->isCanvasData2) {
+                $query = "
+                SELECT *
+                FROM quiz_dim
+                WHERE canvas_id = :assessmentCanvasId";
+            }
             return $this->buildAssessmentUrl(
                 $assessment,
                 $query,
@@ -241,7 +251,7 @@ class Redirect extends AbstractRedirect
 
         /* Otherwise continue shanking
          */
-        $statement = $this->canvasDb->build()->prepareQuery($query);
+        $statement = $this->canvasDb->getConnector()->prepareQuery($query);
 
         $statement->execute([
                                 'assessmentCanvasId' => $canvasId,

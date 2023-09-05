@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database;
+use External\Canvas\Importer\CanvasDb;
 use PDO;
 use Psr\Log\LoggerInterface;
 use UnexpectedValueException;
@@ -32,17 +32,15 @@ use function substr;
 class DataRestorer
 {
     /**
-     * @param IConnector      $canvasDb
+     * @param CanvasDb        $canvasDb
      * @param LoggerInterface $log
-     * @param string          $canvasDbName
      * @param bool            $persistChanges If false, don't persist changes to staging database
      * @param array           $tableNames
      * @param array           $schema
      */
     public function __construct(
-        private IConnector $canvasDb,
+        protected CanvasDb $canvasDb,
         private LoggerInterface $log,
-        private string $canvasDbName,
         private bool $persistChanges,
         private array $tableNames,
         private array $schema
@@ -88,8 +86,8 @@ class DataRestorer
             }
 
             $columnSql = implode(",\n", $columnsSqlArray);
-            $createSql = "CREATE TABLE IF NOT EXISTS `{$this->canvasDbName}`.`{$tableName}` (\n$columnSql\n) COMMENT \"{$description}\";";
-            $this->log->debug("Creating table `{$this->canvasDbName}`.`{$tableName}`");
+            $createSql = "CREATE TABLE IF NOT EXISTS `{$this->canvasDb->getCanvasDbName()}`.`{$tableName}` (\n$columnSql\n) COMMENT \"{$description}\";";
+            $this->log->debug("Creating table `{$this->canvasDb->getCanvasDbName()}`.`{$tableName}`");
 
             try {
                 $this->executeIfPersisting($createSql);
@@ -121,11 +119,11 @@ class DataRestorer
         // truncate table only when requested
         // this should be true, when loading data to this table for the first time
         if ($truncateTable) {
-            $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
+            $sql = "TRUNCATE {$this->canvasDb->getCanvasDbName()}.{$tableName}";
             $this->executeIfPersisting($sql);
         }
 
-        $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
+        $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDb->getCanvasDbName()}.{$tableName}";
         if ($ignoreFirstLine) {
             $sql .= ' IGNORE 1 LINES';
         }
@@ -134,7 +132,7 @@ class DataRestorer
         } catch (Database\Exception $e) {
             $this->log->warning("Loading data failed for $tableFile: " . $e->getMessage());
         }
-        $warnings = $this->persistChanges ? $this->canvasDb->executeQuery('show warnings')->fetchAll() : [];
+        $warnings = $this->persistChanges ? $this->canvasDb->getConnector()->executeQuery('show warnings')->fetchAll() : [];
         if (count($warnings) > 0) {
             $this->log->warning("MySQL warning occurred while loading $tableFile");
             foreach ($warnings as $warning) {
@@ -264,18 +262,18 @@ class DataRestorer
      */
     public function dropCanvasDbTables(): void
     {
-        $this->log->notice("Dropping all tables from {$this->canvasDbName}");
+        $this->log->notice("Dropping all tables from {$this->canvasDb->getCanvasDbName()}");
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 0');
-        $tables      = $this->canvasDb->executeQuery(
+        $tables      = $this->canvasDb->getConnector()->executeQuery(
             'SELECT table_name FROM information_schema.tables WHERE table_schema = :db_name',
-            ['db_name' => $this->canvasDbName]
+            ['db_name' => $this->canvasDb->getCanvasDbName()]
         )->fetchAll(PDO::FETCH_COLUMN);
         $countTables = count($tables);
         $this->log->debug(sprintf("%d tables found", $countTables));
         foreach ($tables as $idx => $table) {
             $idx++;
             $this->log->debug("Dropping table $idx/$countTables '$table'");
-            $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->getQuoter()->quoteIdentifier($table)}");
+            $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->getConnector()->getQuoter()->quoteIdentifier($table)}");
         }
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 1');
     }
@@ -295,8 +293,8 @@ class DataRestorer
         if (strlen($indexName) > 64) {
             $indexName = 'idx_' . md5($tableName) . '_' . substr(md5($columnName), 0, 27); // 4 + 32 + 1 + 27 = 64
         }
-        $this->log->debug("Creating index '$indexName' ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
-        $this->executeIfPersisting("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
+        $this->log->debug("Creating index '$indexName' ON `{$this->canvasDb->getCanvasDbName()}`.`{$tableName}`(`{$columnName}`)");
+        $this->executeIfPersisting("CREATE INDEX {$indexName} ON `{$this->canvasDb->getCanvasDbName()}`.`{$tableName}`(`{$columnName}`)");
     }
 
 
@@ -310,7 +308,7 @@ class DataRestorer
     {
         if ($this->persistChanges) {
             $this->log->debug($sql);
-            $this->canvasDb->execute($sql);
+            $this->canvasDb->getConnector()->execute($sql);
         }
     }
 }

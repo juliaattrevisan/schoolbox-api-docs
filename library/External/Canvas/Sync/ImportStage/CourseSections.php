@@ -15,15 +15,22 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use DomainException;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\Bridge\Course;
+use External\Canvas\Sync\Bridge\CourseGroup;
+use External\Canvas\Sync\Bridge\CourseSection;
+use External\Canvas\Sync\Bridge\CourseSectionDates;
 use PDO;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Folder;
 use UnderflowException;
 use UnexpectedValueException;
@@ -39,103 +46,52 @@ use function implode;
  */
 class CourseSections
 {
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var IConnector */
-    private $schoolboxDb;
-
-    /** @var CourseImpl\Mapper */
-    private $courseImplMapper;
-
-    /** @var CourseSpec\Mapper */
-    private $courseSpecMapper;
-
-    /** @var UnitImpl\Mapper */
-    private $unitImplMapper;
-
-    /** @var UnitSpec\Mapper */
-    private $unitSpecMapper;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var Bridge\Course */
-    private $courseBridge;
-
-    /** @var Bridge\CourseGroup */
-    private $courseGroupBridge;
-
-    /** @var Bridge\CourseSection */
-    private $courseSectionBridge;
-
-    /** @var Bridge\CourseSectionDates */
-    private $courseSectionDatesBridge;
-
     // Per-execution counts
 
     // Canvas source entities
-    private $countCanvasSectionsSynchronised;
+    private int $countCanvasSectionsSynchronised;
 
     // Schoolbox destination entities
-    private $countCourseImplCreated;
-    private $countCourseImplMoved;
-    private $countCourseImplUpdated;
-    private $countCourseImplDeleted;
+    private int $countCourseImplCreated;
+    private int $countCourseImplMoved;
+    private int $countCourseImplUpdated;
+    private int $countCourseImplDeleted;
 
-    private $countUnitImplCreated;
-    private $countUnitImplMoved;
-    private $countUnitImplUpdated;
-    private $countUnitImplDeleted;
-
-    private string $schoolboxTimezone;
+    private int $countUnitImplCreated;
+    private int $countUnitImplMoved;
+    private int $countUnitImplUpdated;
+    private int $countUnitImplDeleted;
 
     /**
-     * @param IConnector                $canvasDb
-     * @param IConnector                $schoolboxDb
-     * @param CourseImpl\Mapper         $courseImplMapper
-     * @param CourseSpec\Mapper         $courseSpecMapper
-     * @param UnitImpl\Mapper           $unitImplMapper
-     * @param UnitSpec\Mapper           $unitSpecMapper
-     * @param Folder\Mapper             $folderMapper
-     * @param LoggerInterface           $log
-     * @param Bridge\Course             $courseBridge
-     * @param Bridge\CourseGroup        $courseGroupBridge
-     * @param Bridge\CourseSection      $courseSectionBridge
-     * @param Bridge\CourseSectionDates $courseSectionDatesBridge
-     * @param string                    $schoolboxTimezone
+     * @param CanvasDb           $canvasDb
+     * @param IConnector         $schoolboxDb
+     * @param CourseImpl\Mapper  $courseImplMapper
+     * @param CourseSpec\Mapper  $courseSpecMapper
+     * @param UnitImpl\Mapper    $unitImplMapper
+     * @param UnitSpec\Mapper    $unitSpecMapper
+     * @param Folder\Mapper      $folderMapper
+     * @param LoggerInterface    $log
+     * @param Course             $courseBridge
+     * @param CourseGroup        $courseGroupBridge
+     * @param CourseSection      $courseSectionBridge
+     * @param CourseSectionDates $courseSectionDatesBridge
+     * @param string             $schoolboxTimezone
      */
     public function __construct(
-        IConnector $canvasDb,
-        IConnector $schoolboxDb,
-        CourseImpl\Mapper $courseImplMapper,
-        CourseSpec\Mapper $courseSpecMapper,
-        UnitImpl\Mapper $unitImplMapper,
-        UnitSpec\Mapper $unitSpecMapper,
-        Folder\Mapper $folderMapper,
-        LoggerInterface $log,
-        Bridge\Course $courseBridge,
-        Bridge\CourseGroup $courseGroupBridge,
-        Bridge\CourseSection $courseSectionBridge,
-        Bridge\CourseSectionDates $courseSectionDatesBridge,
-        string $schoolboxTimezone
+        private CanvasDb $canvasDb,
+        private IConnector $schoolboxDb,
+        private CourseImpl\Mapper $courseImplMapper,
+        private CourseSpec\Mapper $courseSpecMapper,
+        private UnitImpl\Mapper $unitImplMapper,
+        private UnitSpec\Mapper $unitSpecMapper,
+        private Folder\Mapper $folderMapper,
+        private LoggerInterface $log,
+        private Bridge\Course $courseBridge,
+        private Bridge\CourseGroup $courseGroupBridge,
+        private Bridge\CourseSection $courseSectionBridge,
+        private Bridge\CourseSectionDates $courseSectionDatesBridge,
+        private string $schoolboxTimezone
     ) {
-        $this->canvasDb                 = $canvasDb;
-        $this->schoolboxDb              = $schoolboxDb;
-        $this->courseImplMapper         = $courseImplMapper;
-        $this->courseSpecMapper         = $courseSpecMapper;
-        $this->unitImplMapper           = $unitImplMapper;
-        $this->unitSpecMapper           = $unitSpecMapper;
-        $this->folderMapper             = $folderMapper;
-        $this->log                      = $log;
-        $this->courseBridge             = $courseBridge;
-        $this->courseGroupBridge        = $courseGroupBridge;
-        $this->courseSectionBridge      = $courseSectionBridge;
-        $this->courseSectionDatesBridge = $courseSectionDatesBridge;
-        $this->schoolboxTimezone = $schoolboxTimezone;
     }
 
 
@@ -163,7 +119,33 @@ class CourseSections
                 ->in('section.sis_source_id', $sectionSisSourceIds);
             $whereClause = implode(' AND ', $pb->getWhere());
 
-            $sql       = "
+            $sql = "
+                SELECT
+                    account.id                                         'account.canvas_id',
+                    course.course_code                                 'course.code',
+                    course.id                                          'course.canvas_id',
+                    CONVERT_TZ(course.start_at, 'UTC', :timezone)      'course.start_at',
+                    CONVERT_TZ(course.conclude_at, 'UTC', :timezone)   'course.conclude_at',
+                    CONVERT_TZ(courseTerm.start_at, 'UTC', :timezone)  'courseTerm.date_start',
+                    CONVERT_TZ(courseTerm.end_at, 'UTC', :timezone)    'courseTerm.date_end',
+                    section.id                                         'section.canvas_id',
+                    section.name                                       'section.name',
+                    section.sis_source_id                              'section.sis_source_id',
+                    CONVERT_TZ(section.start_at, 'UTC', :timezone)     'section.start_at',
+                    CONVERT_TZ(section.end_at, 'UTC', :timezone)       'section.end_at',
+                    CONVERT_TZ(sectionTerm.start_at, 'UTC', :timezone) 'sectionTerm.date_start',
+                    CONVERT_TZ(sectionTerm.end_at, 'UTC', :timezone)   'sectionTerm.date_end'
+                FROM course_sections section
+                JOIN courses course ON course.id = section.course_id
+                JOIN accounts account ON account.id = course.account_id
+                LEFT JOIN enrollment_terms sectionTerm ON section.enrollment_term_id = sectionTerm.id
+                LEFT JOIN enrollment_terms courseTerm ON course.enrollment_term_id = courseTerm.id
+                WHERE {$whereClause}
+                ORDER BY account.id, course.course_code, course.id, section.id
+            ";
+
+            if (!$this->canvasDb->isCanvasData2) {
+                $sql = "
                 SELECT
                     account.canvas_id                                   'account.canvas_id',
                     course.code                                         'course.code',
@@ -187,7 +169,9 @@ class CourseSections
                 WHERE {$whereClause}
                 ORDER BY account.canvas_id, course.code, course.canvas_id, section.canvas_id
             ";
-            $statement = $this->canvasDb->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
+            }
+
+            $statement = $this->canvasDb->getConnector()->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
             while ($row = $statement->fetch()) {
                 $accountCanvasId = $row['account.canvas_id'];
                 $courseGroupCode = $row['course.code'];
@@ -225,23 +209,25 @@ class CourseSections
         // Track synchronised entities so we can
         // 1) avoid re-sync of sections when iterating an assignment over sections, and
         // 2) delete any entities no longer in Canvas
-        /** @var int[] */
+        /** @var int[] $courseImplSynchronised */
         $courseImplSynchronised = [];
-        /** @var int[] */
+        /** @var int[] $unitImplSynchronised */
         $unitImplSynchronised = [];
 
         foreach ($data as $accountCanvasId => $accountData) {
             foreach ($accountData as $courseGroupCode => $courseGroupData) {
                 $courseSpecFolder = $this->courseGroupBridge->findCourseSpecFolder($this->folderMapper, $accountCanvasId, $courseGroupCode);
                 if ($courseSpecFolder === null) {
-                    throw new UnexpectedValueException("Unable to find folder for account.canvasId '$accountCanvasId' and course.code '$courseGroupCode'");
+                    $this->log->warning("Unable to find folder for account.canvasId '$accountCanvasId' and course.code '$courseGroupCode'");
+                    continue;
                 }
                 foreach ($courseGroupData as $courseCanvasId => $courseData) {
                     $unitSpecFolderPredicate = $this->courseBridge->equalsCanvasCourse($courseCanvasId)->isNull('us.deleted_at');
                     $unitSpecFolder          = $this->folderMapper->findByPredicates($unitSpecFolderPredicate)->first();
 
                     if ($unitSpecFolder === null) {
-                        throw new UnexpectedValueException("Unable to find folder for course.canvasId '$courseCanvasId'");
+                        $this->log->warning("Unable to find folder for course.canvasId '$courseCanvasId'");
+                        continue;
                     }
                     foreach ($courseData['sections'] as $sectionCanvasId => $section) {
                         $this->countCanvasSectionsSynchronised++;
@@ -338,22 +324,19 @@ class CourseSections
     /**
      * Synchronised a Canvas CourseSection with Schoolbox UnitImpl
      *
-     * @param CourseImpl\Model $courseImpl
-     * @param Folder\Model     $unitSpecFolder
-     * @param string           $sectionName
-     * @param string           $sectionStartAt
-     * @param string           $sectionEndAt
-     * @param string|null      $sectionTermDateStart
-     * @param string|null      $sectionTermDateEnd
-     * @param string|null      $courseStartAt
-     * @param string|null      $courseConcludeAt
-     * @param string|null      $courseTermDateStart
-     * @param string|null      $courseTermDateEnd
+     * @param Model        $courseImpl
+     * @param Folder\Model $unitSpecFolder
+     * @param string       $sectionName
+     * @param string|null  $sectionStartAt
+     * @param string|null  $sectionEndAt
+     * @param string|null  $sectionTermDateStart
+     * @param string|null  $sectionTermDateEnd
+     * @param string|null  $courseStartAt
+     * @param string|null  $courseConcludeAt
+     * @param string|null  $courseTermDateStart
+     * @param string|null  $courseTermDateEnd
      * @return UnitImpl\Model
-     * @throws Database\Exception
-     * @throws Mapper\Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws Exception
      */
     private function syncCourseSectionWithUnitImpl(
         CourseImpl\Model $courseImpl,

@@ -13,13 +13,16 @@ use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\Bridge\Course;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use HTMLPurifier;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\DataModel\Mapper;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use PDO;
@@ -34,60 +37,33 @@ abstract class CourseAssessmentAbstract
 {
     use ModelSaveTrait;
 
-    /** @var IConnector */
-    protected $canvasDb;
-
-    /** @var IConnector */
-    protected $schoolboxDb;
-
-    /** @var LoggerInterface */
-    protected $log;
-
     /** @var HTMLPurifier */
-    protected $htmlPurifier;
-
-    /** @var IConfigLoader */
-    protected $config;
-
-    /** @var Assessment\Mapper */
-    protected $assessmentMapper;
-
-    /** @var Bridge\Course */
-    protected $courseBridge;
-
-    protected string $schoolboxTimezone;
+    protected HTMLPurifier $htmlPurifier;
 
     /**
-     * @param IConnector        $canvasDb
-     * @param IConnector        $schoolboxDb
-     * @param Assessment\Mapper $assessmentMapper
-     * @param LoggerInterface   $log
-     * @param IConfigLoader     $config
-     * @param Bridge\Course     $courseBridge
-     * @param string            $schoolboxTimezone
+     * @param CanvasDb        $canvasDb
+     * @param IConnector      $schoolboxDb
+     * @param Mapper          $assessmentMapper
+     * @param LoggerInterface $log
+     * @param IConfigLoader   $config
+     * @param Course          $courseBridge
+     * @param string          $schoolboxTimezone
      */
     public function __construct(
-        IConnector $canvasDb,
-        IConnector $schoolboxDb,
-        Assessment\Mapper $assessmentMapper,
-        LoggerInterface $log,
-        IConfigLoader $config,
-        Bridge\Course $courseBridge,
-        string $schoolboxTimezone
+        protected CanvasDb $canvasDb,
+        protected IConnector $schoolboxDb,
+        protected Assessment\Mapper $assessmentMapper,
+        protected LoggerInterface $log,
+        protected IConfigLoader $config,
+        protected Bridge\Course $courseBridge,
+        protected string $schoolboxTimezone
     ) {
-        $this->canvasDb         = $canvasDb;
-        $this->schoolboxDb      = $schoolboxDb;
-        $this->log              = $log;
-        $this->assessmentMapper = $assessmentMapper;
-
         $htmlPurifierConfig = \HTMLPurifier_Config::createDefault();
         // See Scrub.php
         $htmlPurifierConfig->set('Cache.SerializerPath', $config->get('purifier_cache_dir'));
         $htmlPurifierConfig->set('URI.Base', $config->get(ConfigMapper::_CANVAS_URL));
         $htmlPurifierConfig->set('URI.MakeAbsolute', true);
         $this->htmlPurifier = new HTMLPurifier($htmlPurifierConfig);
-        $this->courseBridge = $courseBridge;
-        $this->schoolboxTimezone = $schoolboxTimezone;
     }
 
     /**
@@ -114,7 +90,6 @@ abstract class CourseAssessmentAbstract
         string $updatedAt,
         int $position
     ): Assessment\Model {
-
         $assessment = (new Assessment\Model())
             ->setContextUnitSpecification($unitSpec)
             ->setTitle($title)
@@ -208,13 +183,23 @@ abstract class CourseAssessmentAbstract
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
         $sql         = "
+            SELECT DISTINCT c.id
+            FROM courses c
+            JOIN course_sections cs ON cs.course_id = c.id
+            JOIN enrollment_terms term ON term.id = c.enrollment_term_id
+             WHERE {$whereClause}
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql         = "
             SELECT DISTINCT c.canvas_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
              WHERE {$whereClause}
         ";
-        $canvasIds   = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+        }
+        $canvasIds   = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
         return array_map(static function (string $canvasId) {
             return (int)$canvasId;
         }, $canvasIds);

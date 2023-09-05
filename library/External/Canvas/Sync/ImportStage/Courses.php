@@ -10,10 +10,13 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database;
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\Bridge\Account;
+use External\Canvas\Sync\Bridge\Course;
+use External\Canvas\Sync\Bridge\CourseGroup;
 use PDO;
 use PDOException;
 use Psr\Log\LoggerInterface;
@@ -38,73 +41,41 @@ use function count;
  */
 class Courses
 {
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var Bridge\Account */
-    private $accountBridge;
-
-    /** @var Bridge\CourseGroup */
-    private $courseGroupBridge;
-
-    /** @var Bridge\Course */
-    private $courseBridge;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /** @var CourseSpec\Mapper */
-    private $courseSpecMapper;
-
-    /** @var UnitSpec\Mapper */
-    private $unitSpecMapper;
-
     // CourseGroups => CourseSpec
-    private $countCourseGroupsSynchronised;
-    private $countCourseGroupsCreated;
-    private $countCourseGroupsUpdated;
-    private $countCourseGroupsMoved;
-    private $countCourseGroupsDeleted;
+    private int $countCourseGroupsSynchronised;
+    private int $countCourseGroupsCreated;
+    private int $countCourseGroupsUpdated;
+    private int $countCourseGroupsMoved;
+    private int $countCourseGroupsDeleted;
 
     // Courses => UnitSpecs
-    private $countCoursesSynchronised;
-    private $countCoursesCreated;
-    private $countCoursesUpdated;
-    private $countCoursesMoved;
-    private $countCoursesDeleted;
+    private int $countCoursesSynchronised;
+    private int $countCoursesCreated;
+    private int $countCoursesUpdated;
+    private int $countCoursesMoved;
+    private int $countCoursesDeleted;
 
 
     /**
-     * @param IConnector         $canvasDb
-     * @param Folder\Mapper      $folderMapper
-     * @param CourseSpec\Mapper  $courseSpecMapper
-     * @param UnitSpec\Mapper    $unitSpecMapper
-     * @param LoggerInterface    $log
-     * @param Bridge\Account     $accountBridge
-     * @param Bridge\Course      $courseBridge
-     * @param Bridge\CourseGroup $courseGroupBridge
+     * @param CanvasDb          $canvasDb
+     * @param Folder\Mapper     $folderMapper
+     * @param CourseSpec\Mapper $courseSpecMapper
+     * @param UnitSpec\Mapper   $unitSpecMapper
+     * @param LoggerInterface   $log
+     * @param Account           $accountBridge
+     * @param Course            $courseBridge
+     * @param CourseGroup       $courseGroupBridge
      */
     public function __construct(
-        IConnector $canvasDb,
-        Folder\Mapper $folderMapper,
-        CourseSpec\Mapper $courseSpecMapper,
-        UnitSpec\Mapper $unitSpecMapper,
-        LoggerInterface $log,
-        Bridge\Account $accountBridge,
-        Bridge\Course $courseBridge,
-        Bridge\CourseGroup $courseGroupBridge
+        private CanvasDb $canvasDb,
+        private Folder\Mapper $folderMapper,
+        private CourseSpec\Mapper $courseSpecMapper,
+        private UnitSpec\Mapper $unitSpecMapper,
+        private LoggerInterface $log,
+        private Bridge\Account $accountBridge,
+        private Bridge\Course $courseBridge,
+        private Bridge\CourseGroup $courseGroupBridge
     ) {
-        $this->canvasDb          = $canvasDb;
-        $this->log               = $log;
-        $this->folderMapper      = $folderMapper;
-        $this->courseSpecMapper  = $courseSpecMapper;
-        $this->unitSpecMapper    = $unitSpecMapper;
-        $this->accountBridge     = $accountBridge;
-        $this->courseGroupBridge = $courseGroupBridge;
-        $this->courseBridge      = $courseBridge;
     }
 
 
@@ -128,9 +99,25 @@ class Courses
         // have an assignment, and an assignment may or may not have a quiz.
 
         $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
-        $courseFilterPb    = (new Builder($this->canvasDb->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+        $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql               = "
+        SELECT
+               account.id           'account.canvas_id',
+               course.name          'course.name',
+               course.id            'course.canvas_id',
+               course.course_code   'course.code',
+               enrollment_term.name 'enrollment_term.name'
+        FROM courses course
+        JOIN enrollment_terms enrollment_term ON enrollment_term.id = course.enrollment_term_id
+        JOIN accounts account ON course.account_id = account.id
+        WHERE {$courseFilterWhere}
+        ORDER BY account.id, course.course_code, enrollment_term.start_at, course.id
+        ";
+        if (!$this->canvasDb->isCanvasData2) {
+            $courseFilterPb    = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))->in('course.canvas_id', $canvasCourseIds);
+            $courseFilterWhere = $courseFilterPb->getWhere()[0];
+            $sql = "
         SELECT
                account.canvas_id           'account.canvas_id',
                course.name                 'course.name',
@@ -143,7 +130,8 @@ class Courses
         WHERE {$courseFilterWhere}
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id
         ";
-        $statement         = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
+        }
+        $statement         = $this->canvasDb->getConnector()->executeQuery($sql, $courseFilterPb->getParams());
 
         // Parse results into hierarchical structure
         $accountsData = [];
@@ -218,13 +206,23 @@ class Courses
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
         $sql         = "
+            SELECT DISTINCT c.id
+            FROM courses c
+            JOIN course_sections cs ON cs.course_id = c.id
+            JOIN enrollment_terms term ON term.id = c.enrollment_term_id
+            WHERE {$whereClause}
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql         = "
             SELECT DISTINCT c.canvas_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
             WHERE {$whereClause}
         ";
-        $canvasIds   = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+        }
+        $canvasIds   = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
         return array_map(static function (string $canvasId) {
             return (int)$canvasId;
         }, $canvasIds);

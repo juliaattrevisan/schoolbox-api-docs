@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
+use External\Canvas\Importer\CanvasDb;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -43,7 +44,7 @@ abstract class SubmissionAbstract
     private User $schoolboxAdmin;
 
     /**
-     * @param IConnector         $canvasDb
+     * @param CanvasDb           $canvasDb
      * @param IConnector         $schoolboxDb
      * @param Participant\Mapper $participantMapper
      * @param UserMapper         $userMapper
@@ -51,7 +52,7 @@ abstract class SubmissionAbstract
      * @param MapperProxy        $assessmentDataSource
      */
     public function __construct(
-        protected IConnector $canvasDb,
+        protected CanvasDb $canvasDb,
         protected IConnector $schoolboxDb,
         protected Participant\Mapper $participantMapper,
         protected UserMapper $userMapper,
@@ -146,21 +147,27 @@ abstract class SubmissionAbstract
      * 2. if 1 failed, try matching Canvas unique_name and SB email address
      * 3. if 2 failed, return schoolbox admin
      *
-     * @param string|null $canvasUserId
+     * @param int|null $canvasUserId
      * @return User
      * @throws Mapper\Exception
      */
-    protected function findUserByCanvasUserId(?string $canvasUserId): User
+    protected function findUserByCanvasUserId(?int $canvasUserId): User
     {
         if (key_exists($canvasUserId, $this->canvasUserIdUserMap)) {
             return $this->canvasUserIdUserMap[$canvasUserId];
         }
 
-        $sql = "SELECT sis_user_id, unique_name FROM pseudonym_dim
+        $sql = "SELECT sis_user_id, unique_id as unique_name FROM pseudonyms
                  WHERE workflow_state = 'active'
                    AND user_id = :userId";
 
-        $statement = $this->canvasDb->executeQuery($sql, ['userId' => $canvasUserId]);
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql = "SELECT sis_user_id, unique_name FROM pseudonym_dim
+                 WHERE workflow_state = 'active'
+                   AND user_id = :userId";
+        }
+
+        $statement = $this->canvasDb->getConnector()->executeQuery($sql, ['userId' => $canvasUserId]);
 
         if ($canvasUser = $statement->fetch()) {
             // Try sis user id

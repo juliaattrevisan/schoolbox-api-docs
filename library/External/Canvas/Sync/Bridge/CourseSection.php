@@ -14,6 +14,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\DataStructures\ObjectTree;
+use External\Canvas\Importer\CanvasDb;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -42,22 +43,7 @@ use function preg_replace;
  */
 class CourseSection
 {
-    /** @var IConnector */
-    protected $canvasDb;
-
-    /** @var IConnector */
-    protected $schoolboxDb;
-
-    /** @var Folder\Mapper */
-    protected $folderMapper;
-
-    /** @var Course */
-    protected $courseBridge;
-
-    protected $folderTree;
-
-    /** @var LoggerInterface */
-    protected $log;
+    protected ?ObjectTree $folderTree = null;
 
     /**
      * Maps all SB FolderCodes to a Canvas CourseSections.SisSourceIds (if one is found)
@@ -74,7 +60,7 @@ class CourseSection
      *
      * @var array
      */
-    protected $yearAndFolderCodeToSisSourceIdMap = [];
+    protected array $yearAndFolderCodeToSisSourceIdMap = [];
 
     /**
      * Maps all SB FolderCodes to a SB folder so we can easily fetch the folder by either old folderCode or sisSourceId
@@ -91,7 +77,7 @@ class CourseSection
      *
      * @var array
      */
-    protected $yearAndFolderCodeToFolderMap = [];
+    protected array $yearAndFolderCodeToFolderMap = [];
 
     /**
      * Maps Schoolbox folder ids to SisSourceId
@@ -103,7 +89,7 @@ class CourseSection
      *
      * @var string[]|null[]
      */
-    protected $folderIdToSisSourceIdMap = [];
+    protected array $folderIdToSisSourceIdMap = [];
 
 
     /**
@@ -117,28 +103,23 @@ class CourseSection
      *
      * @var array
      */
-    protected $sisSourceIdToYearAndFolderCodeMap = [];
+    protected array $sisSourceIdToYearAndFolderCodeMap = [];
 
 
     /**
-     * @param IConnector      $canvasDb
+     * @param CanvasDb        $canvasDb
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
      * @param Course          $courseBridge
      * @param LoggerInterface $log
      */
     public function __construct(
-        IConnector $canvasDb,
-        IConnector $schoolboxDb,
-        Folder\Mapper $folderMapper,
-        Course $courseBridge,
-        LoggerInterface $log
+        private CanvasDb $canvasDb,
+        private IConnector $schoolboxDb,
+        private Folder\Mapper $folderMapper,
+        private Course $courseBridge,
+        protected LoggerInterface $log
     ) {
-        $this->canvasDb     = $canvasDb;
-        $this->schoolboxDb  = $schoolboxDb;
-        $this->folderMapper = $folderMapper;
-        $this->courseBridge = $courseBridge;
-        $this->log          = $log;
     }
 
     /**
@@ -496,14 +477,25 @@ class CourseSection
     {
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
-        $sql         = "
+
+        $sql = "
+            SELECT cs.sis_source_id, term.name as term_name, term.sis_source_id as term_sis_id
+            FROM courses c
+            JOIN course_sections cs ON cs.course_id = c.id
+            JOIN enrollment_terms term ON term.id = c.enrollment_term_id
+            WHERE {$whereClause}
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql = "
             SELECT cs.sis_source_id, term.name as term_name, term.sis_source_id as term_sis_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
             WHERE {$whereClause}
         ";
-        return $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll();
+        }
+        return $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams())->fetchAll();
     }
 
 
@@ -557,7 +549,25 @@ class CourseSection
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
         $pb          = (new Builder($mySqlQuoter, ''))->in('section.sis_source_id', $sectionSisSourceIds);
         $whereClause = implode(' AND ', $pb->getWhere());
+
         $sql         = "
+            SELECT
+                course.id                   'course.canvas_id',
+                course.name                 'course.name',
+                section.id                  'section.canvas_id',
+                section.sis_source_id       'section.sis_source_id',
+                section_student.id          'section_student.canvas_id',
+                section_student.sis_user_id 'section_student.sis_user_id'
+            FROM courses course
+            JOIN course_sections section ON course.id = section.course_id
+            LEFT JOIN enrollments enrollment ON enrollment.course_section_id = section.id AND enrollment.type = 'StudentEnrollment' AND enrollment.workflow_state = 'active'
+            LEFT JOIN pseudonyms section_student ON section_student.user_id = enrollment.user_id AND section_student.sis_user_id IS NOT NULL
+            WHERE {$whereClause}
+            ORDER BY course.course_code, course.id, section.id
+        ";
+
+        if (!$this->canvasDb->isCanvasData2) {
+            $sql         = "
             SELECT
                 course.canvas_id            'course.canvas_id',
                 course.name                 'course.name',
@@ -572,9 +582,10 @@ class CourseSection
             WHERE {$whereClause}
             ORDER BY course.code, course.canvas_id, section.canvas_id
         ";
+        }
 
         $data      = [];
-        $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
+        $statement = $this->canvasDb->getConnector()->executeQuery($sql, $pb->getParams());
         while ($row = $statement->fetch()) {
             $courseCanvasId         = $row['course.canvas_id'];
             $sectionCanvasId        = $row['section.canvas_id'];
