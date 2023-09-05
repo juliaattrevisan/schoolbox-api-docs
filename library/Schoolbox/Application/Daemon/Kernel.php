@@ -23,7 +23,9 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
+use Schoolbox\MultiInstance;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\MQ\ConnectorFactory;
 use Stomp\Protocol\Protocol;
@@ -414,6 +416,35 @@ EOL;
             $conf = $di->get('config');
             return new AsyncRedisClient($conf->get('redis_ephemeral_url'), $this->loop);
         }));
+
+        // Multi-instance repositories
+        $di->set(
+            'multiInstance.instanceRepository',
+            $di->lazy(fn () => new MultiInstance\InstanceRepository(
+                parse_ini_file("/etc/schoolbox/instances.ini", true)
+            ))
+        );
+        $di->set(
+            'multiInstance.connectorRepository',
+            $di->lazyNew(
+                MultiInstance\ConnectorRepository::class,
+                [
+                    'instanceRepository' => $di->get('multiInstance.instanceRepository'),
+                    'databaseFactory'    => $di->get('databaseFactory'),
+                ],
+            )
+        );
+        $di->set(
+            'multiInstance.configRepository',
+            $di->lazyNew(
+                MultiInstance\ConfigRepository::class,
+                [
+                    'connectorRepository' => $di->get('multiInstance.connectorRepository'),
+                    'dataSource'          => $di->lazyNew(DataSource::class),
+                ],
+            )
+        );
+
         return $di;
     }
 }
