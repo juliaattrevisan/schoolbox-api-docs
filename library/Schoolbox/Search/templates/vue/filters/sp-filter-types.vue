@@ -4,6 +4,7 @@
  */
 
 import { useFilterTypesStore } from "./store/spFilterTypesStore";
+import SpFilterTypesType from "./sp-filter-types-type.vue";
 
 const filterTypesStore = useFilterTypesStore();
 </script>
@@ -13,26 +14,11 @@ const filterTypesStore = useFilterTypesStore();
         <label>Types</label>
         <fieldset class="checklist">
             <ul class="option-list">
-                <li v-for="filter in filterTypesStore.allTypes" :key="filter.value">
-                    <input
-                        :id="filter.value"
-                        v-model="filterTypesStore.selectedTypes"
-                        type="checkbox"
-                        :value="filter.value"
-                    />
-                    <label :for="filter.value">{{ filter.title }}</label>
-                    <ul v-if="filter.subTypes">
-                        <li v-for="subType in filter.subTypes" :key="subType.value">
-                            <input
-                                :id="subType.value"
-                                v-model="filterTypesStore.selectedTypes"
-                                type="checkbox"
-                                :value="subType.value"
-                            />
-                            <label :for="subType.value">{{ subType.title }}</label>
-                        </li>
-                    </ul>
-                </li>
+                <sp-filter-types-type
+                    v-for="typeItem in filterTypesStore.allTypes"
+                    :key="typeItem.value"
+                    :type="typeItem"
+                />
             </ul>
         </fieldset>
     </div>

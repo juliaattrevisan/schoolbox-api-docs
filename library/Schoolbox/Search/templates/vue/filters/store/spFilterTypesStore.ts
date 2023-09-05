@@ -39,6 +39,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
 
     return {
         allTypes,
+        activeTypes,
         isActive,
         getFormData,
         clear,
