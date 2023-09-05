@@ -92,8 +92,6 @@ class Hydrator extends BaseHydrator
                         return null;
                     }
 
-                    $context = [$tileFolder];
-
                     return new FullResult(
                         $match,
                         $match->id,
@@ -104,11 +102,11 @@ class Hydrator extends BaseHydrator
                         $tile->getModifiedAt(),
                         $tileFolder,
                         null,
-                        null,
+                        $tile->getBackgroundImage(),
                         'tile',
                         '',
                         null,
-                        $context,
+                        [$tileFolder],
                         [],
                     );
                 }
