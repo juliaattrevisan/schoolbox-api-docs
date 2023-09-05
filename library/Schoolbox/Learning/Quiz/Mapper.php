@@ -270,7 +270,7 @@ class Mapper extends BaseMapper
         ]);
 
         /* FIXME projects need some special treatment of some kind,
-         *  getBaseAsseable() might return a Schoolbox\Learning\Assessment\Project
+         *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
          *  which won't have a Learnosity Reference field...weird behaviours
          *  But Why?
          */

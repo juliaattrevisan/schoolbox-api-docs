@@ -76,16 +76,24 @@ class Overwriter
 
         // Delete quiz constituents and rubric
         $this->deleteDueWorkRubric($updatedDestination);
-        $this->deleteQuizConstituents($updatedDestination);
+
+        /* TODO Probably delete this quiz from Learnosity entirely,
+         *  and orphan it intentionally into an archived state
+         */
+        // $this->deleteQuizConstituents($updatedDestination);
+
+        /* Cloning a quiz means we need the new Learnosity Reference identifier
+         * that can only really be obtained after sending it to Learnosity; we
+         * store the Learnosity Reference in the $assessment itself, thus making
+         * Learnosity content cloning have a sequential dependency here.
+         */
+        $this->replicateQuizConstituents($source, $updatedDestination);
 
         // Save
         $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
 
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $updatedDestination);
-
-        // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($source, $updatedDestination);
 
         return $updatedDestination;
     }
@@ -105,7 +113,13 @@ class Overwriter
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
         }
-        $this->quizMapper->copyQuizConstituents($source->getId(), $destination->getId());
+
+        /* Clone an existing Learnosity Activity
+         * Get the cloned activity's Learnosity Reference
+         * Assign this new Learnosity Reference to $destination's instance
+         * Save it
+         */
+        $this->quizMapper->copyQuizConstituents($source, $destination);
     }
 
     /**
