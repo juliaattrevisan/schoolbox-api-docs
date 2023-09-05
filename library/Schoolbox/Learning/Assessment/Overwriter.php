@@ -89,6 +89,9 @@ class Overwriter
          */
         $this->replicateQuizConstituents($source, $updatedDestination);
 
+        /* TODO But how to replicate projects containing quizzes, then?
+         */
+
         // Save
         $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
 
