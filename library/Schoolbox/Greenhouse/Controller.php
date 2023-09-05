@@ -11,6 +11,7 @@ namespace Schoolbox\Greenhouse;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStone;
 use Twig\Error\Error;
 
 /**
@@ -26,11 +27,19 @@ class Controller extends Base
     protected static $l10nMapper;
 
     /**
+     * @var RosettaStone
+     */
+    protected static $rosettaStone;
+
+    /**
      * Let's build this thing!
      */
-    public function __construct()
+    public function __construct(
+        RosettaStone $rosettaStone
+    )
     {
         self::$l10nMapper = L10nMapper::getInstance();
+        self::$rosettaStone = $rosettaStone;
     }
 
     /**
@@ -46,7 +55,7 @@ class Controller extends Base
 //var_dump(
 //    json_encode(
 //        [
-//            'filters' => $this->substituteLocalisedTermsIntoFilters($filters)
+//            'filters' => $filters
 //        ]
 //    )
 //);
@@ -55,7 +64,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             "@greenhouse/$templateName.twig",
             [
-                'filters' => $this->substituteLocalisedTermsIntoFilters($filters)
+                'filters' => $filters
             ]
         );
     }
@@ -71,14 +80,15 @@ class Controller extends Base
 
         $loggedInUserRole = $this->getUser()->getRole();
         $configLoader = $this->getConfigLoader();
+        $rosettaStone = self::$rosettaStone;
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $subTypes = [
-                ["title" => "Due Work"   , "value" => "assessment.dueWork"      ],
-                ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"   ],
-                ["title" => "Project"    , "value" => "assessment.project"      ],
-                ["title" => "Quiz"       , "value" => "assessment.quiz"         ],
-                ["title" => "Task"       , "value" => "assessment.task"         ],
+                ["title" => $rosettaStone->translate("dueWork", false, true), "value" => "assessment.dueWork"],
+                ["title" => $rosettaStone->translate("project", false, true), "value" => "assessment.project"],
+                ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"],
+                ["title" => "Quiz"       , "value" => "assessment.quiz"      ],
+                ["title" => "Task"       , "value" => "assessment.task"      ],
             ];
 
             if ($configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
@@ -87,7 +97,7 @@ class Controller extends Base
 
             // NOTE: Features to include based on NAME_LMS_ENABLED were found by inspecting code in conf/modules/Learning.php.
             $filters[] = [
-                "title" => "Assessment",
+                "title" => $rosettaStone->translate("assessment", false, true),
                 "value" => "assessment",
                 "subTypes" => $subTypes
             ];
@@ -110,15 +120,15 @@ class Controller extends Base
         ];
 
         $pagesFoldersSubTypes = [
-            ["title" => "Current Class", "value" => "page.class"   ],
-            ["title" => "Folder"       , "value" => "page.other"   ],
-            ["title" => "Group"        , "value" => "page.other"   ],
-            ["title" => "Homepage"     , "value" => "page.homepage"],
+            ["title" => "Current " . $rosettaStone->translate("class", false, true), "value" => "page.class"],
+            ["title" => "Folder"  , "value" => "page.other"   ],
+            ["title" => "Group"   , "value" => "page.other"   ],
+            ["title" => "Homepage", "value" => "page.homepage"],
         ];
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $pagesFoldersSubTypes[] = ["title" => "Course", "value" => "page.course"];
-            $pagesFoldersSubTypes[] = ["title" => "Unit"  , "value" => "page.unit"  ];
+            $pagesFoldersSubTypes[] = ["title" => $rosettaStone->translate("unit", false, true), "value" => "page.unit"];
         }
 
         $filters[] = [
@@ -128,8 +138,8 @@ class Controller extends Base
         ];
 
         $userSubTypes = [
-            ["title" => "Guest", "value" => "user.guest" ],
-            ["title" => "Staff", "value" => "user.staff" ],
+            ["title" => "Guest", "value" => "user.guest"],
+            ["title" => "Staff", "value" => "user.staff"],
         ];
 
         if ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) {
@@ -148,60 +158,13 @@ class Controller extends Base
             "subTypes" => $userSubTypes
         ];
 
+        $filters[] = ["title" => $rosettaStone->translate("news", false, true), "value" => "news"];
         $filters[] = ["title" => "Events", "value" => "events"];
         $filters[] = ["title" => "Forums", "value" => "forum"];
         $filters[] = ["title" => "Links", "value" => "link"];
-        $filters[] = ["title" => "News", "value" => "news"];
         $filters[] = ["title" => "Textboxes", "value" => "textbox"];
         $filters[] = ["title" => "Tiles", "value" => "tile"];
 
         return $filters;
-    }
-
-    /**
-     * For each title in $filters, look for a row in the schoolbox.localisation DB table with a matching title.
-     * If one is found, replace the title in $filters with schoolbox.localisation.singular_form.
-     * @param array $filters
-     * @return array
-     */
-    private function substituteLocalisedTermsIntoFilters(array $filters): array
-    {
-        $filtersLocalised = [];
-
-        foreach ($filters as $filter) {
-            $singularForm = self::getSingularFormMatchingTitle(strtolower($filter["title"]));
-
-            $filterWithTerminology = [
-                "title" => (($singularForm === null) ? $filter["title"] : ucwords($singularForm)),
-                "value" => $filter["value"],
-            ];
-
-            if (array_key_exists('subTypes', $filter) && count($filter["subTypes"]) > 0) {
-                $filterWithTerminology["subTypes"] = $this->substituteLocalisedTermsIntoFilters($filter["subTypes"]);
-            }
-
-            $filtersLocalised[] = $filterWithTerminology;
-        }
-
-        return $filtersLocalised;
-    }
-
-    /**
-     * @param string $title
-     * @return string|null
-     */
-    private static function getSingularFormMatchingTitle(string $title): string|null
-    {
-        static $singularFormByTitle = null;
-
-        if ($singularFormByTitle === null) {
-            $singularFormByTitle = [];
-
-            foreach (self::$l10nMapper->findAll()->sortNaturally('title') as $termObj) {
-                $singularFormByTitle[strtolower($termObj->getTitle())] = $termObj->getSingularForm();
-            }
-        }
-
-        return (array_key_exists($title, $singularFormByTitle)) ? $singularFormByTitle[$title] : null;
     }
 }

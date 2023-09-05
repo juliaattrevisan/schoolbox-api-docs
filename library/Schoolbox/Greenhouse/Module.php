@@ -51,6 +51,8 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->injector->get('l10n')
+        );
     }
 }
