@@ -117,8 +117,16 @@ class Replicator
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
         }
+
+        /* Clone an existing Learnosity Activity
+         * Get the cloned activity's Learnosity Reference
+         * Assign this new Learnosity Reference to $destination's instance
+         * Save it
+         */
+
         $this->quizMapper->copyQuizConstituents($source->getId(), $destination->getId());
     }
+
 
     /**
      * Copy the rubric from `$source` into `$destination`.

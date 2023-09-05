@@ -220,7 +220,7 @@ class Mapper extends BaseMapper
      *
      * @param int $sourceAssessmentId
      * @param int $destinationAssessmentId
-     * @return bool
+     * @return string
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      * @throws BaseMapper\Exception\Deleted
@@ -229,44 +229,49 @@ class Mapper extends BaseMapper
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId)
+    public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId): string
     {
-        $sectionMapper = $this->getJoinMapper('sections');
-        $questionMapper = QuizQuestionMapper::getInstance();
-        $solutionMapper = QuizSolutionMapper::getInstance();
 
-        /** @var Model $sourceQuiz */
-        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
-        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
+        /* Clone a Learnosity Reference in Learnosity land
+         * Get the new learnosity reference and return that
+         */
 
-        foreach ($sourceQuiz->getSections() as $section) {
-            $questions = $questionMapper->findByColumn('section_id', $section->getId());
-            $section->setQuestions($questions);
-        }
-
-        /** @var Model $destinationQuiz */
-        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
-
-        // Ensure that we don't clobber destination Sections
-        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
-        if ($destinationQuiz->getSections()->count()) {
-            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
-        }
-
-        // Clone and Save Sections, Questions + Solutions
-        foreach ($sourceQuiz->getSections() as $section) {
-            $clonedSection = clone $section;
-            $clonedSection->setQuiz($destinationQuiz);
-            $destinationQuiz->getSections()->add($clonedSection);
-            $sectionMapper->save($clonedSection);
-
-            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
-                $questionMapper->save($clonedQuestion);
-                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
-                    $solutionMapper->save($clonedQuestion->getSolution());
-                }
-            }
-        }
+//        $sectionMapper = $this->getJoinMapper('sections');
+//        $questionMapper = QuizQuestionMapper::getInstance();
+//        $solutionMapper = QuizSolutionMapper::getInstance();
+//
+//        /** @var Model $sourceQuiz */
+//        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
+//        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
+//
+//        foreach ($sourceQuiz->getSections() as $section) {
+//            $questions = $questionMapper->findByColumn('section_id', $section->getId());
+//            $section->setQuestions($questions);
+//        }
+//
+//        /** @var Model $destinationQuiz */
+//        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
+//
+//        // Ensure that we don't clobber destination Sections
+//        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
+//        if ($destinationQuiz->getSections()->count()) {
+//            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
+//        }
+//
+//        // Clone and Save Sections, Questions + Solutions
+//        foreach ($sourceQuiz->getSections() as $section) {
+//            $clonedSection = clone $section;
+//            $clonedSection->setQuiz($destinationQuiz);
+//            $destinationQuiz->getSections()->add($clonedSection);
+//            $sectionMapper->save($clonedSection);
+//
+//            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
+//                $questionMapper->save($clonedQuestion);
+//                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
+//                    $solutionMapper->save($clonedQuestion->getSolution());
+//                }
+//            }
+//        }
         return true;
     }
 
