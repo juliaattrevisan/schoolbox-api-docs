@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory as DatabaseFactory;
 use OutOfBoundsException;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -39,9 +40,6 @@ use Schoolbox\IConfigLoader;
  */
 class Repository
 {
-    public const FIELD_BOOLEAN       =  3;
-    public const FIELD_CHECKBOX      =  5;
-
     /**
      * A cache of database connectors per instance.
      *
@@ -131,33 +129,6 @@ class Repository
      */
     private function loadConfig(string $instanceId): array
     {
-        $database = $this->getDatabaseForInstance($instanceId);
-        $query    = $database->executeQuery('SELECT name, value, field_id FROM config');
-        $configs  = [];
-        foreach ($query as $row) {
-            $configs[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
-        }
-        return $configs;
-    }
-
-    /**
-     * Light-weight hydration to respect boolean fields
-     *
-     * @todo copied from `\Schoolbox\Config\ConfigMapper::findAllConfigs`:
-     *       extract to its own class
-     *
-     * @param int   $fieldId
-     * @param mixed $value
-     * @return mixed
-     */
-    private function hydrateValue(int $fieldId, mixed $value): mixed
-    {
-        switch ($fieldId) {
-            case self::FIELD_BOOLEAN:
-            case self::FIELD_CHECKBOX:
-                return $value === null ? null : (bool)$value;
-            default:
-        }
-        return $value;
+        return (new DataSource())->findAllConfigs($this->getDatabaseForInstance($instanceId));
     }
 }

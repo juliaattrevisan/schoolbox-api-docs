@@ -357,13 +357,7 @@ class ConfigMapper extends Mapper
      */
     public function findAllConfigs(): array
     {
-        $configs = [];
-        $query   = $this->getDatabase()->prepare("SELECT name, value, field_id FROM {$this->getTable()}");
-        $query->execute();
-        foreach ($query as $row) {
-            $configs[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
-        }
-        return $configs;
+        return (new DataSource())->findAllConfigs($this->database);
     }
 
 
@@ -427,25 +421,6 @@ class ConfigMapper extends Mapper
         }
         return $configs;
     }
-
-    /**
-     * Light-weight hydration to respect boolean fields
-     *
-     * @param int   $fieldId
-     * @param mixed $value
-     * @return mixed
-     */
-    private function hydrateValue(int $fieldId, $value)
-    {
-        switch ($fieldId) {
-            case self::FIELD_BOOLEAN:
-            case self::FIELD_CHECKBOX:
-                return $value === null ? null : (bool)$value;
-            default:
-        }
-        return $value;
-    }
-
 
     /**
      * Override notifications to silence them
