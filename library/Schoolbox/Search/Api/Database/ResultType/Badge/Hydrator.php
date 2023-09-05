@@ -63,7 +63,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($badges) {
+            function (RawResult $match) use ($keyword, $badges) {
                 $badge = $badges->getBy('id', $match->id);
                 if ($badge instanceof BadgeModel) {
                     // For other searched items, permission checks are done here.
@@ -81,7 +81,7 @@ class Hydrator extends BaseHydrator
                         $badge->getCategory()->getName(), // Meta.  Context line for the search result.
                         $badge->getImage(),
                         'badge',
-                        $badge->getBody(), // The closest thing to a description for a badge is badge.body.
+                        $this->truncateAroundKeyword($keyword, $badge->getBody(), self::DESCRIPTION_LENGTH),
                         $badge->getCreatedBy(),
                         [], // Context.  Empty since no linked folder.
                         [], // Links.  None for badges.
