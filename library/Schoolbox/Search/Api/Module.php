@@ -25,6 +25,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Tile\Mapper as TileMapper;
 use Schoolbox\User\Formatter\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
@@ -97,6 +98,7 @@ class Module extends BaseModule
                 new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -137,6 +139,10 @@ class Module extends BaseModule
                 new Database\ResultType\Badge\Hydrator(
                     $mapperFactory->get(BadgeMapper::class),
                     new PrefixGenerator($this->getConfig()),
+                ),
+                new Database\ResultType\Tile\Hydrator(
+                    $mapperFactory->get(TileMapper::class),
+                    Access::getInstance(),
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
