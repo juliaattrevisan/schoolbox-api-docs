@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Blog\Homepage\Post;
 
-use Alaress\Database\Wrapper\Db2\PDOStatement;
 use PDO;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
@@ -80,7 +79,8 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
     {
         return "SELECT
                 {$this->getColumnString()},
-                {$this->getJoinMapper('owner')->getColumnString('u')}
+                {$this->getJoinMapper('owner')->getColumnString('u')},
+                {$this->getJoinColumnString('owner.pronoun', 'op')}
         ";
     }
 
@@ -92,6 +92,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
         return "FROM
                 `{$this->getTable()}`
                 JOIN {$this->getJoinSql('owner', 'blog', 'u')}
+                LEFT JOIN {$this->getJoinSql('owner.pronoun', 'u', 'op')}
         ";
     }
 
@@ -110,6 +111,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
 
             /** @var User $owner */
             $owner = $this->hydrateJoin($row, 'owner', 'u');
+            $owner->setPronoun($this->hydrateJoin($row, 'owner.pronoun', 'op'));
             $model->setOwner($owner);
 
             $collection->add($model);
