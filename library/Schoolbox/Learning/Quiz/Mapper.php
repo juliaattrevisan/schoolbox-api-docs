@@ -8,13 +8,17 @@
 
 namespace Schoolbox\Learning\Quiz;
 
+use Alaress\Lumberjack\Logger;
 use PDO;
 use PDOStatement;
+use Ramsey\Uuid\Uuid;
 use Schoolbox;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -218,23 +222,49 @@ class Mapper extends BaseMapper
      *
      * For now, this call will throw an exception if the destination Quiz already has Sections.
      *
-     * @param int $sourceAssessmentId
-     * @param int $destinationAssessmentId
+     * @param IAssessable $source
+     * @param IAssessable $destination
      * @return string
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
-     * @throws BaseMapper\Exception\Deleted
      * @throws \DomainException
-     * @throws \InvalidArgumentException If Destination Quiz already has Sections
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      */
-    public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId): string
+    public function copyQuizConstituents(IAssessable $source, IAssessable $destination): string
     {
+        $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
+        $learnosityConsumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
+
+        $api = new Api(
+            $_SERVER['SERVER_NAME'],
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+        );
 
         /* Clone a Learnosity Reference in Learnosity land
-         * Get the new learnosity reference and return that
          */
+        $oldLearnosityReference = $source->getLearnosityReference();
+
+        /* Get the new learnosity reference and return that
+         *
+         * TODO We could either Poll Learnosity to find out when it's cloned,
+         *  or assign a random uuidv4() arbitrarily, and use that instead...
+         *  ...and hope that Learnosity is okay with it
+         */
+        $newLearnosityReference = (string)Uuid::uuid4();
+
+        /* Make a massive assumption that this _jsut worked_
+         * You could lean on the polling system to find out when this cloning has finished,
+         * or just blindly assume the uuidv4() was unique
+         */
+        $response = $api->dataSetRequest('/itembank/activities/duplicate', [
+            'activities' => [
+                [
+                    'reference' => $oldLearnosityReference,
+                    'new_reference' => $newLearnosityReference
+                ]
+            ]
+        ]);
+
+        $destination->getBaseAssessable()->setLearnosityReference($newLearnosityReference);
 
 //        $sectionMapper = $this->getJoinMapper('sections');
 //        $questionMapper = QuizQuestionMapper::getInstance();
@@ -272,6 +302,7 @@ class Mapper extends BaseMapper
 //                }
 //            }
 //        }
+
         return true;
     }
 
