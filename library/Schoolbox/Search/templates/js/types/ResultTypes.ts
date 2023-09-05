@@ -6,7 +6,7 @@ export enum ResultTypes {
     ASSESSMENT_DUE_WORK = "assessment.dueWork",
     ASSESSMENT_LESSON_PLAN = "assessment.lessonPlan",
     ASSESSMENT_PROJECT = "assessment.project",
-    ASSESSMENT_LTI = "assessment.ltiAssessment",
+    ASSESSMENT_LTI = "assessment.lti",
     ASSESSMENT_TASK = "assessment.task",
     ASSESSMENT_QUIZ = "assessment.quiz",
     BADGE = "badge",
