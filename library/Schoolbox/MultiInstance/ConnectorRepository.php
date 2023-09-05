@@ -13,6 +13,9 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory as DatabaseFactory;
 use OutOfBoundsException;
 
+/**
+ * Repository of connectors for each instance this node knows about.
+ */
 class ConnectorRepository
 {
     /**
@@ -41,11 +44,11 @@ class ConnectorRepository
      * @return IConnector
      * @throws OutOfBoundsException if `$instanceId` is unknown
      */
-    public function fetchDatabaseForInstance(string $instanceId): IConnector
+    public function fetchConnectorForInstance(string $instanceId): IConnector
     {
         $instanceConfig = $this->instanceRepository->fetchConfigForInstance($instanceId);
 
-        // Build a connection if required: assuming read-only for now
+        // Build a connection if required
         if (!isset($this->instanceConnectors[$instanceId])) {
             $this->instanceConnectors[$instanceId] = $this->databaseFactory->createMysql();
             $this->instanceConnectors[$instanceId]->connect(

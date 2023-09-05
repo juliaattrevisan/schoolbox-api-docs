@@ -51,4 +51,25 @@ class InstanceConfig
         #[SensitiveParameter] public ?string $dbPasswordRead = null,
     ) {
     }
+
+    /**
+     * Debug info: exclude DB passwords
+     *
+     * @return array
+     */
+    public function __debugInfo(): array
+    {
+        return [
+            'instanceId'     => $this->instanceId,
+            'hostnames'      => $this->hostnames,
+            'dbHost'         => $this->dbHost,
+            'dbSchema'       => $this->dbSchema,
+            'dbUser'         => $this->dbUser,
+            'dbPassword'     => '',
+            'dbHostRead'     => $this->dbHostRead,
+            'dbSchemaRead'   => $this->dbSchemaRead,
+            'dbUserRead'     => $this->dbUserRead,
+            'dbPasswordRead' => isset($this->dbPasswordRead) ? '' : null,
+        ];
+    }
 }

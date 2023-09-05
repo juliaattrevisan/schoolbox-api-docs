@@ -9,12 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\MultiInstance;
 
-use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Factory as DatabaseFactory;
 use OutOfBoundsException;
 use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
 
+/**
+ * Repository of configs for each instance this node knows about.
+ */
 class ConfigRepository
 {
     /**
@@ -46,7 +47,7 @@ class ConfigRepository
      */
     public function fetchConfigForInstance(string $instanceId): IConfigLoader
     {
-        $instanceConnector = $this->connectorRepository->fetchDatabaseForInstance($instanceId);
+        $instanceConnector = $this->connectorRepository->fetchConnectorForInstance($instanceId);
         if (!isset($this->instanceConfigs[$instanceId])) {
             $this->instanceConfigs[$instanceId] = $this->dataSource->findAllConfigs($instanceConnector);
         }

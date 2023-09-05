@@ -9,10 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\MultiInstance;
 
-use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Factory as DatabaseFactory;
 use OutOfBoundsException;
-
 
 /**
  * Repository of all instances this node knows about.
@@ -32,6 +29,8 @@ use OutOfBoundsException;
 class InstanceRepository
 {
     /**
+     * A cache of parsed instance configs, stored by instance.
+     *
      * @var array<string, InstanceConfig>
      */
     private array $instanceConfigs = [];
@@ -39,7 +38,7 @@ class InstanceRepository
     /**
      * Constructor
      *
-     * @param array<string, TInstanceConfigArray> $instances
+     * @param array<string, TInstanceConfigArray> $instances A list of instances, as parsed from an .ini file.
      */
     public function __construct(private array $instances)
     {
