@@ -109,17 +109,22 @@ class Controller extends Base
             ]
         ];
 
+        $pagesFoldersSubTypes = [
+            ["title" => "Current Class", "value" => "page.class"   ],
+            ["title" => "Folder"       , "value" => "page.other"   ],
+            ["title" => "Group"        , "value" => "page.other"   ],
+            ["title" => "Homepage"     , "value" => "page.homepage"],
+        ];
+
+        if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            $pagesFoldersSubTypes[] = ["title" => "Course", "value" => "page.course"];
+            $pagesFoldersSubTypes[] = ["title" => "Unit"  , "value" => "page.unit"  ];
+        }
+
         $filters[] = [
             "title" => "Pages / Folders",
             "value" => "page",
-            "subTypes" => [
-                ["title" => "Course"       , "value" => "page.course"  ],
-                ["title" => "Unit"         , "value" => "page.unit"    ],
-                ["title" => "Current Class", "value" => "page.class"   ],
-                ["title" => "Folder"       , "value" => "page.other"   ],
-                ["title" => "Group"        , "value" => "page.other"   ],
-                ["title" => "Homepage"     , "value" => "page.homepage"],
-            ]
+            "subTypes" => $pagesFoldersSubTypes
         ];
 
         // TODO: Should user type be included in filters if no users of that type exist?
