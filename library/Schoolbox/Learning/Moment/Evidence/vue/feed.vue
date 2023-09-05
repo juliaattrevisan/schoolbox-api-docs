@@ -86,20 +86,8 @@ export default {
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
         await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
         this.loadFilteredContent(this.selectedTag, false);
+    },
 
-        // Ensure dropdowns are initialised
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
-    /**
-     * Ensure dropdowns are initialised when we create them
-     */
-    updated() {
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
     methods: {
         /**
          * Load learning evidence for the student in question.
@@ -622,13 +610,10 @@ export default {
                                             </a>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
-                                            <a
-                                                href="#"
-                                                class="icon-overflow"
-                                                :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
-                                                aria-expanded="false"
-                                                title="Actions"
-                                            ></a>
+                                            <wc-actions-dropdown
+                                                :content-id="`evidence-${evidence.object.id}-dropdown`"
+                                                :data-test="`wc-actions-dropdown-evidence-${evidence.object.id}`"
+                                            ></wc-actions-dropdown>
                                         </nav>
                                         <ul
                                             v-if="hasMenu(evidence.object)"

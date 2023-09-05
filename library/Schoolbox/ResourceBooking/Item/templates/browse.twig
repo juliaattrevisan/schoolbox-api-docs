@@ -10,7 +10,7 @@
         </div>
     </div>
     <nav>
-        <a href="#" class="icon-overflow" data-dropdown="options" aria-expanded="false" title="Actions"></a>
+        <wc-actions-dropdown content-id="options"></wc-actions-dropdown>
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="options">
         <li>
@@ -124,6 +124,3 @@
         {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: page, class:'pagination'} %}
     </div>
 </div>
-
-
-

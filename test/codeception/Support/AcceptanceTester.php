@@ -127,7 +127,7 @@ class AcceptanceTester extends Actor
     public function impersonateAnyUser($fullname): void
     {
         $i = $this;
-       // $i->amOnPage('/user/recoverSession');
+        // $i->amOnPage('/user/recoverSession');
         $i->click('#profile-drop');
         $i->executeJS("var scrollableDiv = document.getElementById('account-content');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
@@ -150,7 +150,7 @@ class AcceptanceTester extends Actor
         $i->loginAsAdmin();
         $i->searchBar($fullname);
         $i->click('a[title="Modify User"]');
-        $i->click('a.icon-more');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-header-options]', '[data-test=wc-actions-dropdown-header-options-button]');
         $i->click('a[title="Login as user"]');
         $i->waitForText($fullname, 5);
         $i->deleteSessionSnapshot($fullname);
@@ -281,5 +281,15 @@ class AcceptanceTester extends Actor
             $this->click('Finish');
         } catch (Exception $e) {
         }
+    }
+
+    /**
+     * To click an element inside a web component
+     * @param $selector - the web component to target
+     * @param $inSelector - the element within the web component to click
+     */
+    public function clickElementInWebComponent($selector, $inSelector): void
+    {
+        $this->executeJS('document.querySelector("' . $selector . '").shadowRoot.querySelector("' . $inSelector . '").click();');
     }
 }

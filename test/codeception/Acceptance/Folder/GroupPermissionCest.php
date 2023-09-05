@@ -100,10 +100,10 @@ class GroupPermissionCest
         $i->amGoingTo('get logged in as Eloise White and check she is able to leave the group');
         $i->impersonateViaModifyUserPage($groupMember);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
-        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->canSee('Leave Group');
         $i->click('Leave Group');
-        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->canSee('Join Group');
     }
 
@@ -177,11 +177,11 @@ class GroupPermissionCest
         $i->amGoingTo('get logged in as Eloise White and check she is able to leave the group');
         $i->impersonateViaModifyUserPage($groupMember);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
-        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         sleep(1);
         $i->canSee('Leave Group');
         $i->click('Leave Group');
-        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         sleep(1);
         $i->cantSee('Cancel Application');
     }
@@ -256,7 +256,7 @@ class GroupPermissionCest
         $i->amGoingTo('get logged in as Jana Reed and check she is unable to leave the group');
         $i->impersonateViaModifyUserPage($groupMember);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/' . $folderId);
-        $i->click(Common::SELECTOR_JELLY_TOT);
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->cantSee('Leave Group');
     }
 
@@ -304,7 +304,7 @@ class GroupPermissionCest
         $manageGroup->clickFromRadioButton('role');
         $i->click('Add Members');
         $i->amGoingTo('Making Jack Coles the group admin via database');
-        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null,'name like' => $folderName]);
+        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null, 'name like' => $folderName]);
         $i->updateInDatabase('userAccess', ['type' => '3'], ['sid' => $folderId]);
 
         $i->amGoingTo('Create a sub folder under the group');
@@ -327,7 +327,7 @@ class GroupPermissionCest
 
         $i->amGoingTo('Impersonate Jana Reed and access the sub folder');
         $i->impersonate('Jana Reed');
-        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null,'name like' => $subFolderName]);
+        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null, 'name like' => $subFolderName]);
         $i->amOnPage('/homepage/' . $folderId);
         $i->cantSee('Group 1');
         $i->canSee('You do not have permission to view this page.');

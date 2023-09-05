@@ -85,8 +85,7 @@ class SummaryPage
         $i = $this->tester;
 
         // Jelly Tot!
-//        $i->click(Locator::elementAt('#content a.icon-more[data-dropdown="section' . $sectionId . '-options"]', 2));
-        $i->click('#content a.icon-more[data-dropdown="section' . $sectionId . '-options"]');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-section' . $sectionId . '-options]', '[data-test=wc-actions-dropdown-section' . $sectionId . '-options-button]');
         // Add from Question Bank
         $i->click('#section' . $sectionId . '-options a.icon-download');
 
@@ -105,8 +104,7 @@ class SummaryPage
         $i = $this->tester;
 
         // Jelly Tot!
-//        $i->click(Locator::elementAt('#content a.icon-more[data-dropdown="section' . $sectionId . '-options"]', 2));
-        $i->click('#content a.icon-more[data-dropdown="section' . $sectionId . '-options"]');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-section' . $sectionId . '-options]', '[data-test=wc-actions-dropdown-section' . $sectionId . '-options-button]');
         // Add from Question Bank
         $i->click('#section' . $sectionId . '-options a.icon-add');
 

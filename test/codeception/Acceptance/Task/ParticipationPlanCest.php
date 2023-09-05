@@ -82,14 +82,14 @@ class ParticipationPlanCest
         $homepageUrl = $i->getCurrentUrl();
 
         $i->amGoingTo('Add Jack Coles, Eden Reed and Jana Reed into the group via manage group page');
-        $i->click('a#all-actions.icon-more');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $manageGroup->search($teacher);
         $manageGroup->selectUser(22);
         $manageGroup->clickFromRadioButton('role');
         $i->click('Add Members');
         $i->amGoingTo('Making Jack Coles the group admin via database');
-        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null,'name like' => $folderName]);
+        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null, 'name like' => $folderName]);
         $i->updateInDatabase('userAccess', ['type' => '3'], ['sid' => $folderId]);
         $i->amGoingTo('Add Eden Reed into the group');
         $manageGroup->search($student1);
@@ -116,11 +116,11 @@ class ParticipationPlanCest
         $dateLearningPlan = \Alaress_Date_Format::now()->setDate(2030, 10, 03)->setTime(10, 0, 0);
         $dueDate = \Alaress_Date_Format::now()->setDate(2030, 8, 03)->setTime(10, 0, 0);
         $dueworkForm->setWorkType(AssessmentForm::WORKTYPE_ASSESSMENT_TASK)
-                    ->setTitle('Task Participation and Learning Plan')
-                    ->setPublishDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
-                    ->setDueDate($dueDate)
-                    ->createLearningPlan(6, 'Test learning plan', $dateLearningPlan)
-                    ->create();
+            ->setTitle('Task Participation and Learning Plan')
+            ->setPublishDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
+            ->setDueDate($dueDate)
+            ->createLearningPlan(6, 'Test learning plan', $dateLearningPlan)
+            ->create();
         $i->waitForText('Tasks');
 
         $i->amGoingTo("As admin check if the learning plan is presented under Participation and Learning Plans");

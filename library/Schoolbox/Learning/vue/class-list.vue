@@ -250,7 +250,6 @@ export default {
             sendEmailButtonDefaultText: "Compose Email",
             sendEmailButtonText: null,
             formIsReady: false,
-            actionsPlaceholder: true,
             loadingText: "Please Wait...",
             noEmailsFoundText: "Sorry we cannot send an email to the selected users as they do not have an email",
             currentClassCode: null,
@@ -271,11 +270,6 @@ export default {
 
         // If the Back button is pressed on this page: set the class code
         window.addEventListener("popstate", () => self.setClassCode(window.location.hash.substring(1)));
-
-        // Ensure dropdowns are initialised
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
     },
     methods: {
         getStudentsPastoralCountsEndpoint: function () {
@@ -317,8 +311,6 @@ export default {
             setTimeout(() => {
                 this.studentsCheckboxElements = document.getElementsByName("students[]");
                 this.groupsCheckboxElements = document.getElementsByName("groups[]");
-                // Remove actions placeholder once everything is ready
-                this.actionsPlaceholder = false;
             }, 100);
         },
         sendEmail: function () {
@@ -724,12 +716,9 @@ export default {
                             <td class="no-pad">
                                 <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                     <nav>
-                                        <a
-                                            href="#"
-                                            :data-dropdown="'overflow' + student.id"
-                                            class="icon-more"
-                                            title="Actions"
-                                        ></a>
+                                        <wc-actions-dropdown
+                                            :content-id="`overflow${student.id}`"
+                                        ></wc-actions-dropdown>
                                     </nav>
                                 </div>
                             </td>
@@ -780,13 +769,5 @@ export default {
                 <p>Sorry, the system is unable to find any student in this class.</p>
             </div>
         </div>
-
-        <template v-if="actionsPlaceholder">
-            <!--
-              Just a place holder. Cause currently when we remove this line, the actions doesn't work.
-              Seems like when the page has loaded, foundation JS looks for this element right-away.
-            -->
-            <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>
-        </template>
     </div>
 </template>

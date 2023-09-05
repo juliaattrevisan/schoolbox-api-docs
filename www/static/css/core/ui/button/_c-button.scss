@@ -1,0 +1,110 @@
+/*
+    Button rework heavily inspired by https://moderncss.dev/css-button-styling-guide/
+    as well as some custom tweaks
+*/
+
+// Inherits colour from the parent element
+.c-icon {
+    fill: currentcolor;
+}
+
+// Reset default link styles
+a.c-button {
+    text-decoration: none;
+}
+
+// Reset default button styles
+button.c-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    @media screen and (-ms-high-contrast: active) {
+        border: 2px solid currentcolor;
+    }
+}
+
+a.c-button,
+button.c-button {
+    align-items: center;
+    align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
+    background-color: var(--content-ui-background);
+    border-radius: var(--roundness-interactibles);
+    color: var(--content-ui-foreground);
+    display: inline-flex;
+    gap: var(--whitespace-xs);
+    justify-content: center;
+    line-height: 1.1;
+    min-height: 3rem;
+    min-width: 5rem;
+    padding: var(--whitespace-xs) var(--whitespace-m);
+    text-align: center;
+    transition: 200ms all ease-out;
+
+    // ^foundation-fixes^
+    margin: 0;
+    overflow: auto;
+    position: static;
+    vertical-align: baseline;
+
+    &:hover,
+    &:active {
+        background-color: var(--content-ui-hover);
+    }
+
+    // Using both a foreground and background for focus should increase the likelihood of the
+    // focus ring being visible regardless of the background the button is sittin within
+    &:focus {
+        outline-style: solid;
+        outline-color: transparent;
+        box-shadow: 0 0 0 3px var(--content-ui-foreground), 0 0 0 6px var(--content-ui-background);
+    }
+
+    // To extend the button to the full width of its container
+    &--block {
+        width: 100%;
+    }
+
+    // Used to further highlight a primary action
+    &--submit {
+        background-color: var(--content-ui-submit-background);
+        color: var(--content-ui-submit-foreground);
+        font-weight: 600;
+
+        &:hover,
+        &:active {
+            background-color: rgba(
+                calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+                calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+                calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+                var(--content-ui-submit-background-a)
+            );
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px var(--content-ui-submit-foreground), 0 0 0 6px var(--content-ui-submit-background);
+        }
+    }
+
+    &--icon-only {
+        height: 3rem;
+        min-width: auto;
+        padding: var(--whitespace-xs);
+        width: 3rem;
+        &__icon {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+    }
+
+    // rely on the background it sits on
+    &--no-bkg {
+        background: none;
+        &:hover,
+        &:active {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+    }
+}

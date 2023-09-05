@@ -35,7 +35,7 @@
                 </div>
                 {% if writeAccess %}
                     <nav>
-                        <a class="icon-more" title="" data-dropdown="google-file-{{ loop.index }}"></a>
+                        <wc-actions-dropdown content-id="google-file-{{ loop.index }}"></wc-actions-dropdown>
                     </nav>
                     <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
                         <li><a class="icon-bin" data-action="delete"

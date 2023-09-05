@@ -73,15 +73,6 @@ export default {
     },
 
     /**
-     * Ensure dropdowns are initialised when we create them
-     */
-    updated() {
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
-
-    /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
@@ -241,11 +232,10 @@ export default {
                                 </div>
                                 <template v-if="hasTot(award)">
                                     <nav>
-                                        <a
-                                            class="icon-more"
-                                            title="Actions"
-                                            :data-dropdown="generateIdentifier(award)"
-                                        ></a>
+                                        <wc-actions-dropdown
+                                            :content-id="generateIdentifier(award)"
+                                            :data-test="`wc-actions-dropdown-${generateIdentifier(award)}`"
+                                        ></wc-actions-dropdown>
                                     </nav>
                                     <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
                                         <!-- Only show Withdraw button if you can actually do it

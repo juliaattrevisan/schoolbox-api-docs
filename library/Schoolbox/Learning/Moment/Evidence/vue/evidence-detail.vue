@@ -60,18 +60,6 @@ export default {
     },
 
     /**
-     * Mounted.
-     * Basically, when vue has done all its inits and is ready to go
-     * kind of like window.onload
-     */
-    mounted: function () {
-        // Ensure dropdowns are initialised
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
-
-    /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
@@ -151,7 +139,7 @@ export default {
                     <div class="actions-small-1">
                         <nav>
                             <template v-if="evidence._links.delete">
-                                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+                                <wc-actions-dropdown content-id="header-options"></wc-actions-dropdown>
                             </template>
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>

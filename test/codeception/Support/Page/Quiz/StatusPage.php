@@ -17,7 +17,8 @@ use Tests\Support\AcceptanceTester;
 class StatusPage
 {
     public const URL = '/learning/assessments/{assessment_id}/status';
-    public const LINK_JELLY_TOT = '#content a.icon-more';
+    public const LINK_JELLY_TOT = '[data-test=wc-actions-dropdown-header-options]';
+    public const LINK_JELLY_TOT_BUTTON = '[data-test=wc-actions-dropdown-header-options-button]';
     public const LINK_REVIEW_HORIZONTAL = '#header-options a.icon-class-list';
     public const LINK_BULK_REVIEW = '#header-options a.icon-approve';
 
@@ -85,7 +86,7 @@ class StatusPage
     public function clickReviewHorizontal(string $quizTitle): ReviewHorizontalForm
     {
         $i = $this->tester;
-        $i->click(self::LINK_JELLY_TOT);
+        $i->clickElementInWebComponent(self::LINK_JELLY_TOT, self::LINK_JELLY_TOT_BUTTON);
         $i->click(self::LINK_REVIEW_HORIZONTAL);
         $i->waitForText('Horizontal Marking for ' . $quizTitle);
         $i->click('Q1)');
@@ -103,7 +104,7 @@ class StatusPage
     public function bulkReview(string $quizTitle)
     {
         $i = $this->tester;
-        $i->click(self::LINK_JELLY_TOT);
+        $i->clickElementInWebComponent(self::LINK_JELLY_TOT, self::LINK_JELLY_TOT_BUTTON);
         $i->click(self::LINK_BULK_REVIEW);
         $i->waitForText('Mark Attempts as Reviewed');
         $i->click('Mark All as Reviewed');

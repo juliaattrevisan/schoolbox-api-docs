@@ -17,7 +17,8 @@ use Tests\Support\AcceptanceTester;
 class AssessmentPage
 {
     public const URL = '/learning/assessments/{assessment_id}/{user_id}';
-    public const LINK_JELLY_TOT = '#content a.icon-more';
+    public const LINK_JELLY_TOT = '[data-test=wc-actions-dropdown-header-options]';
+    public const LINK_JELLY_TOT_BUTTON = '[data-test=wc-actions-dropdown-header-options-button]';
     public const LINK_MODIFY = '#header-options a.icon-modify';
 
     /**
@@ -55,12 +56,12 @@ class AssessmentPage
     public function clickModify(): AssessmentForm
     {
         $i = $this->tester;
-        $i->click(self::LINK_JELLY_TOT);
+        $i->clickElementInWebComponent(self::LINK_JELLY_TOT, self::LINK_JELLY_TOT_BUTTON);
         $i->click(self::LINK_MODIFY);
         $i->waitForText('Finish Modifying');
 
         // Jelly tot
-        $i->click(self::LINK_JELLY_TOT);
+        $i->clickElementInWebComponent(self::LINK_JELLY_TOT, self::LINK_JELLY_TOT_BUTTON);
         $i->click(self::LINK_MODIFY);
         $i->waitForElement(AssessmentForm::SELECTOR_BUTTON_UPDATE);
 

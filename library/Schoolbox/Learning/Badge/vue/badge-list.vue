@@ -93,13 +93,6 @@ export default {
         document.addEventListener("badge-list__onFilterChange", this.onFilterChange);
     },
 
-    updated() {
-        // Ensure dropdowns are initialised
-        this.$nextTick(() => {
-            document.dispatchEvent(new Event("DROPDOWN__INIT"));
-        });
-    },
-
     methods: {
         /**
          * Opens a modal window for viewing this badge's full details.
@@ -381,13 +374,10 @@ export default {
                                     </h3>
                                 </div>
                                 <nav v-if="showBadgeMenus">
-                                    <a
-                                        href="#"
-                                        class="icon-overflow"
-                                        :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
-                                        aria-expanded="false"
-                                        title="Actions"
-                                    ></a>
+                                    <wc-actions-dropdown
+                                        :content-id="`badge-${badge.id}-dropdown`"
+                                        :data-test="`wc-actions-dropdown-badge-${badge.id}-dropdown`"
+                                    ></wc-actions-dropdown>
                                 </nav>
                                 <ul
                                     v-if="showBadgeMenus"

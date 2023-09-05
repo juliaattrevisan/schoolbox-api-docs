@@ -121,7 +121,7 @@ class LessonPlanCest
         $i->amGoingTo('click button Import, navigate to the homepage and check that Romeo and Juliet unit is presented in the page');
         $importCourseIntoClass->clickSubmit('Import');
         $i->amGoingTo('check if the lesson plan is presented in the homepage');
-        $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => $folderName,'deleted_at' => null]);
+        $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => $folderName, 'deleted_at' => null]);
         $i->amOnPage('/homepage/' . $folder_id);
         $i->canSee('Romeo and Juliet');
         $i->canSee($lessonPlanName);
@@ -195,14 +195,14 @@ class LessonPlanCest
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
         $i->amGoingTo('Add Jack Coles into the group via manage group page');
-        $i->click('a#all-actions.icon-more');
+        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $manageGroup->search($teacher);
         $manageGroup->selectUser(22);
         $manageGroup->clickFromRadioButton('role');
         $i->click('Add Members');
         $i->amGoingTo('Making Jack Coles the group admin via database');
-        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null,'name like' => $folderName]);
+        $folderId = $i->grabFromDatabase('folder', 'id', ['deleted_at' => null, 'name like' => $folderName]);
         $i->updateInDatabase('userAccess', ['type' => '3'], ['sid' => $folderId]);
         $i->amGoingTo('Add Eden Reed into the group');
         $manageGroup->search($student);

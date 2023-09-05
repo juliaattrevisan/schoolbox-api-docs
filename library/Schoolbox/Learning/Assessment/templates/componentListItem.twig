@@ -33,7 +33,7 @@
         {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
         {% block extraNavItems %}{% endblock %}
         {% if isActionRoutes %}
-            <a href="#" class="icon-more" data-dropdown="duework-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a>
+            <wc-actions-dropdown content-id="duework-options{{ assessable.id }}" data-test="wc-actions-dropdown-duework-options{{ assessable.id }}"></wc-actions-dropdown>
         {% endif %}
     </nav>
     {% if isActionRoutes %}

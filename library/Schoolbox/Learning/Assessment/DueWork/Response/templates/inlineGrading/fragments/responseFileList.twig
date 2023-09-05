@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
+                            <wc-actions-dropdown content-id="download-options-{{ currentFile.id }}"></wc-actions-dropdown>
                         </nav>
                         {% set latestFeedback    = latestFeedback ?? participant.findMostRecentInstructorGivenFeedback %}
 

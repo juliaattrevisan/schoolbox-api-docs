@@ -28,7 +28,7 @@ class CourseList
      */
     public function clickCourseDotMenu($courseDropdownNumber): void
     {
-        $this->tester->click(['css' => 'a[class=icon-overflow][data-dropdown=courseDropdown-' . $courseDropdownNumber . ']']);
+        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-courseDropdown-' . $courseDropdownNumber . ']', '[data-test=wc-actions-dropdown-courseDropdown-' . $courseDropdownNumber . '-button]');
     }
 
 

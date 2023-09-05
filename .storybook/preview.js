@@ -49,14 +49,19 @@ export const parameters = {
         pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
     },
     docs: {
-        theme: themes.dark,
+        // theme: themes.dark, // would be nice, but of course our Foundation styles do some funky things
     },
     layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
     options: {
         storySort: {
             // Sort stories alphabetically, but with Introduction related docs first
             method: "alphabetical",
-            order: ["Introduction", "Getting Started", ["Contributing", "CSS Principles", "Design Tokens"], "*"],
+            order: [
+                "Introduction",
+                "Getting Started",
+                ["Design Systems", "CSS Principles", "Design Tokens", "Contributing"],
+                "*",
+            ],
         },
     },
 };

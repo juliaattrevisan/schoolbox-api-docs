@@ -5,7 +5,6 @@
 
 import Vue from "vue";
 import dayjs from "dayjs";
-import { ActiveDropdown } from "@js/dropdown/dropdownTypes";
 
 declare global {
     interface Window {
@@ -19,7 +18,6 @@ declare global {
             imageLightboxLicenseKey: string;
             imageSlideshows: { [key: string]: any };
             colourDefaults: { [key: string]: any };
-            activeDropdown: ActiveDropdown | false;
         };
         siteVersion: string;
         STORYBOOK_ENV: string;

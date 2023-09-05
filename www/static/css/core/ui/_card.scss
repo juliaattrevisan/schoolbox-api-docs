@@ -4,7 +4,6 @@
 
 .c-card {
     background-color: var(--foreground-colour);
-    // Control radius from custom property
     border-radius: var(--roundness-cards);
     line-height: var(--base-line-height);
     position: relative;
@@ -32,7 +31,6 @@
         }
     }
 
-    /* MODIFIERS / VARIANTS */
     // Add inline (default left) border and grey background to card.
     &--child {
         border-inline-start: var(--whitespace-s) solid #aaaaaa;

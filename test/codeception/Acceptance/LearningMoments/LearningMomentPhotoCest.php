@@ -110,7 +110,7 @@ class LearningMomentPhotoCest
         $learningMoments->clickSubmit();
         $i->amGoingTo('checking the learning moment is presented in the student activity feed and getting it updated');
         $i->waitForText('This is a learning moments test to be modified');
-        $learningMoments->clickDropdownMenu();
+        $learningMoments->clickDropdownMenu(3);
         $learningMoments->clickModifySubmenu();
         $i->fillCkEditorById('evidence-body', 'This is a learning moments test to be modified updated');
         $learningMoments->deletePhotoEvidence();
@@ -184,7 +184,7 @@ class LearningMomentPhotoCest
         $i->amGoingTo('checking the learning moment is presented in the student activity feed');
         $i->waitForText('This is a learning moment test to get deleted');
         $i->amGoingTo('deleting the learning moment');
-        $learningMoments->clickDropdownMenu();
+        $learningMoments->clickDropdownMenu(5);
         $learningMoments->clickLearningMomentDeleteButton();
         sleep(2);
         $i->click(Locator::lastElement('a.button.submit'));

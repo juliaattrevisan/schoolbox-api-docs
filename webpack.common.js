@@ -29,6 +29,9 @@ module.exports = {
             "./www/static/js/foundation/jquery.tab-activator.js",
             "./www/static/js/foundation/jquery.collapsable.js",
 
+            // Custom Web Components
+            "./vue/initWebComponents.ts",
+
             // Side Navigation
             // This includes the Flyout menu, on user profile drop down
             // Also fixes touch on side navigation and adds scroll to top
@@ -94,9 +97,6 @@ module.exports = {
 
             // Global property storage
             "./www/static/js/global/sbProps.js",
-
-            // Dropdowns
-            "./www/static/js/dropdown/dropdown.ts",
         ],
         masonry: {
             import: ["./www/static/js/masonry/masonry.js"],
@@ -276,6 +276,7 @@ module.exports = {
                 options: {
                     appendTsSuffixTo: [/\.vue$/],
                     compilerOptions: {
+                        isCustomElement: (tag) => tag.startsWith("wc-"), // allow wc- tags in vue templates, which is our custom element prefix
                         whitespace: "preserve",
                     },
                 },

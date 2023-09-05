@@ -122,7 +122,7 @@
                 </div>
                 {% if pActionCount %}
                     <nav>
-                        <a class="icon-more" title="" data-dropdown="feedback-options-{{ participant.user.id }}"></a>
+                        <wc-actions-dropdown content-id="feedback-options-{{ participant.user.id }}" data-test="wc-actions-dropdown-feedback-options-{{ participant.user.id }}"></wc-actions-dropdown>
                     </nav>
                     <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                         {%- apply spaceless %}

@@ -291,7 +291,7 @@ Usage:
     </div>
     {% if courseSpec %}
     <nav>
-        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
+        <wc-actions-dropdown content-id="courseDropdown-{{ courseSpec.id }}"></wc-actions-dropdown>
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
         {% if courseSpec.folder.hasHomepage %}
@@ -436,4 +436,3 @@ Usage:
 </div>
 
 <div class="toast" data-alert data-relation="ajax-response"></div>
-

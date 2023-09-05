@@ -22,19 +22,11 @@ window.Vue.watch(
     () => store.hasLoadedOk,
     (hasLoadedOk) => {
         if (hasLoadedOk) {
-            initDropdowns();
             initFoundation();
         }
     }
 );
 
-/**
- * ensure the jelly tot menus work,
- */
-async function initDropdowns() {
-    await window.Vue.nextTick();
-    document.dispatchEvent(new Event("DROPDOWN__INIT"));
-}
 /**
  * ensure the tooltips work.
  */
@@ -78,7 +70,7 @@ function onDisbandSelected() {
             <h1>Manage Group</h1>
         </div>
         <nav v-if="store.hasLoadedOk && settingsStore.isAccessSaved">
-            <a href="#expand" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
+            <wc-actions-dropdown content-id="tab-control"></wc-actions-dropdown>
         </nav>
         <ul id="tab-control" class="f-dropdown" data-dropdown-content>
             <li>
