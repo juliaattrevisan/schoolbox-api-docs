@@ -254,7 +254,7 @@ class Mapper extends BaseMapper
          */
         $newLearnosityReference = (string)Uuid::uuid4();
 
-        /* Make a massive assumption that this _jsut worked_
+        /* Make a massive assumption that this _just worked_
          * You could lean on the polling system to find out when this cloning has finished,
          * or just blindly assume the uuidv4() was unique
          *
@@ -269,7 +269,16 @@ class Mapper extends BaseMapper
             ]
         ]);
 
-        $destination->getBaseAssessable()->setLearnosityReference($newLearnosityReference);
+        /* FIXME projects need some special treatment of some kind,
+         *  getBaseAsseable() might return a Schoolbox\Learning\Assessment\Project
+         *  which won't have a Learnosity Reference field...weird behaviours
+         *  But Why?
+         */
+        if ($destination->getBaseAssessable() instanceof \Schoolbox\Learning\Assessment\Project) {
+            $destination->setLearnosityReference($newLearnosityReference);
+        } else {
+            $destination->getBaseAssessable()->setLearnosityReference($newLearnosityReference);
+        }
 
 //        $sectionMapper = $this->getJoinMapper('sections');
 //        $questionMapper = QuizQuestionMapper::getInstance();

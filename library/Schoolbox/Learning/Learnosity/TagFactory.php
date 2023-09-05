@@ -56,14 +56,26 @@ class TagFactory
             $this->produceForSchoolCode()
         ];
 
+        /* If we're in a course specification, regardless of being
+         * in a Unit or a Project within a unit:
+         *     * supply a School Code tag
+         *     * supply a Course Spec tag
+         *     * supply a Course Unit Spec tag
+         *
+         * This occurs when you're creating courses themselves
+         */
         if ($assessment->getContext()->isSpecificationContext()) {
-            /* If we're in a course specification:
-             *     * supply a School Code tag
-             *     * supply a Course Spec tag
-             *     * supply a Course Unit Spec tag
-             *
-             * This occurs when you're creating courses themselves
+            /* Quiz specifications can exist in either a Unit or a Project
+             * Do an instanceof check to find out which
              */
+            if ($assessment->getContext() instanceof \Schoolbox\Learning\Assessment\Project) {
+                return $this->produce(
+                    $assessment->getBaseContext()->getCourse()->getUuid(),
+                    $assessment->getBaseContext()->getUuid(),
+                    null
+                );
+            }
+
             return $this->produce(
                 $assessment->getContext()->getCourse()->getUuid(),
                 $assessment->getContext()->getUuid(),
