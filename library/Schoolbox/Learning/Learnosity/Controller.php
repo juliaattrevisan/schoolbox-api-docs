@@ -85,9 +85,28 @@ class Controller extends Base
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
 
-        /* TODO replace with actual course and unit identifiers from the course workflow
-         */
-        $tags = $tagFactory->produce('25745286-8883-4fe4-98e6-39201c931ab2', 'f0fd5b1a-9e07-47c8-9434-af0dc57dfd35', $assessment->getContext()->getFolder()->getCodeString());
+        if ($assessment->getContext()->isSpecificationContext()) {
+            /* If we're in a course specification:
+             *     * supply a School Code tag
+             *     * supply a Course Spec tag
+             *     * supply a Course Unit Spec tag
+             */
+            $tags = $tagFactory->produce(
+                $assessment->getContext()->getCourse()->getUuid(),
+                $assessment->getContext()->getUuid(),
+                null
+            );
+        } else {
+            /* If we're in a homepage:
+             *     * supply a School Code tag
+             *     * supply a Folder Code tag
+             */
+            $tags = $tagFactory->produce(
+                null,
+                null,
+                $assessment->getContext()->getCodeString()
+            );
+        }
 
         $payload = [
             'config' => [
