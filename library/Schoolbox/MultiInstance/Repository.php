@@ -17,7 +17,7 @@ use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
 
 /**
- * Repository of connectors for all instances this node knows about.
+ * Repository of all instances this node knows about.
  *
  * May retrieve the following fully-realised objects for an instance:
  * * Database connector
@@ -107,6 +107,18 @@ class Repository
             $this->instanceConfigs[$instanceId] = new ArrayLoader($this->loadConfig($instanceId));
         }
         return $this->instanceConfigs[$instanceId];
+    }
+
+    /**
+     * Invalidate the configuration for a given instance: the next time this
+     * instance's config is fetched, it will be reloaded.
+     *
+     * @param string $instanceId
+     * @return void
+     */
+    public function invalidateConfigForInstance(string $instanceId): void
+    {
+        unset($this->instanceConfigs[$instanceId]);
     }
 
     /**
