@@ -424,7 +424,7 @@ try {
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             if ($config->get('resource_booking_enabled')) {
-                $apiFactory = new CalendarApiFactory($user, $kernel->getDependencyInjector()->get('externalTimetable'), $config, \Schoolbox\External\Event\Mapper::getInstance());
+                $apiFactory = new CalendarApiFactory($user, $kernel->getDependencyInjector()->get('externalTimetable'), \Schoolbox\External\Event\Mapper::getInstance());
                 $api        = $apiFactory->buildFromResourceCollection(
                     ItemMapper::getInstance()->findByColumn(
                         'resource_category_id',
