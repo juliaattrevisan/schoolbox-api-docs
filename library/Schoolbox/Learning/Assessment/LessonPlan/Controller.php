@@ -193,8 +193,8 @@ class Controller extends Assessment\Controller
                         'closeDateFormatted'  => $unitImpl->getDueDate()?->getRelativeTime(),
                         'openDate' => $unitImpl->getOpenDate()?->getUsingFormat(DATE_ATOM),
                         'openDateFormatted'  => $unitImpl->getOpenDate()?->getRelativeTime(),
-                        'relativeCloseDateFormatted' => $unitImpl->getRelativeDueDate()?->getRelativeTime(),
-                        'relativeOpenDateFormatted' => $unitImpl->getRelativeOpenDate()?->getRelativeTime(),
+                        'relativeCloseDateFormatted' => $unitImpl->getRelativeDueDate()->getRelativeTime(),
+                        'relativeOpenDateFormatted' => $unitImpl->getRelativeOpenDate()->getRelativeTime(),
                         'assessments' => $assessments->map($unitAssessmentsTranslator)
                     ];
                 }
