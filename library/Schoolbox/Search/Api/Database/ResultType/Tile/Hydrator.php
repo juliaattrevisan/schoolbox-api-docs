@@ -72,21 +72,24 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($tiles, $viewer) {
                 $tile = $tiles->getBy('id', $match->id);
                 if ($tile instanceof TileModel) {
-                    try {
-                        $tileFolder = $this->folderMapper->findById($match->folderId);
-                    } catch (MapperException $e) {
-                        $tileFolder = null;
-                    }
-
-                    if ($tileFolder === null) {
+                    if ($match->folderId === null) {
                         // This tile is not linked to a folder, so it is of no interest.
                         return null;
                     }
 
-                    // Check if the user has access to the tile's folder.
-                    $tileAccess = $this->access->getFolderAccess($viewer, $tileFolder->getId());
-                    if ($tileAccess < UserAccess::ACCESS_READ) {
-                        return null;
+                    try {
+                        // Check if the user has access to the tile's folder.
+                        $tileAccess = $this->access->getFolderAccess($viewer, $match->folderId);
+                        if ($tileAccess < UserAccess::ACCESS_READ) {
+                            return null;
+                        }
+
+                        $tileFolder = $this->folderMapper->findById($match->folderId);
+                    } catch (MapperException $e) {
+                        // Tile folder could not be found for some reason.
+                        // This is a slightly different situation to situation where tile is not linked to folder.
+                        // In this case the result might be of interest, so return a result but with tileFolder null.
+                        $tileFolder = null;
                     }
 
                     return new FullResult(
@@ -103,7 +106,7 @@ class Hydrator extends BaseHydrator
                         'tile',
                         '',
                         null,
-                        [$tileFolder],
+                        ($tileFolder === null) ? [] : [$tileFolder],
                         [],
                     );
                 }
