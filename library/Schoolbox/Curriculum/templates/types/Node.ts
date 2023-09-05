@@ -45,7 +45,7 @@ export enum ActivityTypes {
     LEARNING_ACTIVITY_TASK = "task",
     LEARNING_ACTIVITY_QUIZ = "quiz",
     LEARNING_ACTIVITY_LESSON_PLAN = "lessonPlan",
-    LEARNING_ACTIVITY_LTI = "ltiAssessment",
+    LEARNING_ACTIVITY_LTI = "lti",
     BADGE = "badge",
 }
 
