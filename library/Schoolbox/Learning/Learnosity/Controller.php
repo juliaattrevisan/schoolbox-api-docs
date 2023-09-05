@@ -85,48 +85,7 @@ class Controller extends Base
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
 
-        if ($assessment->getContext()->isSpecificationContext()) {
-            /* If we're in a course specification:
-             *     * supply a School Code tag
-             *     * supply a Course Spec tag
-             *     * supply a Course Unit Spec tag
-             *
-             * This occurs when you're creating courses themselves
-             */
-            $tags = $tagFactory->produce(
-                $assessment->getContext()->getCourse()->getUuid(),
-                $assessment->getContext()->getUuid(),
-                null
-            );
-        } elseif ($assessment->getContext()->isImplementationContext()) {
-            /* If we're in a course implementation:
-             *     * supply a School Code tag
-             *     * supply a Course Spec tag
-             *     * supply a Course Unit Spec tag
-             *     * supply a Folder Code tag
-             *
-             * This occurs when you try to edit an already-imported quiz
-             * from the Course Outline component in a homepage
-             */
-            $tags = $tagFactory->produce(
-                $assessment->getContext()->getSpecification()->getCourse()->getUuid(),
-                $assessment->getContext()->getSpecification()->getUuid(),
-                $assessment->getContext()->getFolder()->getCodeString()
-            );
-        } else {
-            /* If we're in a homepage:
-             *     * supply a School Code tag
-             *     * supply a Folder Code tag
-             *
-             * This occurs when you're using the Quizzes component directly
-             * in a homepage, and not in any Course workflow
-             */
-            $tags = $tagFactory->produce(
-                null,
-                null,
-                $assessment->getContext()->getCodeString()
-            );
-        }
+        $tags = $tagFactory->produceFromAssessment($assessment);
 
         $payload = [
             'config' => [
