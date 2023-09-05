@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -403,7 +404,7 @@ class Model extends AbstractAssessment
      */
     public function getFamilyName(): string
     {
-        return 'lessonPlan';
+        return AssessmentType::TYPE_LESSON_PLAN;
     }
 
 

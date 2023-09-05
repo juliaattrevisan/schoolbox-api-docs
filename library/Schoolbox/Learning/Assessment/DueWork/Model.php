@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
@@ -479,7 +480,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      */
     public function getFamilyName()
     {
-        return 'dueWork';
+        return AssessmentType::TYPE_DUE_WORK;
     }
 
 
