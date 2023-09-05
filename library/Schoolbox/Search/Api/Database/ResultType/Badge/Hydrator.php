@@ -78,7 +78,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $badge->getUpdatedAt(),
                         null, // A badge is not linked to any folder.
-                        null,
+                        $badge->getCategory()->getName(), // Meta.  Context line for the search result.
                         $badge->getImage(),
                         'badge',
                         $badge->getBody(), // The closest thing to a description for a badge is badge.body.
