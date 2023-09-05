@@ -22,7 +22,6 @@ use Schoolbox\User;
  */
 class Model extends AbstractAssessment
 {
-    private const FAMILY_NAME       = 'ltiAssessment';
     private const DEFAULT_TYPE_NAME = '3rd Party Assessment';
 
     /**
