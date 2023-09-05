@@ -225,6 +225,7 @@ export default {
             eventClick: this.onEventClick,
             dateClick: this.onDateClick,
             datesSet: this.datesSet,
+            resourceOrder: "title", // sort resources(events) by the event title
         };
     },
 
@@ -291,7 +292,7 @@ export default {
                 // the event must have a `display` property set to `block`, rather then the default of 'auto'
                 // This appears to relate to https://github.com/fullcalendar/fullcalendar/issues/5533
                 response.data.forEach((e) => {
-                    e.display = "block"
+                    e.display = "block";
                 });
 
                 // Filter out events which don't start
