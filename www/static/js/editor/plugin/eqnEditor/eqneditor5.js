@@ -66,6 +66,7 @@ export default class Eqneditor5 extends Plugin {
 
             // Insert a text into the editor after clicking the button.
             this.listenTo(view, "execute", () => {
+                this.eqnView = this._createEqnEditorView();
                 this._initEqnEditor(locale);
             });
 
@@ -128,7 +129,6 @@ export default class Eqneditor5 extends Plugin {
         const view = new EqnEditorView(editor.locale);
 
         this.listenTo(view, "submit", () => {
-            console.log("Inserting equation");
             const viewFragment = this.editor.data.processor.toView(this.output.exportAs("html"));
             const modelFragment = this.editor.data.toModel(viewFragment);
             this.editor.model.insertContent(modelFragment);
