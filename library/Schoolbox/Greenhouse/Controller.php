@@ -9,7 +9,6 @@
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
-use Ramsey\Uuid\Uuid;
 use Twig\Error\Error;
 
 /**

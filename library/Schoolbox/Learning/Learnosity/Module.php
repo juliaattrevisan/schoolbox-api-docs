@@ -127,11 +127,6 @@ class Module extends BaseModule
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
         $this->register('GET', '/items', 'getItems', $instructorPerms, null);
         $this->register('GET', '/sessionList', 'getSessionListReport', $instructorPerms, null);
-
-        /* Schoolbox devs only: mass soft-deleted data that we may have spawned
-         * There's no convenient way except to slap in identifiers yourself
-         */
-        $this->register('GET', '/cleanse', 'getArchiveReferences', $instructorPerms, null);
     }
 
 

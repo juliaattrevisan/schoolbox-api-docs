@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use LearnositySdk\Exceptions\ValidationException;
+use Psr\Log\LoggerInterface;
 
 /**
  * A shortcut to simple operations that involve
@@ -27,8 +28,9 @@ class Helper
      * Constructor.
      *
      * @param Api $api
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(private Api $api)
+    public function __construct(private Api $api, private ?LoggerInterface $logger = null)
     {
     }
 
@@ -61,6 +63,8 @@ class Helper
             'activities' => []
         ];
 
+        /* $activities['data'] is a one-element stack in this usage
+         */
         foreach ($activities['data'] as $activity) {
             /* Shank the activity into the Archived state
              */
@@ -72,31 +76,68 @@ class Helper
 
             /* Then shank its items into the Archived state
              */
-            $references = [];
+            $itemReferences = [];
 
-            foreach ($activity['data']['items'] as $item) {
-                $references[] = $item['reference'];
+            /* This quiz might not have any questions (items) in it
+             */
+            if (isset($activity['data']['items'])) {
+                foreach ($activity['data']['items'] as $item) {
+                    $itemReferences[] = $item['reference'];
+                }
             }
 
             /* Get all the items' details so we can archive it
              * and all its related pieces
+             *
+             * Even thought he activity didn't have items in it,
+             * there might be orphaned data in learnosity; we
+             * can check anyway
              */
-            $items = $this->api->dataGetRequest('/itembank/items', ['references' => $references]);
+            $this->logger?->debug(sprintf(
+                'Fetching items for activity %s',
+                $activity['reference']
+            ));
 
-            $itemsPayload = [
-                'items' => []
-            ];
+            /* No items? No trabajo
+             */
+            if (\count($itemReferences)) {
+                /* Archive all the items collated in $references
+                 * If this is empty, it returns ALL ITEMS which isn't what you want.
+                 */
+                $items = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences]);
 
-            foreach ($items['data'] as $item) {
-                $updatedItem = $item;
-                $updatedItem['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
+                $itemsPayload = [
+                    'items' => []
+                ];
 
-                $itemsPayload['items'][] = $updatedItem;
+                foreach ($items['data'] as $item) {
+                    $this->logger?->debug(sprintf(
+                        'Setting item %s status to archived',
+                        $item['reference']
+                    ));
+
+                    $updatedItem = $item;
+                    $updatedItem['status'] = 'archived';
+
+                    $itemsPayload['items'][] = $updatedItem;
+                }
+
+                /* Shank them into the Archived state
+                 */
+                $this->logger?->debug(sprintf(
+                    'Archiving items for activity %s',
+                    $activity['reference']
+                ));
+
+                $itemArchiveResult = $this->api->dataSetRequest('/itembank/items', $itemsPayload);
+            } else {
+                $this->logger?->debug(sprintf(
+                    'No items for activity %s; continuing onwards',
+                    $activity['reference']
+                ));
+
+                return;
             }
-
-            /* Shank them into the Archived state
-             */
-            $itemArchiveResult = $this->api->dataSetRequest('/itembank/items', $itemsPayload);
         }
     }
 }

@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Learnosity;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
@@ -74,12 +73,24 @@ class Controller extends Base
      * @return void
      * @throws Error
      * @throws ValidationException
+     * @throws \DomainException Thrown when site_school_code is empty string
      * @throws \JsonException
      */
     public function getContent(IAssessable $assessment): void
     {
+        /* Tags for presetting without requiring the additional
+         * authorApp.saveActivity() upon spawn. "create" (such as
+         * in "tags_on_create") is when you first hit the Save button,
+         * not when authorApp initialises for the first time
+         */
+        $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+
+        /* TODO replace with actual course and unit identifiers from the course workflow
+         */
+        $tags = $tagFactory->produce('25745286-8883-4fe4-98e6-39201c931ab2', 'f0fd5b1a-9e07-47c8-9434-af0dc57dfd35', $assessment->getContext()->getFolder()->getCodeString());
+
         $payload = [
-            'config'    => [
+            'config' => [
                 'activity_edit' => [
                     'back' => false,
                     'item' => [
@@ -94,32 +105,52 @@ class Controller extends Base
                     ],
                     'reference' => [
                         'show' => false,
-                    ]
+                    ],
+                    /* Tags are only spawned upon clicking Save, not before
+                     */
+                    'tags_on_create' => $tags
                 ],
+                /* Editing a particular item
+                 */
                 'item_edit' => [
                     'item' => [
                         'title' => [
                             'show' => true
                         ]
+                    ],
+                    /* Tags are only spawned upon clicking Save, not before
+                     */
+                    'tags_on_create' => $tags
+                ],
+                /* Show a list of Items, which you can see by clicking Find Items
+                 */
+                'item_list' => [
+                    'filter' => [
+                        'restricted' => [
+                            'tags' => [
+                                /* Show all content belonging to your school, for now, I guess
+                                 * TODO What is the limit of scope for Find Item like this?
+                                 */
+                                'all' => [
+                                    $tagFactory->produceForSchoolCode()
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ],
-            'mode'  => 'activity_edit',
+            'mode' => 'activity_edit',
             /* A Learnosity uuid that we arbitrarily prescribed
              */
             'reference' => $assessment->getLearnosityReference(),
             /* Corresponds to a user in the Learnosity Console who will be
              * considered "the author" of stuff created by the school's teachers
              * Misconfiguring this leads to Error 10000 which has no definition
-             *
-             * TODO Waiting for learnosity to clarify
              */
             'user' => [
                 'id' => (string)$this->getUser()->getId(),
-                /* These fields are superfluous and are presumably
-                 * used for auditing; we attribute an individual user's
-                 * name to a collectively-utilised author account
-                 * configured in Learnosity itself (that's the id above)
+                /* These fields are superfluous and are presumably used for auditing
+                 * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */
                 'firstname' => 'Schoolbox',
                 'lastname'  => 'Schoolbox',
@@ -130,6 +161,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
             'initOptions' => $this->api->initOptions('author', $payload),
+            'tags' => json_encode($tags, JSON_THROW_ON_ERROR),
             'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
         ], sprintf(
             'Modify contents of %s',
@@ -1098,40 +1130,6 @@ class Controller extends Base
 
 
     /**
-     * Archive (soft-delete) multiple Learnosity Activities
-     *
-     * @return void
-     * @throws ValidationException
-     * @throws DebugBarException
-     */
-    public function getArchiveReferences(): void
-    {
-        $activityReferences = [
-            'f0b0a793-7f52-45eb-baba-071e5f12d60b',
-            '9120323f-672f-4e68-8533-94ba8c9abfca',
-            'd1276ea8-5be7-449a-8bea-87ed1a0f7be3',
-            'aed231de-5909-4628-a7e0-c4d5c772d5a8',
-            '8b43fe13-79a1-4ae4-8c08-43e858d9f6d7',
-            'ad45b26f-f3aa-4127-ba59-c61901d9990f',
-        ];
-
-        $messages = [];
-
-        foreach ($activityReferences as $activityReference) {
-            try {
-                $this->getArchiveReference($activityReference);
-
-                $messages[] = "Archived {$activityReference}";
-            } catch (\RuntimeException $e) {
-                $messages[] = $e->getMessage();
-            }
-        }
-
-        new \Alaress_Probe($messages);
-    }
-
-
-    /**
      * Archive (soft-delete) a particular Learnosity Activity
      * Activities must have at least one published item before an activity can be archived
      *
@@ -1174,19 +1172,13 @@ class Controller extends Base
                 ]
             ],
             'user' => [
-                /* Corresponds to a user in the Learnosity Console who will be
-                 * considered "the author" of stuff created by the school's teachers
-                 * Misconfiguring this leads to Error 10000 which has no definition
+                'id' => (string)$this->getUser()->getId(),
+                /* These fields are superfluous and are presumably used for auditing
+                 * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */
-                'id' => (string)$this->getConfigLoader()->get('learnosity_author_id'),
-                /* These fields are superfluous and are presumably
-                 * used for auditing; we attribute an individual user's
-                 * name to a collectively-utilised author account
-                 * configured in Learnosity itself (that's the id above)
-                 */
-                'firstname' => $this->getUser()->getFirstname(),
-                'lastname' => $this->getUser()->getLastname(),
-                'email' => $this->getUser()->getEmail()
+                'firstname' => 'Schoolbox',
+                'lastname'  => 'Schoolbox',
+                'email'     => 'schoolbox@schoolbox.com.au'
             ]
         ];
 
