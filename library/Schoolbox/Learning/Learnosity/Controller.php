@@ -96,6 +96,21 @@ class Controller extends Base
                 $assessment->getContext()->getUuid(),
                 null
             );
+        } elseif ($assessment->getContext()->isImplementationContext()) {
+            /* If we're in a course implementation:
+             *     * supply a School Code tag
+             *     * supply a Course Spec tag
+             *     * supply a Course Unit Spec tag
+             *     * supply a Folder Code tag
+             *
+             * This occurs when you try to edit an already-imported quiz
+             * from the Course Outline component in a homepage
+             */
+            $tags = $tagFactory->produce(
+                $assessment->getContext()->getSpecification()->getCourse()->getUuid(),
+                $assessment->getContext()->getSpecification()->getUuid(),
+                $assessment->getContext()->getFolder()->getCodeString()
+            );
         } else {
             /* If we're in a homepage:
              *     * supply a School Code tag
