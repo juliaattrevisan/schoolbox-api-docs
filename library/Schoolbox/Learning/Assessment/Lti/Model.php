@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -21,7 +22,6 @@ use Schoolbox\User;
  */
 class Model extends AbstractAssessment
 {
-    private const FAMILY_NAME       = 'ltiAssessment';
     private const DEFAULT_TYPE_NAME = '3rd Party Assessment';
 
     /**
@@ -119,7 +119,7 @@ class Model extends AbstractAssessment
      */
     public function getFamilyName()
     {
-        return self::FAMILY_NAME;
+        return AssessmentType::TYPE_LTI_ASSESSMENT;
     }
 
     /**

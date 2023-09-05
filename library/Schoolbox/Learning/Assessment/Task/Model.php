@@ -20,6 +20,7 @@ namespace Schoolbox\Learning\Assessment\Task;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
@@ -86,7 +87,7 @@ class Model extends AbstractAssessment
      */
     public function getFamilyName()
     {
-        return 'task';
+        return AssessmentType::TYPE_TASK;
     }
 
     /**
