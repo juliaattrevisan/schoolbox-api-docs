@@ -21,6 +21,38 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     const isActive = window.Vue.computed(() => activeTypes.value.length > 0);
 
     /**
+     * When a parent type is selected, add all the sub types as well
+     * @param {FilterType} type - the parent type
+     */
+    function addType(type: FilterType) {
+        if (!activeTypes.value.includes(type.value)) {
+            activeTypes.value.push(type.value);
+        }
+    }
+
+    /**
+     * When a parent type is selected, add all the sub types as well
+     * @param {FilterType} type - the parent type
+     */
+    function addSubTypes(type: FilterType) {
+        type.subTypes?.forEach((subType) => {
+            if (!activeTypes.value.includes(subType.value)) {
+                activeTypes.value.push(subType.value);
+            }
+        });
+    }
+
+    /**
+     * When a parent type is unselected, remove all the sub types as well
+     * @param {FilterType} type - the parent type
+     */
+    function removeSubTypes(type: FilterType) {
+        type.subTypes?.forEach((subType) => {
+            activeTypes.value = activeTypes.value.filter((activeType) => activeType !== subType.value);
+        });
+    }
+
+    /**
      * Get the types filter data
      * @returns {string} - the filter types
      */
@@ -40,6 +72,9 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     return {
         allTypes,
         activeTypes,
+        addType,
+        addSubTypes,
+        removeSubTypes,
         isActive,
         getFormData,
         clear,
