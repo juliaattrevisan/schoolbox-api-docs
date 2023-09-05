@@ -81,7 +81,7 @@ class Controller extends Base
                 ["title" => "Task"       , "value" => "assessment.task"         ],
             ];
 
-            if ($configLoader->get('lti_assessments_enable')) {
+            if ($configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
                 $subTypes[] = ["title" => "LTI", "value" => "assessment.ltiAssessment"];
             }
 
