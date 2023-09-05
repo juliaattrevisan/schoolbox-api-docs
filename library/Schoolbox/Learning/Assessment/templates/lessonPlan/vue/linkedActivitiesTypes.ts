@@ -2,6 +2,7 @@ export type Activity = {
     id: number;
     title: string;
     assessmentType: string;
+    assessments: Activity[];
     closeAt: string;
     closeAtFormatted: string;
     _links: {

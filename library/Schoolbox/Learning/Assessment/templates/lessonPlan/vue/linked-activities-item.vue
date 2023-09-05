@@ -16,14 +16,26 @@ const store = useLinkedActivitiesStore();
 
 /**
  * Get the title of the course that the activity belongs to
+ * Will also include the project title if the activity is part of a project
  * @param { Activity } activity The activity to get the course title for
- * @returns { string } Course title
+ * @returns { string } Course title with project title if applicable
  */
 function getActivityCourseTitle(activity: Activity): string {
-    const selectedUnit = props.courseAssessments.units.find((unit) => {
-        return unit.assessments.find((a) => a.id === activity.id);
-    });
-    return selectedUnit ? selectedUnit.title : "";
+    const selectedUnit = props.courseAssessments.units.find((unit) =>
+        unit.assessments.some(
+            (assessment) =>
+                assessment.id === activity.id || (assessment.assessments && assessment.assessments[activity.id])
+        )
+    );
+
+    const selectedProject =
+        selectedUnit &&
+        selectedUnit.assessments.find(
+            (assessment) =>
+                assessment.id === activity.id || (assessment.assessments && assessment.assessments[activity.id])
+        );
+
+    return (selectedUnit ? selectedUnit.title : "") + (selectedProject ? ` | ${selectedProject.title}` : "");
 }
 
 /**

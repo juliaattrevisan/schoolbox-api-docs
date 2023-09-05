@@ -155,17 +155,25 @@ window.Vue.onMounted(() => {
                             :data-collapsable="'collap-unit-' + unit.id"
                         >
                             <ul class="information-list card-selectable threaded" data-task-list>
-                                <li
-                                    v-for="activity in unit.assessments"
-                                    :key="activity.id"
-                                    class="interact child"
-                                    :data-unit-assessment="activity.id"
-                                >
-                                    <linked-activities-modal-item
-                                        :activity="activity"
-                                        :source-id="props.sourceId"
-                                    ></linked-activities-modal-item>
-                                </li>
+                                <template v-for="activity in unit.assessments" :key="activity.id">
+                                    <li class="interact child" :data-unit-assessment="activity.id">
+                                        <linked-activities-modal-item
+                                            :activity="activity"
+                                            :source-id="props.sourceId"
+                                        ></linked-activities-modal-item>
+                                    </li>
+                                    <li
+                                        v-for="subActivity in activity.assessments"
+                                        :key="subActivity.id"
+                                        :data-unit-assessment="subActivity.id"
+                                        class="interact child"
+                                    >
+                                        <linked-activities-modal-item
+                                            :activity="subActivity"
+                                            :source-id="props.sourceId"
+                                        ></linked-activities-modal-item>
+                                    </li>
+                                </template>
                             </ul>
                         </div>
                     </li>
