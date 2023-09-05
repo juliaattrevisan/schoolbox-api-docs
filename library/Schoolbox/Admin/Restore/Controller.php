@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Restore;
 use Alaress\Web\Controller\Base;
 use Psr\Log\NullLogger;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -74,14 +75,9 @@ class Controller extends Base
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
             'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
-            'assessmentTypes'    => [
-                'dueWork'    => Assessment\DueWork\Model::getDefaultTypeName(),
-                'quiz'       => Assessment\Quiz\Model::getDefaultTypeName(),
-                'task'       => Assessment\Task\Model::getDefaultTypeName(),
-                'project'    => Assessment\Project::getDefaultTypeName(),
-                'lti'        => Assessment\Lti\Model::getDefaultTypeName(),
-                'lessonPlan' => Assessment\LessonPlan\Model::getDefaultTypeName(),
-            ],
+            'assessmentTypes'    => Assessment\AssessmentType::getOptions(
+                $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
+            ),
         ]);
     }
 
