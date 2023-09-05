@@ -91,7 +91,7 @@ class TagFactory
      * @param string|null $uuid
      * @return string[]|null
      */
-    public function produceForCourseSpec(?string $uuid): ?array
+    private function produceForCourseSpec(?string $uuid): ?array
     {
         if ($uuid) {
             return [
@@ -110,7 +110,7 @@ class TagFactory
      * @param string|null $uuid
      * @return string[]|null
      */
-    public function produceForCourseUnitSpec(?string $uuid): ?array
+    private function produceForCourseUnitSpec(?string $uuid): ?array
     {
         if ($uuid) {
             return [
@@ -129,7 +129,7 @@ class TagFactory
      * @param string|null $classCode
      * @return string[]|null
      */
-    public function produceForClassCode(?string $classCode): ?array
+    private function produceForClassCode(?string $classCode): ?array
     {
         if ($classCode) {
             return [
