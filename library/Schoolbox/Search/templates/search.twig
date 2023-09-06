@@ -1,0 +1,37 @@
+{#
+Expected data items:
+ - filters
+ - filtersTerminology
+ #}
+
+<div id="search-page-container">
+    <search-page
+        endpoint="/api/search"
+        :filter-types="[]"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
+
+<ul>
+{% for filter in filters %}
+    <li>
+    {% if filter.subTypes is defined %}
+        {{ filter.title }}
+        <ul>
+        {% for filter2 in filter.subTypes %}
+            <li>{{ filter2.title }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+       {{ filter.title }}
+    {% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+<style>
+/* temporarily add extra padding to the container to allow the new styles */
+#container {
+    padding: 2rem;
+}
+</style>

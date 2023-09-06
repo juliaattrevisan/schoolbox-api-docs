@@ -21,7 +21,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'search';
+    protected $basename = 'searchv2';
 
 
     /**
