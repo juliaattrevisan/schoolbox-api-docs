@@ -429,8 +429,8 @@ EOL;
             $di->lazyNew(
                 MultiInstance\ConnectorRepository::class,
                 [
-                    'instanceRepository' => $di->get('multiInstance.instanceRepository'),
-                    'databaseFactory'    => $di->get('databaseFactory'),
+                    'instanceRepository' => $di->lazyGet('multiInstance.instanceRepository'),
+                    'databaseFactory'    => $di->lazyGet('databaseFactory'),
                 ],
             )
         );
@@ -439,7 +439,7 @@ EOL;
             $di->lazyNew(
                 MultiInstance\ConfigRepository::class,
                 [
-                    'connectorRepository' => $di->get('multiInstance.connectorRepository'),
+                    'connectorRepository' => $di->lazyGet('multiInstance.connectorRepository'),
                     'dataSource'          => $di->lazyNew(DataSource::class),
                 ],
             )
