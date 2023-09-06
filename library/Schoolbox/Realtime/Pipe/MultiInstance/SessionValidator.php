@@ -13,7 +13,6 @@ use Predis\ClientInterface;
 use Ratchet\Session\Serialize\HandlerInterface;
 use Schoolbox\MultiInstance\ConfigRepository;
 use Schoolbox\MultiInstance\ConnectorRepository;
-use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\SessionException;
 use SensitiveParameter;
 use UnexpectedValueException;
@@ -28,7 +27,7 @@ class SessionValidator
      *
      * @var array<string, array<string, int>>
      */
-    private $userIdCache = [];
+    private array $userIdCache = [];
 
     /**
      * Constructor
