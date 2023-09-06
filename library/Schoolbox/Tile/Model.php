@@ -247,10 +247,10 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @param  IStorage $backgroundImage
+     * @param  ?IStorage $backgroundImage
      * @return $this
      */
-    public function setBackgroundImage(IStorage $backgroundImage): static
+    public function setBackgroundImage(?IStorage $backgroundImage): static
     {
         $this->backgroundImage = $backgroundImage;
         return $this;
