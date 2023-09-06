@@ -37,6 +37,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 {
     public const REDIS_SESSION_PREFIX_BASE = 'PHPREDIS_SESSION:';
 
+    public const PHP_SESSION_PREFIX   = 'PHPSESSID';
+
     private const INACTIVE_TIMEOUT     = 300; // 5 minutes
 
     public const PIPE_METHOD_ACKNOWLEDGE = 'ack';
