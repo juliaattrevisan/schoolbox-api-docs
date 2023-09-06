@@ -994,10 +994,10 @@ Search,"View only news results",Superuser,https://vagrant.dev.schoolbox.cloud/se
 Search,"View only news results",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,200
 Search,"View only news results",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,200
 Search,"View only news results",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,200
-Search,"Search and resieve no results.",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
-Search,"Search and resieve no results.",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
-Search,"Search and resieve no results.",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
-Search,"Search and resieve no results.",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
+Search,"Search and receive no results.",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
+Search,"Search and receive no results.",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
+Search,"Search and receive no results.",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
+Search,"Search and receive no results.",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
 Learning Moments,"Create a new learning moment with photo",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
 Learning Moments,"Create a new learning moment with photo",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
 Learning Moments,"Create a new learning moment with photo",Student,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
