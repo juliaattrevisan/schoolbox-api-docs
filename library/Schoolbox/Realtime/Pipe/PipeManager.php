@@ -25,6 +25,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
+use Schoolbox\MultiInstance\InstanceRepository;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
@@ -99,15 +100,19 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     private int $fdLimit;
 
     /**
-     * @param LoopInterface             $reactLoop
-     * @param PipeCollection            $pipes
-     * @param ISubscriptionManager      $subscriptionManager
-     * @param LoggerInterface           $log
+     * Constructor
+     *
+     * @param LoopInterface $reactLoop
+     * @param InstanceRepository $instanceRepository
+     * @param PipeCollection $pipes
+     * @param ISubscriptionManager $subscriptionManager
+     * @param LoggerInterface $log
      * @param DispatchStrategyInterface $strat
-     * @param int                       $fdLimit
+     * @param int $fdLimit
      */
     public function __construct(
         private LoopInterface $reactLoop,
+        private InstanceRepository $instanceRepository,
         private PipeCollection $pipes,
         private ISubscriptionManager $subscriptionManager,
         private LoggerInterface $log,
@@ -156,6 +161,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
 
         $pipe = new Pipe($conn);
+
+        // Extract the instance ID
+        $instanceConfig = $this->instanceRepository->fetchConfigForHostname(
+            Pipe::extractWebSocketRequest($conn)->getUri()->getHost()
+        );
+        $pipe->setInstanceId($instanceConfig->instanceId);
 
         try {
             $this->log->info(sprintf('Received socket connection from %s', $pipe->getRemoteAddress()));

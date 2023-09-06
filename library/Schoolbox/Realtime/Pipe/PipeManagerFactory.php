@@ -9,15 +9,13 @@
 
 namespace Schoolbox\Realtime\Pipe;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\Session\Serialize\HandlerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\MultiInstance\ConfigRepository;
-use Schoolbox\MultiInstance\ConnectorRepository;
+use Schoolbox\MultiInstance;
 use Schoolbox\Realtime\Subscription;
 
 /**
@@ -30,15 +28,16 @@ class PipeManagerFactory
     /**
      * Take all the root dependencies, ready for composing into more complex object
      *
-     * @param LoopInterface             $loop
-     * @param HandlerInterface          $handler
-     * @param LoggerInterface           $log
-     * @param ClientInterface           $redis
-     * @param Async\Client              $asyncRedis
-     * @param ConfigRepository          $configRepository
-     * @param ConnectorRepository       $connectorRepository
-     * @param DispatchStrategyInterface $strat
-     * @param int                       $fdLimit
+     * @param LoopInterface                     $loop
+     * @param HandlerInterface                  $handler
+     * @param LoggerInterface                   $log
+     * @param ClientInterface                   $redis
+     * @param Async\Client                      $asyncRedis
+     * @param MultiInstance\InstanceRepository  $instanceRepository
+     * @param MultiInstance\ConfigRepository    $configRepository
+     * @param MultiInstance\ConnectorRepository $connectorRepository
+     * @param DispatchStrategyInterface         $strat
+     * @param int                               $fdLimit
      */
     public function __construct(
         private LoopInterface $loop,
@@ -46,8 +45,9 @@ class PipeManagerFactory
         private LoggerInterface $log,
         private ClientInterface $redis,
         private Async\Client $asyncRedis,
-        private ConfigRepository $configRepository,
-        private ConnectorRepository $connectorRepository,
+        private MultiInstance\InstanceRepository $instanceRepository,
+        private MultiInstance\ConfigRepository $configRepository,
+        private MultiInstance\ConnectorRepository $connectorRepository,
         private DispatchStrategyInterface $strat,
         private int $fdLimit,
     ) {
@@ -77,7 +77,7 @@ class PipeManagerFactory
         $subManager  = new Subscription\SubscriptionManager($subFactory, $this->log);
 
         // Needs multi-instance, as it uses $pipes
-        $pipeManager = new PipeManager($this->loop, $pipes, $subManager, $this->log, $this->strat, $this->fdLimit);
+        $pipeManager = new PipeManager($this->loop, $this->instanceRepository, $pipes, $subManager, $this->log, $this->strat, $this->fdLimit);
 
         // setup the listener
         $subFactory->setListener($pipeManager);

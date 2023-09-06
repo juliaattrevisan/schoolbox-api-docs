@@ -9,7 +9,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Redis;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
@@ -22,9 +21,7 @@ use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Schoolbox\Application\Daemon;
 use Schoolbox\Application\Daemon\Kernel;
-use Schoolbox\IConfigLoader;
-use Schoolbox\MultiInstance\ConfigRepository;
-use Schoolbox\MultiInstance\ConnectorRepository;
+use Schoolbox\MultiInstance;
 use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
 
@@ -41,10 +38,12 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     // Can it be assumed the Redis instance is the same for all instances?
     $redis = Redis::getStorageClientInstance();
 
-    // Config will always be per-instance: need some method to load them all
-    /** @var IConfigLoader $config */
-    $config = $di->get('config');
-    /** @var ConfigRepository $configRepository */
+    // Need the multi-instance repository
+    /** @var MultiInstance\InstanceRepository $instanceRepository */
+    $instanceRepository = $di->get('multiInstance.instanceRepository');
+
+    // Config will always be per-instance
+    /** @var MultiInstance\ConfigRepository $configRepository */
     $configRepository = $di->get('multiInstance.configRepository');
 
     // The signal queue should always be global?
@@ -52,10 +51,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var Async\Client $asyncRedis */
     $asyncRedis = $di->get('redis.signalQueue.sub');
 
-    // Database will certainly be per-instance
-    /** @var IConnector $db */
-    $db = $di->get('databaseInternal');
-    /** @var ConnectorRepository $connectorRepository */
+    // Database will always be per-instance
+    /** @var MultiInstance\ConnectorRepository $connectorRepository */
     $connectorRepository = $di->get('multiInstance.connectorRepository');
 
     $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
@@ -70,6 +67,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $log,
         $redis,
         $asyncRedis,
+        $instanceRepository,
         $configRepository,
         $connectorRepository,
         $stratBuilder->build($flags),

@@ -24,12 +24,6 @@ class Pipe implements PipeInterface
      */
     private $commandLock;
 
-
-    /**
-     * @var ConnectionInterface
-     */
-    protected $socketConnection;
-
     /**
      * @var string
      */
@@ -48,11 +42,10 @@ class Pipe implements PipeInterface
 
 
     /**
-     * @param ConnectionInterface $conn
+     * @param ConnectionInterface $socketConnection
      */
-    public function __construct(ConnectionInterface $conn)
+    public function __construct(private ConnectionInterface $socketConnection)
     {
-        $this->socketConnection = $conn;
     }
 
 
@@ -151,8 +144,13 @@ class Pipe implements PipeInterface
      */
     public function getInstanceId(): string
     {
-        // TODO instance ID is extracted from connection
+        // TODO add factory for making pipes, which injects this
         return $this->instanceId;
+    }
+
+    public function setInstanceId(string $instanceId)
+    {
+        $this->instanceId = $instanceId;
     }
 
     /**
@@ -199,9 +197,13 @@ class Pipe implements PipeInterface
      * @return RequestInterface
      * @throws \TypeError if somehow the websocket request doesn't exist
      */
-    protected static function extractWebSocketRequest(ConnectionInterface $conn): RequestInterface
+    public static function extractWebSocketRequest(ConnectionInterface $conn): RequestInterface
     {
         // kosher according to http://socketo.me/docs/migration-3
+        /**
+         * @noinspection PhpUndefinedFieldInspection
+         * @phpstan-ignore-next-line
+         */
         return $conn->httpRequest;
     }
 

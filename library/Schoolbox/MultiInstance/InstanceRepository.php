@@ -71,4 +71,22 @@ class InstanceRepository
         );
         return $this->instanceConfigs[$instanceId];
     }
+
+    /**
+     * Fetch an instance configuration, given a hostname.
+     *
+     * @param string $hostname
+     * @return InstanceConfig
+     * @throws OutOfBoundsException if no config matches this hostname
+     */
+    public function fetchConfigForHostname(string $hostname): InstanceConfig
+    {
+        foreach ($this->instances as $instanceId => $instance) {
+            $instanceConfig = $this->fetchConfigForInstance($instanceId);
+            if (in_array($hostname, $instanceConfig->hostnames)) {
+                return $instanceConfig;
+            }
+        }
+        throw new OutOfBoundsException(sprintf('Unknown hostname "%s"', $hostname));
+    }
 }
