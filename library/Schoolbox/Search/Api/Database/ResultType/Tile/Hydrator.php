@@ -102,7 +102,7 @@ class Hydrator extends BaseHydrator
                         $tile->getModifiedAt(),
                         $tileFolder,
                         null,
-                        $tile->getBackgroundImage()?->getFilename(),
+                        $tile->getBackgroundImage()? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString() : null,
                         'tile',
                         '',
                         null,
