@@ -1,21 +1,21 @@
-import SpinIn from "./spin-in.vue";
+import PopUp from "./pop-up.vue";
 
 export default {
-    title: "Animations/Badge Awards/Spin In",
-    component: SpinIn,
+    title: "Animations/Celebrating Achievement/Badge Awards/Pop Up",
+    component: PopUp,
     parameters: {
         docs: {
             description: {
-                component: "_Spin In_ badge award animation",
+                component: "_Pop Up_ badge award animation",
             },
         },
     },
 };
 
 const Template = (args, { argTypes }) => ({
-    components: { SpinIn },
+    components: { PopUp },
     template: `
-        <spin-in />
+        <pop-up />
         `,
 });
 

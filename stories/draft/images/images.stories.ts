@@ -17,7 +17,7 @@ export const Default: Story = {
         template: `
             <div class="c-img">
                 <div class="c-img__wrapper">
-                    <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
+                    <img src="/user.jpg" alt="Placedog 100 by 200 image" />
                 </div>
             </div>
         `,
@@ -34,7 +34,7 @@ export const Sizes: Story = {
         template: `
             <div class="c-img c-img--xl">
                 <div class="c-img__wrapper">
-                    <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
+                    <img src="/user.jpg" alt="Placedog 100 by 200 image" />
                 </div>
             </div>
         `,
@@ -49,7 +49,7 @@ export const RoundedImage: Story = {
         template: `
             <div class="c-img c-img--round">
                 <div class="c-img__wrapper">
-                    <img src="https://placedog.net/100/200" alt="Placedog 100 by 200 image" />
+                    <img src="/user.jpg" alt="Placedog 100 by 200 image" />
                 </div>
             </div>
         `,

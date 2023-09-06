@@ -1,21 +1,21 @@
-import DropDown from "./drop-down.vue";
+import SwingDown from "./swing-down.vue";
 
 export default {
-    title: "Animations/Badge Awards/Drop Down",
-    component: DropDown,
+    title: "Animations/Celebrating Achievement/Badge Awards/Swing Down",
+    component: SwingDown,
     parameters: {
         docs: {
             description: {
-                component: "_Drop Down_ badge award animation",
+                component: "_Swing Down_ badge award animation",
             },
         },
     },
 };
 
 const Template = (args, { argTypes }) => ({
-    components: { DropDown },
+    components: { SwingDown },
     template: `
-        <drop-down />
+        <swing-down />
         `,
 });
 

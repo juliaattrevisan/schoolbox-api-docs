@@ -1,21 +1,21 @@
-import FlipUp from "./flip-up.vue";
+import CoinSpin from "./coin-spin.vue";
 
 export default {
-    title: "Animations/Badge Awards/Flip Up",
-    component: FlipUp,
+    title: "Animations/Celebrating Achievement/Badge Awards/Coin Spin",
+    component: CoinSpin,
     parameters: {
         docs: {
             description: {
-                component: "_Flip up_ badge award animation",
+                component: "_Coin Spin_ badge award animation",
             },
         },
     },
 };
 
 const Template = (args, { argTypes }) => ({
-    components: { FlipUp },
+    components: { CoinSpin },
     template: `
-        <flip-up />
+        <coin-spin />
         `,
 });
 

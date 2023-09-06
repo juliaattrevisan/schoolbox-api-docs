@@ -14,6 +14,14 @@ import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to 
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
+window.Vue = {};
+window.Vue.ref = ref;
+window.Vue.computed = computed;
+window.Vue.watch = watch;
+window.Vue.onMounted = onMounted;
+window.Vue.onUnmounted = onUnmounted;
+window.Vue.nextTick = nextTick;
 
 initialize({
     // Initialize MSW
