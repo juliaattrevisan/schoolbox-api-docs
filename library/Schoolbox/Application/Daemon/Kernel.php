@@ -10,6 +10,7 @@
 namespace Schoolbox\Application\Daemon;
 
 use Alaress\Async\Stomp\Implementation\Stream as Stomp;
+use Alaress\Database\Factory as BaseDatabaseFactory;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Redis\Async\Client as AsyncRedisClient;
@@ -430,7 +431,7 @@ EOL;
                 MultiInstance\ConnectorRepository::class,
                 [
                     'instanceRepository' => $di->lazyGet('multiInstance.instanceRepository'),
-                    'databaseFactory'    => $di->lazyGet('databaseFactory'),
+                    'databaseFactory'    => $di->lazyNew(BaseDatabaseFactory::class),
                 ],
             )
         );
