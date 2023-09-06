@@ -978,26 +978,26 @@ ePortfolio,"Add a new page",Superuser,https://vagrant.dev.schoolbox.cloud/eportf
 ePortfolio,"Add a new page",Teacher,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,200
 ePortfolio,"Add a new page",Student,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,200
 ePortfolio,"Add a new page",Parent,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,400
-Search,"Search for user with results",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,200
-Search,"Search for user with results",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,200
-Search,"Search for user with results",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,200
-Search,"Search for user with results",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,200
-Search,"View only users results",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,200
-Search,"View only users results",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,200
-Search,"View only users results",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,200
-Search,"View only users results",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,200
-Search,"View only Textbox results",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,200
-Search,"View only Textbox results",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,200
-Search,"View only Textbox results",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,200
-Search,"View only Textbox results",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,200
-Search,"View only news results",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,200
-Search,"View only news results",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,200
-Search,"View only news results",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,200
-Search,"View only news results",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,200
-Search,"Search and receive no results.",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
-Search,"Search and receive no results.",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
-Search,"Search and receive no results.",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
-Search,"Search and receive no results.",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
+Search,"Search for user with results",Superuser,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#all,200
+Search,"Search for user with results",Teacher,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#all,200
+Search,"Search for user with results",Student,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#all,200
+Search,"Search for user with results",Parent,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#all,200
+Search,"View only users results",Superuser,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#user,200
+Search,"View only users results",Teacher,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#user,200
+Search,"View only users results",Student,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#user,200
+Search,"View only users results",Parent,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#user,200
+Search,"View only Textbox results",Superuser,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#textbox,200
+Search,"View only Textbox results",Teacher,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#textbox,200
+Search,"View only Textbox results",Student,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#textbox,200
+Search,"View only Textbox results",Parent,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#textbox,200
+Search,"View only news results",Superuser,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#news,200
+Search,"View only news results",Teacher,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#news,200
+Search,"View only news results",Student,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#news,200
+Search,"View only news results",Parent,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed#news,200
+Search,"Search and receive no results.",Superuser,https://vagrant.dev.schoolbox.cloud/api/search?keyword=ahtrehrash,200
+Search,"Search and receive no results.",Teacher,https://vagrant.dev.schoolbox.cloud/api/search?keyword=ahtrehrash,200
+Search,"Search and receive no results.",Student,https://vagrant.dev.schoolbox.cloud/api/search?keyword=ahtrehrash,200
+Search,"Search and receive no results.",Parent,https://vagrant.dev.schoolbox.cloud/api/search?keyword=ahtrehrash,200
 Learning Moments,"Create a new learning moment with photo",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
 Learning Moments,"Create a new learning moment with photo",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
 Learning Moments,"Create a new learning moment with photo",Student,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
