@@ -1,17 +1,20 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Pipe;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis\Async;
+use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\QueueingException;
+use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use ErrorException;
 use InvalidArgumentException;
@@ -22,35 +25,25 @@ use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use Schoolbox\Realtime\Notification\Decorator;
-use Schoolbox\Realtime\Pipe\Action\IAction;
-use Schoolbox\Realtime\Pipe\Action;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
-use Alaress\WorkerCrew\Dispatcher;
-use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Schoolbox\Realtime\Subscription\ISubscriptionManager;
 
 /**
- * This is the main "app" of our React loop.
- *
- * Class PipeManager
- *
- * @package Schoolbox\Realtime
+ * Multi-instance aware pipe manager.
  */
 class PipeManager implements MessageComponentInterface, TaskResponseHandlerInterface, Async\EventListener
 {
     public const REDIS_SESSION_PREFIX_BASE = 'PHPREDIS_SESSION:';
-    public const REDIS_SESSION_PREFIX = self::REDIS_SESSION_PREFIX_BASE . INSTANCE_ID . ':';
-    const PHP_SESSION_PREFIX   = 'PHPSESSID';
-    const INACTIVE_TIMEOUT     = 300; // 5 minutes
 
-    const PIPE_METHOD_ACKNOWLEDGE = 'ack';
-    const PIPE_METHOD_ALERT       = 'alert';
-    const PIPE_METHOD_FETCH       = 'fetch';
-    const PIPE_METHOD_PUSH        = 'push';
-    const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
-    const PIPE_METHOD_WAIT        = 'wait';
+    private const INACTIVE_TIMEOUT     = 300; // 5 minutes
+
+    public const PIPE_METHOD_ACKNOWLEDGE = 'ack';
+    public const PIPE_METHOD_ALERT       = 'alert';
+    public const PIPE_METHOD_FETCH       = 'fetch';
+    public const PIPE_METHOD_PUSH        = 'push';
+    public const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
+    public const PIPE_METHOD_WAIT        = 'wait';
 
     /**
      * On the matter of File Descriptors: one or more file descriptors are opened by this process every time...
@@ -63,29 +56,21 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * is undesirable. This limit buffer is to mitigate any possible race condition between sockets opening and
      * others closing.
      */
-    const FD_LIMIT_BUFFER = 16;
+    private const FD_LIMIT_BUFFER = 16;
 
-    /** @var string[] */
-    private static $headerMap = [
+    /**
+     * Map of response codes to headers.
+     */
+    private const HEADER_MAP = [
         400 => 'Bad Request',
         401 => 'Unauthorized',
         503 => 'Service Unavailable',
     ];
 
-    /** @var PipeCollection */
-    private $pipes;
-
-    /** @var ISubscriptionManager */
-    private $subscriptionManager;
-
-    /** @var LoopInterface */
-    private $reactLoop;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var Dispatcher */
-    private $taskDispatcher;
+    /**
+     * Task dispatcher: used to spawn workers for handling commands.
+     */
+    private Dispatcher $taskDispatcher;
 
     /**
      * Push transactions (whatever those are), indexed by:
@@ -104,9 +89,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private array $userTimeouts = [];
 
-    /** @var int */
-    private $fdLimit;
-
+    /**
+     * File descriptor limit: if the number of descriptors this pipe manager
+     * has open is above this limit, reject incoming connections.
+     */
+    private int $fdLimit;
 
     /**
      * @param LoopInterface             $reactLoop
@@ -117,32 +104,30 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param int                       $fdLimit
      */
     public function __construct(
-        LoopInterface $reactLoop,
-        PipeCollection $pipes,
-        ISubscriptionManager $subscriptionManager,
-        LoggerInterface $log,
+        private LoopInterface $reactLoop,
+        private PipeCollection $pipes,
+        private ISubscriptionManager $subscriptionManager,
+        private LoggerInterface $log,
         DispatchStrategyInterface $strat,
-        $fdLimit
+        int $fdLimit
     ) {
-        $this->reactLoop           = $reactLoop;
-        $this->log                 = $log;
-        $this->subscriptionManager = $subscriptionManager;
-        $this->pipes               = $pipes;
-        $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
-        $this->fdLimit             = $fdLimit - self::FD_LIMIT_BUFFER;
-
+        $this->taskDispatcher = new Dispatcher($reactLoop, $this, $log, $strat);
+        $this->fdLimit        = $fdLimit - self::FD_LIMIT_BUFFER;
         $this->log->debug('Instantiated PipeManager');
     }
 
     /**
-     * Returns an instance-specific session save path
+     * Returns an instance-specific session save path.
+     *
+     * @todo move to some other class, which manages sessions directly
      *
      * @param string $redisUrl
+     * @param string $instanceId
      * @return string
      */
-    public static function getSessionSavePath(string $redisUrl): string
+    public static function getSessionSavePath(string $redisUrl, string $instanceId): string
     {
-        return sprintf('%s?prefix=%s', $redisUrl, self::REDIS_SESSION_PREFIX);
+        return sprintf('%s?prefix=%s', $redisUrl, self::REDIS_SESSION_PREFIX_BASE . $instanceId . ':');
     }
 
 
@@ -153,7 +138,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws \Exception
      * @return void
      */
-    public function onOpen(ConnectionInterface $conn)
+    public function onOpen(ConnectionInterface $conn): void
     {
         // receive new connection, register a pipe based on it
         $pipeCount = $this->pipes->count();
@@ -195,15 +180,15 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param ConnectionInterface $conn
      * @param int                 $code
      */
-    private function closeConnectionWithReason(ConnectionInterface $conn, $code)
+    private function closeConnectionWithReason(ConnectionInterface $conn, int $code): void
     {
         // handle the connection raw
         $conn->send(
             json_encode([
-                'error' => self::$headerMap[$code],
-                'code'  => [$code],
-                'retry' => false,
-            ])
+                            'error' => self::HEADER_MAP[$code],
+                            'code'  => [$code],
+                            'retry' => false,
+                        ])
         );
 
         $conn->close();
@@ -218,15 +203,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws \Exception
      * @return void
      */
-    public function onClose(ConnectionInterface $conn)
+    public function onClose(ConnectionInterface $conn): void
     {
         // all WS are RFC6455, we can safely assume there's a pipe to unregister
         $socketKeyForConnection = Pipe::getSocketKeyForConnection($conn);
         $pipe                   = $this->pipes->getPipeBySocketKey($socketKeyForConnection);
         $this->pipes->unregisterPipe($socketKeyForConnection);
-        if (null !== $pipe) {
-            $pipe->close();
-        }
+        $pipe?->close();
     }
 
 
@@ -240,7 +223,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws \Exception
      * @return void
      */
-    public function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, \Exception $e): void
     {
 //        if ($e instanceof ConnectionException) {
 //            $this->log->warning("Connection to client lost, terminating");
@@ -270,7 +253,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws \Exception
      * @return void
      */
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $msg): void
     {
         $socketKey = Pipe::getSocketKeyForConnection($from);
         $pipe      = $this->pipes->getPipeBySocketKey($socketKey);
@@ -349,7 +332,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param Async\Event\IEvent $event
      * @return void
      */
-    public function handle(Async\Event\IEvent $event)
+    public function handle(Async\Event\IEvent $event): void
     {
         if (!$event instanceof Async\Event\Message) {
             // we're only interested in messages, no pongs
@@ -366,7 +349,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             return;
         }
 
-        if (!$this->pipes->userPipeCount($action->getUserId())) {
+        if (!$this->pipes->userPipeCount($action->getInstanceId(), $action->getUserId())) {
             // this scenario will arise if the last socket for the user disconnects but a message arrived on their
             // subscription before it could be unsubscribed - just drop the message.
             return;
@@ -382,9 +365,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param Async\Event\Message $msg
      * @throws InvalidArgumentException
      * @throws ErrorException
-     * @return IAction
+     * @return Action\IAction
      */
-    private function convertMessageToAction(Async\Event\Message $msg)
+    private function convertMessageToAction(Async\Event\Message $msg): Action\IAction
     {
         if (preg_match('`^msg:(.+?):(\d+):(.*)$`', $msg->getChannel(), $matches)) {
             [, $instanceId, $userId, $method] = $matches;
@@ -396,10 +379,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             switch ($method) {
                 case static::PIPE_METHOD_PUSH:
-                    return new Action\Push($instanceId, $userId, $instance);
+                    return new Action\Push($instanceId, (int)$userId, $instance);
 
                 case static::PIPE_METHOD_ALERT:
-                    return new Action\Alert($instanceId, $userId, $instance);
+                    return new Action\Alert($instanceId, (int)$userId, $instance);
             }
         }
 
@@ -417,7 +400,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function getFirstPipeForInstanceAndUser(string $instanceId, int $userId)
     {
-        return reset($this->pipes->getPipesByInstanceAndUserId($instanceId, $userId));
+        $pipes = $this->pipes->getPipesByInstanceAndUserId($instanceId, $userId);
+        return reset($pipes);
     }
 
 
@@ -428,7 +412,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws QueueingException
      * @return void
      */
-    private function enqueue(PipeInterface $pipe, $command, $payload)
+    private function enqueue(PipeInterface $pipe, string $command, mixed $payload): void
     {
         $this->taskDispatcher->enqueue($pipe, $command, $payload);
     }
@@ -442,7 +426,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws QueueingException
      * @return void
      */
-    public function enqueueUser(string $instanceId, int $userId, $command, $payload): void
+    public function enqueueUser(string $instanceId, int $userId, string $command, mixed $payload): void
     {
         $this->enqueue($this->getFirstPipeForInstanceAndUser($instanceId, $userId), $command, $payload);
     }
@@ -455,7 +439,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param mixed  $payload
      * @return void
      */
-    public function transactUser(string $instanceId, int $userId, $key, $payload): void
+    public function transactUser(string $instanceId, int $userId, string $key, mixed $payload): void
     {
         $this->getTransaction($this->getFirstPipeForInstanceAndUser($instanceId, $userId))->put($key, $payload);
     }
@@ -465,7 +449,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param  PipeInterface $pipe
      * @return Transaction
      */
-    private function getTransaction(PipeInterface $pipe)
+    private function getTransaction(PipeInterface $pipe): Transaction
     {
         $instanceId = $pipe->getInstanceId();
         $userId     = $pipe->getUserId();
@@ -501,7 +485,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws InvalidArgumentException
      * @throws QueueingException
      */
-    private function enqueueInstances(PipeInterface $pipe, array $instances)
+    private function enqueueInstances(PipeInterface $pipe, array $instances): void
     {
         if (empty($instances)) {
             return;
@@ -526,7 +510,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @throws InvalidArgumentException
      * @throws QueueingException
      */
-    public function handleResponse($pipe, $command, $data)
+    public function handleResponse($pipe, $command, $data): void
     {
         $instanceId = $pipe->getInstanceId();
         $userId     = $pipe->getUserId();
@@ -597,7 +581,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param array  $data       - the data with which the Worker responded
      * @return void              - this method does not return any value
      */
-    public function handleError($identifier, $command, $data)
+    public function handleError($identifier, $command, $data): void
     {
         $this->log->notice("Received worker error for '$command': $data");
     }
@@ -609,11 +593,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param bool $allowRetry
      * @return bool
      */
-    private function sendHeader($pipe, $code, $allowRetry = false)
+    private function sendHeader($pipe, $code, $allowRetry = false): bool
     {
-        if (isset(self::$headerMap[$code])) {
+        if (isset(self::HEADER_MAP[$code])) {
             $data = [
-                'error' => self::$headerMap[$code],
+                'error' => self::HEADER_MAP[$code],
                 'code'  => $code,
             ];
 
@@ -637,7 +621,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param string|array $data
      * @return void
      */
-    private function sendToPipe($pipe, $data)
+    private function sendToPipe($pipe, $data): void
     {
         $data  = is_string($data) ? $data : json_encode($data);
         $bytes = strlen($data);
@@ -667,7 +651,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param int    $userId
      * @return void
      */
-    private function refreshUser(string $instanceId, int $userId)
+    private function refreshUser(string $instanceId, int $userId): void
     {
         if (
             isset($this->userTimeouts[$instanceId][$userId])
@@ -691,7 +675,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param int    $userId
      * @return void
      */
-    private function onTimeout(string $instanceId, int $userId)
+    private function onTimeout(string $instanceId, int $userId): void
     {
         $success = $this->subscriptionManager->removeSubscription($instanceId, $userId);
 
