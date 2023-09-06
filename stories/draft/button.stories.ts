@@ -16,7 +16,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Temp/Button",
+    title: "Draft/Button",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
