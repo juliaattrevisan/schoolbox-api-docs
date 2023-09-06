@@ -117,7 +117,7 @@ HELP;
 
         /* Cleanses everything except references in $exclusions
          */
-        $activityReferences = explode(',', $this->getOpt(self::OPT_LONG_REFERENCE) ?? '');
+        $activityReferences = array_values(array_filter(explode(',', $this->getOpt(self::OPT_LONG_REFERENCE) ?? '')));
 
         $activities = $api->dataGetRequest('/itembank/activities', [
             'references' => $activityReferences,
