@@ -231,7 +231,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 //        }
 //        else
         if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`i', $e->getMessage(), $matches)) {
-            $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
+            $this->log->warning("IOException: $matches[3] [$matches[2]] ($matches[1] bytes dropped)");
         } else {
             $this->log->critical(
                 sprintf('%s: "%s" occurred in %s on line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()),
@@ -472,9 +472,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                     try {
                         // enqueue to be dispatched
                         $this->enqueueInstances($pipe, $data);
-                    } catch (QueueingException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception' => $e]);
-                    } catch (InvalidArgumentException $e) {
+                    } catch (QueueingException | InvalidArgumentException $e) {
                         $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception' => $e]);
                     }
                 }
@@ -509,17 +507,17 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /**
      * Handles a response from a Worker
      *
-     * @param Pipe   $pipe    - the identifier passed as the first argument to Dispatcher::enqueue()
-     * @param string $command - the command that was executed by the Worker
-     * @param array  $data    - the data with which the Worker responded
-     * @return void           - this method does not return any value
+     * @param Pipe   $identifier the identifier passed as the first argument to Dispatcher::enqueue()
+     * @param string $command    the command that was executed by the Worker
+     * @param array  $data       the data with which the Worker responded
+     * @return void
      * @throws InvalidArgumentException
      * @throws QueueingException
      */
-    public function handleResponse($pipe, $command, $data): void
+    public function handleResponse($identifier, $command, $data): void
     {
-        $instanceId = $pipe->getInstanceId();
-        $userId     = $pipe->getUserId();
+        $instanceId = $identifier->getInstanceId();
+        $userId     = $identifier->getUserId();
 
         $this->log->notice("Handling a worker response: $command");
 
@@ -529,23 +527,25 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             // deal with this yourself
             case self::PIPE_METHOD_SUBSCRIBE:
                 if ($this->subscriptionManager->subscribeUser($instanceId, $userId)) {
-                    $this->sendToPipe($pipe, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
+                    $this->sendToPipe($identifier, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
 
-                    $this->enqueueInstances($pipe, $this->subscriptionManager
+                    $this->enqueueInstances($identifier, $this->subscriptionManager
                         ->getUserSubscription($instanceId, $userId)
                         ->getUnread());
                 } else {
                     // could not subscribe the user, rabbit-offline has already been reported, just inform the user
-                    $this->sendToPipe($pipe, [ $command => false ]);
+                    $this->sendToPipe($identifier, [ $command => false ]);
                 }
                 break;
 
             // this was dealt with by a worker, just push the result
             case self::PIPE_METHOD_FETCH:
                 $data = $data[0];
-                $this->sendToPipe($pipe, [ $command => $data ]);
+                $this->sendToPipe($identifier, [ $command => $data ]);
                 break;
 
+            // alert behaves like push + ack: either way it's sent the same way
+            case self::PIPE_METHOD_ALERT:
             case self::PIPE_METHOD_PUSH:
                 $this->sendToUser($instanceId, $userId, [ $command => $data ]);
                 $release = false;
@@ -553,28 +553,21 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             // deal with this yourself
             case self::PIPE_METHOD_ACKNOWLEDGE:
-                if ($subscription = $this->subscriptionManager->getUserSubscription($instanceId, $userId)) {
-                    $markAsRead = [];
-                    foreach ((array)$data[1] as $msgId) {
-                        if ($subscription->acknowledgeMessage($msgId)) {
-                            $markAsRead[] = $msgId;
-                        }
+                $subscription = $this->subscriptionManager->getUserSubscription($instanceId, $userId);
+                $markAsRead   = [];
+                foreach ((array)$data[1] as $msgId) {
+                    if ($subscription->acknowledgeMessage($msgId)) {
+                        $markAsRead[] = $msgId;
                     }
-
-                    $this->sendToUser($instanceId, $userId, [ $command => $markAsRead ]);
                 }
-                break;
 
-            // alert behaves like push + ack
-            case self::PIPE_METHOD_ALERT:
-                $this->sendToUser($instanceId, $userId, [ $command => $data ]);
-                $release = false;
+                $this->sendToUser($instanceId, $userId, [ $command => $markAsRead ]);
                 break;
         }
 
         // release the socket if permissible
         if ($release) {
-            $pipe->unlock();
+            $identifier->unlock();
         }
     }
 
@@ -599,7 +592,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param bool $allowRetry
      * @return bool
      */
-    private function sendHeader($pipe, $code, $allowRetry = false): bool
+    private function sendHeader(Pipe $pipe, int $code, bool $allowRetry = false): bool
     {
         if (isset(self::HEADER_MAP[$code])) {
             $data = [
@@ -627,7 +620,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param string|array $data
      * @return void
      */
-    private function sendToPipe($pipe, $data): void
+    private function sendToPipe(Pipe $pipe, $data): void
     {
         $data  = is_string($data) ? $data : json_encode($data);
         $bytes = strlen($data);
@@ -640,8 +633,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /**
      * Send data to all pipes associated with a specific user.
      *
-     * @param int   $userId
-     * @param array $data
+     * @param string $instanceId
+     * @param int    $userId
+     * @param array  $data
      * @return void
      */
     private function sendToUser(string $instanceId, int $userId, array $data): void
