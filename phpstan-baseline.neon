@@ -5046,16 +5046,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Message/RoutePermissionMapper.php
 
 		-
-			message: "#^Access to an undefined property Ratchet\\\\ConnectionInterface\\:\\:\\$httpRequest\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
-			message: "#^Access to an undefined property Ratchet\\\\ConnectionInterface\\:\\:\\$remoteAddress\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
 			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock \\(string\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/Pipe.php
@@ -5064,26 +5054,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock \\(string\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
-			message: "#^Method Schoolbox\\\\Realtime\\\\Pipe\\\\PipeCollection\\:\\:getPipeBySocketKey\\(\\) should return Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/PipeCollection.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
-
-		-
-			message: "#^Part \\$data \\(array\\) of encapsed string cannot be cast to string\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
 
 		-
 			message: "#^Cannot cast callable\\(\\)\\: mixed to string\\.$#"
