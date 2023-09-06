@@ -95,7 +95,7 @@ class SessionValidator
     {
         try {
             $session = $this->handler->unserialize(
-                $this->findData($sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX_BASE . $instanceId)
+                $this->findData($sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX_BASE . $instanceId . ':')
             );
         } catch (UnexpectedValueException $e) {
             throw new SessionException('Could not decode session', 0, $e);
