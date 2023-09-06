@@ -296,7 +296,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             if ($pipe->isLocked()) {
                 // pipe has a command active: don't permit another until this one is finished
-                $this->sendToPipe($pipe, json_encode([ $command => self::PIPE_METHOD_WAIT ]));
+                $this->sendToPipe($pipe, [ $command => self::PIPE_METHOD_WAIT ]);
                 return;
             }
 
@@ -604,7 +604,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 $data['retry'] = true;
             }
 
-            $this->sendToPipe($pipe, json_encode($data));
+            $this->sendToPipe($pipe, $data);
 
             return true;
         }
@@ -616,17 +616,17 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /**
      * Send data to a specific pipe.
      *
-     * @param Pipe         $pipe
-     * @param string|array $data
+     * @param Pipe  $pipe
+     * @param array $data
      * @return void
      */
-    private function sendToPipe(Pipe $pipe, $data): void
+    private function sendToPipe(Pipe $pipe, array $data): void
     {
-        $data  = is_string($data) ? $data : json_encode($data);
-        $bytes = strlen($data);
+        $encodedData = json_encode($data);
+        $bytes = strlen($encodedData);
 
         $this->log->debug("Sending $bytes bytes to {$pipe->getSocketKey()}", [ 'char' => '<' ]);
-        $pipe->send($data);
+        $pipe->send($encodedData);
     }
 
 
