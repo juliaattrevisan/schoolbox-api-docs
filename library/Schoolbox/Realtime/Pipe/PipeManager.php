@@ -582,7 +582,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function handleError($identifier, $command, $data): void
     {
-        $this->log->notice("Received worker error for '$command': $data");
+        $this->log->notice("Received worker error for '$command': " . json_encode($data));
     }
 
 
