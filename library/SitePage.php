@@ -7,6 +7,7 @@ use Aura\Router\Generator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\API\Token\JwtParser\SelfIssued;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Auth\Remember;
@@ -337,7 +338,7 @@ class SitePage
         $sessionUser       = $_SESSION['user'] ?? null;
         $sessionExpired    = !isset($_SESSION['lasttime'])
             || (int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time();
-        $sessionIpMismatch = $this->config->get('track_ip') && ($_SESSION['ip'] ?? '') !== Session::getIP();
+        $sessionIpMismatch = $this->config->get('track_ip') && !isset($_SESSION[SelfIssued::CUSTOM_CLAIM_TASKD]) && ($_SESSION['ip'] ?? '') !== Session::getIP();
         if (!$sessionUser instanceof User || $sessionExpired || $sessionIpMismatch) {
             // Catch users with the remember me cookie
             if ($this->config->get('session_remember')) {

@@ -7,6 +7,7 @@
 
 use League\Flysystem\FilesystemException;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\API\Token\JwtParser\SelfIssued;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -84,6 +85,7 @@ class Session
 
         // Clear all remnants of past sessions, except identifier
         $sessionIdentifier = $_SESSION['identifier'] ?? null;
+        $fromTaskD = $_SESSION[SelfIssued::CUSTOM_CLAIM_TASKD] ?? false;
         $_SESSION          = [];
 
         $user = $userMapper->findByUsername($username);
@@ -112,6 +114,9 @@ class Session
             // however, this survives user authentication and re-authentication
             $sessionIdentifier ??= Uuid::uuid4()->__toString();
             $_SESSION['identifier'] = $sessionIdentifier;
+            if ($fromTaskD) {
+                $_SESSION[SelfIssued::CUSTOM_CLAIM_TASKD] = true;
+            }
 
             // add mobile session data
             $sbmAuth = new Authenticator();
