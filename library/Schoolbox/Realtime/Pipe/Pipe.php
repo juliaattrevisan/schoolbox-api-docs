@@ -166,7 +166,7 @@ class Pipe
      * @param int|null $id
      * @return $this
      */
-    public function setUserId(?int $id)
+    public function setUserId(?int $id): self
     {
         $this->userId = $id;
         return $this;

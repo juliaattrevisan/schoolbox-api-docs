@@ -39,8 +39,10 @@ class SessionValidator
      * @param HandlerInterface    $handler             Session serialization handler: required for decoding session data
      *                                                 without actually creating the session.
      * @param ConnectorRepository $connectorRepository Repository for database connections for all instances served by
-     *                                                 this node.
-     * @param ConfigRepository    $configRepository    Repository for configs for all instances served by this node.
+     *                                                 this node: required for converting a username to a user ID for a
+     *                                                 given instance.
+     * @param ConfigRepository    $configRepository    Repository for configs for all instances served by this node:
+     *                                                 required in order to determine each node's session expiry time.
      */
     public function __construct(
         private ClientInterface $redis,

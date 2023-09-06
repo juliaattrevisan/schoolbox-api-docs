@@ -19,9 +19,7 @@ use Schoolbox\MultiInstance;
 use Schoolbox\Realtime\Subscription;
 
 /**
- * Convenience class for instantiation of the Pipe Manager
- *
- * @package Schoolbox\Realtime\Pipe
+ * Convenience class for instantiation of a `PipeManager`.
  */
 class PipeManagerFactory
 {
@@ -57,7 +55,7 @@ class PipeManagerFactory
     /**
      * @return PipeManager
      */
-    public function build()
+    public function build(): PipeManager
     {
         // Requires multi-instance version
         $validator   = new SessionValidator(
@@ -79,7 +77,7 @@ class PipeManagerFactory
         // Needs multi-instance, as it uses $pipes
         $pipeManager = new PipeManager($this->loop, $this->instanceRepository, $pipes, $subManager, $this->log, $this->strat, $this->fdLimit);
 
-        // setup the listener
+        // setup the listener (required before `$subFactory` is used)
         $subFactory->setListener($pipeManager);
 
         return $pipeManager;
