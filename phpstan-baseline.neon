@@ -5716,11 +5716,6 @@ parameters:
 			path: library/Schoolbox/Tile/Component/TileControllerDelegate.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Controller.php
-
-		-
 			message: "#^Property Schoolbox\\\\Tile\\\\Controller\\:\\:\\$folderMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Tile/Controller.php
