@@ -30,8 +30,7 @@ class Controller extends Base
      */
     public function __construct(
         RosettaStone $rosettaStone
-    )
-    {
+    ) {
         self::$l10nMapper = L10nMapper::getInstance();
         self::$rosettaStone = $rosettaStone;
     }
