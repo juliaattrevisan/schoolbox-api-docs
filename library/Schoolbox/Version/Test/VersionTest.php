@@ -21,7 +21,6 @@ use Schoolbox\Version\Version;
  */
 class VersionTest extends TestCase
 {
-
     /**
      * Confirm we are able to extract the major section from the full site_version
      *

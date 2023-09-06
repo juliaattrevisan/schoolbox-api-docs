@@ -17,7 +17,6 @@ use Schoolbox\Test\TestCase;
 
 class SubmissionBoxMapperTest extends TestCase
 {
-
     /**
      * @var SubmissionBoxMapper
      */
