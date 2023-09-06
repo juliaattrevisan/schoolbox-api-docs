@@ -14,8 +14,10 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
+use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
@@ -94,6 +96,7 @@ class Module extends BaseModule
                 new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -130,6 +133,10 @@ class Module extends BaseModule
                 new Database\ResultType\Blog\Hydrator(
                     $mapperFactory->get(BlogMapper::class),
                     Access::getInstance(),
+                ),
+                new Database\ResultType\Badge\Hydrator(
+                    $mapperFactory->get(BadgeMapper::class),
+                    new PrefixGenerator($this->getConfig()),
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
