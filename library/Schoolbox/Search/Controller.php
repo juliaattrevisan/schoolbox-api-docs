@@ -36,7 +36,6 @@ class Controller extends Base
     }
 
     /**
-     * @param string $templateName
      * @throws Error
      */
     public function search(): void
