@@ -35,8 +35,8 @@ class PipeManagerFactory
      * @param LoggerInterface           $log
      * @param ClientInterface           $redis
      * @param Async\Client              $asyncRedis
-     * @param int                       $sessionLength
-     * @param IConnector                $db
+     * @param ConfigRepository          $configRepository
+     * @param ConnectorRepository       $connectorRepository
      * @param DispatchStrategyInterface $strat
      * @param int                       $fdLimit
      */
@@ -46,12 +46,10 @@ class PipeManagerFactory
         private LoggerInterface $log,
         private ClientInterface $redis,
         private Async\Client $asyncRedis,
-        private int $sessionLength,
-        private IConnector $db,
+        private ConfigRepository $configRepository,
+        private ConnectorRepository $connectorRepository,
         private DispatchStrategyInterface $strat,
         private int $fdLimit,
-        private ConnectorRepository $connectorRepository,
-        private ConfigRepository $configRepository,
     ) {
     }
 

@@ -70,12 +70,10 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $log,
         $redis,
         $asyncRedis,
-        $config->get('session_length'),
-        $db,
+        $configRepository,
+        $connectorRepository,
         $stratBuilder->build($flags),
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
-        $connectorRepository,
-        $configRepository,
     ))->build();
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);
