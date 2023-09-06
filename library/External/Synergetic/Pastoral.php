@@ -1478,7 +1478,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         $this->htmlConverter->setHtml($pastoral->getBodyPublic());
-        $bodyPublicText = $this->htmlConverter->getText();
+        $bodyPublicText = $pastoral->getHeading() . "\r\n" . $this->htmlConverter->getText();
 
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
