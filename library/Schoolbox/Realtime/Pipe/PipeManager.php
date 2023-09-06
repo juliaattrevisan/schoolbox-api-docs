@@ -17,6 +17,7 @@ use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use ErrorException;
+use Exception;
 use InvalidArgumentException;
 use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
@@ -135,7 +136,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * When a new connection is opened it will be passed to this method
      *
      * @param  ConnectionInterface $conn The socket/connection that just connected to your application
-     * @throws \Exception
+     * @throws Exception
      * @return void
      */
     public function onOpen(ConnectionInterface $conn): void
@@ -185,10 +186,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         // handle the connection raw
         $conn->send(
             json_encode([
-                            'error' => self::HEADER_MAP[$code],
-                            'code'  => [$code],
-                            'retry' => false,
-                        ])
+                'error' => self::HEADER_MAP[$code],
+                'code'  => [$code],
+                'retry' => false,
+            ])
         );
 
         $conn->close();
@@ -200,7 +201,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * SendMessage to $conn will not result in an error if it has already been closed.
      *
      * @param  ConnectionInterface $conn The socket/connection that is closing/closed
-     * @throws \Exception
+     * @throws Exception
      * @return void
      */
     public function onClose(ConnectionInterface $conn): void
@@ -219,11 +220,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * method.
      *
      * @param  ConnectionInterface $conn
-     * @param  \Exception          $e
-     * @throws \Exception
+     * @param  Exception          $e
+     * @throws Exception
      * @return void
      */
-    public function onError(ConnectionInterface $conn, \Exception $e): void
+    public function onError(ConnectionInterface $conn, Exception $e): void
     {
 //        if ($e instanceof ConnectionException) {
 //            $this->log->warning("Connection to client lost, terminating");
@@ -250,7 +251,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      *
      * @param  ConnectionInterface $from The socket/connection that sent the message to your application
      * @param  string              $msg  The message received
-     * @throws \Exception
+     * @throws Exception
      * @return void
      */
     public function onMessage(ConnectionInterface $from, $msg): void
@@ -341,10 +342,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         try {
             $action = $this->convertMessageToAction($event);
-        } catch (InvalidArgumentException $e) {
-            $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
-            return;
-        } catch (ErrorException $e) {
+        } catch (InvalidArgumentException | ErrorException $e) {
             $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
             return;
         }
@@ -395,7 +393,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * an alert or a push. As such, it doesn't matter *which* pipe is used, because it will only be used as a basis
      * for broadcasting to all the pipes that belong to the same user. This method just retrieves *a* pipe for the user.
      *
-     * @param int $userId
+     * @param string $instanceId
+     * @param int    $userId
      * @return Pipe
      */
     private function getFirstPipeForInstanceAndUser(string $instanceId, int $userId)
