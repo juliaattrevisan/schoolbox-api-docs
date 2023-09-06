@@ -37,6 +37,7 @@ use Schoolbox\Realtime\Subscription\ISubscriptionManager;
 class PipeManager implements MessageComponentInterface, TaskResponseHandlerInterface, Async\EventListener
 {
     public const REDIS_SESSION_PREFIX_BASE = 'PHPREDIS_SESSION:';
+    public const REDIS_SESSION_PREFIX = self::REDIS_SESSION_PREFIX_BASE . INSTANCE_ID . ':';
 
     public const PHP_SESSION_PREFIX   = 'PHPSESSID';
 
